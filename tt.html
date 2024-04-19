@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>0级标题</title>
+    </head>
+    <body>
+
+        <div id = "cc"></div>
+        <div id ="div1" style="height: 1000px;background-color: aqua;" ></div>
+        <div id ="div2" style="height: 1000px;background-color: blue;"></div>
+        <div id ="div3" style="height: 1000px;background-color: brown;"></div>
+        <div id ="div4" style="height: 1000px;background-color: red;"></div>
+        <div style="height: 1000px;background-color: aqua;" ></div>
+
+    </body>
+    </html>
+
+    <script language="javascript">
+
+       var data = [
+        { "name":"合旗" , "ww":"一张被使用且未造成伤害的【杀】结算完成","key":"你可将之置于武将牌上(此回合结束时获得)并令使用者摸一张牌。","hero":"爱新觉罗·皇太极","n":"1","sc":"#div2" },
+        { "name":"响珰" , "ww":"你受到伤害","key":"你可将之置于武将牌上(此回合结束时获得)并令使用者摸一张牌。","hero":"关汉卿","n":"1","sc":"#div3" },
+        { "name":"感人" , "ww":"每名角色的结束阶段","key":"你可弃置一张牌并判定，获得弃牌堆一张此回合进入的同色同类型牌。","hero":"李商隐","n":"1","sc":"#div4" }
+        ];
+    
+
+    
+        var ccstring = "";
+        for (var o in data)
+        {
+            ccstring += "【" + data[o].name + "】<span class='w1' onclick=\"scrollToElement('"+ data[o].sc  +"')\">当<span class='w2'>" + data[o].ww + "</span>时</span>，" + data[o].key + "<" + data[o].hero  + data[o].n + ">"
+            ccstring += "<br>"
+        }
+
+        cc.innerHTML = ccstring ;
+
+
+
+     // 滚动到页面上指定元素的位置
+      function scrollToElement(elementSelector) {
+        var element = document.querySelector(elementSelector);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } 
+    </script>
+    <style>
+      .w1 {
+        background-color: white;
+      }
+      .w2 {
+        background-color: white;
+      }
+
+      .w1:hover
+      {
+        background-color: #d8cbc8;
+      }
+    </style>

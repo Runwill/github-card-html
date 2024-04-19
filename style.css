@@ -1,0 +1,115 @@
+.indent{
+    text-indent: 20px;
+}
+.indent+padding{
+    padding-top: 0px;
+}
+.indent+.indent{
+    padding-top: 20px;
+}
+.noH{
+    padding-top: 20px;
+}
+padding {
+    display: block;
+    padding-left: 3em;
+}
+.bold {
+    font-weight: bold;
+}
+.scroll{
+    scroll-margin-top: 40px;
+}
+
+body{
+    margin :0;
+    font-size: .9rem;
+}
+
+/*header*/
+header{
+    background: #ffffff;
+    text-align:center;
+    box-shadow: 0 0 .2rem #0000001a,0 .2rem .4rem #0003;
+    display: flex;
+    left: 0;
+    position: sticky;
+    right: 0;
+    top: 0;
+    z-index: 4;
+    white-space: nowrap;
+}
+.header_title{
+    flex-grow: 1;
+    font-size: .9rem;
+    height: 2.4rem;
+    line-height: 2.4rem;
+    margin-left: 1rem;
+    margin-right: 75px;
+}
+a{
+    text-decoration: none;
+    color:black;
+}
+a:hover{
+    color:black;
+    font-weight: 900;
+    
+}
+.sidebar{
+    background: #ffffff;
+    padding: 0;
+    z-index: 11;
+    margin-left: 10;
+}
+.active{
+    font-weight: 900;
+}
+.nav{
+    overflow: hidden;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin-bottom: 0;
+    margin-top: 10px;
+    list-style: none;
+    padding: 0px 0 0 0px;
+}
+.nav-item{
+    
+    margin-top: 0;
+    display: inline;
+    margin: 0 30px 0 0;
+}
+/*main-people*/
+.main-people{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.main-contain{
+    display: flex;
+    height: 100%;
+    margin-top: 1.5rem;
+}
+.main-text{
+    display: block;
+    width: 70%;
+}
+.main-sidebar{
+    align-self: flex-start;
+    flex-shrink: 0;
+    padding: 1.2rem 0;
+    position: sticky;
+    top: 2.4rem;
+    width: 12.1rem;
+    order:2;
+}
+@font-face {
+    font-family: "FZBWKS";
+    src: url("方正北魏楷书.TTF") format("truetype"); 
+}
+/*#standardCharacterSkillsBlock{
+    font-family: "FZBWKS";
+    font-size: x-large;
+}*/
