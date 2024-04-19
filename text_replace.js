@@ -388,9 +388,49 @@ $(function(){
             "color":"#b0b7e8"
         },
         { 
+            "cn":"牌" ,
+            "en":"card" ,
+            "color":"#d8cbc8"
+        },
+        { 
+            "cn":"区域" ,
+            "en":"area" ,
+            "color":"#b0d9e8"
+        },
+        { 
+            "cn":"手牌区" ,
+            "en":"hand" ,
+            "color":"#e8beb0"
+        },
+        { 
+            "cn":"手牌" ,
+            "en":"handCard" ,
+            "color":"#ecb09d"
+        },
+        { 
             "cn":"选择" ,
             "en":"choose" ,
             "color":"#b0e8d0"
+        },
+        { 
+            "en":"make" ,
+            "part":[
+                {
+                    "cn":"令" ,
+                    "en":"makeHead" ,
+                }
+            ],
+            "color":"#ebf1be"
+        },
+        { 
+            "en":"to" ,
+            "part":[
+                {
+                    "cn":"对" ,
+                    "en":"toHead" ,
+                }
+            ],
+            "color":"#9ed19a"
         },
         { 
             "cn":"角色选择器" ,
@@ -467,7 +507,7 @@ $(function(){
     var CharacterSkill = [
         {
             "name":"允中",
-            "content":"<procedureTrigger class=\"irreplacable\"><tickingTimeLimit class=\"irreplacable\"><tickingLimit class=\"irreplacable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplacable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or>令<roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\">手牌最多的<livingRole epithet=\"1\"></livingRole></targetLimit></roleSelector>各弃置一张牌<orBody></orBody>令<roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\">手牌最少的<livingRole epithet=\"1\"></livingRole></targetLimit></roleSelector>各摸一张牌</or></can>。",
+            "content":"<procedureTrigger class=\"irreplacable\"><tickingTimeLimit class=\"irreplacable\"><tickingLimit class=\"irreplacable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplacable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\">手牌最多的<livingRole epithet=\"1\"></livingRole></targetLimit></roleSelector></make>各弃置一张牌<orBody></orBody><make><makeHead></makeHead><roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\">手牌最少的<livingRole epithet=\"1\"></livingRole></targetLimit></roleSelector></make>各摸一张牌</or></can>。",
             "own":[{"role":"1"}]
         },
         {

@@ -18,8 +18,9 @@ padding {
     font-weight: bold;
 }
 .scroll{
-    scroll-margin-top: 40px;
+    scroll-margin-top:50px;
 }
+
 
 body{
     margin :0;
@@ -63,6 +64,7 @@ a:hover{
     margin-left: 10;
 }
 .active{
+    text-decoration:overline;
     font-weight: 900;
 }
 .nav{
