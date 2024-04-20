@@ -70,6 +70,7 @@
 }
 padding {
     display: block;
+    padding-bottom: 0.75em;
 }
 .h{
     padding-top: 0.75em;
