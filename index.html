@@ -115,11 +115,13 @@
                         包含以下<procedure></procedure>：
                     </div>
                     <padding>
-                        <div class="indent noH">
-                            <advance></advance><tick></tick>“<atGameStart class="scroll bold"> </atGameStart>”。
-                        </div>
-                        <div class="indent">
-                            循环<advance></advance><round></round>。
+                        <div class="h">
+                            <div class="indent">
+                                <advance></advance><tick></tick>“<atGameStart class="scroll bold"> </atGameStart>”。
+                            </div>
+                            <div class="indent">
+                                循环<advance></advance><round></round>。
+                            </div>
                         </div>
                     </padding>
                     <h2><round class="scroll"></round></h2>
@@ -130,15 +132,17 @@
                         包含以下<procedure></procedure>：
                     </div>
                     <padding>
-                        <div class="indent noH">
-                            <advance></advance><tick></tick>“<atRoundStart class="scroll bold"> </atRoundStart>”。
-                        </div>
-                        <div class="indent">
-                            令所有<livingRole></livingRole><advance></advance><turnProcess></turnProcess>。
-                        </div>
-                        <div class="indent">
-                            <advance></advance><tick></tick>“<atRoundFinish class="scroll bold"> </atRoundFinish>”。
-                        </div>
+                        <div class="h">
+                            <div class="indent">
+                                <advance></advance><tick></tick>“<atRoundStart class="scroll bold"> </atRoundStart>”。
+                            </div>
+                            <div class="indent">
+                                令所有<livingRole></livingRole><advance></advance><turnProcess></turnProcess>。
+                            </div>
+                            <div class="indent">
+                                <advance></advance><tick></tick>“<atRoundFinish class="scroll bold"> </atRoundFinish>”。
+                            </div>
+                        </div class="h">
                     </padding>
                     <padding>
                         <h3><rounds class="scroll"></rounds></h3>
@@ -154,14 +158,16 @@
                         包含以下<procedure></procedure>：
                     </div>
                     <padding>
-                        <div class="indent noH">
-                            <advance></advance><tick></tick>“<beforeTurnStart class="scroll bold"></beforeTurnStart>”。
-                        </div>
-                        <div class="indent">
-                            <advance></advance><turn></turn>。
-                        </div>
-                        <div class="indent">
-                            <advance></advance><tick></tick>“<afterTurnFinish class="scroll bold"></afterTurnFinish>”。
+                        <div class="h">
+                            <div class="indent">
+                                <advance></advance><tick></tick>“<beforeTurnStart class="scroll bold"></beforeTurnStart>”。
+                            </div>
+                            <div class="indent">
+                                <advance></advance><turn></turn>。
+                            </div>
+                            <div class="indent">
+                                <advance></advance><tick></tick>“<afterTurnFinish class="scroll bold"></afterTurnFinish>”。
+                            </div>
                         </div>
                     </padding>
                     <h2><stageProcess class="scroll"></stageProcess></h2>
@@ -206,17 +212,19 @@
                         <procedure></procedure>在某<tick></tick>可执行的条件：
                     </div>
                     <padding>
-                        <div class="indent noH">
-                            <procedure></procedure>在<currentTick></currentTick>未<or>执行过<orBody></orBody><ask></ask>是否执行</or>过；
-                        </div>
-                        <div class="indent">
-                            若<procedure></procedure>属于<currentTick></currentTick>，满足<numberLimit></numberLimit>；
-                        </div>
-                        <div class="indent">
-                            若<procedure></procedure>不属于<currentTick></currentTick>，<and>满足<or><tickingTimeLimit></tickingTimeLimit><orBody></orBody><tickingTimeLimit></tickingTimeLimit>不存在</or><andBody></andBody>满足<tickLimit></tickLimit></and>；
-                        </div>
-                        <div class="indent">
-                            <procedure></procedure>合法；
+                        <div class="h">
+                            <div class="indent">
+                                <procedure></procedure>在<currentTick></currentTick>未<or>执行过<orBody></orBody><ask></ask>是否执行</or>过；
+                            </div>
+                            <div class="indent">
+                                若<procedure></procedure>属于<currentTick></currentTick>，满足<numberLimit></numberLimit>；
+                            </div>
+                            <div class="indent">
+                                若<procedure></procedure>不属于<currentTick></currentTick>，<and>满足<or><tickingTimeLimit></tickingTimeLimit><orBody></orBody><tickingTimeLimit></tickingTimeLimit>不存在</or><andBody></andBody>满足<tickLimit></tickLimit></and>；
+                            </div>
+                            <div class="indent">
+                                <procedure></procedure>合法；
+                            </div>
                         </div>
                     </padding>
                     <padding>
@@ -232,23 +240,25 @@
                             包含以下<tick></tick>：
                         </div>
                         <padding>
-                            <div class="indent noH">
-                                <inherentPreparingStage></inherentPreparingStage>
-                            </div>
-                            <div class="indent">
-                                <inherentDealingStage></inherentDealingStage>
-                            </div>
-                            <div class="indent">
-                                <inherentGettingStage></inherentGettingStage>
-                            </div>
-                            <div class="indent">
-                                <inherentActingStage></inherentActingStage>
-                            </div>
-                            <div class="indent">
-                                <inherentThrowingStage></inherentThrowingStage>
-                            </div>
-                            <div class="indent">
-                                <inherentConcludingStage></inherentConcludingStage>
+                            <div class="h">
+                                <div class="indent">
+                                    <inherentPreparingStage></inherentPreparingStage>
+                                </div>
+                                <div class="indent">
+                                    <inherentDealingStage></inherentDealingStage>
+                                </div>
+                                <div class="indent">
+                                    <inherentGettingStage></inherentGettingStage>
+                                </div>
+                                <div class="indent">
+                                    <inherentActingStage></inherentActingStage>
+                                </div>
+                                <div class="indent">
+                                    <inherentThrowingStage></inherentThrowingStage>
+                                </div>
+                                <div class="indent">
+                                    <inherentConcludingStage></inherentConcludingStage>
+                                </div>
                             </div>
                         </padding>
                     </padding>
