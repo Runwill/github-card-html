@@ -635,6 +635,7 @@ $(function(){
                         'click', function(){
                             document.querySelectorAll(".scroll").forEach(
                                 scroll => {
+                                    event.stopPropagation()
                                     if (scroll.outerHTML.startsWith("<"+term[event.currentTarget.termPosition].en.toLowerCase()+" ")){
                                         if(!(scroll.classList.contains('fadeOnly'))){
                                             scroll.scrollIntoView({behavior: "smooth"});
