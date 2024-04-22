@@ -21,6 +21,21 @@ $(function(){
             "color":"#d3e7ff"
         },
         { 
+            "cn":"操作" ,
+            "en":"operation" ,
+            "color":"#ffe7d3"
+        },
+        { 
+            "en":"each" ,
+            "part":[
+                {
+                    "cn":"各" ,
+                    "en":"eachHead" ,
+                },
+            ],
+            "color":"#c3d9e0"
+        },
+        { 
             "cn":"优先级" ,
             "en":"priority" ,
             "color":"#779bff"
@@ -325,11 +340,6 @@ $(function(){
             "color":"#f0a2a2"
         },
         { 
-            "epithet":[{"cn":"存活角色"},{"cn":"角色"}] ,
-            "en":"livingRole" ,
-            "color":"#f0a2b7"
-        },
-        { 
             "cn":"死亡" ,
             "en":"dead" ,
             "color":"#e1e1e1"
@@ -433,6 +443,11 @@ $(function(){
             "color":"#9ed19a"
         },
         { 
+            "cn":"选择器" ,
+            "en":"selector" ,
+            "color":"#b0e8d0"
+        },
+        { 
             "cn":"角色选择器" ,
             "en":"roleSelector" ,
             "color":"#b0e8d0"
@@ -443,14 +458,24 @@ $(function(){
             "color":"#a1cbfb"
         },
         { 
-            "cn":"距离限制" ,
-            "en":"distanceLimit" ,
-            "color":"#a1fbaa"
-        },
-        { 
             "cn":"目标限制" ,
             "en":"targetLimit" ,
             "color":"#a1b1fb"
+        },
+        { 
+            "cn":"游戏内" ,
+            "en":"inGame" ,
+            "color":"#a1b1fb"
+        },
+        { 
+            "cn":"游戏外" ,
+            "en":"outGame" ,
+            "color":"#a1b1fb"
+        },
+        { 
+            "cn":"距离限制" ,
+            "en":"distanceLimit" ,
+            "color":"#a1fbaa"
         },
         { 
             "cn":"技能" ,
@@ -507,7 +532,7 @@ $(function(){
     var CharacterSkill = [
         {
             "name":"允中",
-            "content":"<procedureTrigger class=\"irreplacable\"><tickingTimeLimit class=\"irreplacable\"><tickingLimit class=\"irreplacable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplacable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\">手牌最多的<livingRole epithet=\"1\"></livingRole></targetLimit></roleSelector></make>各弃置一张牌<orBody></orBody><make><makeHead></makeHead><roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\">手牌最少的<livingRole epithet=\"1\"></livingRole></targetLimit></roleSelector></make>各摸一张牌</or></can>。",
+            "content":"<procedureTrigger class=\"irreplacable\"><tickingTimeLimit class=\"irreplacable\"><tickingLimit class=\"irreplacable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplacable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\"><handCard></handCard>最多的<role></role></targetLimit></roleSelector><each><eachHead></eachHead>弃置一张牌</each></make><orBody></orBody><make><makeHead></makeHead><roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\"><handCard></handCard>最少的<role></role></targetLimit></roleSelector><each><eachHead></eachHead>摸一张牌</each></make></or></can>。",
             "own":[{"role":"1"}]
         },
         {
@@ -558,7 +583,7 @@ $(function(){
                                     event.stopPropagation()
                                     if (scroll.outerHTML.startsWith("<"+event.currentTarget.tagName.toLowerCase()+" ")){
                                         if(!(scroll.classList.contains('fadeOnly'))){
-                                            scroll.scrollIntoView({behavior:'smooth'})
+                                            scroll.scrollIntoView({behavior: "smooth"});
                                         }
                                         $(scroll).fadeTo(200,0).fadeTo(1000,1)
                                     }
@@ -610,9 +635,10 @@ $(function(){
                         'click', function(){
                             document.querySelectorAll(".scroll").forEach(
                                 scroll => {
+                                    event.stopPropagation()
                                     if (scroll.outerHTML.startsWith("<"+term[event.currentTarget.termPosition].en.toLowerCase()+" ")){
                                         if(!(scroll.classList.contains('fadeOnly'))){
-                                            scroll.scrollIntoView({behavior:'smooth'})
+                                            scroll.scrollIntoView({behavior: "smooth"});
                                         }
                                         for(var j in term[event.currentTarget.termPosition].part){
                                             $(term[event.currentTarget.termPosition].en+".scroll").find(term[event.currentTarget.termPosition].part[j].en).fadeTo(200,0).fadeTo(1000,1)
