@@ -1,18 +1,80 @@
+@media (max-width: 700px){
+    html{
+        font-size: 15px
+    }
+    padding {
+        padding-left: 1.6em;
+        padding-right:1.6em;
+    }
+}
+@media (min-width: 701px) and (max-width: 800px){
+    html{
+        font-size: 17px
+    }
+    padding {
+        padding-left: 1.8em;
+        padding-right:1.8em;
+    }
+}
+@media (min-width: 801px) and (max-width: 900px){
+    html{
+        font-size: 18px
+    }
+    padding {
+        padding-left: 2.0em;
+        padding-right:2.0em;
+    }
+}
+@media (min-width: 900px) and (max-width: 1100px){
+    html{
+        font-size: 19px
+    }
+    padding {
+        padding-left: 2.2em;
+        padding-right:2.2em;
+    }
+}
+@media (min-width: 1101px) and (max-width: 1200px){
+    html{
+        font-size: 20px
+    }
+    padding {
+        padding-left: 2.4em;
+        padding-right:2.4em;
+    }
+}
+@media (min-width: 1201px) and (max-width: 1400px){
+    html{
+        font-size: 20px
+    }
+    padding {
+        padding-left: 2.6em;
+        padding-right:2.6em;
+    }
+}
+@media (min-width: 1401px){
+    html{
+        font-size: 20px
+    }
+    padding {
+        padding-left: 3em;
+        padding-right:3em;
+    }
+}
 .indent{
     text-indent: 20px;
-}
-.indent+padding{
-    padding-top: 0px;
+    line-height: 1.9em;
 }
 .indent+.indent{
-    padding-top: 20px;
-}
-.noH{
-    padding-top: 20px;
+    padding-top: 0.6em;
 }
 padding {
     display: block;
-    padding-left: 3em;
+    padding-bottom: 0.75em;
+}
+.h{
+    padding-top: 0.75em;
+    padding-bottom: 0.75em;
 }
 .bold {
     font-weight: bold;
@@ -20,7 +82,6 @@ padding {
 .scroll{
     scroll-margin-top:50px;
 }
-
 
 body{
     margin :0;
@@ -83,7 +144,30 @@ a:hover{
     display: inline;
     margin: 0 30px 0 0;
 }
-
+/*main-people*/
+.main-people{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+.main-contain{
+    display: flex;
+    height: 100%;
+    margin-top: 1.5rem;
+}
+.main-text{
+    display: block;
+    width: 70%;
+}
+.main-sidebar{
+    align-self: flex-start;
+    flex-shrink: 0;
+    padding: 1.2rem 0;
+    position: sticky;
+    top: 2.4rem;
+    width: 12.1rem;
+    order:2;
+}
 @font-face {
     font-family: "FZBWKS";
     src: url("方正北魏楷书.TTF") format("truetype"); 
