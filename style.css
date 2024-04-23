@@ -144,30 +144,7 @@ a:hover{
     display: inline;
     margin: 0 30px 0 0;
 }
-/*main-people*/
-.main-people{
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-.main-contain{
-    display: flex;
-    height: 100%;
-    margin-top: 1.5rem;
-}
-.main-text{
-    display: block;
-    width: 70%;
-}
-.main-sidebar{
-    align-self: flex-start;
-    flex-shrink: 0;
-    padding: 1.2rem 0;
-    position: sticky;
-    top: 2.4rem;
-    width: 12.1rem;
-    order:2;
-}
+
 @font-face {
     font-family: "FZBWKS";
     src: url("方正北魏楷书.TTF") format("truetype"); 
