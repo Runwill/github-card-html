@@ -264,6 +264,11 @@
         "color":"#c6ff8d"
     },
     { 
+        "epithet":[{"cn":"弃置"},{"cn":"弃"}] ,
+        "en":"discard" ,
+        "color":"#acd1ab"
+    },
+    { 
         "cn":"对象" ,
         "en":"object" ,
         "color":"#aea2d6"
