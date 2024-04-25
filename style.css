@@ -73,6 +73,7 @@ padding {
     padding-bottom: 0.75em;
 }
 .h{
+    font-size: .9rem;
     padding-top: 0.75em;
     padding-bottom: 0.75em;
 }
@@ -89,7 +90,7 @@ body{
 }
 
 /*header*/
-header{
+#header{
     background: #ffffff;
     text-align:center;
     box-shadow: 0 0 .2rem #0000001a,0 .2rem .4rem #0003;
@@ -101,7 +102,7 @@ header{
     z-index: 4;
     white-space: nowrap;
 }
-.header_title{
+#header_title{
     flex-grow: 1;
     font-size: .9rem;
     height: 2.4rem;
@@ -109,26 +110,26 @@ header{
     margin-left: 1rem;
     margin-right: 75px;
 }
-a{
+#title-a{
     text-decoration: none;
     color:black;
 }
-a:hover{
+#title-a:hover{
     color:black;
     font-weight: 900;
     
 }
-.sidebar{
+#sidebar{
     background: #ffffff;
     padding: 0;
     z-index: 11;
     margin-left: 10;
 }
-.active{
+#active{
     text-decoration:overline;
     font-weight: 900;
 }
-.nav{
+#nav{
     overflow: hidden;
     flex-wrap: nowrap;
     flex-direction: column;
@@ -138,16 +139,19 @@ a:hover{
     list-style: none;
     padding: 0px 0 0 0px;
 }
-.nav-item{
+#nav-item{
     
     margin-top: 0;
     display: inline;
     margin: 0 30px 0 0;
 }
-
+.main{
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
 @font-face {
-    font-family: "FZBWKS";
-    src: url("方正北魏楷书.TTF") format("truetype"); 
+    
 }
 /*#standardCharacterSkillsBlock{
     font-family: "FZBWKS";
