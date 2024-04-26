@@ -1,0 +1,7 @@
+[
+    {
+        "name":"姚重华",
+        "health":4,
+        "skill":[{"skillName":"玄德","type":"simple","id":1},{"skillName":"允中","type":"emperor","id":2}]
+    }
+]
