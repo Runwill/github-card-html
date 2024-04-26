@@ -1,36 +1,25 @@
 $(function(){
     $.ajax({
-        url:"charskill.json",
+        url:"base/skill.json",
         type:"GET",
         datatype:"json",
         success:
         function (data){
-            CharacterSkillReplace(data)
+            SkillReplace(data)
         }
     });
-    var CharacterSkillReplace = function(CharacterSkill){
+    var SkillReplace = function(skill){
         //获取技能名并排序
-        let CharacterSkillNames = []
-        for(var i in CharacterSkill){
-            CharacterSkillNames.push(CharacterSkill[i].name)
+        let skillNames = []
+        for(var i in skill){
+            if(skill[i].role)skillNames.push(skill[i].name)
         }
-        CharacterSkillNames.sort()
-        
-        let standardCharacterSkills = ""
-        for(var i in CharacterSkillNames){
-            for(var j in CharacterSkill){
-                if(CharacterSkill[j].name == CharacterSkillNames[i]){
-                    standardCharacterSkills += "<skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>"+"<characterSkillElement"+" class=\""+CharacterSkill[j].name+" scroll\"></characterSkillElement>"+"<skillQuoteRight></skillQuoteRight></skillQuote>"+CharacterSkill[j].content
-                }
-            }
-            standardCharacterSkills += "<br>"+"<br>"
-        }
-        standardCharacterSkillsBlock.innerHTML = "<br>"+"<br>"+standardCharacterSkills
-        
-        for(var i in CharacterSkillNames){
-            document.querySelectorAll("."+CharacterSkillNames[i]).forEach(//替换和滚动
+        skillNames.sort()
+
+        for(var i in skillNames){
+            document.querySelectorAll("."+skillNames[i]).forEach(//替换和滚动
                 element => {
-                    element.innerHTML = CharacterSkillNames[i]
+                    element.innerHTML = skillNames[i]
                     element.skillPosition=i
                     element.addEventListener(
                         'click', function(){
@@ -49,13 +38,13 @@ $(function(){
                     )
                 }
             )
-            $("."+CharacterSkillNames[i]).mouseover(//高亮
+            $("."+skillNames[i]).mouseover(//高亮
                 function(){
                     $(this).css("background-color","#df90ff")
                     $("."+event.currentTarget.classList[0]+".scroll").css("background-color","#df90ff")
                 }
             )
-            $("."+CharacterSkillNames[i]).mouseout(//高亮
+            $("."+skillNames[i]).mouseout(//高亮
                 function(){
                     $(this).css("background-color","")
                     $("."+event.currentTarget.classList[0]+".scroll").css("background-color","")

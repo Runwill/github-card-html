@@ -1,6 +1,6 @@
 $(function(){
     $.ajax({
-        url:"txtrp.json",
+        url:"base/term.json",
         type:"GET",
         datatype:"json",
         success:
@@ -20,7 +20,7 @@ $(function(){
                                 else element.innerHTML = term[i].en
                             }
                             else{
-                                if(!element.getAttribute("epithet"))     element.innerHTML =  term[i].epithet[0].cn
+                                if(!element.getAttribute("epithet"))element.innerHTML =  term[i].epithet[0].cn
                                 else    element.innerHTML =  term[i].epithet[element.getAttribute("epithet")].cn  
                         }
                         }
