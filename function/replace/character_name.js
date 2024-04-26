@@ -1,26 +1,32 @@
 $(function(){
     $.ajax({
-        url:"base/skill.json",
+        url:"base/character.json",
         type:"GET",
         datatype:"json",
         success:
         function (data){
-            SkillNameReplace(data)
+            CharacterNameReplace(data)
         }
     });
-    var SkillNameReplace = function(skill){
-        //获取技能名并排序
-        let skillNames = []
-        for(var i in skill){
-            if(skill[i].role)skillNames.push(skill[i].name)
+    var CharacterNameReplace = function(character){
+        //获取武将ID并排序
+        let characterID = []
+        for(var i in character){
+                characterID.push(character[i].id)
         }
-        skillNames.sort()
-
-        for(var i in skillNames){
-            document.querySelectorAll("."+skillNames[i]).forEach(//替换和滚动
+        characterID.sort()
+        
+        for(var i in characterID){
+            for(var j in character){
+                if(character[j].id==characterID[i]){
+                    characteName=character[j].name
+                }
+            }
+            document.querySelectorAll(".characterID"+characterID[i]).forEach(//替换和滚动
                 element => {
-                    element.innerHTML = skillNames[i]
-                    element.skillPosition=i
+                    alert(1)
+                    element.innerHTML = characteName
+                    element.characterPosition=i
                     element.addEventListener(
                         'click', function(){
                             document.querySelectorAll(".scroll").forEach(
@@ -38,13 +44,13 @@ $(function(){
                     )
                 }
             )
-            $("."+skillNames[i]).mouseover(//高亮
+            $(".characterID"+characterID[i]).mouseover(//高亮
                 function(){
                     $(this).css("background-color","#df90ff")
                     $("."+event.currentTarget.classList[0]+".scroll").css("background-color","#df90ff")
                 }
             )
-            $("."+skillNames[i]).mouseout(//高亮
+            $(".characterID"+characterID[i]).mouseout(//高亮
                 function(){
                     $(this).css("background-color","")
                     $("."+event.currentTarget.classList[0]+".scroll").css("background-color","")

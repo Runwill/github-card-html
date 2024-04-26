@@ -2,15 +2,19 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="../Foundation-Sites-CSS/css/foundation.css">
-        <script src="../Foundation-Sites-CSS/js/vendor/foundation.js"></script>
-        <script src="../Foundation-Sites-CSS/js/vendor/jquery.js"></script>
-        <script src="../Foundation-Sites-CSS/js/vendor/what-input.js"></script>
+        <script src="Foundation-Sites-CSS/js/vendor/foundation.js"></script>
+        <script src="Foundation-Sites-CSS/js/vendor/jquery.js"></script>
+        <script src="Foundation-Sites-CSS/js/vendor/what-input.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="../style.css">
-        <link rel="stylesheet" type="text/css" href="./char-style.css">
-        <script src="./text_replace.js"></script>
-        <title>05 wiki</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        
+        <script src="function/summon/standard_characters_block.js"></script>
+
+        <script src="function/replace/term.js"></script>
+        <script src="function/replace/character_name.js"></script>
+        <script src="function/replace/skill_name.js"></script>
+
+        <title>Document丨将池</title>
     </head>
     <body>
         <header id="header">
@@ -28,7 +32,7 @@
                         <a  id = title-a href="./index.html">程序</a>
                     </li>
                     <li id ="nav-item">
-                        <a id=title-a href="../card/card.html">牌库</a>
+                        <a id=title-a href="./card.html">牌库</a>
                     </li>
                     <li id="nav-item" class = active>
                         <a id=title-a href="./character.html">将池</a>
@@ -41,6 +45,7 @@
                 <padding>
                     <padding>
                         <div id="standardCharactersBlock" type=""></div>
+                        "<characterName class="characterID125 scroll"></characterName>"
                     </padding>
                 </padding>
             </main>

@@ -2,11 +2,22 @@
     {
         "name":"允中",
         "content":"<procedureTrigger class=\"irreplacable\"><tickingTimeLimit class=\"irreplacable\"><tickingLimit class=\"irreplacable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplacable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\"><handCard></handCard>最多的<role></role></targetLimit></roleSelector><each><eachHead></eachHead><discard></discard>一张牌</each></make><orBody></orBody><make><makeHead></makeHead><roleSelector class=\"irreplacable\"><targetNumberLimit class=\"irreplacable\">所有</targetNumberLimit><targetLimit class=\"irreplacable\"><handCard></handCard>最少的<role></role></targetLimit></roleSelector><each><eachHead></eachHead>摸一张牌</each></make></or></can>。",
-        "role":[{"role":"1"}]
+        "role":[
+            {
+                "id":125,
+                "skill_order":1
+            }
+        ]
     },
     {
         "name":"玄德",
         "content":"准备阶段，你摸已失去体力值一半（向上取整）的牌",
-        "role":[{"role":"1"}]
+        "role":[
+            {
+                "id":125,
+                "skill_order":2,
+                "dominator":true
+            }
+        ]
     }
 ]
