@@ -26,6 +26,7 @@ $(function(){
             standardCharacterSkills += "<br>"+"<br>"
         }
         standardCharacterSkillsBlock.innerHTML = "<br>"+"<br>"+standardCharacterSkills
+        
         for(var i in CharacterSkillNames){
             document.querySelectorAll("."+CharacterSkillNames[i]).forEach(//替换和滚动
                 element => {

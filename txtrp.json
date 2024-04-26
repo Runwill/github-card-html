@@ -269,6 +269,60 @@
         "color":"#acd1ab"
     },
     { 
+        "en":"beforeDiscard" ,
+        "part":[
+            {
+                "cn":"被" ,
+                "en":"beforeDiscardPassivity" 
+            },
+            {
+                "cn":"弃置" ,
+                "en":"beforeDiscardBody" 
+            },
+            {
+                "cn":"前" ,
+                "en":"beoreDiscardEnd" 
+            }
+        ],
+        "color":"#acd1ab"
+    },
+    { 
+        "en":"whenDiscard" ,
+        "part":[
+            {
+                "cn":"被" ,
+                "en":"whenDiscardPassivity" 
+            },
+            {
+                "cn":"弃置" ,
+                "en":"whenDiscardBody" 
+            },
+            {
+                "cn":"时" ,
+                "en":"whenDiscardEnd" 
+            }
+        ],
+        "color":"#acd1ab"
+    },
+    { 
+        "en":"afterDiscard" ,
+        "part":[
+            {
+                "cn":"被" ,
+                "en":"afterDiscardPassivity" 
+            },
+            {
+                "cn":"弃置" ,
+                "en":"afterDiscardBody" 
+            },
+            {
+                "cn":"后" ,
+                "en":"afterDiscardEnd" 
+            }
+        ],
+        "color":"#acd1ab"
+    },
+    { 
         "cn":"对象" ,
         "en":"object" ,
         "color":"#aea2d6"
