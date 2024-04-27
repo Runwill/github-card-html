@@ -1,13 +1,13 @@
 $(function(){
-    skill = []
-    character = []
+    var deferred1 = $.Deferred();
+    var deferred2 = $.Deferred();
     $.ajax({
         url:"base/character.json",
         type:"GET",
         datatype:"json",
         success:
-        function (data){
-            CharacterSkillReplace(data)
+        function (characterData){
+            deferred1.resolve(characterData)
         }
     })
     $.ajax({
@@ -15,11 +15,15 @@ $(function(){
         type:"GET",
         datatype:"json",
         success:
-        function (data){
-            CharacterSkillReplace(data)
+        function (skillData){
+            deferred2.resolve(skillData);
         }
     })
-    var CharacterSkillReplace = function(skill,character){
+    $.when(deferred1, deferred2).done(function (characterData, skillData) {
+        CharacterSkillReplace(characterData, skillData);
+    });
+    
+    var CharacterSkillReplace = function(character,skill){
         let standardCharacters = []
         //提取武将序号的顺序数组
         let characterID = []
