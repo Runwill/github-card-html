@@ -24,7 +24,6 @@ $(function(){
             }
             document.querySelectorAll(".characterID"+characterID[i]).forEach(//替换和滚动
                 element => {
-                    alert(1)
                     element.innerHTML = characteName
                     element.characterPosition=i
                     element.addEventListener(

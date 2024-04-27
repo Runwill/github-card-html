@@ -20,10 +20,10 @@ $(function(){
         }
     })
     $.when(deferred1, deferred2).done(function (characterData, skillData) {
-        CharacterSkillReplace(characterData, skillData);
+        CharacterReplace(characterData, skillData);
     });
-    
-    var CharacterSkillReplace = function(character,skill){
+
+    var CharacterReplace = function(character,skill){
         let standardCharacters = []
         //提取武将序号的顺序数组
         let characterID = []
@@ -33,26 +33,34 @@ $(function(){
         for (i in characterID){
             for(j in character){
                 if(character[j].id == characterID[i]){
-                    standardCharacters += characterID[i] + " <charactorName class=\"characterID"+characterID[i]+" scroll\"></charactorName>"
+                    standardCharacters += characterID[i] + " <charactorName class=\"characterID"+characterID[i]+" scroll\"></charactorName> "+character[j].title
+
+                    //提取武将牌上技能序号
+                    let skillOrder = []
+                    for(k in skill){
+                        if(skill[k].role){
+                            for(l in skill[k].role){
+                                if(skill[k].role[l].id == characterID[i]){
+                                    skillOrder.push(parseInt(skill[k].role[l].skill_order))
+                                }
+                            }
+                        }
+                    }
+                    skillOrder.sort((a,b) => a-b)
+                    alert(skillOrder)
+                    /*for(k in skill){
+                        if(skill[k].role){
+
+                            for(l in skill[k].role){
+                                if(skill[k].role[l].id == characterID[i]){
+                                    standardCharacters+=skill[k].role[l].skill_order
+                                }
+                            }
+                        }
+                    }*/
                 }
             }
-        }   
-        //获取武将名并排序
-        /*let 
-        for(var i in character){
-            CharacterNames.push(character[i].name)
         }
-        CharacterNames.sort()
-        
-        let standardCharacterSkills = ""
-        for(var i in CharacterSkillNames){
-            for(var j in skill){
-                if(skill[j].name == CharacterSkillNames[i]){
-                    standardCharacterSkills += "<skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>"+"<characterSkillElement"+" class=\""+skill[j].name+" scroll\"></characterSkillElement>"+"<skillQuoteRight></skillQuoteRight></skillQuote>"+skill[j].content
-                }
-            }
-            standardCharacters += "<br>"+"<br>"
-        }*/
-        standardCharactersBlock.innerHTML = "<br>"+"<br>"+standardCharacters+"<process></process>"
+        standardCharactersBlock.innerHTML = "<br>"+"<br>"+standardCharacters
     }
 });
