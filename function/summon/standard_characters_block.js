@@ -1,25 +1,24 @@
 $(function(){
-    $.ajax(
-        {
-            url:"base/skill.json",
-            type:"GET",
-            datatype:"json",
-            success:
-            function (skill){
-                $.ajax(
-                    {
-                        url:"base/character.json",
-                        type:"GET",
-                        datatype:"json",
-                        success:
-                        function (character){
-                            CharacterSkillReplace(skill,character)
-                        }
-                    },
-                );
-            }
-        },
-    );
+    skill = []
+    character = []
+    $.ajax({
+        url:"base/character.json",
+        type:"GET",
+        datatype:"json",
+        success:
+        function (data){
+            CharacterSkillReplace(data)
+        }
+    })
+    $.ajax({
+        url:"base/skill.json",
+        type:"GET",
+        datatype:"json",
+        success:
+        function (data){
+            CharacterSkillReplace(data)
+        }
+    })
     var CharacterSkillReplace = function(skill,character){
         let standardCharacters = []
         //提取武将序号的顺序数组
@@ -50,6 +49,6 @@ $(function(){
             }
             standardCharacters += "<br>"+"<br>"
         }*/
-        standardCharactersBlock.innerHTML = "<br>"+"<br>"+standardCharacters+"<characterName class=\"characterID125 scroll\"></characterName>"
+        standardCharactersBlock.innerHTML = "<br>"+"<br>"+standardCharacters+"<process></process>"
     }
 });
