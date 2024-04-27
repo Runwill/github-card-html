@@ -546,6 +546,11 @@
         "color":"#cca7ec"
     },
     { 
+        "epithet":[{"cn":"君主技"},{"cn":"*"}] ,
+        "en":"dominatorSkill" ,
+        "color":"#ead386"
+    },
+    { 
         "cn":"装备技能" ,
         "en":"equipmentSkill" ,
         "color":"#a7beec"

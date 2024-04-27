@@ -23,17 +23,22 @@ $(function(){
                     element.skillPosition=i
                     element.addEventListener(
                         'click', function(){
-                            document.querySelectorAll(".scroll").forEach(
-                                scroll => {
-                                    if (scroll.classList.contains(event.currentTarget.classList[0])){
-                                        event.stopPropagation()
-                                        if(!(scroll.classList.contains('fadeOnly'))){
-                                            scroll.scrollIntoView({behavior:'smooth'})
+                            if(document.URL.includes("index.html")){
+                                document.querySelectorAll(".scroll").forEach(
+                                    scroll => {
+                                        if (scroll.classList.contains(event.currentTarget.classList[0])){
+                                            event.stopPropagation()
+                                            if(!(scroll.classList.contains('fadeOnly'))){
+                                                scroll.scrollIntoView({behavior:'smooth'})
+                                            }
+                                            $(scroll).fadeTo(200,0).fadeTo(1000,1)
                                         }
-                                        $(scroll).fadeTo(200,0).fadeTo(1000,1)
                                     }
-                                }
-                            )
+                                )
+                            }
+                            else {
+                                window.location.href = "index.html#"+event.currentTarget.classList[0]
+                            }
                         }
                     )
                 }

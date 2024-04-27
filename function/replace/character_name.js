@@ -45,8 +45,8 @@ $(function(){
             )
             $(".characterID"+characterID[i]).mouseover(//高亮
                 function(){
-                    $(this).css("background-color","#df90ff")
-                    $("."+event.currentTarget.classList[0]+".scroll").css("background-color","#df90ff")
+                    $(this).css("background-color","#9ca8ee")
+                    $("."+event.currentTarget.classList[0]+".scroll").css("background-color","#9ca8ee")
                 }
             )
             $(".characterID"+characterID[i]).mouseout(//高亮

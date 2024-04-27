@@ -33,9 +33,9 @@ $(function(){
         for (i in characterID){
             for(j in character){
                 if(character[j].id == characterID[i]){
-                    standardCharacters += characterID[i] + " <charactorName class=\"characterID"+characterID[i]+" scroll\"></charactorName> "+character[j].title
+                    standardCharacters += "<h3>" + characterID[i] + " <charactorName class=\"characterID"+characterID[i]+" scroll\"></charactorName> "+character[j].title+"</h3>"
 
-                    //提取武将牌上技能序号
+                    //获得武将牌上技能次序
                     let skillOrder = []
                     for(k in skill){
                         if(skill[k].role){
@@ -47,17 +47,29 @@ $(function(){
                         }
                     }
                     skillOrder.sort((a,b) => a-b)
-                    alert(skillOrder)
-                    /*for(k in skill){
-                        if(skill[k].role){
 
-                            for(l in skill[k].role){
-                                if(skill[k].role[l].id == characterID[i]){
-                                    standardCharacters+=skill[k].role[l].skill_order
+                    for(k in skillOrder){
+                        for(l in skill){
+                            if(skill[l].role){
+                                for(m in skill[l].role){
+                                    if(skill[l].role[m].id == characterID[i] && skill[l].role[m].skill_order==skillOrder[k]){
+                                        standardCharacters+="<padding><skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>"+"<characterSkillElement"+" class=\""+skill[l].name+"\"></characterSkillElement>"+"<skillQuoteRight></skillQuoteRight></skillQuote>"+skill[l].content
+                                        for(n in skill[l].role){
+                                            for(o in character){
+                                                if(character[o].id==skill[l].role[n].id){
+                                                    standardCharacters+="<"+ "<charactorName class=\"characterID"+character[o].id+"\"></charactorName>"+skill[l].role[n].skill_order
+                                                    //君主技
+                                                    if(skill[l].role[n].dominator)standardCharacters+="<dominatorSkill epithet=\"1\"></dominatorSkill>"
+                                                    standardCharacters+=">"
+                                                }
+                                            }
+                                        }
+                                        standardCharacters+="</padding>"
+                                    }
                                 }
                             }
                         }
-                    }*/
+                    }
                 }
             }
         }
