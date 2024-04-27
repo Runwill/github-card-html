@@ -26,17 +26,23 @@ $(function(){
                         }
                         element.addEventListener(
                             'click', function(){
-                                document.querySelectorAll(".scroll").forEach(
-                                    scroll => {
-                                        event.stopPropagation()
-                                        if (scroll.outerHTML.startsWith("<"+event.currentTarget.tagName.toLowerCase()+" ")){
-                                            if(!(scroll.classList.contains('fadeOnly'))){
-                                                scroll.scrollIntoView({behavior: "smooth"});
+                                event.stopPropagation()
+                                if(document.URL.includes("index.html")){
+                                    document.querySelectorAll(".scroll").forEach(
+                                        scroll => {
+                                            event.stopPropagation()
+                                            if (scroll.outerHTML.startsWith("<"+event.currentTarget.tagName.toLowerCase()+" ")){
+                                                if(!(scroll.classList.contains('fadeOnly'))){
+                                                    scroll.scrollIntoView({behavior: "smooth"});
+                                                }
+                                                $(scroll).fadeTo(200,0).fadeTo(1000,1)
                                             }
-                                            $(scroll).fadeTo(200,0).fadeTo(1000,1)
                                         }
-                                    }
-                                )
+                                    )
+                                }
+                                else{
+                                    window.location.href = "index.html#"+event.currentTarget.tagName.toLowerCase()
+                                }
                             }
                         )
                     }
@@ -81,19 +87,26 @@ $(function(){
                     element => {
                         element.addEventListener(
                             'click', function(){
-                                document.querySelectorAll(".scroll").forEach(
-                                    scroll => {
-                                        event.stopPropagation()
-                                        if (scroll.outerHTML.startsWith("<"+term[event.currentTarget.termPosition].en.toLowerCase()+" ")){
-                                            if(!(scroll.classList.contains('fadeOnly'))){
-                                                scroll.scrollIntoView({behavior: "smooth"});
-                                            }
-                                            for(var j in term[event.currentTarget.termPosition].part){
-                                                $(term[event.currentTarget.termPosition].en+".scroll").find(term[event.currentTarget.termPosition].part[j].en).fadeTo(200,0).fadeTo(1000,1)
+                                event.stopPropagation()
+                                if(document.URL.includes("index.html")){
+                                    document.querySelectorAll(".scroll").forEach(
+                                        scroll => {
+                                            event.stopPropagation()
+                                            if (scroll.outerHTML.startsWith("<"+term[event.currentTarget.termPosition].en.toLowerCase()+" ")){
+                                                if(!(scroll.classList.contains('fadeOnly'))){
+                                                    scroll.scrollIntoView({behavior:'smooth'});
+                                                    $(scroll).fadeTo(200,0).fadeTo(1000,1)
+                                                }
+                                                /*for(var j in term[event.currentTarget.termPosition].part){
+                                                    $(term[event.currentTarget.termPosition].en+".scroll").find(term[event.currentTarget.termPosition].part[j].en).fadeTo(200,0).fadeTo(1000,1)
+                                                }*/
                                             }
                                         }
-                                    }
-                                )
+                                    )
+                                }
+                                else{
+                                    window.location.href = "index.html#"+term[event.currentTarget.termPosition].en.toLowerCase()
+                                }
                             }
                         )
                     }

@@ -23,7 +23,8 @@ $(function(){
                     element.skillPosition=i
                     element.addEventListener(
                         'click', function(){
-                            if(document.URL.includes("index.html")){
+                            event.stopPropagation()
+                            if(document.URL.includes("skill.html")){
                                 document.querySelectorAll(".scroll").forEach(
                                     scroll => {
                                         if (scroll.classList.contains(event.currentTarget.classList[0])){
@@ -37,7 +38,7 @@ $(function(){
                                 )
                             }
                             else {
-                                window.location.href = "index.html#"+event.currentTarget.classList[0]
+                                window.location.href = "skill.html#"+event.currentTarget.classList[0]
                             }
                         }
                     )

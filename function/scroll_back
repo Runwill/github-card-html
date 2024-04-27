@@ -7,7 +7,7 @@ $(function(){
             clearTimeout(timer);
             }
             timer = setTimeout(() => {
-            localStorage.setItem('scrollHeight', window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop)
+            localStorage.setItem('scrollHeight'+window.location.pathname, window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop)
             }, 100)
         }
     }
@@ -17,10 +17,10 @@ $(function(){
 // 滚动到上次访问位置
 var scroll_back = {
     scrollToView:() => {
-        let scrollHeight = localStorage.getItem('scrollHeight');
+        let scrollHeight = localStorage.getItem('scrollHeight'+window.location.pathname);
         if (scrollHeight) {
         setTimeout(() => {
-            window.scrollTo({ top: scrollHeight, behavior: "smooth" });
+            window.scrollTo({ top: scrollHeight});
             }, 50)
         }
     }

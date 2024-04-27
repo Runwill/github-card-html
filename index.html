@@ -7,29 +7,25 @@
         <script src="Foundation-Sites-CSS/js/vendor/what-input.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="style.css">
-        
-        <script src="function/summon/standard_character_skills_block.js"></script>
 
         <script src="function/replace/term.js"></script>
         <script src="function/replace/skill_name.js"></script>
         <script src="function/scroll_back"></script>
         
         <script>
-            if(window.location.hash){
-                setTimeout(function(){
-                    document.querySelectorAll(".scroll").forEach(
-                        scroll => {
-                            if(scroll.classList.contains(window.location.hash.slice(1))){
-                                scroll.scrollIntoView({behavior:'smooth'})
-                                $(scroll).fadeTo(200,0).fadeTo(1000,1)
+            scroll_back.scrollToView()
+            setTimeout(function(){
+                document.querySelectorAll(".scroll").forEach(
+                    scroll => {
+                        if (scroll.outerHTML.startsWith("<"+window.location.hash.slice(1)+" ")){
+                            if(!(scroll.classList.contains('fadeOnly'))){
+                                scroll.scrollIntoView({behavior:'smooth'});
                             }
+                            $(scroll).fadeTo(200,0).fadeTo(1000,1)
                         }
-                    )
-                },50)
-            }
-            else{
-                scroll_back.scrollToView()
-            }
+                    }
+                )
+            },50)
         </script>
 
         <title>Document丨程序</title>
@@ -48,6 +44,9 @@
                 <ul id="nav">
                     <li id="nav-item" class = active>
                         <a id=title-a href="./index.html">程序</a>
+                    </li>
+                    <li id="nav-item">
+                        <a id=title-a href="./skill.html">技能</a>
                     </li>
                     <li id ="nav-item">
                         <a id=title-a href="./card.html">牌库</a>
@@ -497,7 +496,6 @@
                                 </padding>
                             </padding>
                         </padding>
-                        <div id="standardCharacterSkillsBlock" type=""></div>
                     </padding>
                 </padding>
             </main>
