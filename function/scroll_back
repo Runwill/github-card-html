@@ -3,11 +3,9 @@ $(function(){
     const debounce = () => {
         let timer = null
         return () => {
-            if (timer) {
-            clearTimeout(timer);
-            }
+            if (timer)clearTimeout(timer);
             timer = setTimeout(() => {
-            localStorage.setItem('scrollHeight'+window.location.pathname, window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop)
+                localStorage.setItem('scrollHeight'+window.location.pathname, window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop)
             }, 100)
         }
     }
@@ -19,9 +17,9 @@ var scroll_back = {
     scrollToView:() => {
         let scrollHeight = localStorage.getItem('scrollHeight'+window.location.pathname);
         if (scrollHeight) {
-        setTimeout(() => {
-            window.scrollTo({ top: scrollHeight});
-            }, 50)
+            setTimeout(() => {
+                window.scrollTo({top:scrollHeight});
+            }, 15)
         }
     }
 }
