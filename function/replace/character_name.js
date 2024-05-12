@@ -28,17 +28,23 @@ $(function(){
                     element.characterPosition=i
                     element.addEventListener(
                         'click', function(){
-                            document.querySelectorAll(".scroll").forEach(
-                                scroll => {
-                                    if (scroll.classList.contains(event.currentTarget.classList[0])){
-                                        event.stopPropagation()
-                                        if(!(scroll.classList.contains('fadeOnly'))){
-                                            scroll.scrollIntoView({behavior:'smooth'})
+                            event.stopPropagation()
+                            if(document.URL.includes("character.html")){
+                                document.querySelectorAll(".scroll").forEach(
+                                    scroll => {
+                                        if (scroll.classList.contains(event.currentTarget.classList[0])){
+                                            //event.stopPropagation()
+                                            if(!(scroll.classList.contains('fadeOnly'))){
+                                                scroll.scrollIntoView({behavior:'smooth'})
+                                            }
+                                            $(scroll).fadeTo(200,0).fadeTo(1000,1)
                                         }
-                                        $(scroll).fadeTo(200,0).fadeTo(1000,1)
                                     }
-                                }
-                            )
+                                )
+                            }
+                            else {
+                                window.location.href = "character.html#"+event.currentTarget.classList[0]
+                            }
                         }
                     )
                 }

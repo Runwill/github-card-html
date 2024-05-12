@@ -1,14 +1,29 @@
 $(function(){
+    var deferred1 = $.Deferred();
+    var deferred2 = $.Deferred();
+    $.ajax({
+        url:"base/character.json",
+        type:"GET",
+        datatype:"json",
+        success:
+        function (characterData){
+            deferred1.resolve(characterData)
+        }
+    })
     $.ajax({
         url:"base/skill.json",
         type:"GET",
         datatype:"json",
         success:
-        function (data){
-            CharacterSkillReplace(data)
+        function (skillData){
+            deferred2.resolve(skillData);
         }
-    });
-    var CharacterSkillReplace = function(skill){
+    })
+    $.when(deferred1, deferred2).done(function (characterData, skillData) {
+        CharacterSkillReplace(characterData, skillData);
+    })
+
+    var CharacterSkillReplace = function(character,skill){
         //获取武将技能名并排序
         let CharacterSkillNames = []
         for(var i in skill){
@@ -21,6 +36,16 @@ $(function(){
             for(var j in skill){
                 if(skill[j].name == CharacterSkillNames[i]){
                     standardCharacterSkills += "<skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>"+"<characterSkillElement"+" class=\""+skill[j].name+" scroll\"></characterSkillElement>"+"<skillQuoteRight></skillQuoteRight></skillQuote>"+skill[j].content
+                    for(k in skill[j].role){
+                        for(l in character){
+                            if(character[l].id==skill[j].role[k].id){
+                                standardCharacterSkills+="<"+ "<charactorName class=\"characterID"+character[l].id+"\"></charactorName>"+skill[j].role[k].skill_order
+                                //君主技
+                                if(skill[j].role[k].dominator)standardCharacterSkills+="<dominatorSkill epithet=\"1\"></dominatorSkill>"
+                                standardCharacterSkills+=">"
+                            }
+                        }
+                    }
                 }
             }
             standardCharacterSkills += "<br>"+"<br>"
