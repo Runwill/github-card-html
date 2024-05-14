@@ -6558,7 +6558,6 @@ table.hover:not(.unstriped) tr:nth-of-type(even):hover {
 
 .tabs {
   margin: 0;
-  border: 1px solid #e6e6e6;
   background: #fefefe;
   list-style-type: none;
 }
@@ -6604,21 +6603,19 @@ table.hover:not(.unstriped) tr:nth-of-type(even):hover {
   float: left;
 }
 .tabs-title > a {
-  display: block;
-  padding: 1.25rem 1.5rem;
-  font-size: 0.75rem;
+  padding: 1rem 1.5rem;
+  font-size: 0.85rem;
   line-height: 1;
   color: #1779ba;
+  line-height: 2.4rem;
 }
 [data-whatinput=mouse] .tabs-title > a {
   outline: 0;
 }
 .tabs-title > a:hover {
-  background: #fefefe;
   color: #1468a0;
 }
 .tabs-title > a:focus, .tabs-title > a[aria-selected=true] {
-  background: #e6e6e6;
   color: #1779ba;
 }
 
