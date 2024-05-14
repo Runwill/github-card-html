@@ -129,7 +129,7 @@ body{
     text-decoration:overline;
     font-weight: 900;
 }
-#nav{
+.nav{
     overflow: hidden;
     flex-wrap: nowrap;
     flex-direction: column;
