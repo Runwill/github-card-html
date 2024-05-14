@@ -1,4 +1,7 @@
 $(function(){
+    $(document).ready(function() {
+        $(document).foundation();
+    })
     $.ajax({
         url:"base/term.json",
         type:"GET",
@@ -28,6 +31,7 @@ $(function(){
                             'click', function(){
                                 event.stopPropagation()
                                 if(document.URL.includes("index.html")){
+                                    $("#example-tabs").foundation('selectTab', "panel_term", 1);
                                     document.querySelectorAll(".scroll").forEach(
                                         scroll => {
                                             event.stopPropagation()
@@ -89,6 +93,7 @@ $(function(){
                             'click', function(){
                                 event.stopPropagation()
                                 if(document.URL.includes("index.html")){
+                                    $("#example-tabs").foundation('selectTab', "panel_term", 1);
                                     document.querySelectorAll(".scroll").forEach(
                                         scroll => {
                                             event.stopPropagation()
