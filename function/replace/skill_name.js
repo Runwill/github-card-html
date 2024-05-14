@@ -28,7 +28,7 @@ $(function(){
                                 document.querySelectorAll(".scroll").forEach(
                                     scroll => {
                                         if (scroll.classList.contains(event.currentTarget.classList[0])){
-                                            event.stopPropagation()
+                                            //event.stopPropagation()
                                             if(!(scroll.classList.contains('fadeOnly'))){
                                                 scroll.scrollIntoView({behavior:'smooth'})
                                             }

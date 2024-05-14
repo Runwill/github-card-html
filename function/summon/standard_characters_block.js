@@ -21,7 +21,7 @@ $(function(){
     })
     $.when(deferred1, deferred2).done(function (characterData, skillData) {
         CharacterReplace(characterData, skillData);
-    });
+    })
 
     var CharacterReplace = function(character,skill){
         let standardCharacters = []

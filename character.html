@@ -14,6 +14,20 @@
         <script src="function/replace/character_name.js"></script>
         <script src="function/replace/skill_name.js"></script>
         <script src="function/scroll_back"></script>
+        
+        <script>
+            scroll_back.scrollToView()
+            setTimeout(function(){
+                document.querySelectorAll(".scroll").forEach(
+                    scroll => {
+                        if(scroll.classList.contains(window.location.hash.slice(1))){
+                            scroll.scrollIntoView({behavior:'smooth'})
+                            $(scroll).fadeTo(200,0).fadeTo(1000,1)
+                        }
+                    }
+                )
+            },100)
+        </script>
 
         <title>Document丨将池</title>
     </head>
