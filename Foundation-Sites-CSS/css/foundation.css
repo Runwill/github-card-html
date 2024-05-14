@@ -3840,6 +3840,7 @@ select:not([multiple]) {
   position: relative;
   display: block;
   padding: 1.25rem 1rem;
+  border: 1px solid #e6e6e6;
   border-bottom: 0;
   font-size: 0.75rem;
   line-height: 1;
