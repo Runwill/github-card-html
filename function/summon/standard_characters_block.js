@@ -33,7 +33,7 @@ $(function(){
         for (i in characterID){
             for(j in character){
                 if(character[j].id == characterID[i]){
-                    standardCharacters += "<h3>" + characterID[i] + " <charactorName class=\"characterID"+characterID[i]+" scroll\"></charactorName> "+character[j].title+"</h3>"
+                    standardCharacters += "<h3>" + characterID[i] + " <characterName class=\"characterID"+characterID[i]+" scroll\"></characterName> "+character[j].title+"</h3>"
 
                     //获得武将牌上技能次序
                     let skillOrder = []
@@ -57,7 +57,7 @@ $(function(){
                                         for(n in skill[l].role){
                                             for(o in character){
                                                 if(character[o].id==skill[l].role[n].id){
-                                                    standardCharacters+="<"+ "<charactorName class=\"characterID"+character[o].id+"\"></charactorName>"+skill[l].role[n].skill_order
+                                                    standardCharacters+="<"+ "<characterName class=\"characterID"+character[o].id+"\"></characterName>"+skill[l].role[n].skill_order
                                                     //君主技
                                                     if(skill[l].role[n].dominator)standardCharacters+="<dominatorSkill epithet=\"1\"></dominatorSkill>"
                                                     standardCharacters+=">"
