@@ -18,21 +18,6 @@
 
         <script src="function/scroll_back"></script>
         
-        <script>
-            scroll_back.scrollToView()
-            setTimeout(function(){
-                document.querySelectorAll(".scroll").forEach(
-                    scroll => {
-                        if (scroll.outerHTML.startsWith("<"+window.location.hash.slice(1)+" ")){
-                            if(!(scroll.classList.contains('fadeOnly'))){
-                                scroll.scrollIntoView({behavior:'smooth'});
-                            }
-                            $(scroll).fadeTo(200,0).fadeTo(1000,1)
-                        }
-                    }
-                )
-            },100)
-        </script>
 
         <title>Document丨程序</title>
     </head>
@@ -49,10 +34,10 @@
             </nav>
             <nav id="sidebar">
                 <ul class="tabs nav" data-tabs id="example-tabs">
-                    <li id="nav-item" class="tabs-title is-active"><a id=title-a href="#panel_term" aria-selected="true">程序</a></li>
-                    <li id="nav-item" class="tabs-title"><a id=title-a href="#panel_skill">技能</a></li>
-                    <li id="nav-item" class="tabs-title"><a id=title-a href="#panel_card">牌库</a></li>
-                    <li id="nav-item" class="tabs-title"><a id=title-a href="#panel_character">将池</a></li>
+                    <li id="nav-item" class="tabs-title is-active"><a id=title-a class='title-a' href="#panel_term" aria-selected="true">程序</a></li>
+                    <li id="nav-item" class="tabs-title"><a id=title-a class='title-a' href="#panel_skill">技能</a></li>
+                    <li id="nav-item" class="tabs-title"><a id=title-a class='title-a' href="#panel_card">牌库</a></li>
+                    <li id="nav-item" class="tabs-title"><a id=title-a class='title-a' href="#panel_character">将池</a></li>
                 </ul>
             </nav>
         </header>
