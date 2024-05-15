@@ -70,7 +70,7 @@
 }
 padding {
     display: block;
-    padding-bottom: 0.75em;
+    padding-bottom: 1.2em;
 }
 .h{
     font-size: .9rem;
@@ -81,7 +81,7 @@ padding {
     font-weight: bold;
 }
 .scroll{
-    scroll-margin-top:50px;
+    scroll-margin-top:70px;
 }
 
 body{
