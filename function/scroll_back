@@ -5,8 +5,9 @@ $(function(){
         return () => {
             if (timer)clearTimeout(timer);
             timer = setTimeout(() => {
-                localStorage.setItem('scrollHeight'+window.location.hash, window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop)
+                localStorage.setItem('scrollHeight'+document.getElementsByClassName('tabs-panel is-active').href, window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop)
             }, 100)
+            alert(document.getElementsByClassName('tabs-panel is-active').href)
         }
     }
     this.scrollFn = debounce()

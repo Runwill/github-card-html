@@ -30,7 +30,7 @@ $(function(){
                         element.addEventListener(
                             'click', function(){
                                 event.stopPropagation()
-                                $("#example-tabs").foundation('selectTab', "panel_term", 1);
+                                $("#example-tabs").foundation('selectTab','panel_term',1);
                                 document.querySelectorAll(".scroll").forEach(
                                     scroll => {
                                         event.stopPropagation()
@@ -85,7 +85,7 @@ $(function(){
                         element.addEventListener(
                             'click', function(){
                                 event.stopPropagation()
-                                $("#example-tabs").foundation('selectTab', "panel_term", 1);
+                                $("#example-tabs").foundation('selectTab','panel_term',1);
                                 document.querySelectorAll(".scroll").forEach(
                                     scroll => {
                                         event.stopPropagation()
