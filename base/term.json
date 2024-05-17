@@ -358,6 +358,10 @@
         "en":"object" ,
         "color":"#aea2d6"
     },
+    {
+        "en":"inGameBool" ,
+        "color":"#a1b1fb"
+    },
     { 
         "cn":"时机" ,
         "en":"tick" ,
@@ -497,6 +501,51 @@
         "color":"#b0d9e8"
     },
     { 
+        "cn":"向背" ,
+        "en":"forOrAgainst" ,
+        "color":"#fbeca1"
+    },
+    { 
+        "epithet":[{"cn":"向置"},{"cn":"向"}] ,
+        "en":"for" ,
+        "color":"#fbeca1"
+    },
+    { 
+        "epithet":[{"cn":"背置"},{"cn":"背"}] ,
+        "en":"against" ,
+        "color":"#fbeca1"
+    },
+    { 
+        "cn":"纵横" ,
+        "en":"verticalOrHorizontal" ,
+        "color":"#c9fba1"
+    },
+    { 
+        "epithet":[{"cn":"纵置"},{"cn":"纵"}] ,
+        "en":"vertical" ,
+        "color":"#c9fba1"
+    },
+    { 
+        "epithet":[{"cn":"横置"},{"cn":"横"}] ,
+        "en":"horizontal" ,
+        "color":"#c9fba1"
+    },
+    { 
+        "cn":"分合" ,
+        "en":"apartOrTogather" ,
+        "color":"#fbc0a1"
+    },
+    { 
+        "epithet":[{"cn":"分置"},{"cn":"分"}] ,
+        "en":"apart" ,
+        "color":"#fbc0a1"
+    },
+    { 
+        "epithet":[{"cn":"合置"},{"cn":"合"}] ,
+        "en":"togather" ,
+        "color":"#fbc0a1"
+    },
+    { 
         "cn":"手牌区" ,
         "en":"hand" ,
         "color":"#e8beb0"
@@ -557,12 +606,12 @@
         "color":"#a1b1fb"
     },
     { 
-        "cn":"游戏内" ,
+        "epithet":[{"cn":"局内"},{"cn":"在局内"}] ,
         "en":"inGame" ,
         "color":"#a1b1fb"
     },
     { 
-        "cn":"游戏外" ,
+        "epithet":[{"cn":"局外"},{"cn":"在局外"}] ,
         "en":"outGame" ,
         "color":"#a1b1fb"
     },

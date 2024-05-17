@@ -252,6 +252,26 @@
                                         </padding>
                                         <h1><object class="scroll"></object></h1>
                                         <padding>
+                                            <h2><inGameBool class="scroll"/></h2>
+                                            <div class="indent">
+                                                <object></object>的一项<attribute></attribute>。布尔型变量。
+                                            </div>
+                                            <div class="indent">
+                                                未规定<inGameBool></inGameBool>的<card></card>，其的<inGameBool></inGameBool>值视为与其所属<area></area>相等。
+                                            </div>
+                                            <div class="indent">
+                                                未规定<inGameBool></inGameBool>的<area></area>，其的<inGameBool></inGameBool>值视为与其所属<role></role>相等。
+                                            </div>
+                                            <padding>
+                                                <h3><inGame class="scroll"/></h3>
+                                                <div class="indent">
+                                                    <inGameBool></inGameBool>为1。
+                                                </div>
+                                                <h3><outGame class="scroll"/></h3>
+                                                <div class="indent">
+                                                    <inGameBool></inGameBool>为0。
+                                                </div>
+                                            </padding>
                                             <h2><tick class="scroll"/></h2>
                                             <div class="indent">
                                                 一类<object></object>。
@@ -434,9 +454,64 @@
                                                 一类<object></object>。
                                             </div>
                                             <padding>
+                                                <h3><forOrAgainst class="scroll"/></h3>
+                                                <div class="indent">
+                                                    <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。布尔型变量。
+                                                </div>
+                                                <div class="indent">
+                                                    未规定<forOrAgainst></forOrAgainst>的<card></card>，其的<forOrAgainst></forOrAgainst>值视为与其所属<area></area>相等。
+                                                </div>
+                                                <padding>
+                                                    <h3><for class="scroll"/></h3>
+                                                    <div class="indent">
+                                                        <forOrAgainst></forOrAgainst>为0。
+                                                    </div>
+                                                    <h3><against class="scroll"/></h3>
+                                                    <div class="indent">
+                                                        <forOrAgainst></forOrAgainst>为1。
+                                                    </div>
+                                                </padding>
+                                                <h3><verticalOrHorizontal class="scroll"/></h3>
+                                                <div class="indent">
+                                                    <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。布尔型变量。
+                                                </div>
+                                                <div class="indent">
+                                                    未规定<verticalOrHorizontal></verticalOrHorizontal>的<card></card>，其的<verticalOrHorizontal></verticalOrHorizontal>值视为与其所属<area></area>相等。
+                                                </div>
+                                                <padding>
+                                                    <h3><vertical class="scroll"/></h3>
+                                                    <div class="indent">
+                                                        <verticalOrHorizontal></verticalOrHorizontal>为0。
+                                                    </div>
+                                                    <h3><horizontal class="scroll"/></h3>
+                                                    <div class="indent">
+                                                        <verticalOrHorizontal></verticalOrHorizontal>为1。
+                                                    </div>
+                                                </padding>
+                                                <h3><apartOrTogather class="scroll"/></h3>
+                                                <div class="indent">
+                                                    <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。布尔型变量。
+                                                </div>
+                                                <div class="indent">
+                                                    未规定<apartOrTogather></apartOrTogather>的<card></card>，其的<apartOrTogather></apartOrTogather>值视为与所属的<area></area>相等。
+                                                </div>
+                                                <padding>
+                                                    <h3><apart class="scroll"/></h3>
+                                                    <div class="indent">
+                                                        <apartOrTogather></apartOrTogather>为0。
+                                                    </div>
+                                                    <h3><togather class="scroll"/></h3>
+                                                    <div class="indent">
+                                                        <apartOrTogather></apartOrTogather>为1。
+                                                    </div>
+                                                </padding>
+                                                <h3><discardPile class="scroll"/></h2>
+                                                <div class="indent">
+                                                    一种<area></area>。<togather epithet="1"></togather><against></against>。
+                                                </div>
                                                 <h3><hand class="scroll"/></h2>
                                                 <div class="indent">
-                                                    一种<area></area>。
+                                                    一种<area></area>。<against></against>。
                                                 </div>
                                                 <padding>
                                                     <h3><handCard class="scroll"/></h2>
