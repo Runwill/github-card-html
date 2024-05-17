@@ -501,6 +501,20 @@
         "color":"#b0d9e8"
     },
     { 
+        "en":"visible" ,
+        "part":[
+            {
+                "cn":"对" ,
+                "en":"visibleHead" 
+            },
+            {
+                "cn":"可见" ,
+                "en":"visibleBody" 
+            }
+        ],
+        "color":"#aaeee9"
+    },
+    { 
         "cn":"向背" ,
         "en":"forOrAgainst" ,
         "color":"#fbeca1"
