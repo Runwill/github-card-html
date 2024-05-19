@@ -300,6 +300,38 @@
         "color":"#acd1ab"
     },
     { 
+        "en":"discardRole" ,
+        "part":[
+            {
+                "cn":"弃置" ,
+                "en":"discardRoleHead1" 
+            },
+            {
+                "cn":"弃" ,
+                "en":"discardRoleHead2" 
+            },
+            {
+                "cn":"者" ,
+                "en":"discardRoleEnd" 
+            }
+        ],
+        "color":"#acd1ab"
+    },
+    { 
+        "en":"discardedCard" ,
+        "part":[
+            {
+                "cn":"被弃" ,
+                "en":"discardedCardHead" 
+            },
+            {
+                "cn":"牌" ,
+                "en":"discardedCardEnd" 
+            }
+        ],
+        "color":"#acd1ab"
+    },
+    { 
         "en":"beforeDiscard" ,
         "part":[
             {

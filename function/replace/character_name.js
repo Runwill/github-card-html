@@ -29,22 +29,17 @@ $(function(){
                     element.addEventListener(
                         'click', function(){
                             event.stopPropagation()
-                            if(document.URL.includes("character.html")){
-                                document.querySelectorAll(".scroll").forEach(
-                                    scroll => {
-                                        if (scroll.classList.contains(event.currentTarget.classList[0])){
-                                            //event.stopPropagation()
-                                            if(!(scroll.classList.contains('fadeOnly'))){
-                                                scroll.scrollIntoView({behavior:'smooth'})
-                                            }
-                                            $(scroll).fadeTo(200,0).fadeTo(1000,1)
+                            $("#example-tabs").foundation('selectTab','panel_character',1);
+                            document.querySelectorAll(".scroll").forEach(
+                                scroll => {
+                                    if (scroll.classList.contains(event.currentTarget.classList[0])){
+                                        if(!(scroll.classList.contains('fadeOnly'))){
+                                            scroll.scrollIntoView({behavior:'smooth'})
                                         }
+                                        $(scroll).fadeTo(200,0).fadeTo(1000,1)
                                     }
-                                )
-                            }
-                            else {
-                                window.location.href = "character.html#"+event.currentTarget.classList[0]
-                            }
+                                }
+                            )
                         }
                     )
                 }
