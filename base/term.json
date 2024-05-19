@@ -496,6 +496,11 @@
         "color":"#d8cbc8"
     },
     { 
+        "cn":"位置" ,
+        "en":"position" ,
+        "color":"#aaeee8"
+    },
+    { 
         "cn":"区域" ,
         "en":"area" ,
         "color":"#b0d9e8"
