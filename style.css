@@ -1,4 +1,13 @@
-@media (max-width: 600px){
+@media (max-width: 500px){
+    html{
+        font-size: 15px
+    }
+    padding {
+        padding-left: 0.8em;
+        padding-right:0.6em;
+    }
+}
+@media (min-width: 501px) and (max-width: 600px){
     html{
         font-size: 15px
     }
