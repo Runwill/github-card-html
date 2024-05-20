@@ -264,6 +264,24 @@
         "color":"#c6ff8d"
     },
     { 
+        "en":"placeAt" ,
+        "part":[
+            {
+                "cn":"被" ,
+                "en":"placeAtPassivity" 
+            },
+            {
+                "cn":"置" ,
+                "en":"placeAtBody" 
+            },
+            {
+                "cn":"于" ,
+                "en":"placeAtEnd" 
+            }
+        ],
+        "color":"#b8abd1"
+    },
+    { 
         "en":"placeIn" ,
         "part":[
             {
@@ -276,7 +294,107 @@
             },
             {
                 "cn":"入" ,
-                "en":"placeInEnd" 
+                "en":"placeInEnd1" 
+            },
+            {
+                "cn":"于" ,
+                "en":"placeInEnd2" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"placeInRole" ,
+        "part":[
+            {
+                "cn":"置入" ,
+                "en":"placeInRoleHead" 
+            },
+            {
+                "cn":"者" ,
+                "en":"placeInRoleEnd" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"placedInCard" ,
+        "part":[
+            {
+                "cn":"被置入" ,
+                "en":"placedInCardHead" 
+            },
+            {
+                "cn":"牌" ,
+                "en":"placedInCardEnd" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"placedInArea" ,
+        "part":[
+            {
+                "cn":"被置入" ,
+                "en":"placedInAreaHead" 
+            },
+            {
+                "cn":"区域" ,
+                "en":"placedInAreaEnd" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"beforePlaceIn" ,
+        "part":[
+            {
+                "cn":"被" ,
+                "en":"beforePlaceInPassivity" 
+            },
+            {
+                "cn":"置入" ,
+                "en":"beforePlaceInBody" 
+            },
+            {
+                "cn":"前" ,
+                "en":"beforePlaceInEnd" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"whenPlaceIn" ,
+        "part":[
+            {
+                "cn":"被" ,
+                "en":"whenPlaceInPassivity" 
+            },
+            {
+                "cn":"置入" ,
+                "en":"whenPlaceInBody" 
+            },
+            {
+                "cn":"时" ,
+                "en":"whenPlaceInEnd" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"afterPlaceIn" ,
+        "part":[
+            {
+                "cn":"被" ,
+                "en":"afterPlaceInPassivity" 
+            },
+            {
+                "cn":"置入" ,
+                "en":"afterPlaceInBody" 
+            },
+            {
+                "cn":"后" ,
+                "en":"afterPlaceInEnd" 
             }
         ],
         "color":"#abd1c4"
@@ -447,6 +565,11 @@
     { 
         "cn":"角色" ,
         "en":"role" ,
+        "color":"#e8dbb0"
+    },
+    { 
+        "cn":"角色" ,
+        "en":"roleDefault" ,
         "color":"#b0d9e8"
     },
     { 
@@ -528,6 +651,11 @@
         "color":"#d8cbc8"
     },
     { 
+        "cn":"牌" ,
+        "en":"cardDefault" ,
+        "color":"#c9d8c8"
+    },
+    { 
         "cn":"位置" ,
         "en":"position" ,
         "color":"#aaeee8"
@@ -605,6 +733,11 @@
         "cn":"手牌" ,
         "en":"handCard" ,
         "color":"#ecb09d"
+    },
+    { 
+        "cn":"装备区" ,
+        "en":"equipArea" ,
+        "color":"#b0cce8"
     },
     { 
         "cn":"弃牌堆" ,
