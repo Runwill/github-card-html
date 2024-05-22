@@ -45,6 +45,16 @@
         "color":"#f0a2a2"
     },
     { 
+        "en":"except" ,
+        "part":[
+            {
+                "cn":"否则" ,
+                "en":"exceptHead" 
+            }
+        ],
+        "color":"#fddede"
+    },
+    { 
         "cn":"时段与次数限制" ,
         "en":"tickingTimeLimit" ,
         "color":"#b9f69e"
@@ -264,137 +274,195 @@
         "color":"#c6ff8d"
     },
     { 
-        "en":"placeAt" ,
+        "en":"place" ,
         "part":[
             {
                 "cn":"被" ,
-                "en":"placeAtPassivity" 
+                "en":"placeHead" 
             },
             {
-                "cn":"置" ,
-                "en":"placeAtBody" 
+                "cn":"置于" ,
+                "en":"placeBody1" 
             },
             {
-                "cn":"于" ,
-                "en":"placeAtEnd" 
+                "cn":"置入" ,
+                "en":"placeBody2" 
             }
         ],
-        "color":"#b8abd1"
+        "color":"#abd1c4"
     },
     { 
-        "en":"placeIn" ,
+        "en":"placeRole" ,
         "part":[
             {
-                "cn":"被" ,
-                "en":"placeInPassivity" 
-            },
-            {
                 "cn":"置" ,
-                "en":"placeInBody" 
+                "en":"placeRoleHead" 
             },
             {
                 "cn":"入" ,
-                "en":"placeInEnd1" 
-            },
-            {
-                "cn":"于" ,
-                "en":"placeInEnd2" 
-            }
-        ],
-        "color":"#abd1c4"
-    },
-    { 
-        "en":"placeInRole" ,
-        "part":[
-            {
-                "cn":"置入" ,
-                "en":"placeInRoleHead" 
+                "en":"placeRoleBody" 
             },
             {
                 "cn":"者" ,
-                "en":"placeInRoleEnd" 
+                "en":"placeRoleEnd" 
             }
         ],
         "color":"#abd1c4"
     },
     { 
-        "en":"placedInCard" ,
+        "en":"placedCard" ,
         "part":[
             {
-                "cn":"被置入" ,
-                "en":"placedInCardHead" 
+                "cn":"被置" ,
+                "en":"placedCardHead" 
             },
             {
+                "cn":"入" ,
+                "en":"placedCardBody" 
+            }, 
+            {
                 "cn":"牌" ,
-                "en":"placedInCardEnd" 
+                "en":"placedCardEnd" 
             }
         ],
         "color":"#abd1c4"
     },
     { 
-        "en":"placedInArea" ,
+        "en":"placedArea" ,
         "part":[
             {
+                "cn":"被置于" ,
+                "en":"placedAreaHead1" 
+            },
+            {
                 "cn":"被置入" ,
-                "en":"placedInAreaHead" 
+                "en":"placedAreaHead2" 
             },
             {
                 "cn":"区域" ,
-                "en":"placedInAreaEnd" 
+                "en":"placedAreaEnd" 
             }
         ],
         "color":"#abd1c4"
     },
     { 
-        "en":"beforePlaceIn" ,
+        "en":"placedPosition" ,
         "part":[
             {
-                "cn":"被" ,
-                "en":"beforePlaceInPassivity" 
+                "cn":"被置于" ,
+                "en":"placedPositionHead" 
             },
             {
-                "cn":"置入" ,
-                "en":"beforePlaceInBody" 
+                "cn":"位置" ,
+                "en":"placedPositionEnd" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"beforePlace" ,
+        "part":[
+            {
+                "cn":"将" ,
+                "en":"beforePlaceHead" 
+            },
+            {
+                "cn":"置于" ,
+                "en":"beforePlaceBody" 
             },
             {
                 "cn":"前" ,
-                "en":"beforePlaceInEnd" 
+                "en":"beforePlaceEnd" 
             }
         ],
         "color":"#abd1c4"
     },
     { 
-        "en":"whenPlaceIn" ,
+        "en":"beforePlaced" ,
         "part":[
             {
                 "cn":"被" ,
-                "en":"whenPlaceInPassivity" 
+                "en":"beforePlacedHead" 
             },
             {
-                "cn":"置入" ,
-                "en":"whenPlaceInBody" 
+                "cn":"置于" ,
+                "en":"beforePlacedBody" 
+            },
+            {
+                "cn":"前" ,
+                "en":"beforePlacedEnd" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"whenPlace" ,
+        "part":[
+            {
+                "cn":"将" ,
+                "en":"whenPlaceHead" 
+            },
+            {
+                "cn":"置于" ,
+                "en":"whenPlaceBody" 
             },
             {
                 "cn":"时" ,
-                "en":"whenPlaceInEnd" 
+                "en":"whenPlaceEnd" 
             }
         ],
         "color":"#abd1c4"
     },
     { 
-        "en":"afterPlaceIn" ,
+        "en":"whenPlaced" ,
         "part":[
             {
                 "cn":"被" ,
-                "en":"afterPlaceInPassivity" 
+                "en":"whenPlacedHead" 
             },
             {
-                "cn":"置入" ,
-                "en":"afterPlaceInBody" 
+                "cn":"置于" ,
+                "en":"whenPlacedBody" 
+            },
+            {
+                "cn":"时" ,
+                "en":"whenPlacedEnd" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"afterPlace" ,
+        "part":[
+            {
+                "cn":"将" ,
+                "en":"afterPlaceHead" 
+            },
+            {
+                "cn":"置于" ,
+                "en":"afterPlaceBody" 
             },
             {
                 "cn":"后" ,
-                "en":"afterPlaceInEnd" 
+                "en":"afterPlaceEnd" 
+            }
+        ],
+        "color":"#abd1c4"
+    },
+    { 
+        "en":"afterPlaced" ,
+        "part":[
+            {
+                "cn":"被" ,
+                "en":"afterPlacedHead" 
+            },
+            {
+                "cn":"置于" ,
+                "en":"afterPlacedBody" 
+            },
+            {
+                "cn":"后" ,
+                "en":"afterPlacedEnd" 
             }
         ],
         "color":"#abd1c4"
@@ -453,12 +521,8 @@
         "en":"beforeDiscard" ,
         "part":[
             {
-                "cn":"被" ,
-                "en":"beforeDiscardPassivity" 
-            },
-            {
                 "cn":"弃置" ,
-                "en":"beforeDiscardBody" 
+                "en":"beforeDiscardHead" 
             },
             {
                 "cn":"前" ,
@@ -468,15 +532,29 @@
         "color":"#acd1ab"
     },
     { 
-        "en":"whenDiscard" ,
+        "en":"beforeDiscarded" ,
         "part":[
             {
                 "cn":"被" ,
-                "en":"whenDiscardPassivity" 
+                "en":"beforeDiscardedHead" 
             },
             {
                 "cn":"弃置" ,
-                "en":"whenDiscardBody" 
+                "en":"beforeDiscardedBody" 
+            },
+            {
+                "cn":"前" ,
+                "en":"beforeDiscardedEnd" 
+            }
+        ],
+        "color":"#acd1ab"
+    },
+    { 
+        "en":"whenDiscard" ,
+        "part":[
+            {
+                "cn":"弃置" ,
+                "en":"whenDiscardHead" 
             },
             {
                 "cn":"时" ,
@@ -486,19 +564,51 @@
         "color":"#acd1ab"
     },
     { 
-        "en":"afterDiscard" ,
+        "en":"whenDiscarded" ,
         "part":[
             {
                 "cn":"被" ,
-                "en":"afterDiscardPassivity" 
+                "en":"whenDiscardedHead" 
             },
             {
                 "cn":"弃置" ,
-                "en":"afterDiscardBody" 
+                "en":"whenDiscardedBody" 
+            },
+            {
+                "cn":"时" ,
+                "en":"whenDiscardedEnd" 
+            }
+        ],
+        "color":"#acd1ab"
+    },
+    { 
+        "en":"afterDiscard" ,
+        "part":[
+            {
+                "cn":"弃置" ,
+                "en":"afterDiscardHead" 
             },
             {
                 "cn":"后" ,
                 "en":"afterDiscardEnd" 
+            }
+        ],
+        "color":"#acd1ab"
+    },
+    { 
+        "en":"afterDiscarded" ,
+        "part":[
+            {
+                "cn":"被" ,
+                "en":"afterDiscardedHead" 
+            },
+            {
+                "cn":"弃置" ,
+                "en":"afterDiscardedBody" 
+            },
+            {
+                "cn":"后" ,
+                "en":"afterDiscardedEnd" 
             }
         ],
         "color":"#acd1ab"
@@ -553,14 +663,18 @@
         "color":"#91be9c"
     },
     { 
-        "en":"in" ,
+        "en":"inTicking" ,
         "part":[
             {
+                "cn":"于" ,
+                "en":"inTickingHead" 
+            },
+            {
                 "cn":"内" ,
-                "en":"inEnd" 
+                "en":"inTickingEnd" 
             }
         ],
-        "color":"#fddede"
+        "color":"#fddeec"
     },
     { 
         "cn":"角色" ,
@@ -664,6 +778,34 @@
         "cn":"区域" ,
         "en":"area" ,
         "color":"#b0d9e8"
+    },
+    { 
+        "en":"inArea" ,
+        "part":[
+            {
+                "cn":"在" ,
+                "en":"inAreaHead" 
+            },
+            {
+                "cn":"内" ,
+                "en":"inAreaEnd" 
+            }
+        ],
+        "color":"#fddeec"
+    },
+    { 
+        "en":"outArea" ,
+        "part":[
+            {
+                "cn":"在" ,
+                "en":"outAreaHead" 
+            },
+            {
+                "cn":"外" ,
+                "en":"outAreaEnd" 
+            }
+        ],
+        "color":"#fddeec"
     },
     { 
         "en":"visible" ,
