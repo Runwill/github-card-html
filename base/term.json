@@ -10,9 +10,44 @@
         "color":"#8dff9e"
     },
     { 
+        "cn":"公式" ,
+        "en":"formula" ,
+        "color":"#daf4f8"
+    },
+    { 
         "cn":"程序" ,
         "en":"procedure" ,
         "color":"#8dbeff"
+    },
+    { 
+        "en":"if" ,
+        "part":[
+            {
+                "cn":"若" ,
+                "en":"ifHead" 
+            }
+        ],
+        "color":"#a5d8a8"
+    },
+    { 
+        "en":"counts" ,
+        "part":[
+            {
+                "cn":"数" ,
+                "en":"countsEnd" 
+            }
+        ],
+        "color":"#b1cfe3"
+    },
+    { 
+        "en":"every" ,
+        "part":[
+            {
+                "cn":"每" ,
+                "en":"everyHead" 
+            }
+        ],
+        "color":"#c3a5d8"
     },
     { 
         "cn":"程序触发器" ,
