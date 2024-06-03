@@ -251,15 +251,15 @@
                                                     </div>
                                                     <h3><placedCard class="scroll"><placedCardHead></placedCardHead><placedCardEnd></placedCardEnd></placedCard></h3>
                                                     <div class="indent">
-                                                        任意张<card></card>。
+                                                        任意张<card></card>的集合。
                                                     </div>
                                                     <h3><placedArea class="scroll"><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea></h3>
                                                     <div class="indent">
-                                                        任意张<card></card>。
+                                                        一个<area></area>。若<placedPosition><placedPositionHead></placedPositionHead><placedPositionEnd></placedPositionEnd></placedPosition>与原<position></position>相同，不与原<lyingArea epithet="1"></lyingArea>相同。
                                                     </div>
                                                     <h3><placedPosition class="scroll"><placedPositionHead></placedPositionHead><placedPositionEnd></placedPositionEnd></placedPosition></h3>
                                                     <div class="indent">
-                                                        一个正整数。默认为1。
+                                                        一个正整数。默认为1。若<placedArea><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea>与原<lyingArea epithet="1"></lyingArea>相同，不与原<position></position>相同。
                                                     </div>
                                                 </padding>
                                                 <div class="indent">
@@ -274,23 +274,29 @@
                                                             <advance></advance><tick></tick>“<beforePlaced class="scroll bold"><beforePlacedHead></beforePlacedHead><beforePlacedBody></beforePlacedBody><beforePlacedEnd></beforePlacedEnd></beforePlaced>”。
                                                         </div>
                                                         <div class="indent">
-                                                            若存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<advance></advance><tick></tick>“<whenDiscard class="scroll bold"><whenDiscardHead></whenDiscardHead><whenDiscardEnd></whenDiscardEnd></whenDiscard>”：
+                                                            若存在<placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>，<advance></advance><tick></tick>“<whenPlace class="scroll bold"><whenPlaceBody></whenPlaceBody><whenPlaceEnd></whenPlaceEnd></whenPlace>”：
                                                         </div>
                                                         <div class="indent">
-                                                            <advance></advance><tick></tick>“<whenDiscarded class="scroll bold"><whenDiscardedHead></whenDiscardedHead><whenDiscardedBody></whenDiscardedBody><whenDiscardedEnd></whenDiscardedEnd></whenDiscarded>”：
+                                                            <advance></advance><tick></tick>“<whenPlaced class="scroll bold"><whenPlacedHead></whenPlacedHead><whenPlacedBody></whenPlacedBody><whenPlacedEnd></whenPlacedEnd></whenPlaced>”：
                                                         </div>
                                                         <padding>
                                                             <div class="h">
                                                                 <div class="indent">
-                                                                    <discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole><place>将<discardedCard><discardedCardHead></discardedCardHead><discardedCardEnd></discardedCardEnd></discardedCard><placeEnd2></placeEnd2><placeInEnd1></placeInEnd1><discardPile></discardPile></place>。
+                                                                    <placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>将<placedCard><placedCardHead></placedCardHead><placedCardEnd></placedCardEnd></placedCard>的<lyingArea></lyingArea>改为<placedArea><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea>。
+                                                                </div>
+                                                                <div class="indent">
+                                                                    <placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>将<placedArea><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea>所有<card></card>的<position></position>+。
+                                                                </div>
+                                                                <div class="indent">
+                                                                    <position></position>改为<placedPosition><placedPositionHead></placedPositionHead><placedPositionEnd></placedPositionEnd></placedPosition>。
                                                                 </div>
                                                             </div>
                                                         </padding>
                                                         <div class="indent">
-                                                            若存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<advance></advance><tick></tick>“<afterDiscard class="scroll bold"><afterDiscardHead></afterDiscardHead><afterDiscardEnd></afterDiscardEnd></afterDiscard>”。
+                                                            若存在<placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>，<advance></advance><tick></tick>“<afterPlace class="scroll bold"><afterPlaceBody></afterPlaceBody><afterPlaceEnd></afterPlaceEnd></afterPlace>”。
                                                         </div>
                                                         <div class="indent">
-                                                            <advance></advance><tick></tick>“<afterDiscarded class="scroll bold"><afterDiscardedHead></afterDiscardedHead><afterDiscardedBody></afterDiscardedBody><afterDiscardedEnd></afterDiscardedEnd></afterDiscarded>”。
+                                                            <advance></advance><tick></tick>“<afterPlaced class="scroll bold"><afterPlacedHead></afterPlacedHead><afterPlacedBody></afterPlacedBody><afterPlacedEnd></afterPlacedEnd></afterPlaced>”。
                                                         </div>
                                                     </div>
                                                 </padding>
@@ -308,7 +314,7 @@
                                                     </div>
                                                     <h3><discardedCard class="scroll"><discardedCardHead></discardedCardHead><discardedCardEnd></discardedCardEnd></discardedCard></h3>
                                                     <div class="indent">
-                                                        任意张<card></card>。
+                                                        任意张<card></card>的集合。
                                                     </div>
                                                 </padding>
                                                 <div class="indent">
@@ -331,7 +337,7 @@
                                                         <padding>
                                                             <div class="h">
                                                                 <div class="indent">
-                                                                    <discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole><place>将<discardedCard><discardedCardHead></discardedCardHead><discardedCardEnd></discardedCardEnd></discardedCard><placeEnd2></placeEnd2><placeInEnd1></placeInEnd1><discardPile></discardPile></place>。
+                                                                    <discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole><place>将<discardedCard><discardedCardHead></discardedCardHead><discardedCardEnd></discardedCardEnd></discardedCard><placeBody2></placeBody2><discardPile></discardPile></place>。
                                                                 </div>
                                                             </div>
                                                         </padding>
@@ -553,8 +559,10 @@
                                                 <div class="indent">
                                                     <or><handCard></handCard><orBody></orBody><inArea><equipArea></equipArea><inAreaEnd></inAreaEnd></inArea></or>的<card></card>。
                                                 </div>
-                                            </padding>
-                                            <padding>
+                                                <h3><lyingArea class="scroll"/></h3>
+                                                <div class="indent">
+                                                    <card></card>的一项<attribute></attribute>。一种<area></area>。
+                                                </div>
                                                 <h3><position class="scroll"/></h3>
                                                 <div class="indent">
                                                     <card></card>的一项<attribute></attribute>。整型变量。

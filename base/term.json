@@ -770,6 +770,11 @@
         "color":"#c9d8c8"
     },
     { 
+        "epithet":[{"cn":"所处区域"},{"cn":"区域"}] ,
+        "en":"lyingArea" ,
+        "color":"#b0d9e8"
+    },
+    { 
         "cn":"位置" ,
         "en":"position" ,
         "color":"#aaeee8"
