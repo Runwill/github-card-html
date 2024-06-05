@@ -820,6 +820,10 @@
         "color":"#b0d9e8"
     },
     { 
+        "en":"objectInArea" ,
+        "color":"#c8beea"
+    },
+    { 
         "en":"inArea" ,
         "part":[
             {
