@@ -114,12 +114,12 @@
                                                     满足<tickLimit></tickLimit>，即<currentTick></currentTick>符合<tickLimit></tickLimit>。
                                                 </div>
                                                 <div class="indent">
-                                                    未规定<tickLimit></tickLimit>的<procedureTrigger></procedureTrigger>，<if><ifHead></ifHead>其对应的<tickingLimit></tickingLimit>为：</if>
+                                                    未规定<tickLimit></tickLimit>的<procedureTrigger></procedureTrigger>，<if><ifHead></ifHead>其对应的<tickingLimit></tickingLimit>为：
                                                 </div>
                                                 <padding>
                                                     <div class="h">
                                                         <div class="indent">
-                                                            <actingStage></actingStage>，其的<tickLimit></tickLimit>值视为<acting></acting>。
+                                                            <actingStage></actingStage>，<ifBody></ifBody>其的<tickLimit></tickLimit>值视为<acting></acting>。</if>
                                                         </div>
                                                     </div>
                                                 </padding>
@@ -139,7 +139,7 @@
                                             </padding>
                                             <h2><priority class="scroll"/></h2>
                                             <div class="indent">
-                                                <characterSkill></characterSkill>><equipmentSkill></equipmentSkill>>其他，<if><ifHead></ifHead>同级</if>则按照从<or><living></living>的<currentTurnRole></currentTurnRole><orBody></orBody><dead></dead>的<currentTurnRole></currentTurnRole>的<nextSeat><nextSeatHead></nextSeatHead><nextSeatEnd></nextSeatEnd></nextSeat></or>开始的<seatOrder></seatOrder>顺序。
+                                                <characterSkill></characterSkill>><equipmentSkill></equipmentSkill>>其他，<if><ifHead></ifHead>同级<ifBody></ifBody>按照从<or><living></living>的<currentTurnRole></currentTurnRole><orBody></orBody><dead></dead>的<currentTurnRole></currentTurnRole>的<nextSeat><nextSeatHead></nextSeatHead><nextSeatEnd></nextSeatEnd></nextSeat></or>开始的<seatOrder></seatOrder>顺序</if>。
                                             </div>
                                             <h2><you class="scroll"/></h2>
                                             <div class="indent">
@@ -251,7 +251,7 @@
                                                     一类<event></event>。
                                                 </div>
                                                 <div class="indent">
-                                                    <if><ifHead></ifHead><placedCard><placedCardHead></placedCardHead><placedCardEnd></placedCardEnd></placedCard><outArea><outAreaHead></outAreaHead><placedArea><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea><outAreaEnd></outAreaEnd></outArea></if>，可称为<place><placeBody2></placeBody2></place>。
+                                                    <if><ifHead></ifHead><placedCard><placedCardHead></placedCardHead><placedCardEnd></placedCardEnd></placedCard><outArea><outAreaHead></outAreaHead><placedArea><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea><outAreaEnd></outAreaEnd></outArea>，<ifBody></ifBody>可称为<place><placeBody2></placeBody2></place></if>。
                                                 </div>
                                                 <div class="indent">
                                                     包含以下输入：
@@ -267,11 +267,11 @@
                                                     </div>
                                                     <h3><placedArea class="scroll"><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea></h3>
                                                     <div class="indent">
-                                                        一个<area></area>。<if><ifHead></ifHead><placedPosition><placedPositionHead></placedPositionHead><placedPositionEnd></placedPositionEnd></placedPosition>与原<position></position>相同</if>，不与原<lyingArea epithet="1"></lyingArea>相同。
+                                                        一个<area></area>。<if><ifHead></ifHead><placedPosition><placedPositionHead></placedPositionHead><placedPositionEnd></placedPositionEnd></placedPosition>与原<position></position>相同，<ifBody></ifBody>不与原<lyingArea epithet="1"></lyingArea>相同</if>。
                                                     </div>
                                                     <h3><placedPosition class="scroll"><placedPositionHead></placedPositionHead><placedPositionEnd></placedPositionEnd></placedPosition></h3>
                                                     <div class="indent">
-                                                        一个正整数。默认为1。<if><ifHead></ifHead><placedArea><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea>与原<lyingArea epithet="1"></lyingArea>相同</if>，不与原<position></position>相同。
+                                                        一个正整数。默认为1。<if><ifHead></ifHead><placedArea><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea>与原<lyingArea epithet="1"></lyingArea>相同，<ifBody></ifBody>不与原<position></position>相同</if>。
                                                     </div>
                                                 </padding>
                                                 <div class="indent">
@@ -280,13 +280,13 @@
                                                 <padding>
                                                     <div class="h">
                                                         <div class="indent">
-                                                            <if><ifHead></ifHead></if>存在<placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>，<advance></advance><tick></tick>“<beforePlace class="scroll bold"><beforePlaceBody></beforePlaceBody><beforePlaceEnd></beforePlaceEnd></beforePlace>”。
+                                                            <if><ifHead></ifHead>存在<placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>，<ifBody></ifBody><advance></advance><tick></tick>“<beforePlace class="scroll bold"><beforePlaceBody></beforePlaceBody><beforePlaceEnd></beforePlaceEnd></beforePlace>”</if>。
                                                         </div>
                                                         <div class="indent">
                                                             <advance></advance><tick></tick>“<beforePlaced class="scroll bold"><beforePlacedHead></beforePlacedHead><beforePlacedBody></beforePlacedBody><beforePlacedEnd></beforePlacedEnd></beforePlaced>”。
                                                         </div>
                                                         <div class="indent">
-                                                            <if><ifHead></ifHead></if>存在<placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>，<advance></advance><tick></tick>“<whenPlace class="scroll bold"><whenPlaceBody></whenPlaceBody><whenPlaceEnd></whenPlaceEnd></whenPlace>”：
+                                                            <if><ifHead></ifHead>存在<placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>，<ifBody></ifBody><advance></advance><tick></tick>“<whenPlace class="scroll bold"><whenPlaceBody></whenPlaceBody><whenPlaceEnd></whenPlaceEnd></whenPlace>”</if>：
                                                         </div>
                                                         <div class="indent">
                                                             <advance></advance><tick></tick>“<whenPlaced class="scroll bold"><whenPlacedHead></whenPlacedHead><whenPlacedBody></whenPlacedBody><whenPlacedEnd></whenPlacedEnd></whenPlaced>”：
@@ -302,7 +302,7 @@
                                                             </div>
                                                         </padding>
                                                         <div class="indent">
-                                                            <if><ifHead></ifHead></if>存在<placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>，<advance></advance><tick></tick>“<afterPlace class="scroll bold"><afterPlaceBody></afterPlaceBody><afterPlaceEnd></afterPlaceEnd></afterPlace>”。
+                                                            <if><ifHead></ifHead>存在<placeRole><placeRoleHead></placeRoleHead><placeRoleEnd></placeRoleEnd></placeRole>，<ifBody></ifBody><advance></advance><tick></tick>“<afterPlace class="scroll bold"><afterPlaceBody></afterPlaceBody><afterPlaceEnd></afterPlaceEnd></afterPlace>”</if>。
                                                         </div>
                                                         <div class="indent">
                                                             <advance></advance><tick></tick>“<afterPlaced class="scroll bold"><afterPlacedHead></afterPlacedHead><afterPlacedBody></afterPlacedBody><afterPlacedEnd></afterPlacedEnd></afterPlaced>”。
@@ -332,13 +332,13 @@
                                                 <padding>
                                                     <div class="h">
                                                         <div class="indent">
-                                                            <if><ifHead></ifHead></if>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<advance></advance><tick></tick>“<beforeDiscard class="scroll bold"><beforeDiscardHead></beforeDiscardHead><beforeDiscardEnd></beforeDiscardEnd></beforeDiscard>”。
+                                                            <if><ifHead></ifHead>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<ifBody></ifBody><advance></advance><tick></tick>“<beforeDiscard class="scroll bold"><beforeDiscardHead></beforeDiscardHead><beforeDiscardEnd></beforeDiscardEnd></beforeDiscard>”</if>。
                                                         </div>
                                                         <div class="indent">
                                                             <advance></advance><tick></tick>“<beforeDiscarded class="scroll bold"><beforeDiscardedHead></beforeDiscardedHead><beforeDiscardedBody></beforeDiscardedBody><beforeDiscardedEnd></beforeDiscardedEnd></beforeDiscarded>”。
                                                         </div>
                                                         <div class="indent">
-                                                            <if><ifHead></ifHead></if>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<advance></advance><tick></tick>“<whenDiscard class="scroll bold"><whenDiscardHead></whenDiscardHead><whenDiscardEnd></whenDiscardEnd></whenDiscard>”：
+                                                            <if><ifHead></ifHead>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<ifBody></ifBody><advance></advance><tick></tick>“<whenDiscard class="scroll bold"><whenDiscardHead></whenDiscardHead><whenDiscardEnd></whenDiscardEnd></whenDiscard>”</if>：
                                                         </div>
                                                         <div class="indent">
                                                             <advance></advance><tick></tick>“<whenDiscarded class="scroll bold"><whenDiscardedHead></whenDiscardedHead><whenDiscardedBody></whenDiscardedBody><whenDiscardedEnd></whenDiscardedEnd></whenDiscarded>”：
@@ -351,7 +351,7 @@
                                                             </div>
                                                         </padding>
                                                         <div class="indent">
-                                                            <if><ifHead></ifHead></if>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<advance></advance><tick></tick>“<afterDiscard class="scroll bold"><afterDiscardHead></afterDiscardHead><afterDiscardEnd></afterDiscardEnd></afterDiscard>”。
+                                                            <if><ifHead></ifHead>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<ifBody></ifBody><advance></advance><tick></tick>“<afterDiscard class="scroll bold"><afterDiscardHead></afterDiscardHead><afterDiscardEnd></afterDiscardEnd></afterDiscard>”</if>。
                                                         </div>
                                                         <div class="indent">
                                                             <advance></advance><tick></tick>“<afterDiscarded class="scroll bold"><afterDiscardedHead></afterDiscardedHead><afterDiscardedBody></afterDiscardedBody><afterDiscardedEnd></afterDiscardedEnd></afterDiscarded>”。
@@ -387,7 +387,7 @@
                                                 一类<object></object>。
                                             </div>
                                             <div class="indent">
-                                                <advance></advance><tick></tick>时，检测所有可执行的<procedure></procedure>，<choose></choose><priority></priority>最高的<procedure></procedure>之一，执行，<if><ifHead></ifHead>包含“<can class="scroll bold"><canHead></canHead></can>”</if>，<ask></ask>是否执行</or>。重复此<process></process>直到不存在可执行的<procedure></procedure>。
+                                                <advance></advance><tick></tick>时，检测所有可执行的<procedure></procedure>，<choose></choose><priority></priority>最高的<procedure></procedure>之一，执行，<if><ifHead></ifHead>包含“<can class="scroll bold"><canHead></canHead></can>”，<ifBody></ifBody><ask></ask>是否执行</or>。重复此<process></process>直到不存在可执行的<procedure></procedure>。
                                             </div>
                                             <div class="indent">
                                                 <procedure></procedure>在某<tick></tick>可执行的条件：
@@ -696,7 +696,7 @@
                                                         <object></object>的集合。
                                                     </div>
                                                     <div class="indent">
-                                                        <if><ifHead></ifHead>不在<procedureTrigger></procedureTrigger>内</if>，对每个元素，如果可能，限制为<procedure></procedure>执行<role></role>的。
+                                                        <if><ifHead></ifHead>不在<procedureTrigger></procedureTrigger>内，<ifBody></ifBody>对每个元素，如果可能，限制为<procedure></procedure>执行<role></role>的</if>。
                                                     </div>
                                                 </padding>
                                                 <div class="indent">

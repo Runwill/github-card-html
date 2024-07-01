@@ -25,6 +25,10 @@
             {
                 "cn":"若" ,
                 "en":"ifHead" 
+            },
+            {
+                "cn":"则" ,
+                "en":"ifBody" 
             }
         ],
         "color":"#a5d8a8"
