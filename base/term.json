@@ -54,6 +54,16 @@
         "color":"#c3a5d8"
     },
     { 
+        "en":"equaling" ,
+        "part":[
+            {
+                "cn":"等同于" ,
+                "en":"equalingHead" 
+            }
+        ],
+        "color":"#f3d1ef"
+    },
+    { 
         "cn":"程序触发器" ,
         "en":"procedureTrigger" ,
         "color":"#d3e7ff"
@@ -313,89 +323,61 @@
         "color":"#c6ff8d"
     },
     { 
-        "en":"place" ,
+        "en":"move" ,
         "part":[
             {
                 "cn":"被" ,
-                "en":"placeHead" 
+                "en":"moveHead" 
             },
             {
-                "cn":"置于" ,
-                "en":"placeBody1" 
+                "cn":"移置" ,
+                "en":"moveBody0" 
+            },
+            {
+                "cn":"移动" ,
+                "en":"moveBody1" 
+            },
+            {
+                "cn":"移出" ,
+                "en":"moveBody2" 
+            },
+            {
+                "cn":"失去" ,
+                "en":"moveBody3" 
             },
             {
                 "cn":"置入" ,
-                "en":"placeBody2" 
+                "en":"moveBody4" 
+            },
+            {
+                "cn":"获得" ,
+                "en":"moveBody5" 
+            },
+            {
+                "cn":"置于" ,
+                "en":"moveBody6" 
             }
         ],
         "color":"#abd1c4"
     },
     { 
-        "en":"placeRole" ,
-        "part":[
-            {
-                "cn":"置" ,
-                "en":"placeRoleHead" 
-            },
-            {
-                "cn":"入" ,
-                "en":"placeRoleBody" 
-            },
-            {
-                "cn":"者" ,
-                "en":"placeRoleEnd" 
-            }
-        ],
+        "en":"moveRole" ,
+        "cn":"移置者" ,
         "color":"#abd1c4"
     },
     { 
-        "en":"placedCard" ,
-        "part":[
-            {
-                "cn":"被置" ,
-                "en":"placedCardHead" 
-            },
-            {
-                "cn":"入" ,
-                "en":"placedCardBody" 
-            }, 
-            {
-                "cn":"牌" ,
-                "en":"placedCardEnd" 
-            }
-        ],
+        "en":"movedCard" ,
+        "cn":"目标牌" ,
         "color":"#abd1c4"
     },
     { 
-        "en":"placedArea" ,
-        "part":[
-            {
-                "cn":"被置于" ,
-                "en":"placedAreaHead1" 
-            },
-            {
-                "cn":"被置入" ,
-                "en":"placedAreaHead2" 
-            },
-            {
-                "cn":"区域" ,
-                "en":"placedAreaEnd" 
-            }
-        ],
+        "en":"movedInArea" ,
+        "cn":"目标区域" ,
         "color":"#abd1c4"
     },
     { 
-        "en":"placedPosition" ,
-        "part":[
-            {
-                "cn":"被置于" ,
-                "en":"placedPositionHead" 
-            },
-            {
-                "cn":"位置" ,
-                "en":"placedPositionEnd" 
-            }
-        ],
+        "en":"movedAtPosition" ,
+        "cn":"目标位置" ,
         "color":"#abd1c4"
     },
     { 
@@ -651,6 +633,45 @@
             }
         ],
         "color":"#acd1ab"
+    },
+    { 
+        "en":"draw" ,
+        "part":[
+            {
+                "cn":"摸" ,
+                "en":"drawHead" 
+            },
+            {
+                "cn":"牌" ,
+                "en":"drawEnd" 
+            }
+        ],
+        "color":"#abd1b4"
+    },
+    { 
+        "en":"drawRole" ,
+        "cn":"摸牌者" ,
+        "color":"#abd1b4"
+    },
+    { 
+        "en":"drawQuantity" ,
+        "cn":"摸牌数" ,
+        "color":"#abd1b4"
+    },
+    { 
+        "en":"beforeDraw" ,
+        "cn":"摸牌前" ,
+        "color":"#abd1b4"
+    },
+    { 
+        "en":"whenDraw" ,
+        "cn":"摸牌时" ,
+        "color":"#abd1b4"
+    },
+    { 
+        "en":"afterDraw" ,
+        "cn":"摸牌后" ,
+        "color":"#abd1b4"
     },
     { 
         "cn":"对象" ,
@@ -928,6 +949,11 @@
         "cn":"装备区" ,
         "en":"equipArea" ,
         "color":"#b0cce8"
+    },
+    { 
+        "cn":"牌堆" ,
+        "en":"pile" ,
+        "color":"#b0e8b2"
     },
     { 
         "cn":"弃牌堆" ,
