@@ -54,22 +54,18 @@ $(function(){
             for(var j in skill){//不同武将的技能名悬浮个性化文本
                 if(skill[j].name==skillNames[i]){
                     for(k in skill[j].role){
-                        document.querySelectorAll('.'+skillNames[i]+'LoreCharacterID'+skill[j].role[k].id).forEach(//替换和滚动
-                            element => {
-                                //将有关数据位置存入元素
-                                element.loreSkillPosition=j
-                                element.loreRolePosition=k
 
-                                $('.'+skillNames[i]+'LoreCharacterID'+skill[j].role[k].id).mouseover(//高亮
-                                    function(){
-                                        $(this).after('<lore>「'+skill[j].role[k].lore+'」——《'+skill[j].role[k].legend+'》</lore>')
-                                    }
-                                )
-                                $('.'+skillNames[i]+'LoreCharacterID'+skill[j].role[k].id).mouseout(//高亮
-                                    function(){
-                                        $("lore").remove()
-                                    }
-                                )
+                        $('.'+skillNames[i]+'LoreCharacterID'+skill[j].role[k].id).prop('loreSkillPosition',j)
+                        $('.'+skillNames[i]+'LoreCharacterID'+skill[j].role[k].id).prop('loreRolePosition',k)
+
+                        $('.'+skillNames[i]+'LoreCharacterID'+skill[j].role[k].id).mouseover(
+                            function(){
+                                $(this).after('<lore>「'+skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].lore+'」——《'+skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].legend+'》</lore>')
+                            }
+                        )
+                        $('.'+skillNames[i]+'LoreCharacterID'+skill[j].role[k].id).mouseout(
+                            function(){
+                                $("lore").remove()
                             }
                         )
                     }
