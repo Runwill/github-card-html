@@ -64,7 +64,7 @@
         "color":"#f3d1ef"
     },
     { 
-        "cn":"程序触发器" ,
+        "cn":"程序触发结构" ,
         "en":"procedureTrigger" ,
         "color":"#d3e7ff"
     },
@@ -986,12 +986,12 @@
         "color":"#9ed19a"
     },
     { 
-        "cn":"选择器" ,
+        "cn":"选择结构" ,
         "en":"selector" ,
         "color":"#b0e8d0"
     },
     { 
-        "cn":"角色选择器" ,
+        "cn":"角色选择结构" ,
         "en":"roleSelector" ,
         "color":"#b0e8d0"
     },

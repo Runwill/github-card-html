@@ -53,10 +53,12 @@ $(function(){
                             if(skill[l].role){
                                 for(m in skill[l].role){
                                     if(skill[l].role[m].id == characterID[i] && skill[l].role[m].skill_order==skillOrder[k]){
-                                        standardCharacters+="<padding><skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>"+"<characterSkillElement"+" class=\""+skill[l].name+"\"></characterSkillElement>"+"<skillQuoteRight></skillQuoteRight></skillQuote>"+skill[l].content
+                                        standardCharacters+="<padding><skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>"+"<characterSkillElement"+" class=\""+skill[l].name+" "+skill[l].name+"LoreCharacterID"+characterID[i]+"\"></characterSkillElement>"+"<skillQuoteRight></skillQuoteRight></skillQuote>"+skill[l].content
+                                        //尾部武将名
                                         for(n in skill[l].role){
                                             for(o in character){
                                                 if(character[o].id==skill[l].role[n].id){
+                                                    //武将名
                                                     standardCharacters+="<"+ "<characterName class=\"characterID"+character[o].id+"\"></characterName>"+skill[l].role[n].skill_order
                                                     //君主技
                                                     if(skill[l].role[n].dominator)standardCharacters+="<dominatorSkill epithet=\"1\"></dominatorSkill>"

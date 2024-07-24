@@ -101,6 +101,13 @@ padding {
 .scroll{
     scroll-margin-top:70px;
 }
+lore{
+    color: gray;
+    font-weight: normal;
+    font-style: italic;
+    font-family: 'KaiTi';
+    letter-spacing: -0.15em;
+}
 
 body{
     margin :0;

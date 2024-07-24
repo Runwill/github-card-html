@@ -5,7 +5,9 @@
         "role":[
             {
                 "id":125,
-                "skill_order":1
+                "skill_order":1,
+                "lore":"濬哲文明，溫恭允塞，玄德升聞",
+                "legend":"書·舜典"
             }
         ]
     },
@@ -16,7 +18,9 @@
             {
                 "id":125,
                 "skill_order":2,
-                "dominator":true
+                "dominator":true,
+                "lore":"惟精惟一，允執厥中",
+                "legend":"書·大禹謨"
             }
         ]
     }
