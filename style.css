@@ -97,6 +97,46 @@
     }
 }
 
+.button{
+    position:relative;
+    display: inline-block;
+    padding:12px 18px;
+    margin:10px 0;
+    color:#ffffff;
+    text-decoration:none;
+    font-size:18px;
+    letter-spacing:2px;
+    border-radius:40px;
+    overflow: hidden;
+    background:#ff8686;
+}
+
+.button:hover, .button:focus{
+    background:#a5a5a5;
+}
+
+span{
+    position:absolute;
+    background:#ffffff;
+    transform:translate(-50%,-50%);
+    pointer-events: none;
+    border-radius: 50%;
+    animation: animate 1s linear infinite;
+}
+
+@keyframes animate{
+    0%{
+        width:0px;
+        height:0px;
+        opacity:0.5;
+    }
+    100%{
+        width:500px;
+        height:500px;
+        opacity:0;
+    }
+}
+
 .indent {
     text-indent: 20px;
     line-height: 1.9em;

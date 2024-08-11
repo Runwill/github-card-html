@@ -58,7 +58,30 @@
                                         <div class="indent">
                                             声明条件。
                                         </div>
-                                        <h2><equaling class="scroll"><equalingHead></equalingHead>……</equaling></h2>
+                                        <h2>
+                                            <equaling class="scroll"><equalingHead></equalingHead>……</equaling>
+                                            <a href="#" class="button"></a>
+                                            <script type="text/javascript">
+                                                const buttons = document.querySelectorAll('.button');
+                                                buttons.forEach(button => {
+                                                    button.addEventListener('click', function(e){
+
+                                                        let x = e.clientX - e.target.offsetLeft;
+                                                        let y = e.clientX - e.target.offsetTop;
+
+                                                        let ripples = document.createElement('span');
+                                                        ripples.style.left = x + 'px';
+                                                        ripples.style.top = y + 'px';
+                                                        this.appendChild(ripples);
+
+                                                        setTimeout(() => {
+                                                            ripples.remove()
+                                                        }, 1000);
+                                                    });
+                                                });
+
+                                            </script>
+                                        </h2>
                                         <div class="indent">
                                             声明公式。
                                         </div>
