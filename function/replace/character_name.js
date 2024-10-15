@@ -19,12 +19,12 @@ $(function(){
         for(var i in characterID){
             for(var j in character){
                 if(character[j].id==characterID[i]){
-                    characteName=character[j].name
+                    characterName=character[j].name
                 }
             }
             document.querySelectorAll(".characterID"+characterID[i]).forEach(//替换和滚动
                 element => {
-                    element.innerHTML = characteName
+                    element.innerHTML = characterName
                     element.characterPosition=i
                     element.addEventListener(
                         'click', function(){
