@@ -63,37 +63,23 @@
                                             声明条件。
                                         </div>
                                         <h2>
-                                            <equaling class="scroll"><equalingHead></equalingHead>……</equaling>
-                                            <a href="#" class="button button_equaling"></a>
+                                            <a class="button button_equaling"></a>
                                             <script type="text/javascript">
                                                 document.querySelectorAll('.button_equaling').forEach(button => {
                                                     button.addEventListener('click', function(e){
                                                         if(status_equaling == 0){
                                                             button.style.background='#ff8686'
                                                             status_equaling = 1
-
-                                                            let equalingHeads = document.querySelectorAll("equalingHead");
-                                                            equalingHeads.forEach(function(element) {
-                                                                let newElement = document.createElement("equalingHead0");
-                                                                newElement.innerHTML = element.innerHTML;
-                                                                head.parentNode.replaceChild(newElement, element);
-                                                            });
-                                                            textReplace()
+                                                            elementReplace('equalingHead','equalingHead0')
                                                         }else{
                                                             button.style.background='#8698ff'
                                                             status_equaling = 0
-
-                                                            let equalingHeads = document.querySelectorAll("equalingHead0");
-                                                            equalingHeads.forEach(function(element) {
-                                                                let newElement = document.createElement("equalingHead");
-                                                                newElement.innerHTML = element.innerHTML;
-                                                                head.parentNode.replaceChild(newElement, element);
-                                                            });
-                                                            textReplace()
+                                                            elementReplace('equalingHead0','equalingHead')
                                                         }
                                                     })
-                                                });
+                                                })
                                             </script>
+                                            <equaling class="scroll"><equalingHead></equalingHead>……</equaling>
                                         </h2>
                                         <div class="indent">
                                             声明公式。
@@ -863,18 +849,26 @@
 <script type="text/javascript">
     document.querySelectorAll('.button').forEach(button => {
         button.addEventListener('click', function(e){
-            let x = e.clientX - e.target.offsetLeft;
-            let y = e.clientX - e.target.offsetTop;
+            let x = e.clientX - e.target.offsetLeft
+            let y = e.clientY - e.target.offsetTop
 
-            let ripples = document.createElement('span');
-            ripples.style.left = x + 'px';
-            ripples.style.top = y + 'px';
-            this.appendChild(ripples);
+            let ripples = document.createElement('span')
+            ripples.style.left = x + 'px'
+            ripples.style.top = y + 'px'
+            this.appendChild(ripples)
 
             setTimeout(() => {
                 ripples.remove()
-            }, 1000);
-        });
-    });
+            }, 1000)
+        })
+    })
+    function elementReplace(name1,name2){
+        document.querySelectorAll(name1).forEach(function(element) {
+            let newElement = document.createElement(name2)
+            newElement.innerHTML = element.innerHTML
+            element.parentNode.replaceChild(newElement, element)
+        })
+        textReplace('base/term/dynamic.json')
+    }
 </script>
 </html>

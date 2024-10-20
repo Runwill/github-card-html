@@ -1,17 +1,5 @@
-$(function () {
-    $(document).ready(function () {
-        $(document).foundation();
-    })
-    $.ajax({
-        url: "base/term.json",
-        type: "GET",
-        datatype: "json",
-        success:
-            function (data) {
-                textReplace(data)
-            }
-    });
-    var textReplace = function (term) {
+function textReplace(path) {
+    fetch(path).then(response => response.json()).then(term => {
         for (var i in term) {
             if (!term[i].part) {
                 document.querySelectorAll(term[i].en).forEach(//替换和滚动
@@ -103,5 +91,12 @@ $(function () {
                 )
             }
         }
-    }
-});
+    })
+}
+$(function () {
+    $(document).ready(function () {
+        $(document).foundation();
+    })
+    textReplace('base/term/fixed.json')
+    textReplace('base/term/dynamic.json')
+})

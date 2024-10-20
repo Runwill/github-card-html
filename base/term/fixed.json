@@ -54,16 +54,6 @@
         "color": "#c3a5d8"
     },
     {
-        "en": "equaling",
-        "part": [
-            {
-                "cn": "等同于",
-                "en": "equalingHead"
-            }
-        ],
-        "color": "#f3d1ef"
-    },
-    {
         "cn": "程序触发结构",
         "en": "procedureTrigger",
         "color": "#d3e7ff"
