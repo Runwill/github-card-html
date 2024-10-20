@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<script type="text/javascript">
+    status_equaling = 0
+</script>
+
 <head>
     <meta charset="UTF-8">
     <script src="Foundation-Sites-CSS/js/vendor/jquery.js"></script>
@@ -27,9 +31,9 @@
     <script>$(document).foundation()</script>
     <header id="header">
         <nav>
-            <lebel id="ison_image"> <!--图标-->
+            <label id="ison_image"> <!--图标-->
 
-            </lebel>
+            </label>
             <div id="header_title">
                 05 wiki
             </div>
@@ -60,26 +64,35 @@
                                         </div>
                                         <h2>
                                             <equaling class="scroll"><equalingHead></equalingHead>……</equaling>
-                                            <a href="#" class="button"></a>
+                                            <a href="#" class="button button_equaling"></a>
                                             <script type="text/javascript">
-                                                const buttons = document.querySelectorAll('.button');
-                                                buttons.forEach(button => {
+                                                document.querySelectorAll('.button_equaling').forEach(button => {
                                                     button.addEventListener('click', function(e){
+                                                        if(status_equaling == 0){
+                                                            button.style.background='#ff8686'
+                                                            status_equaling = 1
 
-                                                        let x = e.clientX - e.target.offsetLeft;
-                                                        let y = e.clientX - e.target.offsetTop;
+                                                            let equalingHeads = document.querySelectorAll("equalingHead");
+                                                            equalingHeads.forEach(function(element) {
+                                                                let newElement = document.createElement("equalingHead0");
+                                                                newElement.innerHTML = element.innerHTML;
+                                                                head.parentNode.replaceChild(newElement, element);
+                                                            });
+                                                            textReplace()
+                                                        }else{
+                                                            button.style.background='#8698ff'
+                                                            status_equaling = 0
 
-                                                        let ripples = document.createElement('span');
-                                                        ripples.style.left = x + 'px';
-                                                        ripples.style.top = y + 'px';
-                                                        this.appendChild(ripples);
-
-                                                        setTimeout(() => {
-                                                            ripples.remove()
-                                                        }, 1000);
-                                                    });
+                                                            let equalingHeads = document.querySelectorAll("equalingHead0");
+                                                            equalingHeads.forEach(function(element) {
+                                                                let newElement = document.createElement("equalingHead");
+                                                                newElement.innerHTML = element.innerHTML;
+                                                                head.parentNode.replaceChild(newElement, element);
+                                                            });
+                                                            textReplace()
+                                                        }
+                                                    })
                                                 });
-
                                             </script>
                                         </h2>
                                         <div class="indent">
@@ -217,7 +230,7 @@
                                                     <advance></advance><tick></tick>“<atRoundStart class="scroll bold"></atRoundStart>”。
                                                 </div>
                                                 <div class="indent">
-                                                    <make><makeHead></makeHead>所有<roleSelector class="irreplacable"><living></living><role></role></roleSelector><advance></advance><turnProcess></turnProcess></makeHead>。
+                                                    <make><makeHead></makeHead>所有<roleSelector class="irreplaceable"><living></living><role></role></roleSelector><advance></advance><turnProcess></turnProcess></makeHead>。
                                                 </div>
                                                 <div class="indent">
                                                     <advance></advance><tick></tick>“<atRoundFinish class="scroll bold"> </atRoundFinish>”。
@@ -339,10 +352,10 @@
                                                     <padding>
                                                         <div class="h">
                                                             <div class="indent">
-                                                                <movedInArea></movedInArea>所有<card></card>的<position></position>+<formula class="irreplacable"><counts><movedCard></movedCard><countsEnd></countsEnd></counts></formula>。
+                                                                <movedInArea></movedInArea>所有<card></card>的<position></position>+<formula class="irreplaceable"><counts><movedCard></movedCard><countsEnd></countsEnd></counts></formula>。
                                                             </div>
                                                             <div class="indent">
-                                                                <moveRole></moveRole>将<every><everyHead></everyHead>张<placedCard><placedCardHead></placedCardHead><placedCardEnd></placedCardEnd></placedCard></every>的<lyingArea></lyingArea>改为<placedArea><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea>，<position></position>改为<formula class="irreplacable"><placedPosition><placedPositionHead></placedPositionHead><placedPositionEnd></placedPositionEnd></placedPosition>+序数-1</formula>。
+                                                                <moveRole></moveRole>将<every><everyHead></everyHead>张<placedCard><placedCardHead></placedCardHead><placedCardEnd></placedCardEnd></placedCard></every>的<lyingArea></lyingArea>改为<placedArea><placedAreaHead1></placedAreaHead1><placedAreaEnd></placedAreaEnd></placedArea>，<position></position>改为<formula class="irreplaceable"><placedPosition><placedPositionHead></placedPositionHead><placedPositionEnd></placedPositionEnd></placedPosition>+序数-1</formula>。
                                                             </div>
                                                         </div>
                                                     </padding>
@@ -847,4 +860,21 @@
     </div>
 </body>
 
+<script type="text/javascript">
+    document.querySelectorAll('.button').forEach(button => {
+        button.addEventListener('click', function(e){
+            let x = e.clientX - e.target.offsetLeft;
+            let y = e.clientX - e.target.offsetTop;
+
+            let ripples = document.createElement('span');
+            ripples.style.left = x + 'px';
+            ripples.style.top = y + 'px';
+            this.appendChild(ripples);
+
+            setTimeout(() => {
+                ripples.remove()
+            }, 1000);
+        });
+    });
+</script>
 </html>

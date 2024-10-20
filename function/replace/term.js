@@ -17,7 +17,7 @@ $(function () {
                 document.querySelectorAll(term[i].en).forEach(//替换和滚动
                     element => {
                         element.termPosition = i
-                        if (!element.classList.contains('irreplacable')) {
+                        if (!element.classList.contains('irreplaceable')) {
                             if (!term[i].epithet) {
                                 if (term[i].cn) element.innerHTML = term[i].cn
                                 else element.innerHTML = term[i].en
