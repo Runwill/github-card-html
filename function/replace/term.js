@@ -101,7 +101,7 @@ function textReplace(path,mode) {
 }
 $(function () {
     $(document).ready(function () {
-        $(document).foundation();
+        $(document).foundation()
     })
     textReplace('base/term/fixed.json',1)
     textReplace('base/term/dynamic.json',1)
