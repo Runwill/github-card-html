@@ -1,8 +1,8 @@
-function textReplace(path) {
+function textReplace(path,mode) {
     fetch(path).then(response => response.json()).then(term => {
         for (var i in term) {
-            if (!term[i].part) {
-                document.querySelectorAll(term[i].en).forEach(//替换和滚动
+            if (!term[i].part) {//不分段术语
+                document.querySelectorAll(term[i].en).forEach(//替换
                     element => {
                         element.termPosition = i
                         if (!element.classList.contains('irreplaceable')) {
@@ -15,37 +15,41 @@ function textReplace(path) {
                                 else element.innerHTML = term[i].epithet[element.getAttribute("epithet")].cn
                             }
                         }
-                        element.addEventListener(
-                            'click', function () {
-                                event.stopPropagation()
-                                $("#example-tabs").foundation('selectTab', 'panel_term', 1);
-                                document.querySelectorAll(".scroll").forEach(
-                                    scroll => {
-                                        event.stopPropagation()
-                                        if (scroll.outerHTML.startsWith("<" + event.currentTarget.tagName.toLowerCase() + " ")) {
-                                            if (!(scroll.classList.contains('fadeOnly'))) scroll.scrollIntoView({ behavior: "smooth" })
-                                            $(scroll).fadeTo(200, 0).fadeTo(1000, 1)
+                        if(mode){
+                            element.addEventListener(//滚动
+                                'click', function () {
+                                    event.stopPropagation()
+                                    $("#example-tabs").foundation('selectTab', 'panel_term', 1);
+                                    document.querySelectorAll(".scroll").forEach(
+                                        scroll => {
+                                            event.stopPropagation()
+                                            if (scroll.outerHTML.startsWith("<" + event.currentTarget.tagName.toLowerCase() + " ")) {
+                                                if (!(scroll.classList.contains('fadeOnly'))) scroll.scrollIntoView({ behavior: "smooth" })
+                                                $(scroll).fadeTo(200, 0).fadeTo(1000, 1)
+                                            }
                                         }
-                                    }
-                                )
-                            }
-                        )
+                                    )
+                                }
+                            )
+                        }
                     }
                 )
-                $(term[i].en).mouseover(//高亮
-                    function () {
-                        $(this).css("background-color", term[event.currentTarget.termPosition].color)
-                        $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", term[event.currentTarget.termPosition].color)
-                    }
-                )
-                $(term[i].en).mouseout(//高亮
-                    function () {
-                        $(this).css("background-color", "")
-                        $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", "")
-                    }
-                )
+                if(mode){
+                    $(term[i].en).mouseover(//高亮
+                        function () {
+                            $(this).css("background-color", term[event.currentTarget.termPosition].color)
+                            $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", term[event.currentTarget.termPosition].color)
+                        }
+                    )
+                    $(term[i].en).mouseout(//去高亮
+                        function () {
+                            $(this).css("background-color", "")
+                            $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", "")
+                        }
+                    )
+                }
             }
-            else {
+            else {//分段术语
                 for (var j in term[i].part) {//替换
                     document.querySelectorAll(term[i].part[j].en).forEach(
                         element => {
@@ -53,42 +57,44 @@ function textReplace(path) {
                         }
                     )
                 }
-                $(term[i].en).each((index, element) => {//高亮
-                    element.termPosition = i
-                    $(element).mouseover(() => {
-                        for (var j in term[event.currentTarget.termPosition].part) {
-                            $(element).children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
-                            $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
-                        }
+                if(mode){
+                    $(term[i].en).each((index, element) => {//高亮
+                        element.termPosition = i
+                        $(element).mouseover(() => {
+                            for (var j in term[event.currentTarget.termPosition].part) {
+                                $(element).children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
+                                $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
+                            }
+                        })
+                        $(element).mouseout(() => {
+                            for (var j in term[event.currentTarget.termPosition].part) {
+                                $(element).children(term[event.currentTarget.termPosition].part[j].en).css("background-color", "")
+                                $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", "")
+                            }
+                        })
                     })
-                    $(element).mouseout(() => {
-                        for (var j in term[event.currentTarget.termPosition].part) {
-                            $(element).children(term[event.currentTarget.termPosition].part[j].en).css("background-color", "")
-                            $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", "")
-                        }
-                    })
-                })
-                document.querySelectorAll(term[i].en).forEach(//滚动
-                    element => {
-                        element.addEventListener(
-                            'click', function () {
-                                event.stopPropagation()
-                                $("#example-tabs").foundation('selectTab', 'panel_term', 1);
-                                document.querySelectorAll(".scroll").forEach(
-                                    scroll => {
-                                        event.stopPropagation()
-                                        if (scroll.outerHTML.startsWith("<" + term[event.currentTarget.termPosition].en.toLowerCase() + " ")) {
-                                            if (!(scroll.classList.contains('fadeOnly'))) {
-                                                scroll.scrollIntoView({ behavior: 'smooth' });
-                                                $(scroll).fadeTo(200, 0).fadeTo(1000, 1)
+                    document.querySelectorAll(term[i].en).forEach(//滚动
+                        element => {
+                            element.addEventListener(
+                                'click', function () {
+                                    event.stopPropagation()
+                                    $("#example-tabs").foundation('selectTab', 'panel_term', 1);
+                                    document.querySelectorAll(".scroll").forEach(
+                                        scroll => {
+                                            event.stopPropagation()
+                                            if (scroll.outerHTML.startsWith("<" + term[event.currentTarget.termPosition].en.toLowerCase() + " ")) {
+                                                if (!(scroll.classList.contains('fadeOnly'))) {
+                                                    scroll.scrollIntoView({ behavior: 'smooth' });
+                                                    $(scroll).fadeTo(200, 0).fadeTo(1000, 1)
+                                                }
                                             }
                                         }
-                                    }
-                                )
-                            }
-                        )
-                    }
-                )
+                                    )
+                                }
+                            )
+                        }
+                    )
+                }
             }
         }
     })
@@ -97,6 +103,6 @@ $(function () {
     $(document).ready(function () {
         $(document).foundation();
     })
-    textReplace('base/term/fixed.json')
-    textReplace('base/term/dynamic.json')
+    textReplace('base/term/fixed.json',1)
+    textReplace('base/term/dynamic.json',1)
 })
