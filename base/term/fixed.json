@@ -962,12 +962,17 @@
     },
     {
         "cn": "体力",
-        "en": "stamina",
+        "en": "health",
         "color": "#e08b8b"
     },
     {
+        "cn": "已失去体力",
+        "en": "lostHealth",
+        "color": "#d8d8d8"
+    },
+    {
         "cn": "已失去体力值",
-        "en": "lostStaminaValue",
+        "en": "lostHealthPoints",
         "color": "#d8d8d8"
     },
     {
@@ -1108,7 +1113,7 @@
     },
     {
         "cn": "分合",
-        "en": "apartOrTogather",
+        "en": "apartOrTogether",
         "color": "#fbc0a1"
     },
     {
@@ -1132,7 +1137,7 @@
                 "cn": "合"
             }
         ],
-        "en": "togather",
+        "en": "together",
         "color": "#fbc0a1"
     },
     {

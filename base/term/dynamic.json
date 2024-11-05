@@ -12,5 +12,19 @@
             }
         ],
         "color": "#f3d1ef"
+    },
+    {
+        "en": "roundUp",
+        "part": [
+            {
+                "cn": "归上",
+                "en": "roundUp"
+            },
+            {
+                "cn": "",
+                "en": "equalingHead0"
+            }
+        ],
+        "color": "#f3d1ef"
     }
 ]

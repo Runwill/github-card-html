@@ -92,6 +92,10 @@
                                         <div class="indent">
                                             遍历。
                                         </div>
+                                        <h2><every class="scroll"><everyHead></everyHead>……</every></h2>
+                                        <div class="indent">
+                                            遍历。
+                                        </div>
                                         <h2><procedureTrigger class="scroll" /></h2>
                                         <div class="indent">
                                             一种数据结构。用于执行<procedure></procedure>。
@@ -295,7 +299,7 @@
                                                 <if><ifHead></ifHead><movedCard></movedCard><outArea><outAreaHead></outAreaHead><movedInArea></movedInArea><outAreaEnd></outAreaEnd></outArea>，<ifBody></ifBody>可称为<or><move><moveBody2></moveBody2></move><orBody></orBody><move><moveBody4></moveBody4></move></or></if>。
                                             </div>
                                             <div class="indent">
-                                                <if><ifHead></ifHead><and><movedCard></movedCard><outArea><outAreaHead></outAreaHead><movedInArea></movedInArea><outAreaEnd></outAreaEnd></outArea>，<andBody></andBody><movedInArea></movedInArea>为一名<role></role>的<HandCard></HandCard></and>，<ifBody></ifBody>可称为<move>moveBody5></moveBody5></move></if>。
+                                                <if><ifHead></ifHead><and><movedCard></movedCard><outArea><outAreaHead></outAreaHead><movedInArea></movedInArea><outAreaEnd></outAreaEnd></outArea>，<andBody></andBody><movedInArea></movedInArea>为一名<role></role>的<HandCard></HandCard></and>，<ifBody></ifBody>可称为<move><moveBody5></moveBody5></move></if>。
                                             </div>
                                             <div class="indent">
                                                 包含以下输入：
@@ -384,7 +388,7 @@
                                                         <advance></advance><tick></tick>“<beforeDiscarded class="scroll bold"><beforeDiscardedHead></beforeDiscardedHead><beforeDiscardedBody></beforeDiscardedBody><beforeDiscardedEnd></beforeDiscardedEnd></beforeDiscarded>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <if><ifHead></ifHead>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<ifBody></ifBody>advance></advance><tick></tick>“<whenDiscard class="scroll bold"><whenDiscardHead></whenDiscardHead><whenDiscardEnd></whenDiscardEnd></whenDiscard>”</if>：
+                                                        <if><ifHead></ifHead>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<ifBody></ifBody><advance></advance><tick></tick>“<whenDiscard class="scroll bold"><whenDiscardHead></whenDiscardHead><whenDiscardEnd></whenDiscardEnd></whenDiscard>”</if>：
                                                     </div>
                                                     <div class="indent">
                                                         <advance></advance><tick></tick>“<whenDiscarded class="scroll bold"><whenDiscardedHead></whenDiscardedHead><whenDiscardedBody></whenDiscardedBody><whenDiscardedEnd></whenDiscardedEnd></whenDiscarded>”：
@@ -631,6 +635,10 @@
                                                     <liveStatus></liveStatus>为0。
                                                 </div>
                                             </padding>
+                                            <h3><lostHealthPoints class="scroll" /></h3>
+                                            <div class="indent">
+                                                <role></role>的一项<attribute></attribute>。其的<counts><lostHealth></lostHealth><countsEnd></countsEnd></counts>。
+                                            </div>
                                             <h3><seat class="scroll" /></h3>
                                             <div class="indent">
                                                 <role></role>的一项<attribute></attribute>。整型变量。
@@ -658,6 +666,14 @@
                                                 正在<advance></advance><turn epithet="1"></turn>的<role></role>。
                                             </div>
                                         </padding>
+                                        <h2><health class="scroll" /></h2>
+                                        <div class="indent">
+                                            一类<object></object>。
+                                        </div>
+                                        <h2><LostHealth class="scroll" /></h2>
+                                        <div class="indent">
+                                            一类<object></object>。
+                                        </div>
                                         <h2><card class="scroll" /></h2>
                                         <div class="indent">
                                             一类<object></object>。
@@ -736,30 +752,30 @@
                                                     <verticalOrHorizontal></verticalOrHorizontal>为1。
                                                 </div>
                                             </padding>
-                                            <h3><apartOrTogather class="scroll" /></h3>
+                                            <h3><apartOrTogether class="scroll" /></h3>
                                             <div class="indent">
                                                 <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。布尔型变量。
                                             </div>
                                             <div class="indent">
-                                                未规定<apartOrTogather></apartOrTogather>的<card></card>，其的<apartOrTogather></apartOrTogather>值视为与所属的<area></area>相等。
+                                                未规定<apartOrTogether></apartOrTogether>的<card></card>，其的<apartOrTogether></apartOrTogether>值视为与所属的<area></area>相等。
                                             </div>
                                             <padding>
                                                 <h3><apart class="scroll" /></h3>
                                                 <div class="indent">
-                                                    <apartOrTogather></apartOrTogather>为0。
+                                                    <apartOrTogether></apartOrTogether>为0。
                                                 </div>
-                                                <h3><togather class="scroll" /></h3>
+                                                <h3><together class="scroll" /></h3>
                                                 <div class="indent">
-                                                    <apartOrTogather></apartOrTogather>为1。
+                                                    <apartOrTogether></apartOrTogether>为1。
                                                 </div>
                                             </padding>
                                             <h3><pile class="scroll" /></h3>
                                             <div class="indent">
-                                                一种<area></area>。<togather epithet="1"></togather><against></against>。
+                                                一种<area></area>。<together epithet="1"></together><against></against>。
                                             </div>
                                             <h3><discardPile class="scroll" /></h3>
                                             <div class="indent">
-                                                一种<area></area>。<togather epithet="1"></togather><for></for>。
+                                                一种<area></area>。<together epithet="1"></together><for></for>。
                                             </div>
                                             <h3><hand class="scroll" /></h3>
                                             <div class="indent">
@@ -847,6 +863,7 @@
 </body>
 
 <script type="text/javascript">
+    let term_status = {}
     document.querySelectorAll('.button').forEach(button => {
         button.addEventListener('click', function(e){
             let x = e.clientX - e.target.offsetLeft
@@ -862,6 +879,21 @@
             }, 1000)
         })
     })
+    function elementReplaceCheck(name,color){
+        fetch('base/term/dynamic.json').then(data => {
+            const targetObject = data.find(item => item.en === name);
+            const partLength = targetObject ? targetObject.part.length : 0
+        })
+        if(term_status[name] > partLength){
+            button.style.background='#ff8686'
+            status_equaling = 1
+            elementReplace('equalingHead','equalingHead0')
+        }else{
+            button.style.background='#8698ff'
+            status_equaling = 0
+            elementReplace('equalingHead0','equalingHead')
+        }
+    }
     function elementReplace(name1,name2){
         document.querySelectorAll(name1).forEach(function(element) {
             let newElement = document.createElement(name2)
