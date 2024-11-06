@@ -66,17 +66,7 @@
                                             <a class="button button_equaling"></a>
                                             <script type="text/javascript">
                                                 document.querySelectorAll('.button_equaling').forEach(button => {
-                                                    button.addEventListener('click', function(e){
-                                                        if(status_equaling == 0){
-                                                            button.style.background='#ff8686'
-                                                            status_equaling = 1
-                                                            elementReplace('equalingHead','equalingHead0')
-                                                        }else{
-                                                            button.style.background='#8698ff'
-                                                            status_equaling = 0
-                                                            elementReplace('equalingHead0','equalingHead')
-                                                        }
-                                                    })
+                                                    button.addEventListener('click', elementReplaceCheck('equaling'))
                                                 })
                                             </script>
                                             <equaling class="scroll"><equalingHead></equalingHead>……</equaling>
@@ -879,19 +869,23 @@
             }, 1000)
         })
     })
-    function elementReplaceCheck(name,color){
+    function elementReplaceCheck(name){
         fetch('base/term/dynamic.json').then(data => {
             const targetObject = data.find(item => item.en === name);
             const partLength = targetObject ? targetObject.part.length : 0
         })
-        if(term_status[name] > partLength){
+        if(term_status[name] >= partLength - 1){
             button.style.background='#ff8686'
-            status_equaling = 1
-            elementReplace('equalingHead','equalingHead0')
-        }else{
+            term_status[name] = 0
+            elementReplace(name + (partLength - 1),name + '0')
+        }else if(term_status[name] < partLength - 1){
             button.style.background='#8698ff'
-            status_equaling = 0
-            elementReplace('equalingHead0','equalingHead')
+            term_status[name] += 1
+            elementReplace(name + (term_status[name] - 1),name + term_status[name])
+        }else{
+            button.style.background='#ff8686'
+            term_status[name] = 0
+            textReplace('base/term/dynamic.json')
         }
     }
     function elementReplace(name1,name2){
