@@ -4,11 +4,11 @@
         "part": [
             {
                 "cn": "等同于",
-                "en": "equalingHead"
+                "en": "equalingHead0"
             },
             {
                 "cn": "",
-                "en": "equalingHead0"
+                "en": "equalingHead1"
             }
         ],
         "color": "#f3d1ef"
@@ -18,11 +18,11 @@
         "part": [
             {
                 "cn": "归上",
-                "en": "roundUp"
+                "en": "roundUp0"
             },
             {
                 "cn": "",
-                "en": "equalingHead0"
+                "en": "roundUp1"
             }
         ],
         "color": "#f3d1ef"

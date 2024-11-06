@@ -3,49 +3,6 @@
 
 <script type="text/javascript">
     let term_status = {}
-    document.querySelectorAll('.button').forEach(button => {
-        button.addEventListener('click', function(e){
-            let x = e.clientX - e.target.offsetLeft
-            let y = e.clientY - e.target.offsetTop
-
-            let ripples = document.createElement('span')
-            ripples.style.left = x + 'px'
-            ripples.style.top = y + 'px'
-            this.appendChild(ripples)
-
-            setTimeout(() => {
-                ripples.remove()
-            }, 1000)
-        })
-    })
-    function elementReplaceCheck(name){
-        fetch('base/term/dynamic.json').then(data => {
-            const targetObject = data.find(item => item.en === name);
-            const partLength = targetObject ? targetObject.part.length : 0
-        })
-        if(term_status[name] >= partLength - 1){
-            button.style.background='#ff8686'
-            term_status[name] = 0
-            elementReplace(name + (partLength - 1),name + '0')
-        }else if(term_status[name] < partLength - 1){
-            button.style.background='#8698ff'
-            term_status[name] += 1
-            elementReplace(name + (term_status[name] - 1),name + term_status[name])
-        }else{
-            button.style.background='#ff8686'
-            term_status[name] = 0
-            textReplace('base/term/dynamic.json')
-            alert(1)
-        }
-    }
-    function elementReplace(name1,name2){
-        document.querySelectorAll(name1).forEach(function(element) {
-            let newElement = document.createElement(name2)
-            newElement.innerHTML = element.innerHTML
-            element.parentNode.replaceChild(newElement, element)
-        })
-        textReplace('base/term/dynamic.json')
-    }
 </script>
 
 <head>
@@ -60,6 +17,9 @@
     <script src="function/summon/standard_character_skills_block.js"></script>
     <script src="function/summon/standard_characters_block.js"></script>
 
+    <script src="function/button/replace.js"></script>
+    <script src="function/button/wave.js"></script>
+    
     <script src="function/replace/term.js"></script>
     <script src="function/replace/character_name.js"></script>
     <script src="function/replace/skill_name.js"></script>
@@ -109,10 +69,12 @@
                                             <a class="button button_equaling"></a>
                                             <script type="text/javascript">
                                                 document.querySelectorAll('.button_equaling').forEach(button => {
-                                                    button.addEventListener('click', elementReplaceCheck('equaling'))
+                                                    button.addEventListener(
+                                                        'click', (event) => elementReplaceCheck('equaling', 'equalingHead', event)
+                                                    )
                                                 })
                                             </script>
-                                            <equaling class="scroll"><equalingHead></equalingHead>……</equaling>
+                                            <equaling class="scroll"><equalingHead0></equalingHead0>……</equaling>
                                         </h2>
                                         <div class="indent">
                                             声明公式。
@@ -472,7 +434,7 @@
                                                     <padding>
                                                         <div class="h">
                                                             <div class="indent">
-                                                                <drawRole></drawRole><move><moveBody5></moveBody5><pile></pile>前<equaling><equalingHead></equalingHead><drawQuantity></drawQuantity></equaling>张<card></card></move>。
+                                                                <drawRole></drawRole><move><moveBody5></moveBody5><pile></pile>前<equaling><equalingHead0></equalingHead0><drawQuantity></drawQuantity></equaling>张<card></card></move>。
                                                             </div>
                                                         </div>
                                                     </padding>
@@ -894,4 +856,22 @@
         </div>
     </div>
 </body>
+
+<script type="text/javascript">
+    document.querySelectorAll('.button').forEach(button => {
+        button.addEventListener('click', function(e){
+            let x = e.clientX - e.target.offsetLeft
+            let y = e.clientY - e.target.offsetTop
+
+            let ripples = document.createElement('span')
+            ripples.style.left = x + 'px'
+            ripples.style.top = y + 'px'
+            this.appendChild(ripples)
+
+            setTimeout(() => {
+                ripples.remove()
+            }, 1000)
+        })
+    })
+</script>
 </html>
