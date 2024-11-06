@@ -2,7 +2,50 @@
 <html lang="en">
 
 <script type="text/javascript">
-    status_equaling = 0
+    let term_status = {}
+    document.querySelectorAll('.button').forEach(button => {
+        button.addEventListener('click', function(e){
+            let x = e.clientX - e.target.offsetLeft
+            let y = e.clientY - e.target.offsetTop
+
+            let ripples = document.createElement('span')
+            ripples.style.left = x + 'px'
+            ripples.style.top = y + 'px'
+            this.appendChild(ripples)
+
+            setTimeout(() => {
+                ripples.remove()
+            }, 1000)
+        })
+    })
+    function elementReplaceCheck(name){
+        fetch('base/term/dynamic.json').then(data => {
+            const targetObject = data.find(item => item.en === name);
+            const partLength = targetObject ? targetObject.part.length : 0
+        })
+        if(term_status[name] >= partLength - 1){
+            button.style.background='#ff8686'
+            term_status[name] = 0
+            elementReplace(name + (partLength - 1),name + '0')
+        }else if(term_status[name] < partLength - 1){
+            button.style.background='#8698ff'
+            term_status[name] += 1
+            elementReplace(name + (term_status[name] - 1),name + term_status[name])
+        }else{
+            button.style.background='#ff8686'
+            term_status[name] = 0
+            textReplace('base/term/dynamic.json')
+            alert(1)
+        }
+    }
+    function elementReplace(name1,name2){
+        document.querySelectorAll(name1).forEach(function(element) {
+            let newElement = document.createElement(name2)
+            newElement.innerHTML = element.innerHTML
+            element.parentNode.replaceChild(newElement, element)
+        })
+        textReplace('base/term/dynamic.json')
+    }
 </script>
 
 <head>
@@ -851,50 +894,4 @@
         </div>
     </div>
 </body>
-
-<script type="text/javascript">
-    let term_status = {}
-    document.querySelectorAll('.button').forEach(button => {
-        button.addEventListener('click', function(e){
-            let x = e.clientX - e.target.offsetLeft
-            let y = e.clientY - e.target.offsetTop
-
-            let ripples = document.createElement('span')
-            ripples.style.left = x + 'px'
-            ripples.style.top = y + 'px'
-            this.appendChild(ripples)
-
-            setTimeout(() => {
-                ripples.remove()
-            }, 1000)
-        })
-    })
-    function elementReplaceCheck(name){
-        fetch('base/term/dynamic.json').then(data => {
-            const targetObject = data.find(item => item.en === name);
-            const partLength = targetObject ? targetObject.part.length : 0
-        })
-        if(term_status[name] >= partLength - 1){
-            button.style.background='#ff8686'
-            term_status[name] = 0
-            elementReplace(name + (partLength - 1),name + '0')
-        }else if(term_status[name] < partLength - 1){
-            button.style.background='#8698ff'
-            term_status[name] += 1
-            elementReplace(name + (term_status[name] - 1),name + term_status[name])
-        }else{
-            button.style.background='#ff8686'
-            term_status[name] = 0
-            textReplace('base/term/dynamic.json')
-        }
-    }
-    function elementReplace(name1,name2){
-        document.querySelectorAll(name1).forEach(function(element) {
-            let newElement = document.createElement(name2)
-            newElement.innerHTML = element.innerHTML
-            element.parentNode.replaceChild(newElement, element)
-        })
-        textReplace('base/term/dynamic.json')
-    }
-</script>
 </html>
