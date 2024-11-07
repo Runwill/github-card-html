@@ -13,6 +13,14 @@
         margin-left: -2em;
         margin-top: -1em;
     }
+    
+    #header_title {
+        margin-right: 20px;
+    }
+
+    #nav-item {
+        margin: 0 -25px 0 0;
+    }
 }
 
 @media (min-width: 501px) and (max-width: 600px) {
@@ -29,6 +37,14 @@
         padding:8px 12px;
         margin-left: -2em;
         margin-top: -1em;
+    }
+    
+    #header_title {
+        margin-right: 30px;
+    }
+
+    #nav-item {
+        margin: 0 -20px 0 0;
     }
 }
 
@@ -47,6 +63,14 @@
         margin-left: -2em;
         margin-top: -1em;
     }
+    
+    #header_title {
+        margin-right: 40px;
+    }
+
+    #nav-item {
+        margin: 0 -10px 0 0;
+    }
 }
 
 @media (min-width: 701px) and (max-width: 800px) {
@@ -63,6 +87,14 @@
         padding:8px 12px;
         margin-left: -2em;
         margin-top: -1em;
+    }
+    
+    #header_title {
+        margin-right: 50px;
+    }
+
+    #nav-item {
+        margin: 0 -10px 0 0;
     }
 }
 
@@ -81,6 +113,14 @@
         margin-left: -2em;
         margin-top: -1em;
     }
+    
+    #header_title {
+        margin-right: 75px;
+    }
+
+    #nav-item {
+        margin: 0 10px 0 0;
+    }
 }
 
 @media (min-width: 900px) and (max-width: 1100px) {
@@ -98,6 +138,14 @@
         margin-left: -2em;
         margin-top: -1em;
     }
+    
+    #header_title {
+        margin-right: 75px;
+    }
+
+    #nav-item {
+        margin: 0 20px 0 0;
+    }
 }
 
 @media (min-width: 1101px) and (max-width: 1200px) {
@@ -110,10 +158,26 @@
         padding-right: 2.4em;
     }
     
+    #header_title {
+        margin-right: 75px;
+    }
+
+    #nav-item {
+        margin: 0 30px 0 0;
+    }
+    
     .button{
         padding:10px 15px;
         margin-left: -2em;
         margin-top: -1em;
+    }
+    
+    #header_title {
+        margin-right: 75px;
+    }
+
+    #nav-item {
+        margin: 0 30px 0 0;
     }
 }
 
@@ -132,6 +196,14 @@
         margin-left: -2em;
         margin-top: -1em;
     }
+    
+    #header_title {
+        margin-right: 75px;
+    }
+
+    #nav-item {
+        margin: 0 30px 0 0;
+    }
 }
 
 @media (min-width: 1401px) {
@@ -148,6 +220,14 @@
         padding:10px 15px;
         margin-left: -2em;
         margin-top: -1em;
+    }
+    
+    #header_title {
+        margin-right: 75px;
+    }
+
+    #nav-item {
+        margin: 0 30px 0 0;
     }
 }
 
@@ -246,7 +326,6 @@ body {
     height: 2.4rem;
     line-height: 2.4rem;
     margin-left: 1rem;
-    margin-right: 75px;
 }
 
 #title-a {
@@ -284,10 +363,8 @@ body {
 }
 
 #nav-item {
-
     margin-top: 0;
     display: inline;
-    margin: 0 30px 0 0;
 }
 
 .main {

@@ -91,6 +91,20 @@
                                         <div class="indent">
                                             遍历。
                                         </div>
+                                        <h2>
+                                            <a class="button button_roundUp"></a>
+                                            <script type="text/javascript">
+                                                document.querySelectorAll('.button_roundUp').forEach(button => {
+                                                    button.addEventListener(
+                                                        'click', (event) => elementReplaceCheck('roundUp', 'roundUp', event)
+                                                    )
+                                                })
+                                            </script>
+                                            <roundUp class="scroll"><roundUp0></roundUp0></roundUp>
+                                        </h2>
+                                        <div class="indent">
+                                            向上取整。
+                                        </div>
                                         <h2><procedureTrigger class="scroll" /></h2>
                                         <div class="indent">
                                             一种数据结构。用于执行<procedure></procedure>。

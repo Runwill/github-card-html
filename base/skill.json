@@ -1,7 +1,7 @@
 [
     {
         "name": "玄德",
-        "content": "<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead><equaling><equalingHead0></equalingHead0><lostHealthPoints></lostHealthPoints>一半(向上取整)</equaling>的<drawEnd></drawEnd></draw>。",
+        "content": "<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead><equaling><equalingHead0></equalingHead0><lostHealthPoints></lostHealthPoints>一半(<roundUp><roundUp0></roundUp0></roundUp>)</equaling>的<drawEnd></drawEnd></draw>。",
         "role": [
             {
                 "id": 125,

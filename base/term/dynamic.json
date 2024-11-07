@@ -17,14 +17,14 @@
         "en": "roundUp",
         "part": [
             {
-                "cn": "归上",
+                "cn": "向上取整",
                 "en": "roundUp0"
             },
             {
-                "cn": "",
+                "cn": "归上",
                 "en": "roundUp1"
             }
         ],
-        "color": "#f3d1ef"
+        "color": "#edaad6"
     }
 ]
