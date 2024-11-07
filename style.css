@@ -221,6 +221,11 @@
         margin-left: -2em;
         margin-top: -1em;
     }
+    .strength_button{
+        padding:8px 8px;
+        margin-left: 0.5%;
+        margin-top: 15px;
+    }
     
     #header_title {
         margin-right: 75px;
@@ -230,6 +235,24 @@
         margin: 0 30px 0 0;
     }
 }
+@font-face {
+    font-family: '古隶';
+    src: url('source/方正古隶繁体.ttf') format('truetype');
+}
+
+.strength_title{
+    display: inline;
+    margin-top: 0.45em;
+    line-height: 1.8em;
+    letter-spacing: -4px;
+    font-family: '古隶';
+    position: absolute;
+    writing-mode: vertical-rl;
+}
+
+.button:hover, .button:focus{
+    background: #8698ff;
+}
 
 .button{
     position: absolute;
@@ -237,10 +260,6 @@
     border-radius:40px;
     overflow: hidden;
     background:#8698ff;
-}
-
-.button:hover, .button:focus{
-    background: #8698ff;
 }
 
 span{
@@ -390,10 +409,3 @@ h3 {
     font-weight: 900;
     margin-bottom: 0.5rem;
 }
-
-@font-face {}
-
-/*#standardCharacterSkillsBlock{
-    font-family: "FZBWKS";
-    font-size: x-large;
-}*/

@@ -11,7 +11,7 @@ $(function () {
             }
     })
     $.ajax({
-        url: "base/skill.json",
+        url: 'base/skill/strength'+ localStorage.getItem('strength') +'.json',
         type: "GET",
         datatype: "json",
         success:

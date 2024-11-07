@@ -18,6 +18,7 @@
     <script src="function/summon/standard_characters_block.js"></script>
 
     <script src="function/button/replace.js"></script>
+    <script src="function/button/strength.js"></script>
     <script src="function/button/wave.js"></script>
     
     <script src="function/replace/term.js"></script>
@@ -39,6 +40,16 @@
             </label>
             <div id="header_title">
                 05 wiki
+                <p class="strength_title"></p>
+                <script type="text/javascript">
+                    document.querySelectorAll('.strength_title').forEach(button => {
+                        button.addEventListener(
+                            'click', () => {
+                                change_strength()
+                            }
+                        )
+                    })
+                </script>
             </div>
         </nav>
         <nav id="sidebar">
