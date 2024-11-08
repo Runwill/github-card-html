@@ -33,7 +33,7 @@ $(function () {
         for (i in characterID) {
             for (j in character) {
                 if (character[j].id == characterID[i]) {
-                    standardCharacters += "<h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> " + character[j].title + "</h3>"
+                    standardCharacters += "<div class='container'><div class='role_title'>" + character[j].title + "</div><padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName>" +"</h3>"
 
                     //获得武将牌上技能次序
                     let skillOrder = []
@@ -53,7 +53,13 @@ $(function () {
                             if (skill[l].role) {
                                 for (m in skill[l].role) {
                                     if (skill[l].role[m].id == characterID[i] && skill[l].role[m].skill_order == skillOrder[k]) {
-                                        standardCharacters += "<padding><skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>" + "<characterSkillElement" + " class=\"" + skill[l].name + " " + skill[l].name + "LoreCharacterID" + characterID[i] + "\"></characterSkillElement>" + "<skillQuoteRight></skillQuoteRight></skillQuote>" + skill[l].content
+
+                                        standardCharacters += "<div class=\"indent\"><skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>" + "<characterSkillElement" + " class=\"" + skill[l].name + " " + skill[l].name + "LoreCharacterID" + characterID[i] + "\"></characterSkillElement>" + "<skillQuoteRight></skillQuoteRight></skillQuote>"
+
+                                        //if (skill[l].role[m].dominator) standardCharacters += "<dominatorSkill epithet=\"0\"></dominatorSkill>，"
+
+                                        standardCharacters += skill[l].content
+
                                         //尾部武将名
                                         for (n in skill[l].role) {
                                             for (o in character) {
@@ -66,12 +72,13 @@ $(function () {
                                                 }
                                             }
                                         }
-                                        standardCharacters += "</padding>"
+                                        standardCharacters += "</div>"
                                     }
                                 }
                             }
                         }
                     }
+                    standardCharacters += "</padding></div>"
                 }
             }
         }

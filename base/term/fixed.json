@@ -966,6 +966,11 @@
         "color": "#e08b8b"
     },
     {
+        "cn": "体力值",
+        "en": "healthPoints",
+        "color": "#e08b8b"
+    },
+    {
         "cn": "已失去体力",
         "en": "lostHealth",
         "color": "#d8d8d8"
@@ -974,6 +979,16 @@
         "cn": "已失去体力值",
         "en": "lostHealthPoints",
         "color": "#d8d8d8"
+    },
+    {
+        "cn": "手牌上限初值",
+        "en": "initialHandLimit",
+        "color": "#eccf9d"
+    },
+    {
+        "cn": "手牌上限",
+        "en": "handLimit",
+        "color": "#ecb09d"
     },
     {
         "cn": "牌",
@@ -1204,6 +1219,11 @@
         "cn": "目标数限制",
         "en": "targetNumberLimit",
         "color": "#a1cbfb"
+    },
+    {
+        "cn": "任意",
+        "en": "anyNumber",
+        "color": "#ffb0cf"
     },
     {
         "cn": "目标限制",

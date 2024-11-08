@@ -655,9 +655,21 @@
                                                     <liveStatus></liveStatus>为0。
                                                 </div>
                                             </padding>
+                                            <h3><healthPoints class="scroll" /></h3>
+                                            <div class="indent">
+                                                <role></role>的一项<attribute></attribute>。其的<counts><health></health><countsEnd></countsEnd></counts>。
+                                            </div>
                                             <h3><lostHealthPoints class="scroll" /></h3>
                                             <div class="indent">
                                                 <role></role>的一项<attribute></attribute>。其的<counts><lostHealth></lostHealth><countsEnd></countsEnd></counts>。
+                                            </div>
+                                            <h3><initialHandLimit class="scroll" /></h3>
+                                            <div class="indent">
+                                                <role></role>的一项<attribute></attribute>。等于其的<healthPoints></healthPoints>。
+                                            </div>
+                                            <h3><handLimit class="scroll" /></h3>
+                                            <div class="indent">
+                                                <role></role>的一项<attribute></attribute>。等于其的<initialHandLimit></initialHandLimit>。至少为0。
                                             </div>
                                             <h3><seat class="scroll" /></h3>
                                             <div class="indent">
@@ -730,7 +742,7 @@
                                             </div>
                                             <h3><visible class="scroll"><visibleBody></visibleBody></visible></h3>
                                             <div class="indent">
-                                                <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。<role></role>的集合。称为<or>集合中的任意<role></role><visible><visibleBody></visibleBody></visible>此<card></card><orBody></orBody>此<card></card><visible><visibleHead></visibleHead>集合中的任意<role></role><visibleBody></visibleBody></visible></or>。
+                                                <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。<role></role>的集合。称为<or><roleSelector class="irreplaceable">集合中的<anyNumber></anyNumber><role></role></roleSelector><visible><visibleBody></visibleBody></visible>此<card></card><orBody></orBody>此<card></card><visible><visibleHead></visibleHead><roleSelector class="irreplaceable">集合中的<anyNumber></anyNumber><role></role></roleSelector><visibleBody></visibleBody></visible></or>。
                                             </div>
                                             <div class="indent">
                                                 <visible><visibleBody></visibleBody></visible>某<card></card>的<role></role><can></can>随时查看此<card></card>。
@@ -829,6 +841,12 @@
                                             </div>
                                             <padding>
                                                 <h3><targetNumberLimit class="scroll" /></h3>
+                                                <padding>
+                                                    <h3><anyNumber></anyNumber></h3>
+                                                    <div class="indent">
+                                                        不限制目标数。
+                                                    </div>
+                                                </padding>
                                                 <h3><targetLimit class="scroll" /></h3>
                                                 <div class="indent">
                                                     <object></object>的集合。
@@ -871,9 +889,9 @@
                 <div class="tabs-panel" id="panel_character">
                     <main>
                         <padding>
-                            <padding>
-                                <div id="standardCharactersBlock"></div>
-                            </padding>
+                            <div id="div4" style="height: 1000px; background-color: white;"></div>
+                            <div id="standardCharactersBlock"></div>
+                            <div id="div4" style="height: 1000px; background-color: white;"></div>
                         </padding>
                     </main>
                 </div>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>竖排文本示例</title>
+    <style>
+        .A {
+            position: relative; /* 为了给绝对定位的竖排文本提供参照 */
+            display: inline-block; /* 确保 div 中的文本保持正常布局 */
+            padding: 10px;
+            border: 1px solid #000;
+            font-size: 18px;
+        }
+
+        .vertical-text {
+            position: absolute;
+            top: 50%; /* 竖排文本竖直居中 */
+            left: 5%; /* 使竖排文本出现在原文本的右侧 */
+            transform: translateY(-50%) rotate(90deg); /* 垂直居中，并旋转90度 */
+            white-space: nowrap; /* 保证文本在一行内 */
+            font-size: 16px;
+            color: #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="A">
+        这是原文本内容。
+        <div class="vertical-text">竖排文本</div>
+    </div>
+    <br>
+    <div class="A">
+        另一个例子，展示竖排文本与原文本的布局。
+        另一个例子，展示竖排文本与原文本的布局。
+        另一个例子，展示竖排文本与原文本的布局。
+        另一个例子，展示竖排文本与原文本的布局。
+        另一个例子，展示竖排文本与原文本的布局。
+        另一个例子，展示竖排文本与原文本的布局。
+        另一个例子，展示竖排文本与原文本的布局。
+        另一个例子，展示竖排文本与原文本的布局。
+        另一个例子，展示竖排文本与原文本的布局。
+        另一个例子，展示竖排文本与原文本的布局。
+        <div class="vertical-text">竖排文本</div>
+    </div>
+</body>
+</html>
