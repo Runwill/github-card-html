@@ -256,15 +256,16 @@
     letter-spacing: -4px;
     font-family: '古隶';
     position: absolute;
-    writing-mode: vertical-rl;
+    writing-mode: vertical-rl
 }
 
 .button:hover, .button:focus{
-    background: #8698ff;
+    background: #8698ff
 }
 
 .container{
-    display: flex;
+    position: relative;
+    display: inline-block
 }
 roleSkillContainer{
     flex: 1;
@@ -275,13 +276,15 @@ roleSkillContainer{
 }
 
 .role_title{
-    position: absolute;
     font-family: '明朝';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
     writing-mode: vertical-rl;
     white-space: nowrap;
     text-align: center;
     font-size: 5em;
-    opacity: 0.1;
+    opacity: 0.1
 }
 
 .button{

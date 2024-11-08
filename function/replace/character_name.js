@@ -32,11 +32,26 @@ $(function(){
                             $("#example-tabs").foundation('selectTab','panel_character',1);
                             document.querySelectorAll(".scroll").forEach(
                                 scroll => {
-                                    if (scroll.classList.contains(event.currentTarget.classList[0])){
-                                        if(!(scroll.classList.contains('fadeOnly'))){
-                                            scroll.scrollIntoView({behavior:'smooth'})
+                                    if (scroll.classList.contains(event.currentTarget.classList[0])) {
+                                        if (!(scroll.classList.contains('fadeOnly'))) {
+                                            // 获取页面高度和目标元素的位置信息
+                                            const container = scroll.closest('.container')
+                                            const elementTop = container.getBoundingClientRect().top + window.pageYOffset;
+                                            const elementHeight = container.offsetHeight;
+                                            const windowHeight = window.innerHeight;
+                                    
+                                            // 计算目标元素滚动到屏幕中央的位置
+                                            const offset = elementTop - (windowHeight / 2) + (elementHeight / 2);
+                                    
+                                            // 使用 scrollTo 进行滚动，确保目标元素居中
+                                            window.scrollTo({
+                                                top: offset,
+                                                behavior: 'smooth'
+                                            });
                                         }
-                                        $(scroll).fadeTo(200,0).fadeTo(1000,1)
+                                    
+                                        // 淡入效果
+                                        $(scroll).fadeTo(1000, 1);
                                     }
                                 }
                             )
