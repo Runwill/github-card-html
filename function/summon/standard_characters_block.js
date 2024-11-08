@@ -33,7 +33,12 @@ $(function () {
         for (i in characterID) {
             for (j in character) {
                 if (character[j].id == characterID[i]) {
-                    standardCharacters += "<div class='container'><div class='role_title'>" + character[j].title + "</div><padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName>" +"</h3>"
+
+                    standardCharacters += "<div class='container'><div class='role_title'>" + character[j].title + "</div><padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
+
+                    for (let a = 0; a < character[j].health; a++)standardCharacters += "<health epithet='1' style='font-size: 1.3em;letter-spacing: -2px;'></health>"
+
+                    standardCharacters += "</h3>"
 
                     //获得武将牌上技能次序
                     let skillOrder = []
@@ -54,9 +59,13 @@ $(function () {
                                 for (m in skill[l].role) {
                                     if (skill[l].role[m].id == characterID[i] && skill[l].role[m].skill_order == skillOrder[k]) {
 
-                                        standardCharacters += "<div class=\"indent\"><skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>" + "<characterSkillElement" + " class=\"" + skill[l].name + " " + skill[l].name + "LoreCharacterID" + characterID[i] + "\"></characterSkillElement>" + "<skillQuoteRight></skillQuoteRight></skillQuote>"
+                                        standardCharacters += "<div class=\"indent\"><skillQuote class=\"bold"
+                                        
+                                        //if (skill[l].role[m].dominator) standardCharacters += " glowing"
 
-                                        //if (skill[l].role[m].dominator) standardCharacters += "<dominatorSkill epithet=\"0\"></dominatorSkill>，"
+                                        standardCharacters += "\"><skillQuoteLeft></skillQuoteLeft>" + "<characterSkillElement" + " class=\"" + skill[l].name + " " + skill[l].name + "LoreCharacterID" + characterID[i] + "\"></characterSkillElement>" + "<skillQuoteRight></skillQuoteRight></skillQuote>"
+
+                                        if (skill[l].role[m].dominator) standardCharacters += "<dominatorSkill></dominatorSkill>，"
 
                                         standardCharacters += skill[l].content
 
