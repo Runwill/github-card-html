@@ -34,7 +34,14 @@ $(function () {
             for (j in character) {
                 if (character[j].id == characterID[i]) {
 
-                    standardCharacters += "<div class='container'><div class='role_title'>" + character[j].title + "</div><padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
+                    standardCharacters += "<div class='container'><div class='role_title'>" + character[j].title + "</div>"
+                    
+                    standardCharacters += "<img src='source/"
+                    standardCharacters += character[j].position
+                    if(character[j].dominator)standardCharacters += "_君主"
+                    standardCharacters += ".png' width='300' height='300' class='role_icon'>"
+
+                    standardCharacters += "<padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
 
                     for (let a = 0; a < character[j].health; a++)standardCharacters += "<health epithet='1' style='font-size: 1.3em;letter-spacing: -2px;'></health>"
 

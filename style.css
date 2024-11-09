@@ -273,7 +273,8 @@
 
 .container{
     position: relative;
-    display: inline-block
+    display: inline-block;
+    z-index: 2;
 }
 
 .role_title{
@@ -289,11 +290,30 @@
     left: -5%;
     transition: left 1s ease, opacity 1s ease;
     user-select: none; pointer-events: none;
+    z-index: 1;
 }
-
 .container:hover .role_title {
     opacity: 0.1;
     left: 0%
+}
+
+.role_icon{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+    text-align: center;
+    opacity: 0;
+    left: 10%;
+    transition: left 1s ease, opacity 1s ease;
+    user-select: none; pointer-events: none;
+    z-index: 0;
+    
+}
+.container:hover .role_icon {
+    opacity: 0.015;
+    left: 5%
 }
 
 .button{
