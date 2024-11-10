@@ -29,6 +29,10 @@
             {
                 "cn": "则",
                 "en": "ifBody"
+            },
+            {
+                "cn": "反之",
+                "en": "else"
             }
         ],
         "color": "#a5d8a8"
@@ -118,7 +122,7 @@
     {
         "cn": "时机限制",
         "en": "tickLimit",
-        "color": "#8dff8d"
+        "color": "#cffbcf"
     },
     {
         "en": "numberLimiting",
@@ -813,6 +817,61 @@
         "en": "afterDraw",
         "cn": "摸牌后",
         "color": "#abd1b4"
+    },
+    {
+        "en": "dying",
+        "cn": "濒死",
+        "color": "#8dffbd"
+    },
+    {
+        "en": "dyingRole",
+        "cn": "濒死者",
+        "color": "#8dffbd"
+    },
+    {
+        "en": "whenEnteringDying",
+        "cn": "陷入濒死时",
+        "color": "#abd1b4"
+    },
+    {
+        "en": "whenDying",
+        "cn": "濒死时",
+        "color": "#abd1b4"
+    },
+    {
+        "en": "whenExitingDying",
+        "cn": "脱离濒死时",
+        "color": "#abd1b4"
+    },
+    {
+        "en": "die",
+        "cn": "死亡",
+        "color": "#979797"
+    },
+    {
+        "en": "dieRole",
+        "cn": "死者",
+        "color": "#979797"
+    },
+    {
+        "en": "beforeDie",
+        "cn": "死亡前",
+        "color": "#979797"
+    },
+    {
+        "en": "whenDie",
+        "cn": "死亡时",
+        "color": "#979797"
+    },
+    {
+        "en": "afterDie",
+        "cn": "死亡后",
+        "color": "#979797"
+    },
+    {
+        "cn": "奖惩",
+        "en": "bonus-penalty",
+        "color": "#e5c88a"
     },
     {
         "cn": "对象",

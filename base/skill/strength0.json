@@ -23,5 +23,30 @@
                 "legend": "書·大禹謨"
             }
         ]
+    },
+    {
+        "name": "鸿志",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier0>一名</tickQuantifier0><role></role><whenEnteringDying></whenEnteringDying></when></tickLimit></procedureTrigger>，你摸两张牌；当一名角色死亡时，你摸一张牌。",
+        "role": [
+            {
+                "id": 2,
+                "skill_order": 1,
+                "lore": "嗟乎，燕雀安知鴻鵠之志哉",
+                "legend": "太史公書·陳涉世家"
+            }
+        ]
+    },
+    {
+        "name": "狐鸣",
+        "content": "锁定技，出牌阶段，你可多使用其他受伤角色数张【杀】。",
+        "role": [
+            {
+                "id": 2,
+                "skill_order": 2,
+                "dominator": true,
+                "lore": "狐鳴呼曰：「大楚興，陳勝王」",
+                "legend": "太史公書·陳涉世家"
+            }
+        ]
     }
 ]

@@ -94,7 +94,7 @@ $(function () {
                             }
                         }
                     }
-                    standardCharacters += "</padding></div>"
+                    standardCharacters += "</padding></div><br><br><br><br>"
                 }
             }
         }
