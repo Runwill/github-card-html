@@ -26,7 +26,7 @@
     },
     {
         "name": "鸿志",
-        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier0>一名</tickQuantifier0><role></role><whenEnteringDying></whenEnteringDying></when></tickLimit></procedureTrigger>，你摸两张牌；当一名角色死亡时，你摸一张牌。",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenEnteringDying></whenEnteringDying></when></tickLimit></procedureTrigger>，你摸两张牌；当一名角色死亡时，你摸一张牌。",
         "role": [
             {
                 "id": 2,

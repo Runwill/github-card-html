@@ -17,6 +17,7 @@
     <script src="function/summon/standard_character_skills_block.js"></script>
     <script src="function/summon/standard_characters_block.js"></script>
 
+    <script src="function/button/hide.js"></script>
     <script src="function/button/replace.js"></script>
     <script src="function/button/strength.js"></script>
     <script src="function/button/wave.js"></script>
@@ -176,8 +177,15 @@
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <a class="button"></a>
-                                                        <tickLimit></tickLimit>中存在量词时，<if><ifHead></ifHead>对应<object></object>可能不唯一，则对<every><tickQuantifier0><everyHead></everyHead></tickQuantifier0>个<object></object></every><each><eachHead></eachHead>触发一次</each>，<else></else>，量词可省略</if>。
+                                                        <a class="button button_tickQuantifier"></a>
+                                                        <script type="text/javascript">
+                                                            document.querySelectorAll('.button_tickQuantifier').forEach(button => {
+                                                                button.addEventListener(
+                                                                    'click', (event) => elementHideCheck('tickQuantifier', event)
+                                                                )
+                                                            })
+                                                        </script>
+                                                        <tickLimit></tickLimit>中存在量词时，<if><ifHead></ifHead>对应<object></object>可能不唯一，则对<every><tickQuantifier><everyHead></everyHead>个</tickQuantifier><object></object></every><each><eachHead></eachHead>触发一次</each>，<else></else>，量词可省略</if>。
                                                     </div>
                                                     <padding>
                                                         <h3><when class="scroll"><whenHead></whenHead>……</when></h3>
