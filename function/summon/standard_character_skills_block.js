@@ -1,29 +1,9 @@
-$(function(){
-    var deferred1 = $.Deferred();
-    var deferred2 = $.Deferred();
-    $.ajax({
-        url:"base/character.json",
-        type:"GET",
-        datatype:"json",
-        success:
-        function (characterData){
-            deferred1.resolve(characterData)
-        }
-    })
-    $.ajax({
-        url:'base/skill/strength'+ localStorage.getItem('strength') +'.json',
-        type:"GET",
-        datatype:"json",
-        success:
-        function (skillData){
-            deferred2.resolve(skillData);
-        }
-    })
-    $.when(deferred1, deferred2).done(function (characterData, skillData) {
-        CharacterSkillReplace(characterData, skillData);
-    })
 
-    var CharacterSkillReplace = function(character,skill){
+function CharacterSkillReplace(path1, path2) {
+    Promise.all([
+        fetch(path1).then(response => response.json()), // 获取第一个文件的数据
+        fetch(path2).then(response => response.json())  // 获取第二个文件的数据
+    ]).then(([character,skill]) => {
         //获取武将技能名并排序
         let CharacterSkillNames = []
         for(var i in skill){
@@ -51,5 +31,11 @@ $(function(){
             standardCharacterSkills += "<br>"+"<br>"
         }
         standardCharacterSkillsBlock.innerHTML = "<br>"+"<br>"+standardCharacterSkills
-    }
-});
+    })
+}
+$(function () {
+    $(document).ready(function () {
+        $(document).foundation()
+    })
+    CharacterSkillReplace('base/character.json','base/skill/strength'+ localStorage.getItem('strength') +'.json')
+})

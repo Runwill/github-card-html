@@ -1,14 +1,5 @@
-$(function () {
-    $.ajax({
-        url: 'base/skill/strength'+ localStorage.getItem('strength') +'.json',
-        type: "GET",
-        datatype: "json",
-        success:
-            function (data) {
-                SkillNameReplace(data)
-            }
-    });
-    var SkillNameReplace = function (skill) {
+function SkillNameReplace(path){
+    fetch(path).then(response => response.json()).then(skill => {
         //获取技能名并排序
         let skillNames = []
         for (var i in skill) {
@@ -22,7 +13,7 @@ $(function () {
                     element.innerHTML = skillNames[i]
                     element.skillPosition = i
                     element.addEventListener(
-                        'click', function () {
+                        'click', function (event) {
                             event.stopPropagation()
                             $("#example-tabs").foundation('selectTab', 'panel_skill', 1);
                             document.querySelectorAll(".scroll").forEach(
@@ -40,13 +31,13 @@ $(function () {
                 }
             )
             $("." + skillNames[i]).mouseover(//高亮
-                function () {
+                function (event) {
                     $(this).css("background-color", "#df90ff")
                     $("." + event.currentTarget.classList[0] + ".scroll").css("background-color", "#df90ff")
                 }
             )
             $("." + skillNames[i]).mouseout(//高亮
-                function () {
+                function (event) {
                     $(this).css("background-color", "")
                     $("." + event.currentTarget.classList[0] + ".scroll").css("background-color", "")
                 }
@@ -72,5 +63,11 @@ $(function () {
                 }
             }
         }
-    }
-});
+    })
+}
+$(function () {
+    $(document).ready(function () {
+        $(document).foundation()
+    })
+    SkillNameReplace('base/skill/strength'+ localStorage.getItem('strength') +'.json')
+})

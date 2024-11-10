@@ -43,7 +43,7 @@ $(function () {
 
                     standardCharacters += "<padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
 
-                    for (let a = 0; a < character[j].health; a++)standardCharacters += "<health epithet='1' style='font-size: 1.3em;letter-spacing: -2px;'></health>"
+                    for (let a = 0; a < character[j].health; a++)standardCharacters += "<health epithet='2' style='font-size: 1.3em;letter-spacing: -2px;'></health>"
 
                     standardCharacters += "</h3>"
 

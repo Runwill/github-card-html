@@ -1,7 +1,7 @@
 [
     {
         "name": "玄德",
-        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead><equaling><equalingHead0></equalingHead0><lostHealthPoints></lostHealthPoints>一半(<roundUp><roundUp0></roundUp0></roundUp>)</equaling>的<drawEnd></drawEnd></draw>。",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead><equaling><equalingHead0></equalingHead0><lostHealth epithet='1'></lostHealth epithet='1'>一半(<roundUp><roundUp0></roundUp0></roundUp>)</equaling>的<drawEnd></drawEnd></draw>。",
         "role": [
             {
                 "id": 125,
@@ -26,7 +26,7 @@
     },
     {
         "name": "鸿志",
-        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenEnteringDying></whenEnteringDying></when></tickLimit></procedureTrigger>，你摸两张牌；当一名角色死亡时，你摸一张牌。",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenEnteringDying></whenEnteringDying></when></tickLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead>两张<drawEnd></drawEnd></draw>；<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenDie></whenDie></when></tickLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead>一张<drawEnd></drawEnd></draw>。",
         "role": [
             {
                 "id": 2,
@@ -38,7 +38,7 @@
     },
     {
         "name": "狐鸣",
-        "content": "锁定技，出牌阶段，你可多使用其他受伤角色数张【杀】。",
+        "content": "锁定技，<you></you>的<cardQuote><cardQuoteLeft></cardQuoteLeft><attack></attack><cardQuoteRight></cardQuoteRight></cardQuote><numberLimit></numberLimit>+<counts><damaged></damaged><roleDefault></roleDefault><countsEnd></countsEnd></counts>。",
         "role": [
             {
                 "id": 2,

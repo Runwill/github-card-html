@@ -1,7 +1,7 @@
 [
     {
         "name": "玄德",
-        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead><equaling><equalingHead0></equalingHead0><lostHealthPoints></lostHealthPoints>+1的一半(<roundUp><roundUp0></roundUp0></roundUp>)</equaling>的<drawEnd></drawEnd></draw>。",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead><equaling><equalingHead0></equalingHead0><lostHealth epithet='1'></lostHealth epithet='1'>+1的一半(<roundUp><roundUp0></roundUp0></roundUp>)</equaling>的<drawEnd></drawEnd></draw>。",
         "role": [
             {
                 "id": 125,

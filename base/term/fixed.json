@@ -1025,6 +1025,9 @@
                 "cn": "体力"
             },
             {
+                "cn": "体力值"
+            },
+            {
                 "cn": "○"
             }
         ],
@@ -1032,19 +1035,34 @@
         "color": "#e08b8b"
     },
     {
-        "cn": "体力值",
-        "en": "healthPoints",
-        "color": "#e08b8b"
+        "cn": "体力上限",
+        "en": "healthLimit",
+        "color": "#e0a98b"
     },
     {
-        "cn": "已失去体力",
+        "epithet": [
+            {
+                "cn": "已失去体力"
+            },
+            {
+                "cn": "已失去体力值"
+            },
+            {
+                "cn": "·"
+            }
+        ],
         "en": "lostHealth",
         "color": "#d8d8d8"
     },
     {
-        "cn": "已失去体力值",
-        "en": "lostHealthPoints",
-        "color": "#d8d8d8"
+        "cn": "受伤",
+        "en": "damaged",
+        "color": "#ca7a7a"
+    },
+    {
+        "cn": "未受伤",
+        "en": "undamaged",
+        "color": "#c9e69a"
     },
     {
         "cn": "手牌上限初值",
@@ -1060,6 +1078,20 @@
         "cn": "牌",
         "en": "card",
         "color": "#d8cbc8"
+    },
+    {
+        "en": "cardQuote",
+        "part": [
+            {
+                "cn": "【",
+                "en": "cardQuoteLeft"
+            },
+            {
+                "cn": "】",
+                "en": "cardQuoteRight"
+            }
+        ],
+        "color": "#f4ecea"
     },
     {
         "cn": "牌",
@@ -1385,5 +1417,15 @@
             }
         ],
         "color": "#dffdde"
+    },
+    {
+        "cn": "基础牌",
+        "en": "baseCard",
+        "color": "#d8cbc8"
+    },
+    {
+        "cn": "基本牌",
+        "en": "basicCard",
+        "color": "#c2f3c2"
     }
 ]

@@ -23,6 +23,7 @@
     <script src="function/button/wave.js"></script>
     
     <script src="function/replace/term.js"></script>
+    <script src="function/replace/card.js"></script>
     <script src="function/replace/character_name.js"></script>
     <script src="function/replace/skill_name.js"></script>
 
@@ -497,10 +498,10 @@
                                                         <advance></advance><tick></tick>“<whenEnteringDying class="scroll bold"></whenEnteringDying>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <if><ifHead></ifHead><dyingRole></dyingRole><healthPoints></healthPoints>不大于0，<ifBody></ifBody><advance></advance><tick></tick>“<whenDying class="scroll bold"></whenDying>”(<if><ifHead></ifHead><dyingRole></dyingRole><healthPoints></healthPoints>大于0，<ifBody></ifBody>此<tick></tick>的<tickLimit></tickLimit>视为不满足</if>)，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="scroll bold"></whenExitingDying>”</if>。
+                                                        <if><ifHead></ifHead><dyingRole></dyingRole><health epithet='1'></health>不大于0，<ifBody></ifBody><advance></advance><tick></tick>“<whenDying class="scroll bold"></whenDying>”(<if><ifHead></ifHead><dyingRole></dyingRole><health epithet='1'></health>大于0，<ifBody></ifBody>此<tick></tick>的<tickLimit></tickLimit>视为不满足</if>)，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="scroll bold"></whenExitingDying>”</if>。
                                                     </div>
                                                     <div class="indent">
-                                                        <if><ifHead></ifHead><dyingRole></dyingRole><healthPoints></healthPoints>不大于0，<ifBody></ifBody>其<die></die>，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="bold"></whenExitingDying>”</if>。
+                                                        <if><ifHead></ifHead><dyingRole></dyingRole><health epithet='1'></health epithet='1'>不大于0，<ifBody></ifBody>其<die></die>，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="bold"></whenExitingDying>”</if>。
                                                     </div>
                                                 </div>
                                             </padding><h3><die class="scroll" /></h3>
@@ -729,22 +730,38 @@
                                                     <liveStatus></liveStatus>为0。
                                                 </div>
                                             </padding>
-                                            <h3><healthPoints class="scroll" /></h3>
+                                            <h3><health class="scroll" /></h3>
                                             <div class="indent">
-                                                <role></role>的一项<attribute></attribute>。其的<counts><health></health><countsEnd></countsEnd></counts>。
+                                                <role></role>的一项<attribute></attribute>。
                                             </div>
-                                            <h3><lostHealthPoints class="scroll" /></h3>
+                                            <h3><healthLimit class="scroll" /></h3>
                                             <div class="indent">
-                                                <role></role>的一项<attribute></attribute>。其的<counts><lostHealth></lostHealth><countsEnd></countsEnd></counts>。
+                                                <role></role>的一项<attribute></attribute>。
                                             </div>
+                                            <h3><lostHealth class="scroll" /></h3>
+                                            <div class="indent">
+                                                <role></role>的一项<attribute></attribute>。等于其的<healthLimit></healthLimit>-<health epithet='1'></health>。
+                                            </div>
+                                            <padding>
+                                                <h3><damaged></damaged></h3>
+                                                <div class="indent">
+                                                    <lostHealth epithet='1'></lostHealth>大于0。
+                                                </div>
+                                                <h3><undamaged></undamaged></h3>
+                                                <div class="indent">
+                                                    <lostHealth epithet='1'></lostHealth>不大于0。
+                                                </div>
+                                            </padding>
                                             <h3><initialHandLimit class="scroll" /></h3>
                                             <div class="indent">
-                                                <role></role>的一项<attribute></attribute>。等于其的<healthPoints></healthPoints>。
+                                                <role></role>的一项<attribute></attribute>。等于其的<health epithet='1'></health>。
                                             </div>
-                                            <h3><handLimit class="scroll" /></h3>
-                                            <div class="indent">
-                                                <role></role>的一项<attribute></attribute>。等于其的<initialHandLimit></initialHandLimit>。至少为0。
-                                            </div>
+                                            <padding>
+                                                <h3><handLimit class="scroll" /></h3>
+                                                <div class="indent">
+                                                    <role></role>的一项<attribute></attribute>。等于其的<initialHandLimit></initialHandLimit>。至少为0。
+                                                </div>
+                                            </padding>
                                             <h3><seat class="scroll" /></h3>
                                             <div class="indent">
                                                 <role></role>的一项<attribute></attribute>。整型变量。
@@ -796,6 +813,10 @@
                                             <h3><position class="scroll" /></h3>
                                             <div class="indent">
                                                 <card></card>的一项<attribute></attribute>。整型变量。
+                                            </div>
+                                            <h3><cardQuote class="scroll"><cardQuoteLeft></cardQuoteLeft>……<cardQuoteRight></cardQuoteRight></cardQuote></h3>
+                                            <div class="indent">
+                                                引用<card></card>。
                                             </div>
                                         </padding>
                                         <h2><area class="scroll" /></h2>
@@ -944,6 +965,26 @@
                                                     <h3><distanceLimit class="scroll" /></h3>
                                                 </padding>
                                             </padding>
+                                        </padding>
+                                    </padding>
+                                </padding>
+                            </padding>
+                        </main>
+                    </div>
+                </div>
+                <div class="tabs-panel" id="panel_card">
+                    <div class="main">
+                        <main>
+                            <padding>
+                                <padding>
+                                    <h1><baseCard class="scroll" /></h1>
+                                    <padding>
+                                        <h2><basicCard class="scroll" /></h2>
+                                        <padding>
+                                            <h3><attack class="scroll"></attack></h3>
+                                            <div class="indent">
+                                                <procedureTrigger class="irreplaceable"><tickingTimeLimit class="irreplaceable"><tickingLimit class="irreplaceable"><actingStage></actingStage></tickingLimit><numberLimit class="irreplaceable"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，
+                                            </div>
                                         </padding>
                                     </padding>
                                 </padding>

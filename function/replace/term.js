@@ -17,12 +17,11 @@ function textReplace(path,mode) {
                         }
                         if(mode){
                             element.addEventListener(//滚动
-                                'click', function () {
+                                'click', function (event) {
                                     event.stopPropagation()
                                     $("#example-tabs").foundation('selectTab', 'panel_term', 1);
                                     document.querySelectorAll(".scroll").forEach(
                                         scroll => {
-                                            event.stopPropagation()
                                             if (scroll.outerHTML.startsWith("<" + event.currentTarget.tagName.toLowerCase() + " ")) {
                                                 if (!(scroll.classList.contains('fadeOnly'))) scroll.scrollIntoView({ behavior: "smooth" })
                                                 $(scroll).fadeTo(200, 0).fadeTo(1000, 1)
@@ -36,13 +35,13 @@ function textReplace(path,mode) {
                 )
                 if(mode){
                     $(term[i].en).mouseover(//高亮
-                        function () {
+                        function (event) {
                             $(this).css("background-color", term[event.currentTarget.termPosition].color)
                             $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", term[event.currentTarget.termPosition].color)
                         }
                     )
                     $(term[i].en).mouseout(//去高亮
-                        function () {
+                        function (event) {
                             $(this).css("background-color", "")
                             $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", "")
                         }
@@ -60,13 +59,13 @@ function textReplace(path,mode) {
                 if(mode){
                     $(term[i].en).each((index, element) => {//高亮
                         element.termPosition = i
-                        $(element).mouseover(() => {
+                        $(element).mouseover((event) => {
                             for (var j in term[event.currentTarget.termPosition].part) {
                                 $(element).children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
                                 $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
                             }
                         })
-                        $(element).mouseout(() => {
+                        $(element).mouseout((event) => {
                             for (var j in term[event.currentTarget.termPosition].part) {
                                 $(element).children(term[event.currentTarget.termPosition].part[j].en).css("background-color", "")
                                 $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", "")
@@ -76,12 +75,11 @@ function textReplace(path,mode) {
                     document.querySelectorAll(term[i].en).forEach(//滚动
                         element => {
                             element.addEventListener(
-                                'click', function () {
+                                'click', function (event) {
                                     event.stopPropagation()
                                     $("#example-tabs").foundation('selectTab', 'panel_term', 1);
                                     document.querySelectorAll(".scroll").forEach(
                                         scroll => {
-                                            event.stopPropagation()
                                             if (scroll.outerHTML.startsWith("<" + term[event.currentTarget.termPosition].en.toLowerCase() + " ")) {
                                                 if (!(scroll.classList.contains('fadeOnly'))) {
                                                     scroll.scrollIntoView({ behavior: 'smooth' });

@@ -1,7 +1,7 @@
 [
     {
         "name": "玄德",
-        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><make><makeHead></makeHead><roleSelector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\"><anyNumber></anyNumber>名</targetNumberLimit><targetLimit class=\"irreplaceable\"><roleDefault></roleDefault></roleSelector><draw><drawHead></drawHead>共x(“x”为<you></you><lostHealthPoints></lostHealthPoints>+1的一半，<roundUp><roundUp0></roundUp0></roundUp>)的<drawEnd></drawEnd></draw></make>；<you></you>的<handLimit></handLimit>+x。",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><make><makeHead></makeHead><roleSelector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\"><anyNumber></anyNumber>名</targetNumberLimit><targetLimit class=\"irreplaceable\"><roleDefault></roleDefault></roleSelector><draw><drawHead></drawHead>共x(“x”为<you></you><lostHealth epithet='1'></lostHealth epithet='1'>+1的一半，<roundUp><roundUp0></roundUp0></roundUp>)的<drawEnd></drawEnd></draw></make>；<you></you>的<handLimit></handLimit>+x。",
         "role": [
             {
                 "id": 125,
