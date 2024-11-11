@@ -64,9 +64,3 @@ function CharacterNameReplace(path){
         }
     })
 }
-$(function () {
-    $(document).ready(function () {
-        $(document).foundation()
-    })
-    CharacterNameReplace('base/character.json')
-})

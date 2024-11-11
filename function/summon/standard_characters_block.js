@@ -1,8 +1,29 @@
-function CharacterReplace(path1, path2) {
-    Promise.all([
-        fetch(path1).then(response => response.json()), // 获取第一个文件的数据
-        fetch(path2).then(response => response.json())  // 获取第二个文件的数据
-    ]).then(([character,skill]) => {
+$(function(){
+    var deferred1 = $.Deferred();
+    var deferred2 = $.Deferred();
+    $.ajax({
+        url:"base/character.json",
+        type:"GET",
+        datatype:"json",
+        success:
+        function (characterData){
+            deferred1.resolve(characterData)
+        }
+    })
+    $.ajax({
+        url:'base/skill/strength'+ localStorage.getItem('strength') +'.json',
+        type:"GET",
+        datatype:"json",
+        success:
+        function (skillData){
+            deferred2.resolve(skillData);
+        }
+    })
+    $.when(deferred1, deferred2).done(function (characterData, skillData) {
+        CharacterReplace(characterData, skillData);
+    })
+})
+function CharacterReplace(character,skill) {
         let standardCharacters = []
         //提取武将序号的顺序数组
         let characterID = []
@@ -77,12 +98,5 @@ function CharacterReplace(path1, path2) {
                 }
             }
         }
-        standardCharactersBlock.innerHTML = "<br>" + "<br>" + standardCharacters
-    })
+        $(".standardCharactersBlock").html("<br>" + "<br>" + standardCharacters)
 }
-$(function () {
-    $(document).ready(function () {
-        $(document).foundation()
-    })
-    CharacterReplace('base/character.json','base/skill/strength'+ localStorage.getItem('strength') +'.json')
-})

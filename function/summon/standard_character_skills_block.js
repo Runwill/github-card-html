@@ -1,9 +1,29 @@
-
-function CharacterSkillReplace(path1, path2) {
-    Promise.all([
-        fetch(path1).then(response => response.json()), // 获取第一个文件的数据
-        fetch(path2).then(response => response.json())  // 获取第二个文件的数据
-    ]).then(([character,skill]) => {
+$(function(){
+    var deferred1 = $.Deferred();
+    var deferred2 = $.Deferred();
+    $.ajax({
+        url:"base/character.json",
+        type:"GET",
+        datatype:"json",
+        success:
+        function (characterData){
+            deferred1.resolve(characterData)
+        }
+    })
+    $.ajax({
+        url:'base/skill/strength'+ localStorage.getItem('strength') +'.json',
+        type:"GET",
+        datatype:"json",
+        success:
+        function (skillData){
+            deferred2.resolve(skillData);
+        }
+    })
+    $.when(deferred1, deferred2).done(function (characterData, skillData) {
+        CharacterSkillReplace(characterData, skillData);
+    })
+})
+function CharacterSkillReplace(character,skill) {
         //获取武将技能名并排序
         let CharacterSkillNames = []
         for(var i in skill){
@@ -19,7 +39,7 @@ function CharacterSkillReplace(path1, path2) {
                     for(k in skill[j].role){
                         for(l in character){
                             if(character[l].id==skill[j].role[k].id){
-                                standardCharacterSkills+="<"+ "<charactorName class=\"characterID"+character[l].id+"\"></charactorName>"+skill[j].role[k].skill_order
+                                standardCharacterSkills+="<"+ "<characterName class=\"characterID"+character[l].id+"\"></characterName>"+skill[j].role[k].skill_order
                                 //君主技
                                 if(skill[j].role[k].dominator)standardCharacterSkills+="<dominatorSkill epithet=\"1\"></dominatorSkill>"
                                 standardCharacterSkills+=">"
@@ -30,12 +50,5 @@ function CharacterSkillReplace(path1, path2) {
             }
             standardCharacterSkills += "<br>"+"<br>"
         }
-        standardCharacterSkillsBlock.innerHTML = "<br>"+"<br>"+standardCharacterSkills
-    })
+        $(".standardCharacterSkillsBlock").html("<br>"+"<br>"+standardCharacterSkills)
 }
-$(function () {
-    $(document).ready(function () {
-        $(document).foundation()
-    })
-    CharacterSkillReplace('base/character.json','base/skill/strength'+ localStorage.getItem('strength') +'.json')
-})

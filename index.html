@@ -27,7 +27,7 @@
     <script src="function/replace/term.js"></script>
     <script src="function/replace/card.js"></script>
 
-    <script src="function/scroll_back"></script>
+    <script src="function/scroll_back.js"></script>
 
 
     <title>Document丨程序</title>
@@ -996,7 +996,7 @@
                     <main>
                         <padding>
                             <padding>
-                                <div id="standardCharacterSkillsBlock"></div>
+                                <div class="standardCharacterSkillsBlock"></div>
                             </padding>
                         </padding>
                     </main>
@@ -1005,7 +1005,7 @@
                     <main>
                         <padding>
                             <div id="div4" style="height: 500px; background-color: white;"></div>
-                            <div id="standardCharactersBlock"></div>
+                            <div class="standardCharactersBlock"></div>
                             <div id="div4" style="height: 500px; background-color: white;"></div>
                         </padding>
                     </main>
@@ -1014,5 +1014,19 @@
         </div>
     </div>
 </body>
+
+<script type="text/javascript">
+    $(function () {
+        $(document).ready(function () {
+            $(document).foundation()
+        })
+        CharacterNameReplace('base/character.json')
+        SkillNameReplace('base/skill/strength'+ localStorage.getItem('strength') +'.json')
+        CardReplace('base/card.json')
+        check_strength()
+        add_button_wave()
+        textReplace('base/term/dynamic.json',1)
+        textReplace('base/term/fixed.json',1)
+    })
 </script>
 </html>

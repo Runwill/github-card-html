@@ -21,9 +21,3 @@ function change_strength(){
     }
     location.reload()
 }
-$(function () {
-    $(document).ready(function () {
-        $(document).foundation()
-    })
-    check_strength()
-})

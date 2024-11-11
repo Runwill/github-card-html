@@ -40,5 +40,4 @@ $(function () {
     $(document).ready(function () {
         $(document).foundation()
     })
-    CardReplace('base/card.json')
 })

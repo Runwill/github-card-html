@@ -16,9 +16,3 @@ function add_button_wave(){
         })
     })
 }
-$(function () {
-    $(document).ready(function () {
-        $(document).foundation()
-    })
-    add_button_wave()
-})

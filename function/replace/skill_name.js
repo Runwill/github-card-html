@@ -65,9 +65,3 @@ function SkillNameReplace(path){
         }
     })
 }
-$(function () {
-    $(document).ready(function () {
-        $(document).foundation()
-    })
-    SkillNameReplace('base/skill/strength'+ localStorage.getItem('strength') +'.json')
-})
