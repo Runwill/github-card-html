@@ -652,19 +652,19 @@
         "color": "#acd1ab"
     },
     {
-        "en": "discardRole",
+        "en": "discarder",
         "part": [
             {
                 "cn": "弃置",
-                "en": "discardRoleHead1"
+                "en": "discarderHead1"
             },
             {
                 "cn": "弃",
-                "en": "discardRoleHead2"
+                "en": "discarderHead2"
             },
             {
                 "cn": "者",
-                "en": "discardRoleEnd"
+                "en": "discarderEnd"
             }
         ],
         "color": "#acd1ab"
@@ -698,19 +698,19 @@
         "color": "#acd1ab"
     },
     {
-        "en": "beforeDiscard",
+        "en": "beforeDiscarded",
         "part": [
             {
                 "cn": "被",
-                "en": "beforeDiscardHead"
+                "en": "beforeDiscardedHead"
             },
             {
                 "cn": "弃置",
-                "en": "beforeDiscardBody"
+                "en": "beforeDiscardedBody"
             },
             {
                 "cn": "前",
-                "en": "beforeDiscardEnd"
+                "en": "beforeDiscardedEnd"
             }
         ],
         "color": "#acd1ab"
@@ -854,15 +854,29 @@
         "color": "#91d595"
     },
     {
-        "en": "beforeUse",
+        "en": "beforeUsed",
         "part": [
             {
                 "cn": "被",
-                "en": "beforeUseHead"
+                "en": "beforeUsedHead"
             },
             {
                 "cn": "使用",
-                "en": "beforeUseBody"
+                "en": "beforeUsedBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeUsedEnd"
+            }
+        ],
+        "color": "#91d595"
+    },
+    {
+        "en": "beforeUse",
+        "part": [
+            {
+                "cn": "使用",
+                "en": "beforeUseHead"
             },
             {
                 "cn": "前",
@@ -875,12 +889,8 @@
         "en": "whenUse",
         "part": [
             {
-                "cn": "被",
-                "en": "whenUseHead"
-            },
-            {
                 "cn": "使用",
-                "en": "whenUseBody"
+                "en": "whenUseHead"
             },
             {
                 "cn": "时",
@@ -890,19 +900,51 @@
         "color": "#91d595"
     },
     {
-        "en": "afterUse",
+        "en": "whenUsed",
         "part": [
             {
                 "cn": "被",
-                "en": "afterUseHead"
+                "en": "whenUsedHead"
             },
             {
                 "cn": "使用",
-                "en": "afterUseBody"
+                "en": "whenUsedBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenUsedEnd"
+            }
+        ],
+        "color": "#91d595"
+    },
+    {
+        "en": "afterUse",
+        "part": [
+            {
+                "cn": "使用",
+                "en": "afterUseHead"
             },
             {
                 "cn": "后",
                 "en": "afterUseEnd"
+            }
+        ],
+        "color": "#91d595"
+    },
+    {
+        "en": "afterUsed",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterUsedHead"
+            },
+            {
+                "cn": "使用",
+                "en": "afterUsedBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterUsedEnd"
             }
         ],
         "color": "#91d595"
@@ -1242,6 +1284,26 @@
         "color": "#fddeec"
     },
     {
+        "en": "top",
+        "part": [
+            {
+                "cn": "顶",
+                "en": "topEnd"
+            }
+        ],
+        "color": "#fdf8de"
+    },
+    {
+        "en": "bottom",
+        "part": [
+            {
+                "cn": "底",
+                "en": "bottomEnd"
+            }
+        ],
+        "color": "#fdf8de"
+    },
+    {
         "en": "visible",
         "part": [
             {
@@ -1356,6 +1418,11 @@
         "cn": "装备区",
         "en": "equipArea",
         "color": "#b0cce8"
+    },
+    {
+        "cn": "处理区",
+        "en": "treatmentArea",
+        "color": "#b0c0e8"
     },
     {
         "cn": "牌堆",
