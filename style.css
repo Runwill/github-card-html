@@ -311,7 +311,7 @@
     
 }
 .container:hover .role_icon {
-    opacity: 0.015;
+    opacity: 0.025;
     left: 5%
 }
 

@@ -413,7 +413,7 @@
                                                         <if><ifHead></ifHead>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<ifBody></ifBody><advance></advance><tick></tick>“<beforeDiscard class="scroll bold"><beforeDiscardHead></beforeDiscardHead><beforeDiscardEnd></beforeDiscardEnd></beforeDiscard>”</if>。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeDiscarded class="scroll bold"><beforeDiscardedHead></beforeDiscardedHead><beforeDiscardedBody></beforeDiscardedBody><beforeDiscardedEnd></beforeDiscardedEnd></beforeDiscarded>”。
+                                                        <advance></advance><tick></tick>“<beforeDiscard class="scroll bold"><beforeDiscardHead></beforeDiscardHead><beforeDiscardBody></beforeDiscardBody><beforeDiscardEnd></beforeDiscardEnd></beforeDiscard>”。
                                                     </div>
                                                     <div class="indent">
                                                         <if><ifHead></ifHead>存在<discardRole><discardRoleHead1></discardRoleHead1><discardRoleEnd></discardRoleEnd></discardRole>，<ifBody></ifBody><advance></advance><tick></tick>“<whenDiscard class="scroll bold"><whenDiscardHead></whenDiscardHead><whenDiscardEnd></whenDiscardEnd></whenDiscard>”</if>：
@@ -444,7 +444,7 @@
                                                 包含以下输入：
                                             </div>
                                             <padding>
-                                                <h3><drawRole class="scroll" /></h3>
+                                                <h3><drawer class="scroll" /></h3>
                                                 <div class="indent">
                                                     一名<roleDefault></roleDefault>。
                                                 </div>
@@ -467,7 +467,55 @@
                                                     <padding>
                                                         <div class="h">
                                                             <div class="indent">
-                                                                <drawRole></drawRole><move><moveBody5></moveBody5><pile></pile>前<equaling><equalingHead0></equalingHead0><drawQuantity></drawQuantity></equaling>张<card></card></move>。
+                                                                <drawer></drawer><move><moveBody5></moveBody5><pile></pile>前<equaling><equalingHead0></equalingHead0><drawQuantity></drawQuantity></equaling>张<card></card></move>。
+                                                            </div>
+                                                        </div>
+                                                    </padding>
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<afterDraw class="scroll bold"></afterDraw>”。
+                                                    </div>
+                                                </div>
+                                            </padding>
+                                            <h3><use class="scroll"><useHead></useHead></use></h3>
+                                            <div class="indent">
+                                                一类<event></event>。
+                                            </div>
+                                            <div class="indent">
+                                                包含以下输入：
+                                            </div>
+                                            <padding>
+                                                <h3><user class="scroll" /></h3>
+                                                <div class="indent">
+                                                    至多一名<role></role>。
+                                                </div>
+                                                <h3><useTarget class="scroll" /></h3>
+                                                <div class="indent">
+                                                    至少一名<roleDefault></roleDefault>。
+                                                </div>
+                                                <h3><usedPhysicalCard class="scroll" /></h3>
+                                                <div class="indent">
+                                                    <anyNumber></anyNumber>张<baseCard></baseCard>。
+                                                </div>
+                                                <h3><usedCard class="scroll" /></h3>
+                                                <div class="indent">
+                                                    <card></card>的属性。
+                                                </div>
+                                            </padding>
+                                            <div class="indent">
+                                                包含以下<procedure></procedure>：
+                                            </div>
+                                            <padding>
+                                                <div class="h">
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<beforeDraw class="scroll bold"></beforeDraw>”。
+                                                    </div>
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<whenDraw class="scroll bold"></whenDraw>”：
+                                                    </div>
+                                                    <padding>
+                                                        <div class="h">
+                                                            <div class="indent">
+                                                                <drawer></drawer><move><moveBody5></moveBody5><pile></pile>前<equaling><equalingHead0></equalingHead0><drawQuantity></drawQuantity></equaling>张<card></card></move>。
                                                             </div>
                                                         </div>
                                                     </padding>

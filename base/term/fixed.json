@@ -698,19 +698,19 @@
         "color": "#acd1ab"
     },
     {
-        "en": "beforeDiscarded",
+        "en": "beforeDiscard",
         "part": [
             {
                 "cn": "被",
-                "en": "beforeDiscardedHead"
+                "en": "beforeDiscardHead"
             },
             {
                 "cn": "弃置",
-                "en": "beforeDiscardedBody"
+                "en": "beforeDiscardBody"
             },
             {
                 "cn": "前",
-                "en": "beforeDiscardedEnd"
+                "en": "beforeDiscardEnd"
             }
         ],
         "color": "#acd1ab"
@@ -794,7 +794,7 @@
         "color": "#abd1b4"
     },
     {
-        "en": "drawRole",
+        "en": "drawer",
         "cn": "摸牌者",
         "color": "#abd1b4"
     },
@@ -817,6 +817,95 @@
         "en": "afterDraw",
         "cn": "摸牌后",
         "color": "#abd1b4"
+    },
+    {
+        "part": [
+            {
+                "cn": "使用",
+                "en": "useHead"
+            }
+        ],
+        "en": "use",
+        "color": "#91d595"
+    },
+    {
+        "en": "user",
+        "cn": "使用者",
+        "color": "#91d595"
+    },
+    {
+        "en": "useTarget",
+        "cn": "目标",
+        "color": "#91d595"
+    },
+    {
+        "en": "usedPhysicalCard",
+        "cn": "对应实体牌",
+        "color": "#91d595"
+    },
+    {
+        "en": "usedCard",
+        "cn": "被使用牌",
+        "color": "#91d595"
+    },
+    {
+        "en": "usedCard",
+        "cn": "被使用牌",
+        "color": "#91d595"
+    },
+    {
+        "en": "beforeUse",
+        "part": [
+            {
+                "cn": "被",
+                "en": "beforeUseHead"
+            },
+            {
+                "cn": "使用",
+                "en": "beforeUseBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeUseEnd"
+            }
+        ],
+        "color": "#91d595"
+    },
+    {
+        "en": "whenUse",
+        "part": [
+            {
+                "cn": "被",
+                "en": "whenUseHead"
+            },
+            {
+                "cn": "使用",
+                "en": "whenUseBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenUseEnd"
+            }
+        ],
+        "color": "#91d595"
+    },
+    {
+        "en": "afterUse",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterUseHead"
+            },
+            {
+                "cn": "使用",
+                "en": "afterUseBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterUseEnd"
+            }
+        ],
+        "color": "#91d595"
     },
     {
         "en": "dying",
