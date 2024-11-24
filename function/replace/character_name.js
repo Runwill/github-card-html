@@ -18,7 +18,7 @@ function CharacterNameReplace(path){
                     element.innerHTML = characterName
                     element.characterPosition=i
                     element.addEventListener(
-                        'click', function(event){
+                        'dblclick', function(event){
                             event.stopPropagation()
                             $("#example-tabs").foundation('selectTab','panel_character',1);
                             document.querySelectorAll(".scroll").forEach(

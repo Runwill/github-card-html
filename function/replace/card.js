@@ -6,7 +6,7 @@ function CardReplace(path){
                 element => {
                     element.innerHTML = cardName
                     element.addEventListener(
-                        'click', function(event){
+                        'dblclick', function(event){
                             event.stopPropagation()
                             $("#example-tabs").foundation('selectTab','panel_card',1)
                             document.querySelectorAll(card[i].en).forEach(

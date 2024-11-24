@@ -13,7 +13,7 @@ function SkillNameReplace(path){
                     element.innerHTML = skillNames[i]
                     element.skillPosition = i
                     element.addEventListener(
-                        'click', function (event) {
+                        'dblclick', function (event) {
                             event.stopPropagation()
                             $("#example-tabs").foundation('selectTab', 'panel_skill', 1);
                             document.querySelectorAll(".scroll").forEach(

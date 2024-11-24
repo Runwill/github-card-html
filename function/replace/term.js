@@ -17,7 +17,7 @@ function textReplace(path,mode) {
                         }
                         if(mode){
                             element.addEventListener(//滚动
-                                'click', function (event) {
+                                'dblclick', function (event) {
                                     event.stopPropagation()
                                     $("#example-tabs").foundation('selectTab', 'panel_term', 1);
                                     document.querySelectorAll(".scroll").forEach(
@@ -75,7 +75,7 @@ function textReplace(path,mode) {
                     document.querySelectorAll(term[i].en).forEach(//滚动
                         element => {
                             element.addEventListener(
-                                'click', function (event) {
+                                'dblclick', function (event) {
                                     event.stopPropagation()
                                     $("#example-tabs").foundation('selectTab', 'panel_term', 1);
                                     document.querySelectorAll(".scroll").forEach(

@@ -249,6 +249,9 @@
     src: url('source/汉仪篆书繁.TTF') format('truetype');
 }
 
+*{
+    user-select: none;
+}
 .strength_title{
     display: inline;
     margin-top: 0.45em;
