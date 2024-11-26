@@ -1151,6 +1151,20 @@
         "color": "#b0b7e8"
     },
     {
+        "en": "distance",
+        "part": [
+            {
+                "cn": "与",
+                "en": "distanceHead"
+            },
+            {
+                "cn": "距离",
+                "en": "distanceEnd"
+            }
+        ],
+        "color": "#9beedc"
+    },
+    {
         "epithet": [
             {
                 "cn": "体力"
