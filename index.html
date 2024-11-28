@@ -1084,7 +1084,9 @@
                 <div class="tabs-panel" id="panel_character">
                     <main>
                         <padding>
-                            <div id="div4" style="height: 500px; background-color: white;"></div>
+                            <div class="search-container" style="z-index: 100; position: sticky; top: 10%; margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px;">
+                                <input type="text" id="search-input" placeholder="搜检" oninput="filterParagraphs()" autocomplete="off" style=" background-color: rgba(255,255,255,1); position: relative; right: -95%; transition: right 1s ease;">
+                            </div>
                             <div class="standardCharactersBlock"></div>
                             <div id="div4" style="height: 500px; background-color: white;"></div>
                         </padding>
@@ -1108,5 +1110,47 @@
         textReplace('base/term/dynamic.json',1)
         textReplace('base/term/fixed.json',1)
     })
+
+    function filterParagraphs() {
+        var query = document.getElementById('search-input').value.trim().toLowerCase();
+        var paragraphs = document.querySelectorAll('.characterParagraph');
+        paragraphs.forEach(function(paragraph) {
+            var paragraphText = paragraph.textContent.toLowerCase()
+            var isMatch = true;
+            for (var i = 0; i < query.length; i++) {
+                if (paragraphText.indexOf(query[i]) === -1) {
+                    isMatch = false;
+                    break;
+                }
+            }
+            if (isMatch) {
+                paragraph.classList.remove('hidden');
+            } else {
+                paragraph.classList.add('hidden');
+            }
+        })
+    }
+    
+    const searchContainer = document.querySelector('.search-container')
+    const searchInput = document.getElementById('search-input')
+    let isFocused = false
+
+    searchContainer.addEventListener('mouseenter', () => {
+        searchInput.style.right = '0'
+    })
+    searchContainer.addEventListener('mouseleave', () => {
+        if (!isFocused) {
+            searchInput.style.right = '-95%'
+        }
+    })
+
+    searchInput.addEventListener('focus', () => {
+        isFocused = true
+    })
+    searchInput.addEventListener('blur', () => {
+        isFocused = false
+        searchInput.style.right = '-95%'
+    })
+    
 </script>
 </html>

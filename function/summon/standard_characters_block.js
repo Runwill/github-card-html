@@ -34,7 +34,7 @@ function CharacterReplace(character,skill) {
             for (j in character) {
                 if (character[j].id == characterID[i]) {
 
-                    standardCharacters += "<div class='container'><div class='role_title'>" + character[j].title + "</div>"
+                    standardCharacters += "<div class='container characterParagraph'><div class='role_title'>" + character[j].title + "</div>"
                     
                     standardCharacters += "<img src='source/"
                     standardCharacters += character[j].position
