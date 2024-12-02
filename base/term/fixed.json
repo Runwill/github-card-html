@@ -1220,6 +1220,18 @@
         "color": "#ecb09d"
     },
     {
+        "epithet": [
+            {
+                "cn": "攻击范围"
+            },
+            {
+                "cn": "范围"
+            }
+        ],
+        "en": "reach",
+        "color": "#eeb09b"
+    },
+    {
         "cn": "牌",
         "en": "card",
         "color": "#d8cbc8"
@@ -1574,6 +1586,16 @@
             {
                 "cn": "且",
                 "en": "andBody"
+            }
+        ],
+        "color": "#fdeade"
+    },
+    {
+        "en": "and2",
+        "part": [
+            {
+                "cn": "与",
+                "en": "and2Body"
             }
         ],
         "color": "#fdeade"
