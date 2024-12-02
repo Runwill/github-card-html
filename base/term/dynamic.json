@@ -1,0 +1,30 @@
+[
+    {
+        "en": "equaling",
+        "part": [
+            {
+                "cn": "等同于",
+                "en": "equalingHead0"
+            },
+            {
+                "cn": "",
+                "en": "equalingHead1"
+            }
+        ],
+        "color": "#f3d1ef"
+    },
+    {
+        "en": "roundUp",
+        "part": [
+            {
+                "cn": "向上取整",
+                "en": "roundUp0"
+            },
+            {
+                "cn": "归上",
+                "en": "roundUp1"
+            }
+        ],
+        "color": "#edaad6"
+    }
+]

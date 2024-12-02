@@ -1,0 +1,52 @@
+[
+    {
+        "name": "玄德",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead><equaling><equalingHead0></equalingHead0><lostHealth epithet='1'></lostHealth epithet='1'>一半(<roundUp><roundUp0></roundUp0></roundUp>)</equaling>的<drawEnd></drawEnd></draw>。",
+        "role": [
+            {
+                "id": 125,
+                "skill_order": 1,
+                "lore": "濬哲文明，溫恭允塞，玄德升聞",
+                "legend": "書·舜典"
+            }
+        ]
+    },
+    {
+        "name": "允中",
+        "content": "<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplaceable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><roleSelector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\"></targetNumberLimit><targetLimit class=\"irreplaceable\"><handCard></handCard>最多的<roleDefault></roleDefault></targetLimit></roleSelector><each><eachHead></eachHead><discard><discardBody1></discardBody1></discard><selector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\">一张</targetNumberLimit><cardDefault></cardDefault></selector></each></make><orBody></orBody><make><makeHead></makeHead><roleSelector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\"></targetNumberLimit><targetLimit class=\"irreplaceable\"><handCard></handCard>最少的<roleDefault></roleDefault></targetLimit></roleSelector><each><eachHead></eachHead><draw><drawHead></drawHead>一张<drawEnd></drawEnd></draw></each></make></or></can>。",
+        "role": [
+            {
+                "id": 125,
+                "skill_order": 2,
+                "dominator": true,
+                "lore": "惟精惟一，允執厥中",
+                "legend": "書·大禹謨"
+            }
+        ]
+    },
+    {
+        "name": "鸿志",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenEnteringDying></whenEnteringDying></when></tickLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead>两张<drawEnd></drawEnd></draw>；<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenDie></whenDie></when></tickLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead>一张<drawEnd></drawEnd></draw>。",
+        "role": [
+            {
+                "id": 2,
+                "skill_order": 1,
+                "lore": "嗟乎，燕雀安知鴻鵠之志哉",
+                "legend": "太史公書·陳涉世家"
+            }
+        ]
+    },
+    {
+        "name": "狐鸣",
+        "content": "锁定技，<you></you>的<cardQuote><cardQuoteLeft></cardQuoteLeft><attack></attack><cardQuoteRight></cardQuoteRight></cardQuote><numberLimit></numberLimit>+<counts><damaged></damaged><roleDefault></roleDefault><countsEnd></countsEnd></counts>。",
+        "role": [
+            {
+                "id": 2,
+                "skill_order": 2,
+                "dominator": true,
+                "lore": "狐鳴呼曰：「大楚興，陳勝王」",
+                "legend": "太史公書·陳涉世家"
+            }
+        ]
+    }
+]

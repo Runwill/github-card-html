@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文本滚动平移效果</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 200vh; /* 增加页面高度，便于滚动 */
+            background: #f0f0f0;
+        }
+        
+        .scrolling-text {
+            font-size: 30px;
+            white-space: nowrap;
+            transition: transform 0.1s ease-out; /* 平滑过渡 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scrolling-text">
+        这段文本将在滚动时调整位置<br>
+        这段文本将在滚动时调整位置<br>
+        这段文本将在滚动时调整位置<br>
+        这段文本将在滚动时调整位置<br>
+        这段文本将在滚动时调整位置<br>
+        这段文本将在滚动时调整位置<br>
+        这段文本将在滚动时调整位置<br>
+    </div>
+
+    <script>
+        // 获取文本元素
+        const textElement = document.querySelector('.scrolling-text');
+
+        // 获取屏幕的高度
+        const screenHeight = window.innerHeight;
+
+        // 监听滚动事件
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY; // 当前滚动位置
+            const distanceFromMiddle = Math.abs(scrollTop + screenHeight / 2); // 当前滚动位置距离屏幕中线的距离
+            
+            // 计算文本的水平偏移量：距离越远，向右偏移
+            const maxOffset = 200; // 最大偏移量
+            const offset = Math.min(maxOffset, distanceFromMiddle / screenHeight * maxOffset); // 根据滚动距离动态计算偏移
+
+            // 如果滚动位置靠近屏幕上下界（距离较远），就偏向左侧，靠近屏幕中线则偏右
+            if (scrollTop + screenHeight / 2 > screenHeight / 2) {
+                textElement.style.transform = `translate(-50%, -50%) translateX(${offset}px)`; // 向右偏移
+            } else {
+                textElement.style.transform = `translate(-50%, -50%) translateX(-${offset}px)`; // 向左偏移
+            }
+        });
+    </script>
+
+</body>
+</html>
