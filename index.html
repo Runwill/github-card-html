@@ -827,6 +827,10 @@
                                                     <role></role>的一项<attribute></attribute>。等于其的<initialHandLimit></initialHandLimit>。至少为0。
                                                 </div>
                                             </padding>
+                                            <h3><reach class="scroll" /></h3>
+                                            <div class="indent">
+                                                <role></role>的一项<attribute></attribute>。可简称为<reach epithet="1"></reach>。等于1。
+                                            </div>
                                             <h3><seat class="scroll" /></h3>
                                             <div class="indent">
                                                 <role></role>的一项<attribute></attribute>。整型变量。
@@ -850,7 +854,7 @@
                                                 </div>
                                                 <h3><distance class="scroll"><<roleDefault></roleDefault>><distanceHead></distanceHead><<roleDefault></roleDefault>>的<distanceEnd></distanceEnd></distance></h3>
                                                 <div class="indent">
-                                                    等于<counts><seat></seat><or>在二者之间<orBody></orBody>不在二者之间</or>的除其外<roleDefault></roleDefault><countsEnd></countsEnd></counts>。<if><ifHead></ifHead>二者不为同一<role></role>，至少为1，<else></else>，至少为0</if>。
+                                                    等于<counts><seat></seat><and2>在二者之间<and2Body></and2Body>不在二者之间</and2>的除其外<roleDefault></roleDefault><countsEnd></countsEnd></counts>的最小值。<if><ifHead></ifHead>二者不为同一<role></role>，至少为1，<else></else>，至少为0</if>。
                                                 </div>
                                             </padding>
                                             <h3><currentTurnRole class="scroll" /></h3>
