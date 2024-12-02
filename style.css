@@ -25,6 +25,10 @@
     search-input{
         right: 0;
     }
+
+    #block-upon-search{
+        height: 20px; 
+    }
 }
 
 @media (min-width: 501px) and (max-width: 600px) {
@@ -53,6 +57,10 @@
 
     #search-input{
         right: 0;
+    }
+
+    #block-upon-search{
+        height: 20px; 
     }
 }
 
@@ -83,6 +91,10 @@
     #search-input{
         right: 0;
     }
+
+    #block-upon-search{
+        height: 20px; 
+    }
 }
 
 @media (min-width: 701px) and (max-width: 800px) {
@@ -111,6 +123,10 @@
 
     #search-input{
         right: 0;
+    }
+
+    #block-upon-search{
+        height: 20px; 
     }
 }
 
@@ -141,6 +157,10 @@
     #search-input{
         right: 0;
     }
+
+    #block-upon-search{
+        height: 20px; 
+    }
 }
 
 @media (min-width: 900px) and (max-width: 1100px) {
@@ -169,6 +189,10 @@
 
     #search-input{
         right: 0;
+    }
+
+    #block-upon-search{
+        height: 20px; 
     }
 }
 
@@ -207,6 +231,10 @@
     #search-input{
         right: -95%;
     }
+
+    .search-container{
+        margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
+    }
 }
 
 @media (min-width: 1201px) and (max-width: 1400px) {
@@ -235,6 +263,10 @@
 
     #search-input{
         right: -95%;
+    }
+
+    .search-container{
+        margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
     }
 }
 
@@ -269,6 +301,10 @@
 
     #search-input{
         right: -95%;
+    }
+
+    .search-container{
+        margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
     }
 }
 
