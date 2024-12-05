@@ -70,8 +70,10 @@
         // 检测双击位置
         if (touchCount === 2) {
             if (touchStartY < window.innerHeight / 2) {
-                localStorage.setItem('health_limit', localStorage.getItem('health_limit') - 1 )
-                health_bar_check()
+                if(localStorage.getItem('health_limit') > 0){
+                    localStorage.setItem('health_limit', localStorage.getItem('health_limit') - 1 )
+                    health_bar_check()
+                }
             } else {
                 localStorage.setItem('health_limit', parseInt(localStorage.getItem('health_limit')) + 1 )
                 health_bar_check()
