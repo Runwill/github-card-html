@@ -5,7 +5,7 @@ function textReplace(path,mode) {
                 document.querySelectorAll(term[i].en).forEach(//替换
                     element => {
                         element.termPosition = i
-                        if (!element.classList.contains('irreplaceable')) {
+                        if (!element.classList.contains('irreplaceable') && !(term[i].irreplaceable)) {
                             if (!term[i].epithet) {
                                 if (term[i].cn) element.innerHTML = term[i].cn
                                 else element.innerHTML = term[i].en
@@ -38,12 +38,34 @@ function textReplace(path,mode) {
                         function (event) {
                             $(this).css("background-color", term[event.currentTarget.termPosition].color)
                             $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", term[event.currentTarget.termPosition].color)
+                            if($(this).hasClass('highlight')){
+                                if($(this).closest('pronounScope').length > 0){
+                                    $(this).closest('pronounScope').find(term[event.currentTarget.termPosition].en + '.highlight').each(function() {
+                                        $(this).css("background-color", "#ff00002a")
+                                    })
+                                }else{
+                                    $(this).closest('padding').find(term[event.currentTarget.termPosition].en + '.highlight').each(function() {
+                                        $(this).css("background-color", "#ff00002a")
+                                    })
+                                }
+                            }
                         }
                     )
                     $(term[i].en).mouseout(//去高亮
                         function (event) {
                             $(this).css("background-color", "")
                             $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", "")
+                            if($(this).hasClass('highlight')){
+                                if($(this).closest('pronounScope').length > 0){
+                                    $(this).closest('pronounScope').find(term[event.currentTarget.termPosition].en + '.highlight').each(function() {
+                                        $(this).css("background-color", "")
+                                    })
+                                }else{
+                                    $(this).closest('padding').find(term[event.currentTarget.termPosition].en + '.highlight').each(function() {
+                                        $(this).css("background-color", "")
+                                    })
+                                }
+                            }
                         }
                     )
                 }

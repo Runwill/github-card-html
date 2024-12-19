@@ -51,7 +51,7 @@ function SkillNameReplace(path){
 
                         $('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id).mouseover(
                             function () {
-                                $(this).after('<lore>「' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].lore + '」——《' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].legend + '》</lore>')
+                                $(this).after('<lore style="line-height: 0;">「' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].lore + '」——《' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].legend + '》</lore>')
                             }
                         )
                         $('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id).mouseout(

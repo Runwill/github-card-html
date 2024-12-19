@@ -66,7 +66,7 @@ function CharacterReplace(character,skill) {
                                 for (m in skill[l].role) {
                                     if (skill[l].role[m].id == characterID[i] && skill[l].role[m].skill_order == skillOrder[k]) {
 
-                                        standardCharacters += "<div class=\"indent\"><skillQuote class=\"bold"
+                                        standardCharacters += "<div class=\"indent\"><pronounScope><skillQuote class=\"bold"
                                         
                                         //if (skill[l].role[m].dominator) standardCharacters += " glowing"
 
@@ -88,7 +88,7 @@ function CharacterReplace(character,skill) {
                                                 }
                                             }
                                         }
-                                        standardCharacters += "</div>"
+                                        standardCharacters += "</pronounScope></div>"
                                     }
                                 }
                             }

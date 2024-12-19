@@ -114,6 +114,17 @@
                                         <div class="indent">
                                             向上取整。
                                         </div>
+                                        <h2>
+                                            <a class="button button_pronoun"></a>
+                                            <script type="text/javascript">
+                                                document.querySelectorAll('.button_pronoun').forEach(button => {
+                                                    button.addEventListener(
+                                                        'click', (event) => pronounReplaceCheck(event)
+                                                    )
+                                                })
+                                            </script>
+                                            <pronoun1 class="highlight">代词</pronoun1>
+                                        </h2>
                                         <h2><procedureTrigger class="scroll" /></h2>
                                         <div class="indent">
                                             一种数据结构。用于执行<procedure></procedure>。
@@ -851,7 +862,7 @@
                                                 <div class="indent">
                                                     <seatOrder></seatOrder>中的前某名<living></living><role></role>，前一名则可简称为<previousSeat><previousSeatHead></previousSeatHead><previousSeatEnd></previousSeatEnd></previousSeat>。
                                                 </div>
-                                                <h3><distance class="scroll"><<roleDefault></roleDefault>><distanceHead></distanceHead><<roleDefault></roleDefault>>的<distanceEnd></distanceEnd></distance></h3>
+                                                <h3><distance class="scroll"><<pronoun1 class="highlight"><roleDefault></roleDefault></pronoun1>><distanceHead></distanceHead><<pronoun2 class="highlight"><roleDefault></roleDefault></pronoun2>>的<distanceEnd></distanceEnd></distance></h3>
                                                 <div class="indent">
                                                     等于<counts><seat></seat><and2>在二者之间<and2Body></and2Body>不在二者之间</and2>的除其外<roleDefault></roleDefault><countsEnd></countsEnd></counts>的最小值。<if><ifHead></ifHead>二者不为同一<role></role>，至少为1，<else></else>，至少为0</if>。
                                                 </div>
@@ -1113,6 +1124,14 @@
         add_button_wave()
         textReplace('base/term/dynamic.json',1)
         textReplace('base/term/fixed.json',1)
+        const pronounName = ['甲','乙']
+        for(const i of [1, 2]){
+            document.querySelectorAll('pronoun'+i).forEach(//替换
+                element => {
+                    element.innerHTML = element.innerHTML + '<pronounName>' + pronounName[i-1] + '</pronounName>'
+                }
+            )
+        }
     })
 
     function filterParagraphs() {

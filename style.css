@@ -248,6 +248,10 @@
     font-family: '小篆';
     src: url('source/汉仪篆书繁.TTF') format('truetype');
 }
+@font-face {
+    font-family: '大篆';
+    src: url('source/金文大篆体.TTF') format('truetype');
+}
 
 *{
     user-select: none;
@@ -269,6 +273,12 @@ body {
     font-family: '古隶';
     position: absolute;
     writing-mode: vertical-rl
+}
+
+pronounName{
+    font-family: '大篆';
+    line-height: 0;
+    color: #a00000
 }
 
 .glowing {

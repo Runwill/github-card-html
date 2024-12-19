@@ -35,7 +35,7 @@ function CharacterSkillReplace(character,skill) {
         for(var i in CharacterSkillNames){
             for(var j in skill){
                 if(skill[j].name == CharacterSkillNames[i]){
-                    standardCharacterSkills += "<skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>"+"<characterSkillElement"+" class=\""+skill[j].name+" scroll\"></characterSkillElement>"+"<skillQuoteRight></skillQuoteRight></skillQuote>"+skill[j].content
+                    standardCharacterSkills += "<pronounScope><skillQuote class=\"bold\"><skillQuoteLeft></skillQuoteLeft>"+"<characterSkillElement"+" class=\""+skill[j].name+" scroll\"></characterSkillElement>"+"<skillQuoteRight></skillQuoteRight></skillQuote>"+skill[j].content
                     for(k in skill[j].role){
                         for(l in character){
                             if(character[l].id==skill[j].role[k].id){
@@ -48,7 +48,7 @@ function CharacterSkillReplace(character,skill) {
                     }
                 }
             }
-            standardCharacterSkills += "<br>"+"<br>"
+            standardCharacterSkills += "</pronounScope><br><br>"
         }
         $(".standardCharacterSkillsBlock").html("<br>"+"<br>"+standardCharacterSkills)
 }

@@ -1619,5 +1619,13 @@
         "cn": "基本牌",
         "en": "basicCard",
         "color": "#c2f3c2"
+    },
+    {
+        "en": "pronoun1",
+        "irreplaceable": true
+    },
+    {
+        "en": "pronoun2",
+        "irreplaceable": true
     }
 ]
