@@ -98,5 +98,28 @@ function CharacterReplace(character,skill) {
                 }
             }
         }
-        $(".standardCharactersBlock").html("<br>" + "<br>" + standardCharacters)
+        $(".standardCharactersBlock").html("<br>" + '<div class="search-container" style="z-index: 100; top: 10%;"><input type="text" id="search-input" placeholder="搜检" oninput="filterParagraphs()" autocomplete="off" style=" background-color: rgba(255,255,255,1); position: relative; transition: right 1s ease;"></div>' + '<div id="block-under-search" style="background-color: white;"></div>' + standardCharacters)
+
+        const searchContainer = document.querySelector('.search-container')
+        const searchInput = document.getElementById('search-input')
+        let isFocused = false
+
+        searchContainer.addEventListener('mouseenter', () => {
+            searchInput.style.right = '0'
+        })
+        searchContainer.addEventListener('mouseleave', () => {
+            if (!isFocused && window.innerWidth > 1101) {
+                searchInput.style.right = '-95%'
+            }
+        })
+
+        searchInput.addEventListener('focus', () => {
+            isFocused = true
+        })
+        searchInput.addEventListener('blur', () => {
+            isFocused = false
+            if (window.innerWidth > 1101) {
+                searchInput.style.right = '-95%'
+            }
+        })
 }

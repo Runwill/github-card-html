@@ -21,6 +21,14 @@
     #nav-item {
         margin: 0 -25px 0 0;
     }
+
+    #search-input{
+        right: 0;
+    }
+
+    #block-under-search{
+        height: 0.5em;
+    }
 }
 
 @media (min-width: 501px) and (max-width: 600px) {
@@ -45,6 +53,14 @@
 
     #nav-item {
         margin: 0 -20px 0 0;
+    }
+
+    #search-input{
+        right: 0;
+    }
+
+    #block-under-search{
+        height: 0.5em;
     }
 }
 
@@ -71,6 +87,14 @@
     #nav-item {
         margin: 0 -10px 0 0;
     }
+
+    #search-input{
+        right: 0;
+    }
+
+    #block-under-search{
+        height: 0.5em;
+    }
 }
 
 @media (min-width: 701px) and (max-width: 800px) {
@@ -95,6 +119,14 @@
 
     #nav-item {
         margin: 0 -10px 0 0;
+    }
+
+    #search-input{
+        right: 0;
+    }
+
+    #block-under-search{
+        height: 0.5em;
     }
 }
 
@@ -121,6 +153,14 @@
     #nav-item {
         margin: 0 10px 0 0;
     }
+
+    #search-input{
+        right: 0;
+    }
+
+    #block-under-search{
+        height: 0.5em;
+    }
 }
 
 @media (min-width: 900px) and (max-width: 1100px) {
@@ -145,6 +185,14 @@
 
     #nav-item {
         margin: 0 20px 0 0;
+    }
+
+    #search-input{
+        right: 0;
+    }
+
+    #block-under-search{
+        height: 0.5em;
     }
 }
 
@@ -179,6 +227,18 @@
     #nav-item {
         margin: 0 30px 0 0;
     }
+
+    #search-input{
+        right: -95%;
+    }
+
+    .search-container{
+        margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
+    }
+
+    #block-under-search{
+        height: 1.5em;
+    }
 }
 
 @media (min-width: 1201px) and (max-width: 1400px) {
@@ -203,6 +263,18 @@
 
     #nav-item {
         margin: 0 30px 0 0;
+    }
+
+    #search-input{
+        right: -95%;
+    }
+
+    .search-container{
+        margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
+    }
+
+    #block-under-search{
+        height: 1.5em;
     }
 }
 
@@ -233,6 +305,18 @@
 
     #nav-item {
         margin: 0 30px 0 0;
+    }
+
+    #search-input{
+        right: -95%;
+    }
+
+    .search-container{
+        margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
+    }
+
+    #block-under-search{
+        height: 1.5em;
     }
 }
 

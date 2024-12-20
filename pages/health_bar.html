@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+  <script src="../Foundation-Sites-CSS/js/vendor/jquery.js"></script>
+
+  <title>体力丨4/4</title>
+  <style>
+    body {
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-family: Arial, sans-serif;
+        line-height: 1;
+        font-size: 20vw;
+        overflow-y: hidden;
+    }
+  </style>
+</head>
+<body>
+    <h1>
+        <div class="health-bar"></div>
+    </h1>
+
+    <script>
+        localStorage.setItem('health_point', 4)
+        localStorage.setItem('health_limit', 4)
+
+        let touchStartY = 0  // 记录触摸开始时的垂直位置
+        let touchEndY = 0
+        let lastTouchTime = 0  // 记录最后一次双击的时间
+        let touchCount = 0
+
+        // 触摸事件的处理
+        document.body.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY // 记录触摸起始位置
+        })
+
+        document.body.addEventListener('touchend', (e) => {
+        touchEndY = e.changedTouches[0].clientY // 记录触摸结束位置
+        const currentTime = new Date().getTime()
+        
+        // 检查双击事件
+        if (currentTime - lastTouchTime < 500) {
+            touchCount++
+        } else {
+            touchCount = 1
+        }
+        lastTouchTime = currentTime
+
+        // 禁止浏览器默认的双击缩放行为
+        e.preventDefault()
+
+        // 检测滑动方向
+        if (touchEndY < touchStartY - 50) {
+            localStorage.setItem('health_point', localStorage.getItem('health_point') - 1 )
+            health_bar_check()
+            touchCount = 0
+        } else if (touchEndY > touchStartY + 50) {
+            localStorage.setItem('health_point', parseInt(localStorage.getItem('health_point')) + 1 )
+            health_bar_check()
+            touchCount = 0
+        }
+
+        // 检测双击位置
+        if (touchCount === 2) {
+            if (touchStartY < window.innerHeight / 2) {
+                if(localStorage.getItem('health_limit') > 0){
+                    localStorage.setItem('health_limit', localStorage.getItem('health_limit') - 1 )
+                    health_bar_check()
+                }
+            } else {
+                localStorage.setItem('health_limit', parseInt(localStorage.getItem('health_limit')) + 1 )
+                health_bar_check()
+            }
+            touchCount = 0 // 重置双击计数
+        }
+        })
+
+        function health_bar_check(){
+            point = parseInt(localStorage.getItem('health_point'))
+            limit = parseInt(localStorage.getItem('health_limit'))
+            document.title = "体力丨" + point + '/' + limit
+            html = ''
+            if(point < 1){
+                document.querySelector('.health-bar').style.color = 'rgb(255,0,0,0.5)'
+            }else{
+                document.querySelector('.health-bar').style.color = 'rgb(0,0,0,1)'
+            }
+            if(point < limit){
+                if(point <= 0){
+                    for(let i = 0; i < -point; i++)html += '<div style="color: rgba(0,0,0,0.2)">·</div>'
+                    if(limit > 0){
+                        for(let i = 0; i < limit; i++)html += '<div>·</div>'
+                    }
+                }
+                else{
+                    for(let i = 0; i < point; i++)html += '<div>○</div>'
+                    for(let i = 0; i < limit-point; i++)html += '<div>·</div>'
+                }
+            }
+            else{
+                if(point <= 0){
+                    for(let i = 0; i < -point; i++)html += '<div style="color: rgba(0,0,0,0.2)">·</div>'
+                }
+                else{
+                    for(let i = 0; i < limit; i++)html += '<div>○</div>'
+                    for(let i = 0; i < point - limit; i++)html += '<div style="color: rgba(0,0,0,0.2)">○</div>'
+                }
+            }
+
+
+
+            $('.health-bar').html(html)
+
+
+
+
+            const textElement = document.querySelector('.health-bar')
+
+            let fontSize = parseInt(window.getComputedStyle(textElement).fontSize)
+
+            for(let i = 0; i < 5; i++){
+                if (textElement.offsetWidth < window.innerWidth * 0.8 && textElement.offsetHeight < window.innerHeight * 0.8) {
+                    fontSize += 5
+                    textElement.style.fontSize = fontSize + 'px'
+                }else{
+                    break
+                }
+            }
+            for(let i = 0; i < 100; i++){
+                if (textElement.offsetWidth > window.innerWidth * 0.8 || textElement.offsetHeight > window.innerHeight * 0.8) {
+                    fontSize -= 5
+                    textElement.style.fontSize = fontSize + 'px'
+                }else{
+                    break
+                }
+            }
+        }
+        health_bar_check()
+    </script>
+</body>
+</html>

@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
+    
 <script type="text/javascript">
     let term_status = {}
 </script>
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="Foundation-Sites-CSS/js/vendor/jquery.js"></script>
     <script src="Foundation-Sites-CSS/js/vendor/foundation.js"></script>
     <script src="Foundation-Sites-CSS/js/vendor/what-input.js"></script>
@@ -56,11 +57,16 @@
         </nav>
         <nav id="sidebar">
             <ul class="tabs nav" data-tabs id="example-tabs">
-                <li id="nav-item" class="tabs-title is-active"><a id=title-a class='title-a' href="#panel_term"
-                        aria-selected="true">程序</a></li>
-                <li id="nav-item" class="tabs-title"><a id=title-a class='title-a' href="#panel_skill">技能</a></li>
-                <li id="nav-item" class="tabs-title"><a id=title-a class='title-a' href="#panel_card">牌库</a></li>
-                <li id="nav-item" class="tabs-title"><a id=title-a class='title-a' href="#panel_character">将池</a></li>
+                <li id="nav-item" class="tabs-title is-active"><a id='title-a' class='title-a' href="#panel_term" aria-selected="true" onclick="changeTitle(0)">程序</a></li>
+                <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_skill" onclick="changeTitle(1)">技能</a></li>
+                <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_card" onclick="changeTitle(2)">牌库</a></li>
+                <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_character" onclick="changeTitle(3)">将池</a></li>
+                <script>
+                    function changeTitle(n) {
+                        title_name = ['程序','技能','牌库','将池']
+                        document.title = "Document丨" + title_name[n]
+                    }
+                </script>
             </ul>
         </nav>
     </header>
@@ -808,7 +814,10 @@
                                                     <liveStatus></liveStatus>为0。
                                                 </div>
                                             </padding>
-                                            <h3><health class="scroll" /></h3>
+                                            <h3>
+                                                <a class="button" style="background: rgb(130, 211, 164)" href="./pages/health_bar.html" target="_blank"></a>
+                                                <health class="scroll" />
+                                            </h3>
                                             <div class="indent">
                                                 <role></role>的一项<attribute></attribute>。
                                             </div>
@@ -881,14 +890,6 @@
                                                 正在<advance></advance><turn epithet="1"></turn>的<role></role>。
                                             </div>
                                         </padding>
-                                        <h2><health class="scroll" /></h2>
-                                        <div class="indent">
-                                            一类<object></object>。
-                                        </div>
-                                        <h2><LostHealth class="scroll" /></h2>
-                                        <div class="indent">
-                                            一类<object></object>。
-                                        </div>
                                         <h2><card class="scroll" /></h2>
                                         <div class="indent">
                                             一类<object></object>。
@@ -1116,9 +1117,6 @@
                 <div class="tabs-panel" id="panel_character">
                     <main>
                         <padding>
-                            <div class="search-container" style="z-index: 100; position: sticky; top: 10%; margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px;">
-                                <input type="text" id="search-input" placeholder="搜检" oninput="filterParagraphs()" autocomplete="off" style=" background-color: rgba(255,255,255,1); position: relative; right: -95%; transition: right 1s ease;">
-                            </div>
                             <div class="standardCharactersBlock"></div>
                             <div id="div4" style="height: 500px; background-color: white;"></div>
                         </padding>
@@ -1163,27 +1161,6 @@
             }
         })
     }
-    
-    const searchContainer = document.querySelector('.search-container')
-    const searchInput = document.getElementById('search-input')
-    let isFocused = false
-
-    searchContainer.addEventListener('mouseenter', () => {
-        searchInput.style.right = '0'
-    })
-    searchContainer.addEventListener('mouseleave', () => {
-        if (!isFocused) {
-            searchInput.style.right = '-95%'
-        }
-    })
-
-    searchInput.addEventListener('focus', () => {
-        isFocused = true
-    })
-    searchInput.addEventListener('blur', () => {
-        isFocused = false
-        searchInput.style.right = '-95%'
-    })
     
 </script>
 </html>
