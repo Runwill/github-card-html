@@ -38,14 +38,14 @@ function textReplace(path,mode) {
                         function (event) {
                             $(this).css("background-color", term[event.currentTarget.termPosition].color)
                             $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", term[event.currentTarget.termPosition].color)
-                            if($(this).hasClass('highlight')){
+                            if($(this).hasClass('highlight') || term[event.currentTarget.termPosition].highlight){
                                 if($(this).closest('pronounScope').length > 0){
-                                    $(this).closest('pronounScope').find(term[event.currentTarget.termPosition].en + '.highlight').each(function() {
-                                        $(this).css("background-color", "#ff00002a")
+                                    $(this).closest('pronounScope').find(term[event.currentTarget.termPosition].en).each(function() {
+                                        $(this).css("background-color", "#ff00002f")
                                     })
                                 }else{
-                                    $(this).closest('padding').find(term[event.currentTarget.termPosition].en + '.highlight').each(function() {
-                                        $(this).css("background-color", "#ff00002a")
+                                    $(this).closest('padding').find(term[event.currentTarget.termPosition].en).each(function() {
+                                        $(this).css("background-color", "#ff00002f")
                                     })
                                 }
                             }
@@ -55,13 +55,13 @@ function textReplace(path,mode) {
                         function (event) {
                             $(this).css("background-color", "")
                             $(term[event.currentTarget.termPosition].en + ".scroll").css("background-color", "")
-                            if($(this).hasClass('highlight')){
+                            if($(this).hasClass('highlight') || term[event.currentTarget.termPosition].highlight){
                                 if($(this).closest('pronounScope').length > 0){
-                                    $(this).closest('pronounScope').find(term[event.currentTarget.termPosition].en + '.highlight').each(function() {
+                                    $(this).closest('pronounScope').find(term[event.currentTarget.termPosition].en).each(function() {
                                         $(this).css("background-color", "")
                                     })
                                 }else{
-                                    $(this).closest('padding').find(term[event.currentTarget.termPosition].en + '.highlight').each(function() {
+                                    $(this).closest('padding').find(term[event.currentTarget.termPosition].en).each(function() {
                                         $(this).css("background-color", "")
                                     })
                                 }
@@ -74,7 +74,7 @@ function textReplace(path,mode) {
                 for (var j in term[i].part) {//替换
                     document.querySelectorAll(term[i].part[j].en).forEach(
                         element => {
-                            element.innerHTML = term[i].part[j].cn
+                            if(!element.classList.contains('irreplaceable'))element.innerHTML = term[i].part[j].cn
                         }
                     )
                 }
@@ -83,13 +83,23 @@ function textReplace(path,mode) {
                         element.termPosition = i
                         $(element).mouseover((event) => {
                             for (var j in term[event.currentTarget.termPosition].part) {
-                                $(element).children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
-                                $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
+                                if(term[event.currentTarget.termPosition].part[j].termedPart){
+                                    if(term[event.currentTarget.termPosition].part[j].color){
+                                        $(element).find(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].part[j].color + '60')
+                                        $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].part[j].color + '60')
+                                    }else{
+                                        $(element).find(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color + '60')
+                                        $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color + '60')
+                                    }
+                                }else{
+                                    $(element).find(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
+                                    $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", term[event.currentTarget.termPosition].color)
+                                }
                             }
                         })
                         $(element).mouseout((event) => {
                             for (var j in term[event.currentTarget.termPosition].part) {
-                                $(element).children(term[event.currentTarget.termPosition].part[j].en).css("background-color", "")
+                                $(element).find(term[event.currentTarget.termPosition].part[j].en).css("background-color", "")
                                 $(term[event.currentTarget.termPosition].en + ".scroll").children(term[event.currentTarget.termPosition].part[j].en).css("background-color", "")
                             }
                         })
@@ -114,6 +124,44 @@ function textReplace(path,mode) {
                             )
                         }
                     )
+                    for (var j in term[i].part) {
+                        if (term[i].part[j].termedPart){
+                            $(term[i].part[j].en).each((index, element) => {
+                                element.termPartFatherPosition = i
+                                element.termPartPosition = j
+                                $(element).mouseover((event) => {
+                                    if(term[event.currentTarget.termPartFatherPosition].part[event.currentTarget.termPartPosition].color){
+                                        $(term[event.currentTarget.termPartFatherPosition].part[event.currentTarget.termPartPosition].en + ".scroll").css("background-color", term[event.currentTarget.termPartFatherPosition].part[j].color + '60')
+                                    }else{
+                                        $(term[event.currentTarget.termPartFatherPosition].part[event.currentTarget.termPartPosition].en + ".scroll").css("background-color", term[event.currentTarget.termPartFatherPosition].color + '60')
+                                    }
+                                })
+                                $(element).mouseout((event) => {
+                                    $(term[event.currentTarget.termPartFatherPosition].part[event.currentTarget.termPartPosition].en + ".scroll").css("background-color", "")
+                                })
+                            })
+                            document.querySelectorAll(term[i].part[j].en).forEach(//滚动
+                                element => {
+                                    element.addEventListener(
+                                        'dblclick', function (event) {
+                                            event.stopPropagation()
+                                            $("#example-tabs").foundation('selectTab', 'panel_term', 1);
+                                            document.querySelectorAll(".scroll").forEach(
+                                                scroll => {
+                                                    if (scroll.outerHTML.startsWith("<" + term[event.currentTarget.termPartFatherPosition].part[event.currentTarget.termPartPosition].en.toLowerCase() + " ")) {
+                                                        if (!(scroll.classList.contains('fadeOnly'))) {
+                                                            scroll.scrollIntoView({ behavior: 'smooth' });
+                                                            $(scroll).fadeTo(200, 0).fadeTo(1000, 1)
+                                                        }
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    )
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

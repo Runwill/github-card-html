@@ -20,21 +20,14 @@ function elementReplaceCheck(key,name,event){
     })
 }
 function pronounReplaceCheck(event){
-    const pronounName = ['甲','乙']
     if(term_status['pronoun'] == 0){
         event.target.style.background='#8698ff'
         term_status['pronoun'] = 1
-        for(const i of [1, 2]){
-            document.querySelectorAll('pronoun'+i).forEach(//替换
-                element => {
-                    element.innerHTML = element.innerHTML + '<pronounName>' + pronounName[i-1] + '</pronounName>'
-                }
-            )
-        }
+        pronounAdd()
     }else{
         event.target.style.background='#ff8686'
         term_status['pronoun'] = 0
-        for(const i of [1, 2]){
+        for(const i of [1, 2, 3]){
             document.querySelectorAll('pronoun'+i).forEach(//替换
                 element => {
                     element.innerHTML = element.innerHTML.slice(0, -28)
@@ -50,4 +43,14 @@ function elementReplace(name1,name2){
         element.parentNode.replaceChild(newElement, element)
     })
     textReplace('base/term/dynamic.json')
+}
+function pronounAdd(){
+    const pronounName = ['甲','乙','丙']
+    for(const i of [1, 2, 3]){
+        document.querySelectorAll('pronoun'+i).forEach(//替换
+            element => {
+                element.innerHTML = element.innerHTML + '<pronounName>' + pronounName[i-1] + '</pronounName>'
+            }
+        )
+    }
 }

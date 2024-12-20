@@ -88,6 +88,11 @@
         "color": "#f0a2a2"
     },
     {
+        "cn": "其他角色",
+        "en": "elseRole",
+        "color": "#f0cca2"
+    },
+    {
         "en": "except",
         "part": [
             {
@@ -251,32 +256,32 @@
     {
         "cn": "准备阶段",
         "en": "preparingStage",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "cn": "准备阶段开始前",
         "en": "beforePreparingStageStart",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "cn": "准备阶段开始时",
         "en": "atPreparingStageStart",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "en": "preparing",
-        "color": "#d97fe5",
+        "color": "#dc93e6",
         "replace": true
     },
     {
         "cn": "准备阶段结束时",
         "en": "atPreparingStageFinish",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "cn": "准备阶段结束后",
         "en": "afterPreparingStageFinish",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "epithet": [
@@ -501,28 +506,28 @@
             {
                 "cn": "置于",
                 "en": "moveBody6"
+            },
+            {
+                "cn": "移置者",
+                "en": "moveRole",
+                "termedPart": true
+            },
+            {
+                "cn": "目标牌",
+                "en": "movedCard",
+                "termedPart": true
+            },
+            {
+                "cn": "目标区域",
+                "en": "movedInArea",
+                "termedPart": true
+            },
+            {
+                "cn": "目标位置",
+                "en": "movedAtPosition",
+                "termedPart": true
             }
         ],
-        "color": "#abd1c4"
-    },
-    {
-        "en": "moveRole",
-        "cn": "移置者",
-        "color": "#abd1c4"
-    },
-    {
-        "en": "movedCard",
-        "cn": "目标牌",
-        "color": "#abd1c4"
-    },
-    {
-        "en": "movedInArea",
-        "cn": "目标区域",
-        "color": "#abd1c4"
-    },
-    {
-        "en": "movedAtPosition",
-        "cn": "目标位置",
         "color": "#abd1c4"
     },
     {
@@ -647,38 +652,16 @@
             {
                 "cn": "弃",
                 "en": "discardBody2"
-            }
-        ],
-        "color": "#acd1ab"
-    },
-    {
-        "en": "discarder",
-        "part": [
-            {
-                "cn": "弃置",
-                "en": "discarderHead1"
             },
             {
-                "cn": "弃",
-                "en": "discarderHead2"
+                "cn": "弃置者",
+                "en": "discardRole",
+                "termedPart": true
             },
             {
-                "cn": "者",
-                "en": "discarderEnd"
-            }
-        ],
-        "color": "#acd1ab"
-    },
-    {
-        "en": "discardedCard",
-        "part": [
-            {
-                "cn": "被弃",
-                "en": "discardedCardHead"
-            },
-            {
-                "cn": "牌",
-                "en": "discardedCardEnd"
+                "cn": "被弃牌",
+                "en": "discardedCard",
+                "termedPart": true
             }
         ],
         "color": "#acd1ab"
@@ -789,18 +772,18 @@
             {
                 "cn": "牌",
                 "en": "drawEnd"
+            },
+            {
+                "cn": "摸牌者",
+                "en": "drawer",
+                "termedPart": true
+            },
+            {
+                "cn": "摸牌数",
+                "en": "drawQuantity",
+                "termedPart": true
             }
         ],
-        "color": "#abd1b4"
-    },
-    {
-        "en": "drawer",
-        "cn": "摸牌者",
-        "color": "#abd1b4"
-    },
-    {
-        "en": "drawQuantity",
-        "cn": "摸牌数",
         "color": "#abd1b4"
     },
     {
@@ -823,34 +806,29 @@
             {
                 "cn": "使用",
                 "en": "useHead"
+            },
+            {
+                "cn": "使用者",
+                "en": "user",
+                "termedPart": true
+            },
+            {
+                "cn": "目标",
+                "en": "useTarget",
+                "termedPart": true
+            },
+            {
+                "cn": "对应实体牌",
+                "en": "usedPhysicalCard",
+                "termedPart": true
+            },
+            {
+                "cn": "被使用牌",
+                "en": "usedCard",
+                "termedPart": true
             }
         ],
         "en": "use",
-        "color": "#91d595"
-    },
-    {
-        "en": "user",
-        "cn": "使用者",
-        "color": "#91d595"
-    },
-    {
-        "en": "useTarget",
-        "cn": "目标",
-        "color": "#91d595"
-    },
-    {
-        "en": "usedPhysicalCard",
-        "cn": "对应实体牌",
-        "color": "#91d595"
-    },
-    {
-        "en": "usedCard",
-        "cn": "被使用牌",
-        "color": "#91d595"
-    },
-    {
-        "en": "usedCard",
-        "cn": "被使用牌",
         "color": "#91d595"
     },
     {
@@ -950,13 +928,51 @@
         "color": "#91d595"
     },
     {
-        "en": "dying",
-        "cn": "濒死",
-        "color": "#8dffbd"
+        "en": "damage",
+        "part": [
+            {
+                "cn": "造成",
+                "en": "damageBody0"
+            },
+            {
+                "cn": "受到",
+                "en": "damageBody1"
+            },
+            {
+                "cn": "伤害",
+                "en": "damageEnd"
+            },
+            {
+                "cn": "伤害来源",
+                "en": "damageRole",
+                "termedPart": true
+            },
+            {
+                "cn": "受伤者",
+                "en": "damagedRole",
+                "termedPart": true
+            },
+            {
+                "cn": "伤害值",
+                "en": "damageValue",
+                "termedPart": true
+            }
+        ],
+        "color": "#d1abab"
     },
     {
-        "en": "dyingRole",
-        "cn": "濒死者",
+        "part": [
+            {
+                "cn": "濒死",
+                "en": "dyingEnd"
+            },
+            {
+                "cn": "濒死者",
+                "en": "dyingRole",
+                "termedPart": true
+            }
+        ],
+        "en": "dying",
         "color": "#8dffbd"
     },
     {
@@ -975,13 +991,18 @@
         "color": "#abd1b4"
     },
     {
+        "part": [
+            {
+                "cn": "死亡",
+                "en": "dieEnd"
+            },
+            {
+                "cn": "死者",
+                "en": "dieRole",
+                "termedPart": true
+            }
+        ],
         "en": "die",
-        "cn": "死亡",
-        "color": "#979797"
-    },
-    {
-        "en": "dieRole",
-        "cn": "死者",
         "color": "#979797"
     },
     {
@@ -1229,6 +1250,20 @@
             }
         ],
         "en": "reach",
+        "color": "#eeb09b"
+    },
+    {
+        "en": "inReach",
+        "part": [
+            {
+                "cn": "在",
+                "en": "inReachHead"
+            },
+            {
+                "cn": "范围内",
+                "en": "inReachEnd"
+            }
+        ],
         "color": "#eeb09b"
     },
     {
@@ -1622,10 +1657,17 @@
     },
     {
         "en": "pronoun1",
-        "irreplaceable": true
+        "irreplaceable": true,
+        "highlight": true
     },
     {
         "en": "pronoun2",
-        "irreplaceable": true
+        "irreplaceable": true,
+        "highlight": true
+    },
+    {
+        "en": "pronoun3",
+        "irreplaceable": true,
+        "highlight": true
     }
 ]
