@@ -872,6 +872,20 @@
         "color": "#91d595"
     },
     {
+        "en": "beforeUse",
+        "part": [
+            {
+                "cn": "使用",
+                "en": "beforeUseHead"
+            },
+            {
+                "cn": "前",
+                "en": "beforeUseEnd"
+            }
+        ],
+        "color": "#91d595"
+    },
+    {
         "en": "beforeUsed",
         "part": [
             {
@@ -885,20 +899,6 @@
             {
                 "cn": "前",
                 "en": "beforeUsedEnd"
-            }
-        ],
-        "color": "#91d595"
-    },
-    {
-        "en": "beforeUse",
-        "part": [
-            {
-                "cn": "使用",
-                "en": "beforeUseHead"
-            },
-            {
-                "cn": "前",
-                "en": "beforeUseEnd"
             }
         ],
         "color": "#91d595"
@@ -966,6 +966,137 @@
             }
         ],
         "color": "#91d595"
+    },
+    {
+        "part": [
+            {
+                "cn": "打出",
+                "en": "playHead"
+            },
+            {
+                "cn": "打出者",
+                "en": "player",
+                "termedPart": true
+            },
+            {
+                "cn": "目标",
+                "en": "playTarget",
+                "termedPart": true
+            },
+            {
+                "cn": "对应实体牌",
+                "en": "playedPhysicalCard",
+                "termedPart": true
+            },
+            {
+                "cn": "被打出牌",
+                "en": "playedCard",
+                "termedPart": true
+            },
+            {
+                "cn": "效果",
+                "en": "playEffect",
+                "termedPart": true
+            }
+        ],
+        "en": "play",
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "beforePlay",
+        "part": [
+            {
+                "cn": "打出",
+                "en": "beforePlayHead"
+            },
+            {
+                "cn": "前",
+                "en": "beforePlayEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "beforePlayed",
+        "part": [
+            {
+                "cn": "被",
+                "en": "beforePlayedHead"
+            },
+            {
+                "cn": "打出",
+                "en": "beforePlayedBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforePlayedEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "whenPlay",
+        "part": [
+            {
+                "cn": "打出",
+                "en": "whenPlayHead"
+            },
+            {
+                "cn": "时",
+                "en": "whenPlayEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "whenPlayed",
+        "part": [
+            {
+                "cn": "被",
+                "en": "whenPlayedHead"
+            },
+            {
+                "cn": "打出",
+                "en": "whenPlayedBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenPlayedEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "afterPlay",
+        "part": [
+            {
+                "cn": "打出",
+                "en": "afterPlayHead"
+            },
+            {
+                "cn": "后",
+                "en": "afterPlayEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "afterPlayed",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterPlayedHead"
+            },
+            {
+                "cn": "打出",
+                "en": "afterPlayedBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterPlayedEnd"
+            }
+        ],
+        "color": "#d1e9d3"
     },
     {
         "en": "damage",
