@@ -341,6 +341,50 @@
                                             一类<process></process>。
                                         </div>
                                         <padding>
+                                            <h3><affect class="scroll"><affectEnd /></affect></h3>
+                                            <div class="indent">
+                                                一类<event></event>。
+                                            </div>
+                                            <div class="indent">
+                                                包含以下输入：
+                                            </div>
+                                            <padding>
+                                                <h3><affect><affectRole class="scroll" /></affect></h3>
+                                                <div class="indent">
+                                                    可能不存在。
+                                                </div>
+                                                <h3><affect><affectedRole class="scroll" /></affect></h3>
+                                                <div class="indent">
+                                                    可能不存在。
+                                                </div>
+                                                <h3><affect><effect class="scroll" /></affect></h3>
+                                                <div class="indent">
+                                                    至少一段<procedure></procedure>。
+                                                </div>
+                                            </padding>
+                                            <div class="indent">
+                                                包含以下<procedure></procedure>：
+                                            </div>
+                                            <padding>
+                                                <div class="h">
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<beforeAffect class="scroll bold"></beforeAffect>”。
+                                                    </div>
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<whenAffect class="scroll bold"></whenAffect>”。
+                                                    </div>
+                                                    <padding>
+                                                        <div class="h">
+                                                            <div class="indent">
+                                                                依次执行<affect><effect></effect></affect>。
+                                                            </div>
+                                                        </div>
+                                                    </padding>
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<afterAffect class="scroll bold"></afterAffect>”。
+                                                    </div>
+                                                </div>
+                                            </padding>
                                             <h3><move class="scroll"><moveBody0></moveBody0></move></h3>
                                             <div class="indent">
                                                 一类<event></event>。可称为<move><moveBody1></moveBody1></move>或<move><moveBody6></moveBody6></move>。
@@ -558,6 +602,59 @@
                                                             </div>
                                                         </div>
                                                     </padding>
+                                                </div>
+                                            </padding>
+                                            <h3><damage class="scroll"><damageEnd /></damage></h3>
+                                            <div class="indent">
+                                                一类<event></event>。可称为<or><damage class="scroll"><damageBody0></damageBody0><damageEnd></damageEnd></damage><orBody></orBody><damage class="scroll"><damageBody1></damageBody1><damageEnd></damageEnd></damage></or>。
+                                            </div>
+                                            <div class="indent">
+                                                包含以下输入：
+                                            </div>
+                                            <padding>
+                                                <h3><damage><damageRole class="scroll" /></damage></h3>
+                                                <div class="indent">
+                                                    一名<role></role>。
+                                                </div>
+                                                <h3><damage><damagedRole class="scroll" /></damage></h3>
+                                                <div class="indent">
+                                                    一名<role></role>。
+                                                </div>
+                                                <h3><damage><damageValue class="scroll" /></damage></h3>
+                                                <div class="indent">
+                                                    一个正整数。
+                                                </div>
+                                            </padding>
+                                            <div class="indent">
+                                                包含以下<procedure></procedure>：
+                                            </div>
+                                            <padding>
+                                                <div class="h">
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<beforeDamage class="scroll bold"><beforeDamageBody></beforeDamageBody><beforeDamageEnd></beforeDamageEnd></beforeDamage>”。
+                                                    </div>
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<beforeDamaged class="scroll bold"><beforeDamagedBody></beforeDamagedBody><beforeDamagedEnd></beforeDamagedEnd></beforeDamaged>”。
+                                                    </div>
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<whenDamage class="scroll bold"><whenDamageBody></whenDamageBody><whenDamageEnd></whenDamageEnd></whenDamage>”。
+                                                    </div>
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<whenDamaged class="scroll bold"><whenDamagedBody></whenDamagedBody><whenDamagedEnd></whenDamagedEnd></whenDamaged>”。
+                                                    </div>
+                                                    <padding>
+                                                        <div class="h">
+                                                            <div class="indent">
+                                                                <damage><damagedRole></damagedRole></damage>减少<damage><damageValue></damageValue></damage>点<health></health>。
+                                                            </div>
+                                                        </div>
+                                                    </padding>
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<afterDamage class="scroll bold"><afterDamageBody></afterDamageBody><afterDamageEnd></afterDamageEnd></afterDamage>”。
+                                                    </div>
+                                                    <div class="indent">
+                                                        <advance></advance><tick></tick>“<afterDamaged class="scroll bold"><afterDamagedBody></afterDamagedBody><afterDamagedEnd></afterDamagedEnd></afterDamaged>”。
+                                                    </div>
                                                 </div>
                                             </padding>
                                             <h3><dying class="scroll"><dyingEnd /></dying></h3>
@@ -830,11 +927,11 @@
                                                 <role></role>的一项<attribute></attribute>。等于其的<healthLimit></healthLimit>-<health epithet='1'></health>。
                                             </div>
                                             <padding>
-                                                <h3><damaged></damaged></h3>
+                                                <h3><damaged class="scroll"></damaged></h3>
                                                 <div class="indent">
                                                     <lostHealth epithet='1'></lostHealth>大于0。
                                                 </div>
-                                                <h3><undamaged></undamaged></h3>
+                                                <h3><undamaged class="scroll"></undamaged></h3>
                                                 <div class="indent">
                                                     <lostHealth epithet='1'></lostHealth>不大于0。
                                                 </div>

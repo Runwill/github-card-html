@@ -105,7 +105,7 @@
     {
         "cn": "时段与次数限制",
         "en": "tickingTimeLimit",
-        "color": "#b9f69e"
+        "color": "#c4f8ad"
     },
     {
         "epithet": [
@@ -471,6 +471,46 @@
         "cn": "事件",
         "en": "event",
         "color": "#c6ff8d"
+    },
+    {
+        "en": "affect",
+        "part": [
+            {
+                "cn": "生效",
+                "en": "affectEnd"
+            },
+            {
+                "cn": "来源",
+                "en": "affectRole",
+                "termedPart": true
+            },
+            {
+                "cn": "目标",
+                "en": "affectedRole",
+                "termedPart": true
+            },
+            {
+                "cn": "效果",
+                "en": "effect",
+                "termedPart": true
+            }
+        ],
+        "color": "#f1e989"
+    },
+    {
+        "en": "beforeAffect",
+        "cn": "生效前",
+        "color": "#f1e989"
+    },
+    {
+        "en": "whenAffect",
+        "cn": "生效时",
+        "color": "#f1e989"
+    },
+    {
+        "en": "afterAffect",
+        "cn": "生效后",
+        "color": "#f1e989"
     },
     {
         "en": "move",
@@ -961,6 +1001,90 @@
         "color": "#d1abab"
     },
     {
+        "en": "beforeDamage",
+        "part": [
+            {
+                "cn": "造成",
+                "en": "beforeDamageBody"
+            },
+            {
+                "cn": "伤害前",
+                "en": "beforeDamageEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "beforeDamaged",
+        "part": [
+            {
+                "cn": "受到",
+                "en": "beforeDamagedBody"
+            },
+            {
+                "cn": "伤害前",
+                "en": "beforeDamagedEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "whenDamage",
+        "part": [
+            {
+                "cn": "造成",
+                "en": "whenDamageBody"
+            },
+            {
+                "cn": "伤害时",
+                "en": "whenDamageEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "whenDamaged",
+        "part": [
+            {
+                "cn": "受到",
+                "en": "whenDamagedBody"
+            },
+            {
+                "cn": "伤害时",
+                "en": "whenDamagedEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "afterDamage",
+        "part": [
+            {
+                "cn": "造成",
+                "en": "afterDamageBody"
+            },
+            {
+                "cn": "伤害后",
+                "en": "afterDamageEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "afterDamaged",
+        "part": [
+            {
+                "cn": "受到",
+                "en": "afterDamagedBody"
+            },
+            {
+                "cn": "伤害后",
+                "en": "afterDamagedEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
         "part": [
             {
                 "cn": "濒死",
@@ -1223,7 +1347,7 @@
     {
         "cn": "受伤",
         "en": "damaged",
-        "color": "#ca7a7a"
+        "color": "#d4a9a9"
     },
     {
         "cn": "未受伤",
@@ -1264,7 +1388,7 @@
                 "en": "inReachEnd"
             }
         ],
-        "color": "#eeb09b"
+        "color": "#eebcac"
     },
     {
         "cn": "牌",
@@ -1533,7 +1657,7 @@
     {
         "cn": "目标数限制",
         "en": "targetNumberLimit",
-        "color": "#a1cbfb"
+        "color": "#c0ddfd"
     },
     {
         "cn": "任意",
@@ -1543,7 +1667,7 @@
     {
         "cn": "目标限制",
         "en": "targetLimit",
-        "color": "#a1b1fb"
+        "color": "#c7cff7"
     },
     {
         "epithet": [
@@ -1572,7 +1696,7 @@
     {
         "cn": "距离限制",
         "en": "distanceLimit",
-        "color": "#a1fbaa"
+        "color": "#bfffc6"
     },
     {
         "cn": "技能",
