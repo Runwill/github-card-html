@@ -1751,6 +1751,26 @@
         "color": "#fbc0a1"
     },
     {
+        "cn": "基础牌",
+        "en": "baseCard",
+        "color": "#d8cbc8"
+    },
+    {
+        "cn": "类型",
+        "en": "cardType",
+        "color": "#d8cbc8"
+    },
+    {
+        "cn": "基本牌",
+        "en": "basicCard",
+        "color": "#c2f3c2"
+    },
+    {
+        "cn": "锦囊牌",
+        "en": "trickCard",
+        "color": "#f3e6c2"
+    },
+    {
         "cn": "手牌区",
         "en": "hand",
         "color": "#e8beb0"
@@ -1929,21 +1949,6 @@
             }
         ],
         "color": "#dffdde"
-    },
-    {
-        "cn": "基础牌",
-        "en": "baseCard",
-        "color": "#d8cbc8"
-    },
-    {
-        "cn": "基本牌",
-        "en": "basicCard",
-        "color": "#c2f3c2"
-    },
-    {
-        "cn": "锦囊牌",
-        "en": "trickCard",
-        "color": "#f3e6c2"
     },
     {
         "en": "pronoun1",
