@@ -43,11 +43,11 @@ function textReplace(path,mode) {
                             if($(this).hasClass('highlight') || term[target.i].highlight){
                                 if($(this).closest('pronounScope').length > 0){
                                     $(this).closest('pronounScope').find(term[target.i].en).each(function() {
-                                        $(this).css("background-color", "#ff00002f")
+                                        $(this).css("background-color", "#fddfdf")
                                     })
                                 }else{
                                     $(this).closest('padding').find(term[target.i].en).each(function() {
-                                        $(this).css("background-color", "#ff00002f")
+                                        $(this).css("background-color", "#fddfdf")
                                     })
                                 }
                             }

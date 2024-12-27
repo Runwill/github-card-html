@@ -1,18 +1,25 @@
 [
     {
+        "name":"陈胜/吴广",
+        "id":2,
+        "title":"鴻鵠之志",
+        "health":4,
+        "dominator":1,
+        "position":"朱雀"
+    },
+    {
+        "name":"田忌/孙膑",
+        "id":6,
+        "title":"東面朝齊",
+        "health":4,
+        "position":"朱雀"
+    },
+    {
         "name":"姚重华",
         "id":125,
         "title":"黜陟幽明",
         "health":4,
         "dominator":1,
         "position":"青龙"
-    },
-    {
-        "name":"陈胜/吴广",
-        "id":2,
-        "title":"鸿鹄之志",
-        "health":4,
-        "dominator":1,
-        "position":"朱雀"
     }
 ]

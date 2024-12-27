@@ -48,5 +48,17 @@
                 "legend": "太史公書·陳涉世家"
             }
         ]
+    },
+    {
+        "name": "筹策",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><you></you><whenUse><whenUseHead></whenUseHead><use><useTarget></useTarget></use>不包含<you></you>的<trickCard></trickCard><whenUseEnd></whenUseEnd></whenUse></when></tickLimit></procedureTrigger>，<draw><drawHead></drawHead><drawQuantity class=\"irreplaceable\">一张</drawQuantity><drawEnd></drawEnd></draw>。",
+        "role": [
+            {
+                "id": 6,
+                "skill_order": 1,
+                "lore": "其孫臏腳，籌策龐涓",
+                "legend": "史記索隱·列傳述贊·孫子吳起列傳"
+            }
+        ]
     }
 ]

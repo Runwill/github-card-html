@@ -513,6 +513,36 @@
         "color": "#f1e989"
     },
     {
+        "en": "offset",
+        "part": [
+            {
+                "cn": "抵消",
+                "en": "offsetEnd"
+            },
+            {
+                "cn": "目标",
+                "en": "offsetTarget",
+                "termedPart": true
+            }
+        ],
+        "color": "#e4e1c0"
+    },
+    {
+        "en": "beforeOffset",
+        "cn": "抵消前",
+        "color": "#e4e1c0"
+    },
+    {
+        "en": "whenOffset",
+        "cn": "抵消时",
+        "color": "#e4e1c0"
+    },
+    {
+        "en": "afterOffset",
+        "cn": "抵消后",
+        "color": "#e4e1c0"
+    },
+    {
         "en": "move",
         "part": [
             {
@@ -1258,22 +1288,22 @@
             }
         ],
         "en": "die",
-        "color": "#979797"
+        "color": "#e0e0e0"
     },
     {
         "en": "beforeDie",
         "cn": "死亡前",
-        "color": "#979797"
+        "color": "#e0e0e0"
     },
     {
         "en": "whenDie",
         "cn": "死亡时",
-        "color": "#979797"
+        "color": "#e0e0e0"
     },
     {
         "en": "afterDie",
         "cn": "死亡后",
-        "color": "#979797"
+        "color": "#e0e0e0"
     },
     {
         "cn": "奖惩",
@@ -1302,7 +1332,7 @@
                 "en": "canHead"
             }
         ],
-        "color": "#f6b19e"
+        "color": "#ffe4dc"
     },
     {
         "cn": "任何时候",
@@ -1346,7 +1376,7 @@
     {
         "cn": "角色",
         "en": "role",
-        "color": "#e8dbb0"
+        "color": "#d7e8b0"
     },
     {
         "cn": "角色",
@@ -1909,6 +1939,11 @@
         "cn": "基本牌",
         "en": "basicCard",
         "color": "#c2f3c2"
+    },
+    {
+        "cn": "锦囊牌",
+        "en": "trickCard",
+        "color": "#f3e6c2"
     },
     {
         "en": "pronoun1",

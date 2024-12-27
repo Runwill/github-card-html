@@ -416,9 +416,13 @@ pronounName{
     z-index: 0;
     
 }
-.container:hover .role_icon {
+.container:hover .role_icon.dominator {
     opacity: 0.025;
     left: 5%
+}
+.container:hover .role_icon.not_dominator {
+    opacity: 0.025;
+    left: 4%
 }
 
 .button{

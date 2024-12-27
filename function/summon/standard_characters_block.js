@@ -39,9 +39,12 @@ function CharacterReplace(character,skill) {
                     standardCharacters += "<img src='source/"
                     standardCharacters += character[j].position
                     if(character[j].dominator)standardCharacters += "_君主"
-                    standardCharacters += ".png' width='300' height='300' class='role_icon'>"
+                    standardCharacters += ".png' width='300' height='300' class='role_icon"
 
-                    standardCharacters += "<padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
+                    if(character[j].dominator)standardCharacters += " dominator"
+                    else standardCharacters += " not_dominator"
+
+                    standardCharacters += "'><padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
 
                     for (let a = 0; a < character[j].health; a++)standardCharacters += "<health epithet='2' style='font-size: 1.3em;letter-spacing: -2px;'></health>"
 
