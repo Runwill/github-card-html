@@ -13,7 +13,7 @@
     },
     {
         "name": "允中",
-        "content": "<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplaceable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><discard><discardRole class=\"irreplaceable\"><roleSelector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\"></targetNumberLimit><targetLimit class=\"irreplaceable\"><handCard></handCard>最多的<roleDefault></roleDefault></targetLimit></roleSelector></discardRole><each><eachHead></eachHead><discardBody1></discardBody1><discardedCard class=\"irreplaceable\"><selector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\">一张</targetNumberLimit><cardDefault></cardDefault></selector></discardedCard></discard></each></make><orBody></orBody><make><makeHead></makeHead><draw><drawer class=\"irreplaceable\"><roleSelector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\"></targetNumberLimit><targetLimit class=\"irreplaceable\"><handCard></handCard>最少的<roleDefault></roleDefault></targetLimit></roleSelector></drawer><each><eachHead></eachHead><drawHead></drawHead><drawQuantity class=\"irreplaceable\">一张</drawQuantity><drawEnd></drawEnd></draw></each></make></or></can>。",
+        "content": "<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplaceable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><discard><discardRole class=\"irreplaceable\"><handCard></handCard>最多的<roleDefault></roleDefault></discardRole><each><eachHead></eachHead><discardBody1></discardBody1><discardedCard class=\"irreplaceable\"><choose><targetNumberLimit class=\"irreplaceable\">一张</targetNumberLimit><cardDefault></cardDefault></choose></discardedCard></discard></each></make><orBody></orBody><make><makeHead></makeHead><draw><drawer class=\"irreplaceable\"><handCard></handCard>最少的<roleDefault></roleDefault></drawer><each><eachHead></eachHead><drawHead></drawHead><drawQuantity class=\"irreplaceable\">一张</drawQuantity><drawEnd></drawEnd></draw></each></make></or></can>。",
         "role": [
             {
                 "id": 125,
@@ -51,13 +51,25 @@
     },
     {
         "name": "筹策",
-        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><you></you><whenUse><whenUseHead></whenUseHead><use><useTarget></useTarget></use>不包含<you></you>的<trickCard></trickCard><whenUseEnd></whenUseEnd></whenUse></when></tickLimit></procedureTrigger>，<draw><drawHead></drawHead><drawQuantity class=\"irreplaceable\">一张</drawQuantity><drawEnd></drawEnd></draw>。",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><you></you><whenUse><whenUseHead></whenUseHead><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenUseEnd></whenUseEnd></whenUse></when></tickLimit></procedureTrigger>，<draw><drawHead></drawHead><drawQuantity class=\"irreplaceable\">一张</drawQuantity><drawEnd></drawEnd></draw>。",
         "role": [
             {
                 "id": 6,
                 "skill_order": 1,
                 "lore": "其孫臏腳，籌策龐涓",
                 "legend": "史記索隱·列傳述贊·孫子吳起列傳"
+            }
+        ]
+    },
+    {
+        "name": "唯识",
+        "content": "<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><beforeActingStageStart></beforeActingStageStart></tickLimit></procedureTrigger>，<you></you><can><canHead></canHead>与任意名其他角色拼点</can>，若你赢，<and2><you></you><and2Body></and2Body>目标</and2>依次可使用一张拼点牌。若如此做，此回合<you></you>的点数大于最大负点的<handCard></handCard>的<affect><effect></effect></affect>视为【普度众生】。",
+        "role": [
+            {
+                "id": 8,
+                "skill_order": 1,
+                "lore": "稽首唯識性，滿分清淨者",
+                "legend": "成唯識論"
             }
         ]
     }

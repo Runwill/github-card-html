@@ -26,5 +26,19 @@
             }
         ],
         "color": "#ecb9db"
+    },
+    {
+        "en": "include",
+        "part": [
+            {
+                "cn": "包含",
+                "en": "include0"
+            },
+            {
+                "cn": "含",
+                "en": "include1"
+            }
+        ],
+        "color": "#e5d1f3"
     }
 ]

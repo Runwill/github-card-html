@@ -58,6 +58,11 @@
         "color": "#c3a5d8"
     },
     {
+        "cn": "任意",
+        "en": "anyNumber",
+        "color": "#ffb0cf"
+    },
+    {
         "cn": "程序触发结构",
         "en": "procedureTrigger",
         "color": "#d3e7ff"
@@ -471,6 +476,31 @@
         "cn": "事件",
         "en": "event",
         "color": "#c6ff8d"
+    },
+    {
+        "en": "choose",
+        "part": [
+            {
+                "cn": "选择",
+                "en": "chooseHead"
+            },
+            {
+                "cn": "目标数限制",
+                "en": "targetNumberLimit",
+                "termedPart": true
+            },
+            {
+                "cn": "目标限制",
+                "en": "targetLimit",
+                "termedPart": true
+            },
+            {
+                "cn": "距离限制",
+                "en": "distanceLimit",
+                "termedPart": true
+            }
+        ],
+        "color": "#c7cff7"
     },
     {
         "en": "affect",
@@ -1127,6 +1157,46 @@
             }
         ],
         "color": "#d1e9d3"
+    },
+    {
+        "part": [
+            {
+                "cn": "拼点",
+                "en": "comparisonEnd"
+            },
+            {
+                "cn": "发起者",
+                "en": "comparisonInitiator",
+                "termedPart": true
+            },
+            {
+                "cn": "目标",
+                "en": "comparisonTarget",
+                "termedPart": true
+            },
+            {
+                "cn": "效果",
+                "en": "comparisonEffect",
+                "termedPart": true
+            }
+        ],
+        "en": "comparison",
+        "color": "#e9dcd1"
+    },
+    {
+        "en": "beforeComparison",
+        "cn": "拼点前",
+        "color": "#e9dcd1"
+    },
+    {
+        "en": "whenComparison",
+        "cn": "拼点时",
+        "color": "#e9dcd1"
+    },
+    {
+        "en": "afterComparison",
+        "cn": "拼点后",
+        "color": "#e9dcd1"
     },
     {
         "en": "damage",
@@ -1801,11 +1871,6 @@
         "color": "#b0e8b2"
     },
     {
-        "cn": "选择",
-        "en": "choose",
-        "color": "#b0e8d0"
-    },
-    {
         "en": "make",
         "part": [
             {
@@ -1824,31 +1889,6 @@
             }
         ],
         "color": "#9ed19a"
-    },
-    {
-        "cn": "选择结构",
-        "en": "selector",
-        "color": "#b0e8d0"
-    },
-    {
-        "cn": "角色选择结构",
-        "en": "roleSelector",
-        "color": "#b0e8d0"
-    },
-    {
-        "cn": "目标数限制",
-        "en": "targetNumberLimit",
-        "color": "#c0ddfd"
-    },
-    {
-        "cn": "任意",
-        "en": "anyNumber",
-        "color": "#ffb0cf"
-    },
-    {
-        "cn": "目标限制",
-        "en": "targetLimit",
-        "color": "#c7cff7"
     },
     {
         "epithet": [
@@ -1873,11 +1913,6 @@
         ],
         "en": "outGame",
         "color": "#a1b1fb"
-    },
-    {
-        "cn": "距离限制",
-        "en": "distanceLimit",
-        "color": "#bfffc6"
     },
     {
         "cn": "技能",
