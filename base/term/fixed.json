@@ -485,6 +485,11 @@
                 "en": "chooseHead"
             },
             {
+                "cn": "选择者",
+                "en": "chooseRole",
+                "termedPart": true
+            },
+            {
                 "cn": "目标数限制",
                 "en": "targetNumberLimit",
                 "termedPart": true
@@ -739,11 +744,375 @@
         "color": "#abd1c4"
     },
     {
+        "en": "face",
+        "part": [
+            {
+                "cn": "被",
+                "en": "faceHead"
+            },
+            {
+                "cn": "向置",
+                "en": "faceBody"
+            },
+            {
+                "cn": "向",
+                "en": "faceBody1"
+            },
+            {
+                "cn": "向置者",
+                "en": "faceRole",
+                "termedPart": true
+            },
+            {
+                "cn": "被向置牌",
+                "en": "facedCard",
+                "termedPart": true
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "beforeFace",
+        "part": [
+            {
+                "cn": "向置",
+                "en": "beforeFaceBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeFaceEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "beforeFaced",
+        "part": [
+            {
+                "cn": "被",
+                "en": "beforeFacedHead"
+            },
+            {
+                "cn": "向置",
+                "en": "beforeFacedBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeFacedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "whenFace",
+        "part": [
+            {
+                "cn": "向置",
+                "en": "whenFaceBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenFaceEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "whenFaced",
+        "part": [
+            {
+                "cn": "被",
+                "en": "whenFacedHead"
+            },
+            {
+                "cn": "向置",
+                "en": "whenFacedBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenFacedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "afterFace",
+        "part": [
+            {
+                "cn": "向置",
+                "en": "afterFaceBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterFaceEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "afterFaced",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterFacedHead"
+            },
+            {
+                "cn": "向置",
+                "en": "afterFacedBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterFacedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "back",
+        "part": [
+            {
+                "cn": "被",
+                "en": "backHead"
+            },
+            {
+                "cn": "背置",
+                "en": "backBody"
+            },
+            {
+                "cn": "背",
+                "en": "backBody1"
+            },
+            {
+                "cn": "背置者",
+                "en": "backRole",
+                "termedPart": true
+            },
+            {
+                "cn": "被背置牌",
+                "en": "backedCard",
+                "termedPart": true
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "beforeBack",
+        "part": [
+            {
+                "cn": "背置",
+                "en": "beforeBackBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeBackEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "beforeBacked",
+        "part": [
+            {
+                "cn": "被",
+                "en": "beforeBackedHead"
+            },
+            {
+                "cn": "背置",
+                "en": "beforeBackedBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeBackedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "whenBack",
+        "part": [
+            {
+                "cn": "背置",
+                "en": "whenBackBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenBackEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "whenBacked",
+        "part": [
+            {
+                "cn": "被",
+                "en": "whenBackedHead"
+            },
+            {
+                "cn": "背置",
+                "en": "whenBackedBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenBackedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "afterBack",
+        "part": [
+            {
+                "cn": "背置",
+                "en": "afterBackBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterBackEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "afterBacked",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterBackedHead"
+            },
+            {
+                "cn": "背置",
+                "en": "afterBackedBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterBackedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "show",
+        "part": [
+            {
+                "cn": "展示",
+                "en": "showBody"
+            },
+            {
+                "cn": "展示者",
+                "en": "showRole",
+                "termedPart": true
+            },
+            {
+                "cn": "被展示牌",
+                "en": "shownCard",
+                "termedPart": true
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "beforeShow",
+        "part": [
+            {
+                "cn": "展示",
+                "en": "beforeShowHead"
+            },
+            {
+                "cn": "前",
+                "en": "beforeShowEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "beforeShown",
+        "part": [
+            {
+                "cn": "被",
+                "en": "beforeShownHead"
+            },
+            {
+                "cn": "展示",
+                "en": "beforeShownBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeShownEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "whenShow",
+        "part": [
+            {
+                "cn": "展示",
+                "en": "whenShowHead"
+            },
+            {
+                "cn": "时",
+                "en": "whenShowEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "whenShown",
+        "part": [
+            {
+                "cn": "被",
+                "en": "whenShownHead"
+            },
+            {
+                "cn": "展示",
+                "en": "whenShownBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenShownEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "afterShow",
+        "part": [
+            {
+                "cn": "展示",
+                "en": "afterShowHead"
+            },
+            {
+                "cn": "后",
+                "en": "afterShowEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "afterShown",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterShownHead"
+            },
+            {
+                "cn": "展示",
+                "en": "afterShownBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterShownEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
         "en": "discard",
         "part": [
             {
                 "cn": "被",
-                "en": "discardPassivity"
+                "en": "discardHead"
             },
             {
                 "cn": "弃置",
@@ -904,8 +1273,12 @@
     {
         "part": [
             {
-                "cn": "使用",
+                "cn": "被",
                 "en": "useHead"
+            },
+            {
+                "cn": "使用",
+                "en": "useBody"
             },
             {
                 "cn": "使用者",
@@ -1030,8 +1403,12 @@
     {
         "part": [
             {
-                "cn": "打出",
+                "cn": "被",
                 "en": "playHead"
+            },
+            {
+                "cn": "打出",
+                "en": "playBody"
             },
             {
                 "cn": "打出者",
