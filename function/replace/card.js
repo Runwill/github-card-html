@@ -5,11 +5,12 @@ function CardReplace(path){
             document.querySelectorAll(card[i].en).forEach(//替换和滚动
                 element => {
                     element.innerHTML = cardName
+                    element.i = i
                     element.addEventListener(
                         'dblclick', function(event){
                             event.stopPropagation()
                             $("#example-tabs").foundation('selectTab','panel_card',1)
-                            document.querySelectorAll(card[i].en).forEach(
+                            document.querySelectorAll(card[element.i].en + ".scroll").forEach(
                                 scroll => {
                                     event.stopPropagation()
                                     scroll.scrollIntoView({ behavior: "smooth" })
@@ -21,16 +22,16 @@ function CardReplace(path){
                 }
             )
             $(card[i].en).mouseover(//高亮
-                function(){
-                    if(card[i].type == '基本') color = "#c2f3c2"
+                function(event){
+                    if(card[event.currentTarget.i].type == '基本') color = "#c2f3c2"
                     $(this).css("background-color",color)
-                    $(card[i].en+".scroll").css("background-color",color)
+                    $(card[event.currentTarget.i].en+".scroll").css("background-color",color)
                 }
             )
             $(card[i].en).mouseout(//高亮
-                function(){
+                function(event){
                     $(this).css("background-color","")
-                    $(card[i].en+".scroll").css("background-color","")
+                    $(card[event.currentTarget.i].en+".scroll").css("background-color","")
                 }
             )
         }

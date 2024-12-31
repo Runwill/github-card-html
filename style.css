@@ -22,12 +22,12 @@
         margin: 0 -25px 0 0;
     }
 
-    search-input{
+    #search-input{
         right: 0;
     }
 
-    #block-upon-search{
-        height: 20px; 
+    #block-under-search{
+        height: 0.5em;
     }
 }
 
@@ -59,8 +59,8 @@
         right: 0;
     }
 
-    #block-upon-search{
-        height: 20px; 
+    #block-under-search{
+        height: 0.5em;
     }
 }
 
@@ -92,8 +92,8 @@
         right: 0;
     }
 
-    #block-upon-search{
-        height: 20px; 
+    #block-under-search{
+        height: 0.5em;
     }
 }
 
@@ -125,8 +125,8 @@
         right: 0;
     }
 
-    #block-upon-search{
-        height: 20px; 
+    #block-under-search{
+        height: 0.5em;
     }
 }
 
@@ -158,8 +158,8 @@
         right: 0;
     }
 
-    #block-upon-search{
-        height: 20px; 
+    #block-under-search{
+        height: 0.5em;
     }
 }
 
@@ -191,8 +191,8 @@
         right: 0;
     }
 
-    #block-upon-search{
-        height: 20px; 
+    #block-under-search{
+        height: 0.5em;
     }
 }
 
@@ -235,6 +235,10 @@
     .search-container{
         margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
     }
+
+    #block-under-search{
+        height: 1.5em;
+    }
 }
 
 @media (min-width: 1201px) and (max-width: 1400px) {
@@ -267,6 +271,10 @@
 
     .search-container{
         margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
+    }
+
+    #block-under-search{
+        height: 1.5em;
     }
 }
 
@@ -306,6 +314,10 @@
     .search-container{
         margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
     }
+
+    #block-under-search{
+        height: 1.5em;
+    }
 }
 
 @font-face {
@@ -319,6 +331,10 @@
 @font-face {
     font-family: '小篆';
     src: url('source/汉仪篆书繁.TTF') format('truetype');
+}
+@font-face {
+    font-family: '大篆';
+    src: url('source/金文大篆体.TTF') format('truetype');
 }
 
 *{
@@ -341,6 +357,12 @@ body {
     font-family: '古隶';
     position: absolute;
     writing-mode: vertical-rl
+}
+
+pronounName{
+    font-family: '大篆';
+    line-height: 0;
+    color: #d60000bb
 }
 
 .glowing {
@@ -394,9 +416,13 @@ body {
     z-index: 0;
     
 }
-.container:hover .role_icon {
+.container:hover .role_icon.dominator {
     opacity: 0.025;
     left: 5%
+}
+.container:hover .role_icon.not_dominator {
+    opacity: 0.025;
+    left: 4.5%
 }
 
 .button{

@@ -58,6 +58,11 @@
         "color": "#c3a5d8"
     },
     {
+        "cn": "任意",
+        "en": "anyNumber",
+        "color": "#ffb0cf"
+    },
+    {
         "cn": "程序触发结构",
         "en": "procedureTrigger",
         "color": "#d3e7ff"
@@ -88,6 +93,11 @@
         "color": "#f0a2a2"
     },
     {
+        "cn": "其他角色",
+        "en": "elseRole",
+        "color": "#f0cca2"
+    },
+    {
         "en": "except",
         "part": [
             {
@@ -100,7 +110,7 @@
     {
         "cn": "时段与次数限制",
         "en": "tickingTimeLimit",
-        "color": "#b9f69e"
+        "color": "#c4f8ad"
     },
     {
         "epithet": [
@@ -251,32 +261,32 @@
     {
         "cn": "准备阶段",
         "en": "preparingStage",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "cn": "准备阶段开始前",
         "en": "beforePreparingStageStart",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "cn": "准备阶段开始时",
         "en": "atPreparingStageStart",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "en": "preparing",
-        "color": "#d97fe5",
+        "color": "#dc93e6",
         "replace": true
     },
     {
         "cn": "准备阶段结束时",
         "en": "atPreparingStageFinish",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "cn": "准备阶段结束后",
         "en": "afterPreparingStageFinish",
-        "color": "#d97fe5"
+        "color": "#dc93e6"
     },
     {
         "epithet": [
@@ -468,6 +478,110 @@
         "color": "#c6ff8d"
     },
     {
+        "en": "choose",
+        "part": [
+            {
+                "cn": "被",
+                "en": "chooseHead"
+            },
+            {
+                "cn": "选择",
+                "en": "chooseBody"
+            },
+            {
+                "cn": "选择者",
+                "en": "chooseRole",
+                "termedPart": true
+            },
+            {
+                "cn": "目标数限制",
+                "en": "targetNumberLimit",
+                "termedPart": true
+            },
+            {
+                "cn": "目标限制",
+                "en": "targetLimit",
+                "termedPart": true
+            },
+            {
+                "cn": "距离限制",
+                "en": "distanceLimit",
+                "termedPart": true
+            }
+        ],
+        "color": "#c7cff7"
+    },
+    {
+        "en": "affect",
+        "part": [
+            {
+                "cn": "生效",
+                "en": "affectEnd"
+            },
+            {
+                "cn": "来源",
+                "en": "affectRole",
+                "termedPart": true
+            },
+            {
+                "cn": "目标",
+                "en": "affectedRole",
+                "termedPart": true
+            },
+            {
+                "cn": "效果",
+                "en": "effect",
+                "termedPart": true
+            }
+        ],
+        "color": "#f1e989"
+    },
+    {
+        "en": "beforeAffect",
+        "cn": "生效前",
+        "color": "#f1e989"
+    },
+    {
+        "en": "whenAffect",
+        "cn": "生效时",
+        "color": "#f1e989"
+    },
+    {
+        "en": "afterAffect",
+        "cn": "生效后",
+        "color": "#f1e989"
+    },
+    {
+        "en": "offset",
+        "part": [
+            {
+                "cn": "抵消",
+                "en": "offsetEnd"
+            },
+            {
+                "cn": "目标",
+                "en": "offsetTarget",
+                "termedPart": true
+            }
+        ],
+        "color": "#e4e1c0"
+    },
+    {
+        "en": "beforeOffset",
+        "cn": "抵消前",
+        "color": "#e4e1c0"
+    },
+    {
+        "en": "whenOffset",
+        "cn": "抵消时",
+        "color": "#e4e1c0"
+    },
+    {
+        "en": "afterOffset",
+        "cn": "抵消后",
+        "color": "#e4e1c0"
+    },
+    {
         "en": "move",
         "part": [
             {
@@ -501,28 +615,28 @@
             {
                 "cn": "置于",
                 "en": "moveBody6"
+            },
+            {
+                "cn": "移置者",
+                "en": "moveRole",
+                "termedPart": true
+            },
+            {
+                "cn": "目标牌",
+                "en": "movedCard",
+                "termedPart": true
+            },
+            {
+                "cn": "目标区域",
+                "en": "movedInArea",
+                "termedPart": true
+            },
+            {
+                "cn": "目标位置",
+                "en": "movedAtPosition",
+                "termedPart": true
             }
         ],
-        "color": "#abd1c4"
-    },
-    {
-        "en": "moveRole",
-        "cn": "移置者",
-        "color": "#abd1c4"
-    },
-    {
-        "en": "movedCard",
-        "cn": "目标牌",
-        "color": "#abd1c4"
-    },
-    {
-        "en": "movedInArea",
-        "cn": "目标区域",
-        "color": "#abd1c4"
-    },
-    {
-        "en": "movedAtPosition",
-        "cn": "目标位置",
         "color": "#abd1c4"
     },
     {
@@ -634,11 +748,375 @@
         "color": "#abd1c4"
     },
     {
+        "en": "face",
+        "part": [
+            {
+                "cn": "被",
+                "en": "faceHead"
+            },
+            {
+                "cn": "向置",
+                "en": "faceBody"
+            },
+            {
+                "cn": "向",
+                "en": "faceBody1"
+            },
+            {
+                "cn": "向置者",
+                "en": "faceRole",
+                "termedPart": true
+            },
+            {
+                "cn": "被向置牌",
+                "en": "facedCard",
+                "termedPart": true
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "beforeFace",
+        "part": [
+            {
+                "cn": "向置",
+                "en": "beforeFaceBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeFaceEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "beforeFaced",
+        "part": [
+            {
+                "cn": "被",
+                "en": "beforeFacedHead"
+            },
+            {
+                "cn": "向置",
+                "en": "beforeFacedBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeFacedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "whenFace",
+        "part": [
+            {
+                "cn": "向置",
+                "en": "whenFaceBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenFaceEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "whenFaced",
+        "part": [
+            {
+                "cn": "被",
+                "en": "whenFacedHead"
+            },
+            {
+                "cn": "向置",
+                "en": "whenFacedBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenFacedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "afterFace",
+        "part": [
+            {
+                "cn": "向置",
+                "en": "afterFaceBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterFaceEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "afterFaced",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterFacedHead"
+            },
+            {
+                "cn": "向置",
+                "en": "afterFacedBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterFacedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "back",
+        "part": [
+            {
+                "cn": "被",
+                "en": "backHead"
+            },
+            {
+                "cn": "背置",
+                "en": "backBody"
+            },
+            {
+                "cn": "背",
+                "en": "backBody1"
+            },
+            {
+                "cn": "背置者",
+                "en": "backRole",
+                "termedPart": true
+            },
+            {
+                "cn": "被背置牌",
+                "en": "backedCard",
+                "termedPart": true
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "beforeBack",
+        "part": [
+            {
+                "cn": "背置",
+                "en": "beforeBackBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeBackEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "beforeBacked",
+        "part": [
+            {
+                "cn": "被",
+                "en": "beforeBackedHead"
+            },
+            {
+                "cn": "背置",
+                "en": "beforeBackedBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeBackedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "whenBack",
+        "part": [
+            {
+                "cn": "背置",
+                "en": "whenBackBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenBackEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "whenBacked",
+        "part": [
+            {
+                "cn": "被",
+                "en": "whenBackedHead"
+            },
+            {
+                "cn": "背置",
+                "en": "whenBackedBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenBackedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "afterBack",
+        "part": [
+            {
+                "cn": "背置",
+                "en": "afterBackBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterBackEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "afterBacked",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterBackedHead"
+            },
+            {
+                "cn": "背置",
+                "en": "afterBackedBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterBackedEnd"
+            }
+        ],
+        "color": "#d1abcc"
+    },
+    {
+        "en": "show",
+        "part": [
+            {
+                "cn": "展示",
+                "en": "showBody"
+            },
+            {
+                "cn": "展示者",
+                "en": "showRole",
+                "termedPart": true
+            },
+            {
+                "cn": "被展示牌",
+                "en": "shownCard",
+                "termedPart": true
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "beforeShow",
+        "part": [
+            {
+                "cn": "展示",
+                "en": "beforeShowHead"
+            },
+            {
+                "cn": "前",
+                "en": "beforeShowEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "beforeShown",
+        "part": [
+            {
+                "cn": "被",
+                "en": "beforeShownHead"
+            },
+            {
+                "cn": "展示",
+                "en": "beforeShownBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforeShownEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "whenShow",
+        "part": [
+            {
+                "cn": "展示",
+                "en": "whenShowHead"
+            },
+            {
+                "cn": "时",
+                "en": "whenShowEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "whenShown",
+        "part": [
+            {
+                "cn": "被",
+                "en": "whenShownHead"
+            },
+            {
+                "cn": "展示",
+                "en": "whenShownBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenShownEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "afterShow",
+        "part": [
+            {
+                "cn": "展示",
+                "en": "afterShowHead"
+            },
+            {
+                "cn": "后",
+                "en": "afterShowEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
+        "en": "afterShown",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterShownHead"
+            },
+            {
+                "cn": "展示",
+                "en": "afterShownBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterShownEnd"
+            }
+        ],
+        "color": "#e4c8c0"
+    },
+    {
         "en": "discard",
         "part": [
             {
                 "cn": "被",
-                "en": "discardPassivity"
+                "en": "discardHead"
             },
             {
                 "cn": "弃置",
@@ -647,38 +1125,16 @@
             {
                 "cn": "弃",
                 "en": "discardBody2"
-            }
-        ],
-        "color": "#acd1ab"
-    },
-    {
-        "en": "discarder",
-        "part": [
-            {
-                "cn": "弃置",
-                "en": "discarderHead1"
             },
             {
-                "cn": "弃",
-                "en": "discarderHead2"
+                "cn": "弃置者",
+                "en": "discardRole",
+                "termedPart": true
             },
             {
-                "cn": "者",
-                "en": "discarderEnd"
-            }
-        ],
-        "color": "#acd1ab"
-    },
-    {
-        "en": "discardedCard",
-        "part": [
-            {
-                "cn": "被弃",
-                "en": "discardedCardHead"
-            },
-            {
-                "cn": "牌",
-                "en": "discardedCardEnd"
+                "cn": "被弃牌",
+                "en": "discardedCard",
+                "termedPart": true
             }
         ],
         "color": "#acd1ab"
@@ -789,18 +1245,18 @@
             {
                 "cn": "牌",
                 "en": "drawEnd"
+            },
+            {
+                "cn": "摸牌者",
+                "en": "drawer",
+                "termedPart": true
+            },
+            {
+                "cn": "摸牌数",
+                "en": "drawQuantity",
+                "termedPart": true
             }
         ],
-        "color": "#abd1b4"
-    },
-    {
-        "en": "drawer",
-        "cn": "摸牌者",
-        "color": "#abd1b4"
-    },
-    {
-        "en": "drawQuantity",
-        "cn": "摸牌数",
         "color": "#abd1b4"
     },
     {
@@ -821,36 +1277,49 @@
     {
         "part": [
             {
-                "cn": "使用",
+                "cn": "被",
                 "en": "useHead"
+            },
+            {
+                "cn": "使用",
+                "en": "useBody"
+            },
+            {
+                "cn": "使用者",
+                "en": "user",
+                "termedPart": true
+            },
+            {
+                "cn": "目标",
+                "en": "useTarget",
+                "termedPart": true
+            },
+            {
+                "cn": "对应实体牌",
+                "en": "usedPhysicalCard",
+                "termedPart": true
+            },
+            {
+                "cn": "被使用牌",
+                "en": "usedCard",
+                "termedPart": true
             }
         ],
         "en": "use",
         "color": "#91d595"
     },
     {
-        "en": "user",
-        "cn": "使用者",
-        "color": "#91d595"
-    },
-    {
-        "en": "useTarget",
-        "cn": "目标",
-        "color": "#91d595"
-    },
-    {
-        "en": "usedPhysicalCard",
-        "cn": "对应实体牌",
-        "color": "#91d595"
-    },
-    {
-        "en": "usedCard",
-        "cn": "被使用牌",
-        "color": "#91d595"
-    },
-    {
-        "en": "usedCard",
-        "cn": "被使用牌",
+        "en": "beforeUse",
+        "part": [
+            {
+                "cn": "使用",
+                "en": "beforeUseHead"
+            },
+            {
+                "cn": "前",
+                "en": "beforeUseEnd"
+            }
+        ],
         "color": "#91d595"
     },
     {
@@ -867,20 +1336,6 @@
             {
                 "cn": "前",
                 "en": "beforeUsedEnd"
-            }
-        ],
-        "color": "#91d595"
-    },
-    {
-        "en": "beforeUse",
-        "part": [
-            {
-                "cn": "使用",
-                "en": "beforeUseHead"
-            },
-            {
-                "cn": "前",
-                "en": "beforeUseEnd"
             }
         ],
         "color": "#91d595"
@@ -950,13 +1405,350 @@
         "color": "#91d595"
     },
     {
-        "en": "dying",
-        "cn": "濒死",
-        "color": "#8dffbd"
+        "part": [
+            {
+                "cn": "被",
+                "en": "playHead"
+            },
+            {
+                "cn": "打出",
+                "en": "playBody"
+            },
+            {
+                "cn": "打出者",
+                "en": "player",
+                "termedPart": true
+            },
+            {
+                "cn": "目标",
+                "en": "playTarget",
+                "termedPart": true
+            },
+            {
+                "cn": "对应实体牌",
+                "en": "playedPhysicalCard",
+                "termedPart": true
+            },
+            {
+                "cn": "被打出牌",
+                "en": "playedCard",
+                "termedPart": true
+            },
+            {
+                "cn": "效果",
+                "en": "playEffect",
+                "termedPart": true
+            }
+        ],
+        "en": "play",
+        "color": "#d1e9d3"
     },
     {
-        "en": "dyingRole",
-        "cn": "濒死者",
+        "en": "beforePlay",
+        "part": [
+            {
+                "cn": "打出",
+                "en": "beforePlayHead"
+            },
+            {
+                "cn": "前",
+                "en": "beforePlayEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "beforePlayed",
+        "part": [
+            {
+                "cn": "被",
+                "en": "beforePlayedHead"
+            },
+            {
+                "cn": "打出",
+                "en": "beforePlayedBody"
+            },
+            {
+                "cn": "前",
+                "en": "beforePlayedEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "whenPlay",
+        "part": [
+            {
+                "cn": "打出",
+                "en": "whenPlayHead"
+            },
+            {
+                "cn": "时",
+                "en": "whenPlayEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "whenPlayed",
+        "part": [
+            {
+                "cn": "被",
+                "en": "whenPlayedHead"
+            },
+            {
+                "cn": "打出",
+                "en": "whenPlayedBody"
+            },
+            {
+                "cn": "时",
+                "en": "whenPlayedEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "afterPlay",
+        "part": [
+            {
+                "cn": "打出",
+                "en": "afterPlayHead"
+            },
+            {
+                "cn": "后",
+                "en": "afterPlayEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "en": "afterPlayed",
+        "part": [
+            {
+                "cn": "被",
+                "en": "afterPlayedHead"
+            },
+            {
+                "cn": "打出",
+                "en": "afterPlayedBody"
+            },
+            {
+                "cn": "后",
+                "en": "afterPlayedEnd"
+            }
+        ],
+        "color": "#d1e9d3"
+    },
+    {
+        "part": [
+            {
+                "cn": "拼点",
+                "en": "comparisonEnd"
+            },
+            {
+                "cn": "发起者",
+                "en": "comparisonInitiator",
+                "termedPart": true
+            },
+            {
+                "cn": "目标",
+                "en": "comparisonTarget",
+                "termedPart": true
+            },
+            {
+                "cn": "效果",
+                "en": "comparisonEffect",
+                "termedPart": true
+            }
+        ],
+        "en": "comparison",
+        "color": "#e9dcd1"
+    },
+    {
+        "en": "beforeComparison",
+        "cn": "拼点前",
+        "color": "#e9dcd1"
+    },
+    {
+        "en": "whenComparison",
+        "cn": "拼点时",
+        "color": "#e9dcd1"
+    },
+    {
+        "en": "afterComparison",
+        "cn": "拼点后",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "拼点者",
+        "en": "compareRole",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "拼点牌",
+        "en": "comparedCard",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "胜",
+        "en": "winComparison",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "负",
+        "en": "loseComparison",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "胜方",
+        "en": "winComparisonRole",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "负方",
+        "en": "loseComparisonRole",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "胜点",
+        "en": "winComparisonPoint",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "负点",
+        "en": "loseComparisonPoint",
+        "color": "#e9dcd1"
+    },
+    {
+        "en": "damage",
+        "part": [
+            {
+                "cn": "造成",
+                "en": "damageBody0"
+            },
+            {
+                "cn": "受到",
+                "en": "damageBody1"
+            },
+            {
+                "cn": "伤害",
+                "en": "damageEnd"
+            },
+            {
+                "cn": "伤害来源",
+                "en": "damageRole",
+                "termedPart": true
+            },
+            {
+                "cn": "受伤者",
+                "en": "damagedRole",
+                "termedPart": true
+            },
+            {
+                "cn": "伤害值",
+                "en": "damageValue",
+                "termedPart": true
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "beforeDamage",
+        "part": [
+            {
+                "cn": "造成",
+                "en": "beforeDamageBody"
+            },
+            {
+                "cn": "伤害前",
+                "en": "beforeDamageEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "beforeDamaged",
+        "part": [
+            {
+                "cn": "受到",
+                "en": "beforeDamagedBody"
+            },
+            {
+                "cn": "伤害前",
+                "en": "beforeDamagedEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "whenDamage",
+        "part": [
+            {
+                "cn": "造成",
+                "en": "whenDamageBody"
+            },
+            {
+                "cn": "伤害时",
+                "en": "whenDamageEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "whenDamaged",
+        "part": [
+            {
+                "cn": "受到",
+                "en": "whenDamagedBody"
+            },
+            {
+                "cn": "伤害时",
+                "en": "whenDamagedEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "afterDamage",
+        "part": [
+            {
+                "cn": "造成",
+                "en": "afterDamageBody"
+            },
+            {
+                "cn": "伤害后",
+                "en": "afterDamageEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "en": "afterDamaged",
+        "part": [
+            {
+                "cn": "受到",
+                "en": "afterDamagedBody"
+            },
+            {
+                "cn": "伤害后",
+                "en": "afterDamagedEnd"
+            }
+        ],
+        "color": "#d1abab"
+    },
+    {
+        "part": [
+            {
+                "cn": "濒死",
+                "en": "dyingEnd"
+            },
+            {
+                "cn": "濒死者",
+                "en": "dyingRole",
+                "termedPart": true
+            }
+        ],
+        "en": "dying",
         "color": "#8dffbd"
     },
     {
@@ -975,29 +1767,34 @@
         "color": "#abd1b4"
     },
     {
+        "part": [
+            {
+                "cn": "死亡",
+                "en": "dieEnd"
+            },
+            {
+                "cn": "死者",
+                "en": "dieRole",
+                "termedPart": true
+            }
+        ],
         "en": "die",
-        "cn": "死亡",
-        "color": "#979797"
-    },
-    {
-        "en": "dieRole",
-        "cn": "死者",
-        "color": "#979797"
+        "color": "#e0e0e0"
     },
     {
         "en": "beforeDie",
         "cn": "死亡前",
-        "color": "#979797"
+        "color": "#e0e0e0"
     },
     {
         "en": "whenDie",
         "cn": "死亡时",
-        "color": "#979797"
+        "color": "#e0e0e0"
     },
     {
         "en": "afterDie",
         "cn": "死亡后",
-        "color": "#979797"
+        "color": "#e0e0e0"
     },
     {
         "cn": "奖惩",
@@ -1026,7 +1823,7 @@
                 "en": "canHead"
             }
         ],
-        "color": "#f6b19e"
+        "color": "#ffe4dc"
     },
     {
         "cn": "任何时候",
@@ -1070,7 +1867,7 @@
     {
         "cn": "角色",
         "en": "role",
-        "color": "#e8dbb0"
+        "color": "#d7e8b0"
     },
     {
         "cn": "角色",
@@ -1202,7 +1999,7 @@
     {
         "cn": "受伤",
         "en": "damaged",
-        "color": "#ca7a7a"
+        "color": "#d4a9a9"
     },
     {
         "cn": "未受伤",
@@ -1230,6 +2027,20 @@
         ],
         "en": "reach",
         "color": "#eeb09b"
+    },
+    {
+        "en": "inReach",
+        "part": [
+            {
+                "cn": "在",
+                "en": "inReachHead"
+            },
+            {
+                "cn": "范围内",
+                "en": "inReachEnd"
+            }
+        ],
+        "color": "#eebcac"
     },
     {
         "cn": "牌",
@@ -1431,6 +2242,31 @@
         "color": "#fbc0a1"
     },
     {
+        "cn": "基础牌",
+        "en": "baseCard",
+        "color": "#d8cbc8"
+    },
+    {
+        "cn": "类型",
+        "en": "cardType",
+        "color": "#d8cbc8"
+    },
+    {
+        "cn": "基本牌",
+        "en": "basicCard",
+        "color": "#c2f3c2"
+    },
+    {
+        "cn": "锦囊牌",
+        "en": "trickCard",
+        "color": "#f3e6c2"
+    },
+    {
+        "cn": "点数",
+        "en": "point",
+        "color": "#d8cbc8"
+    },
+    {
         "cn": "手牌区",
         "en": "hand",
         "color": "#e8beb0"
@@ -1461,11 +2297,6 @@
         "color": "#b0e8b2"
     },
     {
-        "cn": "选择",
-        "en": "choose",
-        "color": "#b0e8d0"
-    },
-    {
         "en": "make",
         "part": [
             {
@@ -1480,35 +2311,14 @@
         "part": [
             {
                 "cn": "对",
-                "en": "toHead"
+                "en": "toHead0"
+            },
+            {
+                "cn": "与",
+                "en": "toHead1"
             }
         ],
         "color": "#9ed19a"
-    },
-    {
-        "cn": "选择结构",
-        "en": "selector",
-        "color": "#b0e8d0"
-    },
-    {
-        "cn": "角色选择结构",
-        "en": "roleSelector",
-        "color": "#b0e8d0"
-    },
-    {
-        "cn": "目标数限制",
-        "en": "targetNumberLimit",
-        "color": "#a1cbfb"
-    },
-    {
-        "cn": "任意",
-        "en": "anyNumber",
-        "color": "#ffb0cf"
-    },
-    {
-        "cn": "目标限制",
-        "en": "targetLimit",
-        "color": "#a1b1fb"
     },
     {
         "epithet": [
@@ -1533,11 +2343,6 @@
         ],
         "en": "outGame",
         "color": "#a1b1fb"
-    },
-    {
-        "cn": "距离限制",
-        "en": "distanceLimit",
-        "color": "#a1fbaa"
     },
     {
         "cn": "技能",
@@ -1611,13 +2416,18 @@
         "color": "#dffdde"
     },
     {
-        "cn": "基础牌",
-        "en": "baseCard",
-        "color": "#d8cbc8"
+        "en": "pronoun1",
+        "irreplaceable": true,
+        "highlight": true
     },
     {
-        "cn": "基本牌",
-        "en": "basicCard",
-        "color": "#c2f3c2"
+        "en": "pronoun2",
+        "irreplaceable": true,
+        "highlight": true
+    },
+    {
+        "en": "pronoun3",
+        "irreplaceable": true,
+        "highlight": true
     }
 ]

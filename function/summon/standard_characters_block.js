@@ -34,14 +34,17 @@ function CharacterReplace(character,skill) {
             for (j in character) {
                 if (character[j].id == characterID[i]) {
 
-                    standardCharacters += "<div class='container characterParagraph'><div class='role_title'>" + character[j].title + "</div>"
+                    standardCharacters += "<characterParagraph class='characterParagraph'><div class='container'><div class='role_title'>" + character[j].title + "</div>"
                     
                     standardCharacters += "<img src='source/"
                     standardCharacters += character[j].position
                     if(character[j].dominator)standardCharacters += "_君主"
-                    standardCharacters += ".png' width='300' height='300' class='role_icon'>"
+                    standardCharacters += ".png' width='300' height='300' class='role_icon"
 
-                    standardCharacters += "<padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
+                    if(character[j].dominator)standardCharacters += " dominator"
+                    else standardCharacters += " not_dominator"
+
+                    standardCharacters += "'><padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
 
                     for (let a = 0; a < character[j].health; a++)standardCharacters += "<health epithet='2' style='font-size: 1.3em;letter-spacing: -2px;'></health>"
 
@@ -66,7 +69,7 @@ function CharacterReplace(character,skill) {
                                 for (m in skill[l].role) {
                                     if (skill[l].role[m].id == characterID[i] && skill[l].role[m].skill_order == skillOrder[k]) {
 
-                                        standardCharacters += "<div class=\"indent\"><skillQuote class=\"bold"
+                                        standardCharacters += "<div class=\"indent\"><pronounScope><skillQuote class=\"bold"
                                         
                                         //if (skill[l].role[m].dominator) standardCharacters += " glowing"
 
@@ -88,17 +91,17 @@ function CharacterReplace(character,skill) {
                                                 }
                                             }
                                         }
-                                        standardCharacters += "</div>"
+                                        standardCharacters += "</pronounScope></div>"
                                     }
                                 }
                             }
                         }
                     }
-                    standardCharacters += "</padding></div><br><br><br><br>"
+                    standardCharacters += "</padding></div><br><br><br><br></characterParagraph>"
                 }
             }
         }
-        $(".standardCharactersBlock").html("<br>" + '<div class="search-container" style="z-index: 100; top: 10%;"><input type="text" id="search-input" placeholder="搜检" oninput="filterParagraphs()" autocomplete="off" style=" background-color: rgba(255,255,255,1); position: relative; transition: right 1s ease;"></div>' + "<br>" + standardCharacters)
+        $(".standardCharactersBlock").html("<br>" + '<div class="search-container" style="z-index: 100; top: 10%;"><input type="text" id="search-input" placeholder="搜检" oninput="filterParagraphs()" autocomplete="off" style=" background-color: rgba(255,255,255,1); position: relative; transition: right 1s ease;"></div>' + '<div id="block-under-search" style="background-color: white;"></div>' + standardCharacters)
 
         const searchContainer = document.querySelector('.search-container')
         const searchInput = document.getElementById('search-input')

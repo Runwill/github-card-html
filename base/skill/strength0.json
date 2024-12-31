@@ -1,7 +1,7 @@
 [
     {
         "name": "玄德",
-        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead><equaling><equalingHead0></equalingHead0><lostHealth epithet='1'></lostHealth epithet='1'>一半(<roundUp><roundUp0></roundUp0></roundUp>)</equaling>的<drawEnd></drawEnd></draw>。",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><preparingStage></preparingStage></tickingLimit></tickingLimit></procedureTrigger>，<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawHead></drawHead><drawQuantity class=\"irreplaceable\"><equaling><equalingHead0></equalingHead0><lostHealth epithet='1'></lostHealth epithet='1'>一半(<roundUp><roundUp0></roundUp0></roundUp>)</equaling>的</drawQuantity><drawEnd></drawEnd></draw>。",
         "role": [
             {
                 "id": 125,
@@ -13,7 +13,7 @@
     },
     {
         "name": "允中",
-        "content": "<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplaceable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><roleSelector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\"></targetNumberLimit><targetLimit class=\"irreplaceable\"><handCard></handCard>最多的<roleDefault></roleDefault></targetLimit></roleSelector><each><eachHead></eachHead><discard><discardBody1></discardBody1></discard><selector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\">一张</targetNumberLimit><cardDefault></cardDefault></selector></each></make><orBody></orBody><make><makeHead></makeHead><roleSelector class=\"irreplaceable\"><targetNumberLimit class=\"irreplaceable\"></targetNumberLimit><targetLimit class=\"irreplaceable\"><handCard></handCard>最少的<roleDefault></roleDefault></targetLimit></roleSelector><each><eachHead></eachHead><draw><drawHead></drawHead>一张<drawEnd></drawEnd></draw></each></make></or></can>。",
+        "content": "<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\"><actingStage></actingStage></tickingLimit><numberLimit class=\"irreplaceable\"><numberLimiting><numberLimitingHead></numberLimitingHead>一<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit></tickingLimit></procedureTrigger>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><discard><discardRole class=\"irreplaceable\"><handCard></handCard>最多的<roleDefault></roleDefault></discardRole><each><eachHead></eachHead><discardBody1></discardBody1><discardedCard class=\"irreplaceable\"><choose><targetNumberLimit class=\"irreplaceable\">一张</targetNumberLimit><cardDefault></cardDefault></choose></discardedCard></discard></each></make><orBody></orBody><make><makeHead></makeHead><draw><drawer class=\"irreplaceable\"><handCard></handCard>最少的<roleDefault></roleDefault></drawer><each><eachHead></eachHead><drawHead></drawHead><drawQuantity class=\"irreplaceable\">一张</drawQuantity><drawEnd></drawEnd></draw></each></make></or></can>。",
         "role": [
             {
                 "id": 125,
@@ -26,7 +26,7 @@
     },
     {
         "name": "鸿志",
-        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenEnteringDying></whenEnteringDying></when></tickLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead>两张<drawEnd></drawEnd></draw>；<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenDie></whenDie></when></tickLimit></procedureTrigger>，<you></you><draw><drawHead></drawHead>一张<drawEnd></drawEnd></draw>。",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenEnteringDying></whenEnteringDying></when></tickLimit></procedureTrigger>，<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawHead></drawHead><drawQuantity class=\"irreplaceable\">两张</drawQuantity><drawEnd></drawEnd></draw>；<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><tickQuantifier>一名</tickQuantifier><role></role><whenDie></whenDie></when></tickLimit></procedureTrigger>，<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawHead></drawHead><drawQuantity class=\"irreplaceable\">一张</drawQuantity><drawEnd></drawEnd></draw>。",
         "role": [
             {
                 "id": 2,
@@ -46,6 +46,30 @@
                 "dominator": true,
                 "lore": "狐鳴呼曰：「大楚興，陳勝王」",
                 "legend": "太史公書·陳涉世家"
+            }
+        ]
+    },
+    {
+        "name": "筹策",
+        "content": "锁定技，<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead><you></you><whenUse><whenUseHead></whenUseHead><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenUseEnd></whenUseEnd></whenUse></when></tickLimit></procedureTrigger>，<draw><drawHead></drawHead><drawQuantity class=\"irreplaceable\">一张</drawQuantity><drawEnd></drawEnd></draw>。",
+        "role": [
+            {
+                "id": 6,
+                "skill_order": 1,
+                "lore": "其孫臏腳，籌策龐涓",
+                "legend": "史記索隱·列傳述贊·孫子吳起列傳"
+            }
+        ]
+    },
+    {
+        "name": "唯识",
+        "content": "<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><beforeActingStageStart></beforeActingStageStart></tickLimit></procedureTrigger>，<comparison><comparisonInitiator class=\"irreplaceable\"><you></you></comparisonInitiator><can><canHead></canHead><to><toHead1></toHead1><comparisonTarget class=\"irreplaceable\"><anyNumber></anyNumber>名<elseRole></elseRole></comparisonTarget><comparisonEnd></comparisonEnd></to></comparison></can>，<if><ifHead></ifHead><you></you><winComparison></winComparison>，<use><user class=\"irreplaceable\"><compareRole></compareRole></user><each><eachHead></eachHead><can><canHead></canHead><useBody></useBody><usedCard class=\"irreplaceable\"><choose><targetLimit class=\"irreplaceable\">一张<comparedCard></comparedCard></targetLimit></choose></usedCard></can></each></use></if>。若如此做，此回合<you></you>的点数大于最大负点的<handCard></handCard>的<affect><effect></effect></affect>视为【普度众生】。",
+        "role": [
+            {
+                "id": 8,
+                "skill_order": 1,
+                "lore": "稽首唯識性，滿分清淨者",
+                "legend": "成唯識論"
             }
         ]
     }
