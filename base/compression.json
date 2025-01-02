@@ -1,0 +1,42 @@
+[
+    {
+        "name":"whenC",
+        "pre":"<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead>",
+        "suf":"</when></tickLimit></procedureTrigger>"
+    },
+    {
+        "name":"eachC",
+        "pre":"<each><eachHead></eachHead>",
+        "suf":"</each>"
+    },
+    {
+        "name":"equalingC",
+        "pre":"<equaling><equalingHead0></equalingHead0>",
+        "suf":"</equaling>"
+    },
+    {
+        "name":"ifC",
+        "pre":"<if><ifHead></ifHead>",
+        "suf":"</if>"
+    },
+    {
+        "name":"cardQuoteC",
+        "pre":"<cardQuote><cardQuoteLeft></cardQuoteLeft>",
+        "suf":"<cardQuoteRight></cardQuoteRight></cardQuote>"
+    },
+    {
+        "name":"tickingLimitC",
+        "pre":"<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\">",
+        "suf":"</tickingLimit></tickingTimeLimit></procedureTrigger>"
+    },
+    {
+        "name":"numberLimitC",
+        "pre":"<numberLimit class=\"irreplaceable\"><numberLimiting><numberLimitingHead></numberLimitingHead>",
+        "suf":"<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit>"
+    },
+    {
+        "name":"drawQuantityC",
+        "pre":"<drawHead></drawHead><drawQuantity class=\"irreplaceable\">",
+        "suf":"</drawQuantity><drawEnd></drawEnd>"
+    }
+]

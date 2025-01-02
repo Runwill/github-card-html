@@ -24,6 +24,7 @@ function CardReplace(path){
             $(card[i].en).mouseover(//高亮
                 function(event){
                     if(card[event.currentTarget.i].type == '基本') color = "#c2f3c2"
+                    if(card[event.currentTarget.i].type == '锦囊') color = "#f3e6c2"
                     $(this).css("background-color",color)
                     $(card[event.currentTarget.i].en+".scroll").css("background-color",color)
                 }
@@ -37,8 +38,3 @@ function CardReplace(path){
         }
     })
 }
-$(function () {
-    $(document).ready(function () {
-        $(document).foundation()
-    })
-})

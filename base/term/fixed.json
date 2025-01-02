@@ -481,8 +481,12 @@
         "en": "choose",
         "part": [
             {
-                "cn": "选择",
+                "cn": "被",
                 "en": "chooseHead"
+            },
+            {
+                "cn": "选择",
+                "en": "chooseBody"
             },
             {
                 "cn": "选择者",
@@ -1576,6 +1580,46 @@
         "color": "#e9dcd1"
     },
     {
+        "cn": "拼点者",
+        "en": "compareRole",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "拼点牌",
+        "en": "comparedCard",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "胜",
+        "en": "winComparison",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "负",
+        "en": "loseComparison",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "胜方",
+        "en": "winComparisonRole",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "负方",
+        "en": "loseComparisonRole",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "胜点",
+        "en": "winComparisonPoint",
+        "color": "#e9dcd1"
+    },
+    {
+        "cn": "负点",
+        "en": "loseComparisonPoint",
+        "color": "#e9dcd1"
+    },
+    {
         "en": "damage",
         "part": [
             {
@@ -2218,6 +2262,11 @@
         "color": "#f3e6c2"
     },
     {
+        "cn": "点数",
+        "en": "point",
+        "color": "#d8cbc8"
+    },
+    {
         "cn": "手牌区",
         "en": "hand",
         "color": "#e8beb0"
@@ -2262,7 +2311,11 @@
         "part": [
             {
                 "cn": "对",
-                "en": "toHead"
+                "en": "toHead0"
+            },
+            {
+                "cn": "与",
+                "en": "toHead1"
             }
         ],
         "color": "#9ed19a"
