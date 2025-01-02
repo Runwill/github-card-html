@@ -20,6 +20,66 @@
         "suf":"</if>"
     },
     {
+        "name":"thisC",
+        "pre":"<this><thisHead></thisHead>",
+        "suf":"</this>"
+    },
+    {
+        "name":"currentC",
+        "pre":"<current><currentHead></currentHead>",
+        "suf":"</current>"
+    },
+    {
+        "name":"greaterC",
+        "pre":"<greater><greaterHead></greaterHead>",
+        "suf":"</greater>"
+    },
+    {
+        "name":"lessC",
+        "pre":"<less><lessHead></lessHead>",
+        "suf":"</less>"
+    },
+    {
+        "name":"moreC",
+        "pre":"<more><moreHead></moreHead>",
+        "suf":"</more>"
+    },
+    {
+        "name":"fewerC",
+        "pre":"<fewer><fewerHead></fewerHead>",
+        "suf":"</fewer>"
+    },
+    {
+        "name":"maxC",
+        "pre":"<max><maxHead></maxHead>",
+        "suf":"</max>"
+    },
+    {
+        "name":"minC",
+        "pre":"<min><minHead></minHead>",
+        "suf":"</min>"
+    },
+    {
+        "name":"mostC",
+        "pre":"<most>",
+        "suf":"<mostHead></mostHead></most>"
+    },
+    {
+        "name":"leastC",
+        "pre":"<least>",
+        "suf":"<leastHead></leastHead></least>"
+    },
+    {
+        "name":"theMaxC",
+        "pre":"<theMax><theMaxHead></theMaxHead>",
+        "suf":"</theMax>"
+    },
+    {
+        "name":"theMinC",
+        "pre":"<theMin><theMinHead></theMinHead>",
+        "suf":"</theMin>"
+    },
+    {
         "name":"cardQuoteC",
         "pre":"<cardQuote><cardQuoteLeft></cardQuoteLeft>",
         "suf":"<cardQuoteRight></cardQuoteRight></cardQuote>"

@@ -58,6 +58,146 @@
         "color": "#c3a5d8"
     },
     {
+        "en": "this",
+        "part": [
+            {
+                "cn": "此",
+                "en": "thisHead"
+            }
+        ],
+        "color": "#d5f0f5"
+    },
+    {
+        "en": "current",
+        "part": [
+            {
+                "cn": "本",
+                "en": "currentHead"
+            }
+        ],
+        "color": "#f5f0d5"
+    },
+    {
+        "en": "max",
+        "part": [
+            {
+                "cn": "最大",
+                "en": "maxHead"
+            }
+        ],
+        "color": "#fff6ec"
+    },
+    {
+        "en": "min",
+        "part": [
+            {
+                "cn": "最小",
+                "en": "minHead"
+            }
+        ],
+        "color": "#fff6ec"
+    },
+    {
+        "en": "theMax",
+        "part": [
+            {
+                "cn": "唯一最大",
+                "en": "theMaxHead"
+            }
+        ],
+        "color": "#fff6ec"
+    },
+    {
+        "en": "theMin",
+        "part": [
+            {
+                "cn": "唯一最小",
+                "en": "theMinHead"
+            }
+        ],
+        "color": "#fff6ec"
+    },
+    {
+        "en": "most",
+        "part": [
+            {
+                "cn": "最多",
+                "en": "mostHead"
+            }
+        ],
+        "color": "#fff6ec"
+    },
+    {
+        "en": "least",
+        "part": [
+            {
+                "cn": "最少",
+                "en": "leastHead"
+            }
+        ],
+        "color": "#fff6ec"
+    },
+    {
+        "en": "theMost",
+        "part": [
+            {
+                "cn": "唯一最多",
+                "en": "theMostHead"
+            }
+        ],
+        "color": "#fff6ec"
+    },
+    {
+        "en": "theLeast",
+        "part": [
+            {
+                "cn": "唯一最少",
+                "en": "theLeastHead"
+            }
+        ],
+        "color": "#fff6ec"
+    },
+    {
+        "en": "greater",
+        "part": [
+            {
+                "cn": "大于",
+                "en": "greaterHead"
+            }
+        ],
+        "color": "#fffdec"
+    },
+    {
+        "en": "less",
+        "part": [
+            {
+                "cn": "小于",
+                "en": "lessHead"
+            }
+        ],
+        "color": "#fffdec"
+    },
+    {
+        "en": "more",
+        "part": [
+            {
+                "cn": "多于",
+                "en": "moreHead"
+            }
+        ],
+        "color": "#fffdec"
+    },
+    {
+        "en": "fewer",
+        "part": [
+            {
+                "cn": "少于",
+                "en": "fewerHead"
+            }
+        ],
+        "color": "#fffdec"
+    },
+    {
         "cn": "任意",
         "en": "anyNumber",
         "color": "#ffb0cf"
@@ -227,10 +367,10 @@
     {
         "epithet": [
             {
-                "cn": "回合时段"
+                "cn": "回合"
             },
             {
-                "cn": "回合"
+                "cn": "回合时段"
             }
         ],
         "en": "turn",

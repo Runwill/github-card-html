@@ -107,7 +107,72 @@
                                         <div class="indent">
                                             遍历。
                                         </div>
-                                        <h2><anyNumber class="scroll"></anyNumber></h2>
+                                        <h2><this class="scroll"><thisHead></thisHead>……</this></h2>
+                                        <div class="indent">
+                                            <or>指向传递的<object></object><orBody></orBody>表示所在的</or>。
+                                        </div>
+                                        <h2><current class="scroll"><currentHead></currentHead>……</current></h2>
+                                        <div class="indent">
+                                            指向当前的。
+                                        </div>
+                                        <h2>比较</h2>
+                                        <padding>
+                                            <h3><greater class="scroll"><greaterHead></greaterHead>……</greater></h3>
+                                            <padding>
+                                                <h3><more class="scroll"><moreHead></moreHead>……</more></h3>
+                                                <div class="indent">
+                                                    数量<greaterC></greaterC>。
+                                                </div>
+                                            </padding>
+                                            <h3><less class="scroll"><lessHead></lessHead>……</less></h3>
+                                            <padding>
+                                                <h3><fewer class="scroll"><fewerHead></fewerHead>……</fewer></h3>
+                                                <div class="indent">
+                                                    数量<lessC></lessC>。
+                                                </div>
+                                            </padding>
+                                            <h3><max class="scroll"><maxHead /></max></h3>
+                                            <div class="indent">
+                                                不存在更大者。
+                                            </div>
+                                            <padding>
+                                                <h3><theMax class="scroll"><theMaxHead /></theMax></h3>
+                                                <div class="indent">
+                                                    不存在更大或相等者。
+                                                </div>
+                                            </padding>
+                                            <h3><min class="scroll"><minHead /></min></h3>
+                                            <div class="indent">
+                                                不存在更小者。
+                                            </div>
+                                            <padding>
+                                                <h3><theMin class="scroll"><theMinHead /></theMin></h3>
+                                                <div class="indent">
+                                                    不存在更小或相等者。
+                                                </div>
+                                            </padding>
+                                            <h3><most class="scroll"><mostHead /></most></h3>
+                                            <div class="indent">
+                                                不存在更多者。
+                                            </div>
+                                            <padding>
+                                                <h3><theMost class="scroll"><theMostHead /></theMost></h3>
+                                                <div class="indent">
+                                                    不存在更多或数量相等者。
+                                                </div>
+                                            </padding>
+                                            <h3><least class="scroll"><leastHead /></least></h3>
+                                            <div class="indent">
+                                                不存在更少者。
+                                            </div>
+                                            <padding>
+                                                <h3><theLeast class="scroll"><theLeastHead /></theLeast></h3>
+                                                <div class="indent">
+                                                    不存在更少或数量相等者。
+                                                </div>
+                                            </padding>
+                                        </padding>
+                                        <h2><anyNumber class="scroll" /></h2>
                                         <div class="indent">
                                             不限数量。
                                         </div>
@@ -184,7 +249,7 @@
                                                                 一项<attribute></attribute>。整型变量。
                                                             </div>
                                                             <div class="indent">
-                                                                满足<numberLimit></numberLimit>，即<and>存在正在<advance></advance>的<ticking></ticking>符合此<tickingTimeLimit></tickingTimeLimit>的<tickingLimit></tickingLimit>，<andBody></andBody><inTicking>该<ticking></ticking><inTickingEnd></inTickingEnd></inTicking>此<procedure></procedure>的执行次数小于<procedure></procedure>的<numberLimit></numberLimit></and>。
+                                                                满足<numberLimit></numberLimit>，即<and>存在正在<advance></advance>的<ticking></ticking>符合<thisC><tickingTimeLimit></tickingTimeLimit></thisC>的<tickingLimit></tickingLimit>，<andBody></andBody><inTicking>该<ticking></ticking><inTickingEnd></inTickingEnd></inTicking><currentC><procedure></procedure></currentC>的执行次数<lessC><procedure></procedure>的<numberLimit></numberLimit></lessC></and>。
                                                             </div>
                                                             <padding>
                                                                 <h3><numberLimiting class="scroll"><numberLimitingHead></numberLimitingHead>……<numberLimitingEnd /></numberLimitingHead></h3>
@@ -289,7 +354,7 @@
                                                     <advance></advance><tick></tick>“<atRoundStart class="scroll bold"></atRoundStart>”。
                                                 </div>
                                                 <div class="indent">
-                                                    <make><makeHead></makeHead>所有<roleDefault></roleDefault><advance></advance><turnProcess></turnProcess></makeHead>。
+                                                    <make><makeHead></makeHead>所有<roleDefault></roleDefault><advance></advance><turnProcess epithet="1"></turnProcess></makeHead>。
                                                 </div>
                                                 <div class="indent">
                                                     <advance></advance><tick></tick>“<atRoundFinish class="scroll bold"> </atRoundFinish>”。
@@ -302,9 +367,9 @@
                                                 <round></round>的循环次数。
                                             </div>
                                         </padding>
-                                        <h2><turnProcess class="scroll" /></h2>
+                                        <h2><turnProcess epithet="1" class="scroll" /></h2>
                                         <div class="indent">
-                                            一种<process></process>。可简称为<turnProcess epithet="1"></turnProcess>。
+                                            一种<process></process>。可简称为<turnProcess></turnProcess>。
                                         </div>
                                         <div class="indent">
                                             包含以下<procedure></procedure>：
@@ -315,7 +380,7 @@
                                                     <advance></advance><tick></tick>“<beforeTurnStart class="scroll bold"></beforeTurnStart>”。
                                                 </div>
                                                 <div class="indent">
-                                                    <advance></advance><turn></turn>。
+                                                    <advance></advance><turn epithet="1"></turn>。
                                                 </div>
                                                 <div class="indent">
                                                     <advance></advance><tick></tick>“<afterTurnFinish class="scroll bold"></afterTurnFinish>”。
@@ -920,11 +985,11 @@
                                                 <padding>
                                                     <h3><winComparison class="scroll" /></h3>
                                                     <div class="indent">
-                                                        <comparedCard></comparedCard>的<point></point>唯一最大。
+                                                        <comparedCard></comparedCard>的<point></point><theMaxC></theMaxC>。
                                                     </div>
                                                     <h3><loseComparison class="scroll" /></h3>
                                                     <div class="indent">
-                                                        <comparedCard></comparedCard>的<point></point>不为最大。
+                                                        <comparedCard></comparedCard>的<point></point>不为<maxC></maxC>。
                                                     </div>
                                                 </padding>
                                                 <h3><compareRole class="scroll" /></h3>
@@ -1029,10 +1094,10 @@
                                                         <advance></advance><tick></tick>“<whenEnteringDying class="scroll bold"></whenEnteringDying>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health>不大于0，<ifBody></ifBody><advance></advance><tick></tick>“<whenDying class="scroll bold"></whenDying>”(<ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health>大于0，<ifBody></ifBody>此<tick></tick>的<tickLimit></tickLimit>视为不满足</ifC>)，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="scroll bold"></whenExitingDying>”</ifC>。
+                                                        <ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health>不<greaterC>0</greaterC>，<ifBody></ifBody><advance></advance><tick></tick>“<whenDying class="scroll bold"></whenDying>”(<ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health><greaterC>0</greaterC>，<ifBody></ifBody><thisC><tick></tick></thisC>的<tickLimit></tickLimit>视为不满足</ifC>)，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="scroll bold"></whenExitingDying>”</ifC>。
                                                     </div>
                                                     <div class="indent">
-                                                        <ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health epithet='1'>不大于0，<ifBody></ifBody><die><dieRole class="irreplaceable">其</dieRole><dieEnd></dieEnd></die>，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="bold"></whenExitingDying>”</ifC>。
+                                                        <ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health epithet='1'>不<greaterC>0</greaterC>，<ifBody></ifBody><die><dieRole class="irreplaceable">其</dieRole><dieEnd></dieEnd></die>，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="bold"></whenExitingDying>”</ifC>。
                                                     </div>
                                                 </div>
                                             </padding><h3><die class="scroll"><dieEnd /></die></h3>
@@ -1103,7 +1168,7 @@
                                             一类<object></object>。
                                         </div>
                                         <div class="indent">
-                                            <advance></advance><tick></tick>时，检测所有可执行的<procedure></procedure>，<choose>><chooseBody></chooseBody><priority></priority>最高的<procedure></procedure>之一</choose>，执行，<ifC>包含“<can class="scroll bold"><canHead></canHead></can>”，<ifBody></ifBody><ask></ask>是否执行</ifC>。重复此<process></process>直到不存在可执行的<procedure></procedure>。
+                                            <advance></advance><tick></tick>时，检测所有可执行的<procedure></procedure>，<choose>><chooseBody></chooseBody><priority></priority>最高的<procedure></procedure>之一</choose>，执行，<ifC>包含“<can class="scroll bold"><canHead></canHead></can>”，<ifBody></ifBody><ask></ask>是否执行</ifC>。重复<thisC><process></process></thisC>直到不存在可执行的<procedure></procedure>。
                                         </div>
                                         <div class="indent">
                                             <procedure></procedure>在某<tick></tick>可执行的条件：
@@ -1168,9 +1233,9 @@
                                             <div class="indent">
                                                 引用<ticking></ticking>。
                                             </div>
-                                            <h3><turn class="scroll"></turn></h3>
+                                            <h3><turn class="scroll" epithet="1"></turn></h3>
                                             <div class="indent">
-                                                一种<ticking></ticking>。可简称为<turn epithet="1"></turn>。
+                                                一种<ticking></ticking>。可简称为<turn></turn>。
                                             </div>
                                             <div class="indent">
                                                 包含以下<tick></tick>：
@@ -1279,11 +1344,11 @@
                                             <padding>
                                                 <h3><damaged class="scroll"></damaged></h3>
                                                 <div class="indent">
-                                                    <lostHealth epithet='1'></lostHealth>大于0。
+                                                    <lostHealth epithet='1'></lostHealth><greaterC>0</greaterC>。
                                                 </div>
                                                 <h3><undamaged class="scroll"></undamaged></h3>
                                                 <div class="indent">
-                                                    <lostHealth epithet='1'></lostHealth>不大于0。
+                                                    <lostHealth epithet='1'></lostHealth>不<greaterC>0</greaterC>。
                                                 </div>
                                             </padding>
                                             <h3><initialHandLimit class="scroll" /></h3>
@@ -1303,7 +1368,7 @@
                                             <padding>
                                                 <h3><inReach class="scroll"><<pronoun1><roleDefault></roleDefault></pronoun1>><inReachHead></inReachHead><<pronoun2><roleDefault></roleDefault></pronoun2>><inReachEnd></inReachEnd></inReach></h3>
                                                 <div class="indent">
-                                                    <pronoun2>后者</pronoun2>的<reach></reach>不小于<distance><pronoun2>后者</pronoun2><distanceHead></distanceHead><pronoun1>前者</pronoun1>的<distanceEnd></distanceEnd></distance>。
+                                                    <pronoun2>后者</pronoun2>的<reach></reach>不<lessC><distance><pronoun2>后者</pronoun2><distanceHead></distanceHead><pronoun1>前者</pronoun1>的<distanceEnd></distanceEnd></distance></lessC>。
                                                 </div>
                                             </padding>
                                             <h3><seat class="scroll" /></h3>
@@ -1317,7 +1382,7 @@
                                                 </div>
                                                 <h3><seatOrder class="scroll" /></h3>
                                                 <div class="indent">
-                                                    <role></role>按照<seat></seat>由小到大排序组成的集合。规定此集合末位的后位为首位，首位的前位为末位。
+                                                    <role></role>按照<seat></seat>由小到大排序组成的集合。规定<thisC>集合</thisC>末位的后位为首位，首位的前位为末位。
                                                 </div>
                                                 <h3><nextSeat class="scroll"><nextSeatHead></nextSeatHead>……<nextSeatEnd /></h3>
                                                 <div class="indent">
@@ -1329,12 +1394,12 @@
                                                 </div>
                                                 <h3><distance class="scroll"><<roleDefault></roleDefault>><distanceHead></distanceHead><<roleDefault></roleDefault>>的<distanceEnd></distanceEnd></distance></h3>
                                                 <div class="indent">
-                                                    等于<counts><seat></seat><and2>在<pronoun1 class="highlight">二者</pronoun1>之间<and2Body></and2Body>不在<pronoun1 class="highlight">二者</pronoun1>之间</and2>的除<pronoun1 class="highlight">其</pronoun1>外<roleDefault></roleDefault><countsEnd></countsEnd></counts>的最小值，<ifC><pronoun1 class="highlight"></pronoun1>不为同一<role></role>，至少为1，<else></else>，至少为0</ifC>。
+                                                    等于<counts><seat></seat><and2>在<pronoun1 class="highlight">二者</pronoun1>之间<and2Body></and2Body>不在<pronoun1 class="highlight">二者</pronoun1>之间</and2>的除<pronoun1 class="highlight">其</pronoun1>外<roleDefault></roleDefault><countsEnd></countsEnd></counts>的<minC>值</minC>，<ifC><pronoun1 class="highlight"></pronoun1>不为同一<role></role>，至少为1，<else></else>，至少为0</ifC>。
                                                 </div>
                                             </padding>
                                             <h3><currentTurnRole class="scroll" /></h3>
                                             <div class="indent">
-                                                正在<advance></advance><turn epithet="1"></turn>的<role></role>。
+                                                正在<advance></advance><turn></turn>的<role></role>。
                                             </div>
                                         </padding>
                                         <h2><card class="scroll" /></h2>
@@ -1397,10 +1462,10 @@
                                             </div>
                                             <h3><visible class="scroll"><visibleBody></visibleBody></visible></h3>
                                             <div class="indent">
-                                                <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。<role></role>的集合。称为<or>集合中的<anyNumber></anyNumber><role></role><visible><visibleBody></visibleBody></visible>此<card></card><orBody></orBody>此<card></card><visible><visibleHead></visibleHead>集合中的<anyNumber></anyNumber><role></role><visibleBody></visibleBody></visible></or>。
+                                                <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。<role></role>的集合。称为<or>集合中的<anyNumber></anyNumber><role></role><visible><visibleBody></visibleBody></visible><thisC><card></card></thisC><orBody></orBody><thisC><card></card></thisC><visible><visibleHead></visibleHead>集合中的<anyNumber></anyNumber><role></role><visibleBody></visibleBody></visible></or>。
                                             </div>
                                             <div class="indent">
-                                                <visible><visibleBody></visibleBody></visible>某<card></card>的<role></role><can></can>随时查看此<card></card>。
+                                                <visible><visibleBody></visibleBody></visible>某<card></card>的<role></role><can></can>随时查看<thisC><card></card></thisC>。
                                             </div>
                                             <div class="indent">
                                                 未规定<visible><visibleBody></visibleBody></visible>的<card></card>，其的<visible><visibleBody></visibleBody></visible>值视为与其所属<area></area>相等。
@@ -1514,7 +1579,7 @@
                                                 </padding>
                                             </div>
                                             <div class="indent">
-                                                <whenC>此<card></card><to><toHead0></toHead0><pronoun1><tickQuantifier>一名</tickQuantifier><roleDefault></roleDefault></pronoun1><whenAffect></whenAffect></to></whenC>，<pronoun1>其</pronoun1><can><canHead></canHead><play><playBody></playBody><playedCard class="irreplaceable"><choose><targetNumberLimit class="irreplaceable">一张</targetNumberLimit><targetLimit class="irreplaceable"><cardQuoteC><dodge></dodge></cardQuoteC></targetLimit></choose></playedCard><playEffect class="irreplaceable"><offset><offsetEnd></offsetEnd><offsetTarget class="irreplaceable">之</offsetTarget></offset></playEffect></play></can>。
+                                                <whenC><thisC><card></card></thisC><to><toHead0></toHead0><pronoun1><tickQuantifier>一名</tickQuantifier><roleDefault></roleDefault></pronoun1><whenAffect></whenAffect></to></whenC>，<pronoun1>其</pronoun1><can><canHead></canHead><play><playBody></playBody><playedCard class="irreplaceable"><choose><targetNumberLimit class="irreplaceable">一张</targetNumberLimit><targetLimit class="irreplaceable"><cardQuoteC><dodge></dodge></cardQuoteC></targetLimit></choose></playedCard><playEffect class="irreplaceable"><offset><offsetEnd></offsetEnd><offsetTarget class="irreplaceable">之</offsetTarget></offset></playEffect></play></can>。
                                             </div>
                                             <h3><dodge class="scroll" /></h3>
                                         </padding>
