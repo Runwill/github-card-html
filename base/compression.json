@@ -1,5 +1,15 @@
 [
     {
+        "name":"actingStageCC",
+        "pre":"<tickingLimitC><actingStage></actingStage></tickingLimit><numberLimitC>",
+        "suf":"</numberLimitC></tickingLimitC>"
+    },
+    {
+        "name":"drawCC",
+        "pre":"<draw><drawQuantityC>",
+        "suf":"</drawQuantityC></draw>"
+    },
+    {
         "name":"whenC",
         "pre":"<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead>",
         "suf":"</when></tickLimit></procedureTrigger>"
@@ -20,9 +30,19 @@
         "suf":"</if>"
     },
     {
+        "name":"canC",
+        "pre":"<can><canHead></canHead>",
+        "suf":"</can>"
+    },
+    {
         "name":"thisC",
         "pre":"<this><thisHead></thisHead>",
         "suf":"</this>"
+    },
+    {
+        "name":"exceptC",
+        "pre":"<except><exceptHead></exceptHead>",
+        "suf":"</except>"
     },
     {
         "name":"currentC",
@@ -90,6 +110,11 @@
         "suf":"</tickingLimit></tickingTimeLimit></procedureTrigger>"
     },
     {
+        "name":"tickLimitC",
+        "pre":"<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\">",
+        "suf":"</tickLimit></procedureTrigger>"
+    },
+    {
         "name":"numberLimitC",
         "pre":"<numberLimit class=\"irreplaceable\"><numberLimiting><numberLimitingHead></numberLimitingHead>",
         "suf":"<numberLimitingEnd></numberLimitingEnd></numberLimiting></numberLimit>"
@@ -98,5 +123,10 @@
         "name":"drawQuantityC",
         "pre":"<drawHead></drawHead><drawQuantity class=\"irreplaceable\">",
         "suf":"</drawQuantity><drawEnd></drawEnd>"
+    },
+    {
+        "name":"targetLimitC",
+        "pre":"<choose><targetLimit class=\"irreplaceable\">",
+        "suf":"</targetLimit></choose>"
     }
 ]

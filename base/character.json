@@ -22,6 +22,13 @@
         "position":"青龙"
     },
     {
+        "name":"李耳",
+        "id":9,
+        "title":"道法自然",
+        "health":3,
+        "position":"青龙"
+    },
+    {
         "name":"姚重华",
         "id":125,
         "title":"黜陟幽明",

@@ -13,7 +13,7 @@
     },
     {
         "name": "允中",
-        "content": "<tickingLimitC><actingStage></actingStage></tickingLimit><numberLimitC>一</numberLimitC></tickingLimitC>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><discard><discardRole class=\"irreplaceable\"><mostC><handCard></handCard></mostC>的<roleDefault></roleDefault></discardRole><eachC><discardBody1></discardBody1><discardedCard class=\"irreplaceable\"><choose><targetNumberLimit class=\"irreplaceable\">一张</targetNumberLimit><cardDefault></cardDefault></choose></discardedCard></discard></eachC></make><orBody></orBody><make><makeHead></makeHead><draw><drawer class=\"irreplaceable\"><leastC><handCard></handCard></leastC>的<roleDefault></roleDefault></drawer><eachC><drawQuantityC>一张</drawQuantityC></draw></eachC></make></or></can>。",
+        "content": "<actingStageCC>一</actingStageCC>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><discard><discardRole class=\"irreplaceable\"><mostC><handCard></handCard></mostC>的<roleDefault></roleDefault></discardRole><eachC><discardBody1></discardBody1><discardedCard class=\"irreplaceable\"><choose><targetNumberLimit class=\"irreplaceable\">一张</targetNumberLimit><cardDefault></cardDefault></choose></discardedCard></discard></eachC></make><orBody></orBody><make><makeHead></makeHead><draw><drawer class=\"irreplaceable\"><leastC><handCard></handCard></leastC>的<roleDefault></roleDefault></drawer><eachC><drawQuantityC>一张</drawQuantityC></draw></eachC></make></or></can>。",
         "role": [
             {
                 "id": 125,
@@ -51,7 +51,7 @@
     },
     {
         "name": "筹策",
-        "content": "锁定技，<whenC><you></you><whenUse><whenUseHead></whenUseHead><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenUseEnd></whenUseEnd></whenUse></whenC>，<draw><drawQuantityC>一张</drawQuantityC></draw>。",
+        "content": "锁定技，<whenC><you></you><whenUse><whenUseHead></whenUseHead><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenUseEnd></whenUseEnd></whenUse></whenC>，<drawCC>一张</drawCC>。",
         "role": [
             {
                 "id": 6,
@@ -63,13 +63,37 @@
     },
     {
         "name": "唯识",
-        "content": "<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><beforeActingStageStart></beforeActingStageStart></tickLimit></procedureTrigger>，<comparison><comparisonInitiator class=\"irreplaceable\"><you></you></comparisonInitiator><can><canHead></canHead><to><toHead1></toHead1><comparisonTarget class=\"irreplaceable\"><anyNumber></anyNumber>名<elseRole></elseRole></comparisonTarget><comparisonEnd></comparisonEnd></to></comparison></can>，<ifC><you></you><winComparison></winComparison>，<use><user class=\"irreplaceable\"><compareRole></compareRole></user><eachC><can><canHead></canHead><useBody></useBody><usedCard class=\"irreplaceable\"><choose><targetLimit class=\"irreplaceable\">一张<comparedCard></comparedCard></targetLimit></choose></usedCard></can></eachC></use></ifC>。若如此做，<currentC><turn></turn></currentC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。",
+        "content": "<tickLimitC><atActingStageStart></atActingStageStart></tickLimitC>，<comparison><comparisonInitiator class=\"irreplaceable\"><you></you></comparisonInitiator><can><canHead></canHead><to><toHead1></toHead1><comparisonTarget class=\"irreplaceable\"><anyNumber></anyNumber>名<elseRole></elseRole></comparisonTarget><comparisonEnd></comparisonEnd></to></comparison></can>，<ifC><you></you><winComparison></winComparison>，<use><user class=\"irreplaceable\"><compareRole></compareRole></user><eachC><can><canHead></canHead><useBody></useBody><usedCard class=\"irreplaceable\"><choose><targetLimit class=\"irreplaceable\">一张<comparedCard></comparedCard></targetLimit></choose></usedCard></can></eachC></use></ifC>。若如此做，<currentC><turn></turn></currentC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。",
         "role": [
             {
                 "id": 8,
                 "skill_order": 1,
                 "lore": "稽首唯識性，滿分清淨者",
                 "legend": "成唯識論"
+            }
+        ]
+    },
+    {
+        "name": "观复",
+        "content": "<actingStageCC>一</actingStageCC>，<ifC><thisC><stage></stage></thisC>未有<role></role><health></health>变化过</ifC>，<you></you><canC><discard><discardBody1></discardBody1><discardedCard class=\"irreplaceable\">所有<handCard></handCard></discardedCard></discard>并<drawCC>等量</drawCC></canC>。",
+        "role": [
+            {
+                "id": 9,
+                "skill_order": 1,
+                "lore": "萬物並作，動作生長，吾以觀復",
+                "legend": "老子"
+            }
+        ]
+    },
+    {
+        "name": "自然",
+        "content": "锁定技，<tickLimitC><atActingStageFinish></atActingStageFinish></tickLimitC>，<use><user class=\"irreplaceable\"><you></you></user><useBody></useBody><usedCard class=\"irreplaceable\"><targetLimitC>一张<card></card></targetLimitC></usedCard></use>，<exceptC>，<drawCC>一张</drawCC></exceptC>。",
+        "role": [
+            {
+                "id": 9,
+                "skill_order": 2,
+                "lore": "萬物並作，動作生長，吾以觀復",
+                "legend": "老子"
             }
         ]
     }
