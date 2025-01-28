@@ -29,6 +29,13 @@
         "position":"青龙"
     },
     {
+        "name":"列御寇",
+        "id":11,
+        "title":"衝虚真人",
+        "health":3,
+        "position":"青龙"
+    },
+    {
         "name":"姚重华",
         "id":125,
         "title":"黜陟幽明",

@@ -1,7 +1,7 @@
 [
     {
         "name": "玄德",
-        "content": "锁定技，<tickingLimitC><preparingStage></preparingStage></tickingLimitC>，<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawQuantityC><equalingC><lostHealth epithet='1'></lostHealth epithet='1'>一半(<roundUp><roundUp0></roundUp0></roundUp>)</equalingC>的</drawQuantityC></draw>。",
+        "content": "锁定技，<tickingLimitCC><preparingStage></preparingStage></tickingLimitCC>，<youDrawCC><equalingC><lostHealth epithet=\"1\"></lostHealth epithet=\"1\">一半(<roundUp><roundUp0></roundUp0></roundUp>)</equalingC>的</youDrawCC>。",
         "role": [
             {
                 "id": 125,
@@ -13,7 +13,7 @@
     },
     {
         "name": "允中",
-        "content": "<actingStageCC>一</actingStageCC>，<you></you><can><canHead></canHead><or><make><makeHead></makeHead><discard><discardRole class=\"irreplaceable\"><mostC><handCard></handCard></mostC>的<roleDefault></roleDefault></discardRole><eachC><discardBody1></discardBody1><discardedCard class=\"irreplaceable\"><choose><targetNumberLimit class=\"irreplaceable\">一张</targetNumberLimit><cardDefault></cardDefault></choose></discardedCard></discard></eachC></make><orBody></orBody><make><makeHead></makeHead><draw><drawer class=\"irreplaceable\"><leastC><handCard></handCard></leastC>的<roleDefault></roleDefault></drawer><eachC><drawQuantityC>一张</drawQuantityC></draw></eachC></make></or></can>。",
+        "content": "<actingStageCC>一</actingStageCC>，<youCanCC><or><makeC><discard><discardRole class=\"irreplaceable\"><mostC><handCard></handCard></mostC>的<roleDefault></roleDefault></discardRole><eachC><discardedCardC><choose><targetACardCC></targetACardCC></choose></discardedCardC></discard></eachC></makeC><orBody></orBody><makeC><draw><drawer class=\"irreplaceable\"><leastC><handCard></handCard></leastC>的<roleDefault></roleDefault></drawer><eachC><drawQuantityC>一张</drawQuantityC></draw></eachC></makeC></or></youCanCC>。",
         "role": [
             {
                 "id": 125,
@@ -26,7 +26,7 @@
     },
     {
         "name": "鸿志",
-        "content": "锁定技，<whenC><tickQuantifier>一名</tickQuantifier><role></role><whenEnteringDying></whenEnteringDying></whenC>，<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawQuantityC>两张</drawQuantityC></draw>；<whenC><tickQuantifier>一名</tickQuantifier><role></role><whenDie></whenDie></whenC>，<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawQuantityC>一张</drawQuantityC></draw>。",
+        "content": "锁定技，<whenCC><tickQuantifier>一名</tickQuantifier><role></role><whenEnteringDying></whenEnteringDying></whenCC>，<youDrawCC>两张</youDrawCC>；<whenCC><tickQuantifier>一名</tickQuantifier><role></role><whenDie></whenDie></whenCC>，<youDrawCC>一张</youDrawCC>。",
         "role": [
             {
                 "id": 2,
@@ -51,7 +51,7 @@
     },
     {
         "name": "筹策",
-        "content": "锁定技，<whenC><you></you><whenUse><whenUseHead></whenUseHead><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenUseEnd></whenUseEnd></whenUse></whenC>，<drawCC>一张</drawCC>。",
+        "content": "锁定技，<whenCC><you></you><whenUse><whenUseHead></whenUseHead><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenUseEnd></whenUseEnd></whenUse></whenCC>，<drawCC>一张</drawCC>。",
         "role": [
             {
                 "id": 6,
@@ -63,7 +63,7 @@
     },
     {
         "name": "唯识",
-        "content": "<tickLimitC><atActingStageStart></atActingStageStart></tickLimitC>，<comparison><comparisonInitiator class=\"irreplaceable\"><you></you></comparisonInitiator><can><canHead></canHead><to><toHead1></toHead1><comparisonTarget class=\"irreplaceable\"><anyNumber></anyNumber>名<elseRole></elseRole></comparisonTarget><comparisonEnd></comparisonEnd></to></comparison></can>，<ifC><you></you><winComparison></winComparison>，<use><user class=\"irreplaceable\"><compareRole></compareRole></user><eachC><can><canHead></canHead><useBody></useBody><usedCard class=\"irreplaceable\"><choose><targetLimit class=\"irreplaceable\">一张<comparedCard></comparedCard></targetLimit></choose></usedCard></can></eachC></use></ifC>。若如此做，<currentC><turn></turn></currentC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。",
+        "content": "<tickLimitC><atActingStageStart></atActingStageStart></tickLimitC>，<comparison><comparisonInitiator class=\"irreplaceable\"><you></you></comparisonInitiator><canC><comparisonTargetC><choose><targetNumberLimit class=\"irreplaceable\"><anyNumber></anyNumber>名</targetNumberLimit><targetElsRlC></targetElsRlC></choose></comparisonTargetC></comparison></canC>，<ifC><you></you><winComparison></winComparison>，<use><user class=\"irreplaceable\"><compareRole></compareRole></user><eachC><canC><useChooseC><target1zC></target1zC><targetLimit class=\"irreplaceable\"><comparedCard></comparedCard></targetLimit></useChooseC></canC></eachC></use></ifC>。若如此做，<crtTurnCC></crtTurnCC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。",
         "role": [
             {
                 "id": 8,
@@ -75,25 +75,37 @@
     },
     {
         "name": "观复",
-        "content": "<actingStageCC>一</actingStageCC>，<ifC><thisC><stage></stage></thisC>未有<role></role><health></health>变化过</ifC>，<you></you><canC><discard><discardBody1></discardBody1><discardedCard class=\"irreplaceable\">所有<handCard></handCard></discardedCard></discard>并<drawCC>等量</drawCC></canC>。",
+        "content": "<actingStageCC>一</actingStageCC>，<ifC><thisC><stage></stage></thisC>未有<role></role><health></health>变化过</ifC>，<youCanCC><and3><discardCC>所有<handCard></handCard></discardCC><and3Body></and3Body><drawCC>等量</drawCC></and3></youCanCC>。",
         "role": [
             {
                 "id": 9,
                 "skill_order": 1,
-                "lore": "萬物並作，動作生長，吾以觀復",
-                "legend": "老子"
+                "lore": "萬物並作，吾以觀其復",
+                "legend": "老子·道經·歸根"
             }
         ]
     },
     {
         "name": "自然",
-        "content": "锁定技，<tickLimitC><atActingStageFinish></atActingStageFinish></tickLimitC>，<use><user class=\"irreplaceable\"><you></you></user><useBody></useBody><usedCard class=\"irreplaceable\"><targetLimitC>一张<card></card></targetLimitC></usedCard></use>，<exceptC>，<drawCC>一张</drawCC></exceptC>。",
+        "content": "锁定技，<tickLimitC><atActingStageFinish></atActingStageFinish></tickLimitC>，<youUseChooseCC><targetACardCC></targetACardCC></youUseChooseCC>，<exceptC>，<drawCC>一张</drawCC></exceptC>。",
         "role": [
             {
                 "id": 9,
                 "skill_order": 2,
-                "lore": "萬物並作，動作生長，吾以觀復",
-                "legend": "老子"
+                "lore": "天法道，道法自然",
+                "legend": "老子·道經·象元"
+            }
+        ]
+    },
+    {
+        "name": "泊心",
+        "content": "<tickingLimitCC><gettingStage></gettingStage></tickingLimitCC>，<youCanCC>改为<drawC><drawQuantity class=\"irreplaceable\">x张</drawQuantity>(“x”为角色数与你已失去体力值和，至多为5)</drawC></youCanCC>。若如此做，<crtTurnCC></crtTurnCC><youUseC><card></card></youUseC>无法指定<self></self>为目标。",
+        "role": [
+            {
+                "id": 11,
+                "skill_order": 1,
+                "lore": "居太沖之極，浩然泊心",
+                "legend": "莊子注"
             }
         ]
     }

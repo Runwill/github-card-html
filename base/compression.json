@@ -1,8 +1,13 @@
 [
     {
+        "name":"crtTurnCC",
+        "pre":"<currentC><turn></turn></currentC>",
+        "suf":""
+    },
+    {
         "name":"actingStageCC",
-        "pre":"<tickingLimitC><actingStage></actingStage></tickingLimit><numberLimitC>",
-        "suf":"</numberLimitC></tickingLimitC>"
+        "pre":"<tickingLimitCC><actingStage></actingStage></tickingLimit><numberLimitC>",
+        "suf":"</numberLimitC></tickingLimitCC>"
     },
     {
         "name":"drawCC",
@@ -10,9 +15,64 @@
         "suf":"</drawQuantityC></draw>"
     },
     {
+        "name":"youDrawCC",
+        "pre":"<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawQuantityC>",
+        "suf":"</drawQuantityC></draw>"
+    },
+    {
+        "name":"discardCC",
+        "pre":"<discard><discardedCardC>",
+        "suf":"</discardedCardC></discard>"
+    },
+    {
+        "name":"whenCC",
+        "pre":"<tickLimitC><whenC>",
+        "suf":"</whenC></tickLimitC>"
+    },
+    {
+        "name":"tickingLimitCC",
+        "pre":"<tickingTimeLimitC><tickingLimit class=\"irreplaceable\">",
+        "suf":"</tickingLimit></tickingTimeLimitC>"
+    },
+    {
+        "name":"youUseChooseCC",
+        "pre":"<use><user class=\"irreplaceable\"><you></you></user><useChooseC>",
+        "suf":"</useChooseC></use>"
+    },
+    {
+        "name":"targetACardCC",
+        "pre":"<target1zC></target1zC><targetCardC></targetCardC>",
+        "suf":""
+    },
+    {
+        "name":"youCanCC",
+        "pre":"<you></you><canC>",
+        "suf":"</canC>"
+    },
+    {
+        "name":"target1zC",
+        "pre":"<targetNumberLimit class=\"irreplaceable\">一张</targetNumberLimit>",
+        "suf":""
+    },
+    {
+        "name":"targetCardC",
+        "pre":"<targetLimit class=\"irreplaceable\"><cardDefault></cardDefault></targetLimit>",
+        "suf":""
+    },
+    {
+        "name":"targetElsRlC",
+        "pre":"<targetLimit class=\"irreplaceable\"><elseRole></elseRole></targetLimit>",
+        "suf":""
+    },
+    {
+        "name":"useChooseC",
+        "pre":"<useBody></useBody><usedCard class=\"irreplaceable\"><choose>",
+        "suf":"</choose></usedCard>"
+    },
+    {
         "name":"whenC",
-        "pre":"<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\"><when><whenHead></whenHead>",
-        "suf":"</when></tickLimit></procedureTrigger>"
+        "pre":"<when><whenHead></whenHead>",
+        "suf":"</when>"
     },
     {
         "name":"eachC",
@@ -23,6 +83,11 @@
         "name":"equalingC",
         "pre":"<equaling><equalingHead0></equalingHead0>",
         "suf":"</equaling>"
+    },
+    {
+        "name":"makeC",
+        "pre":"<make><makeHead></makeHead>",
+        "suf":"</make>"
     },
     {
         "name":"ifC",
@@ -105,11 +170,6 @@
         "suf":"<cardQuoteRight></cardQuoteRight></cardQuote>"
     },
     {
-        "name":"tickingLimitC",
-        "pre":"<procedureTrigger class=\"irreplaceable\"><tickingTimeLimit class=\"irreplaceable\"><tickingLimit class=\"irreplaceable\">",
-        "suf":"</tickingLimit></tickingTimeLimit></procedureTrigger>"
-    },
-    {
         "name":"tickLimitC",
         "pre":"<procedureTrigger class=\"irreplaceable\"><tickLimit class=\"irreplaceable\">",
         "suf":"</tickLimit></procedureTrigger>"
@@ -125,8 +185,23 @@
         "suf":"</drawQuantity><drawEnd></drawEnd>"
     },
     {
-        "name":"targetLimitC",
-        "pre":"<choose><targetLimit class=\"irreplaceable\">",
-        "suf":"</targetLimit></choose>"
+        "name":"drawC",
+        "pre":"<draw><drawHead></drawHead>",
+        "suf":"<drawEnd></drawEnd></draw>"
+    },
+    {
+        "name":"discardedCardC",
+        "pre":"<discardBody1></discardBody1><discardedCard class=\"irreplaceable\">",
+        "suf":"</discardedCard>"
+    },
+    {
+        "name":"comparisonTargetC",
+        "pre":"<comparisonBody></comparisonBody><comparisonTarget class=\"irreplaceable\">",
+        "suf":"</comparisonTarget><comparisonEnd></comparisonEnd>"
+    },
+    {
+        "name":"youUseC",
+        "pre":"<use><user class=\"irreplaceable\"><you></you></user><useBody></useBody><usedCard class=\"irreplaceable\">",
+        "suf":"</usedCard></use>"
     }
 ]
