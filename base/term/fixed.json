@@ -649,7 +649,7 @@
         "part": [
             {
                 "cn": "被",
-                "en": "chooseHead"
+                "en": "passive"
             },
             {
                 "cn": "选择",
@@ -692,12 +692,14 @@
                 "termedPart": true
             },
             {
-                "cn": "目标",
+                "cn": "目标-生效",
+                "replace": "目标",
                 "en": "affectedRole",
                 "termedPart": true
             },
             {
-                "cn": "效果",
+                "cn": "效果-生效",
+                "replace": "效果",
                 "en": "effect",
                 "termedPart": true
             }
@@ -728,7 +730,8 @@
                 "en": "offsetEnd"
             },
             {
-                "cn": "目标",
+                "cn": "目标-抵消",
+                "replace": "目标",
                 "en": "offsetTarget",
                 "termedPart": true
             }
@@ -756,7 +759,11 @@
         "part": [
             {
                 "cn": "被",
-                "en": "moveHead"
+                "en": "passive"
+            },
+            {
+                "cn": "置于",
+                "en": "placeBody"
             },
             {
                 "cn": "移置",
@@ -781,10 +788,6 @@
             {
                 "cn": "获得",
                 "en": "moveBody5"
-            },
-            {
-                "cn": "置于",
-                "en": "moveBody6"
             },
             {
                 "cn": "移置者",
@@ -815,15 +818,15 @@
         "part": [
             {
                 "cn": "将",
-                "en": "beforePlaceHead"
+                "en": "patientMark"
             },
             {
                 "cn": "置于",
-                "en": "beforePlaceBody"
+                "en": "placeBody"
             },
             {
                 "cn": "前",
-                "en": "beforePlaceEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#abd1c4"
@@ -834,15 +837,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "beforePlacedHead"
+                "en": "passive"
             },
             {
                 "cn": "置于",
-                "en": "beforePlacedBody"
+                "en": "placeBody"
             },
             {
                 "cn": "前",
-                "en": "beforePlacedEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#abd1c4"
@@ -853,15 +856,15 @@
         "part": [
             {
                 "cn": "将",
-                "en": "whenPlaceHead"
+                "en": "patientMark"
             },
             {
                 "cn": "置于",
-                "en": "whenPlaceBody"
+                "en": "placeBody"
             },
             {
                 "cn": "时",
-                "en": "whenPlaceEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#abd1c4"
@@ -872,15 +875,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "whenPlacedHead"
+                "en": "passive"
             },
             {
                 "cn": "置于",
-                "en": "whenPlacedBody"
+                "en": "placeBody"
             },
             {
                 "cn": "时",
-                "en": "whenPlacedEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#abd1c4"
@@ -891,15 +894,15 @@
         "part": [
             {
                 "cn": "将",
-                "en": "afterPlaceHead"
+                "en": "patientMark"
             },
             {
                 "cn": "置于",
-                "en": "afterPlaceBody"
+                "en": "placeBody"
             },
             {
                 "cn": "后",
-                "en": "afterPlaceEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#abd1c4"
@@ -910,15 +913,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "afterPlacedHead"
+                "en": "passive"
             },
             {
                 "cn": "置于",
-                "en": "afterPlacedBody"
+                "en": "placeBody"
             },
             {
                 "cn": "后",
-                "en": "afterPlacedEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#abd1c4"
@@ -929,7 +932,7 @@
         "part": [
             {
                 "cn": "被",
-                "en": "faceHead"
+                "en": "passive"
             },
             {
                 "cn": "向置",
@@ -958,11 +961,11 @@
         "part": [
             {
                 "cn": "向置",
-                "en": "beforeFaceBody"
+                "en": "faceBody"
             },
             {
                 "cn": "前",
-                "en": "beforeFaceEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#d1abcc"
@@ -973,15 +976,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "beforeFacedHead"
+                "en": "passive"
             },
             {
                 "cn": "向置",
-                "en": "beforeFacedBody"
+                "en": "faceBody"
             },
             {
                 "cn": "前",
-                "en": "beforeFacedEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#d1abcc"
@@ -992,11 +995,11 @@
         "part": [
             {
                 "cn": "向置",
-                "en": "whenFaceBody"
+                "en": "faceBody"
             },
             {
                 "cn": "时",
-                "en": "whenFaceEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1007,15 +1010,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "whenFacedHead"
+                "en": "passive"
             },
             {
                 "cn": "向置",
-                "en": "whenFacedBody"
+                "en": "faceBody"
             },
             {
                 "cn": "时",
-                "en": "whenFacedEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1026,11 +1029,11 @@
         "part": [
             {
                 "cn": "向置",
-                "en": "afterFaceBody"
+                "en": "faceBody"
             },
             {
                 "cn": "后",
-                "en": "afterFaceEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1041,15 +1044,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "afterFacedHead"
+                "en": "passive"
             },
             {
                 "cn": "向置",
-                "en": "afterFacedBody"
+                "en": "faceBody"
             },
             {
                 "cn": "后",
-                "en": "afterFacedEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1060,7 +1063,7 @@
         "part": [
             {
                 "cn": "被",
-                "en": "backHead"
+                "en": "passive"
             },
             {
                 "cn": "背置",
@@ -1089,11 +1092,11 @@
         "part": [
             {
                 "cn": "背置",
-                "en": "beforeBackBody"
+                "en": "backBody"
             },
             {
                 "cn": "前",
-                "en": "beforeBackEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1104,15 +1107,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "beforeBackedHead"
+                "en": "passive"
             },
             {
                 "cn": "背置",
-                "en": "beforeBackedBody"
+                "en": "backBody"
             },
             {
                 "cn": "前",
-                "en": "beforeBackedEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1123,11 +1126,11 @@
         "part": [
             {
                 "cn": "背置",
-                "en": "whenBackBody"
+                "en": "backBody"
             },
             {
                 "cn": "时",
-                "en": "whenBackEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1138,15 +1141,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "whenBackedHead"
+                "en": "passive"
             },
             {
                 "cn": "背置",
-                "en": "whenBackedBody"
+                "en": "backBody"
             },
             {
                 "cn": "时",
-                "en": "whenBackedEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1157,11 +1160,11 @@
         "part": [
             {
                 "cn": "背置",
-                "en": "afterBackBody"
+                "en": "backBody"
             },
             {
                 "cn": "后",
-                "en": "afterBackEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1172,15 +1175,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "afterBackedHead"
+                "en": "passive"
             },
             {
                 "cn": "背置",
-                "en": "afterBackedBody"
+                "en": "backBody"
             },
             {
                 "cn": "后",
-                "en": "afterBackedEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#d1abcc"
@@ -1212,11 +1215,11 @@
         "part": [
             {
                 "cn": "展示",
-                "en": "beforeShowHead"
+                "en": "showBody"
             },
             {
                 "cn": "前",
-                "en": "beforeShowEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#e4c8c0"
@@ -1227,15 +1230,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "beforeShownHead"
+                "en": "passive"
             },
             {
                 "cn": "展示",
-                "en": "beforeShownBody"
+                "en": "showBody"
             },
             {
                 "cn": "前",
-                "en": "beforeShownEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#e4c8c0"
@@ -1246,11 +1249,11 @@
         "part": [
             {
                 "cn": "展示",
-                "en": "whenShowHead"
+                "en": "showBody"
             },
             {
                 "cn": "时",
-                "en": "whenShowEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#e4c8c0"
@@ -1261,15 +1264,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "whenShownHead"
+                "en": "passive"
             },
             {
                 "cn": "展示",
-                "en": "whenShownBody"
+                "en": "showBody"
             },
             {
                 "cn": "时",
-                "en": "whenShownEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#e4c8c0"
@@ -1280,11 +1283,11 @@
         "part": [
             {
                 "cn": "展示",
-                "en": "afterShowHead"
+                "en": "showBody"
             },
             {
                 "cn": "后",
-                "en": "afterShowEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#e4c8c0"
@@ -1295,15 +1298,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "afterShownHead"
+                "en": "passive"
             },
             {
                 "cn": "展示",
-                "en": "afterShownBody"
+                "en": "showBody"
             },
             {
                 "cn": "后",
-                "en": "afterShownEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#e4c8c0"
@@ -1314,11 +1317,11 @@
         "part": [
             {
                 "cn": "被",
-                "en": "discardHead"
+                "en": "passive"
             },
             {
                 "cn": "弃置",
-                "en": "discardBody1"
+                "en": "discardBody"
             },
             {
                 "cn": "弃",
@@ -1343,11 +1346,11 @@
         "part": [
             {
                 "cn": "弃置",
-                "en": "beforeDiscardHead"
+                "en": "discardBody"
             },
             {
                 "cn": "前",
-                "en": "beforeDiscardEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#acd1ab"
@@ -1358,15 +1361,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "beforeDiscardedHead"
+                "en": "passive"
             },
             {
                 "cn": "弃置",
-                "en": "beforeDiscardedBody"
+                "en": "discardBody"
             },
             {
                 "cn": "前",
-                "en": "beforeDiscardedEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#acd1ab"
@@ -1377,11 +1380,11 @@
         "part": [
             {
                 "cn": "弃置",
-                "en": "whenDiscardHead"
+                "en": "discardBody"
             },
             {
                 "cn": "时",
-                "en": "whenDiscardEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#acd1ab"
@@ -1392,15 +1395,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "whenDiscardedHead"
+                "en": "passive"
             },
             {
                 "cn": "弃置",
-                "en": "whenDiscardedBody"
+                "en": "discardBody"
             },
             {
                 "cn": "时",
-                "en": "whenDiscardedEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#acd1ab"
@@ -1411,11 +1414,11 @@
         "part": [
             {
                 "cn": "弃置",
-                "en": "afterDiscardHead"
+                "en": "discardBody"
             },
             {
                 "cn": "后",
-                "en": "afterDiscardEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#acd1ab"
@@ -1426,15 +1429,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "afterDiscardedHead"
+                "en": "passive"
             },
             {
                 "cn": "弃置",
-                "en": "afterDiscardedBody"
+                "en": "discardBody"
             },
             {
                 "cn": "后",
-                "en": "afterDiscardedEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#acd1ab"
@@ -1448,7 +1451,8 @@
                 "en": "drawHead"
             },
             {
-                "cn": "牌",
+                "cn": "牌-摸牌",
+                "replace": "牌",
                 "en": "drawEnd"
             },
             {
@@ -1485,11 +1489,11 @@
         "part": [
             {
                 "cn": "对",
-                "en": "useTo"
+                "en": "directedMark"
             },
             {
                 "cn": "被",
-                "en": "usePassive"
+                "en": "passive"
             },
             {
                 "cn": "使用",
@@ -1501,12 +1505,14 @@
                 "termedPart": true
             },
             {
-                "cn": "目标",
+                "cn": "目标-使用",
+                "replace": "目标",
                 "en": "useTarget",
                 "termedPart": true
             },
             {
-                "cn": "对应实体牌",
+                "cn": "对应实体牌-使用",
+                "replace": "对应实体牌",
                 "en": "usedPhysicalCard",
                 "termedPart": true
             },
@@ -1524,11 +1530,11 @@
         "part": [
             {
                 "cn": "使用",
-                "en": "beforeUseHead"
+                "en": "useBody"
             },
             {
                 "cn": "前",
-                "en": "beforeUseEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#91d595"
@@ -1539,15 +1545,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "beforeUsedHead"
+                "en": "passive"
             },
             {
                 "cn": "使用",
-                "en": "beforeUsedBody"
+                "en": "useBody"
             },
             {
                 "cn": "前",
-                "en": "beforeUsedEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#91d595"
@@ -1558,11 +1564,11 @@
         "part": [
             {
                 "cn": "使用",
-                "en": "whenUseHead"
+                "en": "useBody"
             },
             {
                 "cn": "时",
-                "en": "whenUseEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#91d595"
@@ -1573,15 +1579,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "whenUsedHead"
+                "en": "passive"
             },
             {
                 "cn": "使用",
-                "en": "whenUsedBody"
+                "en": "useBody"
             },
             {
                 "cn": "时",
-                "en": "whenUsedEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#91d595"
@@ -1592,11 +1598,11 @@
         "part": [
             {
                 "cn": "使用",
-                "en": "afterUseHead"
+                "en": "useBody"
             },
             {
                 "cn": "后",
-                "en": "afterUseEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#91d595"
@@ -1607,15 +1613,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "afterUsedHead"
+                "en": "passive"
             },
             {
                 "cn": "使用",
-                "en": "afterUsedBody"
+                "en": "useBody"
             },
             {
                 "cn": "后",
-                "en": "afterUsedEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#91d595"
@@ -1626,7 +1632,7 @@
         "part": [
             {
                 "cn": "被",
-                "en": "playHead"
+                "en": "passive"
             },
             {
                 "cn": "打出",
@@ -1638,12 +1644,14 @@
                 "termedPart": true
             },
             {
-                "cn": "目标",
+                "cn": "目标-打出",
+                "replace": "目标",
                 "en": "playTarget",
                 "termedPart": true
             },
             {
-                "cn": "对应实体牌",
+                "cn": "对应实体牌-打出",
+                "replace": "对应实体牌",
                 "en": "playedPhysicalCard",
                 "termedPart": true
             },
@@ -1653,7 +1661,8 @@
                 "termedPart": true
             },
             {
-                "cn": "效果",
+                "cn": "效果-打出",
+                "replace": "效果",
                 "en": "playEffect",
                 "termedPart": true
             }
@@ -1666,11 +1675,11 @@
         "part": [
             {
                 "cn": "打出",
-                "en": "beforePlayHead"
+                "en": "playBody"
             },
             {
                 "cn": "前",
-                "en": "beforePlayEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#d1e9d3"
@@ -1681,15 +1690,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "beforePlayedHead"
+                "en": "passive"
             },
             {
                 "cn": "打出",
-                "en": "beforePlayedBody"
+                "en": "playBody"
             },
             {
                 "cn": "前",
-                "en": "beforePlayedEnd"
+                "en": "beforeEnd"
             }
         ],
         "color": "#d1e9d3"
@@ -1700,11 +1709,11 @@
         "part": [
             {
                 "cn": "打出",
-                "en": "whenPlayHead"
+                "en": "playBody"
             },
             {
                 "cn": "时",
-                "en": "whenPlayEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#d1e9d3"
@@ -1715,15 +1724,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "whenPlayedHead"
+                "en": "passive"
             },
             {
                 "cn": "打出",
-                "en": "whenPlayedBody"
+                "en": "playBody"
             },
             {
                 "cn": "时",
-                "en": "whenPlayedEnd"
+                "en": "whenEnd"
             }
         ],
         "color": "#d1e9d3"
@@ -1734,11 +1743,11 @@
         "part": [
             {
                 "cn": "打出",
-                "en": "afterPlayHead"
+                "en": "playBody"
             },
             {
                 "cn": "后",
-                "en": "afterPlayEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#d1e9d3"
@@ -1749,15 +1758,15 @@
         "part": [
             {
                 "cn": "被",
-                "en": "afterPlayedHead"
+                "en": "passive"
             },
             {
                 "cn": "打出",
-                "en": "afterPlayedBody"
+                "en": "playBody"
             },
             {
                 "cn": "后",
-                "en": "afterPlayedEnd"
+                "en": "afterEnd"
             }
         ],
         "color": "#d1e9d3"
@@ -1768,7 +1777,7 @@
         "part": [
             {
                 "cn": "与",
-                "en": "comparisonBody"
+                "en": "reciprocalMark"
             },
             {
                 "cn": "拼点",
@@ -1780,12 +1789,14 @@
                 "termedPart": true
             },
             {
-                "cn": "目标",
+                "cn": "目标-拼点",
+                "replace": "目标",
                 "en": "comparisonTarget",
                 "termedPart": true
             },
             {
-                "cn": "效果",
+                "cn": "效果-拼点",
+                "replace": "效果",
                 "en": "comparisonEffect",
                 "termedPart": true
             }
@@ -1853,11 +1864,11 @@
         "part": [
             {
                 "cn": "造成",
-                "en": "damageBody0"
+                "en": "dealtBody"
             },
             {
                 "cn": "受到",
-                "en": "damageBody1"
+                "en": "takeBody"
             },
             {
                 "cn": "伤害",
@@ -1887,7 +1898,7 @@
         "part": [
             {
                 "cn": "造成",
-                "en": "beforeDamageBody"
+                "en": "dealtBody"
             },
             {
                 "cn": "伤害前",
@@ -1902,11 +1913,11 @@
         "part": [
             {
                 "cn": "受到",
-                "en": "beforeDamagedBody"
+                "en": "takeBody"
             },
             {
                 "cn": "伤害前",
-                "en": "beforeDamagedEnd"
+                "en": "beforeDamageEnd"
             }
         ],
         "color": "#d1abab"
@@ -1917,7 +1928,7 @@
         "part": [
             {
                 "cn": "造成",
-                "en": "whenDamageBody"
+                "en": "dealtBody"
             },
             {
                 "cn": "伤害时",
@@ -1932,11 +1943,11 @@
         "part": [
             {
                 "cn": "受到",
-                "en": "whenDamagedBody"
+                "en": "takeBody"
             },
             {
                 "cn": "伤害时",
-                "en": "whenDamagedEnd"
+                "en": "whenDamageEnd"
             }
         ],
         "color": "#d1abab"
@@ -1947,7 +1958,7 @@
         "part": [
             {
                 "cn": "造成",
-                "en": "afterDamageBody"
+                "en": "dealtBody"
             },
             {
                 "cn": "伤害后",
@@ -1962,11 +1973,11 @@
         "part": [
             {
                 "cn": "受到",
-                "en": "afterDamagedBody"
+                "en": "takeBody"
             },
             {
                 "cn": "伤害后",
-                "en": "afterDamagedEnd"
+                "en": "afterDamageEnd"
             }
         ],
         "color": "#d1abab"
@@ -2099,7 +2110,7 @@
             },
             {
                 "cn": "内",
-                "en": "inTickingEnd"
+                "en": "inEnd"
             }
         ],
         "color": "#fddeec"
@@ -2110,7 +2121,8 @@
         "color": "#d7e8b0"
     },
     {
-        "cn": "角色",
+        "cn": "角色-存活角色",
+        "replace": "角色",
         "en": "roleDefault",
         "color": "#b0d9e8"
     },
@@ -2130,7 +2142,8 @@
         "color": "#f0a2a2"
     },
     {
-        "cn": "死亡",
+        "cn": "死亡-形容词",
+        "replace": "死亡",
         "en": "dead",
         "color": "#e1e1e1"
     },
@@ -2165,7 +2178,7 @@
             },
             {
                 "cn": "家",
-                "en": "nextSeatEnd"
+                "en": "seatEnd"
             }
         ],
         "color": "#96add9"
@@ -2180,7 +2193,7 @@
             },
             {
                 "cn": "家",
-                "en": "previousSeatEnd"
+                "en": "seatEnd"
             }
         ],
         "color": "#d99696"
@@ -2196,7 +2209,7 @@
         "part": [
             {
                 "cn": "与",
-                "en": "distanceHead"
+                "en": "reciprocalMark"
             },
             {
                 "cn": "距离",
@@ -2278,7 +2291,7 @@
         "part": [
             {
                 "cn": "在",
-                "en": "inReachHead"
+                "en": "inHead"
             },
             {
                 "cn": "范围内",
@@ -2308,7 +2321,8 @@
         "color": "#f4ecea"
     },
     {
-        "cn": "牌",
+        "cn": "牌-手牌或装备区内的牌",
+        "replace": "牌",
         "en": "cardDefault",
         "color": "#c9d8c8"
     },
@@ -2344,11 +2358,11 @@
         "part": [
             {
                 "cn": "在",
-                "en": "inAreaHead"
+                "en": "inHead"
             },
             {
                 "cn": "内",
-                "en": "inAreaEnd"
+                "en": "inEnd"
             }
         ],
         "color": "#fddeec"
@@ -2359,7 +2373,7 @@
         "part": [
             {
                 "cn": "在",
-                "en": "outAreaHead"
+                "en": "inHead"
             },
             {
                 "cn": "外",
@@ -2396,7 +2410,7 @@
         "part": [
             {
                 "cn": "对",
-                "en": "visibleHead"
+                "en": "directedMark"
             },
             {
                 "cn": "可见",
@@ -2559,16 +2573,16 @@
         "color": "#ebf1be"
     },
     {
-        "en": "to",
+        "en": "actionType",
         "cn": "对/与作用域",
         "part": [
             {
                 "cn": "对",
-                "en": "toHead0"
+                "en": "directedMark"
             },
             {
                 "cn": "与",
-                "en": "toHead1"
+                "en": "reciprocalMark"
             }
         ],
         "color": "#9ed19a"
@@ -2640,34 +2654,21 @@
         "color": "#f4defd"
     },
     {
-        "en": "and",
-        "cn": "且作用域",
+        "en": "coordination",
+        "cn": "并列作用域",
         "part": [
             {
                 "cn": "且",
-                "en": "andBody"
-            }
-        ],
-        "color": "#fdeade"
-    },
-    {
-        "en": "and2",
-        "cn": "与作用域",
-        "part": [
+                "en": "stativeCoordination"
+            },
             {
-                "cn": "与",
-                "en": "and2Body"
-            }
-        ],
-        "color": "#fdeade"
-    },
-    {
-        "en": "and3",
-        "cn": "并作用域",
-        "part": [
+                "cn": "与-名词并列",
+                "replace": "与",
+                "en": "nominalCoordination"
+            },
             {
                 "cn": "并",
-                "en": "and3Body"
+                "en": "actionCoordination"
             }
         ],
         "color": "#fdeade"

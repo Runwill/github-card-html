@@ -7,7 +7,10 @@ function textReplace(path,mode) {
                         element.i = i
                         if (!element.classList.contains('irreplaceable') && !(term[i].irreplaceable)) {
                             if (!term[i].epithet) {
-                                if (term[i].cn) element.innerHTML = term[i].cn
+                                if(term[i].cn) {
+                                    if(term[i].replace) element.innerHTML = term[i].replace
+                                    else element.innerHTML = term[i].cn
+                                }
                                 else element.innerHTML = term[i].en
                             }
                             else {
@@ -77,7 +80,10 @@ function textReplace(path,mode) {
                 for (var j in term[i].part) {//替换
                     document.querySelectorAll(term[i].part[j].en).forEach(
                         element => {
-                            if(!element.classList.contains('irreplaceable'))element.innerHTML = term[i].part[j].cn
+                            if(!element.classList.contains('irreplaceable')){
+                                if(term[i].part[j].hasOwnProperty('replace'))element.innerHTML = term[i].part[j].replace
+                                else element.innerHTML = term[i].part[j].cn
+                            }
                         }
                     )
                 }

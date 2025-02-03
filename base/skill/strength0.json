@@ -51,7 +51,7 @@
     },
     {
         "name": "筹策",
-        "content": "锁定技，<whenCC><you></you><whenUse><whenUseHead></whenUseHead><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenUseEnd></whenUseEnd></whenUse></whenCC>，<drawCC>一张</drawCC>。",
+        "content": "锁定技，<whenCC><you></you><whenUse><useBody></useBody><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenEnd></whenEnd></whenUse></whenCC>，<drawCC>一张</drawCC>。",
         "role": [
             {
                 "id": 6,
@@ -63,7 +63,7 @@
     },
     {
         "name": "唯识",
-        "content": "<tickLimitC><atActingStageStart></atActingStageStart></tickLimitC>，<comparison><comparisonInitiator class=\"irreplaceable\"><you></you></comparisonInitiator><canC><comparisonTargetC><choose><targetNumberLimit class=\"irreplaceable\"><anyNumber></anyNumber>名</targetNumberLimit><targetElsRlC></targetElsRlC></choose></comparisonTargetC></comparison></canC>，<ifC><you></you><winComparison></winComparison>，<use><user class=\"irreplaceable\"><compareRole></compareRole></user><eachC><canC><useChooseC><target1zC></target1zC><targetLimit class=\"irreplaceable\"><comparedCard></comparedCard></targetLimit></useChooseC></canC></eachC></use></ifC>。若如此做，<crtTurnCC></crtTurnCC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。",
+        "content": "<tickLimitC><atActingStageStart></atActingStageStart></tickLimitC>，<you></you><canC><comparison><comparisonTargetC><choose><targetNumberLimit class=\"irreplaceable\"><anyNumber></anyNumber>名</targetNumberLimit><targetElsRlC></targetElsRlC></choose></comparisonTargetC></comparison></canC>，<ifC><you></you><winComparison></winComparison>，<use><user class=\"irreplaceable\"><compareRole></compareRole></user><eachC><canC><useChooseC><target1zC></target1zC><targetLimit class=\"irreplaceable\"><comparedCard></comparedCard></targetLimit></useChooseC></canC></eachC></use></ifC>。若如此做，<crtTurnCC></crtTurnCC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。",
         "role": [
             {
                 "id": 8,
@@ -75,7 +75,7 @@
     },
     {
         "name": "观复",
-        "content": "<actingStageCC>一</actingStageCC>，<ifC><thisC><stage></stage></thisC>未有<role></role><health></health>变化过</ifC>，<youCanCC><and3><discardCC>所有<handCard></handCard></discardCC><and3Body></and3Body><drawCC>等量</drawCC></and3></youCanCC>。",
+        "content": "<actingStageCC>一</actingStageCC>，<ifC><thisC><stage></stage></thisC>未有<role></role><health></health>变化过</ifC>，<youCanCC><coordination><discardCC>所有<handCard></handCard></discardCC><actionCoordination></actionCoordination><drawCC>等量</drawCC></coordination></youCanCC>。",
         "role": [
             {
                 "id": 9,

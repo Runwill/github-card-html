@@ -256,7 +256,7 @@
                                                                 一项<attribute></attribute>。整型变量。
                                                             </div>
                                                             <div class="indent">
-                                                                满足<numberLimit></numberLimit>，即<and>存在正在<advance></advance>的<ticking></ticking>符合<thisC><tickingTimeLimit></tickingTimeLimit></thisC>的<tickingLimit></tickingLimit>，<andBody></andBody><inTicking>该<ticking></ticking><inTickingEnd></inTickingEnd></inTicking><currentC><procedure></procedure></currentC>的执行次数<lessC><procedure></procedure>的<numberLimit></numberLimit></lessC></and>。
+                                                                满足<numberLimit></numberLimit>，即<coordination>存在正在<advance></advance>的<ticking></ticking>符合<thisC><tickingTimeLimit></tickingTimeLimit></thisC>的<tickingLimit></tickingLimit>，<stativeCoordination></stativeCoordination><inTicking>该<ticking></ticking><inEnd></inEnd></inTicking><currentC><procedure></procedure></currentC>的执行次数<lessC><procedure></procedure>的<numberLimit></numberLimit></lessC></coordination>。
                                                             </div>
                                                             <padding>
                                                                 <h3><numberLimiting class="scroll"><numberLimitingHead></numberLimitingHead>……<numberLimitingEnd /></numberLimitingHead></h3>
@@ -294,7 +294,7 @@
                                                                 )
                                                             })
                                                         </script>
-                                                        <tickLimit></tickLimit>中存在量词时，<ifC><and>对应<object></object>可能不唯一<andBody></andBody>不为全称量词</and>，则对<every><tickQuantifier><everyHead></everyHead>个</tickQuantifier><object></object></every><eachC>触发一次</eachC>，<else></else>，量词可省略</ifC>。
+                                                        <tickLimit></tickLimit>中存在量词时，<ifC><coordination>对应<object></object>可能不唯一<stativeCoordination></stativeCoordination>不为全称量词</coordination>，则对<every><tickQuantifier><everyHead></everyHead>个</tickQuantifier><object></object></every><eachC>触发一次</eachC>，<else></else>，量词可省略</ifC>。
                                                     </div>
                                                     <padding>
                                                         <h3><when class="scroll"><whenHead></whenHead>……</when></h3>
@@ -312,7 +312,7 @@
                                         </padding>
                                         <h2><priority class="scroll" /></h2>
                                         <div class="indent">
-                                            <characterSkill></characterSkill>><equipmentSkill></equipmentSkill>><card></card>>其他，<ifC>同级<ifBody></ifBody>按照从<or><living></living>的<currentTurnRole></currentTurnRole><orBody></orBody><dead></dead>的<currentTurnRole></currentTurnRole>的<nextSeat><nextSeatHead></nextSeatHead><nextSeatEnd></nextSeatEnd></nextSeat></or>开始的<seatOrder></seatOrder>顺序</ifC>。
+                                            <characterSkill></characterSkill>><equipmentSkill></equipmentSkill>><card></card>>其他，<ifC>同级<ifBody></ifBody>按照从<or><living></living>的<currentTurnRole></currentTurnRole><orBody></orBody><dead></dead>的<currentTurnRole></currentTurnRole>的<nextSeat><nextSeatHead></nextSeatHead><seatEnd></seatEnd></nextSeat></or>开始的<seatOrder></seatOrder>顺序</ifC>。
                                         </div>
                                         <h2><you class="scroll" /></h2>
                                         <div class="indent">
@@ -539,13 +539,13 @@
                                             </padding>
                                             <h3><move class="scroll"><moveBody0 /></move></h3>
                                             <div class="indent">
-                                                一类<event></event>。可称为<move><moveBody1></moveBody1></move>或<move><moveBody6></moveBody6></move>。
+                                                一类<event></event>。可称为<move><moveBody1></moveBody1></move>或<move><placeBody></placeBody></move>。
                                             </div>
                                             <div class="indent">
-                                                <ifC><move><movedCard></movedCard></move><outArea><outAreaHead></outAreaHead><move><movedInArea></movedInArea></move><outAreaEnd></outAreaEnd></outArea>，<ifBody></ifBody>可称为<or><move><moveBody2></moveBody2></move><orBody></orBody><move><moveBody4></moveBody4></move></or></ifC>。
+                                                <ifC><move><movedCard></movedCard></move><outArea><inHead></inHead><move><movedInArea></movedInArea></move><outAreaEnd></outAreaEnd></outArea>，<ifBody></ifBody>可称为<or><move><moveBody2></moveBody2></move><orBody></orBody><move><moveBody4></moveBody4></move></or></ifC>。
                                             </div>
                                             <div class="indent">
-                                                <ifC><and><move><movedCard></movedCard></move><outArea><outAreaHead></outAreaHead><move><movedInArea></movedInArea></move><outAreaEnd></outAreaEnd></outArea>，<andBody></andBody><move><movedInArea></movedInArea></move>为一名<role></role>的<HandCard></HandCard></and>，<ifBody></ifBody>可称为<move><moveBody5></moveBody5></move></ifC>。
+                                                <ifC><coordination><move><movedCard></movedCard></move><outArea><inHead></inHead><move><movedInArea></movedInArea></move><outAreaEnd></outAreaEnd></outArea>，<stativeCoordination></stativeCoordination><move><movedInArea></movedInArea></move>为一名<role></role>的<HandCard></HandCard></coordination>，<ifBody></ifBody>可称为<move><moveBody5></moveBody5></move></ifC>。
                                             </div>
                                             <div class="indent">
                                                 包含以下输入：
@@ -574,16 +574,16 @@
                                             <padding>
                                                 <div class="h">
                                                     <div class="indent">
-                                                        <ifC>存在<move><moveRole></moveRole></move>，<ifBody></ifBody><advance></advance><tick></tick>“<beforePlace class="scroll bold"><beforePlaceBody></beforePlaceBody><beforePlaceEnd></beforePlaceEnd></beforePlace>”</ifC>。
+                                                        <ifC>存在<move><moveRole></moveRole></move>，<ifBody></ifBody><advance></advance><tick></tick>“<beforePlace class="scroll bold"><placeBody></placeBody><beforeEnd></beforeEnd></beforePlace>”</ifC>。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforePlaced class="scroll bold"><beforePlacedHead></beforePlacedHead><beforePlacedBody></beforePlacedBody><beforePlacedEnd></beforePlacedEnd></beforePlaced>”。
+                                                        <advance></advance><tick></tick>“<beforePlaced class="scroll bold"><passive></passive><placeBody></placeBody><beforeEnd></beforeEnd></beforePlaced>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <ifC>存在<move><moveRole></moveRole></move>，<ifBody></ifBody><advance></advance><tick></tick>“<whenPlace class="scroll bold"><whenPlaceBody></whenPlaceBody><whenPlaceEnd></whenPlaceEnd></whenPlace>”</ifC>。
+                                                        <ifC>存在<move><moveRole></moveRole></move>，<ifBody></ifBody><advance></advance><tick></tick>“<whenPlace class="scroll bold"><placeBody></placeBody><whenEnd></whenEnd></whenPlace>”</ifC>。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenPlaced class="scroll bold"><whenPlacedHead></whenPlacedHead><whenPlacedBody></whenPlacedBody><whenPlacedEnd></whenPlacedEnd></whenPlaced>”：
+                                                        <advance></advance><tick></tick>“<whenPlaced class="scroll bold"><passive></passive><placeBody></placeBody><whenEnd></whenEnd></whenPlaced>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
@@ -596,10 +596,10 @@
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <ifC>存在<move><moveRole></moveRole></move>，<ifBody></ifBody><advance></advance><tick></tick>“<afterPlace class="scroll bold"><afterPlaceBody></afterPlaceBody><afterPlaceEnd></afterPlaceEnd></afterPlace>”</ifC>。
+                                                        <ifC>存在<move><moveRole></moveRole></move>，<ifBody></ifBody><advance></advance><tick></tick>“<afterPlace class="scroll bold"><placeBody></placeBody><afterEnd></afterEnd></afterPlace>”</ifC>。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterPlaced class="scroll bold"><afterPlacedHead></afterPlacedHead><afterPlacedBody></afterPlacedBody><afterPlacedEnd></afterPlacedEnd></afterPlaced>”。
+                                                        <advance></advance><tick></tick>“<afterPlaced class="scroll bold"><passive></passive><placeBody></placeBody><afterEnd></afterEnd></afterPlaced>”。
                                                     </div>
                                                 </div>
                                             </padding>
@@ -626,16 +626,16 @@
                                             <padding>
                                                 <div class="h">
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeFace class="scroll bold"><beforeFaceBody></beforeFaceBody><beforeFaceEnd></beforeFaceEnd></beforeFace>”。
+                                                        <advance></advance><tick></tick>“<beforeFace class="scroll bold"><faceBody></faceBody><beforeEnd></beforeEnd></beforeFace>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeFaced class="scroll bold"><beforeFacedHead></beforeFacedHead><beforeFacedBody></beforeFacedBody><beforeFacedEnd></beforeFacedEnd></beforeFaced>”。
+                                                        <advance></advance><tick></tick>“<beforeFaced class="scroll bold"><passive></passive><faceBody></faceBody><beforeEnd></beforeEnd></beforeFaced>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenFace class="scroll bold"><whenFaceBody></whenFaceBody><whenFaceEnd></whenFaceEnd></whenFace>”。
+                                                        <advance></advance><tick></tick>“<whenFace class="scroll bold"><faceBody></faceBody><whenEnd></whenEnd></whenFace>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenFaced class="scroll bold"><whenFacedHead></whenFacedHead><whenFacedBody></whenFacedBody><whenFacedEnd></whenFacedEnd></whenFaced>”：
+                                                        <advance></advance><tick></tick>“<whenFaced class="scroll bold"><passive></passive><faceBody></faceBody><whenEnd></whenEnd></whenFaced>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
@@ -645,10 +645,10 @@
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterFace class="scroll bold"><afterFaceBody></afterFaceBody><afterFaceEnd></afterFaceEnd></afterFace>”。
+                                                        <advance></advance><tick></tick>“<afterFace class="scroll bold"><faceBody></faceBody><afterEnd></afterEnd></afterFace>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterFaced class="scroll bold"><afterFacedHead></afterFacedHead><afterFacedBody></afterFacedBody><afterFacedEnd></afterFacedEnd></afterFaced>”。
+                                                        <advance></advance><tick></tick>“<afterFaced class="scroll bold"><passive></passive><faceBody></faceBody><afterEnd></afterEnd></afterFaced>”。
                                                     </div>
                                                 </div>
                                             </padding>
@@ -675,16 +675,16 @@
                                             <padding>
                                                 <div class="h">
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeBack class="scroll bold"><beforeBackBody></beforeBackBody><beforeBackEnd></beforeBackEnd></beforeBack>”。
+                                                        <advance></advance><tick></tick>“<beforeBack class="scroll bold"><backBody></backBody><beforeEnd></beforeEnd></beforeBack>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeBacked class="scroll bold"><beforeBackedHead></beforeBackedHead><beforeBackedBody></beforeBackedBody><beforeBackedEnd></beforeBackedEnd></beforeBacked>”。
+                                                        <advance></advance><tick></tick>“<beforeBacked class="scroll bold"><passive></passive><backBody></backBody><beforeEnd></beforeEnd></beforeBacked>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenBack class="scroll bold"><whenBackBody></whenBackBody><whenBackEnd></whenBackEnd></whenBack>”。
+                                                        <advance></advance><tick></tick>“<whenBack class="scroll bold"><backBody></backBody><whenEnd></whenEnd></whenBack>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenBacked class="scroll bold"><whenBackedHead></whenBackedHead><whenBackedBody></whenBackedBody><whenBackedEnd></whenBackedEnd></whenBacked>”：
+                                                        <advance></advance><tick></tick>“<whenBacked class="scroll bold"><passive></passive><backBody></backBody><whenEnd></whenEnd></whenBacked>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
@@ -694,14 +694,14 @@
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterBack class="scroll bold"><afterBackBody></afterBackBody><afterBackEnd></afterBackEnd></afterBack>”。
+                                                        <advance></advance><tick></tick>“<afterBack class="scroll bold"><backBody></backBody><afterEnd></afterEnd></afterBack>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterBacked class="scroll bold"><afterBackedHead></afterBackedHead><afterBackedBody></afterBackedBody><afterBackedEnd></afterBackedEnd></afterBacked>”。
+                                                        <advance></advance><tick></tick>“<afterBacked class="scroll bold"><passive></passive><backBody></backBody><afterEnd></afterEnd></afterBacked>”。
                                                     </div>
                                                 </div>
                                             </padding>
-                                            <h3><discard class="scroll"><discardBody1></discardBody1></discard></h3>
+                                            <h3><discard class="scroll"><discardBody></discardBody></discard></h3>
                                             <div class="indent">
                                                 一类<event></event>。可简称为<discard><discardBody2></discardBody2></discard>。
                                             </div>
@@ -724,16 +724,16 @@
                                             <padding>
                                                 <div class="h">
                                                     <div class="indent">
-                                                        <ifC>存在<discard><discardRole></discardRole></discard>，<ifBody></ifBody><advance></advance><tick></tick>“<beforeDiscard class="scroll bold"><beforeDiscardHead></beforeDiscardHead><beforeDiscardEnd></beforeDiscardEnd></beforeDiscard>”</ifC>。
+                                                        <ifC>存在<discard><discardRole></discardRole></discard>，<ifBody></ifBody><advance></advance><tick></tick>“<beforeDiscard class="scroll bold"><discardBody></discardBody><beforeEnd></beforeEnd></beforeDiscard>”</ifC>。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeDiscarded class="scroll bold"><beforeDiscardedHead></beforeDiscardedHead><beforeDiscardedBody></beforeDiscardedBody><beforeDiscardedEnd></beforeDiscardedEnd></beforeDiscarded>”。
+                                                        <advance></advance><tick></tick>“<beforeDiscarded class="scroll bold"><passive></passive><discardBody></discardBody><beforeEnd></beforeEnd></beforeDiscarded>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <ifC>存在<discard><discardRole></discardRole></discard>，<ifBody></ifBody><advance></advance><tick></tick>“<whenDiscard class="scroll bold"><whenDiscardHead></whenDiscardHead><whenDiscardEnd></whenDiscardEnd></whenDiscard>”</ifC>。
+                                                        <ifC>存在<discard><discardRole></discardRole></discard>，<ifBody></ifBody><advance></advance><tick></tick>“<whenDiscard class="scroll bold"><discardBody></discardBody><whenEnd></whenEnd></whenDiscard>”</ifC>。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenDiscarded class="scroll bold"><whenDiscardedHead></whenDiscardedHead><whenDiscardedBody></whenDiscardedBody><whenDiscardedEnd></whenDiscardedEnd></whenDiscarded>”：
+                                                        <advance></advance><tick></tick>“<whenDiscarded class="scroll bold"><passive></passive><discardBody></discardBody><whenEnd></whenEnd></whenDiscarded>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
@@ -743,10 +743,10 @@
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <ifC>存在<discard><discardRole></discardRole></discard>，<ifBody></ifBody><advance></advance><tick></tick>“<afterDiscard class="scroll bold"><afterDiscardHead></afterDiscardHead><afterDiscardEnd></afterDiscardEnd></afterDiscard>”</ifC>。
+                                                        <ifC>存在<discard><discardRole></discardRole></discard>，<ifBody></ifBody><advance></advance><tick></tick>“<afterDiscard class="scroll bold"><discardBody></discardBody><afterEnd></afterEnd></afterDiscard>”</ifC>。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterDiscarded class="scroll bold"><afterDiscardedHead></afterDiscardedHead><afterDiscardedBody></afterDiscardedBody><afterDiscardedEnd></afterDiscardedEnd></afterDiscarded>”。
+                                                        <advance></advance><tick></tick>“<afterDiscarded class="scroll bold"><passive></passive><discardBody></discardBody><afterEnd></afterEnd></afterDiscarded>”。
                                                     </div>
                                                 </div>
                                             </padding>
@@ -821,23 +821,23 @@
                                             <padding>
                                                 <div class="h">
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeUse class="scroll bold"><beforeUseHead></beforeUseHead><beforeUseEnd></beforeUseEnd></beforeUse>”。
+                                                        <advance></advance><tick></tick>“<beforeUse class="scroll bold"><useBody></useBody><beforeEnd></beforeEnd></beforeUse>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeUsed class="scroll bold"><beforeUsedHead></beforeUsedHead><beforeUsedBody></beforeUsedBody><beforeUsedEnd></beforeUsedEnd></beforeUsed>”：
+                                                        <advance></advance><tick></tick>“<beforeUsed class="scroll bold"><passive></passive><useBody></useBody><beforeEnd></beforeEnd></beforeUsed>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
                                                             <div class="indent">
-                                                                <move>将<movedCard class="irreplaceable"><use><usedPhysicalCard></usedPhysicalCard></use></movedCard><moveBody6></moveBody6><movedInArea class="irreplaceable"><top><treatmentArea></treatmentArea><topEnd></topEnd></top></movedInArea></move>。
+                                                                <move>将<movedCard class="irreplaceable"><use><usedPhysicalCard></usedPhysicalCard></use></movedCard><placeBody></placeBody><movedInArea class="irreplaceable"><top><treatmentArea></treatmentArea><topEnd></topEnd></top></movedInArea></move>。
                                                             </div>
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenUse class="scroll bold"><whenUseHead></whenUseHead><whenUseEnd></whenUseEnd></whenUse>”。
+                                                        <advance></advance><tick></tick>“<whenUse class="scroll bold"><useBody></useBody><whenEnd></whenEnd></whenUse>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenUsed class="scroll bold"><whenUsedHead></whenUsedHead><whenUsedBody></whenUsedBody><whenUsedEnd></whenUsedEnd></whenUsed>”：
+                                                        <advance></advance><tick></tick>“<whenUsed class="scroll bold"><passive></passive><useBody></useBody><whenEnd></whenEnd></whenUsed>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
@@ -847,10 +847,10 @@
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterUse class="scroll bold"><afterUseHead></afterUseHead><afterUseEnd></afterUseEnd></afterUse>”。
+                                                        <advance></advance><tick></tick>“<afterUse class="scroll bold"><useBody></useBody><afterEnd></afterEnd></afterUse>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterUsed class="scroll bold"><afterUsedHead></afterUsedHead><afterUsedBody></afterUsedBody><afterUsedEnd></afterUsedEnd></afterUsed>”：
+                                                        <advance></advance><tick></tick>“<afterUsed class="scroll bold"><passive></passive><useBody></useBody><afterEnd></afterEnd></afterUsed>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
@@ -896,23 +896,23 @@
                                             <padding>
                                                 <div class="h">
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforePlay class="scroll bold"><beforePlayHead></beforePlayHead><beforePlayEnd></beforePlayEnd></beforePlay>”。
+                                                        <advance></advance><tick></tick>“<beforePlay class="scroll bold"><playBody></playBody><beforeEnd></beforeEnd></beforePlay>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforePlayed class="scroll bold"><beforePlayedHead></beforePlayedHead><beforePlayedBody></beforePlayedBody><beforePlayedEnd></beforePlayedEnd></beforePlayed>”：
+                                                        <advance></advance><tick></tick>“<beforePlayed class="scroll bold"><passive></passive><playBody></playBody><beforeEnd></beforeEnd></beforePlayed>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
                                                             <div class="indent">
-                                                                <move>将<movedCard class="irreplaceable"><play><playedPhysicalCard></playedPhysicalCard></play></movedCard><moveBody6></moveBody6><movedInArea class="irreplaceable"><top><treatmentArea></treatmentArea><topEnd></topEnd></top></movedInArea></move>。
+                                                                <move>将<movedCard class="irreplaceable"><play><playedPhysicalCard></playedPhysicalCard></play></movedCard><placeBody></placeBody><movedInArea class="irreplaceable"><top><treatmentArea></treatmentArea><topEnd></topEnd></top></movedInArea></move>。
                                                             </div>
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenPlay class="scroll bold"><whenPlayHead></whenPlayHead><whenPlayEnd></whenPlayEnd></whenPlay>”。
+                                                        <advance></advance><tick></tick>“<whenPlay class="scroll bold"><playBody></playBody><whenEnd></whenEnd></whenPlay>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenPlayed class="scroll bold"><whenPlayedHead></whenPlayedHead><whenPlayedBody></whenPlayedBody><whenPlayedEnd></whenPlayedEnd></whenPlayed>”：
+                                                        <advance></advance><tick></tick>“<whenPlayed class="scroll bold"><passive></passive><playBody></playBody><whenEnd></whenEnd></whenPlayed>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
@@ -922,10 +922,10 @@
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterPlay class="scroll bold"><afterPlayHead></afterPlayHead><afterPlayEnd></afterPlayEnd></afterPlay>”。
+                                                        <advance></advance><tick></tick>“<afterPlay class="scroll bold"><playBody></playBody><afterEnd></afterEnd></afterPlay>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterPlayed class="scroll bold"><afterPlayedHead></afterPlayedHead><afterPlayedBody></afterPlayedBody><afterPlayedEnd></afterPlayedEnd></afterPlayed>”：
+                                                        <advance></advance><tick></tick>“<afterPlayed class="scroll bold"><passive></passive><playBody></playBody><afterEnd></afterEnd></afterPlayed>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
@@ -987,7 +987,7 @@
                                                 </div>
                                                 <h3><comparedCard class="scroll" /></h3>
                                                 <div class="indent">
-                                                    <whenComparison></whenComparison>的<choose><chooseHead></chooseHead><chooseBody></chooseBody></choose><card></card>。
+                                                    <whenComparison></whenComparison>的<choose><passive></passive><chooseBody></chooseBody></choose><card></card>。
                                                 </div>
                                                 <padding>
                                                     <h3><winComparison class="scroll" /></h3>
@@ -1001,7 +1001,7 @@
                                                 </padding>
                                                 <h3><compareRole class="scroll" /></h3>
                                                 <div class="indent">
-                                                    <comparison><comparisonEnd></comparisonEnd></comparison>的<and2><comparison><comparisonInitiator></comparisonInitiator></comparison><and2Body></and2Body><comparison><comparisonTarget></comparisonTarget></comparison></and2>。
+                                                    <comparison><comparisonEnd></comparisonEnd></comparison>的<actionType><comparison><comparisonInitiator></comparisonInitiator></comparison><reciprocalMark></reciprocalMark><comparison><comparisonTarget></comparisonTarget></comparison></actionType>。
                                                 </div>
                                                 <padding>
                                                     <h3><winComparisonRole class="scroll" /></h3>
@@ -1028,7 +1028,7 @@
                                             </padding>
                                             <h3><damage class="scroll"><damageEnd /></damage></h3>
                                             <div class="indent">
-                                                一类<event></event>。可称为<or><damage><damageBody0></damageBody0><damageEnd></damageEnd></damage><orBody></orBody><damage><damageBody1></damageBody1><damageEnd></damageEnd></damage></or>。
+                                                一类<event></event>。可称为<or><damage><dealtBody></dealtBody><damageEnd></damageEnd></damage><orBody></orBody><damage><takeBody></takeBody><damageEnd></damageEnd></damage></or>。
                                             </div>
                                             <div class="indent">
                                                 包含以下输入：
@@ -1053,16 +1053,16 @@
                                             <padding>
                                                 <div class="h">
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeDamage class="scroll bold"><beforeDamageBody></beforeDamageBody><beforeDamageEnd></beforeDamageEnd></beforeDamage>”。
+                                                        <advance></advance><tick></tick>“<beforeDamage class="scroll bold"><dealtBody></dealtBody><beforeDamageEnd></beforeDamageEnd></beforeDamage>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<beforeDamaged class="scroll bold"><beforeDamagedBody></beforeDamagedBody><beforeDamagedEnd></beforeDamagedEnd></beforeDamaged>”。
+                                                        <advance></advance><tick></tick>“<beforeDamaged class="scroll bold"><takeBody></takeBody><beforeDamageEnd></beforeDamageEnd></beforeDamaged>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenDamage class="scroll bold"><whenDamageBody></whenDamageBody><whenDamageEnd></whenDamageEnd></whenDamage>”。
+                                                        <advance></advance><tick></tick>“<whenDamage class="scroll bold"><dealtBody></dealtBody><whenDamageEnd></whenDamageEnd></whenDamage>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<whenDamaged class="scroll bold"><whenDamagedBody></whenDamagedBody><whenDamagedEnd></whenDamagedEnd></whenDamaged>”：
+                                                        <advance></advance><tick></tick>“<whenDamaged class="scroll bold"><takeBody></takeBody><whenDamageEnd></whenDamageEnd></whenDamaged>”：
                                                     </div>
                                                     <padding>
                                                         <div class="h">
@@ -1072,10 +1072,10 @@
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterDamage class="scroll bold"><afterDamageBody></afterDamageBody><afterDamageEnd></afterDamageEnd></afterDamage>”。
+                                                        <advance></advance><tick></tick>“<afterDamage class="scroll bold"><dealtBody></dealtBody><afterDamageEnd></afterDamageEnd></afterDamage>”。
                                                     </div>
                                                     <div class="indent">
-                                                        <advance></advance><tick></tick>“<afterDamaged class="scroll bold"><afterDamagedBody></afterDamagedBody><afterDamagedEnd></afterDamagedEnd></afterDamaged>”。
+                                                        <advance></advance><tick></tick>“<afterDamaged class="scroll bold"><takeBody></takeBody><afterDamageEnd></afterDamageEnd></afterDamaged>”。
                                                     </div>
                                                 </div>
                                             </padding>
@@ -1189,7 +1189,7 @@
                                                     <ifC><procedure></procedure>属于<currentTick></currentTick></ifC>，满足<numberLimit></numberLimit>；
                                                 </div>
                                                 <div class="indent">
-                                                    <ifC><procedure></procedure>不属于<currentTick></currentTick></ifC>，<and>满足<or><tickingTimeLimit></tickingTimeLimit><orBody></orBody><tickingTimeLimit></tickingTimeLimit>不存在</or><andBody></andBody>满足<tickLimit></tickLimit></and>；
+                                                    <ifC><procedure></procedure>不属于<currentTick></currentTick></ifC>，<coordination>满足<or><tickingTimeLimit></tickingTimeLimit><orBody></orBody><tickingTimeLimit></tickingTimeLimit>不存在</or><stativeCoordination></stativeCoordination>满足<tickLimit></tickLimit></coordination>；
                                                 </div>
                                                 <div class="indent">
                                                     <procedure></procedure>合法；
@@ -1236,7 +1236,7 @@
                                             一类<object></object>。<tick></tick>的集合。
                                         </div>
                                         <padding>
-                                            <h3><inTicking class="scroll"><<ticking></ticking>><inTickingEnd /></inTicking></h3>
+                                            <h3><inTicking class="scroll"><<ticking></ticking>><inEnd /></inTicking></h3>
                                             <div class="indent">
                                                 引用<ticking></ticking>。
                                             </div>
@@ -1373,9 +1373,9 @@
                                                 <role></role>的一项<attribute></attribute>。可简称为<reach epithet="1"></reach>。等于1。
                                             </div>
                                             <padding>
-                                                <h3><inReach class="scroll"><<pronoun1><roleDefault></roleDefault></pronoun1>><inReachHead></inReachHead><<pronoun2><roleDefault></roleDefault></pronoun2>><inReachEnd></inReachEnd></inReach></h3>
+                                                <h3><inReach class="scroll"><<pronoun1><roleDefault></roleDefault></pronoun1>><inHead></inHead><<pronoun2><roleDefault></roleDefault></pronoun2>><inReachEnd></inReachEnd></inReach></h3>
                                                 <div class="indent">
-                                                    <pronoun2>后者</pronoun2>的<reach></reach>不<lessC><distance><pronoun2>后者</pronoun2><distanceHead></distanceHead><pronoun1>前者</pronoun1>的<distanceEnd></distanceEnd></distance></lessC>。
+                                                    <pronoun2>后者</pronoun2>的<reach></reach>不<lessC><distance><pronoun2>后者</pronoun2><reciprocalMark></reciprocalMark><pronoun1>前者</pronoun1>的<distanceEnd></distanceEnd></distance></lessC>。
                                                 </div>
                                             </padding>
                                             <h3><seat class="scroll" /></h3>
@@ -1391,17 +1391,17 @@
                                                 <div class="indent">
                                                     <role></role>按照<seat></seat>由小到大排序组成的集合。规定<thisC>集合</thisC>末位的后位为首位，首位的前位为末位。
                                                 </div>
-                                                <h3><nextSeat class="scroll"><nextSeatHead></nextSeatHead>……<nextSeatEnd /></h3>
+                                                <h3><nextSeat class="scroll"><nextSeatHead></nextSeatHead>……<seatEnd /></h3>
                                                 <div class="indent">
-                                                    <seatOrder></seatOrder>中的后某名<living></living><role></role>，后一名则可简称为<nextSeat><nextSeatHead></nextSeatHead><nextSeatEnd></nextSeatEnd></nextSeat>。
+                                                    <seatOrder></seatOrder>中的后某名<living></living><role></role>，后一名则可简称为<nextSeat><nextSeatHead></nextSeatHead><seatEnd></seatEnd></nextSeat>。
                                                 </div>
-                                                <h3><previousSeat class="scroll"><previousSeatHead></previousSeatHead>……<previousSeatEnd /></h3>
+                                                <h3><previousSeat class="scroll"><previousSeatHead></previousSeatHead>……<seatEnd /></h3>
                                                 <div class="indent">
-                                                    <seatOrder></seatOrder>中的前某名<living></living><role></role>，前一名则可简称为<previousSeat><previousSeatHead></previousSeatHead><previousSeatEnd></previousSeatEnd></previousSeat>。
+                                                    <seatOrder></seatOrder>中的前某名<living></living><role></role>，前一名则可简称为<previousSeat><previousSeatHead></previousSeatHead><seatEnd></seatEnd></previousSeat>。
                                                 </div>
-                                                <h3><distance class="scroll"><<roleDefault></roleDefault>><distanceHead></distanceHead><<roleDefault></roleDefault>>的<distanceEnd></distanceEnd></distance></h3>
+                                                <h3><distance class="scroll"><<roleDefault></roleDefault>><reciprocalMark></reciprocalMark><<roleDefault></roleDefault>>的<distanceEnd></distanceEnd></distance></h3>
                                                 <div class="indent">
-                                                    等于<counts><seat></seat><and2>在<pronoun1 class="highlight">二者</pronoun1>之间<and2Body></and2Body>不在<pronoun1 class="highlight">二者</pronoun1>之间</and2>的除<pronoun1 class="highlight">其</pronoun1>外<roleDefault></roleDefault><countsEnd></countsEnd></counts>的<minC>值</minC>，<ifC><pronoun1 class="highlight"></pronoun1>不为同一<role></role>，至少为1，<else></else>，至少为0</ifC>。
+                                                    等于<counts><seat></seat><coordination>在<pronoun1 class="highlight">二者</pronoun1>之间<nominalCoordination></nominalCoordination>不在<pronoun1 class="highlight">二者</pronoun1>之间</coordination>的除<pronoun1 class="highlight">其</pronoun1>外<roleDefault></roleDefault><countsEnd></countsEnd></counts>的<minC>值</minC>，<ifC><pronoun1 class="highlight"></pronoun1>不为同一<role></role>，至少为1，<else></else>，至少为0</ifC>。
                                                 </div>
                                             </padding>
                                             <h3><currentTurnRole class="scroll" /></h3>
@@ -1416,7 +1416,7 @@
                                         <padding>
                                             <h3><cardDefault class="scroll" /></h3>
                                             <div class="indent">
-                                                <or><handCard></handCard><orBody></orBody><inArea><equipArea></equipArea><inAreaEnd></inAreaEnd></inArea></or>的<card></card>。
+                                                <or><handCard></handCard><orBody></orBody><inArea><equipArea></equipArea><inEnd></inEnd></inArea></or>的<card></card>。
                                             </div>
                                             <h3><lyingArea class="scroll" /></h3>
                                             <div class="indent">
@@ -1451,7 +1451,7 @@
                                             <h3><objectInArea class="scroll" /></h3>
                                             <div class="indent"><area></area>的一项属性。可变数组。
                                             </div>
-                                            <h3><inArea class="scroll"><<area></area>><inAreaEnd /></inArea></h3>
+                                            <h3><inArea class="scroll"><<area></area>><inEnd /></inArea></h3>
                                             <div class="indent">
                                                 在<area></area>的<objectInArea></objectInArea>中。
                                             </div>
@@ -1469,7 +1469,7 @@
                                             </div>
                                             <h3><visible class="scroll"><visibleBody></visibleBody></visible></h3>
                                             <div class="indent">
-                                                <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。<role></role>的集合。称为<or>集合中的<anyNumber></anyNumber><role></role><visible><visibleBody></visibleBody></visible><thisC><card></card></thisC><orBody></orBody><thisC><card></card></thisC><visible><visibleHead></visibleHead>集合中的<anyNumber></anyNumber><role></role><visibleBody></visibleBody></visible></or>。
+                                                <or><area></area><orBody></orBody><card></card></or>的一项<attribute></attribute>。<role></role>的集合。称为<or>集合中的<anyNumber></anyNumber><role></role><visible><visibleBody></visibleBody></visible><thisC><card></card></thisC><orBody></orBody><thisC><card></card></thisC><visible><directedMark></directedMark>集合中的<anyNumber></anyNumber><role></role><visibleBody></visibleBody></visible></or>。
                                             </div>
                                             <div class="indent">
                                                 <visible><visibleBody></visibleBody></visible>某<card></card>的<role></role><can></can>随时查看<thisC><card></card></thisC>。
@@ -1542,12 +1542,12 @@
                                             </div>
                                             <h3><hand class="scroll" /></h3>
                                             <div class="indent">
-                                                一种<area></area>。<apart epithet="1"></apart><against></against>。<visible><visibleHead></visibleHead>所属<role></role><visibleBody></visibleBody></visible>。
+                                                一种<area></area>。<apart epithet="1"></apart><against></against>。<visible><directedMark></directedMark>所属<role></role><visibleBody></visibleBody></visible>。
                                             </div>
                                             <padding>
                                                 <h3><handCard class="scroll" /></h3>
                                                 <div class="indent">
-                                                    <inArea><hand></hand><inAreaEnd></inAreaEnd></inArea>的<card></card>。
+                                                    <inArea><hand></hand><inEnd></inEnd></inArea>的<card></card>。
                                                 </div>
                                             </padding>
                                         </padding>
@@ -1575,18 +1575,18 @@
                                         <padding>
                                             <h3><attack class="scroll" /></h3>
                                             <div class="indent">
-                                                <tickingTimeLimitC><tickingLimit class="irreplaceable"><actingStage></actingStage></tickingLimit><numberLimitC>一</numberLimitC></tickingLimit></tickingTimeLimitC>，<to><use><toHead0></toHead0><useTarget class="irreplaceable"><choose><targetNumberLimit class="irreplaceable">一名</targetNumberLimit><distanceLimit class="irreplaceable"><inReach><inReachEnd></inReachEnd>的</inReach></distanceLimit><targetElsRlC></targetElsRlC></choose></useTarget><useBody></useBody></use></to>。
+                                                <tickingTimeLimitC><tickingLimit class="irreplaceable"><actingStage></actingStage></tickingLimit><numberLimitC>一</numberLimitC></tickingLimit></tickingTimeLimitC>，<actionType><use><directedMark></directedMark><useTarget class="irreplaceable"><choose><targetNumberLimit class="irreplaceable">一名</targetNumberLimit><distanceLimit class="irreplaceable"><inReach><inReachEnd></inReachEnd>的</inReach></distanceLimit><targetElsRlC></targetElsRlC></choose></useTarget><useBody></useBody></use></actionType>。
                                             </div>
                                             <div class="indent">
                                                 <affect><effect></effect></affect>：
                                                 <padding>
                                                     <div class="indent">
-                                                        <to><damage><damageRole class="irreplaceable"><you></you></damageRole><toHead0></toHead0><damagedRole class="irreplaceable">目标</damagedRole><damageBody0></damageBody0><damageValue class="irreplaceable">一点</damageValue><damageEnd></damageEnd></damage></to>。
+                                                        <actionType><damage><damageRole class="irreplaceable"><you></you></damageRole><directedMark></directedMark><damagedRole class="irreplaceable">目标</damagedRole><dealtBody></dealtBody><damageValue class="irreplaceable">一点</damageValue><damageEnd></damageEnd></damage></actionType>。
                                                     </div>
                                                 </padding>
                                             </div>
                                             <div class="indent">
-                                                <whenCC><thisC><card></card></thisC><to><toHead0></toHead0><pronoun1><tickQuantifier>一名</tickQuantifier><roleDefault></roleDefault></pronoun1><whenAffect></whenAffect></to></whenCC>，<pronoun1>其</pronoun1><can><canHead></canHead><play><playBody></playBody><playedCard class="irreplaceable"><choose><target1zC></target1zC><targetLimit class="irreplaceable"><cardQuoteC><dodge></dodge></cardQuoteC></targetLimit></choose></playedCard><playEffect class="irreplaceable"><offset><offsetEnd></offsetEnd><offsetTarget class="irreplaceable">之</offsetTarget></offset></playEffect></play></can>。
+                                                <whenCC><thisC><card></card></thisC><actionType><directedMark></directedMark><pronoun1><tickQuantifier>一名</tickQuantifier><roleDefault></roleDefault></pronoun1><whenAffect></whenAffect></actionType></whenCC>，<pronoun1>其</pronoun1><can><canHead></canHead><play><playBody></playBody><playedCard class="irreplaceable"><choose><target1zC></target1zC><targetLimit class="irreplaceable"><cardQuoteC><dodge></dodge></cardQuoteC></targetLimit></choose></playedCard><playEffect class="irreplaceable"><offset><offsetEnd></offsetEnd><offsetTarget class="irreplaceable">之</offsetTarget></offset></playEffect></play></can>。
                                             </div>
                                             <h3><dodge class="scroll" /></h3>
                                         </padding>

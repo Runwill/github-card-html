@@ -191,12 +191,12 @@
     },
     {
         "name":"discardedCardC",
-        "pre":"<discardBody1></discardBody1><discardedCard class=\"irreplaceable\">",
+        "pre":"<discardBody></discardBody><discardedCard class=\"irreplaceable\">",
         "suf":"</discardedCard>"
     },
     {
         "name":"comparisonTargetC",
-        "pre":"<comparisonBody></comparisonBody><comparisonTarget class=\"irreplaceable\">",
+        "pre":"<reciprocalMark></reciprocalMark><comparisonTarget class=\"irreplaceable\">",
         "suf":"</comparisonTarget><comparisonEnd></comparisonEnd>"
     },
     {
