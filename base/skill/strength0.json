@@ -1,7 +1,7 @@
 [
     {
         "name": "玄德",
-        "content": "锁定技，<tickingLimitCC><preparingStage></preparingStage></tickingLimitCC>，<youDrawCC><equalingC><lostHealth epithet=\"1\"></lostHealth epithet=\"1\">一半(<roundUp><roundUp0></roundUp0></roundUp>)</equalingC>的</youDrawCC>。",
+        "content": "<lockedSkill></lockedSkill>，<tickingLimitCC><preparingStage></preparingStage></tickingLimitCC>，<youDrawCC><equalingC><lostHealth epithet=\"1\"></lostHealth epithet=\"1\">一半(<roundUp><roundUp0></roundUp0></roundUp>)</equalingC>的</youDrawCC>。",
         "role": [
             {
                 "id": 125,
@@ -26,7 +26,7 @@
     },
     {
         "name": "鸿志",
-        "content": "锁定技，<whenCC><tickQuantifier>一名</tickQuantifier><role></role><whenEnteringDying></whenEnteringDying></whenCC>，<youDrawCC>两张</youDrawCC>；<whenCC><tickQuantifier>一名</tickQuantifier><role></role><whenDie></whenDie></whenCC>，<youDrawCC>一张</youDrawCC>。",
+        "content": "<lockedskill></lockedskill>，<ticklimit class=\"irreplaceable\"><when><whenhead></whenhead>一名<roledefault></roledefault><whenenteringdying></whenenteringdying></when></ticklimit>，<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawhead></drawhead><drawquantity class=\"irreplaceable\">两张</drawquantity><drawend></drawend></draw>；<ticklimit class=\"irreplaceable\"><when><whenhead></whenhead>一名<roledefault></roledefault><whendie></whendie></when></ticklimit>，<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawhead></drawhead><drawquantity class=\"irreplaceable\">一张</drawquantity><drawend></drawend></draw>。",
         "role": [
             {
                 "id": 2,
@@ -38,7 +38,7 @@
     },
     {
         "name": "狐鸣",
-        "content": "锁定技，<you></you>的<cardQuoteC><attack></attack></cardQuoteC><numberLimit></numberLimit>+<counts><damaged></damaged><roleDefault></roleDefault><countsEnd></countsEnd></counts>。",
+        "content": "<lockedSkill></lockedSkill>，<you></you>的<cardQuoteC><attack></attack></cardQuoteC><numberLimit></numberLimit>+<counts><damaged></damaged><roleDefault></roleDefault><countsEnd></countsEnd></counts>。",
         "role": [
             {
                 "id": 2,
@@ -51,7 +51,7 @@
     },
     {
         "name": "筹策",
-        "content": "锁定技，<whenCC><you></you><whenUse><useBody></useBody><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenEnd></whenEnd></whenUse></whenCC>，<drawCC>一张</drawCC>。",
+        "content": "<lockedSkill></lockedSkill>，<whenCC><you></you><whenUse><useBody></useBody><use><useTarget></useTarget></use>不<include><include0></include0><you></you></include>的<trickCard></trickCard><whenEnd></whenEnd></whenUse></whenCC>，<drawCC>一张</drawCC>。",
         "role": [
             {
                 "id": 6,
@@ -63,7 +63,7 @@
     },
     {
         "name": "唯识",
-        "content": "<tickLimitC><atActingStageStart></atActingStageStart></tickLimitC>，<you></you><canC><comparison><comparisonTargetC><choose><targetNumberLimit class=\"irreplaceable\"><anyNumber></anyNumber>名</targetNumberLimit><targetElsRlC></targetElsRlC></choose></comparisonTargetC></comparison></canC>，<ifC><you></you><winComparison></winComparison>，<use><user class=\"irreplaceable\"><compareRole></compareRole></user><eachC><canC><useChooseC><target1zC></target1zC><targetLimit class=\"irreplaceable\"><comparedCard></comparedCard></targetLimit></useChooseC></canC></eachC></use></ifC>。若如此做，<crtTurnCC></crtTurnCC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。",
+        "content": "<tickLimitC><atActingStageStart></atActingStageStart></tickLimitC>，<you></you><canC><comparison><comparisonTargetC><choose><targetNumberLimit class=\"irreplaceable\"><anyNumber></anyNumber>名</targetNumberLimit><targetElsRlC></targetElsRlC></choose></comparisonTargetC></comparison></canC>，<ifC><you></you><winComparison></winComparison>，<compareRole></compareRole><eachC><canC><use><useChooseC><target1zC></target1zC><targetLimit class=\"irreplaceable\"><comparedCard></comparedCard></targetLimit></useChooseC></canC></eachC></use></ifC>。若如此做，<crtTurnCC></crtTurnCC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。",
         "role": [
             {
                 "id": 8,
@@ -87,7 +87,7 @@
     },
     {
         "name": "自然",
-        "content": "锁定技，<tickLimitC><atActingStageFinish></atActingStageFinish></tickLimitC>，<youUseChooseCC><targetACardCC></targetACardCC></youUseChooseCC>，<exceptC>，<drawCC>一张</drawCC></exceptC>。",
+        "content": "<lockedSkill></lockedSkill>，<tickLimitC><atActingStageFinish></atActingStageFinish></tickLimitC>，<youUseChooseCC><targetACardCC></targetACardCC></youUseChooseCC>，<exceptC>，<drawCC>一张</drawCC></exceptC>。",
         "role": [
             {
                 "id": 9,

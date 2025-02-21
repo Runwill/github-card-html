@@ -2617,6 +2617,11 @@
         "color": "#b4a7ec"
     },
     {
+        "cn": "锁定技",
+        "en": "lockedSkill",
+        "color": "#d4bfec"
+    },
+    {
         "cn": "武将技能",
         "en": "characterSkill",
         "color": "#cca7ec"
