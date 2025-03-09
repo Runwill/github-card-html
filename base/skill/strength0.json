@@ -51,7 +51,7 @@
     },
     {
         "name": "筹策",
-        "content": "<lockedskill></lockedskill>，<ticklimit class=\"irreplaceable\"><when><whenhead></whenhead><you></you><whenuse><usebody></usebody><use><usedcard class=\"irreplaceable\"><use><usetarget></usetarget></use>不<include><include0></include0><you></you></include>的<trickcard></trickcard></usedcard></use><whenend></whenend></whenuse></when></ticklimit>，<drawhead></drawhead><drawquantity class=\"irreplaceable\">一张</drawquantity><drawend></drawend>。",
+        "content": "<lockedskill></lockedskill>，<ticklimit class=\"irreplaceable\"><when><whenhead></whenhead><you></you><whenuse><usebody></usebody><use><usedcard class=\"irreplaceable\"><use><usetarget></usetarget></use>不<include><include0></include0><you></you></include>的<trickcard></trickcard></usedcard></use><whenend></whenend></whenuse></when></ticklimit>，<draw><drawhead></drawhead><drawquantity class=\"irreplaceable\">一张</drawquantity><drawend></drawend></draw>。",
         "role": [
             {
                 "id": 6,
@@ -63,7 +63,7 @@
     },
     {
         "name": "唯识",
-        "content": "<tickLimitC><atActingStageStart></atActingStageStart></tickLimitC>，<you></you><canC><comparison><comparisonTargetC><choose><targetNumberLimit class=\"irreplaceable\"><anyNumber></anyNumber>名</targetNumberLimit><targetElsRlC></targetElsRlC></choose></comparisonTargetC></comparison></canC>，<ifC><you></you><winComparison></winComparison>，<compareRole></compareRole><eachC><canC><use><useChooseC><target1zC></target1zC><targetLimit class=\"irreplaceable\"><comparedCard></comparedCard></targetLimit></useChooseC></canC></eachC></use></ifC>。若如此做，<crtTurnCC></crtTurnCC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。",
+        "content": "<tickLimitC><atActingStageStart></atActingStageStart></tickLimitC>，<you></you><canC><comparison><comparisonTargetC><choose><targetNumberLimit class=\"irreplaceable\"><anyNumber></anyNumber>名</targetNumberLimit><targetElsRlC></targetElsRlC></choose></comparisonTargetC></comparison></canC>，<ifC><you></you><winComparison></winComparison>，<compareRole></compareRole><eachC><canC><use><useChooseC><target1zC></target1zC><targetLimit class=\"irreplaceable\"><comparedCard></comparedCard></targetLimit></useChooseC></canC></eachC></use></ifC>。若如此做，<crtTurnCC></crtTurnCC><you></you>的<point></point><greaterC><maxC><loseComparisonPoint></loseComparisonPoint></maxC></greaterC>的<handCard></handCard>的<affect><effect></effect></affect>视为<cardQuoteC><deliver></deliver></cardQuoteC>。<you></you><can><canhead></canhead><reciprocalmark></reciprocalmark><comparisontarget class=\"irreplaceable\"><choose><targetnumberlimit class=\"irreplaceable\"><anynumber></anynumber>名</targetnumberlimit><targetlimit class=\"irreplaceable\"><roledefault></roledefault></targetlimit></choose></comparisontarget><comparisonend></comparisonend></can>",
         "role": [
             {
                 "id": 8,
