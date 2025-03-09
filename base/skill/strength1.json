@@ -23,5 +23,17 @@
                 "legend": "書·大禹謨"
             }
         ]
+    },
+    {
+        "name": "鸿志",
+        "content": "<lockedskill></lockedskill>，<ticklimit class=\"irreplaceable\"><when><whenhead></whenhead>一名<roledefault></roledefault><whenenteringdying></whenenteringdying></when></ticklimit>，<draw><drawer class=\"irreplaceable\"><you></you></drawer><drawhead></drawhead><drawquantity class=\"irreplaceable\">两张</drawquantity><drawend></drawend></draw>；<ticklimit class=\"irreplaceable\"><when><whenhead></whenhead>一名<roledefault></roledefault><whendie></whendie></when></ticklimit>，<you></you><coordination><draw><drawhead></drawhead><drawquantity class=\"irreplaceable\">一张</drawquantity><drawend></drawend></draw><actioncoordination></actioncoordination>增加一点<handlimit></handlimit></coordination>。",
+        "role": [
+            {
+                "id": 2,
+                "skill_order": 1,
+                "lore": "嗟乎，燕雀安知鴻鵠之志哉",
+                "legend": "太史公書·陳涉世家"
+            }
+        ]
     }
 ]

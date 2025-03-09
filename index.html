@@ -303,13 +303,18 @@
                                                         </div>
                                                     </padding>
                                         </padding>
-                                        <h2><operation class="scroll" /></h2>
-                                        <padding>
-                                            <h3><each class="scroll"><eachHead></eachHead><<operation></operation>></each></h3>
-                                            <div class="indent">
-                                                表示<operation></operation>可以被输入重复的执行者。
-                                            </div>
-                                        </padding>
+                                        <h2><command class="scroll" /></h2>
+                                        <div class="indent">
+                                            有<procedureTrigger></procedureTrigger>的<procedure></procedure>。
+                                        </div>
+                                        <h2><status class="scroll" /></h2>
+                                        <div class="indent">
+                                            没有<procedureTrigger></procedureTrigger>的<procedure></procedure>。
+                                        </div>
+                                        <h2><each class="scroll"><eachHead></eachHead><<procedure></procedure>></each></h2>
+                                        <div class="indent">
+                                            表示<procedure></procedure>可以被输入重复的执行者。
+                                        </div>
                                         <h2><priority class="scroll" /></h2>
                                         <div class="indent">
                                             <characterSkill></characterSkill>><equipmentSkill></equipmentSkill>><card></card>>其他，<ifC>同级<ifBody></ifBody>按照从<or><living></living>的<currentTurnRole></currentTurnRole><orBody></orBody><dead></dead>的<currentTurnRole></currentTurnRole>的<nextSeat><nextSeatHead></nextSeatHead><seatEnd></seatEnd></nextSeat></or>开始的<seatOrder></seatOrder>顺序</ifC>。

@@ -91,28 +91,38 @@ function textReplace(path,mode) {
                     $(term[i].en).each((index, element) => {//高亮
                         element.i = i
                         $(element).mouseover((event) => {
-                            var target = event.currentTarget
-                            for (var j in term[target.i].part) {
-                                if(term[target.i].part[j].termedPart){
-                                    if(term[target.i].part[j].color){
-                                        $(element).find(term[target.i].part[j].en).css("background-color", term[target.i].part[j].color + '60')
-                                        $(term[target.i].en + ".scroll").children(term[target.i].part[j].en).css("background-color", term[target.i].part[j].color + '60')
-                                    }else{
-                                        $(element).find(term[target.i].part[j].en).css("background-color", term[target.i].color + '60')
-                                        $(term[target.i].en + ".scroll").children(term[target.i].part[j].en).css("background-color", term[target.i].color + '60')
-                                    }
-                                }else{
-                                    $(element).find(term[target.i].part[j].en).css("background-color", term[target.i].color)
-                                    $(term[target.i].en + ".scroll").children(term[target.i].part[j].en).css("background-color", term[target.i].color)
-                                }
-                            }
+                            const target = event.currentTarget
+                            const termIndex = target.i
+                            const currentTerm = term[termIndex] // 获取当前术语对象
+                            
+                            if (!currentTerm) return // 安全校验
+                        
+                            currentTerm.part.forEach((part) => { // 使用数组迭代代替 for...in
+                                const enSelector = part.en
+                                // 智能颜色选择：优先使用部件颜色，次用主术语颜色，带透明度
+                                const color = part.termedPart 
+                                    ? (part.color || currentTerm.color) + '60' // 60 表示 60% 透明度
+                                    : currentTerm.color
+                                
+                                // 同时高亮主元素和滚动容器中的对应部件
+                                $(element).children(enSelector).add(`${currentTerm.en}.scroll ${enSelector}`)
+                                       .css('background-color', color)
+                            })
                         })
+                        
                         $(element).mouseout((event) => {
-                            var target = event.currentTarget
-                            for (var j in term[target.i].part) {
-                                $(element).find(term[target.i].part[j].en).css("background-color", "")
-                                $(term[target.i].en + ".scroll").children(term[target.i].part[j].en).css("background-color", "")
-                            }
+                            const target = event.currentTarget
+                            const termIndex = target.i
+                            const currentTerm = term[termIndex]
+                            
+                            if (!currentTerm) return
+                        
+                            currentTerm.part.forEach((part) => {
+                                const enSelector = part.en
+                                // 一次性清除两个区域的背景色
+                                $(element).children(enSelector).add(`${currentTerm.en}.scroll ${enSelector}`)
+                                       .css('background-color', '')
+                            })
                         })
                     })
                     document.querySelectorAll(term[i].en).forEach(//滚动
@@ -165,7 +175,7 @@ function textReplace(path,mode) {
                                                     var target = event.currentTarget
                                                     if (scroll.outerHTML.startsWith("<" + term[target.i].part[target.j].en.toLowerCase() + " ")) {
                                                         if (!(scroll.classList.contains('fadeOnly'))) {
-                                                            scroll.scrollIntoView({ behavior: 'smooth' });
+                                                            scroll.scrollIntoView({ behavior: 'smooth' })
                                                             $(scroll).fadeTo(200, 0).fadeTo(1000, 1)
                                                         }
                                                     }

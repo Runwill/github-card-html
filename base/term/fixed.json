@@ -20,6 +20,16 @@
         "color": "#8dbeff"
     },
     {
+        "cn": "状态",
+        "en": "status",
+        "color": "#8dbeff"
+    },
+    {
+        "cn": "指令",
+        "en": "command",
+        "color": "#8dbeff"
+    },
+    {
         "en": "if",
         "cn": "若作用域",
         "part": [
