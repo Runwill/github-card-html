@@ -336,11 +336,11 @@
     font-family: '大篆';
     src: url('source/金文大篆体.TTF') format('truetype');
 }
-
+/*
 *{
     user-select: none;
 }
-
+*/
 body {
     overflow-x: hidden;
 }

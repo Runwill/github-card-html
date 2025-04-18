@@ -25,6 +25,12 @@
         "color": "#8dbeff"
     },
     {
+        "cn": "视为·名词",
+        "replace": "视为",
+        "en": "deemAs",
+        "color": "#bfc8ff"
+    },
+    {
         "cn": "指令",
         "en": "command",
         "color": "#8dbeff"
@@ -702,13 +708,13 @@
                 "termedPart": true
             },
             {
-                "cn": "目标-生效",
+                "cn": "目标·生效",
                 "replace": "目标",
                 "en": "affectedRole",
                 "termedPart": true
             },
             {
-                "cn": "效果-生效",
+                "cn": "效果·生效",
                 "replace": "效果",
                 "en": "effect",
                 "termedPart": true
@@ -740,7 +746,7 @@
                 "en": "offsetEnd"
             },
             {
-                "cn": "目标-抵消",
+                "cn": "目标·抵消",
                 "replace": "目标",
                 "en": "offsetTarget",
                 "termedPart": true
@@ -1461,7 +1467,7 @@
                 "en": "drawHead"
             },
             {
-                "cn": "牌-摸牌",
+                "cn": "牌·摸牌",
                 "replace": "牌",
                 "en": "drawEnd"
             },
@@ -1515,13 +1521,13 @@
                 "termedPart": true
             },
             {
-                "cn": "目标-使用",
+                "cn": "目标·使用",
                 "replace": "目标",
                 "en": "useTarget",
                 "termedPart": true
             },
             {
-                "cn": "对应实体牌-使用",
+                "cn": "对应实体牌·使用",
                 "replace": "对应实体牌",
                 "en": "usedPhysicalCard",
                 "termedPart": true
@@ -1654,13 +1660,13 @@
                 "termedPart": true
             },
             {
-                "cn": "目标-打出",
+                "cn": "目标·打出",
                 "replace": "目标",
                 "en": "playTarget",
                 "termedPart": true
             },
             {
-                "cn": "对应实体牌-打出",
+                "cn": "对应实体牌·打出",
                 "replace": "对应实体牌",
                 "en": "playedPhysicalCard",
                 "termedPart": true
@@ -1671,7 +1677,7 @@
                 "termedPart": true
             },
             {
-                "cn": "效果-打出",
+                "cn": "效果·打出",
                 "replace": "效果",
                 "en": "playEffect",
                 "termedPart": true
@@ -1799,13 +1805,13 @@
                 "termedPart": true
             },
             {
-                "cn": "目标-拼点",
+                "cn": "目标·拼点",
                 "replace": "目标",
                 "en": "comparisonTarget",
                 "termedPart": true
             },
             {
-                "cn": "效果-拼点",
+                "cn": "效果·拼点",
                 "replace": "效果",
                 "en": "comparisonEffect",
                 "termedPart": true
@@ -2131,7 +2137,7 @@
         "color": "#d7e8b0"
     },
     {
-        "cn": "角色-存活角色",
+        "cn": "角色·存活角色",
         "replace": "角色",
         "en": "roleDefault",
         "color": "#b0d9e8"
@@ -2152,7 +2158,7 @@
         "color": "#f0a2a2"
     },
     {
-        "cn": "死亡-形容词",
+        "cn": "死亡·形容词",
         "replace": "死亡",
         "en": "dead",
         "color": "#e1e1e1"
@@ -2331,7 +2337,7 @@
         "color": "#f4ecea"
     },
     {
-        "cn": "牌-手牌或装备区内的牌",
+        "cn": "牌·手牌或装备区内的牌",
         "replace": "牌",
         "en": "cardDefault",
         "color": "#c9d8c8"
@@ -2677,7 +2683,7 @@
                 "en": "stativeCoordination"
             },
             {
-                "cn": "与-名词并列",
+                "cn": "与·名词并列",
                 "replace": "与",
                 "en": "nominalCoordination"
             },
