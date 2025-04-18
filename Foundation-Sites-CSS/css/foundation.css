@@ -229,9 +229,8 @@ body {
   margin: 0;
   padding: 0;
   background: #fefefe;
-  font-family: "FZBWKS";
+  font-family: "Microsoft YaHei", "微软雅黑", Arial, Helvetica, sans-serif;
   font-size: .9rem;
-  src: url("方正北魏楷书.TTF") format("truetype"); 
   font-weight: normal;
   line-height: 1.5;
   color: #0a0a0a;
