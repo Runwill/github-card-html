@@ -62,9 +62,10 @@
                 <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_skill" onclick="changeTitle(1)">技能</a></li>
                 <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_card" onclick="changeTitle(2)">牌库</a></li>
                 <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_character" onclick="changeTitle(3)">将池</a></li>
+                <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_draft" onclick="changeTitle(4)">草稿</a></li>
                 <script>
                     function changeTitle(n) {
-                        title_name = ['程序','技能','牌库','将池']
+                        title_name = ['程序','技能','牌库','将池','草稿']
                         document.title = "Document丨" + title_name[n]
                     }
                 </script>
@@ -1625,6 +1626,32 @@
                         </padding>
                     </main>
                 </div>
+                <div class="tabs-panel" id="panel_draft">
+                    <main>
+                        <padding>
+                            <textarea id="htmlInput" placeholder="输入HTML代码" style="width: 100%; height: 150px;"></textarea>
+                            <div class="draftBlock" style="border: 1px solid #ccc; padding: 10px; margin-top: 10px;"></div>
+                            <div id="div5" style="height: 500px; background-color: white;"></div>
+                        </padding>
+                        <script type="text/javascript">
+                            // 页面加载时恢复内容
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const savedHtml = localStorage.getItem('draftBlockContent');
+                                if (savedHtml) {
+                                    document.getElementById('htmlInput').value = savedHtml;
+                                    document.querySelector('.draftBlock').innerHTML = savedHtml;
+                                }
+                            });
+                
+                            // 实现实时更新并保存到 localStorage
+                            document.getElementById('htmlInput').addEventListener('input', function () {
+                                const inputHtml = this.value;
+                                document.querySelector('.draftBlock').innerHTML = inputHtml
+                                localStorage.setItem('draftBlockContent', inputHtml) // 保存到 localStorage
+                            })
+                        </script>
+                    </main>
+                </div>
             </div>
         </div>
     </div>
@@ -1667,4 +1694,32 @@
     }
     
 </script>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        // 恢复上次访问的 Panel
+        const lastPanelId = localStorage.getItem('lastActivePanel');
+        if (lastPanelId) {
+            const targetPanel = document.querySelector(lastPanelId);
+            if (targetPanel) {
+                // 激活对应的 Panel
+                document.querySelectorAll('.tabs-panel').forEach(panel => panel.classList.remove('is-active'));
+                targetPanel.classList.add('is-active');
+
+                // 更新导航栏的选中状态
+                document.querySelectorAll('.tabs-title').forEach(tab => tab.classList.remove('is-active'));
+                const activeTab = document.querySelector(`a[href="${lastPanelId}"]`).parentElement;
+                if (activeTab) activeTab.classList.add('is-active');
+            }
+        }
+    });
+
+    // 记录当前激活的 Panel
+    document.querySelectorAll('.tabs-title a').forEach(tab => {
+        tab.addEventListener('click', function () {
+            localStorage.setItem('lastActivePanel', this.getAttribute('href'));
+        });
+    });
+</script>
+
 </html>
