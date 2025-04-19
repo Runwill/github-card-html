@@ -1,4 +1,4 @@
-function CharacterNameReplace(path){
+function CharacterNameReplace(path,paragraphs = document){
     fetch(path).then(response => response.json()).then(character => {
         //获取武将ID并排序
         let characterID = []
@@ -13,7 +13,7 @@ function CharacterNameReplace(path){
                     characterName=character[j].name
                 }
             }
-            document.querySelectorAll(".characterID"+characterID[i]).forEach(//替换和滚动
+            paragraphs.querySelectorAll(".characterID"+characterID[i]).forEach(//替换和滚动
                 element => {
                     element.innerHTML = characterName
                     element.characterPosition=i

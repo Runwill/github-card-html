@@ -1,11 +1,9 @@
-function decompress(path){
+function decompress(path,paragraphs = document){
     fetch(path).then(response => response.json()).then(compression => {
         for(var i in compression){
-            document.querySelectorAll(compression[i].name).forEach(
-                element => {
-                    element.innerHTML = compression[i].pre + element.innerHTML +compression[i].suf
-                }
-            )
+            $(paragraphs).find(compression[i].name).each(function() {
+                $(this).html(compression[i].pre + $(this).html() + compression[i].suf)
+            })
         }
     })
 }
