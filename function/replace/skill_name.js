@@ -1,4 +1,4 @@
-function SkillNameReplace(path){
+function replace_skill_name(path, paragraphs = document){
     fetch(path).then(response => response.json()).then(skill => {
         //获取技能名并排序
         let skillNames = []
@@ -8,53 +8,48 @@ function SkillNameReplace(path){
         skillNames.sort()
 
         for (var i in skillNames) {//技能名i
-            document.querySelectorAll("." + skillNames[i]).forEach(//替换和滚动
-                element => {
-                    element.innerHTML = skillNames[i]
-                    element.skillPosition = i
-                    element.addEventListener(
-                        'dblclick', function (event) {
-                            event.stopPropagation()
-                            $("#example-tabs").foundation('selectTab', 'panel_skill', 1);
-                            document.querySelectorAll(".scroll").forEach(
-                                scroll => {
-                                    if (scroll.classList.contains(event.currentTarget.classList[0])) {
-                                        if (!(scroll.classList.contains('fadeOnly'))) {
-                                            scroll.scrollIntoView({ behavior: 'smooth' })
-                                        }
-                                        $(scroll).fadeTo(200, 0).fadeTo(1000, 1)
-                                    }
-                                }
-                            )
+            element = $(paragraphs).find("." + skillNames[i])
+
+            element.each(function() { // 替换和滚动
+                $(this).html(skillNames[i]).on("dblclick", function(event) {
+                    event.stopPropagation()
+                    $("#example-tabs").foundation("selectTab", "panel_skill", 1)
+            
+                    $(".scroll").each(function() {
+                        if ($(this).hasClass(event.currentTarget.classList[0])) {
+                            if (!$(this).hasClass("fadeOnly")) {
+                                // 滚动到目标元素
+                                this.scrollIntoView({ behavior: "smooth" })
+                            }
+                            // 淡入效果
+                            $(this).fadeTo(200, 0).fadeTo(1000, 1)
                         }
-                    )
-                }
-            )
-            $("." + skillNames[i]).mouseover(//高亮
-                function (event) {
+                    })
+                })
+            }).mouseover(//高亮
+                function () {
                     $(this).css("background-color", "#df90ff")
-                    $("." + event.currentTarget.classList[0] + ".scroll").css("background-color", "#df90ff")
+                    $("." + this.classList[0] + ".scroll").css("background-color", "#df90ff")
                 }
-            )
-            $("." + skillNames[i]).mouseout(//高亮
-                function (event) {
+            ).mouseout(//高亮
+                function () {
                     $(this).css("background-color", "")
-                    $("." + event.currentTarget.classList[0] + ".scroll").css("background-color", "")
+                    $("." + this.classList[0] + ".scroll").css("background-color", "")
                 }
             )
             for (var j in skill) {//不同武将的技能名悬浮个性化文本
                 if (skill[j].name == skillNames[i]) {
                     for (k in skill[j].role) {
+                        element = $(paragraphs).find('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id)
+                        element.prop('loreSkillPosition', j)
+                        element.prop('loreRolePosition', k)
 
-                        $('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id).prop('loreSkillPosition', j)
-                        $('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id).prop('loreRolePosition', k)
-
-                        $('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id).mouseover(
+                        element.mouseover(
                             function () {
                                 $(this).after('<lore style="line-height: 0;">「' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].lore + '」——《' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].legend + '》</lore>')
                             }
                         )
-                        $('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id).mouseout(
+                        element.mouseout(
                             function () {
                                 $("lore").remove()
                             }

@@ -27,7 +27,7 @@
     <script src="function/replace/character_name.js"></script>
     <script src="function/replace/skill_name.js"></script>
     <script src="function/replace/term.js"></script>
-    <script src="function/replace/card.js"></script>
+    <script src="function/replace/card_name.js"></script>
 
     <script src="function/scroll_back.js"></script>
 
@@ -1630,8 +1630,7 @@
                     <main>
                         <padding>
                             <textarea id="htmlInput" placeholder="输入HTML代码" style="width: 100%; height: 150px;"></textarea>
-                            <div class="draftBlock" style="border: 1px solid #ccc; padding: 10px; margin-top: 10px;"></div>
-                            <div id="div5" style="height: 500px; background-color: white;"></div>
+                            <div class="draftBlock"></div>
                         </padding>
                         <script type="text/javascript">
                             // 页面加载时恢复内容
@@ -1641,14 +1640,29 @@
                                     document.getElementById('htmlInput').value = savedHtml;
                                     document.querySelector('.draftBlock').innerHTML = savedHtml;
                                 }
-                            });
+                            })
                 
                             // 实现实时更新并保存到 localStorage
                             document.getElementById('htmlInput').addEventListener('input', function () {
                                 const inputHtml = this.value;
-                                document.querySelector('.draftBlock').innerHTML = inputHtml
+                                document.querySelector('.draftBlock').innerHTML = inputHtml.replace('\\', ''); // 去除 HTML 标签
                                 localStorage.setItem('draftBlockContent', inputHtml) // 保存到 localStorage
+
+                                // 调用目标函数
+                                onTextChange(inputHtml)
                             })
+
+                            // 定义要触发的函数
+                            function onTextChange(newValue) {
+                                console.log("文本框内容已更新:", newValue)
+                                draft_block = $('.draftBlock')[0]
+                                replace_character_name('base/character.json', draft_block)
+                                replace_skill_name('base/skill/strength'+ localStorage.getItem('strength') +'.json', draft_block)
+                                replace_card_name('base/card.json', draft_block)
+                                replace_term('base/term/dynamic.json', 1, draft_block)
+                                replace_term('base/term/fixed.json', 1, draft_block)
+                                add_pronoun(draft_block)
+                            }
                         </script>
                     </main>
                 </div>
@@ -1663,63 +1677,36 @@
             $(document).foundation()
         })
         decompress('base/compression.json')
-        CharacterNameReplace('base/character.json')
-        SkillNameReplace('base/skill/strength'+ localStorage.getItem('strength') +'.json')
-        CardReplace('base/card.json')
+        replace_character_name('base/character.json')
+        replace_skill_name('base/skill/strength'+ localStorage.getItem('strength') +'.json')
+        replace_card_name('base/card.json')
         check_strength()
         add_button_wave()
-        textReplace('base/term/dynamic.json',1)
-        textReplace('base/term/fixed.json',1)
-        pronounAdd()
+        replace_term('base/term/dynamic.json', 1)
+        replace_term('base/term/fixed.json', 1)
+        add_pronoun()
     })
 
     function filterParagraphs() {
-        var query = document.getElementById('search-input').value.trim().toLowerCase();
-        var paragraphs = document.querySelectorAll('.characterParagraph');
+        var query = document.getElementById('search-input').value.trim().toLowerCase()
+        var paragraphs = document.querySelectorAll('.characterParagraph')
         paragraphs.forEach(function(paragraph) {
             var paragraphText = paragraph.textContent.toLowerCase()
-            var isMatch = true;
+            var isMatch = true
             for (var i = 0; i < query.length; i++) {
                 if (paragraphText.indexOf(query[i]) === -1) {
-                    isMatch = false;
-                    break;
+                    isMatch = false
+                    break
                 }
             }
             if (isMatch) {
-                paragraph.classList.remove('hidden');
+                paragraph.classList.remove('hidden')
             } else {
-                paragraph.classList.add('hidden');
+                paragraph.classList.add('hidden')
             }
         })
     }
     
-</script>
-
-<script type="text/javascript">
-    document.addEventListener('DOMContentLoaded', function () {
-        // 恢复上次访问的 Panel
-        const lastPanelId = localStorage.getItem('lastActivePanel');
-        if (lastPanelId) {
-            const targetPanel = document.querySelector(lastPanelId);
-            if (targetPanel) {
-                // 激活对应的 Panel
-                document.querySelectorAll('.tabs-panel').forEach(panel => panel.classList.remove('is-active'));
-                targetPanel.classList.add('is-active');
-
-                // 更新导航栏的选中状态
-                document.querySelectorAll('.tabs-title').forEach(tab => tab.classList.remove('is-active'));
-                const activeTab = document.querySelector(`a[href="${lastPanelId}"]`).parentElement;
-                if (activeTab) activeTab.classList.add('is-active');
-            }
-        }
-    });
-
-    // 记录当前激活的 Panel
-    document.querySelectorAll('.tabs-title a').forEach(tab => {
-        tab.addEventListener('click', function () {
-            localStorage.setItem('lastActivePanel', this.getAttribute('href'));
-        })
-    })
 </script>
 
 </html>
