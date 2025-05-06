@@ -39,11 +39,8 @@
     <script>$(document).foundation()</script>
     <header id="header">
         <nav>
-            <label id="ison_image"> <!--图标-->
-
-            </label>
             <div id="header_title">
-                05 wiki
+                <button id="menu-toggle" style="background: none; border: none; cursor: pointer;">05 wiki</button>
                 <p class="strength_title"></p>
                 <script type="text/javascript">
                     document.querySelectorAll('.strength_title').forEach(button => {
@@ -56,6 +53,94 @@
                 </script>
             </div>
         </nav>
+        <div id="sidebar-menu" style="display: none; position: absolute; top: 50px; padding: 10px; border: 1px solid #ccc; background: #ffffff;">
+                <li style="list-style-type: circle;">
+                    <button id="update-account-button" style="background: none; border: none;">更新账户</button>
+                </li>
+                <li style="list-style-type: circle;">
+                    <button id="update-account-button" style="background: none; border: none;">审核请求</button>
+                </li>
+                <li style="list-style-type: circle;">
+                    <button id="logout-button" style="background: none; border: none; ">退出登录</button>
+                </li>
+        </div>
+        <!-- 添加弹窗HTML -->
+        <div id="update-account-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; z-index: 1000;">
+            <h2>更新账户</h2>
+            <form id="updateForm">
+                <input type="text" id="newUsername" name="newUsername" placeholder="新用户名" required>
+                <input type="password" id="newPassword" name="newPassword" placeholder="新密码" required>
+                <button type="submit" style="padding: 10px;
+                background: #8698ff;
+                color: white;
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+                width: 100%;">更新</button>
+            </form>
+        
+            <p id="responseMessage"></p>
+        </div>
+        <script>
+            // 控制弹窗显示/隐藏
+            document.getElementById('update-account-button').addEventListener('click', function () {
+                const updateAccountModal = document.getElementById('update-account-modal')
+                updateAccountModal.style.display = updateAccountModal.style.display === 'none' ? 'block' : 'none';
+                document.getElementById('newUsername').value = localStorage.getItem('username'); // 填充当前用户名
+            });
+        
+            // 表单提交逻辑
+            document.getElementById('updateForm').addEventListener('submit', async (event) => {
+                event.preventDefault();
+        
+                const id = localStorage.getItem('id'); // 假设登录时保存了用户名
+                const newUsername = document.getElementById('newUsername').value;
+                const newPassword = document.getElementById('newPassword').value;
+        
+                if (!id) {
+                    document.getElementById('responseMessage').textContent = '未检测到登录信息，请重新登录。';
+                    document.getElementById('responseMessage').style.color = 'red';
+                    return;
+                }
+        
+                try {
+                    const response = await fetch('http://localhost:3000/api/update', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id, newUsername, newPassword })
+                    });
+        
+                    if (response.ok) {
+                        document.getElementById('responseMessage').textContent = '更新成功！';
+                        document.getElementById('responseMessage').style.color = 'green';
+                        console.log('更新成功');
+                    } else {
+                        const errorData = await response.json();
+                        document.getElementById('responseMessage').textContent = errorData.message;
+                        document.getElementById('responseMessage').style.color = 'red';
+                        console.error('更新失败');
+                    }
+                } catch (error) {
+                    document.getElementById('responseMessage').textContent = '请求失败，请稍后重试。';
+                    document.getElementById('responseMessage').style.color = 'red';
+                    console.error('请求失败:', error);
+                }
+            });
+        </script>
+        
+        <script>
+            // 控制侧边栏显示/隐藏
+            document.getElementById('menu-toggle').addEventListener('click', function () {
+                const sidebarMenu = document.getElementById('sidebar-menu');
+                sidebarMenu.style.display = sidebarMenu.style.display === 'none' ? 'block' : 'none';
+            });
+        
+            // 退出登录功能
+            document.getElementById('logout-button').addEventListener('click', function () {
+                localStorage.removeItem('token'); // 清除登录令牌
+                window.location.href = 'login.html'; // 跳转到登录页面
+            });
+        </script>
         <nav id="sidebar">
             <ul class="tabs nav" data-tabs id="example-tabs">
                 <li id="nav-item" class="tabs-title is-active"><a id='title-a' class='title-a' href="#panel_term" aria-selected="true" onclick="changeTitle(0)">程序</a></li>
@@ -79,6 +164,77 @@
                     <div class="main">
                         <main>
                             <padding>
+                                <div id="pending-users">
+                                    <!-- 动态生成未激活用户列表 -->
+                                </div>
+                                
+                                <script>
+                                    // 定义 ApiService
+                                    const ApiService = {
+                                        async get(endpoint) {
+                                            const response = await fetch(endpoint);
+                                            if (!response.ok) {
+                                                throw new Error(`Error fetching data from ${endpoint}: ${response.statusText}`);
+                                            }
+                                            return response.json();
+                                        },
+                                        async post(endpoint, data) {
+                                            const response = await fetch(endpoint, {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify(data),
+                                            });
+                                            if (!response.ok) {
+                                                throw new Error(`Error posting data to ${endpoint}: ${response.statusText}`);
+                                            }
+                                            return response.json();
+                                        },
+                                    };
+                                    // 示例：获取未激活用户列表
+                                    async function fetchPendingUsers() {
+                                        try {
+                                            const response = await ApiService.get('http://localhost:3000/api/pending-users');
+                                            return response; // 返回未激活用户列表
+                                        } catch (error) {
+                                            console.error('获取未激活用户失败:', error.message);
+                                            return []; // 返回空数组以避免后续报错
+                                        }
+                                    }
+                        
+                                    async function renderPendingUsers() {
+                                        const users = await fetchPendingUsers();
+                                        const container = document.getElementById('pending-users');
+                                        container.innerHTML = '';
+                        
+                                        if (users.length === 0) {
+                                            container.innerHTML = '<p>暂无未激活用户</p>';
+                                            return;
+                                        }
+                        
+                                        users.forEach(user => {
+                                            const userDiv = document.createElement('div');
+                                            userDiv.innerHTML = `
+                                                <p>用户名: ${user.username}</p>
+                                                <button onclick="handleUserApproval('${user._id}', 'approve')">通过</button>
+                                                <button onclick="handleUserApproval('${user._id}', 'reject')">退回</button>
+                                            `;
+                                            container.appendChild(userDiv);
+                                        });
+                                    }
+                                    // 示例：批准或退回用户
+                                    async function handleUserApproval(userId, action) {
+                                        try {
+                                            const response = await ApiService.post('http://localhost:3000/api/approve', { userId, action });
+                                            console.log(response.message); // 显示操作结果
+                                        } catch (error) {
+                                            console.error('操作失败:', error.message);
+                                        }
+                                    }
+                                
+                                    // 页面加载时渲染未激活用户
+                                    alert(localStorage.getItem('role'))
+                                    if(localStorage.getItem('role')=='admin') renderPendingUsers();
+                                </script>
                                 <padding>
                                     <h1><procedure class="scroll" /></h1>
                                     <padding>
@@ -1645,6 +1801,7 @@
                             // 实现实时更新并保存到 localStorage
                             document.getElementById('htmlInput').addEventListener('input', function () {
                                 const inputHtml = this.value;
+                                alert(inputHtml.replace('\\\\', ''))
                                 document.querySelector('.draftBlock').innerHTML = inputHtml.replace('\\', ''); // 去除 HTML 标签
                                 localStorage.setItem('draftBlockContent', inputHtml) // 保存到 localStorage
 
@@ -1670,6 +1827,18 @@
         </div>
     </div>
 </body>
+
+
+<script>
+    // 页面加载时检查登录状态
+    document.addEventListener('DOMContentLoaded', function () {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // 如果没有登录令牌，跳转到登录页面
+            window.location.href = 'login.html';
+        }
+    });
+</script>
 
 <script type="text/javascript">
     $(function () {
@@ -1706,7 +1875,6 @@
             }
         })
     }
-    
 </script>
 
 </html>
