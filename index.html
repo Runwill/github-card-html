@@ -54,19 +54,19 @@
             </div>
         </nav>
         <div id="sidebar-menu" style="display: none; position: absolute; top: 50px; padding: 10px; border: 1px solid #ccc; background: #ffffff;">
-                <li style="list-style-type: circle;">
-                    <button id="update-account-button" style="background: none; border: none;">更新账户</button>
-                </li>
-                <li style="list-style-type: circle;">
-                    <button id="update-account-button" style="background: none; border: none;">审核请求</button>
-                </li>
-                <li style="list-style-type: circle;">
-                    <button id="logout-button" style="background: none; border: none; ">退出登录</button>
-                </li>
+            <li style="list-style-type: circle;">
+                <button id="update-account-button" style="background: none; border: none;">更籍</button>
+            </li>
+            <li style="list-style-type: circle;">
+                <button id="approve-request-button" style="background: none; border: none;">批允</button>
+            </li>
+            <li style="list-style-type: circle;">
+                <button id="logout-button" style="background: none; border: none;">散出</button>
+            </li>
         </div>
         <!-- 添加弹窗HTML -->
         <div id="update-account-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; z-index: 1000;">
-            <h2>更新账户</h2>
+            <h2>更易版籍</h2>
             <form id="updateForm">
                 <input type="text" id="newUsername" name="newUsername" placeholder="新用户名" required>
                 <input type="password" id="newPassword" name="newPassword" placeholder="新密码" required>
@@ -80,6 +80,13 @@
             </form>
         
             <p id="responseMessage"></p>
+        </div>
+        <!-- 添加审核请求弹窗HTML -->
+        <div id="approve-user-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; z-index: 1000;">
+            <h2>呈详</h2>
+            <div id="pending-users-modal-content">
+                <!-- 动态生成未激活用户列表 -->
+            </div>
         </div>
         <script>
             // 控制弹窗显示/隐藏
@@ -126,6 +133,80 @@
                     console.error('请求失败:', error);
                 }
             });
+            // 控制审核请求弹窗显示/隐藏
+            document.getElementById('approve-request-button').addEventListener('click', function () {
+                const approveUserModal = document.getElementById('approve-user-modal');
+                approveUserModal.style.display = approveUserModal.style.display === 'none' ? 'block' : 'none';
+                renderPendingUsers(); // 渲染未激活用户列表
+            });
+            // 修改 renderPendingUsers 函数以支持弹窗内容
+            async function renderPendingUsers() {
+                const users = await fetchPendingUsers();
+                const container = document.getElementById('pending-users-modal-content');
+                container.innerHTML = '';
+
+                if (users.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: gray;">簿书皆毕</p>';
+                    return;
+                }
+
+                users.forEach(user => {
+                    const userDiv = document.createElement('div');
+                    userDiv.style.display = 'flex';
+                    userDiv.style.justifyContent = 'space-between';
+                    userDiv.style.alignItems = 'center';
+                    userDiv.style.marginBottom = '10px';
+                    userDiv.style.padding = '10px';
+                    userDiv.style.border = '1px solid #ccc';
+                    userDiv.style.borderRadius = '5px';
+                    userDiv.style.backgroundColor = '#f9f9f9';
+
+                    userDiv.innerHTML = `
+                        <p style="margin: 0; font-weight: bold;">注册: ${user.username}</p>
+                        <div>
+                            <button onclick="handleUserApproval('${user._id}', 'approve')" style="margin-right: 5px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">允准</button>
+                            <button onclick="handleUserApproval('${user._id}', 'reject')" style="padding: 5px 10px; background-color: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;">不准</button>
+                        </div>
+                    `;
+                    container.appendChild(userDiv);
+                });
+            }
+            // 示例：获取未激活用户列表
+            async function fetchPendingUsers() {
+                try {
+                    const response = await fetch('http://localhost:3000/api/pending-users');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    return data; // 返回未激活用户列表
+                } catch (error) {
+                    console.error('获取未激活用户失败:', error.message);
+                    return []; // 返回空数组以避免后续报错
+                }
+            }
+            // 示例：批准或退回用户
+            async function handleUserApproval(userId, action) {
+                try {
+                    const response = await fetch('http://localhost:3000/api/approve', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId, action })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(data.message); // 显示操作结果
+
+                    // 操作成功后刷新待批准用户列表
+                    await renderPendingUsers();
+                } catch (error) {
+                    console.error('操作失败:', error.message);
+                }
+            }
         </script>
         
         <script>
@@ -164,77 +245,6 @@
                     <div class="main">
                         <main>
                             <padding>
-                                <div id="pending-users">
-                                    <!-- 动态生成未激活用户列表 -->
-                                </div>
-                                
-                                <script>
-                                    // 定义 ApiService
-                                    const ApiService = {
-                                        async get(endpoint) {
-                                            const response = await fetch(endpoint);
-                                            if (!response.ok) {
-                                                throw new Error(`Error fetching data from ${endpoint}: ${response.statusText}`);
-                                            }
-                                            return response.json();
-                                        },
-                                        async post(endpoint, data) {
-                                            const response = await fetch(endpoint, {
-                                                method: 'POST',
-                                                headers: { 'Content-Type': 'application/json' },
-                                                body: JSON.stringify(data),
-                                            });
-                                            if (!response.ok) {
-                                                throw new Error(`Error posting data to ${endpoint}: ${response.statusText}`);
-                                            }
-                                            return response.json();
-                                        },
-                                    };
-                                    // 示例：获取未激活用户列表
-                                    async function fetchPendingUsers() {
-                                        try {
-                                            const response = await ApiService.get('http://localhost:3000/api/pending-users');
-                                            return response; // 返回未激活用户列表
-                                        } catch (error) {
-                                            console.error('获取未激活用户失败:', error.message);
-                                            return []; // 返回空数组以避免后续报错
-                                        }
-                                    }
-                        
-                                    async function renderPendingUsers() {
-                                        const users = await fetchPendingUsers();
-                                        const container = document.getElementById('pending-users');
-                                        container.innerHTML = '';
-                        
-                                        if (users.length === 0) {
-                                            container.innerHTML = '<p>暂无未激活用户</p>';
-                                            return;
-                                        }
-                        
-                                        users.forEach(user => {
-                                            const userDiv = document.createElement('div');
-                                            userDiv.innerHTML = `
-                                                <p>用户名: ${user.username}</p>
-                                                <button onclick="handleUserApproval('${user._id}', 'approve')">通过</button>
-                                                <button onclick="handleUserApproval('${user._id}', 'reject')">退回</button>
-                                            `;
-                                            container.appendChild(userDiv);
-                                        });
-                                    }
-                                    // 示例：批准或退回用户
-                                    async function handleUserApproval(userId, action) {
-                                        try {
-                                            const response = await ApiService.post('http://localhost:3000/api/approve', { userId, action });
-                                            console.log(response.message); // 显示操作结果
-                                        } catch (error) {
-                                            console.error('操作失败:', error.message);
-                                        }
-                                    }
-                                
-                                    // 页面加载时渲染未激活用户
-                                    alert(localStorage.getItem('role'))
-                                    if(localStorage.getItem('role')=='admin') renderPendingUsers();
-                                </script>
                                 <padding>
                                     <h1><procedure class="scroll" /></h1>
                                     <padding>

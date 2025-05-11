@@ -75,7 +75,7 @@
     },
     {
         "name": "观复",
-        "content": "<actingStageCC>一</actingStageCC>，<ifC><thisC><stage></stage></thisC>未有<role></role><health></health>变化过</ifC>，<youCanCC><coordination><discardCC>所有<handCard></handCard></discardCC><actionCoordination></actionCoordination><drawCC>等量</drawCC></coordination></youCanCC>。",
+        "content": "<ticklimit class=\"irreplaceable\"><atactingstagestart></atactingstagestart></ticklimit>，<you></you><can><canhead></canhead><coordination><discard class=\"irreplaceable\"><discardbody></discardbody><discardedcard class=\"irreplaceable\">所有<handcard></handcard></discardedcard></discard><actioncoordination></actioncoordination><draw><drawhead></drawhead><drawquantity class=\"irreplaceable\">等量</drawquantity><drawend></drawend></draw></coordination></can>。",
         "role": [
             {
                 "id": 9,
