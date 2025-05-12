@@ -75,7 +75,7 @@
     },
     {
         "name": "观复",
-        "content": "<ticklimit class=\"irreplaceable\"><atactingstagestart></atactingstagestart></ticklimit>，<you></you><can><canhead></canhead><coordination><discard class=\"irreplaceable\"><discardbody></discardbody><discardedcard class=\"irreplaceable\">所有<handcard></handcard></discardedcard></discard><actioncoordination></actioncoordination><draw><drawhead></drawhead><drawquantity class=\"irreplaceable\">等量</drawquantity><drawend></drawend></draw></coordination></can>。",
+        "content": "<ticklimit class=\"irreplaceable\"><atactingstagestart></atactingstagestart></ticklimit>，<you></you><can><canhead></canhead><coordination><discard class=\"irreplaceable\"><discardbody></discardbody><discardedcard class=\"irreplaceable\"><pronoun1>所有<handcard></handcard></pronoun1></discardedcard></discard><actioncoordination></actioncoordination><draw><drawhead></drawhead><drawquantity class=\"irreplaceable\"><pronoun1>等量</pronoun1></drawquantity><drawend></drawend></draw></coordination></can>。",
         "role": [
             {
                 "id": 9,

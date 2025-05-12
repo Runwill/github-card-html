@@ -15,19 +15,19 @@ function replace_term(path, mode, paragraphs = document) {
                             if (!this.getAttribute("epithet")) $(this).html(term[i].epithet[0].cn)
                             else $(this).html(term[i].epithet[this.getAttribute("epithet")].cn)
                         }
-                        if(mode){
-                            $(this).on('dblclick', function (event) {
-                                event.stopPropagation()
-                                $("#example-tabs").foundation('selectTab', 'panel_term', 1)
-                                $(".scroll").each(function() {
-                                    var target = event.currentTarget
-                                    if (this.outerHTML.startsWith("<" + target.tagName.toLowerCase() + " ")) {
-                                        if (!$(this).hasClass('fadeOnly')) this.scrollIntoView({ behavior: "smooth" })
-                                        $(this).fadeTo(200, 0).fadeTo(1000, 1)
-                                    }
-                                })
+                    }
+                    if(mode){
+                        $(this).on('dblclick', function (event) {
+                            event.stopPropagation()
+                            $("#example-tabs").foundation('selectTab', 'panel_term', 1)
+                            $(".scroll").each(function() {
+                                var target = event.currentTarget
+                                if (this.outerHTML.startsWith("<" + target.tagName.toLowerCase() + " ")) {
+                                    if (!$(this).hasClass('fadeOnly')) this.scrollIntoView({ behavior: "smooth" })
+                                    $(this).fadeTo(200, 0).fadeTo(1000, 1)
+                                }
                             })
-                        }
+                        })
                     }
                 })
                 if(mode){
