@@ -1827,7 +1827,7 @@
                                 replace_card_name('base/card.json', draft_block)
                                 replace_term('base/term/dynamic.json', 1, draft_block)
                                 replace_term('base/term/fixed.json', 1, draft_block)
-                                add_pronoun(draft_block)
+                                pronounCheck(draft_block)
                             }
                         </script>
                     </main>
@@ -1862,7 +1862,7 @@
         add_button_wave()
         replace_term('base/term/dynamic.json', 1)
         replace_term('base/term/fixed.json', 1)
-        add_pronoun()
+        pronounCheck()
     })
 
     function filterParagraphs() {

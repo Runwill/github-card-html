@@ -22,19 +22,29 @@ function pronounReplaceCheck(event){
     if(term_status['pronoun'] == 0){
         event.target.style.background='#8698ff'
         term_status['pronoun'] = 1
-        add_pronoun()
     }else{
         event.target.style.background='#ff8686'
         term_status['pronoun'] = 0
+    }
+    pronounCheck()
+}
+
+function pronounCheck(paragraphs = document){
+    if(term_status['pronoun'] != 0){
+        term_status['pronoun'] = 1
+        add_pronoun(paragraphs)
+    }else{
+        term_status['pronoun'] = 0
         for(const i of [1, 2, 3]){
-            document.querySelectorAll('pronoun'+i).forEach(//替换
-                element => {
-                    element.innerHTML = element.innerHTML.slice(0, -28)
+            $(paragraphs).find('pronoun'+i).each(function() { //替换
+                if(this.innerHTML.endsWith('</pronounname>')){
+                    this.innerHTML = this.innerHTML.slice(0, -28)
                 }
-            )
+            })
         }
     }
 }
+
 function elementReplace(name1,name2){
     document.querySelectorAll(name1).forEach(function(element) {
         let newElement = document.createElement(name2)
@@ -49,7 +59,9 @@ function add_pronoun(paragraphs = document){
     // 使用for...of循环遍历数组[1, 2, 3]
     for(const i of [1, 2, 3]){
         $(paragraphs).find('pronoun'+i).each(function() { //替换
-            this.innerHTML = this.innerHTML + '<pronounName>' + pronounName[i-1] + '</pronounName>'
+            if(!this.innerHTML.endsWith('</pronounname>')){
+                this.innerHTML = this.innerHTML + '<pronounName>' + pronounName[i-1] + '</pronounName>'
+            }
         })
     }
 }
