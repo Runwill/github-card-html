@@ -1810,8 +1810,7 @@
                 
                             // 实现实时更新并保存到 localStorage
                             document.getElementById('htmlInput').addEventListener('input', function () {
-                                const inputHtml = this.value;
-                                alert(inputHtml.replace('\\\\', ''))
+                                const inputHtml = this.value.replace(/\\/g, '');
                                 document.querySelector('.draftBlock').innerHTML = inputHtml.replace('\\', ''); // 去除 HTML 标签
                                 localStorage.setItem('draftBlockContent', inputHtml) // 保存到 localStorage
 
