@@ -1,4 +1,4 @@
-$(function(){
+function summonCharacterSkill(){
     var deferred1 = $.Deferred();
     var deferred2 = $.Deferred();
     $.ajax({
@@ -22,7 +22,7 @@ $(function(){
     $.when(deferred1, deferred2).done(function (characterData, skillData) {
         CharacterSkillReplace(characterData, skillData);
     })
-})
+}
 function CharacterSkillReplace(character,skill) {
         //获取武将技能名并排序
         let CharacterSkillNames = []

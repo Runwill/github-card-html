@@ -87,7 +87,7 @@
     },
     {
         "name": "自然",
-        "content": "<lockedSkill></lockedSkill>，<tickLimitC><atActingStageFinish></atActingStageFinish></tickLimitC>，<youUseChooseCC><targetACardCC></targetACardCC></youUseChooseCC>，<exceptC>，<drawCC>一张</drawCC></exceptC>。",
+        "content": "<lockedskill></lockedskill>，<ticklimit class=\"irreplaceable\"><atactingstagefinish></atactingstagefinish></ticklimit>，<use><user class=\"irreplaceable\"><you></you></user><usebody></usebody><usedcard class=\"irreplaceable\"><choose><targetnumberlimit class=\"irreplaceable\">一张</targetnumberlimit><targetlimit class=\"irreplaceable\"><handcard></handcard></targetlimit></choose></usedcard></use>，<except><excepthead></excepthead>，<draw><drawhead></drawhead><drawquantity class=\"irreplaceable\">一张</drawquantity><drawend></drawend></draw></except>。",
         "role": [
             {
                 "id": 9,

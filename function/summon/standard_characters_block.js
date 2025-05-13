@@ -1,4 +1,4 @@
-$(function(){
+function summonCharacters(){
     var deferred1 = $.Deferred();
     var deferred2 = $.Deferred();
     $.ajax({
@@ -22,7 +22,7 @@ $(function(){
     $.when(deferred1, deferred2).done(function (characterData, skillData) {
         CharacterReplace(characterData, skillData);
     })
-})
+}
 function CharacterReplace(character,skill) {
         let standardCharacters = []
         //提取武将序号的顺序数组

@@ -1854,6 +1854,8 @@
         $(document).ready(function () {
             $(document).foundation()
         })
+        summonCharacters()
+        summonCharacterSkill()
         decompress('base/compression.json')
         replace_character_name('base/character.json')
         replace_skill_name('base/skill/strength'+ localStorage.getItem('strength') +'.json')
@@ -1862,7 +1864,9 @@
         add_button_wave()
         replace_term('base/term/dynamic.json', 1)
         replace_term('base/term/fixed.json', 1)
-        pronounCheck()
+        setTimeout(function() {
+            pronounCheck()
+        }, 1)
     })
 
     function filterParagraphs() {
