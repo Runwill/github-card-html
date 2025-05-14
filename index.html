@@ -31,12 +31,98 @@
 
     <script src="function/scroll_back.js"></script>
 
+    <style>
+        /* 加载动画样式 */
+        #loading-overlay {
+            position: fixed;
+            z-index: 99999;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 1s;
+        }
+        .loading-bar-container {
+            width: 39vw;
+            height: 8px;
+            background: #e0e0e0;
+            /*background: #ecead8;*/
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .loading-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #3f3f3f 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%);
+            /*
+            background: linear-gradient(90deg, #8698ff 0%, #4CAF50 100%);
+            background: linear-gradient(90deg, #000000 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%);
+            background: linear-gradient(90deg, #FFFFFF 90%, #a1a1a1 98%, #ff7f7f 99%, #000000 100%);
+            */
+            border-radius: 4px;
+            animation: loading-bar-anim 1.2s cubic-bezier(.4,0,.2,1) forwards;
+        }
+        .loading-title {
+            margin-bottom: 18px;
+            font-size: 1.5em;
+            color: #66666650;
+            letter-spacing: 1em;
+            font-family: '邯郸';
+            opacity: 0;
+            animation: fade-in-title 0.5s ease-in forwards;
+        }
+        @keyframes loading-bar-anim {
+            0% { width: 0%; }
+            80% { width: 90%; }
+            100% { width: 100%; }
+        }
+        @keyframes fade-in-title {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        #loading-overlay.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
 
     <title>Document丨程序</title>
 </head>
 
 <body>
     <script>$(document).foundation()</script>
+    <!-- 加载动画遮罩 -->
+    <div id="loading-overlay">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="loading-title">敢谒后尗贤者</div>
+            <div class="loading-bar-container">
+                <div class="loading-bar"></div>
+            </div>
+        </div>
+    </div>
+    <!-- ...existing code... -->
+    <script>
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function () {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // 加载动画淡出逻辑
+        window.addEventListener('load', function () {
+            // 进度条动画已自动播放，延迟一点再淡出
+            setTimeout(function () {
+                const overlay = document.getElementById('loading-overlay');
+                overlay.classList.add('fade-out');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 600); // 与CSS transition一致
+            }, 1200); // 与进度条动画时长一致
+        });
+    </script>
     <header id="header">
         <nav>
             <div id="header_title">
@@ -55,13 +141,13 @@
         </nav>
         <div id="sidebar-menu" style="display: none; position: absolute; top: 50px; padding: 10px; border: 1px solid #ccc; background: #ffffff;">
             <li style="list-style-type: circle;">
-                <button id="update-account-button" style="background: none; border: none;">更籍</button>
+                <button id="update-account-button" class="sidebar-menu_button">更籍</button>
             </li>
             <li style="list-style-type: circle;">
-                <button id="approve-request-button" style="background: none; border: none;">批允</button>
+                <button id="approve-request-button" class="sidebar-menu_button">批允</button>
             </li>
             <li style="list-style-type: circle;">
-                <button id="logout-button" style="background: none; border: none;">散出</button>
+                <button id="logout-button" class="sidebar-menu_button">退出</button>
             </li>
         </div>
         <!-- 添加弹窗HTML -->
@@ -162,8 +248,8 @@
                     userDiv.style.backgroundColor = '#f9f9f9';
 
                     userDiv.innerHTML = `
-                        <p style="margin: 0; font-weight: bold;">注册: ${user.username}</p>
-                        <div>
+                        <p style="margin: 0;">注册: ${user.username}</p>
+                        <div style="padding-left: 1em">
                             <button onclick="handleUserApproval('${user._id}', 'approve')" style="margin-right: 5px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">允准</button>
                             <button onclick="handleUserApproval('${user._id}', 'reject')" style="padding: 5px 10px; background-color: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;">不准</button>
                         </div>
@@ -253,7 +339,7 @@
                                             声明条件。
                                         </div>
                                         <h2>
-                                            <a class="button button_equaling"></a>
+                                            <a class="button wave button_equaling"></a>
                                             <script type="text/javascript">
                                                 document.querySelectorAll('.button_equaling').forEach(button => {
                                                     button.addEventListener(
@@ -348,7 +434,7 @@
                                             不限数量。
                                         </div>
                                         <h2>
-                                            <a class="button button_roundUp"></a>
+                                            <a class="button wave button_roundUp"></a>
                                             <script type="text/javascript">
                                                 document.querySelectorAll('.button_roundUp').forEach(button => {
                                                     button.addEventListener(
@@ -362,7 +448,7 @@
                                             向上取整。
                                         </div>
                                         <h2>
-                                            <a class="button button_pronoun"></a>
+                                            <a class="button wave button_pronoun"></a>
                                             <script type="text/javascript">
                                                 document.querySelectorAll('.button_pronoun').forEach(button => {
                                                     button.addEventListener(
@@ -376,7 +462,7 @@
                                             <h3><self class="scroll" /></h3>
                                         </padding>
                                         <h2>
-                                            <a class="button button_include"></a>
+                                            <a class="button wave button_include"></a>
                                             <script type="text/javascript">
                                                 document.querySelectorAll('.button_include').forEach(button => {
                                                     button.addEventListener(
@@ -453,7 +539,7 @@
                                                         </div>
                                                     </padding>
                                                     <div class="indent">
-                                                        <a class="button button_tickQuantifier"></a>
+                                                        <a class="button wave button_tickQuantifier"></a>
                                                         <script type="text/javascript">
                                                             document.querySelectorAll('.button_tickQuantifier').forEach(button => {
                                                                 button.addEventListener(
@@ -1512,7 +1598,7 @@
                                                 </div>
                                             </padding>
                                             <h3>
-                                                <a class="button" style="background: rgb(130, 211, 164)" href="./pages/health_bar.html" target="_blank"></a>
+                                                <a class="button wave" style="background: rgb(130, 211, 164)" href="./pages/health_bar.html" target="_blank"></a>
                                                 <health class="scroll" />
                                             </h3>
                                             <div class="indent">
@@ -1866,7 +1952,7 @@
         replace_term('base/term/fixed.json', 1)
         setTimeout(function() {
             pronounCheck()
-        }, 1)
+        }, 100)
     })
 
     function filterParagraphs() {

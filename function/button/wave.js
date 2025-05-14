@@ -1,5 +1,5 @@
 function add_button_wave(){
-    document.querySelectorAll('.button').forEach(button => {
+    document.querySelectorAll('.button.wave').forEach(button => {
         button.addEventListener('click', function(e){
             let rect = e.target.getBoundingClientRect();
             let x = e.clientX - rect.left

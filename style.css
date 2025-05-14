@@ -336,6 +336,19 @@
     font-family: '大篆';
     src: url('source/金文大篆体.TTF') format('truetype');
 }
+@font-face {
+    font-family: '碑楷';
+    src: url('source/方正北魏楷书.TTF') format('truetype');
+}
+@font-face {
+    font-family: '康熙';
+    src: url('source/康熙字典体.TTF') format('truetype');
+}
+@font-face {
+    font-family: '邯郸';
+    src: url('source/邯郸康熙字典体.TTF') format('truetype');
+}
+
 *{
     user-select: none;
 }
@@ -373,6 +386,10 @@ pronounName{
 
 .button:hover, .button:focus{
     background: #8698ff
+}
+
+.sidebar-menu_button{
+    background: none; border: none; padding-right: 0.5em;
 }
 
 .container{
