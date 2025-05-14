@@ -68,7 +68,7 @@
             font-size: 1.5em;
             color: #66666650;
             letter-spacing: 1em;
-            font-family: '邯郸';
+            font-family: '康熙';
             opacity: 0;
             animation: fade-in-title 0.5s ease-in forwards;
         }
@@ -95,7 +95,18 @@
     <!-- 加载动画遮罩 -->
     <div id="loading-overlay">
         <div style="display: flex; flex-direction: column; align-items: center;">
-            <div class="loading-title">敢谒后尗贤者</div>
+            <div class="loading-title" id="loading-title"></div>
+            <script>
+                // 随机文本列表
+                const loadingTexts = [
+                    "多少事 从来急"
+                ];
+                // 随机选择一句
+                document.addEventListener('DOMContentLoaded', function () {
+                    const randomText = loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
+                    document.getElementById('loading-title').textContent = randomText;
+                });
+            </script>
             <div class="loading-bar-container">
                 <div class="loading-bar"></div>
             </div>

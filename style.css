@@ -348,6 +348,10 @@
     font-family: '邯郸';
     src: url('source/邯郸康熙字典体.TTF') format('truetype');
 }
+@font-face {
+    font-family: '毛体';
+    src: url('source/草檀斋毛泽东字体.ttf') format('truetype');
+}
 
 *{
     user-select: none;
