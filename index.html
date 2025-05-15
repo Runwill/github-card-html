@@ -13,6 +13,10 @@
     <script src="Foundation-Sites-CSS/js/vendor/what-input.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="Foundation-Sites-CSS/css/foundation.css">
+
+    
+    <link rel="stylesheet" type="text/css" href="style/media.css">
+    <link rel="stylesheet" type="text/css" href="style/page_loading.css">
     <link rel="stylesheet" type="text/css" href="style.css">
 
     <script src="function/summon/standard_character_skills_block.js"></script>
@@ -29,63 +33,9 @@
     <script src="function/replace/term.js"></script>
     <script src="function/replace/card_name.js"></script>
 
+    <script src="function/login_check.js"></script>
+    <script src="function/page_loading.js"></script>
     <script src="function/scroll_back.js"></script>
-
-    <style>
-        /* 加载动画样式 */
-        #loading-overlay {
-            position: fixed;
-            z-index: 99999;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 3.5s;
-        }
-        .loading-bar-container {
-            width: 39vw;
-            height: 8px;
-            background: #e0e0e0;
-            /*background: #ecead8;*/
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .loading-bar {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #3f3f3f 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%);
-            /*
-            background: linear-gradient(90deg, #8698ff 0%, #4CAF50 100%);
-            background: linear-gradient(90deg, #000000 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%);
-            background: linear-gradient(90deg, #FFFFFF 90%, #a1a1a1 98%, #ff7f7f 99%, #000000 100%);
-            */
-            border-radius: 4px;
-            animation: loading-bar-anim 1.2s cubic-bezier(.4,0,.2,1) forwards;
-        }
-        .loading-title {
-            margin-bottom: 18px;
-            font-size: 1.5em;
-            color: #66666650;
-            letter-spacing: 1em;
-            font-family: '康熙';
-            opacity: 0;
-            animation: fade-in-title 0.5s ease-in forwards;
-        }
-        @keyframes loading-bar-anim {
-            0% { width: 0%; }
-            80% { width: 90%; }
-            100% { width: 100%; }
-        }
-        @keyframes fade-in-title {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        #loading-overlay.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-    </style>
 
     <title>Document丨程序</title>
 </head>
@@ -97,43 +47,12 @@
         <div style="display: flex; flex-direction: column; align-items: center;">
             <div class="loading-title" id="loading-title"></div>
             <script>
-                // 随机文本列表
-                const loadingTexts = [
-                    "多少事 从来急"
-                ];
-                // 随机选择一句
-                document.addEventListener('DOMContentLoaded', function () {
-                    const randomText = loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
-                    document.getElementById('loading-title').textContent = randomText;
-                });
             </script>
             <div class="loading-bar-container">
                 <div class="loading-bar"></div>
             </div>
         </div>
     </div>
-    <!-- ...existing code... -->
-    <script>
-        // 页面加载时检查登录状态
-        document.addEventListener('DOMContentLoaded', function () {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                window.location.href = 'login.html';
-            }
-        });
-
-        // 加载动画淡出逻辑
-        window.addEventListener('load', function () {
-            // 进度条动画已自动播放，延迟一点再淡出
-            setTimeout(function () {
-                const overlay = document.getElementById('loading-overlay');
-                overlay.classList.add('fade-out');
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                }, 3500); // 与CSS transition一致
-            }, 1200); // 与进度条动画时长一致
-        });
-    </script>
     <header id="header">
         <nav>
             <div id="header_title">
@@ -1933,18 +1852,6 @@
         </div>
     </div>
 </body>
-
-
-<script>
-    // 页面加载时检查登录状态
-    document.addEventListener('DOMContentLoaded', function () {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            // 如果没有登录令牌，跳转到登录页面
-            window.location.href = 'login.html';
-        }
-    });
-</script>
 
 <script type="text/javascript">
     $(function () {

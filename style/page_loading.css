@@ -1,0 +1,53 @@
+/* 加载动画样式 */
+#loading-overlay {
+    position: fixed;
+    z-index: 99999;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 3.5s;
+}
+.loading-bar-container {
+    width: 39vw;
+    height: 8px;
+    background: #e0e0e0;
+    /*background: #ecead8;*/
+    border-radius: 4px;
+    overflow: hidden;
+}
+.loading-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, #3f3f3f 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%);
+    /*
+    background: linear-gradient(90deg, #8698ff 0%, #4CAF50 100%);
+    background: linear-gradient(90deg, #000000 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%);
+    background: linear-gradient(90deg, #FFFFFF 90%, #a1a1a1 98%, #ff7f7f 99%, #000000 100%);
+    */
+    border-radius: 4px;
+    animation: loading-bar-anim 1.2s cubic-bezier(.4,0,.2,1) forwards;
+}
+.loading-title {
+    margin-bottom: 18px;
+    font-size: 1.5em;
+    color: #66666650;
+    letter-spacing: 1em;
+    font-family: '康熙';
+    opacity: 0;
+    animation: fade-in-title 0.5s ease-in forwards;
+}
+@keyframes loading-bar-anim {
+    0% { width: 0%; }
+    80% { width: 90%; }
+    100% { width: 100%; }
+}
+@keyframes fade-in-title {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+#loading-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
