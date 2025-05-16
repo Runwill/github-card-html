@@ -4,15 +4,18 @@ function elementReplaceCheck(key,name,event){
         const targetObject = term.find(item => item.en === key)
         const partLength = targetObject ? targetObject.part.length : 0
         if(term_status[name] >= partLength - 1){
-            clickedButton.style.background='#8698ff'
+            reset_color(clickedButton)
+            clickedButton.classList.add('button_color_blue')
             term_status[name] = 0
             elementReplace(name + String(partLength - 1), name + '0')
         }else if(term_status[name] < partLength - 1){
-            clickedButton.style.background='#ff8686'
+            reset_color(clickedButton)
+            clickedButton.classList.add('button_color_red')
             term_status[name] = term_status[name] + 1
             elementReplace(name + String(term_status[name] - 1), name + String(term_status[name]))
         }else{
-            clickedButton.style.background='#ff8686'
+            reset_color(clickedButton)
+            clickedButton.classList.add('button_color_red')
             term_status[name] = 1
             elementReplace(name + '0', name + '1')
         }
@@ -20,10 +23,12 @@ function elementReplaceCheck(key,name,event){
 }
 function pronounReplaceCheck(event){
     if(term_status['pronoun'] == 0){
-        event.target.style.background='#8698ff'
+        reset_color(event.target)
+        event.target.classList.add('button_color_blue')
         term_status['pronoun'] = 1
     }else{
-        event.target.style.background='#ff8686'
+        reset_color(event.target)
+        event.target.classList.add('button_color_red')
         term_status['pronoun'] = 0
     }
     pronounCheck()
@@ -43,6 +48,11 @@ function pronounCheck(paragraphs = document){
             })
         }
     }
+}
+
+function reset_color(target){
+    target.classList.remove('button_color_blue')
+    target.classList.remove('button_color_red')
 }
 
 function elementReplace(name1,name2){

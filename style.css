@@ -66,10 +66,6 @@ pronounName{
         -1px 1px 0 rgb(255, 215, 0, 0.1);  /* 左下 */
 }
 
-.button:hover, .button:focus{
-    background: #8698ff
-}
-
 .sidebar-menu_button{
     background: none; border: none; padding-right: 0.5em;
 }
@@ -120,14 +116,6 @@ pronounName{
 .container:hover .role_icon.not_dominator {
     opacity: 0.025;
     left: 4.5%
-}
-
-.button{
-    position: absolute;
-    color:#ffffff;
-    border-radius:40px;
-    overflow: hidden;
-    background:#8698ff;
 }
 
 span{

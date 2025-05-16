@@ -1,0 +1,36 @@
+.button{
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    background: linear-gradient(90deg, hsl(233, 100%, 78%) 0%, hsl(233, 100%, 73%) 100%);
+    transition: background 0.4s cubic-bezier(.4,0,.2,1), box-shadow 0.2s, transform 0.2s cubic-bezier(.4,0,.2,1);
+    user-select: none;
+    outline: none;
+    display: inline-block;
+    box-shadow: 0 2px 8px #8698ff22;
+    cursor: pointer;
+    padding: 10px 22px;
+    border: none;
+}
+
+.button.button_color_blue {
+    background: linear-gradient(90deg, hsl(233, 100%, 78%) 0%, hsl(233, 100%, 73%) 100%);
+}
+
+.button.button_color_red {
+    background: linear-gradient(90deg, hsl(1, 100%, 78%) 0%, hsl(1, 100%, 73%) 100%);
+}
+
+@keyframes animate {
+    0% {
+        width: 0;
+        height: 0;
+        opacity: 0.7;
+    }
+    100% {
+        width: 200px;
+        height: 200px;
+        opacity: 0;
+    }
+}
+/*按钮动态大小在media.css*/

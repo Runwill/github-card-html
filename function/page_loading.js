@@ -16,6 +16,6 @@ window.addEventListener('load', function () {
         overlay.classList.add('fade-out');
         setTimeout(() => {
             overlay.style.display = 'none';
-        }, 3500); // 与CSS transition一致
+        }, 3000); // 与CSS transition一致
     }, 1200); // 与进度条动画时长一致
 });
