@@ -2,7 +2,7 @@ function summonCharacters(){
     var deferred1 = $.Deferred();
     var deferred2 = $.Deferred();
     $.ajax({
-        url:"base/character.json",
+        url:"http://localhost:3000/api/character",
         type:"GET",
         datatype:"json",
         success:

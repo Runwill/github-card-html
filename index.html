@@ -1396,6 +1396,10 @@
                                             <div class="indent">
                                                 正在<advance></advance>的最低<tick></tick>。
                                             </div>
+                                            <h3><cancel class="scroll" /></h3>
+                                            <div class="indent">
+                                                移除若干正在<advance></advance>或待<advance></advance>的<tick></tick>。
+                                            </div>
                                             <h3><inherentStage class="scroll" /></h3>
                                             <div class="indent">
                                                 一类<tick></tick>。
@@ -1771,13 +1775,13 @@
                                         <padding>
                                             <h3><attack class="scroll" /></h3>
                                             <div class="indent">
-                                                <tickingTimeLimitC><tickingLimit class="irreplaceable"><actingStage></actingStage></tickingLimit><numberLimitC>一</numberLimitC></tickingLimit></tickingTimeLimitC>，<actionType><use><directedMark></directedMark><useTarget class="irreplaceable"><choose><targetNumberLimit class="irreplaceable">一名</targetNumberLimit><distanceLimit class="irreplaceable"><inReach><inReachEnd></inReachEnd>的</inReach></distanceLimit><targetElsRlC></targetElsRlC></choose></useTarget><useBody></useBody></use></actionType>。
+                                                <tickinglimit class="irreplaceable"><actingstage></actingstage></tickinglimit><numberlimit class="irreplaceable"><numberlimiting><numberlimitinghead></numberlimitinghead>一<numberlimitingend></numberlimitingend></numberlimiting></numberlimit>，<use><directedmark></directedmark><usetarget class="irreplaceable"><choose><targetnumberlimit class="irreplaceable">一名</targetnumberlimit><distancelimit class="irreplaceable"><inreach><inreachend></inreachend></inreach></distancelimit>的<targetlimit class="irreplaceable"><elserole></elserole></targetlimit></choose></usetarget><usebody></usebody></use>。
                                             </div>
                                             <div class="indent">
                                                 <affect><effect></effect></affect>：
                                                 <padding>
                                                     <div class="indent">
-                                                        <actionType><damage><damageRole class="irreplaceable"><you></you></damageRole><directedMark></directedMark><damagedRole class="irreplaceable">目标</damagedRole><dealtBody></dealtBody><damageValue class="irreplaceable">一点</damageValue><damageEnd></damageEnd></damage></actionType>。
+                                                        <damage><damagerole class="irreplaceable"><you></you></damagerole><directedmark></directedmark><damagedrole class="irreplaceable"><use><usetarget></usetarget></use></damagedrole><dealtbody></dealtbody><damagevalue class="irreplaceable">一点</damagevalue><damageend></damageend></damage>。
                                                     </div>
                                                 </padding>
                                             </div>
@@ -1839,7 +1843,7 @@
                             function onTextChange(newValue) {
                                 console.log("文本框内容已更新:", newValue)
                                 draft_block = $('.draftBlock')[0]
-                                replace_character_name('base/character.json', draft_block)
+                                replace_character_name('http://localhost:3000/api/character', draft_block)
                                 replace_skill_name('base/skill/strength'+ localStorage.getItem('strength') +'.json', draft_block)
                                 replace_card_name('base/card.json', draft_block)
                                 replace_term('base/term/dynamic.json', 1, draft_block)
@@ -1860,19 +1864,33 @@
             $(document).foundation()
         })
         summonCharacters()
+        delay(500);
         summonCharacterSkill()
+        delay(1000);
         decompress('base/compression.json')
-        replace_character_name('base/character.json')
+        delay(500);
+        replace_character_name('http://localhost:3000/api/character')
+        delay(500);
         replace_skill_name('base/skill/strength'+ localStorage.getItem('strength') +'.json')
+        delay(500);
         replace_card_name('base/card.json')
+        delay(500);
         check_strength()
+        delay(500);
         add_button_wave()
+        delay(500);
         replace_term('base/term/dynamic.json', 1)
+        delay(500);
         replace_term('base/term/fixed.json', 1)
+        delay(500);
         setTimeout(function() {
             pronounCheck()
         }, 100)
     })
+
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
 
     function filterParagraphs() {
         var query = document.getElementById('search-input').value.trim().toLowerCase()

@@ -99,7 +99,7 @@
     },
     {
         "name": "泊心",
-        "content": "<tickingLimitCC><gettingStage></gettingStage></tickingLimitCC>，<youCanCC>改为<drawC><drawQuantity class=\"irreplaceable\">x张</drawQuantity>(“x”为角色数与你已失去体力值和，至多为5)</drawC></youCanCC>。若如此做，<crtTurnCC></crtTurnCC><youUseC><card></card></youUseC>无法指定<self></self>为目标。",
+        "content": "<tickingLimitCC><gettingStage></gettingStage></tickingLimitCC>，<youCanCC>改为<drawC><drawQuantity class=\"irreplaceable\">x张</drawQuantity>(“x”为其他角色数与你已失去体力值和，至多为5)</drawC></youCanCC>。若如此做，<crtTurnCC></crtTurnCC><youUseC><card></card></youUseC>无法指定<self></self>为目标。",
         "role": [
             {
                 "id": 11,

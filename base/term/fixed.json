@@ -7,7 +7,7 @@
     {
         "cn": "进行",
         "en": "advance",
-        "color": "#8dff9e"
+        "color": "#b7fdc2"
     },
     {
         "cn": "公式",
@@ -1879,6 +1879,10 @@
         "cn": "伤害作用域",
         "part": [
             {
+                "cn": "对",
+                "en": "directedMark"
+            },
+            {
                 "cn": "造成",
                 "en": "dealtBody"
             },
@@ -2099,6 +2103,11 @@
         "cn": "当前时机",
         "en": "currentTick",
         "color": "#9fe3e8"
+    },
+    {
+        "cn": "取消",
+        "en": "cancel",
+        "color": "#f18989"
     },
     {
         "en": "when",
