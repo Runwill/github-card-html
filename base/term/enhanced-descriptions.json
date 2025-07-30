@@ -1,0 +1,140 @@
+[
+    {
+        "en": "actingStage",
+        "cn": "出牌阶段",
+        "color": "#7fe586",
+        "category": "timing",
+        "description": "游戏回合中的主要行动阶段，玩家可以使用手牌、发动技能等。这是游戏的核心互动时段。",
+        "usage": "出牌阶段限一次",
+        "examples": [
+            "出牌阶段，你可以使用【杀】",
+            "出牌阶段开始时，你摸一张牌"
+        ]
+    },
+    {
+        "en": "numberLimiting",
+        "part": [
+            {
+                "cn": "限",
+                "en": "numberLimitingHead"
+            },
+            {
+                "cn": "次",
+                "en": "numberLimitingEnd"  
+            }
+        ],
+        "color": "#60e6ae",
+        "category": "restriction",
+        "description": "限制某个行动或技能在特定时间段内的使用次数。这是平衡游戏机制的重要手段。",
+        "usage": "限X次",
+        "examples": [
+            "出牌阶段限一次",
+            "每回合限两次",
+            "限三次"
+        ]
+    },
+    {
+        "cn": "一点",
+        "en": "onePoint",
+        "color": "#b1cfe3",
+        "category": "quantity",
+        "description": "表示数值为1的计量单位，常用于伤害、体力、距离等游戏数值。",
+        "usage": "造成一点伤害",
+        "examples": [
+            "受到一点伤害",
+            "回复一点体力",
+            "距离+1"
+        ]
+    },
+    {
+        "cn": "摸牌",
+        "en": "draw",
+        "color": "#abd1b4",
+        "category": "effect",
+        "description": "从牌堆顶部获得卡牌到手牌的游戏动作。这是获得资源的主要方式。",
+        "usage": "摸X张牌",
+        "examples": [
+            "摸一张牌",
+            "摸两张牌然后弃一张牌",
+            "摸牌阶段多摸一张牌"
+        ]
+    },
+    {
+        "cn": "弃置",
+        "en": "discard",
+        "color": "#acd1ab",
+        "category": "effect", 
+        "description": "将卡牌从当前位置移动到弃牌堆的游戏动作。可能是主动或被动的。",
+        "usage": "弃置X张牌",
+        "examples": [
+            "弃置一张手牌",
+            "弃置装备区里的一张牌",
+            "被弃置的牌"
+        ]
+    },
+    {
+        "cn": "你",
+        "en": "you",
+        "color": "#f0a2a2",
+        "category": "role",
+        "description": "在技能描述中指代技能的拥有者或执行者。在不同语境下可能指代不同的角色。",
+        "usage": "技能主语",
+        "examples": [
+            "你可以摸一张牌",
+            "当你受到伤害时",
+            "你的回合开始时"
+        ]
+    },
+    {
+        "cn": "目标",
+        "en": "target",
+        "color": "#c7cff7",
+        "category": "role",
+        "description": "被技能或卡牌效果选择作为作用对象的角色。目标的选择往往有特定的限制条件。",
+        "usage": "技能或卡牌的作用对象",
+        "examples": [
+            "选择一名角色为目标",
+            "目标角色摸一张牌",
+            "目标不能响应此【杀】"
+        ]
+    },
+    {
+        "cn": "手牌",
+        "en": "handCard",
+        "color": "#ecb09d",
+        "category": "card",
+        "description": "角色持有的，对其他角色隐藏的卡牌。手牌是进行游戏行动的主要资源。",
+        "usage": "角色的私有卡牌资源",
+        "examples": [
+            "弃置一张手牌",
+            "手牌上限为体力值",
+            "展示所有手牌"
+        ]
+    },
+    {
+        "cn": "装备牌",
+        "en": "equipCard",
+        "color": "#c2f3c2",
+        "category": "card",
+        "description": "可以装备在角色装备区的特殊卡牌，提供持续效果。装备牌有武器、防具、坐骑等类型。",
+        "usage": "提供持续能力的卡牌",
+        "examples": [
+            "装备一张武器牌",
+            "装备区里的牌",
+            "重铸装备牌"
+        ]
+    },
+    {
+        "cn": "体力",
+        "en": "health",
+        "color": "#e08b8b",
+        "category": "quantity",
+        "description": "角色的生命值，当体力降为0或更低时角色进入濒死状态。体力也影响手牌上限。",
+        "usage": "角色的生命数值",
+        "examples": [
+            "损失一点体力",
+            "回复体力至上限",
+            "体力值为3"
+        ]
+    }
+]

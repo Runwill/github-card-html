@@ -1,0 +1,431 @@
+/* Enhanced Three Kingdoms Rules Visualization CSS */
+
+/* Modern Animations and Transitions */
+* {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced Semantic Element Highlighting */
+.semantic-element {
+    border-radius: 4px;
+    padding: 2px 4px;
+    margin: 0 1px;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.semantic-element::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: inherit;
+}
+
+.semantic-element:hover::before {
+    opacity: 1;
+}
+
+/* Element Type Categories with Enhanced Colors */
+.timing-element {
+    background: linear-gradient(135deg, #7fe586, #6bd16e);
+    color: #2d5016;
+    border-left: 4px solid #5cb85c;
+}
+
+.restriction-element {
+    background: linear-gradient(135deg, #f3d1ef, #e5a8d8);
+    color: #6b2c5c;
+    border-left: 4px solid #d81b60;
+}
+
+.quantity-element {
+    background: linear-gradient(135deg, #b1cfe3, #8dbeff);
+    color: #1e3d59;
+    border-left: 4px solid #2196f3;
+}
+
+.effect-element {
+    background: linear-gradient(135deg, #f1e989, #e6d55a);
+    color: #5d4e00;
+    border-left: 4px solid #ffc107;
+}
+
+.procedure-element {
+    background: linear-gradient(135deg, #8dbeff, #6fa8dc);
+    color: #1a237e;
+    border-left: 4px solid #3f51b5;
+}
+
+.role-element {
+    background: linear-gradient(135deg, #d7e8b0, #c5d69a);
+    color: #33691e;
+    border-left: 4px solid #8bc34a;
+}
+
+.card-element {
+    background: linear-gradient(135deg, #d8cbc8, #c9b8b4);
+    color: #4e342e;
+    border-left: 4px solid #795548;
+}
+
+/* Enhanced Hover Effects */
+.semantic-element:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+/* Tooltip System */
+.tooltip {
+    position: absolute;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    max-width: 300px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltip.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.tooltip::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid #2c3e50;
+}
+
+.tooltip .tooltip-title {
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #ecf0f1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 4px;
+}
+
+.tooltip .tooltip-content {
+    color: #bdc3c7;
+}
+
+.tooltip .tooltip-category {
+    display: inline-block;
+    background: rgba(52, 152, 219, 0.8);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+/* Explanation Panel */
+.explanation-panel {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 400px;
+    height: 100vh;
+    background: linear-gradient(180deg, #ffffff, #f8f9fa);
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 1px solid #e9ecef;
+    overflow-y: auto;
+}
+
+.explanation-panel.active {
+    right: 0;
+}
+
+.explanation-panel .panel-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.explanation-panel .panel-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.explanation-panel .panel-content {
+    padding: 20px;
+}
+
+.explanation-panel .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.explanation-panel .close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Search Enhancement */
+.search-container {
+    position: relative;
+    margin: 20px 0;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 20px 12px 50px;
+    border: 2px solid #e9ecef;
+    border-radius: 25px;
+    font-size: 16px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.search-input:focus {
+    border-color: #667eea;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+    outline: none;
+}
+
+.search-icon {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 18px;
+}
+
+/* Enhanced Visual Hierarchy */
+.rule-section {
+    margin: 30px 0;
+    padding: 25px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    position: relative;
+    overflow: hidden;
+}
+
+.rule-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+}
+
+.rule-section h1,
+.rule-section h2,
+.rule-section h3 {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.rule-section h1::after,
+.rule-section h2::after,
+.rule-section h3::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #667eea, transparent);
+    transition: width 0.3s ease;
+}
+
+.rule-section h1::after {
+    width: 60px;
+}
+
+.rule-section h2::after {
+    width: 40px;
+}
+
+.rule-section h3::after {
+    width: 30px;
+}
+
+/* Navigation Enhancement */
+.enhanced-nav {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.enhanced-nav .tab {
+    color: rgba(255, 255, 255, 0.8);
+    border: none;
+    background: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.enhanced-nav .tab:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.enhanced-nav .tab.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.enhanced-nav .tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: white;
+    transition: width 0.3s ease;
+}
+
+.enhanced-nav .tab.active::after {
+    width: 100%;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+    .explanation-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .tooltip {
+        max-width: 250px;
+        font-size: 13px;
+    }
+    
+    .semantic-element {
+        padding: 1px 3px;
+        margin: 0;
+    }
+}
+
+/* Animation Keyframes */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s infinite;
+}
+
+.animate-slide-in {
+    animation: slideInFromRight 0.5s ease-out;
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Three Kingdoms Theme Colors */
+:root {
+    --tk-gold: #d4af37;
+    --tk-red: #dc3545;
+    --tk-blue: #007bff;
+    --tk-green: #28a745;
+    --tk-purple: #6f42c1;
+    --tk-orange: #fd7e14;
+    --tk-teal: #20c997;
+    --tk-dark: #343a40;
+    --tk-light: #f8f9fa;
+}
+
+/* Accessibility Improvements */
+.semantic-element:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.high-contrast .semantic-element {
+    border: 2px solid #000;
+    background: #fff !important;
+    color: #000 !important;
+}
+
+/* Print Styles */
+@media print {
+    .explanation-panel,
+    .tooltip,
+    .search-container {
+        display: none !important;
+    }
+    
+    .semantic-element {
+        background: white !important;
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+}
