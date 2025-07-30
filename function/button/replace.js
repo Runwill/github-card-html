@@ -1,6 +1,6 @@
 function elementReplaceCheck(key,name,event){
     const clickedButton = event.target
-    fetch('base/term/dynamic.json').then(response => response.json()).then(term => {
+    fetch('http://localhost:3000/api/term-dynamic').then(response => response.json()).then(term => {
         const targetObject = term.find(item => item.en === key)
         const partLength = targetObject ? targetObject.part.length : 0
         if(term_status[name] >= partLength - 1){
@@ -61,7 +61,7 @@ function elementReplace(name1,name2){
         newElement.innerHTML = element.innerHTML
         element.parentNode.replaceChild(newElement, element)
     })
-    replace_term('base/term/dynamic.json')
+    replace_term('http://localhost:3000/api/term-dynamic')
 }
 function add_pronoun(paragraphs = document){
     // 定义一个数组，包含三个代名词：甲、乙、丙

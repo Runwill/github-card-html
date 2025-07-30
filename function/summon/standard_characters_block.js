@@ -11,7 +11,7 @@ function summonCharacters(){
         }
     })
     $.ajax({
-        url:'base/skill/strength'+ localStorage.getItem('strength') +'.json',
+        url:'http://localhost:3000/api/skill'+ localStorage.getItem('strength'),
         type:"GET",
         datatype:"json",
         success:

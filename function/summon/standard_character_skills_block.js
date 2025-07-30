@@ -1,27 +1,30 @@
 function summonCharacterSkill(){
-    var deferred1 = $.Deferred();
-    var deferred2 = $.Deferred();
-    $.ajax({
-        url:"http://localhost:3000/api/character",
-        type:"GET",
-        datatype:"json",
-        success:
-        function (characterData){
-            deferred1.resolve(characterData)
-        }
-    })
-    $.ajax({
-        url:'base/skill/strength'+ localStorage.getItem('strength') +'.json',
-        type:"GET",
-        datatype:"json",
-        success:
-        function (skillData){
-            deferred2.resolve(skillData);
-        }
-    })
-    $.when(deferred1, deferred2).done(function (characterData, skillData) {
-        CharacterSkillReplace(characterData, skillData);
-    })
+    return new Promise(function(resolve) {
+        var deferred1 = $.Deferred();
+        var deferred2 = $.Deferred();
+        $.ajax({
+            url:"http://localhost:3000/api/character",
+            type:"GET",
+            datatype:"json",
+            success:
+            function (characterData){
+                deferred1.resolve(characterData)
+            }
+        })
+        $.ajax({
+            url:'http://localhost:3000/api/skill'+ localStorage.getItem('strength'),
+            type:"GET",
+            datatype:"json",
+            success:
+            function (skillData){
+                deferred2.resolve(skillData);
+            }
+        })
+        $.when(deferred1, deferred2).done(function (characterData, skillData) {
+            CharacterSkillReplace(characterData, skillData);
+            resolve(); // 在HTML生成完成后resolve Promise
+        })
+    });
 }
 function CharacterSkillReplace(character,skill) {
         //获取武将技能名并排序
