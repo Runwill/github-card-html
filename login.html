@@ -6,6 +6,7 @@
     <title>登录</title>
     <link rel="stylesheet" type="text/css" href="Foundation-Sites-CSS/css/foundation.css">
     <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="function/login_check.js"></script>
     <style>
         /* 居中登录框 */
 
@@ -57,8 +58,16 @@
                     document.getElementById('login-message').textContent = '登录成功！';
                     document.getElementById('login-message').style.color = 'green';
 
-                    // 登录成功后跳转到主页面
-                    window.location.href = 'index.html';
+                    // 使用新的重定向处理方法
+                    console.log('登录成功，准备重定向');
+                    setTimeout(() => {
+                        if (typeof handleSuccessfulLogin === 'function') {
+                            handleSuccessfulLogin();
+                        } else {
+                            // 后备方案
+                            window.location.href = 'index.html';
+                        }
+                    }, 500); // 给用户一点时间看到成功消息
                 } else {
                     const errorData = await response.json();
                     document.getElementById('login-message').textContent = errorData.message;
