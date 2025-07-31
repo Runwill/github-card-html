@@ -33,21 +33,44 @@ function replace_skill_name(path, paragraphs = document){
             addStandardHighlight(element, "#df90ff", scrollSelector)
             for (var j in skill) {//不同武将的技能名悬浮个性化文本
                 if (skill[j].name == skillNames[i]) {
-                    for (k in skill[j].role) {
-                        element = $(paragraphs).find('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id)
-                        element.prop('loreSkillPosition', j)
-                        element.prop('loreRolePosition', k)
+            for (k in skill[j].role) {
+                element = $(paragraphs).find('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id)
+                element.prop('loreSkillPosition', j)
+                element.prop('loreRolePosition', k)
 
-                        element.mouseover(
-                            function () {
-                                $(this).after('<lore style="line-height: 0;">「' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].lore + '」——《' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].legend + '》</lore>')
-                            }
-                        )
-                        element.mouseout(
-                            function () {
-                                $("lore").remove()
-                            }
-                        )
+                element.on('mouseenter', function (e) {
+                    const loreText = '「' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].lore + '」——《' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].legend + '》';
+                    let $tooltip = $('#lore-tooltip');
+                    if ($tooltip.length === 0) {
+                        $tooltip = $('<div id="lore-tooltip"></div>').appendTo('body');
+                    }
+                    $tooltip.html(loreText)
+                        .css({
+                            position: 'fixed',
+                            left: (e.clientX + 16) + 'px',
+                            top: (e.clientY + 8) + 'px',
+                            background: 'rgba(255,255,240,0.98)',
+                            color: '#333',
+                            border: '1px solid #bbb',
+                            'border-radius': '6px',
+                            'box-shadow': '0 2px 8px rgba(0,0,0,0.12)',
+                            padding: '8px 16px',
+                            'z-index': 9999,
+                            'font-size': '1em',
+                            'pointer-events': 'none',
+                            opacity: 0
+                        })
+                        .stop(true, true).fadeTo(180, 1);
+                })
+                element.on('mousemove', function (e) {
+                    $('#lore-tooltip').css({
+                        left: (e.clientX + 16) + 'px',
+                        top: (e.clientY + 8) + 'px'
+                    });
+                })
+                element.on('mouseleave', function () {
+                    $('#lore-tooltip').stop(true, true).fadeOut(180, function () { $(this).remove(); });
+                })
                     }
                 }
             }
