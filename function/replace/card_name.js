@@ -15,19 +15,15 @@ function replace_card_name(path, paragraphs = document){
                         $(this).fadeTo(200, 0).fadeTo(1000, 1) // 淡入效果
                     })
                 })
-            }).mouseover(//高亮
-                function(event){
-                    if(card[$(this).data("index")].type == '基本') color = "#c2f3c2"
-                    if(card[$(this).data("index")].type == '锦囊') color = "#f3e6c2"
-                    $(this).css("background-color",color)
-                    $(card[$(this).data("index")].en+".scroll").css("background-color",color)
-                }
-            ).mouseout(//高亮
-                function(event){
-                    $(this).css("background-color","")
-                    $(card[$(this).data("index")].en+".scroll").css("background-color","")
-                }
-            )
+            })
+            
+            // 使用统一的高亮函数
+            element.each(function() {
+                const cardData = card[$(this).data("index")]
+                const color = cardData.type == '基本' ? "#c2f3c2" : cardData.type == '锦囊' ? "#f3e6c2" : ""
+                const scrollSelector = cardData.en + ".scroll"
+                addStandardHighlight($(this), color, scrollSelector)
+            })
         }
     })
 }

@@ -26,17 +26,11 @@ function replace_skill_name(path, paragraphs = document){
                         }
                     })
                 })
-            }).mouseover(//高亮
-                function () {
-                    $(this).css("background-color", "#df90ff")
-                    $("." + this.classList[0] + ".scroll").css("background-color", "#df90ff")
-                }
-            ).mouseout(//高亮
-                function () {
-                    $(this).css("background-color", "")
-                    $("." + this.classList[0] + ".scroll").css("background-color", "")
-                }
-            )
+            })
+            
+            // 使用统一的高亮函数
+            const scrollSelector = "." + skillNames[i] + ".scroll"
+            addStandardHighlight(element, "#df90ff", scrollSelector)
             for (var j in skill) {//不同武将的技能名悬浮个性化文本
                 if (skill[j].name == skillNames[i]) {
                     for (k in skill[j].role) {

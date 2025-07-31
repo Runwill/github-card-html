@@ -33,7 +33,7 @@ function replace_term(path, mode, paragraphs = document) {
                 if(mode){
                     $(paragraphs).find(term[i].en).each((index, element) => {
                         element.i = i // 通过元素属性存储索引
-                        term_highlight(term, element)
+                        termHighlight(term, element)
                     })
                 }
             }
@@ -49,7 +49,7 @@ function replace_term(path, mode, paragraphs = document) {
                 if(mode){
                     $(paragraphs).find(term[i].en).each((index, element) => { //高亮
                         element.i = i
-                        term_highlight(term, element, 'divided')
+                        termHighlight(term, element, 'divided')
 
                     }).each(function() { //滚动
                         $(this).on('dblclick', function (event) {
@@ -71,7 +71,7 @@ function replace_term(path, mode, paragraphs = document) {
                             $(paragraphs).find(term[i].part[j].en).each((index, element) => {
                                 element.i = i
                                 element.j = j
-                                term_highlight(term, element, 'part')
+                                termHighlight(term, element, 'part')
 
                             }).each(function() { //滚动
                                 $(this).on('dblclick', function (event) {
@@ -91,91 +91,6 @@ function replace_term(path, mode, paragraphs = document) {
                         }
                     }
                 }
-            }
-        }
-    })
-}
-
-function term_highlight(term, element, mode='') {
-    const HIGHLIGHT_OPACITY = '60'
-
-    function getHighlightColor(baseColor) {
-        return baseColor ? `${baseColor}${HIGHLIGHT_OPACITY}` : ''
-    }
-
-    $(element).mouseover((event) => {
-        const target = event.currentTarget
-        const currentTerm = term[target.i]
-        
-        if(mode=='divided'){
-            currentTerm.part.forEach((part) => { // 使用数组迭代代替 for...in
-                const enSelector = part.en
-                // 智能颜色选择：优先使用部件颜色，次用主术语颜色，带透明度
-                const color = part.termedPart 
-                    ? (part.color || currentTerm.color) + '60' // 60 表示 60% 透明度
-                    : currentTerm.color
-                
-                // 同时高亮主元素和滚动容器中的对应部件
-                $(element).children(enSelector).add(`${currentTerm.en}.scroll ${enSelector}`)
-                       .css('background-color', color)
-            })
-        }else if(mode=='part'){
-            const currentPart = currentTerm?.part[target.j]
-
-            const highlightColor = getHighlightColor(currentPart.color || currentTerm.color)
-
-            $(`${currentPart.en}.scroll`).css({
-                'background-color': highlightColor,
-                'transition': 'background-color 0.3s ease'
-            })
-        }else{
-            // 基础高亮逻辑
-            $(target).css("background-color", currentTerm.color)
-            $(`${currentTerm.en}.scroll`).css("background-color", currentTerm.color)
-            
-            // 特殊高亮处理 判断是否为代词，如果是，自动选取武将段落或一般段落为作用域
-            if ($(target).hasClass('highlight') || currentTerm.highlight) {
-                const containerType = $(target).closest('pronounScope').length > 0 
-                    ? 'pronounScope' 
-                    : 'padding'
-                
-                $(target).closest(containerType)
-                       .find(currentTerm.en)
-                       .css("background-color", "#fddfdf")
-            }
-        }
-    }).mouseout((event) => {
-        const target = event.currentTarget
-        const currentTerm = term[target.i]
-        
-        if(mode=='divided'){
-            currentTerm.part.forEach((part) => {
-                const enSelector = part.en
-                // 一次性清除两个区域的背景色
-                $(element).children(enSelector).add(`${currentTerm.en}.scroll ${enSelector}`)
-                       .css('background-color', '')
-            })
-        }else if(mode=='part'){
-            const currentPart = currentTerm?.part[target.j]
-
-            $(`${currentPart.en}.scroll`).css({
-                'background-color': '',
-                'transition': 'background-color 0.3s ease'
-            })
-        }else{
-            // 清除基础高亮
-            $(target).css("background-color", "")
-            $(`${currentTerm.en}.scroll`).css("background-color", "")
-            
-            // 清除特殊高亮
-            if ($(target).hasClass('highlight') || currentTerm.highlight) {
-                const containerType = $(target).closest('pronounScope').length > 0 
-                    ? 'pronounScope' 
-                    : 'padding'
-                
-                $(target).closest(containerType)
-                       .find(currentTerm.en)
-                       .css("background-color", "")
             }
         }
     })

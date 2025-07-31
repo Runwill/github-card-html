@@ -43,17 +43,13 @@ function replace_character_name(path, paragraphs = document){
                         }
                     })
                 })
-            }).mouseover(//高亮
-                function(event){
-                    $(this).css("background-color","#9ca8ee")
-                    $("." + this.classList[0] + ".scroll").css("background-color","#9ca8ee")
-                }
-            ).mouseout(//高亮
-                function(event){
-                    $(this).css("background-color","")
-                    $("." + this.classList[0] + ".scroll").css("background-color","")
-                }
-            )
+            })
+            
+            // 使用统一的高亮函数
+            element.each(function() {
+                const scrollSelector = "." + this.classList[0] + ".scroll"
+                addStandardHighlight($(this), "#9ca8ee", scrollSelector)
+            })
         }
     })
 }
