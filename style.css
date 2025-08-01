@@ -158,7 +158,7 @@ span{
         rgba(134, 152, 255, 0.05) 0%, 
         rgba(255, 255, 255, 0.8) 15%, 
         transparent 100%); */
-    box-shadow: 0 2px 8px rgba(134, 152, 255, 0.15);
+    /* box-shadow: 0 2px 8px rgba(134, 152, 255, 0.15); */
 }
 
 /* 为 indent 内的文字添加悬浮效果 */
@@ -375,18 +375,36 @@ h1 {
     font-size: 1.5rem;
     font-weight: 900;
     margin-bottom: 0.5rem;
+    letter-spacing: 0;
+    transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+h1:hover {
+    letter-spacing: 0.02em;
 }
 
 h2 {
     font-size: 1.2rem;
     font-weight: 900;
     margin-bottom: 0.5rem;
+    letter-spacing: 0;
+    transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+h2:hover {
+    letter-spacing: 0.02em;
 }
 
 h3 {
     font-size: 1.0rem;
     font-weight: 900;
     margin-bottom: 0.5rem;
+    letter-spacing: 0;
+    transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+h3:hover {
+    letter-spacing: 0.02em;
 }
 
 #login-container {
