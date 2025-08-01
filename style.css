@@ -150,22 +150,7 @@ span{
     padding-left: 0;
 }
 
-.indent:hover {
-    transform: translateX(8px);
-    border-left: 3px solid rgba(134, 152, 255, 0.6);
-    padding-left: 12px;
-    /* background: linear-gradient(90deg, 
-        rgba(134, 152, 255, 0.05) 0%, 
-        rgba(255, 255, 255, 0.8) 15%, 
-        transparent 100%); */
-    /* box-shadow: 0 2px 8px rgba(134, 152, 255, 0.15); */
-}
-
-/* 为 indent 内的文字添加悬浮效果 */
-.indent:hover {
-    color: #2d3748;
-    text-shadow: 0 1px 3px rgba(134, 152, 255, 0.2);
-}
+/* JavaScript 控制的悬浮效果，移除 CSS hover 规则 */
 
 /* 为嵌套的 indent 添加延迟动画效果 */
 .indent .indent {
@@ -379,9 +364,7 @@ h1 {
     transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-h1:hover {
-    letter-spacing: 0.02em;
-}
+/* JavaScript 控制的悬浮效果，移除 CSS hover 规则 */
 
 h2 {
     font-size: 1.2rem;
@@ -391,9 +374,7 @@ h2 {
     transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-h2:hover {
-    letter-spacing: 0.02em;
-}
+/* JavaScript 控制的悬浮效果，移除 CSS hover 规则 */
 
 h3 {
     font-size: 1.0rem;
@@ -403,9 +384,7 @@ h3 {
     transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-h3:hover {
-    letter-spacing: 0.02em;
-}
+/* JavaScript 控制的悬浮效果，移除 CSS hover 规则 */
 
 #login-container {
     max-width: 300px;
