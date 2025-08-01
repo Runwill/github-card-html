@@ -88,8 +88,8 @@ function replace_skill_name(path, paragraphs = document){
                             const tipWidth = $tooltip.outerWidth();
                             const tipHeight = $tooltip.outerHeight();
                             
-                            // 重新计算居中位置
-                            left = left - tipWidth/2;
+                            // 计算tooltip左边缘与目标元素中心对齐的位置
+                            left = rect.left + scrollLeft + rect.width/2;
                             
                             // 左右边界检测
                             if (left < margin) {
@@ -122,7 +122,7 @@ function replace_skill_name(path, paragraphs = document){
                                 transform: `translateY(${showAbove ? '8px' : '-8px'}) scale(0.95)`,
                                 
                                 // 样式优化
-                                background: 'linear-gradient(135deg, rgba(248,250,252,0.98) 0%, rgba(255,255,255,0.96) 50%, rgba(248,250,252,0.98) 100%)',
+                                background: 'rgba(248,250,252,0.9)',
                                 color: '#2d3748',
                                 border: '1px solid rgba(226,232,240,0.9)',
                                 'border-radius': '12px',
