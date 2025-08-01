@@ -51,32 +51,39 @@ function replace_skill_name(path, paragraphs = document){
                             const rect = this.getBoundingClientRect();
                             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
                             const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-                            // tooltip宽度自适应，先设置内容再测量宽度
-                            $tooltip.html(loreText)
-                                .css({
-                                    left: 0,
-                                    top: 0,
-                                    width: 'auto',
-                                    display: 'block',
-                                    opacity: 0
-                                });
-                            const tipWidth = $tooltip.outerWidth();
+                            
                             // 计算tooltip居中于目标元素下方（加上scrollTop/scrollLeft）
-                            let left = rect.left + scrollLeft + rect.width/2 - tipWidth/2;
+                            let left = rect.left + scrollLeft + rect.width/2;
                             const top = rect.bottom + scrollTop + 6;
+                            
+                            // tooltip宽度自适应，先在正确位置隐藏设置内容再测量宽度
+                            $tooltip.css({
+                                left: left + 'px',
+                                top: top + 'px',
+                                visibility: 'hidden',
+                                display: 'block',
+                                opacity: 0,
+                                width: 'auto'
+                            }).html(loreText);
+                            
+                            const tipWidth = $tooltip.outerWidth();
+                            // 重新计算居中位置
+                            left = rect.left + scrollLeft + rect.width/2 - tipWidth/2;
+                            
                             // 如果左侧超出，则左边界对齐元素中线
                             if (left < 8) {
                                 left = rect.left + scrollLeft + rect.width/2 + 8;
                             }
+                            
                             $tooltip.stop(true, true)
                                 .css({
                                     left: left + 'px',
                                     top: top + 'px',
-                                    background: 'linear-gradient(135deg, rgba(45,45,45,0.95) 0%, rgba(30,30,30,0.98) 100%)',
-                                    color: '#f5f5f5',
-                                    border: '1px solid rgba(128,128,128,0.4)',
+                                    background: 'linear-gradient(135deg, rgba(248,248,248,0.98) 0%, rgba(255,255,255,0.95) 100%)',
+                                    color: '#333333',
+                                    border: '1px solid rgba(200,200,200,0.8)',
                                     'border-radius': '8px',
-                                    'box-shadow': '0 6px 24px rgba(0,0,0,0.3), 0 1px 4px rgba(255,255,255,0.1)',
+                                    'box-shadow': '0 6px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
                                     padding: '10px 16px',
                                     'z-index': 9999,
                                     'font-size': '1em',
@@ -88,6 +95,7 @@ function replace_skill_name(path, paragraphs = document){
                                     'white-space': 'nowrap',
                                     opacity: 0,
                                     display: 'block',
+                                    visibility: 'visible',
                                     'backdrop-filter': 'blur(6px)',
                                     'transform': 'translateY(-2px)',
                                     'transition': 'all 0.12s cubic-bezier(0.4, 0, 0.2, 1)'
