@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (loadingBar) {
         loadingBar.style.animationDuration = `${progressBarDuration}s`;
     }
-    
+
     // 将进度条时间传递给全局变量，供淡出逻辑使用
     window.currentProgressBarDuration = progressBarDuration;
 });
@@ -80,7 +80,7 @@ window.addEventListener('load', function () {
     // 获取动态进度条时间，如果没有设置则使用默认值
     const progressBarDuration = window.currentProgressBarDuration || 1.2;
     
-    // 计算等待时间：进度条时间 + 容器渐入时间 + 额外缓冲
+    // 计算等待时间：进度条时间 + 容器渐入时间
     const waitTime = (progressBarDuration * 1000) + 800; // 转换为毫秒并添加800ms容器渐入时间
     
     // 进度条动画完成后，延迟一点再淡出
