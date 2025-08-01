@@ -59,7 +59,7 @@
     <header id="header">
         <nav>
             <div id="header_title">
-                <button id="menu-toggle" style="background: none; border: none; cursor: pointer;">05 wiki</button>
+                <button id="menu-toggle" style="background: none; border: none; cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: all 0.2s ease; color: #4a5568; font-weight: 500;">05 wiki</button>
                 <p class="strength_title"></p>
                 <script type="text/javascript">
                     document.querySelectorAll('.strength_title').forEach(button => {
@@ -72,15 +72,15 @@
                 </script>
             </div>
         </nav>
-        <div id="sidebar-menu" style="display: none; position: absolute; top: 50px; padding: 10px; border: 1px solid #ccc; background: #ffffff;">
-            <li style="list-style-type: circle;">
-                <button id="update-account-button" class="sidebar-menu_button">更籍</button>
+        <div id="sidebar-menu" style="display: none; position: absolute; top: 50px; padding: 12px; border: 1px solid rgba(226,232,240,0.8); background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08); min-width: 120px; animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+            <li style="list-style-type: none; margin-bottom: 6px;">
+                <button id="update-account-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 8px 12px; border-radius: 4px; transition: all 0.2s ease; color: #4a5568; font-weight: 500;">更籍</button>
             </li>
-            <li style="list-style-type: circle;">
-                <button id="approve-request-button" class="sidebar-menu_button">疏入</button>
+            <li style="list-style-type: none; margin-bottom: 6px;">
+                <button id="approve-request-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 8px 12px; border-radius: 4px; transition: all 0.2s ease; color: #4a5568; font-weight: 500;">疏入</button>
             </li>
-            <li style="list-style-type: circle;">
-                <button id="logout-button" class="sidebar-menu_button">退出</button>
+            <li style="list-style-type: none;">
+                <button id="logout-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 8px 12px; border-radius: 4px; transition: all 0.2s ease; color: #e53e3e; font-weight: 500;">退出</button>
             </li>
         </div>
         <!-- 添加弹窗HTML -->
