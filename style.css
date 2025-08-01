@@ -143,6 +143,46 @@ span{
 .indent {
     text-indent: 20px;
     line-height: 1.9em;
+    position: relative;
+    transform: translateX(0);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 3px solid transparent;
+    padding-left: 0;
+}
+
+.indent:hover {
+    transform: translateX(8px);
+    border-left: 3px solid rgba(134, 152, 255, 0.6);
+    padding-left: 12px;
+    /* background: linear-gradient(90deg, 
+        rgba(134, 152, 255, 0.05) 0%, 
+        rgba(255, 255, 255, 0.8) 15%, 
+        transparent 100%); */
+    box-shadow: 0 2px 8px rgba(134, 152, 255, 0.15);
+}
+
+/* 为 indent 内的文字添加悬浮效果 */
+.indent:hover {
+    color: #2d3748;
+    text-shadow: 0 1px 3px rgba(134, 152, 255, 0.2);
+}
+
+/* 为嵌套的 indent 添加延迟动画效果 */
+.indent .indent {
+    transition-delay: 0.1s;
+}
+
+.indent .indent .indent {
+    transition-delay: 0.2s;
+}
+
+/* 鼠标离开时的平滑过渡 */
+.indent {
+    will-change: transform, background, border-left, padding-left, box-shadow;
+}
+
+.indent:not(:hover) {
+    transition-delay: 0s;
 }
 
 .indent+.indent {
