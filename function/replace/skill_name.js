@@ -119,7 +119,7 @@ function replace_skill_name(path, paragraphs = document){
                                 visibility: 'visible',
                                 display: 'block',
                                 opacity: 0,
-                                transform: `translateY(${showAbove ? '8px' : '-8px'}) scale(0.95)`,
+                                transform: 'translateX(-20px) scale(1)',
                                 
                                 // 样式优化
                                 background: 'rgba(248,250,252,0.9)',
@@ -141,36 +141,42 @@ function replace_skill_name(path, paragraphs = document){
                                 'font-family': 'system-ui, -apple-system, sans-serif',
                                 
                                 // 恢复过渡动画（仅用于透明度和变换，不包括位置）
-                                'transition': 'opacity 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                                'transition': 'none' // 完全移除CSS过渡，使用jQuery手动控制
                             }).animate({
-                                opacity: 1,
-                                transform: 'translateY(0px) scale(1)'
+                                opacity: 1
                             }, {
-                                duration: 250,
+                                duration: 600, // 匹配其他动画的进入速度
                                 easing: 'easeOutBack',
                                 step: function(now, fx) {
-                                    if (fx.prop === 'transform') {
-                                        $(this).css('transform', fx.now);
+                                    if (fx.prop === 'opacity') {
+                                        // 手动控制进入动画的transform
+                                        const progress = now; // now从0到1
+                                        const translateX = -20 + (progress * 20); // 从-20px到0px
+                                        $(this).css('transform', `translateX(${translateX}px) scale(1)`);
                                     }
                                 }
                             });
                         })
-                        // 优化鼠标离开动画
+                        // 优化鼠标离开动画 - 纯横轴向右偏移退出
                         element.on('mouseleave', function () {
-                            $tooltip.stop(true, true).animate({
-                                opacity: 0,
-                                transform: 'translateY(-8px) scale(0.92)'
+                            $tooltip.stop(true, true).css({
+                                'transition': 'none' // 移除CSS过渡，使用jQuery动画
+                            }).animate({
+                                opacity: 0
                             }, {
-                                duration: 200,
+                                duration: 300, // 匹配其他动画的退出速度（比进入稍快）
                                 easing: 'easeInQuad',
                                 step: function(now, fx) {
-                                    if (fx.prop === 'transform') {
-                                        $(this).css('transform', fx.now);
+                                    if (fx.prop === 'opacity') {
+                                        // 只控制横向移动，不缩放
+                                        const progress = 1 - now; // now从1到0，progress从0到1
+                                        const translateX = progress * 20; // 最大偏移20px，和进入动画保持一致
+                                        $(this).css('transform', `translateX(${translateX}px) scale(1)`);
                                     }
                                 },
                                 complete: function() {
                                     $tooltip.hide().css({
-                                        'transform': 'translateY(0px) scale(1)',
+                                        'transform': 'translateX(0px) scale(1)',
                                         'transition': 'none'
                                     });
                                 }

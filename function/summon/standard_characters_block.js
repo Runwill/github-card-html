@@ -101,19 +101,80 @@ function CharacterReplace(character,skill) {
                 }
             }
         }
-        $(".standardCharactersBlock").html("<br>" + '<div class="search-container" style="z-index: 100; top: 10%;"><input type="text" id="search-input" placeholder="搜检" oninput="filterParagraphs()" autocomplete="off" style=" background-color: rgba(255,255,255,1); position: relative; transition: right 1s ease;"></div>' + '<div id="block-under-search" style="background-color: white;"></div>' + standardCharacters)
+        $(".standardCharactersBlock").html("<br>" + '<div class="search-container" style="z-index: 100; top: 10%;"><input type="text" id="search-input" placeholder="搜检" oninput="filterParagraphs()" autocomplete="off" style="background-color: rgba(255,255,255,1); position: relative; transition: right 1s ease, transform 0.2s ease, box-shadow 0.2s ease; transform: translateY(0) scale(1); box-shadow: 0 1px 4px rgba(0,0,0,0.08);"></div>' + '<div id="block-under-search" style="background-color: white;"></div>' + standardCharacters)
 
         const searchContainer = document.querySelector('.search-container')
         const searchInput = document.getElementById('search-input')
         let isFocused = false
+        let animationTimers = [] // 存储动画定时器
+
+        // 清除所有动画定时器
+        function clearAnimationTimers() {
+            animationTimers.forEach(timer => clearTimeout(timer))
+            animationTimers = []
+        }
+
+        // 拿起效果
+        function liftSearchInput() {
+            searchInput.style.transform = 'translateY(-3px) scale(1.01)'
+            searchInput.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+        }
+
+        // 放下效果
+        function dropSearchInput() {
+            searchInput.style.transform = 'translateY(0) scale(1)'
+            searchInput.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)'
+        }
+
+        // 搜索框弹出函数 - 拿起、移入、放下效果
+        function showSearchInput() {
+            // 清除之前的动画定时器
+            clearAnimationTimers()
+            
+            // 第一阶段：拿起（上移+缩放）
+            liftSearchInput()
+            
+            // 第二阶段：移入（延迟执行）
+            const timer1 = setTimeout(() => {
+                searchInput.style.right = '0'
+            }, 200)
+            animationTimers.push(timer1)
+            
+            // 第三阶段：放下（等移入完成后再执行，1s移入时间 + 200ms缓冲）
+            const timer2 = setTimeout(() => {
+                dropSearchInput()
+            }, 1200)
+            animationTimers.push(timer2)
+        }
+
+        // 搜索框插回函数 - 拿起、移出、放下效果
+        function hideSearchInput() {
+            if (!isFocused && window.innerWidth > 1101) {
+                // 清除之前的动画定时器
+                clearAnimationTimers()
+                
+                // 第一阶段：拿起（上移+缩放）
+                liftSearchInput()
+                
+                // 第二阶段：移出（延迟执行）
+                const timer1 = setTimeout(() => {
+                    searchInput.style.right = '-95%'
+                }, 200)
+                animationTimers.push(timer1)
+                
+                // 第三阶段：放下（等移出完成后再执行，1s移出时间 + 200ms缓冲）
+                const timer2 = setTimeout(() => {
+                    dropSearchInput()
+                }, 1200)
+                animationTimers.push(timer2)
+            }
+        }
 
         searchContainer.addEventListener('mouseenter', () => {
-            searchInput.style.right = '0'
+            showSearchInput()
         })
         searchContainer.addEventListener('mouseleave', () => {
-            if (!isFocused && window.innerWidth > 1101) {
-                searchInput.style.right = '-95%'
-            }
+            hideSearchInput()
         })
 
         searchInput.addEventListener('focus', () => {
@@ -121,8 +182,6 @@ function CharacterReplace(character,skill) {
         })
         searchInput.addEventListener('blur', () => {
             isFocused = false
-            if (window.innerWidth > 1101) {
-                searchInput.style.right = '-95%'
-            }
+            hideSearchInput()
         })
 }
