@@ -1,7 +1,7 @@
 /* 加载动画样式 */
 #loading-overlay {
     position: fixed;
-    z-index: 99999;
+    z-index: 999999;
     top: 0; left: 0; right: 0; bottom: 0;
     background: #fff;
     display: flex;
@@ -16,6 +16,9 @@
     /*background: #ecead8;*/
     border-radius: 4px;
     overflow: hidden;
+    /* 初始透明，延迟渐入 */
+    opacity: 0;
+    animation: fade-in-container 0.5s ease-in 0.3s forwards;
 }
 .loading-bar {
     width: 0%;
@@ -27,7 +30,10 @@
     background: linear-gradient(90deg, #FFFFFF 90%, #a1a1a1 98%, #ff7f7f 99%, #000000 100%);
     */
     border-radius: 4px;
-    animation: loading-bar-anim 1.2s cubic-bezier(.4,0,.2,1) forwards;
+    animation: loading-bar-anim 1.2s cubic-bezier(.4,0,.2,1) 0.8s forwards;
+    /* GPU 加速优化 */
+    transform: translateZ(0);
+    will-change: width;
 }
 .loading-title {
     margin-bottom: 18px;
@@ -36,7 +42,10 @@
     letter-spacing: 1em;
     font-family: '康熙';
     opacity: 0;
-    animation: fade-in-title 0.5s ease-in forwards;
+    animation: fade-in-title 0.5s ease-in forwards, pulse 2s ease-in-out infinite 1s;
+    /* GPU 加速优化 */
+    transform: translateZ(0);
+    will-change: opacity;
 }
 @keyframes loading-bar-anim {
     0% { width: 0%; }
@@ -46,6 +55,14 @@
 @keyframes fade-in-title {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+@keyframes fade-in-container {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 #loading-overlay.fade-out {
     opacity: 0;

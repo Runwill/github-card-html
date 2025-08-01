@@ -127,6 +127,10 @@ function CharacterReplace(character,skill) {
         function dropSearchInput() {
             searchInput.style.transform = 'translateY(0) scale(1)'
             searchInput.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)'
+            // 如果是由于focus而放下，添加强调样式
+            if (isFocused) {
+                //searchInput.style.boxShadow = '0 2px 15px rgba(0,166,147,0.2)'
+            }
             isDropped = true // 标记为已放下状态
         }
 
@@ -193,7 +197,9 @@ function CharacterReplace(character,skill) {
         }
 
         searchContainer.addEventListener('mouseenter', () => {
-            showSearchInput()
+            if (!isFocused) {
+                showSearchInput()
+            }
         })
         searchContainer.addEventListener('mouseleave', () => {
             hideSearchInput()
