@@ -72,25 +72,32 @@ function replace_skill_name(path, paragraphs = document){
                                 .css({
                                     left: left + 'px',
                                     top: top + 'px',
-                                    background: 'rgba(255,255,240,0.98)',
-                                    color: '#333',
-                                    border: '1px solid #bbb',
-                                    'border-radius': '6px',
-                                    'box-shadow': '0 2px 8px rgba(0,0,0,0.12)',
-                                    padding: '8px 16px',
+                                    background: 'linear-gradient(135deg, rgba(45,45,45,0.95) 0%, rgba(30,30,30,0.98) 100%)',
+                                    color: '#f5f5f5',
+                                    border: '1px solid rgba(128,128,128,0.4)',
+                                    'border-radius': '8px',
+                                    'box-shadow': '0 6px 24px rgba(0,0,0,0.3), 0 1px 4px rgba(255,255,255,0.1)',
+                                    padding: '10px 16px',
                                     'z-index': 9999,
                                     'font-size': '1em',
+                                    'font-weight': '500',
+                                    'line-height': '1.3',
+                                    'letter-spacing': '0.3px',
                                     'pointer-events': 'none',
                                     width: 'auto',
+                                    'white-space': 'nowrap',
                                     opacity: 0,
-                                    display: 'block'
+                                    display: 'block',
+                                    'backdrop-filter': 'blur(6px)',
+                                    'transform': 'translateY(-2px)',
+                                    'transition': 'all 0.12s cubic-bezier(0.4, 0, 0.2, 1)'
                                 })
-                                .fadeTo(120, 1);
+                                .fadeTo(180, 1);
                         })
                         // 不再跟随鼠标
                         element.on('mouseleave', function () {
-                            $tooltip.stop(true, true).fadeTo(120, 0, function () {
-                                $tooltip.hide();
+                            $tooltip.stop(true, true).fadeTo(150, 0, function () {
+                                $tooltip.hide().css('transform', 'translateY(0px)');
                             });
                         })
                     }
