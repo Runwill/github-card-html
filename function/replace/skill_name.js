@@ -33,44 +33,66 @@ function replace_skill_name(path, paragraphs = document){
             addStandardHighlight(element, "#df90ff", scrollSelector)
             for (var j in skill) {//不同武将的技能名悬浮个性化文本
                 if (skill[j].name == skillNames[i]) {
-            for (k in skill[j].role) {
-                element = $(paragraphs).find('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id)
-                element.prop('loreSkillPosition', j)
-                element.prop('loreRolePosition', k)
+                    for (k in skill[j].role) {
+                        element = $(paragraphs).find('.' + skillNames[i] + 'LoreCharacterID' + skill[j].role[k].id)
+                        element.prop('loreSkillPosition', j)
+                        element.prop('loreRolePosition', k)
 
-                element.on('mouseenter', function (e) {
-                    const loreText = '「' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].lore + '」——《' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].legend + '》';
-                    let $tooltip = $('#lore-tooltip');
-                    if ($tooltip.length === 0) {
-                        $tooltip = $('<div id="lore-tooltip"></div>').appendTo('body');
-                    }
-                    $tooltip.html(loreText)
-                        .css({
-                            position: 'fixed',
-                            left: (e.clientX + 16) + 'px',
-                            top: (e.clientY + 8) + 'px',
-                            background: 'rgba(255,255,240,0.98)',
-                            color: '#333',
-                            border: '1px solid #bbb',
-                            'border-radius': '6px',
-                            'box-shadow': '0 2px 8px rgba(0,0,0,0.12)',
-                            padding: '8px 16px',
-                            'z-index': 9999,
-                            'font-size': '1em',
-                            'pointer-events': 'none',
-                            opacity: 0
+                        // 只创建一次tooltip并复用
+                        if (!window._loreTooltipAppended) {
+                            window._loreTooltipAppended = true;
+                            $('body').append('<div id="lore-tooltip" style="display:none;position:absolute;"></div>');
+                        }
+                        const $tooltip = $('#lore-tooltip');
+
+                        element.on('mouseenter', function () {
+                            const loreText = '「' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].lore + '」——《' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].legend + '》';
+                            // 获取目标元素在页面上的位置和宽度
+                            const rect = this.getBoundingClientRect();
+                            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                            const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                            // tooltip宽度自适应，先设置内容再测量宽度
+                            $tooltip.html(loreText)
+                                .css({
+                                    left: 0,
+                                    top: 0,
+                                    width: 'auto',
+                                    display: 'block',
+                                    opacity: 0
+                                });
+                            const tipWidth = $tooltip.outerWidth();
+                            // 计算tooltip居中于目标元素下方（加上scrollTop/scrollLeft）
+                            let left = rect.left + scrollLeft + rect.width/2 - tipWidth/2;
+                            const top = rect.bottom + scrollTop + 6;
+                            // 如果左侧超出，则左边界对齐元素中线
+                            if (left < 8) {
+                                left = rect.left + scrollLeft + rect.width/2 + 8;
+                            }
+                            $tooltip.stop(true, true)
+                                .css({
+                                    left: left + 'px',
+                                    top: top + 'px',
+                                    background: 'rgba(255,255,240,0.98)',
+                                    color: '#333',
+                                    border: '1px solid #bbb',
+                                    'border-radius': '6px',
+                                    'box-shadow': '0 2px 8px rgba(0,0,0,0.12)',
+                                    padding: '8px 16px',
+                                    'z-index': 9999,
+                                    'font-size': '1em',
+                                    'pointer-events': 'none',
+                                    width: 'auto',
+                                    opacity: 0,
+                                    display: 'block'
+                                })
+                                .fadeTo(120, 1);
                         })
-                        .stop(true, true).fadeTo(180, 1);
-                })
-                element.on('mousemove', function (e) {
-                    $('#lore-tooltip').css({
-                        left: (e.clientX + 16) + 'px',
-                        top: (e.clientY + 8) + 'px'
-                    });
-                })
-                element.on('mouseleave', function () {
-                    $('#lore-tooltip').stop(true, true).fadeOut(180, function () { $(this).remove(); });
-                })
+                        // 不再跟随鼠标
+                        element.on('mouseleave', function () {
+                            $tooltip.stop(true, true).fadeTo(120, 0, function () {
+                                $tooltip.hide();
+                            });
+                        })
                     }
                 }
             }
