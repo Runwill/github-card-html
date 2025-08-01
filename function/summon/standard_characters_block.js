@@ -106,6 +106,8 @@ function CharacterReplace(character,skill) {
         const searchContainer = document.querySelector('.search-container')
         const searchInput = document.getElementById('search-input')
         let isFocused = false
+        let isShowingAnimation = false // 跟踪是否正在执行弹出动画
+        let isDropped = false // 跟踪是否已经放下
         let animationTimers = [] // 存储动画定时器
 
         // 清除所有动画定时器
@@ -117,19 +119,24 @@ function CharacterReplace(character,skill) {
         // 拿起效果
         function liftSearchInput() {
             searchInput.style.transform = 'translateY(-3px) scale(1.01)'
-            searchInput.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'
+            searchInput.style.boxShadow = '0 5px 10px rgba(0,0,0,0.15)'
+            isDropped = false // 标记为未放下状态
         }
 
         // 放下效果
         function dropSearchInput() {
             searchInput.style.transform = 'translateY(0) scale(1)'
             searchInput.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)'
+            isDropped = true // 标记为已放下状态
         }
 
         // 搜索框弹出函数 - 拿起、移入、放下效果
         function showSearchInput() {
             // 清除之前的动画定时器
             clearAnimationTimers()
+            
+            // 标记正在执行弹出动画
+            isShowingAnimation = true
             
             // 第一阶段：拿起（上移+缩放）
             liftSearchInput()
@@ -141,8 +148,12 @@ function CharacterReplace(character,skill) {
             animationTimers.push(timer1)
             
             // 第三阶段：放下（等移入完成后再执行，1s移入时间 + 200ms缓冲）
+            // 延迟检查focus状态，因为focus事件可能在mouseenter之后触发
             const timer2 = setTimeout(() => {
-                dropSearchInput()
+                isShowingAnimation = false // 弹出动画完成
+                if (isFocused) {
+                    dropSearchInput()
+                }
             }, 1200)
             animationTimers.push(timer2)
         }
@@ -153,14 +164,25 @@ function CharacterReplace(character,skill) {
                 // 清除之前的动画定时器
                 clearAnimationTimers()
                 
-                // 第一阶段：拿起（上移+缩放）
-                liftSearchInput()
+                // 标记不再执行弹出动画
+                isShowingAnimation = false
                 
-                // 第二阶段：移出（延迟执行）
-                const timer1 = setTimeout(() => {
-                    searchInput.style.right = '-95%'
-                }, 200)
-                animationTimers.push(timer1)
+                // 第一阶段：拿起（上移+缩放）
+                // 只有在已经放下的情况下才执行拿起效果
+                if (isDropped) {
+                    liftSearchInput()
+                
+                    // 第二阶段：移出（延迟执行）
+                    const timer1 = setTimeout(() => {
+                        searchInput.style.right = '-95%'
+                    }, 200)
+                    animationTimers.push(timer1)
+                } else {
+                    const timer1 = setTimeout(() => {
+                        searchInput.style.right = '-95%'
+                    }, 0)
+                    animationTimers.push(timer1)
+                }
                 
                 // 第三阶段：放下（等移出完成后再执行，1s移出时间 + 200ms缓冲）
                 const timer2 = setTimeout(() => {
@@ -179,6 +201,10 @@ function CharacterReplace(character,skill) {
 
         searchInput.addEventListener('focus', () => {
             isFocused = true
+            // 只有在不是弹出动画过程中才立即执行放下动画
+            if (!isShowingAnimation) {
+                dropSearchInput()
+            }
         })
         searchInput.addEventListener('blur', () => {
             isFocused = false
