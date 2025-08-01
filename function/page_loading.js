@@ -71,9 +71,6 @@ document.addEventListener('DOMContentLoaded', function () {
         loadingBar.style.animationDuration = `${progressBarDuration}s`;
     }
     
-    // 调试信息（可选）
-    console.log(`文本: "${randomText}", 字符数: ${randomText.replace(/\s/g, '').length}, 字间距: ${dynamicSpacing}em, 进度条时间: ${progressBarDuration}s`);
-    
     // 将进度条时间传递给全局变量，供淡出逻辑使用
     window.currentProgressBarDuration = progressBarDuration;
 });
@@ -94,7 +91,4 @@ window.addEventListener('load', function () {
             overlay.style.display = 'none';
         }, 15000); // 淡出时间保持不变
     }, waitTime);
-    
-    // 调试信息
-    console.log(`等待时间: ${waitTime}ms (进度条: ${progressBarDuration}s + 容器渐入: 0.8s + 缓冲: 0.2s)`);
 });
