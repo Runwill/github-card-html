@@ -30,7 +30,6 @@ class SmoothHover {
                 element.style.borderLeft = '3px solid rgba(134, 152, 255, 0.6)';
                 element.style.paddingLeft = '12px';
                 element.style.color = '#2d3748';
-                element.style.textShadow = '0 1px 3px rgba(134, 152, 255, 0.2)';
                 
                 // 动画完成后处理待处理状态
                 setTimeout(() => {
