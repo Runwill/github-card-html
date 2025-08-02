@@ -26,7 +26,7 @@ class SmoothHover {
                 }
                 
                 isAnimating = true;
-                element.style.transform = 'translateX(8px)';
+                element.style.transform = 'translateX(4px)';
                 element.style.borderLeft = '3px solid rgba(134, 152, 255, 0.6)';
                 element.style.paddingLeft = '12px';
                 element.style.color = '#2d3748';
