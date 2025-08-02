@@ -16,6 +16,10 @@ class SmoothHover {
         const indentElements = document.querySelectorAll('.indent');
         
         indentElements.forEach(element => {
+            // 跳过包含按钮的 indent 元素
+            if (element.querySelector('.button') || element.querySelector('button')) {
+                return;
+            }
             let isAnimating = false;
             let pendingState = null; // 'hover' 或 'leave' 或 null
             
