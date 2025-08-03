@@ -36,13 +36,17 @@ class TextAnimationController {
     }
 
     setupInitialAnimations() {
-        // 等待页面完全加载
-        window.addEventListener('load', () => {
-            setTimeout(() => {
+        // 使用DOMContentLoaded而不是load，更快触发
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
                 document.body.classList.add('loaded');
                 this.animateInitialElements();
-            }, 50); // 减少页面加载后的延迟
-        });
+            });
+        } else {
+            // 如果DOM已经加载完成，立即执行
+            document.body.classList.add('loaded');
+            this.animateInitialElements();
+        }
     }
 
     animateInitialElements() {
@@ -81,7 +85,7 @@ class TextAnimationController {
         children.forEach((child, index) => {
             setTimeout(() => {
                 child.classList.add('visible');
-            }, index * 30); // 减少级联动画延迟
+            }, index * 100);
         });
     }
 

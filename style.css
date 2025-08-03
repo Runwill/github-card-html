@@ -491,45 +491,45 @@ h1, h2, h3, .indent, padding {
 /* 不同层级的元素使用不同动画 */
 h1 {
     animation-name: fadeInScale;
-    animation-delay: 0.05s;
+    animation-delay: 0s;
 }
 
 h2 {
     animation-name: fadeInUp;
-    animation-delay: 0.1s;
+    animation-delay: 0.05s;
 }
 
 h3 {
     animation-name: fadeInLeft;
-    animation-delay: 0.15s;
+    animation-delay: 0.1s;
 }
 
 .indent {
     animation-name: slideInFromRight;
-    animation-delay: 0.2s;
+    animation-delay: 0.15s;
     transform: translateX(50px);
 }
 
 padding {
     animation-name: fadeInUp;
-    animation-delay: 0.08s;
+    animation-delay: 0.02s;
 }
 
 /* 嵌套元素的延迟动画 */
 .indent .indent {
-    animation-delay: 0.25s;
+    animation-delay: 0.2s;
 }
 
 .indent .indent .indent {
-    animation-delay: 0.3s;
+    animation-delay: 0.25s;
 }
 
 padding padding {
-    animation-delay: 0.12s;
+    animation-delay: 0.07s;
 }
 
 padding padding padding {
-    animation-delay: 0.16s;
+    animation-delay: 0.12s;
 }
 
 /* 激活动画的类 */
