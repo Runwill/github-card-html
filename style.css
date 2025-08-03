@@ -31,6 +31,12 @@
     src: url('source/草檀斋毛泽东字体.ttf') format('truetype');
 }
 
+/* CSS 动画变量 */
+:root {
+    --animation-duration: 0.6s;
+    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 *{
     user-select: none;
 }
@@ -417,4 +423,232 @@ h3 {
     margin-top: 10px;
     color: red;
     text-align: center;
+}
+
+/* 文本出现动画 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes textGlow {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* 默认隐藏状态，准备动画 */
+h1, h2, h3, .indent, padding {
+    opacity: 0;
+    transform: translateY(20px);
+    animation-fill-mode: both;
+    animation-duration: var(--animation-duration);
+    animation-timing-function: var(--animation-easing);
+}
+
+/* 不同层级的元素使用不同动画 */
+h1 {
+    animation-name: fadeInScale;
+    animation-delay: 0.05s;
+}
+
+h2 {
+    animation-name: fadeInUp;
+    animation-delay: 0.1s;
+}
+
+h3 {
+    animation-name: fadeInLeft;
+    animation-delay: 0.15s;
+}
+
+.indent {
+    animation-name: slideInFromRight;
+    animation-delay: 0.2s;
+    transform: translateX(50px);
+}
+
+padding {
+    animation-name: fadeInUp;
+    animation-delay: 0.08s;
+}
+
+/* 嵌套元素的延迟动画 */
+.indent .indent {
+    animation-delay: 0.25s;
+}
+
+.indent .indent .indent {
+    animation-delay: 0.3s;
+}
+
+padding padding {
+    animation-delay: 0.12s;
+}
+
+padding padding padding {
+    animation-delay: 0.16s;
+}
+
+/* 激活动画的类 */
+.animate-in {
+    animation-play-state: running;
+}
+
+/* 页面加载完成后自动播放动画 */
+.loaded h1,
+.loaded h2,
+.loaded h3,
+.loaded .indent,
+.loaded padding {
+    animation-play-state: running;
+}
+
+.fade-in-on-scroll.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 特殊元素的动画增强 - 粗体动画已移除，打字机动画已移除 */
+
+/* 水波纹效果增强 */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(45, 55, 72, 0.3);
+    transform: scale(0);
+    animation: ripple-animation 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* 按钮增强动画 */
+.button, .wave {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.button:hover, .wave:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 平滑滚动增强 */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 文本选择美化 */
+::selection {
+    background: rgba(45, 55, 72, 0.2);
+    color: #2d3748;
+}
+
+/* 响应式动画优化 */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 动画禁用状态 */
+.animations-disabled * {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+}
+
+.animations-disabled .main {
+    transform: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 性能优化：减少重绘 */
+.animate-in, .visible {
+    will-change: transform, opacity;
+}
+
+.animate-in.animation-complete, .visible.animation-complete {
+    will-change: auto;
+}
+
+/* 文本高亮动画 */
+@keyframes highlight {
+    0% {
+        background-size: 0% 100%;
+    }
+    100% {
+        background-size: 100% 100%;
+    }
+}
+
+.highlight-on-scroll {
+    background: linear-gradient(120deg, transparent 0%, rgba(255, 215, 0, 0.3) 50%, transparent 100%);
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    animation: highlight 1s ease-out forwards;
+}
+
+/* 智能加载动画 */
+.smart-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.smart-fade-in.loaded {
+    opacity: 1;
+    transform: translateY(0);
 }
