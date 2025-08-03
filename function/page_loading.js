@@ -75,20 +75,71 @@ document.addEventListener('DOMContentLoaded', function () {
     window.currentProgressBarDuration = progressBarDuration;
 });
 
-// 加载动画淡出逻辑
-window.addEventListener('load', function () {
-    // 获取动态进度条时间，如果没有设置则使用默认值
-    const progressBarDuration = window.currentProgressBarDuration || 1.2;
+// 加载状态跟踪
+let domReady = false;
+let resourcesReady = false;
+let canComplete = false;
+
+// 检查是否可以完成进度条
+function checkLoadingComplete() {
+    return domReady && resourcesReady;
+}
+
+// 平滑完成进度条
+function completeProgressBar() {
+    const loadingBar = document.querySelector('.loading-bar');
+    if (loadingBar) {
+        loadingBar.classList.add('accelerate');
+    }
     
-    // 计算等待时间：进度条时间 + 容器渐入时间
-    const waitTime = (progressBarDuration * 1000) + 800; // 转换为毫秒并添加800ms容器渐入时间
-    
-    // 进度条动画完成后，延迟一点再淡出
-    setTimeout(function () {
+    // 等待最终动画完成后开始淡出
+    setTimeout(() => {
+        // 进度条完成，开始淡出和文本动画
         const overlay = document.getElementById('loading-overlay');
         overlay.classList.add('fade-out');
+        
+        // 进度条完成时立即触发文本动画（与遮罩淡出同时进行）
+        if (window.textAnimationController) {
+            window.textAnimationController.startAnimations();
+        }
+        
         setTimeout(() => {
             overlay.style.display = 'none';
-        }, 15000); // 淡出时间保持不变
-    }, waitTime);
+        }, 3000); // 淡出时间保持不变
+    }, 400); // 等待final动画完成
+}
+
+// 开始检查完成条件的循环
+function startCompletionCheck() {
+    canComplete = true;
+    
+    const checkInterval = setInterval(() => {
+        if (checkLoadingComplete() && canComplete) {
+            clearInterval(checkInterval);
+            completeProgressBar();
+        }
+    }, 16); // 约60fps的检查频率，更流畅
+}
+
+// DOM加载完成
+document.addEventListener('DOMContentLoaded', function() {
+    domReady = true;
+    console.log('DOM ready');
+});
+
+// 所有资源加载完成
+window.addEventListener('load', function () {
+    resourcesReady = true;
+    console.log('Resources ready');
+});
+
+// 在进度条减速阶段开始检查完成条件
+document.addEventListener('DOMContentLoaded', function () {
+    const progressBarDuration = window.currentProgressBarDuration || 1.2;
+    // 在进度条动画的90%时开始检查（此时进度条在85%左右）
+    const checkStartTime = (progressBarDuration * 0.9 * 1000) + 800; // 90%时间点 + 容器渐入时间
+    
+    setTimeout(() => {
+        startCompletionCheck();
+    }, checkStartTime);
 });

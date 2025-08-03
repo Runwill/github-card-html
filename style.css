@@ -486,6 +486,7 @@ h1, h2, h3, .indent, padding {
     animation-fill-mode: both;
     animation-duration: var(--animation-duration);
     animation-timing-function: var(--animation-easing);
+    animation-play-state: paused;
 }
 
 /* 不同层级的元素使用不同动画 */
@@ -507,6 +508,7 @@ h3 {
 .indent {
     animation-name: slideInFromRight;
     animation-delay: 0.15s;
+    opacity: 0;
     transform: translateX(50px);
 }
 
@@ -537,14 +539,7 @@ padding padding padding {
     animation-play-state: running;
 }
 
-/* 页面加载完成后自动播放动画 */
-.loaded h1,
-.loaded h2,
-.loaded h3,
-.loaded .indent,
-.loaded padding {
-    animation-play-state: running;
-}
+/* 保留 .loaded 类但不自动播放动画，等待手动触发 */
 
 .fade-in-on-scroll.visible {
     opacity: 1;

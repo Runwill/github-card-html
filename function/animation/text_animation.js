@@ -36,17 +36,20 @@ class TextAnimationController {
     }
 
     setupInitialAnimations() {
-        // 使用DOMContentLoaded而不是load，更快触发
+        // 不再自动启动动画，等待外部调用
+        // 只添加loaded类，为动画做准备
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
                 document.body.classList.add('loaded');
-                this.animateInitialElements();
             });
         } else {
-            // 如果DOM已经加载完成，立即执行
             document.body.classList.add('loaded');
-            this.animateInitialElements();
         }
+    }
+
+    // 新增：手动启动动画的方法
+    startAnimations() {
+        this.animateInitialElements();
     }
 
     animateInitialElements() {

@@ -30,10 +30,15 @@
     background: linear-gradient(90deg, #FFFFFF 90%, #a1a1a1 98%, #ff7f7f 99%, #000000 100%);
     */
     border-radius: 4px;
-    animation: loading-bar-anim 1.2s cubic-bezier(.4,0,.2,1) 0.8s forwards;
+    animation: loading-bar-smooth 1.2s cubic-bezier(.4,0,.2,1) 0.8s forwards;
     /* GPU 加速优化 */
     transform: translateZ(0);
     will-change: width;
+}
+
+/* 加速完成进度条的类 */
+.loading-bar.accelerate {
+    animation: loading-bar-final 0.4s cubic-bezier(.2,0,.2,1) forwards;
 }
 .loading-title {
     margin-bottom: 18px;
@@ -47,9 +52,14 @@
     transform: translateZ(0);
     will-change: opacity, letter-spacing;
 }
-@keyframes loading-bar-anim {
+@keyframes loading-bar-smooth {
     0% { width: 0%; }
-    80% { width: 90%; }
+    70% { width: 75%; }
+    90% { width: 85%; }
+    100% { width: 88%; }
+}
+@keyframes loading-bar-final {
+    0% { width: 88%; }
     100% { width: 100%; }
 }
 @keyframes fade-in-title {
