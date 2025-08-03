@@ -54,9 +54,8 @@ class TextAnimationController {
         const elements = document.querySelectorAll('h1, h2, h3, .indent, padding');
         
         elements.forEach((element, index) => {
-            setTimeout(() => {
-                element.classList.add('animate-in');
-            }, index * 20); // 减少到20ms的错位延迟
+            // 立即添加动画类，不使用setTimeout
+            element.classList.add('animate-in');
         });
     }
 
@@ -99,13 +98,7 @@ class TextAnimationController {
                 this.createRippleEffect(e);
             });
         });
-
-        // 为第一个h1添加打字机效果已移除
-
-        // 脉冲动画已移除
     }
-
-    // animateHeadingHover方法已移除
 
     createRippleEffect(event) {
         const button = event.currentTarget;
@@ -127,21 +120,9 @@ class TextAnimationController {
             ripple.remove();
         }, 1000);
     }
-
-
-
-    // addTypewriterEffect方法已移除
-    // createTextParticles方法已移除
-    // addWaveEffect方法已移除
 }
 
 // 页面加载时初始化动画控制器
 document.addEventListener('DOMContentLoaded', () => {
     window.textAnimationController = new TextAnimationController();
 });
-
-// addWaveAnimation函数已移除
-// addTypewriterAnimation函数已移除  
-// createTextExplosion函数已移除
-
-// switchAnimationTheme函数已移除

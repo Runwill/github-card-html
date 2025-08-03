@@ -156,7 +156,7 @@ span{
     padding-left: 0;
 }
 
-/* JavaScript 控制的悬浮效果，移除 CSS hover 规则 */
+/* JavaScript */
 
 /* 为嵌套的 indent 添加延迟动画效果 */
 .indent .indent {
@@ -551,7 +551,7 @@ padding padding padding {
     transform: translateY(0);
 }
 
-/* 特殊元素的动画增强 - 粗体动画已移除，打字机动画已移除 */
+/* 特殊元素的动画增强 */
 
 /* 水波纹效果增强 */
 .ripple {
