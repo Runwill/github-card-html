@@ -155,7 +155,8 @@
     backdrop-filter: blur(16px);
     border-radius: 12px;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    min-width: 140px;
+    min-width: 200px;
+    padding: 20px;
 }
 
 .sidebar-menu_button {
@@ -192,7 +193,7 @@
     }
     .modal-header h2 { font-size: 1.1rem; }
     .modal.approve-modal { max-height: 85vh; }
-    #sidebar-menu { min-width: 120px; margin: 10px; }
+    #sidebar-menu { min-width: 180px; margin: 10px; }
 }
 
 @media (max-width: 480px) {
