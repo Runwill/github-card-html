@@ -1,321 +1,94 @@
+/* 响应式样式 */
 @media (max-width: 500px) {
-    html {
-        font-size: 15px
-    }
-
-    padding {
-        padding-left: 0.8em;
-        padding-right: 0.6em;
-    }
-    
-    .button{
-        padding:8px 12px;
-        margin-left: -2em;
-        margin-top: -1em;
-    }
-    
-    #header_title {
-        margin-right: 20px;
-    }
-
-    #nav-item {
-        margin: 0 -25px 0 0;
-    }
-
-    #search-input{
-        right: 0;
-    }
-
-    #block-under-search{
-        height: 0.5em;
-    }
+    html { font-size: 15px; }
+    padding { padding-left: 0.8em; padding-right: 0.6em; }
+    .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 20px; }
+    #nav-item { margin: 0 -25px 0 0; }
+    #search-input { right: 0; }
+    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 501px) and (max-width: 600px) {
-    html {
-        font-size: 15px
-    }
-
-    padding {
-        padding-left: 1.2em;
-        padding-right: 1.2em;
-    }
-    
-    .button{
-        padding:8px 12px;
-        margin-left: -2em;
-        margin-top: -1em;
-    }
-    
-    #header_title {
-        margin-right: 30px;
-    }
-
-    #nav-item {
-        margin: 0 -20px 0 0;
-    }
-
-    #search-input{
-        right: 0;
-    }
-
-    #block-under-search{
-        height: 0.5em;
-    }
+    html { font-size: 15px; }
+    padding { padding-left: 1.2em; padding-right: 1.2em; }
+    .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 30px; }
+    #nav-item { margin: 0 -20px 0 0; }
+    #search-input { right: 0; }
+    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 601px) and (max-width: 700px) {
-    html {
-        font-size: 15px
-    }
-
-    padding {
-        padding-left: 1.6em;
-        padding-right: 1.6em;
-    }
-    
-    .button{
-        padding:8px 12px;
-        margin-left: -2em;
-        margin-top: -1em;
-    }
-    
-    #header_title {
-        margin-right: 40px;
-    }
-
-    #nav-item {
-        margin: 0 -10px 0 0;
-    }
-
-    #search-input{
-        right: 0;
-    }
-
-    #block-under-search{
-        height: 0.5em;
-    }
+    html { font-size: 15px; }
+    padding { padding-left: 1.6em; padding-right: 1.6em; }
+    .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 40px; }
+    #nav-item { margin: 0 -10px 0 0; }
+    #search-input { right: 0; }
+    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 701px) and (max-width: 800px) {
-    html {
-        font-size: 17px
-    }
-
-    padding {
-        padding-left: 1.8em;
-        padding-right: 1.8em;
-    }
-    
-    .button{
-        padding:8px 12px;
-        margin-left: -2em;
-        margin-top: -1em;
-    }
-    
-    #header_title {
-        margin-right: 50px;
-    }
-
-    #nav-item {
-        margin: 0 -10px 0 0;
-    }
-
-    #search-input{
-        right: 0;
-    }
-
-    #block-under-search{
-        height: 0.5em;
-    }
+    html { font-size: 17px; }
+    padding { padding-left: 1.8em; padding-right: 1.8em; }
+    .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 50px; }
+    #nav-item { margin: 0 -10px 0 0; }
+    #search-input { right: 0; }
+    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 801px) and (max-width: 900px) {
-    html {
-        font-size: 18px
-    }
-
-    padding {
-        padding-left: 2.0em;
-        padding-right: 2.0em;
-    }
-    
-    .button{
-        padding:10px 15px;
-        margin-left: -2em;
-        margin-top: -1em;
-    }
-    
-    #header_title {
-        margin-right: 75px;
-    }
-
-    #nav-item {
-        margin: 0 10px 0 0;
-    }
-
-    #search-input{
-        right: 0;
-    }
-
-    #block-under-search{
-        height: 0.5em;
-    }
+    html { font-size: 18px; }
+    padding { padding-left: 2.0em; padding-right: 2.0em; }
+    .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 75px; }
+    #nav-item { margin: 0 10px 0 0; }
+    #search-input { right: 0; }
+    #block-under-search { height: 0.5em; }
 }
 
-@media (min-width: 900px) and (max-width: 1100px) {
-    html {
-        font-size: 19px
-    }
-
-    padding {
-        padding-left: 2.2em;
-        padding-right: 2.2em;
-    }
-    
-    .button{
-        padding:10px 15px;
-        margin-left: -2em;
-        margin-top: -1em;
-    }
-    
-    #header_title {
-        margin-right: 75px;
-    }
-
-    #nav-item {
-        margin: 0 20px 0 0;
-    }
-
-    #search-input{
-        right: 0;
-    }
-
-    #block-under-search{
-        height: 0.5em;
-    }
+@media (min-width: 901px) and (max-width: 1100px) {
+    html { font-size: 19px; }
+    padding { padding-left: 2.2em; padding-right: 2.2em; }
+    .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 75px; }
+    #nav-item { margin: 0 20px 0 0; }
+    #search-input { right: 0; }
+    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 1101px) and (max-width: 1200px) {
-    html {
-        font-size: 20px
-    }
-
-    padding {
-        padding-left: 2.4em;
-        padding-right: 2.4em;
-    }
-    
-    #header_title {
-        margin-right: 75px;
-    }
-
-    #nav-item {
-        margin: 0 30px 0 0;
-    }
-    
-    .button{
-        padding:10px 15px;
-        margin-left: -2em;
-        margin-top: -1em;
-    }
-    
-    #header_title {
-        margin-right: 75px;
-    }
-
-    #nav-item {
-        margin: 0 30px 0 0;
-    }
-
-    #search-input{
-        right: -95%;
-    }
-
-    .search-container{
-        margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
-    }
-
-    #block-under-search{
-        height: 1.5em;
-    }
+    html { font-size: 20px; }
+    padding { padding-left: 2.4em; padding-right: 2.4em; }
+    .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 75px; }
+    #nav-item { margin: 0 30px 0 0; }
+    #search-input { right: -95%; }
+    .search-container { margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky; }
+    #block-under-search { height: 1.5em; }
 }
 
 @media (min-width: 1201px) and (max-width: 1400px) {
-    html {
-        font-size: 20px
-    }
-
-    padding {
-        padding-left: 2.6em;
-        padding-right: 2.6em;
-    }
-    
-    .button{
-        padding:10px 15px;
-        margin-left: -2em;
-        margin-top: -1em;
-    }
-    
-    #header_title {
-        margin-right: 75px;
-    }
-
-    #nav-item {
-        margin: 0 30px 0 0;
-    }
-
-    #search-input{
-        right: -95%;
-    }
-
-    .search-container{
-        margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
-    }
-
-    #block-under-search{
-        height: 1.5em;
-    }
+    html { font-size: 20px; }
+    padding { padding-left: 2.6em; padding-right: 2.6em; }
+    .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 75px; }
+    #nav-item { margin: 0 30px 0 0; }
+    #search-input { right: -95%; }
+    .search-container { margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky; }
+    #block-under-search { height: 1.5em; }
 }
 
 @media (min-width: 1401px) {
-    html {
-        font-size: 20px
-    }
-
-    padding {
-        padding-left: 3em;
-        padding-right: 3em;
-    }
-    
-    .button{
-        padding:10px 15px;
-        margin-left: -2em;
-        margin-top: -1em;
-    }
-    .strength_button{
-        padding:8px 8px;
-        margin-left: 0.5%;
-        margin-top: 15px;
-    }
-    
-    #header_title {
-        margin-right: 75px;
-    }
-
-    #nav-item {
-        margin: 0 30px 0 0;
-    }
-
-    #search-input{
-        right: -95%;
-    }
-
-    .search-container{
-        margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky;
-    }
-
-    #block-under-search{
-        height: 1.5em;
-    }
+    html { font-size: 20px; }
+    padding { padding-left: 3em; padding-right: 3em; }
+    .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
+    .strength_button { padding: 8px 8px; margin-left: 0.5%; margin-top: 15px; }
+    #header_title { margin-right: 75px; }
+    #nav-item { margin: 0 30px 0 0; }
+    #search-input { right: -95%; }
+    .search-container { margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky; }
+    #block-under-search { height: 1.5em; }
 }

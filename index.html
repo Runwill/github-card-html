@@ -18,6 +18,7 @@
     <link rel="stylesheet" type="text/css" href="style/media.css">
     <link rel="stylesheet" type="text/css" href="style/page_loading.css">
     <link rel="stylesheet" type="text/css" href="style/term_button.css">
+    <link rel="stylesheet" type="text/css" href="style/modal.css">
     <link rel="stylesheet" type="text/css" href="style.css">
 
     <script src="function/summon/standard_character_skills_block.js"></script>
@@ -40,6 +41,9 @@
     <script src="function/login_check.js"></script>
     <script src="function/page_loading.js"></script>
     <script src="function/scroll_back.js"></script>
+
+    <!-- 开发时测试脚本 -->
+    <!-- <script src="function/menu_modal_test.js"></script> -->
 
     <title>Document丨程序</title>
 </head>
@@ -73,174 +77,207 @@
                 </script>
             </div>
         </nav>
-        <div id="sidebar-menu" style="display: none; position: absolute; top: 50px; padding: 12px; border: 1px solid rgba(226,232,240,0.8); background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08); min-width: 120px; animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
-            <li style="list-style-type: none; margin-bottom: 6px;">
-                <button id="update-account-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 8px 12px; border-radius: 4px; transition: all 0.2s ease; color: #4a5568; font-weight: 500;">更籍</button>
-            </li>
-            <li style="list-style-type: none; margin-bottom: 6px;">
-                <button id="approve-request-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 8px 12px; border-radius: 4px; transition: all 0.2s ease; color: #4a5568; font-weight: 500;">疏入</button>
-            </li>
-            <li style="list-style-type: none;">
-                <button id="logout-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 8px 12px; border-radius: 4px; transition: all 0.2s ease; color: #e53e3e; font-weight: 500;">退出</button>
-            </li>
-        </div>
-        <!-- 添加弹窗HTML -->
-        <div id="update-account-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; z-index: 1000;">
-            <h2>更易版籍</h2>
-            <form id="updateForm">
-                <input type="text" id="newUsername" name="newUsername" placeholder="新用户名" required>
-                <input type="password" id="newPassword" name="newPassword" placeholder="新密码" required>
-                <button type="submit" style="padding: 10px;
-                background: #8698ff;
-                color: white;
-                border: none;
-                border-radius: 3px;
-                cursor: pointer;
-                width: 100%;">更新</button>
-            </form>
-        
-            <p id="responseMessage"></p>
-        </div>
-        <!-- 添加审核请求弹窗HTML -->
-        <div id="approve-user-modal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; z-index: 1000;">
-            <h2>疏入</h2>
-            <div id="pending-users-modal-content">
-                <!-- 动态生成未激活用户列表 -->
-            </div>
-        </div>
-        <script>
-            // 控制弹窗显示/隐藏
-            document.getElementById('update-account-button').addEventListener('click', function () {
-                const updateAccountModal = document.getElementById('update-account-modal')
-                updateAccountModal.style.display = updateAccountModal.style.display === 'none' ? 'block' : 'none';
-                document.getElementById('newUsername').value = localStorage.getItem('username'); // 填充当前用户名
-            });
-        
-            // 表单提交逻辑
-            document.getElementById('updateForm').addEventListener('submit', async (event) => {
-                event.preventDefault();
-        
-                const id = localStorage.getItem('id'); // 假设登录时保存了用户名
-                const newUsername = document.getElementById('newUsername').value;
-                const newPassword = document.getElementById('newPassword').value;
-        
-                if (!id) {
-                    document.getElementById('responseMessage').textContent = '未检测到登录信息，请重新登录。';
-                    document.getElementById('responseMessage').style.color = 'red';
-                    return;
-                }
-        
-                try {
-                    const response = await fetch('http://localhost:3000/api/update', {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ id, newUsername, newPassword })
-                    });
-        
-                    if (response.ok) {
-                        document.getElementById('responseMessage').textContent = '更新成功！';
-                        document.getElementById('responseMessage').style.color = 'green';
-                        console.log('更新成功');
-                    } else {
-                        const errorData = await response.json();
-                        document.getElementById('responseMessage').textContent = errorData.message;
-                        document.getElementById('responseMessage').style.color = 'red';
-                        console.error('更新失败');
-                    }
-                } catch (error) {
-                    document.getElementById('responseMessage').textContent = '请求失败，请稍后重试。';
-                    document.getElementById('responseMessage').style.color = 'red';
-                    console.error('请求失败:', error);
-                }
-            });
-            // 控制审核请求弹窗显示/隐藏
-            document.getElementById('approve-request-button').addEventListener('click', function () {
-                const approveUserModal = document.getElementById('approve-user-modal');
-                approveUserModal.style.display = approveUserModal.style.display === 'none' ? 'block' : 'none';
-                renderPendingUsers(); // 渲染未激活用户列表
-            });
-            // 修改 renderPendingUsers 函数以支持弹窗内容
-            async function renderPendingUsers() {
-                const users = await fetchPendingUsers();
-                const container = document.getElementById('pending-users-modal-content');
-                container.innerHTML = '';
-
-                if (users.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; color: gray;">簿书皆毕</p>';
-                    return;
-                }
-
-                users.forEach(user => {
-                    const userDiv = document.createElement('div');
-                    userDiv.style.display = 'flex';
-                    userDiv.style.justifyContent = 'space-between';
-                    userDiv.style.alignItems = 'center';
-                    userDiv.style.marginBottom = '10px';
-                    userDiv.style.padding = '10px';
-                    userDiv.style.border = '1px solid #ccc';
-                    userDiv.style.borderRadius = '5px';
-                    userDiv.style.backgroundColor = '#f9f9f9';
-
-                    userDiv.innerHTML = `
-                        <p style="margin: 0;">注册: ${user.username}</p>
-                        <div style="padding-left: 1em">
-                            <button onclick="handleUserApproval('${user._id}', 'approve')" style="margin-right: 5px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">允准</button>
-                            <button onclick="handleUserApproval('${user._id}', 'reject')" style="padding: 5px 10px; background-color: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;">不准</button>
-                        </div>
-                    `;
-                    container.appendChild(userDiv);
-                });
-            }
-            // 示例：获取未激活用户列表
-            async function fetchPendingUsers() {
-                try {
-                    const response = await fetch('http://localhost:3000/api/pending-users');
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    return data; // 返回未激活用户列表
-                } catch (error) {
-                    console.error('获取未激活用户失败:', error.message);
-                    return []; // 返回空数组以避免后续报错
-                }
-            }
-            // 示例：批准或退回用户
-            async function handleUserApproval(userId, action) {
-                try {
-                    const response = await fetch('http://localhost:3000/api/approve', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ userId, action })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    const data = await response.json();
-                    console.log(data.message); // 显示操作结果
-
-                    // 操作成功后刷新待批准用户列表
-                    await renderPendingUsers();
-                } catch (error) {
-                    console.error('操作失败:', error.message);
-                }
-            }
-        </script>
         
         <script>
-            // 控制侧边栏显示/隐藏
-            document.getElementById('menu-toggle').addEventListener('click', function () {
-                const sidebarMenu = document.getElementById('sidebar-menu');
-                sidebarMenu.style.display = sidebarMenu.style.display === 'none' ? 'block' : 'none';
-            });
-        
-            // 退出登录功能
-            document.getElementById('logout-button').addEventListener('click', function () {
-                localStorage.removeItem('token'); // 清除登录令牌
-                window.location.href = 'login.html'; // 跳转到登录页面
-            });
+            // 统一弹窗和菜单管理器
+            const UIManager = {
+                state: { sidebarVisible: false, currentModal: null },
+
+                init() {
+                    this.bindEvents();
+                    this.bindMenuActions();
+                    this.bindFormEvents();
+                },
+
+                bindEvents() {
+                    // 菜单切换
+                    document.getElementById('menu-toggle')?.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.toggleSidebar();
+                    });
+
+                    // 背景遮罩点击关闭
+                    document.getElementById('sidebar-backdrop')?.addEventListener('click', () => this.hideSidebar());
+                    document.getElementById('modal-backdrop')?.addEventListener('click', () => this.hideAllModals());
+
+                    // 阻止内部点击冒泡
+                    document.getElementById('sidebar-menu')?.addEventListener('click', (e) => e.stopPropagation());
+                    ['update-account-modal', 'approve-user-modal'].forEach(id => {
+                        document.getElementById(id)?.addEventListener('click', (e) => e.stopPropagation());
+                    });
+
+                    // ESC键关闭
+                    document.addEventListener('keydown', (e) => {
+                        if (e.key === 'Escape') {
+                            this.hideAllModals();
+                            this.hideSidebar();
+                        }
+                    });
+                },
+
+                bindMenuActions() {
+                    document.getElementById('update-account-button')?.addEventListener('click', () => 
+                        this.showModal('update-account-modal'));
+                    document.getElementById('approve-request-button')?.addEventListener('click', () => 
+                        this.showModal('approve-user-modal'));
+                    document.getElementById('logout-button')?.addEventListener('click', () => this.handleLogout());
+                },
+
+                bindFormEvents() {
+                    document.getElementById('updateForm')?.addEventListener('submit', (e) => this.handleUpdateFormSubmit(e));
+                },
+
+                toggleSidebar() {
+                    this.state.sidebarVisible ? this.hideSidebar() : this.showSidebar();
+                },
+
+                showSidebar() {
+                    if (this.state.sidebarVisible) return;
+                    this.hideAllModals();
+                    
+                    const [menu, backdrop] = [document.getElementById('sidebar-menu'), document.getElementById('sidebar-backdrop')];
+                    if (!menu || !backdrop) return;
+
+                    this.state.sidebarVisible = true;
+                    backdrop.style.display = menu.style.display = 'block';
+                    
+                    requestAnimationFrame(() => {
+                        backdrop.style.opacity = menu.style.opacity = '1';
+                        menu.style.transform = 'translate(-50%, -50%) scale(1)';
+                    });
+                },
+
+                hideSidebar() {
+                    if (!this.state.sidebarVisible) return;
+                    
+                    const [menu, backdrop] = [document.getElementById('sidebar-menu'), document.getElementById('sidebar-backdrop')];
+                    if (!menu || !backdrop) return;
+
+                    this.state.sidebarVisible = false;
+                    backdrop.style.opacity = menu.style.opacity = '0';
+                    menu.style.transform = 'translate(-50%, -50%) scale(0.95)';
+                    
+                    setTimeout(() => {
+                        if (!this.state.sidebarVisible) {
+                            backdrop.style.display = menu.style.display = 'none';
+                        }
+                    }, 300);
+                },
+
+                showModal(modalId) {
+                    if (this.state.currentModal === modalId) return;
+                    this.hideAllModals();
+                    this.hideSidebar();
+
+                    const [backdrop, modal] = [document.getElementById('modal-backdrop'), document.getElementById(modalId)];
+                    if (!backdrop || !modal) return;
+
+                    this.state.currentModal = modalId;
+                    backdrop.style.display = modal.style.display = 'block';
+                    
+                    const responseMessage = modal.querySelector('#responseMessage');
+                    if (responseMessage) {
+                        responseMessage.textContent = '';
+                        responseMessage.className = 'modal-message';
+                    }
+                    
+                    requestAnimationFrame(() => {
+                        backdrop.classList.add('show');
+                        modal.classList.add('show');
+                    });
+
+                    this.handleModalSpecialCases(modalId, modal);
+                },
+
+                hideModal(modalId) {
+                    if (this.state.currentModal !== modalId) return;
+                    
+                    const [backdrop, modal] = [document.getElementById('modal-backdrop'), document.getElementById(modalId)];
+                    if (!backdrop || !modal) return;
+
+                    this.state.currentModal = null;
+                    backdrop.classList.remove('show');
+                    modal.classList.remove('show');
+                    
+                    setTimeout(() => {
+                        if (!this.state.currentModal) {
+                            backdrop.style.display = modal.style.display = 'none';
+                        }
+                    }, 300);
+                },
+
+                hideAllModals() {
+                    if (this.state.currentModal) this.hideModal(this.state.currentModal);
+                },
+
+                handleModalSpecialCases(modalId, modal) {
+                    if (modalId === 'update-account-modal') {
+                        const input = modal.querySelector('#newUsername');
+                        if (input) {
+                            input.value = localStorage.getItem('username') || '';
+                            input.focus();
+                        }
+                    } else if (modalId === 'approve-user-modal' && typeof renderPendingUsers === 'function') {
+                        renderPendingUsers();
+                    }
+                },
+
+                async handleUpdateFormSubmit(event) {
+                    event.preventDefault();
+                    const [id, username, password] = [
+                        localStorage.getItem('id'),
+                        document.getElementById('newUsername').value.trim(),
+                        document.getElementById('newPassword').value.trim()
+                    ];
+                    const responseMessage = document.getElementById('responseMessage');
+
+                    if (!username || !password) {
+                        this.showMessage(responseMessage, '用户名和密码不能为空。', 'error');
+                        return;
+                    }
+                    if (!id) {
+                        this.showMessage(responseMessage, '未检测到登录信息，请重新登录。', 'error');
+                        return;
+                    }
+
+                    try {
+                        this.showMessage(responseMessage, '正在更新...', '');
+                        
+                        const response = await fetch('http://localhost:3000/api/update', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ id, newUsername: username, newPassword: password })
+                        });
+
+                        if (response.ok) {
+                            this.showMessage(responseMessage, '更新成功！', 'success');
+                            localStorage.setItem('username', username);
+                            setTimeout(() => this.hideModal('update-account-modal'), 3000);
+                        } else {
+                            const errorData = await response.json();
+                            this.showMessage(responseMessage, errorData.message || '更新失败', 'error');
+                        }
+                    } catch (error) {
+                        this.showMessage(responseMessage, '请求失败，请稍后重试。', 'error');
+                        console.error('请求失败:', error);
+                    }
+                },
+
+                handleLogout() {
+                    ['token', 'username', 'id'].forEach(key => localStorage.removeItem(key));
+                    window.location.href = 'login.html';
+                },
+
+                showMessage(element, message, type) {
+                    if (element) {
+                        element.textContent = message;
+                        element.className = `modal-message ${type}`;
+                    }
+                }
+            };
+
+            document.addEventListener('DOMContentLoaded', () => UIManager.init());
+            window.MenuModalManager = UIManager; // 保持兼容性
         </script>
         <nav id="sidebar">
             <ul class="tabs nav" data-tabs id="example-tabs">
@@ -258,6 +295,141 @@
             </ul>
         </nav>
     </header>
+    
+    <!-- 弹窗移到body直接子元素，避免受父元素影响 -->
+    <!-- 弹窗背景遮罩 -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+    
+    <!-- 侧边栏菜单背景遮罩 -->
+    <div id="sidebar-backdrop" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.3); z-index: 7999; display: none; opacity: 0; transition: opacity 0.3s ease;"></div>
+    
+    <!-- 侧边栏菜单移到body直接子元素 -->
+    <div id="sidebar-menu" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); padding: 12px; border: 1px solid rgba(226,232,240,0.8); background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08); min-width: 120px; z-index: 8000; opacity: 0; transition: all 0.3s ease;">
+        <li style="list-style-type: none; margin-bottom: 6px;">
+            <button id="update-account-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 8px 12px; border-radius: 4px; transition: all 0.2s ease; color: #4a5568; font-weight: 500; background: none; border: none; cursor: pointer;" onmouseover="this.style.backgroundColor='#f7fafc'" onmouseout="this.style.backgroundColor='transparent'">更籍</button>
+        </li>
+        <li style="list-style-type: none; margin-bottom: 6px;">
+            <button id="approve-request-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 8px 12px; border-radius: 4px; transition: all 0.2s ease; color: #4a5568; font-weight: 500; background: none; border: none; cursor: pointer;" onmouseover="this.style.backgroundColor='#f7fafc'" onmouseout="this.style.backgroundColor='transparent'">疏入</button>
+        </li>
+        <li style="list-style-type: none;">
+            <button id="logout-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 8px 12px; border-radius: 4px; transition: all 0.2s ease; color: #e53e3e; font-weight: 500; background: none; border: none; cursor: pointer;" onmouseover="this.style.backgroundColor='#fed7d7'" onmouseout="this.style.backgroundColor='transparent'">退出</button>
+        </li>
+    </div>
+    
+    <div id="update-account-modal" class="modal update-modal">
+        <div class="modal-header">
+            <h2>更易版籍</h2>
+        </div>
+        <form id="updateForm" class="modal-form">
+            <input type="text" id="newUsername" name="newUsername" placeholder="新用户名" required>
+            <input type="password" id="newPassword" name="newPassword" placeholder="新密码" required>
+            <button type="submit">更新</button>
+        </form>
+        <div id="responseMessage" class="modal-message"></div>
+    </div>
+    
+    <div id="approve-user-modal" class="modal approve-modal">
+        <div class="modal-header">
+            <h2>疏入</h2>
+        </div>
+        <div id="pending-users-modal-content">
+            <!-- 动态生成未激活用户列表 -->
+        </div>
+    </div>
+    
+    <script>
+        // 用户管理函数
+        window.renderPendingUsers = async function() {
+            try {
+                const users = await fetchPendingUsers();
+                const container = document.getElementById('pending-users-modal-content');
+                if (!container) return;
+                
+                container.innerHTML = '';
+
+                if (users.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: gray; padding: 20px;">簿书皆毕</p>';
+                    return;
+                }
+
+                users.forEach(user => {
+                    const userDiv = document.createElement('div');
+                    userDiv.style.cssText = `
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 10px;
+                        padding: 12px;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 6px;
+                        background-color: #f8fafc;
+                        transition: background-color 0.2s ease;
+                    `;
+
+                    userDiv.innerHTML = `
+                        <p style="margin: 0; color: #2d3748; font-weight: 500;">注册: ${user.username}</p>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="handleUserApproval('${user._id}', 'approve')" 
+                                    style="padding: 6px 12px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; transition: background-color 0.2s ease;"
+                                    onmouseover="this.style.backgroundColor='#38a169'"
+                                    onmouseout="this.style.backgroundColor='#48bb78'">允准</button>
+                            <button onclick="handleUserApproval('${user._id}', 'reject')" 
+                                    style="padding: 6px 12px; background-color: #f56565; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; transition: background-color 0.2s ease;"
+                                    onmouseover="this.style.backgroundColor='#e53e3e'"
+                                    onmouseout="this.style.backgroundColor='#f56565'">不准</button>
+                        </div>
+                    `;
+                    container.appendChild(userDiv);
+                });
+            } catch (error) {
+                console.error('渲染未激活用户列表失败:', error);
+                const container = document.getElementById('pending-users-modal-content');
+                if (container) {
+                    container.innerHTML = '<p style="text-align: center; color: #e53e3e; padding: 20px;">加载失败，请重试</p>';
+                }
+            }
+        };
+        
+        // 获取未激活用户列表
+        window.fetchPendingUsers = async function() {
+            try {
+                const response = await fetch('http://localhost:3000/api/pending-users');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                return Array.isArray(data) ? data : [];
+            } catch (error) {
+                console.error('获取未激活用户失败:', error.message);
+                return [];
+            }
+        };
+        
+        // 处理用户审核
+        window.handleUserApproval = async function(userId, action) {
+            try {
+                const response = await fetch('http://localhost:3000/api/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, action })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log(data.message);
+
+                // 刷新待批准用户列表
+                await renderPendingUsers();
+            } catch (error) {
+                console.error('操作失败:', error.message);
+                alert('操作失败，请重试');
+            }
+        };
+    </script>
+    
     <div class="row">
         <div class="columns">
             <div class="tabs-content" data-tabs-content="example-tabs" id="termContainer">

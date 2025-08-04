@@ -1,87 +1,47 @@
-@font-face {
-    font-family: '古隶';
-    src: url('source/方正古隶繁体.ttf') format('truetype');
-}
-@font-face {
-    font-family: '明朝';
-    src: url('source/文悦古典明朝体.ttf') format('truetype');
-}
-@font-face {
-    font-family: '小篆';
-    src: url('source/汉仪篆书繁.TTF') format('truetype');
-}
-@font-face {
-    font-family: '大篆';
-    src: url('source/金文大篆体.TTF') format('truetype');
-}
-@font-face {
-    font-family: '碑楷';
-    src: url('source/方正北魏楷书.TTF') format('truetype');
-}
-@font-face {
-    font-family: '康熙';
-    src: url('source/康熙字典体.TTF') format('truetype');
-}
-@font-face {
-    font-family: '邯郸';
-    src: url('source/邯郸康熙字典体.TTF') format('truetype');
-}
-@font-face {
-    font-family: '毛体';
-    src: url('source/草檀斋毛泽东字体.ttf') format('truetype');
-}
+/* 字体定义 */
+@font-face { font-family: '古隶'; src: url('source/方正古隶繁体.ttf') format('truetype'); }
+@font-face { font-family: '明朝'; src: url('source/文悦古典明朝体.ttf') format('truetype'); }
+@font-face { font-family: '小篆'; src: url('source/汉仪篆书繁.TTF') format('truetype'); }
+@font-face { font-family: '大篆'; src: url('source/金文大篆体.TTF') format('truetype'); }
+@font-face { font-family: '碑楷'; src: url('source/方正北魏楷书.TTF') format('truetype'); }
+@font-face { font-family: '康熙'; src: url('source/康熙字典体.TTF') format('truetype'); }
+@font-face { font-family: '邯郸'; src: url('source/邯郸康熙字典体.TTF') format('truetype'); }
+@font-face { font-family: '毛体'; src: url('source/草檀斋毛泽东字体.ttf') format('truetype'); }
 
-/* CSS 动画变量 */
-:root {
-    --animation-duration: 0.6s;
-    --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* 全局变量和基础样式 */
+:root { --animation-duration: 0.6s; --animation-easing: cubic-bezier(0.4, 0, 0.2, 1); }
+* { user-select: none; }
+body { overflow-x: hidden; margin: 0; font-size: .9rem; }
+.hidden { display: none; }
 
-*{
-    user-select: none;
-}
-body {
-    overflow-x: hidden;
-}
-
-.hidden {
-    display: none;
-}
-
-.strength_title{
+/* 标题和特殊元素样式 */
+.strength_title {
     display: inline;
     margin-top: 0.45em;
     line-height: 1.8em;
     letter-spacing: -4px;
     font-family: '古隶';
     position: absolute;
-    writing-mode: vertical-rl
+    writing-mode: vertical-rl;
 }
 
-pronounName{
+pronounName {
     font-family: '大篆';
     line-height: 0;
-    color: #d60000bb
+    color: #d60000bb;
 }
 
 .glowing {
-    text-shadow: 
-        1px 1px 0 rgb(255, 215, 0, 0.1),  /* 右下 */
-        -1px -1px 0 rgb(255, 215, 0, 0.1), /* 左上 */
-        1px -1px 0 rgb(255, 215, 0, 0.1),  /* 右上 */
-        -1px 1px 0 rgb(255, 215, 0, 0.1);  /* 左下 */
+    text-shadow: 1px 1px 0 rgb(255, 215, 0, 0.1), -1px -1px 0 rgb(255, 215, 0, 0.1), 
+                 1px -1px 0 rgb(255, 215, 0, 0.1), -1px 1px 0 rgb(255, 215, 0, 0.1);
 }
 
-.sidebar-menu_button{
-    background: none; border: none; padding-right: 0.5em;
-}
+.sidebar-menu_button { background: none; border: none; padding-right: 0.5em; }
 
-.container{
-    position: relative;
-    z-index: 2;
-}
+/* 容器和角色相关样式 */
+.container { position: relative; z-index: 2; }
 
-.role_title{
+.role_title {
     font-family: '明朝';
     position: absolute;
     top: 50%;
@@ -93,15 +53,14 @@ pronounName{
     opacity: 0;
     left: -5%;
     transition: left 1s ease, opacity 1s ease;
-    user-select: none; pointer-events: none;
+    user-select: none;
+    pointer-events: none;
     z-index: 1;
 }
-.container:hover .role_title {
-    opacity: 0.1;
-    left: 0%
-}
 
-.role_icon{
+.container:hover .role_title { opacity: 0.1; left: 0%; }
+
+.role_icon {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -111,41 +70,30 @@ pronounName{
     opacity: 0;
     left: 10%;
     transition: left 1s ease, opacity 1s ease;
-    user-select: none; pointer-events: none;
+    user-select: none;
+    pointer-events: none;
     z-index: 0;
-    
-}
-.container:hover .role_icon.dominator {
-    opacity: 0.025;
-    left: 5%
-}
-.container:hover .role_icon.not_dominator {
-    opacity: 0.025;
-    left: 4.5%
 }
 
-span{
-    position:absolute;
-    background:#ffffff;
-    transform:translate(-50%,-50%);
+.container:hover .role_icon.dominator { opacity: 0.025; left: 5%; }
+.container:hover .role_icon.not_dominator { opacity: 0.025; left: 4.5%; }
+
+/* 动画和交互样式 */
+span {
+    position: absolute;
+    background: #ffffff;
+    transform: translate(-50%, -50%);
     pointer-events: none;
     border-radius: 50%;
     animation: animate 1s linear infinite;
 }
 
-@keyframes animate{
-    0%{
-        width:0px;
-        height:0px;
-        opacity:0.5;
-    }
-    100%{
-        width:500px;
-        height:500px;
-        opacity:0;
-    }
+@keyframes animate {
+    0% { width: 0px; height: 0px; opacity: 0.5; }
+    100% { width: 500px; height: 500px; opacity: 0; }
 }
 
+/* 缩进和布局样式 */
 .indent {
     text-indent: 20px;
     line-height: 1.9em;
@@ -154,50 +102,18 @@ span{
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border-left: 3px solid transparent;
     padding-left: 0;
-}
-
-/* JavaScript */
-
-/* 为嵌套的 indent 添加延迟动画效果 */
-.indent .indent {
-    transition-delay: 0.1s;
-}
-
-.indent .indent .indent {
-    transition-delay: 0.2s;
-}
-
-/* 鼠标离开时的平滑过渡 */
-.indent {
     will-change: transform, background, border-left, padding-left, box-shadow;
 }
 
-.indent:not(:hover) {
-    transition-delay: 0s;
-}
+.indent .indent { transition-delay: 0.1s; }
+.indent .indent .indent { transition-delay: 0.2s; }
+.indent:not(:hover) { transition-delay: 0s; }
+.indent + .indent { padding-top: 0.6em; }
 
-.indent+.indent {
-    padding-top: 0.6em;
-}
-
-padding {
-    display: block;
-    padding-bottom: 1.2em;
-}
-
-.h {
-    font-size: .9rem;
-    padding-top: 0.75em;
-    padding-bottom: 0.75em;
-}
-
-.bold {
-    font-weight: bold;
-}
-
-.scroll {
-    scroll-margin-top: 70px;
-}
+padding { display: block; padding-bottom: 1.2em; }
+.h { font-size: .9rem; padding-top: 0.75em; padding-bottom: 0.75em; }
+.bold { font-weight: bold; }
+.scroll { scroll-margin-top: 70px; }
 
 lore {
     color: gray;
@@ -207,12 +123,7 @@ lore {
     letter-spacing: -0.15em;
 }
 
-body {
-    margin: 0;
-    font-size: .9rem;
-}
-
-/*header*/
+/* Header 样式 */
 #header {
     background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
     text-align: center;
@@ -243,9 +154,7 @@ body {
     transition: all 0.2s ease;
 }
 
-#header_title:hover {
-    transform: scale(1.02);
-}
+#header_title:hover { transform: scale(1.02); }
 
 #title-a {
     text-decoration: none;
@@ -273,27 +182,13 @@ body {
     transform: translateY(-1px);
 }
 
-#title-a:hover::after {
-    width: 100%;
-}
+#title-a:hover::after { width: 100%; }
 
-#sidebar {
-    background: #ffffff;
-    padding: 0;
-    z-index: 11;
-    margin-left: 10;
-}
+#sidebar { background: #ffffff; padding: 0; z-index: 11; margin-left: 10; }
 
-/* Header 动画增强 */
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-8px) scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+    from { opacity: 0; transform: translateY(-8px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 #menu-toggle:hover {
@@ -302,6 +197,7 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
+/* 菜单和导航样式 */
 .sidebar-menu_button:hover {
     background: rgba(74, 85, 104, 0.08) !important;
     transform: translateX(2px);
@@ -313,7 +209,6 @@ body {
     color: #c53030 !important;
 }
 
-/* 导航标签页动画增强 */
 #nav .tabs-title a {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative;
@@ -331,9 +226,7 @@ body {
     transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#nav .tabs-title a:hover::before {
-    left: 100%;
-}
+#nav .tabs-title a:hover::before { left: 100%; }
 
 #active {
     text-decoration: overline;
@@ -362,36 +255,19 @@ body {
     flex-grow: 1;
 }
 
-h1 {
-    font-size: 1.5rem;
+/* 标题样式 */
+h1, h2, h3 {
     font-weight: 900;
     margin-bottom: 0.5rem;
     letter-spacing: 0;
     transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* JavaScript 控制的悬浮效果，移除 CSS hover 规则 */
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.2rem; }
+h3 { font-size: 1.0rem; }
 
-h2 {
-    font-size: 1.2rem;
-    font-weight: 900;
-    margin-bottom: 0.5rem;
-    letter-spacing: 0;
-    transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* JavaScript 控制的悬浮效果，移除 CSS hover 规则 */
-
-h3 {
-    font-size: 1.0rem;
-    font-weight: 900;
-    margin-bottom: 0.5rem;
-    letter-spacing: 0;
-    transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* JavaScript 控制的悬浮效果，移除 CSS hover 规则 */
-
+/* 登录表单样式 */
 #login-container {
     max-width: 300px;
     margin: 50px auto;
@@ -425,61 +301,42 @@ h3 {
     text-align: center;
 }
 
-/* 文本出现动画 */
+/* 动画关键帧 */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fadeInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes fadeInScale {
-    from {
-        opacity: 0;
-        transform: scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes slideInFromRight {
-    from {
-        opacity: 0;
-        transform: translateX(50px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes textGlow {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-/* 默认隐藏状态，准备动画 */
+@keyframes ripple-animation {
+    to { transform: scale(4); opacity: 0; }
+}
+
+@keyframes highlight {
+    0% { background-size: 0% 100%; }
+    100% { background-size: 100% 100%; }
+}
+
+/* 动画配置 */
 h1, h2, h3, .indent, padding {
     opacity: 0;
     transform: translateY(20px);
@@ -489,66 +346,21 @@ h1, h2, h3, .indent, padding {
     animation-play-state: paused;
 }
 
-/* 不同层级的元素使用不同动画 */
-h1 {
-    animation-name: fadeInScale;
-    animation-delay: 0s;
-}
+h1 { animation-name: fadeInScale; animation-delay: 0s; }
+h2 { animation-name: fadeInUp; animation-delay: 0.05s; }
+h3 { animation-name: fadeInLeft; animation-delay: 0.1s; }
+.indent { animation-name: slideInFromRight; animation-delay: 0.15s; opacity: 0; transform: translateX(50px); }
+padding { animation-name: fadeInUp; animation-delay: 0.02s; }
 
-h2 {
-    animation-name: fadeInUp;
-    animation-delay: 0.05s;
-}
+.indent .indent { animation-delay: 0.2s; }
+.indent .indent .indent { animation-delay: 0.25s; }
+padding padding { animation-delay: 0.07s; }
+padding padding padding { animation-delay: 0.12s; }
 
-h3 {
-    animation-name: fadeInLeft;
-    animation-delay: 0.1s;
-}
+.animate-in { animation-play-state: running; }
+.fade-in-on-scroll.visible { opacity: 1; transform: translateY(0); }
 
-.indent {
-    animation-name: slideInFromRight;
-    animation-delay: 0.15s;
-    opacity: 0;
-    transform: translateX(50px);
-}
-
-padding {
-    animation-name: fadeInUp;
-    animation-delay: 0.02s;
-}
-
-/* 嵌套元素的延迟动画 */
-.indent .indent {
-    animation-delay: 0.2s;
-}
-
-.indent .indent .indent {
-    animation-delay: 0.25s;
-}
-
-padding padding {
-    animation-delay: 0.07s;
-}
-
-padding padding padding {
-    animation-delay: 0.12s;
-}
-
-/* 激活动画的类 */
-.animate-in {
-    animation-play-state: running;
-}
-
-/* 保留 .loaded 类但不自动播放动画，等待手动触发 */
-
-.fade-in-on-scroll.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* 特殊元素的动画增强 */
-
-/* 水波纹效果增强 */
+/* 交互增强效果 */
 .ripple {
     position: absolute;
     border-radius: 50%;
@@ -558,14 +370,6 @@ padding padding padding {
     pointer-events: none;
 }
 
-@keyframes ripple-animation {
-    to {
-        transform: scale(4);
-        opacity: 0;
-    }
-}
-
-/* 按钮增强动画 */
 .button, .wave {
     position: relative;
     overflow: hidden;
@@ -577,18 +381,14 @@ padding padding padding {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* 平滑滚动增强 */
-html {
-    scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
-/* 文本选择美化 */
 ::selection {
     background: rgba(45, 55, 72, 0.2);
     color: #2d3748;
 }
 
-/* 响应式动画优化 */
+/* 性能和无障碍优化 */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -597,7 +397,6 @@ html {
     }
 }
 
-/* 动画禁用状态 */
 .animations-disabled * {
     animation: none !important;
     transition: none !important;
@@ -610,24 +409,8 @@ html {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* 性能优化：减少重绘 */
-.animate-in, .visible {
-    will-change: transform, opacity;
-}
-
-.animate-in.animation-complete, .visible.animation-complete {
-    will-change: auto;
-}
-
-/* 文本高亮动画 */
-@keyframes highlight {
-    0% {
-        background-size: 0% 100%;
-    }
-    100% {
-        background-size: 100% 100%;
-    }
-}
+.animate-in, .visible { will-change: transform, opacity; }
+.animate-in.animation-complete, .visible.animation-complete { will-change: auto; }
 
 .highlight-on-scroll {
     background: linear-gradient(120deg, transparent 0%, rgba(255, 215, 0, 0.3) 50%, transparent 100%);
@@ -636,7 +419,6 @@ html {
     animation: highlight 1s ease-out forwards;
 }
 
-/* 智能加载动画 */
 .smart-fade-in {
     opacity: 0;
     transform: translateY(20px);

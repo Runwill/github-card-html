@@ -1,130 +1,76 @@
-// 防止快速悬浮时的动画闪动问题
+// 平滑悬浮动画
 class SmoothHover {
     constructor() {
-        this.animatingElements = new Set();
         this.init();
     }
 
     init() {
-        // 为所有 indent 元素添加平滑悬浮效果
         this.setupIndentAnimation();
-        // 为所有标题元素添加平滑悬浮效果  
         this.setupTitleAnimation();
     }
 
     setupIndentAnimation() {
-        const indentElements = document.querySelectorAll('.indent');
-        
-        indentElements.forEach(element => {
-            // 跳过包含按钮的 indent 元素
-            if (element.querySelector('.button') || element.querySelector('button')) {
-                return;
-            }
+        document.querySelectorAll('.indent').forEach(element => {
+            if (element.querySelector('.button, button')) return;
+            
             let isAnimating = false;
-            let pendingState = null; // 'hover' 或 'leave' 或 null
+            let pendingState = null;
             
-            const applyHoverState = () => {
+            const setState = (isHover) => {
                 if (isAnimating) {
-                    pendingState = 'hover';
+                    pendingState = isHover ? 'hover' : 'leave';
                     return;
                 }
                 
                 isAnimating = true;
-                element.style.transform = 'translateX(4px)';
-                element.style.borderLeft = '3px solid rgba(134, 152, 255, 0.6)';
-                element.style.paddingLeft = '12px';
-                element.style.color = '#2d3748';
+                Object.assign(element.style, {
+                    transform: isHover ? 'translateX(4px)' : 'translateX(0)',
+                    borderLeft: isHover ? '3px solid rgba(134, 152, 255, 0.6)' : '3px solid transparent',
+                    paddingLeft: isHover ? '12px' : '0',
+                    color: isHover ? '#2d3748' : ''
+                });
                 
-                // 动画完成后处理待处理状态
                 setTimeout(() => {
                     isAnimating = false;
-                    if (pendingState === 'leave') {
-                        applyLeaveState();
+                    if (pendingState) {
+                        setState(pendingState === 'hover');
+                        pendingState = null;
                     }
-                    pendingState = null;
-                }, 400); // 与 CSS transition 时间一致
+                }, 400);
             };
             
-            const applyLeaveState = () => {
-                if (isAnimating) {
-                    pendingState = 'leave';
-                    return;
-                }
-                
-                isAnimating = true;
-                element.style.transform = 'translateX(0)';
-                element.style.borderLeft = '3px solid transparent';
-                element.style.paddingLeft = '0';
-                element.style.color = '';
-                element.style.textShadow = '';
-                
-                // 动画完成后处理待处理状态
-                setTimeout(() => {
-                    isAnimating = false;
-                    if (pendingState === 'hover') {
-                        applyHoverState();
-                    }
-                    pendingState = null;
-                }, 400); // 与 CSS transition 时间一致
-            };
-            
-            element.addEventListener('mouseenter', applyHoverState);
-            element.addEventListener('mouseleave', applyLeaveState);
+            element.addEventListener('mouseenter', () => setState(true));
+            element.addEventListener('mouseleave', () => setState(false));
         });
     }
 
     setupTitleAnimation() {
-        const titleElements = document.querySelectorAll('h1, h2, h3');
-        
-        titleElements.forEach(element => {
+        document.querySelectorAll('h1, h2, h3').forEach(element => {
             let isAnimating = false;
-            let pendingState = null; // 'hover' 或 'leave' 或 null
+            let pendingState = null;
             
-            const applyHoverState = () => {
+            const setState = (isHover) => {
                 if (isAnimating) {
-                    pendingState = 'hover';
+                    pendingState = isHover ? 'hover' : 'leave';
                     return;
                 }
                 
                 isAnimating = true;
-                element.style.letterSpacing = '0.02em';
+                element.style.letterSpacing = isHover ? '0.02em' : '0';
                 
-                // 动画完成后处理待处理状态
                 setTimeout(() => {
                     isAnimating = false;
-                    if (pendingState === 'leave') {
-                        applyLeaveState();
+                    if (pendingState) {
+                        setState(pendingState === 'hover');
+                        pendingState = null;
                     }
-                    pendingState = null;
-                }, 500); // 与 CSS transition 时间一致
+                }, 500);
             };
             
-            const applyLeaveState = () => {
-                if (isAnimating) {
-                    pendingState = 'leave';
-                    return;
-                }
-                
-                isAnimating = true;
-                element.style.letterSpacing = '0';
-                
-                // 动画完成后处理待处理状态
-                setTimeout(() => {
-                    isAnimating = false;
-                    if (pendingState === 'hover') {
-                        applyHoverState();
-                    }
-                    pendingState = null;
-                }, 500); // 与 CSS transition 时间一致
-            };
-            
-            element.addEventListener('mouseenter', applyHoverState);
-            element.addEventListener('mouseleave', applyLeaveState);
+            element.addEventListener('mouseenter', () => setState(true));
+            element.addEventListener('mouseleave', () => setState(false));
         });
     }
 }
 
-// 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', () => {
-    new SmoothHover();
-});
+document.addEventListener('DOMContentLoaded', () => new SmoothHover());

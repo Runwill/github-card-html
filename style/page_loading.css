@@ -9,72 +9,66 @@
     justify-content: center;
     transition: opacity 3s;
 }
+
+#loading-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
 .loading-bar-container {
     width: 39vw;
     height: 8px;
     background: #e0e0e0;
-    /*background: #ecead8;*/
     border-radius: 4px;
     overflow: hidden;
-    /* 初始透明，延迟渐入 */
     opacity: 0;
-    animation: fade-in-container 0.5s ease-in 0.3s forwards;
+    animation: fade-in 0.5s ease-in 0.3s forwards;
 }
+
 .loading-bar {
     width: 0%;
     height: 100%;
     background: linear-gradient(90deg, #3f3f3f 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%);
-    /*
-    background: linear-gradient(90deg, #8698ff 0%, #4CAF50 100%);
-    background: linear-gradient(90deg, #000000 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%);
-    background: linear-gradient(90deg, #FFFFFF 90%, #a1a1a1 98%, #ff7f7f 99%, #000000 100%);
-    */
     border-radius: 4px;
-    animation: loading-bar-smooth 1.2s cubic-bezier(.4,0,.2,1) 0.8s forwards;
-    /* GPU 加速优化 */
+    animation: loading-progress 1.2s cubic-bezier(.4,0,.2,1) 0.8s forwards;
     transform: translateZ(0);
     will-change: width;
 }
 
-/* 加速完成进度条的类 */
 .loading-bar.accelerate {
-    animation: loading-bar-final 0.4s cubic-bezier(.2,0,.2,1) forwards;
+    animation: loading-complete 0.4s cubic-bezier(.2,0,.2,1) forwards;
 }
+
 .loading-title {
     margin-bottom: 18px;
     font-size: 1.5em;
     color: #66666650;
-    letter-spacing: 1em; /* 基础字间距，会被JavaScript动态调整 */
+    letter-spacing: 1em;
     font-family: '康熙';
     opacity: 0;
-    animation: fade-in-title 0.5s ease-in forwards, pulse 2s ease-in-out infinite 1s;
-    /* GPU 加速优化 */
+    animation: fade-in 0.5s ease-in forwards, pulse 2s ease-in-out infinite 1s;
     transform: translateZ(0);
     will-change: opacity, letter-spacing;
 }
-@keyframes loading-bar-smooth {
+
+@keyframes loading-progress {
     0% { width: 0%; }
     70% { width: 75%; }
     90% { width: 85%; }
     100% { width: 88%; }
 }
-@keyframes loading-bar-final {
-    0% { width: 88%; }
-    100% { width: 100%; }
+
+@keyframes loading-complete {
+    from { width: 88%; }
+    to { width: 100%; }
 }
-@keyframes fade-in-title {
+
+@keyframes fade-in {
     from { opacity: 0; }
     to { opacity: 1; }
 }
-@keyframes fade-in-container {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.7; }
-}
-#loading-overlay.fade-out {
-    opacity: 0;
-    pointer-events: none;
 }
