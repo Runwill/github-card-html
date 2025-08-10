@@ -178,7 +178,6 @@ lore {
 
 #title-a:hover {
     color: #2d3748;
-    font-weight: 600;
     transform: translateY(-1px);
 }
 
@@ -227,6 +226,12 @@ lore {
 }
 
 #nav .tabs-title a:hover::before { left: 100%; }
+
+/* 仅在活动标签页加粗 */
+.tabs-title.is-active > a,
+.tabs-title > a[aria-selected="true"] {
+    font-weight: 600;
+}
 
 #active {
     text-decoration: overline;
