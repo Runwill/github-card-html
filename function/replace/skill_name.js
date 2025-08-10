@@ -41,10 +41,10 @@ function replace_skill_name(path, paragraphs = document){
                         element.prop('loreSkillPosition', j)
                         element.prop('loreRolePosition', k)
 
-                        // 只创建一次tooltip并复用
+                        // 只创建一次tooltip并复用（使用全局样式类，移除内联样式依赖）
                         if (!window._loreTooltipAppended) {
                             window._loreTooltipAppended = true;
-                            $('body').append('<div id="lore-tooltip" style="display:none;position:absolute;"></div>');
+                            $('body').append('<div id="lore-tooltip" aria-hidden="true"></div>');
                         }
                         const $tooltip = $('#lore-tooltip');
 
@@ -58,119 +58,61 @@ function replace_skill_name(path, paragraphs = document){
                             const viewportWidth = window.innerWidth;
                             
                             // 计算最佳位置 - 默认居中显示在元素下方
-                            let left = rect.left + scrollLeft + rect.width/2;
+                            let left = rect.left + scrollLeft + rect.width / 2;
                             let top = rect.bottom + scrollTop + 12;
-                            let showAbove = false;
-                            
-                            // 边界检测和调整
+                            let placement = 'bottom';
                             const margin = 12;
-                            
-                            // 先设置基础样式并测量宽度（在计算位置之前）
-                            $tooltip.css({
-                                visibility: 'hidden',
-                                display: 'block',
-                                opacity: 0,
-                                width: 'auto',
-                                'white-space': 'nowrap',
-                                'transition': 'none' // 临时移除过渡效果避免位置变化时的移动
-                            }).html(loreText);
-                            
-                            const tipWidth = $tooltip.outerWidth();
-                            const tipHeight = $tooltip.outerHeight();
-                            
-                            // 计算tooltip左边缘与目标元素中心对齐的位置
-                            left = rect.left + scrollLeft + rect.width/2;
-                            
-                            // 左右边界检测
-                            if (left < margin) {
-                                left = margin;
-                            } else if (left + tipWidth > viewportWidth - margin) {
-                                left = viewportWidth - tipWidth - margin;
+
+                            // 先写入内容并进行测量（仅使用 visibility 隐藏，避免 inline 覆盖 CSS 动画）
+                            $tooltip
+                                .removeClass('show')
+                                .attr('aria-hidden', 'true')
+                                .html(loreText)
+                                .css({
+                                    visibility: 'hidden',
+                                    display: 'block',
+                                    left: '-9999px',
+                                    top: '-9999px'
+                                });
+
+                            let tipWidth = $tooltip.outerWidth();
+                            let tipHeight = $tooltip.outerHeight();
+
+                            // 左右边界检测：按中心 - 宽度的 15% 进行对齐（偏向左侧展示更多内容）
+                            left = Math.min(
+                                Math.max(left - tipWidth * 0.15, scrollLeft + margin),
+                                scrollLeft + viewportWidth - tipWidth - margin
+                            );
+
+                            // 如果超出可视宽度（即使已经尽量贴边），启用自适应：限制最大宽度并允许换行
+                            const availableWidth = viewportWidth - 2 * margin;
+                            if (tipWidth > availableWidth) {
+                                $tooltip.css({ 'max-width': availableWidth + 'px', 'white-space': 'normal' });
+                                tipWidth = $tooltip.outerWidth();
+                                tipHeight = $tooltip.outerHeight();
+                                left = Math.min(
+                                    Math.max(rect.left + scrollLeft + rect.width / 2 - tipWidth * 0.15, scrollLeft + margin),
+                                    scrollLeft + viewportWidth - tipWidth - margin
+                                );
                             }
-                            
+
                             // 上下边界检测 - 如果下方空间不够，显示在上方
                             if (top + tipHeight > window.innerHeight + scrollTop - margin) {
                                 top = rect.top + scrollTop - tipHeight - 12;
-                                showAbove = true;
+                                placement = 'top';
                             }
-                            
-                            // 如果tooltip当前可见，先立即隐藏
-                            if ($tooltip.is(':visible') && parseFloat($tooltip.css('opacity')) > 0) {
-                                $tooltip.stop(true, true).css({
-                                    opacity: 0,
-                                    display: 'none'
-                                });
-                            }
-                            
-                            // 应用完整样式并启动动画
-                            $tooltip.stop(true, true).css({
-                                left: left + 'px',
-                                top: top + 'px',
-                                visibility: 'visible',
-                                display: 'block',
-                                opacity: 0,
-                                transform: 'translateX(-20px) scale(1)',
-                                
-                                // 样式优化
-                                background: 'rgba(248,250,252,0.9)',
-                                color: '#2d3748',
-                                border: '1px solid rgba(226,232,240,0.9)',
-                                'border-radius': '12px',
-                                'box-shadow': '0 10px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
-                                padding: '12px 18px',
-                                'z-index': 10000,
-                                'font-size': '0.95em',
-                                'font-weight': '500',
-                                'line-height': '1.4',
-                                'letter-spacing': '0.2px',
-                                'pointer-events': 'none',
-                                width: 'auto',
-                                'white-space': 'nowrap',
-                                'backdrop-filter': 'blur(12px) saturate(1.2)',
-                                'text-shadow': '0 1px 2px rgba(255,255,255,0.8)',
-                                'font-family': 'system-ui, -apple-system, sans-serif',
-                                
-                                // 恢复过渡动画（仅用于透明度和变换，不包括位置）
-                                'transition': 'none' // 完全移除CSS过渡，使用jQuery手动控制
-                            }).animate({
-                                opacity: 1
-                            }, {
-                                duration: 600, // 匹配其他动画的进入速度
-                                easing: 'easeOutBack',
-                                step: function(now, fx) {
-                                    if (fx.prop === 'opacity') {
-                                        // 手动控制进入动画的transform
-                                        const progress = now; // now从0到1
-                                        const translateX = -20 + (progress * 20); // 从-20px到0px
-                                        $(this).css('transform', `translateX(${translateX}px) scale(1)`);
-                                    }
-                                }
-                            });
+
+                            // 定位并显示（通过 class 触发 CSS 过渡），确保移除会干扰动画的 inline 样式
+                            $tooltip
+                                .attr('data-placement', placement)
+                                .css({ left: left + 'px', top: top + 'px', visibility: 'visible' })
+                                .each(function(){ this.style.removeProperty('opacity'); this.style.removeProperty('transform'); })
+                                .addClass('show')
+                                .attr('aria-hidden', 'false');
                         })
-                        // 优化鼠标离开动画 - 纯横轴向右偏移退出
+                        // 鼠标离开时通过移除类隐藏，由 CSS 过渡控制
                         element.on('mouseleave', function () {
-                            $tooltip.stop(true, true).css({
-                                'transition': 'none' // 移除CSS过渡，使用jQuery动画
-                            }).animate({
-                                opacity: 0
-                            }, {
-                                duration: 300, // 匹配其他动画的退出速度（比进入稍快）
-                                easing: 'easeInQuad',
-                                step: function(now, fx) {
-                                    if (fx.prop === 'opacity') {
-                                        // 只控制横向移动，不缩放
-                                        const progress = 1 - now; // now从1到0，progress从0到1
-                                        const translateX = progress * 20; // 最大偏移20px，和进入动画保持一致
-                                        $(this).css('transform', `translateX(${translateX}px) scale(1)`);
-                                    }
-                                },
-                                complete: function() {
-                                    $tooltip.hide().css({
-                                        'transform': 'translateX(0px) scale(1)',
-                                        'transition': 'none'
-                                    });
-                                }
-                            });
+                            $tooltip.removeClass('show').attr('aria-hidden', 'true');
                         })
                     }
                 }
