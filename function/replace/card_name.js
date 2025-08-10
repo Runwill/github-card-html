@@ -7,13 +7,8 @@ function replace_card_name(path, paragraphs = document){
             element.each(function() { // 替换和滚动
                 $(this).html(cardName).data("index", i).on("dblclick", function(event) {
                     event.stopPropagation()
-                    $("#example-tabs").foundation("selectTab", "panel_card", 1)
-            
-                    $(card[$(this).data("index")].en + ".scroll").each(function() {
-                        event.stopPropagation()
-                        this.scrollIntoView({ behavior: "smooth" }) // 滚动到目标元素
-                        $(this).fadeTo(200, 0).fadeTo(1000, 1) // 淡入效果
-                    })
+                    const sel = card[$(this).data("index")].en + ".scroll"
+                    scrollActions.scrollToSelectorAndFlash('panel_card', sel, { behavior: 'smooth', stop: true })
                 })
             })
             

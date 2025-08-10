@@ -19,14 +19,8 @@ function replace_term(path, mode, paragraphs = document) {
                     if(mode){
                         $(this).on('dblclick', function (event) {
                             event.stopPropagation()
-                            $("#example-tabs").foundation('selectTab', 'panel_term', 1)
-                            $(".scroll").each(function() {
-                                var target = event.currentTarget
-                                if (this.outerHTML.startsWith("<" + target.tagName.toLowerCase() + " ")) {
-                                    if (!$(this).hasClass('fadeOnly')) this.scrollIntoView({ behavior: "smooth" })
-                                    $(this).fadeTo(200, 0).fadeTo(1000, 1)
-                                }
-                            })
+                            // 依据标签名滚动（非分段）
+                            scrollActions.scrollToTagAndFlash('panel_term', event.currentTarget.tagName, { behavior: 'smooth', stop: true })
                         })
                     }
                 })
@@ -54,16 +48,8 @@ function replace_term(path, mode, paragraphs = document) {
                     }).each(function() { //滚动
                         $(this).on('dblclick', function (event) {
                             event.stopPropagation()
-                            $("#example-tabs").foundation('selectTab', 'panel_term', 1)
-                            $(".scroll").each(function() {
-                                var target = event.currentTarget
-                                if (this.outerHTML.startsWith("<" + term[target.i].en.toLowerCase() + " ")) {
-                                    if (!($(this).hasClass('fadeOnly'))) {
-                                        this.scrollIntoView({ behavior: 'smooth' })
-                                        $(this).stop(true).fadeTo(200, 0).fadeTo(1000, 1)
-                                    }
-                                }
-                            })
+                            // 依据术语的主标签滚动（分段总体）
+                            scrollActions.scrollToTagAndFlash('panel_term', term[event.currentTarget.i].en, { behavior: 'smooth', stop: true })
                         })
                     })
                     for (var j in term[i].part) {
@@ -76,16 +62,8 @@ function replace_term(path, mode, paragraphs = document) {
                             }).each(function() { //滚动
                                 $(this).on('dblclick', function (event) {
                                     event.stopPropagation()
-                                    $("#example-tabs").foundation('selectTab', 'panel_term', 1)
-                                    $(".scroll").each(function() {
-                                        var target = event.currentTarget
-                                        if (this.outerHTML.startsWith("<" + term[target.i].part[target.j].en.toLowerCase() + " ")) {
-                                            if (!($(this).hasClass('fadeOnly'))) {
-                                                this.scrollIntoView({ behavior: 'smooth' })
-                                                $(this).stop(true).fadeTo(200, 0).fadeTo(1000, 1)
-                                            }
-                                        }
-                                    })
+                                    // 依据分段的标签滚动
+                                    scrollActions.scrollToTagAndFlash('panel_term', term[event.currentTarget.i].part[event.currentTarget.j].en, { behavior: 'smooth', stop: true })
                                 })
                             })
                         }

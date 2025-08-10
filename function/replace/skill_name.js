@@ -26,18 +26,8 @@ function replace_skill_name(path, paragraphs = document){
             element.each(function() { // 替换和滚动
                 $(this).html(skillNames[i]).on("dblclick", function(event) {
                     event.stopPropagation()
-                    $("#example-tabs").foundation("selectTab", "panel_skill", 1)
-            
-                    $(".scroll").each(function() {
-                        if ($(this).hasClass(event.currentTarget.classList[0])) {
-                            if (!$(this).hasClass("fadeOnly")) {
-                                // 滚动到目标元素
-                                this.scrollIntoView({ behavior: "smooth" })
-                            }
-                            // 淡入效果
-                            $(this).fadeTo(200, 0).fadeTo(1000, 1)
-                        }
-                    })
+                    const className = event.currentTarget.classList[0]
+                    scrollActions.scrollToClassAndFlash('panel_skill', className, { behavior: 'smooth', stop: true })
                 })
             })
             
