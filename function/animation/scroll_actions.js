@@ -22,15 +22,17 @@
     return Math.max(0, elemTop - (winH/2) + (elemHeight/2))
   }
 
+  // 执行滚动：默认改为居中；若需顶部对齐，可传 opts.center === false
   function performScroll(targetElem, opts){
     if (!targetElem) return
     const behavior = (opts && opts.behavior) || 'smooth'
-    if (opts && opts.center) {
+    const center = (opts && Object.prototype.hasOwnProperty.call(opts, 'center')) ? !!opts.center : true
+    if (center) {
       // 居中滚动
       const top = centerOffsetFor(targetElem)
       window.scrollTo({ top, behavior })
     } else {
-      // 原生滚动至可视区
+      // 顶部对齐（仅在显式 center:false 时）
       try { targetElem.scrollIntoView({ behavior }) } catch(e) { targetElem.scrollIntoView() }
     }
   }
