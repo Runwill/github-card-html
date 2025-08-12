@@ -56,13 +56,21 @@ const UIManager = {
     // 初始化预览
     const preview = document.getElementById('sidebar-avatar-preview');
     const saved = localStorage.getItem('avatar');
-    if (preview && saved) {
-      preview.src = saved;
+    // 将旧的相对路径头像转换为绝对 URL
+    const resolveAvatarUrl = (u) => {
+      if (!u) return '';
+      if (/^https?:\/\//i.test(u)) return u; // 已是绝对地址
+      if (u.startsWith('/uploads/')) return `http://localhost:3000${u}`;
+      return u;
+    };
+    const resolved = resolveAvatarUrl(saved);
+    if (preview && resolved) {
+      preview.src = resolved;
       preview.style.display = 'inline-block';
     }
     const headerAvatar = document.getElementById('header-avatar');
-    if (saved && headerAvatar) {
-      headerAvatar.src = saved;
+    if (resolved && headerAvatar) {
+      headerAvatar.src = resolved;
       headerAvatar.style.display = 'inline-block';
     }
   },
@@ -85,8 +93,8 @@ const UIManager = {
       });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.message || '上传失败');
-      const url = data.url;
-      localStorage.setItem('avatar', url);
+  const url = data.url; // 服务端已返回绝对 URL
+  localStorage.setItem('avatar', url);
       const preview = document.getElementById('sidebar-avatar-preview');
       const headerAvatar = document.getElementById('header-avatar');
       if (preview) {
