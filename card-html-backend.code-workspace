@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": "e:/重要文件/card-html"
+        },
+        {
+            "path": "e:/重要文件/backend-project"
+        }
+    ],
+    "settings": {
+        "liveServer.settings.multiRootWorkspaceName": "card-html"
+    }
+}

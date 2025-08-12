@@ -5,105 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>登录</title>
     <link rel="stylesheet" type="text/css" href="Foundation-Sites-CSS/css/foundation.css">
+    <link rel="stylesheet" type="text/css" href="style/modal.css">
+    <link rel="stylesheet" type="text/css" href="style/forms.css">
+    <link rel="stylesheet" type="text/css" href="style/buttons.css">
     <link rel="stylesheet" type="text/css" href="style.css">
-    <style>
-        /* 居中登录框 */
-
-        #login-form button {
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        #register-button {
-            margin-top: 5px; /* 增加按钮间距 */
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style/login.css">
 </head>
 <body>
-    <div id="login-container" style="background: white; text-align: center;">
-        <form id="login-form">
+    
+    <div id="login-container" class="panel">
+        <div class="modal-header">
             <h2>登录</h2>
-            <input type="text" id="username" placeholder="用户名" required />
-            <input type="password" id="password" placeholder="密码" required />
-            <button type="submit" id="login-button">登录</button>
-            <button type="button" id="register-button">注册</button>
+        </div>
+        <form id="login-form" class="modal-form" autocomplete="off">
+            <input type="text" id="username" placeholder="用户名" required autocomplete="username" />
+            <input type="password" id="password" placeholder="密码" required autocomplete="current-password" />
+            <button type="submit" id="login-button" class="btn btn--primary btn--block">登录</button>
+            <button type="button" id="register-button" class="btn btn--secondary btn--block">注册</button>
         </form>
-        <div id="login-message"></div>
+        <div id="login-message" class="modal-message"></div>
     </div>
 
-    <script>
-        // 登录功能
-        document.getElementById('login-form').addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            try {
-                const response = await fetch('http://localhost:3000/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('id', data.user.id);
-                    localStorage.setItem('username', data.user.username);
-                    localStorage.setItem('role', data.user.role);
-
-                    document.getElementById('login-message').textContent = '登录成功！';
-                    document.getElementById('login-message').style.color = 'green';
-
-                    // 登录成功后跳转到主页面
-                    window.location.href = 'index.html';
-                } else {
-                    const errorData = await response.json();
-                    document.getElementById('login-message').textContent = errorData.message;
-                    document.getElementById('login-message').style.color = 'red';
-                    console.log('调试信息:', errorData.debug);
-                }
-            } catch (err) {
-                console.error('登录失败:', err);
-                document.getElementById('login-message').textContent = '登录失败，请稍后再试';
-            }
-        });
-
-        // 注册功能
-        document.getElementById('register-button').addEventListener('click', async function () {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (!username || !password) {
-                document.getElementById('login-message').textContent = '请输入用户名和密码进行注册';
-                document.getElementById('login-message').style.color = 'red';
-                return;
-            }
-
-            try {
-                const response = await fetch('http://localhost:3000/api/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    document.getElementById('login-message').textContent = data.message;
-                    document.getElementById('login-message').style.color = 'green';
-                } else {
-                    document.getElementById('login-message').textContent = data.message;
-                    document.getElementById('login-message').style.color = 'red';
-                }
-            } catch (error) {
-                console.error('注册请求失败:', error);
-                document.getElementById('login-message').textContent = '注册失败，请稍后重试。';
-                document.getElementById('login-message').style.color = 'red';
-            }
-        });
-    </script>
+    <script src="function/login.js"></script>
 </body>
 </html>

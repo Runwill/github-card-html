@@ -1,0 +1,85 @@
+/* 通用按钮样式（严格按照弹窗提交按钮风格） */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 8px; /* 与 modal 按钮一致 */
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.2;
+  border: 1px solid transparent;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.08s ease, background-position 0.25s ease; 
+  will-change: background-position, box-shadow, transform;
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(66,153,225,0.2);
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn--block { width: 100%; }
+
+/* 主按钮：与弹窗提交按钮一致 */
+.btn--primary {
+  /* 三段渐变 + 背景位移动画，悬浮过渡更平滑 */
+  background: linear-gradient(135deg, #8698ff 0%, #7084ff 50%, #5a6cff 100%) !important;
+  background-size: 200% 200% !important;
+  background-position: 0% 50% !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 6px -1px rgba(134, 152, 255, 0.2) !important;
+}
+.btn--primary:hover {
+  background-position: 100% 50% !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px -1px rgba(134, 152, 255, 0.3) !important;
+}
+.btn--primary:active { transform: translateY(0.5px); }
+
+/* 次按钮：用于“注册”等次级操作 */
+.btn--secondary {
+  background: transparent !important;
+  color: #4a5568 !important;
+  border-color: #e2e8f0 !important;
+}
+.btn--secondary:hover { background-color: #f7fafc !important; border-color: #cbd5e0 !important; color: #2563eb !important; }
+.btn--secondary:active { transform: translateY(0.5px); }
+
+/* 常用禁用态覆盖，确保一致 */
+.btn:disabled {
+  background: #e2e8f0 !important;
+  color: #a0aec0 !important;
+  border-color: #e2e8f0 !important;
+  box-shadow: none !important;
+}
+
+/* 成功/危险变体（用于审核列表） */
+.btn--success {
+  background-color: #48bb78 !important; /* 绿 */
+  color: #ffffff !important;
+  border: none !important;
+}
+.btn--success:hover { background-color: #38a169 !important; }
+
+.btn--danger {
+  background-color: #f56565 !important; /* 红 */
+  color: #ffffff !important;
+  border: none !important;
+}
+.btn--danger:hover { background-color: #e53e3e !important; }
+
+/* 小尺寸按钮（列表内使用） */
+.btn--sm {
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  border-radius: 6px !important;
+}

@@ -24,6 +24,7 @@
     <link rel="stylesheet" type="text/css" href="style/tooltip.css">
     <link rel="stylesheet" type="text/css" href="style/animations.css">
     <link rel="stylesheet" type="text/css" href="style/forms.css">
+    <link rel="stylesheet" type="text/css" href="style/buttons.css">
     <link rel="stylesheet" type="text/css" href="style.css">
 
     <script src="function/summon/standard_character_skills_block.js"></script>
@@ -122,6 +123,72 @@
                     document.getElementById('approve-request-button')?.addEventListener('click', () => 
                         this.showModal('approve-user-modal'));
                     document.getElementById('logout-button')?.addEventListener('click', () => this.handleLogout());
+
+                    // 头像上传
+                    const fileInput = document.getElementById('upload-avatar-input');
+                    const uploadBtn = document.getElementById('upload-avatar-button');
+                    uploadBtn?.addEventListener('click', () => fileInput?.click());
+                    fileInput?.addEventListener('change', (e) => this.handleAvatarUpload(e));
+
+                    // 初始化预览
+
+                    // 头像点击：打开侧边菜单
+                    document.getElementById('header-avatar')?.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.showSidebar();
+                    });
+                    const preview = document.getElementById('sidebar-avatar-preview');
+                    const saved = localStorage.getItem('avatar');
+                    if (preview && saved) {
+                        preview.src = saved;
+                        preview.style.display = 'inline-block';
+                    }
+                    const headerAvatar = document.getElementById('header-avatar');
+                    if (saved && headerAvatar) {
+                        headerAvatar.src = saved;
+                        headerAvatar.style.display = 'inline-block';
+                    }
+                },
+
+                async handleAvatarUpload(event) {
+                    const file = event?.target?.files?.[0];
+                    if (!file) return;
+                    const id = localStorage.getItem('id');
+                    if (!id) {
+                        alert('请先登录');
+                        return;
+                    }
+                    const form = new FormData();
+                    form.append('avatar', file);
+                    form.append('userId', id);
+                    try {
+                        const resp = await fetch('http://localhost:3000/api/upload/avatar', {
+                            method: 'POST',
+                            body: form
+                        });
+                        const data = await resp.json();
+                        if (!resp.ok) throw new Error(data.message || '上传失败');
+                        const url = data.url;
+                        localStorage.setItem('avatar', url);
+                            const preview = document.getElementById('sidebar-avatar-preview');
+                            const headerAvatar = document.getElementById('header-avatar');
+                            if (preview) {
+                                preview.src = url;
+                                preview.style.display = 'inline-block';
+                            }
+                            if (headerAvatar) {
+                                headerAvatar.src = url;
+                                headerAvatar.style.display = 'inline-block';
+                            }
+                        this.showMessage(document.getElementById('responseMessage'), '头像已更新', 'success');
+                    } catch (err) {
+                        console.error('上传头像失败:', err);
+                        alert('上传失败：' + err.message);
+                    } finally {
+                        // 清空文件选择，便于再次选择同一文件
+                        const input = document.getElementById('upload-avatar-input');
+                        if (input) input.value = '';
+                    }
                 },
 
                 bindFormEvents() {
@@ -140,12 +207,11 @@
                     if (!menu || !backdrop) return;
 
                     this.state.sidebarVisible = true;
-                    backdrop.style.display = menu.style.display = 'block';
-                    
-                    requestAnimationFrame(() => {
-                        backdrop.style.opacity = menu.style.opacity = '1';
-                        menu.style.transform = 'translate(-50%, -50%) scale(1)';
-                    });
+                    backdrop.style.display = 'block';
+                    // 清除可能遗留的 display:none，交给 visibility 控制
+                    menu.style.display = '';
+                    menu.classList.add('show');
+                    requestAnimationFrame(() => backdrop.classList.add('show'));
                 },
 
                 hideSidebar() {
@@ -155,12 +221,12 @@
                     if (!menu || !backdrop) return;
 
                     this.state.sidebarVisible = false;
-                    backdrop.style.opacity = menu.style.opacity = '0';
-                    menu.style.transform = 'translate(-50%, -50%) scale(0.95)';
-                    
+                    backdrop.classList.remove('show');
+                    menu.classList.remove('show');
                     setTimeout(() => {
                         if (!this.state.sidebarVisible) {
-                            backdrop.style.display = menu.style.display = 'none';
+                            backdrop.style.display = 'none';
+                            // 不再写入 menu 的 display，避免二次打开不可见
                         }
                     }, 300);
                 },
@@ -174,7 +240,8 @@
                     if (!backdrop || !modal) return;
 
                     this.state.currentModal = modalId;
-                    backdrop.style.display = modal.style.display = 'block';
+                    backdrop.style.display = 'block';
+                    modal.style.display = 'block';
                     
                     const responseMessage = modal.querySelector('#responseMessage');
                     if (responseMessage) {
@@ -202,7 +269,8 @@
                     
                     setTimeout(() => {
                         if (!this.state.currentModal) {
-                            backdrop.style.display = modal.style.display = 'none';
+                            backdrop.style.display = 'none';
+                            modal.style.display = 'none';
                         }
                     }, 300);
                 },
@@ -295,43 +363,194 @@
                 </script>
             </ul>
         </nav>
+    <!-- 头栏最右侧头像（从 localStorage 读取） -->
+    <img id="header-avatar" alt="avatar" />
     </header>
+    
+    <!-- 弹窗样式（参考 sidebar-menu 样式，保持简约） -->
+    <style>
+        /* 背景遮罩 */
+        .modal-backdrop {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 7999;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal-backdrop.show { opacity: 1; }
+
+        /* 通用弹窗容器 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 20px;
+            border: 1px solid rgba(226,232,240,0.8);
+            background: rgba(255,255,255,0.95);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
+            z-index: 8000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 94vw;
+            max-height: 80vh;
+            overflow: auto;
+        }
+        .modal.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        /* 侧边面板（与弹窗统一视觉与动画） */
+        .panel {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 20px;
+            border: 1px solid rgba(226,232,240,0.8);
+            background: rgba(255,255,255,0.95);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
+            z-index: 8000;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+            min-width: 220px;
+        }
+        .panel.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+            transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0s;
+        }
+        #sidebar-menu li { list-style: none; margin-bottom: 12px; }
+        #sidebar-menu li:last-child { margin-bottom: 0; }
+        .sidebar-menu_button {
+            width: 100%;
+            text-align: left;
+            padding: 12px 16px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            color: #4a5568;
+            font-weight: 500;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .sidebar-menu_button:hover { background-color: #f7fafc; }
+        #logout-button { color: #e53e3e; }
+        #logout-button:hover { background-color: #fed7d7; }
+
+        /* 标题与表单 */
+        .modal-header { margin-bottom: 12px; }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .modal-form input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.9);
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .modal-form input:focus {
+            border-color: #a0aec0;
+            box-shadow: 0 0 0 3px rgba(66,153,225,0.2);
+        }
+        .modal-form button {
+            padding: 10px 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: #3182ce;
+            color: #fff;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        .modal-form button:hover { background-color: #2b6cb0; }
+
+        .modal-message { margin-top: 8px; font-size: 14px; color: #4a5568; }
+        .modal-message.success { color: #38a169; }
+        .modal-message.error { color: #e53e3e; }
+
+        /* 尺寸优化 */
+        #update-account-modal { width: 420px; }
+        #approve-user-modal { width: 560px; }
+        #pending-users-modal-content {
+            max-height: 50vh;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 4px 0;
+        }
+
+        @media (max-width: 640px) {
+            #update-account-modal, #approve-user-modal { width: 92vw; }
+        }
+    </style>
     
     <!-- 弹窗移到body直接子元素，避免受父元素影响 -->
     <!-- 弹窗背景遮罩 -->
     <div id="modal-backdrop" class="modal-backdrop"></div>
     
     <!-- 侧边栏菜单背景遮罩 -->
-    <div id="sidebar-backdrop" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.3); z-index: 7999; display: none; opacity: 0; transition: opacity 0.3s ease;"></div>
+    <div id="sidebar-backdrop" class="modal-backdrop"></div>
     
     <!-- 侧边栏菜单移到body直接子元素 -->
-    <div id="sidebar-menu" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); padding: 20px; border: 1px solid rgba(226,232,240,0.8); background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08); min-width: 200px; z-index: 8000; opacity: 0; transition: all 0.3s ease;">
-        <li style="list-style-type: none; margin-bottom: 12px;">
-            <button id="update-account-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 12px 16px; border-radius: 6px; transition: all 0.2s ease; color: #4a5568; font-weight: 500; background: none; border: none; cursor: pointer; font-size: 15px;" onmouseover="this.style.backgroundColor='#f7fafc'" onmouseout="this.style.backgroundColor='transparent'">更籍</button>
+    <div id="sidebar-menu" class="panel">
+        <li style="display:flex; align-items:center; gap:10px;">
+            <img id="sidebar-avatar-preview" src="" alt="avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid #e2e8f0; display:none;" />
+            <button id="update-account-button" class="sidebar-menu_button" style="flex:1;">账号</button>
         </li>
-        <li style="list-style-type: none; margin-bottom: 12px;">
-            <button id="approve-request-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 12px 16px; border-radius: 6px; transition: all 0.2s ease; color: #4a5568; font-weight: 500; background: none; border: none; cursor: pointer; font-size: 15px;" onmouseover="this.style.backgroundColor='#f7fafc'" onmouseout="this.style.backgroundColor='transparent'">疏入</button>
+        <li>
+            <button id="upload-avatar-button" class="sidebar-menu_button">头像</button>
+            <input type="file" id="upload-avatar-input" accept="image/*" style="display:none" />
         </li>
-        <li style="list-style-type: none;">
-            <button id="logout-button" class="sidebar-menu_button" style="width: 100%; text-align: left; padding: 12px 16px; border-radius: 6px; transition: all 0.2s ease; color: #e53e3e; font-weight: 500; background: none; border: none; cursor: pointer; font-size: 15px;" onmouseover="this.style.backgroundColor='#fed7d7'" onmouseout="this.style.backgroundColor='transparent'">退出</button>
+        <li>
+            <button id="approve-request-button" class="sidebar-menu_button">审核</button>
+        </li>
+        <li>
+            <button id="logout-button" class="sidebar-menu_button">退出</button>
         </li>
     </div>
     
     <div id="update-account-modal" class="modal update-modal">
         <div class="modal-header">
-            <h2>更易版籍</h2>
+            <h2>账号</h2>
         </div>
         <form id="updateForm" class="modal-form">
             <input type="text" id="newUsername" name="newUsername" placeholder="新用户名" required>
             <input type="password" id="newPassword" name="newPassword" placeholder="新密码" required>
-            <button type="submit">更新</button>
+            <button type="submit" class="btn btn--primary btn--block">更新</button>
         </form>
         <div id="responseMessage" class="modal-message"></div>
     </div>
     
     <div id="approve-user-modal" class="modal approve-modal">
         <div class="modal-header">
-            <h2>疏入</h2>
+            <h2>审核</h2>
         </div>
         <div id="pending-users-modal-content">
             <!-- 动态生成未激活用户列表 -->
@@ -349,7 +568,7 @@
                 container.innerHTML = '';
 
                 if (users.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; color: gray; padding: 20px;">簿书皆毕</p>';
+                    container.innerHTML = '<p style="text-align: center; color: gray; padding: 20px;">空</p>';
                     return;
                 }
 
@@ -370,14 +589,8 @@
                     userDiv.innerHTML = `
                         <p style="margin: 0; color: #2d3748; font-weight: 500;">注册: ${user.username}</p>
                         <div style="display: flex; gap: 8px;">
-                            <button onclick="handleUserApproval('${user._id}', 'approve')" 
-                                    style="padding: 6px 12px; background-color: #48bb78; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; transition: background-color 0.2s ease;"
-                                    onmouseover="this.style.backgroundColor='#38a169'"
-                                    onmouseout="this.style.backgroundColor='#48bb78'">允准</button>
-                            <button onclick="handleUserApproval('${user._id}', 'reject')" 
-                                    style="padding: 6px 12px; background-color: #f56565; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; transition: background-color 0.2s ease;"
-                                    onmouseover="this.style.backgroundColor='#e53e3e'"
-                                    onmouseout="this.style.backgroundColor='#f56565'">不准</button>
+                            <button class="btn btn--success btn--sm" onclick="handleUserApproval('${user._id}', 'approve')">通过</button>
+                            <button class="btn btn--danger btn--sm" onclick="handleUserApproval('${user._id}', 'reject')">取消</button>
                         </div>
                     `;
                     container.appendChild(userDiv);

@@ -13,6 +13,9 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(8px) saturate(1.1);
     border-bottom: 1px solid rgba(0,0,0,0.06);
+    align-items: center;
+    padding-right: 56px; /* 给右侧头像预留空间，避免与内容重叠 */
+    position: sticky; /* 保持原有粘性定位 */
 }
 
 #header:hover {
@@ -59,6 +62,29 @@
 #title-a:hover::after { width: 100%; }
 
 #sidebar { background: #ffffff; padding: 0; z-index: 11; margin-left: 10; }
+
+/* 头栏右侧头像 */
+#header-avatar {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    cursor: pointer;
+    display: none; /* JS 初始化为 inline-block */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 8010; /* 高于 header 内元素 */
+}
+
+#header-avatar:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
 
 @keyframes slideDown {
     from { opacity: 0; transform: translateY(-8px) scale(0.95); }
