@@ -11,6 +11,7 @@
     opacity: 0;
     transition: opacity 0.3s ease-out;
     backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
 }
 
 .modal-backdrop.show { opacity: 1; }
@@ -32,6 +33,9 @@
     display: none;
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Unify with index inline modal blur without changing existing layout values */
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
 }
 
 .modal.show {
@@ -147,7 +151,11 @@
 }
 
 /* 侧边栏样式 */
-#sidebar-backdrop { backdrop-filter: blur(2px); }
+#sidebar-backdrop {
+    backdrop-filter: blur(2px);
+    /* Ensure sidebar backdrop is below the panel */
+    z-index: 7990;
+}
 
 #sidebar-menu {
     border: 1px solid rgba(226, 232, 240, 0.8);
@@ -157,11 +165,27 @@
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     min-width: 200px;
     padding: 20px;
+    /* Sit above the sidebar backdrop */
+    z-index: 8000;
 }
+
+/* 通用：侧栏条目间距（来自 index 内联，无视觉冲突） */
+#sidebar-menu li { list-style: none; margin-bottom: 12px; }
+#sidebar-menu li:last-child { margin-bottom: 0; }
 
 .sidebar-menu_button {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     font-weight: 500 !important;
+    /* 基础布局与点击区域（来自 index 内联） */
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+    border-radius: 6px;
+    color: #4a5568;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
 }
 
 .sidebar-menu_button:hover {
@@ -170,6 +194,36 @@
 }
 
 #logout-button:hover { background-color: #fed7d7 !important; }
+/* 退出按钮基础色（来自 index 内联） */
+#logout-button { color: #e53e3e; }
+
+/* 通用：面板（与登录页 .panel 保持一致） */
+.panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    padding: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    background: rgba(255, 255, 255, 0.95);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+    z-index: 8000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+    min-width: 220px;
+}
+.panel.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0s;
+}
 
 /* 用户列表样式 */
 #pending-users-modal-content {
