@@ -1,3 +1,21 @@
+#avatar-crop-modal .cropper-face,
+#avatar-crop-modal .cropper-move {
+    display: block !important;        /* 允许接收拖动事件 */
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;            /* 可设为 <1，如果希望微弱提示 */
+    pointer-events: auto !important;  /* 确保可拖动 */
+    z-index: 2 !important;
+}
+#avatar-crop-modal .cropper-view-box,
+#avatar-crop-modal .cropper-view-box::before,
+#avatar-crop-modal .cropper-view-box::after,
+#avatar-crop-modal .cropper-center,
+#avatar-crop-modal .cropper-center::before,
+#avatar-crop-modal .cropper-center::after {
+    display: none !important;
+}
 /* 弹窗和侧边栏样式 */
 .modal-backdrop {
     position: fixed;
@@ -12,9 +30,10 @@
     transition: opacity 0.3s ease-out;
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
+    pointer-events: none; /* 隐藏时不拦截事件 */
 }
 
-.modal-backdrop.show { opacity: 1; }
+.modal-backdrop.show { opacity: 1; pointer-events: auto; }
 
 .modal {
     position: fixed !important;
@@ -36,11 +55,13 @@
     /* Unify with index inline modal blur without changing existing layout values */
     -webkit-backdrop-filter: blur(12px);
     backdrop-filter: blur(12px);
+    pointer-events: none; /* 隐藏时不拦截事件 */
 }
 
 .modal.show {
     opacity: 1;
     transform: translate(-50%, -50%) !important;
+    pointer-events: auto; /* 显示时可交互 */
 }
 
 .modal.update-modal {
@@ -251,6 +272,35 @@
 }
 
 @media (max-width: 480px) {
+
+/* === Cropper.js 覆盖：禁用裁剪框虚线与动画 === */
+#avatar-crop-modal .cropper-container * {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* 去除虚线“蚂蚁线”效果与闪烁 */
+#avatar-crop-modal .cropper-dashed,
+#avatar-crop-modal .cropper-line {
+    animation: none !important;
+    background-image: none !important;
+}
+
+/* 固定边与点样式，避免默认闪烁/动效 */
+#avatar-crop-modal .cropper-line,
+#avatar-crop-modal .cropper-point {
+    background-color: #22c55e !important; /* 可按需调整主题色 */
+}
+
+/* 隐藏所有控制点（圆形小点）*/
+#avatar-crop-modal .cropper-point { display: none !important; }
+
+/* 隐藏辅助中心线（如不需要）*/
+#avatar-crop-modal .cropper-center,
+#avatar-crop-modal .cropper-face::before,
+#avatar-crop-modal .cropper-face::after {
+    display: none !important;
+}
     .modal {
         margin: 10px;
         max-width: calc(100vw - 20px);

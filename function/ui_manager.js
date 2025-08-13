@@ -44,8 +44,24 @@ const UIManager = {
     // 头像上传
     const fileInput = document.getElementById('upload-avatar-input');
     const uploadBtn = document.getElementById('upload-avatar-button');
-    uploadBtn?.addEventListener('click', () => fileInput?.click());
-    fileInput?.addEventListener('change', (e) => this.handleAvatarUpload(e));
+    // 打开头像弹窗
+    uploadBtn?.addEventListener('click', () => {
+      const modal = document.getElementById('avatar-modal');
+      const preview = document.getElementById('avatar-modal-preview');
+      const saved = localStorage.getItem('avatar');
+      if (preview) {
+        preview.src = saved || '';
+        if (saved && saved.startsWith('/uploads/')) {
+          preview.src = `http://localhost:3000${saved}`;
+        }
+      }
+      this.showModal('avatar-modal');
+    });
+    // 弹窗中的“上传头像”按钮
+    document.getElementById('avatar-modal-upload')?.addEventListener('click', () => fileInput?.click());
+    document.getElementById('avatar-modal-close')?.addEventListener('click', () => this.hideModal('avatar-modal'));
+    // 文件选择后进入裁剪
+    fileInput?.addEventListener('change', (e) => this.openAvatarCropper(e));
 
     // 头像点击：打开侧边菜单
     document.getElementById('header-avatar')?.addEventListener('click', (e) => {
@@ -75,9 +91,99 @@ const UIManager = {
     }
   },
 
-  async handleAvatarUpload(event) {
+  // 打开裁剪器
+  openAvatarCropper(event) {
     const file = event?.target?.files?.[0];
     if (!file) return;
+    if (!/^image\//i.test(file.type)) {
+      alert('请选择图片文件');
+      return;
+    }
+    const img = document.getElementById('avatar-crop-image');
+    const modalId = 'avatar-crop-modal';
+    const cancelBtn = document.getElementById('avatar-crop-cancel');
+    const confirmBtn = document.getElementById('avatar-crop-confirm');
+    const msg = document.getElementById('avatar-crop-message');
+    if (!img || !cancelBtn || !confirmBtn) {
+      // 回退：直接上传原图
+      this.handleCroppedUpload(file);
+      return;
+    }
+    msg.textContent = '';
+    msg.className = 'modal-message';
+    // 销毁旧实例
+    if (this._cropper) {
+      try { this._cropper.destroy(); } catch (_) {}
+      this._cropper = null;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      img.src = reader.result;
+      // 打开弹窗
+      this.showModal(modalId);
+      // 等待图片渲染
+      setTimeout(() => {
+        this._cropper = new window.Cropper(img, {
+          viewMode: 1,
+          aspectRatio: 1,
+          dragMode: 'move',
+          autoCropArea: 1,
+          background: false,
+          guides: false,
+          cropBoxResizable: false,
+          cropBoxMovable: false,
+          toggleDragModeOnDblclick: false,
+          movable: true,
+          zoomable: true,
+          responsive: true,
+          minContainerHeight: 320,
+          ready: () => {
+            try { this._cropper && this._cropper.setDragMode('move'); } catch (_) {}
+          }
+        });
+      }, 50);
+    };
+    reader.readAsDataURL(file);
+
+    const cleanup = () => {
+      if (this._cropper) { try { this._cropper.destroy(); } catch (_) {} this._cropper = null; }
+      const input = document.getElementById('upload-avatar-input');
+      if (input) input.value = '';
+    };
+    const onCancel = () => {
+      cleanup();
+      this.hideModal(modalId);
+    };
+    const onConfirm = async () => {
+      try {
+        msg.textContent = '正在裁剪…';
+        // 导出 512x512 PNG，若源小则按源尺寸
+        const canvas = this._cropper.getCroppedCanvas({ width: 512, height: 512, imageSmoothingQuality: 'high' });
+        if (!canvas) throw new Error('裁剪失败');
+        canvas.toBlob(async (blob) => {
+          if (!blob) { msg.textContent = '导出失败'; msg.className = 'modal-message error'; return; }
+          const croppedFile = new File([blob], 'avatar.png', { type: 'image/png' });
+          await this.handleCroppedUpload(croppedFile, msg);
+          this.hideModal(modalId);
+          cleanup();
+        }, 'image/png');
+      } catch (e) {
+        console.error(e);
+        msg.textContent = e.message || '裁剪失败';
+        msg.className = 'modal-message error';
+      }
+    };
+    // 先移除旧监听，避免叠加
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+    const newCancel = document.getElementById('avatar-crop-cancel');
+    const newConfirm = document.getElementById('avatar-crop-confirm');
+    newCancel.addEventListener('click', onCancel);
+    newConfirm.addEventListener('click', onConfirm);
+  },
+
+  // 上传裁剪结果
+  async handleCroppedUpload(file, messageEl) {
     const id = localStorage.getItem('id');
     if (!id) {
       alert('请先登录');
@@ -87,32 +193,25 @@ const UIManager = {
     form.append('avatar', file);
     form.append('userId', id);
     try {
-      const resp = await fetch('http://localhost:3000/api/upload/avatar', {
-        method: 'POST',
-        body: form
-      });
+      messageEl && (messageEl.textContent = '正在上传…');
+      const resp = await fetch('http://localhost:3000/api/upload/avatar', { method: 'POST', body: form });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.message || '上传失败');
-  const url = data.url; // 服务端已返回绝对 URL
-  localStorage.setItem('avatar', url);
+      const url = data.url; // 服务端返回绝对 URL
+      localStorage.setItem('avatar', url);
       const preview = document.getElementById('sidebar-avatar-preview');
       const headerAvatar = document.getElementById('header-avatar');
-      if (preview) {
-        preview.src = url;
-        preview.style.display = 'inline-block';
-      }
-      if (headerAvatar) {
-        headerAvatar.src = url;
-        headerAvatar.style.display = 'inline-block';
-      }
+  const modalPreview = document.getElementById('avatar-modal-preview');
+      if (preview) { preview.src = url; preview.style.display = 'inline-block'; }
+      if (headerAvatar) { headerAvatar.src = url; headerAvatar.style.display = 'inline-block'; }
+  if (modalPreview) { modalPreview.src = url; }
       this.showMessage(document.getElementById('responseMessage'), '头像已更新', 'success');
+      messageEl && (messageEl.textContent = '完成');
     } catch (err) {
       console.error('上传头像失败:', err);
       alert('上传失败：' + err.message);
-    } finally {
-      // 清空文件选择，便于再次选择同一文件
-      const input = document.getElementById('upload-avatar-input');
-      if (input) input.value = '';
+      messageEl && (messageEl.textContent = '上传失败');
+      messageEl && (messageEl.className = 'modal-message error');
     }
   },
 
