@@ -147,9 +147,7 @@
         <div class="modal-header">
             <h2>审核</h2>
         </div>
-        <div id="pending-users-modal-content">
-            <!-- 动态生成未激活用户列表 -->
-        </div>
+        <div id="pending-approvals-modal-content" style="padding: 12px; display:block;"></div>
     </div>
 
     <!-- 头像管理弹窗：显示当前头像与上传按钮 -->
@@ -160,6 +158,10 @@
         <div class="modal-form">
             <img id="avatar-modal-preview" alt="avatar" style="width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; background:#f8fafc; align-self:center;">
             <button id="avatar-modal-upload" class="btn btn--primary btn--block">上传头像</button>
+            <div id="avatar-pending-wrap" style="margin-top:10px; display:none;">
+                <div style="font-size:12px; color:#718096; margin-bottom:6px;">审核中</div>
+                <img id="avatar-pending-preview" alt="pending" style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 1px solid #e2e8f0; background:#f8fafc;">
+            </div>
         </div>
         <div id="avatar-modal-message" class="modal-message"></div>
     </div>
@@ -180,7 +182,7 @@
     </div>
     
     <script>
-        // 用户管理函数
+    // 用户管理函数
         window.renderPendingUsers = async function() {
             try {
                 const users = await fetchPendingUsers();
@@ -226,10 +228,80 @@
             }
         };
         
+        // 获取待审核头像
+        window.fetchPendingAvatars = async function() {
+            try {
+                const response = await fetch('http://localhost:3000/api/avatar/pending', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
+                });
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                const data = await response.json();
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                console.error('获取待审核头像失败:', e);
+                return [];
+            }
+        };
+
+        // 渲染待审核头像列表
+        window.renderPendingAvatars = async function() {
+            const container = document.getElementById('pending-avatars-modal-content');
+            if (!container) return;
+            container.innerHTML = '';
+            const list = await fetchPendingAvatars();
+            if (!list.length) {
+                container.innerHTML = '<p style="text-align:center;color:gray;padding:20px;">空</p>';
+                return;
+            }
+            list.forEach(item => {
+                const row = document.createElement('div');
+                row.style.cssText = `display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; border:1px solid #e2e8f0; border-radius:6px; background:#f8fafc; margin-bottom:10px;`;
+                const abs = (u) => /^https?:\/\//.test(u) ? u : `http://localhost:3000${u}`;
+                row.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <img src="${abs(item.url)}" alt="avatar" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid #e2e8f0;"/>
+                        <div>
+                            <div style="font-weight:500; color:#2d3748;">${item.user?.username || item.user}</div>
+                            <div style="font-size:12px;color:#718096;">${new Date(item.createdAt).toLocaleString()}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn--success btn--sm" onclick="handleAvatarApproval('${item._id}','approve')">通过</button>
+                        <button class="btn btn--danger btn--sm" onclick="handleAvatarApproval('${item._id}','reject')">拒绝</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        };
+
+        // 审核头像
+        window.handleAvatarApproval = async function(recordId, action) {
+            try {
+                const response = await fetch('http://localhost:3000/api/avatar/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` },
+                    body: JSON.stringify({ recordId, action })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                await renderPendingAvatars();
+                // 若通过且是当前登录用户，刷新本地头像
+                try {
+                    const id = localStorage.getItem('id');
+                    const list = await fetchPendingAvatars();
+                    // 简化：通过后由后端更新用户头像，下次刷新会显示；此处不强制刷新
+                } catch (_) {}
+            } catch (e) {
+                console.error('审核头像失败:', e);
+                alert('操作失败，请重试');
+            }
+        };
+        
         // 获取未激活用户列表
         window.fetchPendingUsers = async function() {
             try {
-                const response = await fetch('http://localhost:3000/api/pending-users');
+                const response = await fetch('http://localhost:3000/api/pending-users', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
+                });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -246,7 +318,7 @@
             try {
                 const response = await fetch('http://localhost:3000/api/approve', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` },
                     body: JSON.stringify({ userId, action })
                 });
 
@@ -257,11 +329,132 @@
                 const data = await response.json();
                 console.log(data.message);
 
-                // 刷新待批准用户列表
-                await renderPendingUsers();
+                // 刷新统一审核列表（优先），否则回退到旧的用户列表
+                if (typeof renderApprovals === 'function') {
+                    await renderApprovals();
+                } else if (typeof renderPendingUsers === 'function') {
+                    await renderPendingUsers();
+                }
             } catch (error) {
                 console.error('操作失败:', error.message);
                 alert('操作失败，请重试');
+            }
+        };
+
+        // 获取待审核头像
+        window.fetchPendingAvatars = async function() {
+            try {
+                const response = await fetch('http://localhost:3000/api/avatar/pending', {
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
+                });
+                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+                const data = await response.json();
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                console.error('获取待审核头像失败:', e);
+                return [];
+            }
+        };
+
+        // 审核头像
+        window.handleAvatarApproval = async function(recordId, action) {
+            try {
+                const response = await fetch('http://localhost:3000/api/avatar/approve', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` },
+                    body: JSON.stringify({ recordId, action })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                // 审核后刷新统一列表
+                if (typeof renderApprovals === 'function') await renderApprovals();
+                // 若通过，尝试从服务端刷新一下当前登录用户头像（便于管理员批准自己的头像时即时生效）
+                try { window.MenuModalManager && window.MenuModalManager.refreshCurrentUserFromServer && window.MenuModalManager.refreshCurrentUserFromServer(); } catch (e) {}
+            } catch (e) {
+                console.error('审核头像失败:', e);
+                alert('操作失败，请重试');
+            }
+        };
+
+        // 统一渲染：注册与头像审核合并单列展示
+        window.renderApprovals = async function() {
+            const container = document.getElementById('pending-approvals-modal-content');
+            if (!container) return;
+            container.innerHTML = '';
+            try {
+                const [users, avatars] = await Promise.all([
+                    typeof fetchPendingUsers === 'function' ? fetchPendingUsers() : Promise.resolve([]),
+                    typeof fetchPendingAvatars === 'function' ? fetchPendingAvatars() : Promise.resolve([])
+                ]);
+
+                // 统一数据模型
+                const items = [];
+                (users || []).forEach(u => items.push({
+                    type: 'register',
+                    id: u._id,
+                    createdAt: u.createdAt ? new Date(u.createdAt) : new Date(0),
+                    username: u.username
+                }));
+                (avatars || []).forEach(a => items.push({
+                    type: 'avatar',
+                    id: a._id,
+                    createdAt: a.createdAt ? new Date(a.createdAt) : new Date(0),
+                    username: (a.user && a.user.username) ? a.user.username : (a.user || ''),
+                    url: a.url
+                }));
+
+                // 按时间倒序
+                items.sort((x, y) => (y.createdAt - x.createdAt));
+
+                if (!items.length) {
+                    container.innerHTML = '<p style="text-align:center;color:gray;padding:20px;">空</p>';
+                    return;
+                }
+
+                const abs = (u) => /^https?:\/\//.test(u) ? u : (u ? `http://localhost:3000${u}` : '');
+
+                items.forEach(it => {
+                    const row = document.createElement('div');
+                    row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px; border:1px solid #e2e8f0; border-radius:6px; background:#f8fafc; margin-bottom:10px;';
+                    const left = document.createElement('div');
+                    left.style.cssText = 'display:flex; align-items:center; gap:10px;';
+                    if (it.type === 'avatar' && it.url) {
+                        const img = document.createElement('img');
+                        img.src = abs(it.url);
+                        img.alt = 'avatar';
+                        img.style.cssText = 'width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid #e2e8f0;';
+                        left.appendChild(img);
+                    }
+                    const text = document.createElement('div');
+                    text.innerHTML = `<div style="font-weight:600;color:#2d3748;">${it.type === 'register' ? '注册' : '头像'}：${it.username || ''}</div>` +
+                                     `<div style="font-size:12px;color:#718096;">${it.createdAt.toLocaleString()}</div>`;
+                    left.appendChild(text);
+
+                    const right = document.createElement('div');
+                    right.style.cssText = 'display:flex; gap:8px;';
+                    const approveBtn = document.createElement('button');
+                    approveBtn.className = 'btn btn--success btn--sm';
+                    approveBtn.textContent = '通过';
+                    approveBtn.onclick = () => {
+                        if (it.type === 'register') handleUserApproval(it.id, 'approve');
+                        else handleAvatarApproval(it.id, 'approve');
+                    };
+                    const rejectBtn = document.createElement('button');
+                    rejectBtn.className = 'btn btn--danger btn--sm';
+                    rejectBtn.textContent = '拒绝';
+                    rejectBtn.onclick = () => {
+                        if (it.type === 'register') handleUserApproval(it.id, 'reject');
+                        else handleAvatarApproval(it.id, 'reject');
+                    };
+                    right.appendChild(approveBtn);
+                    right.appendChild(rejectBtn);
+
+                    row.appendChild(left);
+                    row.appendChild(right);
+                    container.appendChild(row);
+                });
+            } catch (e) {
+                console.error('渲染审核项失败:', e);
+                container.innerHTML = '<p style="text-align:center;color:#e53e3e;padding:20px;">加载失败，请重试</p>';
             }
         };
     </script>

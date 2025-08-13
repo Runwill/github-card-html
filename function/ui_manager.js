@@ -6,6 +6,8 @@ const UIManager = {
     this.bindEvents();
     this.bindMenuActions();
     this.bindFormEvents();
+  // 初始化时尝试从服务端刷新一次用户信息（可能刚被管理员通过头像审核）
+  this.refreshCurrentUserFromServer();
   },
 
   bindEvents() {
@@ -45,16 +47,18 @@ const UIManager = {
     const fileInput = document.getElementById('upload-avatar-input');
     const uploadBtn = document.getElementById('upload-avatar-button');
     // 打开头像弹窗
-    uploadBtn?.addEventListener('click', () => {
+    uploadBtn?.addEventListener('click', async () => {
+      // 打开前先尝试从服务器刷新一次头像（防止审核通过后本地仍旧是旧值）
+      await this.refreshCurrentUserFromServer();
       const modal = document.getElementById('avatar-modal');
       const preview = document.getElementById('avatar-modal-preview');
       const saved = localStorage.getItem('avatar');
       if (preview) {
-        preview.src = saved || '';
-        if (saved && saved.startsWith('/uploads/')) {
-          preview.src = `http://localhost:3000${saved}`;
-        }
+        const resolved = this.resolveAvatarUrl(saved);
+        preview.src = resolved || '';
       }
+  // 加载个人待审核头像并显示在小预览
+  this.loadPendingAvatarPreview();
       this.showModal('avatar-modal');
     });
     // 弹窗中的“上传头像”按钮
@@ -72,14 +76,7 @@ const UIManager = {
     // 初始化预览
     const preview = document.getElementById('sidebar-avatar-preview');
     const saved = localStorage.getItem('avatar');
-    // 将旧的相对路径头像转换为绝对 URL
-    const resolveAvatarUrl = (u) => {
-      if (!u) return '';
-      if (/^https?:\/\//i.test(u)) return u; // 已是绝对地址
-      if (u.startsWith('/uploads/')) return `http://localhost:3000${u}`;
-      return u;
-    };
-    const resolved = resolveAvatarUrl(saved);
+    const resolved = this.resolveAvatarUrl(saved);
     if (preview && resolved) {
       preview.src = resolved;
       preview.style.display = 'inline-block';
@@ -89,6 +86,48 @@ const UIManager = {
       headerAvatar.src = resolved;
       headerAvatar.style.display = 'inline-block';
     }
+
+    // 按角色显示/隐藏“审核”入口（moderator / admin 可见）
+    const role = localStorage.getItem('role');
+    const approveBtn = document.getElementById('approve-request-button');
+    if (approveBtn) {
+      const canReview = role === 'admin' || role === 'moderator';
+      approveBtn.style.display = canReview ? '' : 'none';
+    }
+  },
+
+  // 统一解析头像地址（相对 -> 绝对）
+  resolveAvatarUrl(u) {
+    if (!u) return '';
+    if (/^https?:\/\//i.test(u)) return u; // 已是绝对地址
+    if (u.startsWith('/uploads/')) return `http://localhost:3000${u}`;
+    return u;
+  },
+
+  // 从服务端拉取当前用户资料，若头像变更则更新本地与 UI
+  async refreshCurrentUserFromServer() {
+    try {
+      const id = localStorage.getItem('id');
+      if (!id) return;
+      const resp = await fetch(`http://localhost:3000/api/user/${encodeURIComponent(id)}`);
+      if (!resp.ok) return;
+      const data = await resp.json();
+      if (!data) return;
+      const old = localStorage.getItem('avatar') || '';
+      const next = data.avatar || '';
+      if (old !== next) {
+        localStorage.setItem('avatar', next);
+        // 立即刷新两处头像
+        const resolved = this.resolveAvatarUrl(next);
+        const preview = document.getElementById('sidebar-avatar-preview');
+        const headerAvatar = document.getElementById('header-avatar');
+        if (preview && resolved) { preview.src = resolved; preview.style.display = 'inline-block'; }
+        if (headerAvatar && resolved) { headerAvatar.src = resolved; headerAvatar.style.display = 'inline-block'; }
+        // 若头像弹窗开着，也同步一下
+        const avatarModalPreview = document.getElementById('avatar-modal-preview');
+        if (avatarModalPreview && resolved) avatarModalPreview.src = resolved;
+      }
+    } catch (_) { /* 忽略错误 */ }
   },
 
   // 打开裁剪器
@@ -152,7 +191,9 @@ const UIManager = {
     };
     const onCancel = () => {
       cleanup();
-      this.hideModal(modalId);
+    this.hideModal(modalId);
+    // 返回“头像”弹窗
+    this.showModal('avatar-modal');
     };
     const onConfirm = async () => {
       try {
@@ -166,6 +207,8 @@ const UIManager = {
           await this.handleCroppedUpload(croppedFile, msg);
           this.hideModal(modalId);
           cleanup();
+      // 返回“头像”弹窗
+      this.showModal('avatar-modal');
         }, 'image/png');
       } catch (e) {
         console.error(e);
@@ -197,21 +240,40 @@ const UIManager = {
       const resp = await fetch('http://localhost:3000/api/upload/avatar', { method: 'POST', body: form });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.message || '上传失败');
-      const url = data.url; // 服务端返回绝对 URL
-      localStorage.setItem('avatar', url);
-      const preview = document.getElementById('sidebar-avatar-preview');
-      const headerAvatar = document.getElementById('header-avatar');
-  const modalPreview = document.getElementById('avatar-modal-preview');
-      if (preview) { preview.src = url; preview.style.display = 'inline-block'; }
-      if (headerAvatar) { headerAvatar.src = url; headerAvatar.style.display = 'inline-block'; }
-  if (modalPreview) { modalPreview.src = url; }
-      this.showMessage(document.getElementById('responseMessage'), '头像已更新', 'success');
-      messageEl && (messageEl.textContent = '完成');
+  // 审核流程：不立即替换“当前头像”预览，避免误以为已生效
+  // 在“头像”弹窗中提示
+  this.showMessage(document.getElementById('avatar-modal-message'), '头像已提交审核，待管理员批准后生效。', 'success');
+      messageEl && (messageEl.textContent = '已提交审核');
+  // 刷新“审核中头像”预览
+  await this.loadPendingAvatarPreview();
     } catch (err) {
       console.error('上传头像失败:', err);
       alert('上传失败：' + err.message);
       messageEl && (messageEl.textContent = '上传失败');
       messageEl && (messageEl.className = 'modal-message error');
+    }
+  },
+
+  // 拉取并显示个人“审核中头像”
+  async loadPendingAvatarPreview() {
+    try {
+      const userId = localStorage.getItem('id');
+      const wrap = document.getElementById('avatar-pending-wrap');
+      const img = document.getElementById('avatar-pending-preview');
+      if (!userId || !wrap || !img) return;
+      const resp = await fetch(`http://localhost:3000/api/avatar/pending/me?userId=${encodeURIComponent(userId)}`);
+      if (!resp.ok) throw new Error('load pending failed');
+      const data = await resp.json();
+      if (data && data.url) {
+        const abs = /^https?:\/\//i.test(data.url) ? data.url : `http://localhost:3000${data.url}`;
+        img.src = abs;
+        wrap.style.display = 'block';
+      } else {
+        wrap.style.display = 'none';
+      }
+    } catch (_) {
+      const wrap = document.getElementById('avatar-pending-wrap');
+      if (wrap) wrap.style.display = 'none';
     }
   },
 
@@ -236,6 +298,9 @@ const UIManager = {
     menu.style.display = '';
     menu.classList.add('show');
     requestAnimationFrame(() => backdrop.classList.add('show'));
+
+  // 展开时尝试刷新一次当前用户信息，带动头像更新
+  this.refreshCurrentUserFromServer();
   },
 
   hideSidebar() {
@@ -310,8 +375,10 @@ const UIManager = {
         input.value = localStorage.getItem('username') || '';
         input.focus();
       }
-    } else if (modalId === 'approve-user-modal' && typeof renderPendingUsers === 'function') {
-      renderPendingUsers();
+    } else if (modalId === 'approve-user-modal') {
+      if (typeof renderApprovals === 'function') renderApprovals();
+  // 审核面板打开时，后台可能会修改头像，尝试刷新一次本地缓存
+  this.refreshCurrentUserFromServer();
     }
   },
 
