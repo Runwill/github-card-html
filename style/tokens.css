@@ -78,6 +78,40 @@
 /* 刷新按钮在窄屏保持不被压缩/换行 */
 #panel_tokens .tokens-refresh { white-space: nowrap; flex: 0 0 auto; }
 
+/* 类型筛选卡片：可点击 + 激活样式 */
+#panel_tokens .type-tile {
+  cursor: pointer;
+  user-select: none;
+  transition: transform .16s var(--ease-standard, ease),
+              box-shadow .2s var(--ease-standard, ease),
+              border-color .2s var(--ease-standard, ease);
+  outline: none;
+  position: relative;
+  /* 默认强调色（可被各类型覆盖） */
+  --tile-accent: #718096; /* gray-600，较柔和 */
+  /* 基于强调色的浅化色与环色（更浅于主色） */
+  --tile-accent-soft: color-mix(in srgb, var(--tile-accent) 38%, white);
+  --tile-accent-ring: color-mix(in srgb, var(--tile-accent) 20%, transparent);
+}
+#panel_tokens .type-tile:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
+#panel_tokens .type-tile:focus-visible { box-shadow: 0 0 0 3px var(--tile-accent-ring); }
+#panel_tokens .type-tile.is-active { border-color: var(--tile-accent-soft) !important; box-shadow: 0 8px 18px rgba(0,0,0,.08), 0 0 0 2px var(--tile-accent-ring); }
+#panel_tokens .type-tile.is-active::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--tile-accent-soft);
+  border-radius: 8px 0 0 8px;
+}
+
+/* 各类型的强调色（与统计卡背景一致的色系） */
+#panel_tokens .type-tile[data-type="term-fixed"]    { --tile-accent: #A0AEC0; } /* gray-400 更浅 */
+#panel_tokens .type-tile[data-type="term-dynamic"]  { --tile-accent: #81E6D9; } /* teal-300 更浅 */
+#panel_tokens .type-tile[data-type="card"]          { --tile-accent: #F6E05E; } /* yellow-400 更浅 */
+#panel_tokens .type-tile[data-type="character"]     { --tile-accent: #B794F4; } /* purple-300 更浅 */
+#panel_tokens .type-tile[data-type="skill"]         { --tile-accent: #9AE6B4; } /* green-300 更浅 */
+
 /* 当容器极窄时，允许整组换行，但刷新按钮与文字保持一行 */
 @media (max-width: 480px) {
   #panel_tokens .tokens-toolbar { flex-wrap: wrap; gap: 8px; }

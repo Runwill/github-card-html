@@ -5,6 +5,7 @@
     data: null,
     q: '',
     timer: null,
+  activeType: null, // 当前筛选的类型：'term-fixed' | 'term-dynamic' | 'card' | 'character' | 'skill' | null
   };
   
   // 工具：按 dot path 设置对象的值，支持数组索引
@@ -74,7 +75,7 @@
       return r.json();
     };
 
-    try {
+  try {
       if (!state.data || forceReload) {
         const [termFixed, termDynamic, cards, characters, s0, s1, s2] = await Promise.all([
           fetchJson('http://localhost:3000/api/term-fixed'),
@@ -91,18 +92,23 @@
       const skills = ([]).concat(s0||[], s1||[], s2||[]);
 
       const tiles = [
-        { key: '静态术语', value: Array.isArray(termFixed)? termFixed.length : 0, color: '#EDF2F7' },
-        { key: '动态术语', value: Array.isArray(termDynamic)? termDynamic.length : 0, color: '#E6FFFA' },
-        { key: '牌', value: Array.isArray(cards)? cards.length : 0, color: '#FEF3C7' },
-        { key: '武将', value: Array.isArray(characters)? characters.length : 0, color: '#E9D8FD' },
-        { key: '技能', value: Array.isArray(skills)? skills.length : 0, color: '#C6F6D5' },
+        { type: 'term-fixed', key: '静态术语', value: Array.isArray(termFixed)? termFixed.length : 0, color: '#EDF2F7' },
+        { type: 'term-dynamic', key: '动态术语', value: Array.isArray(termDynamic)? termDynamic.length : 0, color: '#E6FFFA' },
+        { type: 'card', key: '牌', value: Array.isArray(cards)? cards.length : 0, color: '#FEF3C7' },
+        { type: 'character', key: '武将', value: Array.isArray(characters)? characters.length : 0, color: '#E9D8FD' },
+        { type: 'skill', key: '技能', value: Array.isArray(skills)? skills.length : 0, color: '#C6F6D5' },
       ];
-      summaryEl.innerHTML = tiles.map(t => `
-        <div style="border:1px solid #e2e8f0; border-radius:8px; padding:10px; background:${t.color}">
-          <div style="font-size:12px;color:#4A5568;">${t.key}</div>
-          <div style="font-weight:700; font-size:22px; color:#2D3748;">${t.value}</div>
-        </div>
-      `).join('');
+      summaryEl.innerHTML = tiles.map(t => {
+        const isActive = state.activeType === t.type;
+        const active = isActive ? ' is-active' : '';
+        return `
+          <div class="type-tile${active}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"
+               style="border:1px solid #e2e8f0; border-radius:8px; padding:10px; background:${t.color}">
+            <div style="font-size:12px;color:#4A5568;">${t.key}</div>
+            <div style="font-weight:700; font-size:22px; color:#2D3748;">${t.value}</div>
+          </div>
+        `;
+      }).join('');
 
   const section = (title, items, renderItem) => {
     const id = 'sec-' + Math.random().toString(36).slice(2,8);
@@ -220,13 +226,15 @@
 
       // 过滤后的视图
       const q = state.q;
-      const html = [
-        section('静态术语', Array.isArray(termFixed)? filterByQuery(termFixed, q): [], termFixedItem),
-        section('动态术语', Array.isArray(termDynamic)? filterByQuery(termDynamic, q): [], termDynamicItem),
-        section('牌', Array.isArray(cards)? filterByQuery(cards, q): [], cardItem),
-        section('武将', Array.isArray(characters)? filterByQuery(characters, q): [], characterItem),
-        section('技能', Array.isArray(skills)? filterByQuery(skills, q): [], skillItem),
-      ].join('');
+      const sections = [
+        { type: 'term-fixed', title: '静态术语', items: Array.isArray(termFixed)? filterByQuery(termFixed, q): [], render: termFixedItem },
+        { type: 'term-dynamic', title: '动态术语', items: Array.isArray(termDynamic)? filterByQuery(termDynamic, q): [], render: termDynamicItem },
+        { type: 'card', title: '牌', items: Array.isArray(cards)? filterByQuery(cards, q): [], render: cardItem },
+        { type: 'character', title: '武将', items: Array.isArray(characters)? filterByQuery(characters, q): [], render: characterItem },
+        { type: 'skill', title: '技能', items: Array.isArray(skills)? filterByQuery(skills, q): [], render: skillItem },
+      ];
+      const filteredSections = state.activeType ? sections.filter(s => s.type === state.activeType) : sections;
+      const html = filteredSections.map(s => section(s.title, s.items, s.render)).join('');
       contentEl.innerHTML = html;
       // 为新渲染的卡片添加入场延迟（交错动画）
       try {
@@ -237,6 +245,24 @@
         });
       } catch (_) {}
       setupSearch();
+      // 绑定类型筛选（只绑定一次）
+      (function setupTypeFilter(){
+        if (summaryEl.__bindTypeFilter) return;
+        summaryEl.__bindTypeFilter = true;
+        const handler = (ev) => {
+          const t = ev.target && ev.target.closest ? ev.target.closest('.type-tile') : null;
+          if (!t) return;
+          const tp = t.getAttribute('data-type');
+          if (!tp) return;
+          // 单选：再次点击取消筛选
+          state.activeType = (state.activeType === tp) ? null : tp;
+          renderTokensDashboard(false);
+        };
+        summaryEl.addEventListener('click', handler);
+        summaryEl.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(e); }
+        });
+      })();
 
   // 启用双击编辑（仅管理员）
       const role = localStorage.getItem('role');
