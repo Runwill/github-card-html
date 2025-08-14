@@ -381,30 +381,103 @@
       const id = tokenCard.getAttribute('data-id');
       if (!coll || !id) return;
 
-      // 避免重复编辑同一元素
-      if (target.getAttribute('data-editing') === '1') return;
-      // 若内部已有输入框（用户点击输入框本身），则忽略
-      if (target.querySelector('input.inline-edit')) return;
+  // 避免重复编辑同一元素
+  if (target.getAttribute('data-editing') === '1') return;
+  // 若内部已有输入控件（点击到控件本身），则忽略
+  if (target.querySelector('.inline-edit')) return;
     target.setAttribute('data-editing', '1');
   const oldText = target.textContent;
   // 存储原始文本，便于在强制关闭上一个编辑框时准确还原
   target.setAttribute('data-old-text', oldText);
-  const input = document.createElement('textarea');
-  input.value = oldText;
-  input.className = 'inline-edit';
-  input.setAttribute('rows', '1');
-  input.setAttribute('wrap', 'soft');
   // 标记编辑态，使用 CSS 控制视觉而非内联阴影
   target.classList.add('is-editing');
-      // 清空并插入输入框
-      target.textContent = '';
-      target.appendChild(input);
-  // 自动高度：根据内容自适应高度
-  const autoSize = () => { try { input.style.height = 'auto'; input.style.height = Math.max(24, input.scrollHeight) + 'px'; } catch(_){} };
-  input.addEventListener('input', autoSize);
-  autoSize();
-  input.focus();
-  input.select();
+
+  // 判断是否颜色字段（更严格）：仅当键名以 color 结尾，或值为十六进制/函数色值
+  const looksLikeHex = (s) => /^#([\da-fA-F]{3}|[\da-fA-F]{4}|[\da-fA-F]{6}|[\da-fA-F]{8})$/.test((s||'').trim());
+  const looksLikeFuncColor = (s) => /^(?:rgb|rgba|hsl|hsla)\s*\(/i.test((s||'').trim());
+  const endsWithColorKey = /(^|\.)color$/i.test(path);
+  const isColorField = endsWithColorKey || looksLikeHex(oldText) || looksLikeFuncColor(oldText);
+
+  let input; // 将用于提交的输入控件
+  let colorPicker = null;
+  const applyPreview = (val) => {
+    try {
+      if (!tokenCard || !val) return;
+      const col = String(val).trim();
+      if (!col) return;
+      const tint = computeTint(col);
+      tokenCard.style.setProperty('--token-accent', col);
+      if (tint) tokenCard.style.setProperty('--token-bg', tint);
+      tokenCard.style.borderLeft = `3px solid ${col}`;
+    } catch(_){}
+  };
+
+  if (isColorField) {
+    const wrap = document.createElement('div');
+    wrap.className = 'inline-edit-color';
+    colorPicker = document.createElement('input');
+    colorPicker.type = 'color';
+    colorPicker.className = 'color-picker';
+    const to6Hex = (s) => {
+      s = (s||'').trim();
+      if (!s.startsWith('#')) return null;
+      const hex = s.slice(1);
+      if (hex.length === 3) return '#' + hex.split('').map(c=>c+c).join('');
+      if (hex.length === 4) return '#' + hex.slice(0,3).split('').map(c=>c+c).join('');
+      if (hex.length === 6) return '#' + hex;
+      if (hex.length === 8) return '#' + hex.slice(0,6);
+      return null;
+    };
+    colorPicker.value = to6Hex(oldText) || '#3399ff';
+    const text = document.createElement('input');
+    text.type = 'text';
+    text.value = oldText;
+    text.className = 'inline-edit';
+    wrap.appendChild(colorPicker);
+    wrap.appendChild(text);
+    // 清空并插入
+    target.textContent = '';
+    target.appendChild(wrap);
+    input = text;
+
+    // 联动：picker -> text；text -> picker（仅 hex 时）并实时预览
+    colorPicker.addEventListener('input', () => {
+      const v = colorPicker.value;
+      input.value = v;
+      applyPreview(v);
+    });
+    colorPicker.addEventListener('change', () => {
+      const v = colorPicker.value;
+      input.value = v;
+      commit();
+    });
+    input.addEventListener('input', () => {
+      const v = input.value;
+      if (looksLikeHex(v)) {
+        const hx = to6Hex(v);
+        if (hx) colorPicker.value = hx;
+      }
+      applyPreview(v);
+    });
+    input.focus();
+    input.select();
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = oldText;
+    ta.className = 'inline-edit';
+    ta.setAttribute('rows', '1');
+    ta.setAttribute('wrap', 'soft');
+    // 清空并插入
+    target.textContent = '';
+    target.appendChild(ta);
+    input = ta;
+    // 自动高度
+    const autoSize = () => { try { ta.style.height = 'auto'; ta.style.height = Math.max(24, ta.scrollHeight) + 'px'; } catch(_){} };
+    ta.addEventListener('input', autoSize);
+    autoSize();
+    ta.focus();
+    ta.select();
+  }
 
       let committing = false; // 标记是否正在提交，避免 blur 触发还原造成闪烁
       let revertTimer = null; // 延迟还原，平滑从一个编辑框切换到另一个
@@ -518,12 +591,23 @@
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); }
         else if (e.key === 'Escape') { e.preventDefault(); revert(); }
       });
-      input.addEventListener('blur', () => {
-        // 若正在提交，忽略 blur，防止提交成功设置文本后又被还原造成“闪一下”
+      const safeBlur = () => {
         if (committing) return;
-        // 失焦取消编辑，不保存（稍作延时，避免在切换到下一项时出现突兀闪烁）
-        revertTimer = setTimeout(() => { revert(); }, 110);
-      });
+        // 稍作延时，若焦点仍在当前编辑容器内，则不还原
+        revertTimer = setTimeout(() => {
+          if (committing) return;
+          const ae = document.activeElement;
+          if (!target.contains(ae)) revert();
+        }, 110);
+      };
+      input.addEventListener('blur', safeBlur);
+      if (colorPicker) {
+        colorPicker.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); commit(); }
+          else if (e.key === 'Escape') { e.preventDefault(); revert(); }
+        });
+        colorPicker.addEventListener('blur', safeBlur);
+      }
     });
   }
   // 词元页绿色提示小弹窗（toast）

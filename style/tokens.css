@@ -239,6 +239,40 @@
   word-break: break-word;
 }
 
+/* 颜色编辑器布局 */
+#tokens-content .kv-val .inline-edit-color {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+#tokens-content .kv-val .inline-edit-color .color-picker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+/* 颜色编辑器容器与拾色器样式 */
+#tokens-content .kv-val .inline-edit-color {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+#tokens-content .kv-val .inline-edit-color .color-picker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
 /* 保存中禁用态（可选）：降低不必要的视觉跳变 */
 #tokens-content .kv-val.is-saving .inline-edit {
   opacity: .7;
