@@ -1,4 +1,10 @@
 /* 词元页样式：外置，避免内联注入 */
+/* 动画曲线变量（Material 风格） */
+:root {
+  --ease-standard: cubic-bezier(.4, 0, .2, 1);
+  --ease-decel:    cubic-bezier(0, 0, .2, 1);
+  --ease-accel:    cubic-bezier(.4, 0, 1, 1);
+}
 #panel_tokens .tokens-toolbar {
   display: flex;
   align-items: center;
@@ -62,6 +68,7 @@
   border-bottom: 2px solid currentColor;
   transform-origin: 50% 50%;
   opacity: .85;
+  transition: transform .24s var(--ease-standard);
 }
 #panel_tokens .expand-btn.is-expanded::before {
   /* 展开后箭头指向上（旋转到 -135° 等效为向上） */
@@ -150,7 +157,58 @@
   color: #2D3748;
   white-space: pre-wrap;
   word-break: break-all;
-  transition: background-color .25s ease, color .25s ease;
+  /* 使用内阴影模拟描边，避免 outline/边框引起的抖动与抗锯齿闪烁 */
+  box-shadow: inset 0 0 0 0px transparent;
+  transition: box-shadow .2s var(--ease-standard),
+              background-color .2s var(--ease-standard),
+              color .2s var(--ease-standard);
+  cursor: text; /* 暗示可编辑 */
+}
+
+#tokens-content .kv-val:not(.is-editing):hover {
+  background: rgba(226, 232, 240, 0.2); /* 轻微悬浮反馈 */
+}
+
+/* 编辑态：柔和背景 + 内阴影边框（无发光） */
+#tokens-content .kv-val.is-editing {
+  background-color: #F7FAFC; /* 柔和浅灰蓝 */
+  box-shadow: inset 0 0 0 1px #CBD5E0;
+  border-radius: 4px;
+}
+
+/* 聚焦时，仅调整边框颜色 */
+#tokens-content .kv-val.is-editing:focus-within {
+  box-shadow: inset 0 0 0 1px #A0AEC0;
+}
+
+/* 当卡片带有强调色时，编辑态的描边使用强调色的浅变体 */
+#tokens-content .token-card[style*="--token-accent"] .kv-val.is-editing {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--token-accent) 35%, #CBD5E0);
+  background: color-mix(in srgb, var(--token-accent) 8%, #F7FAFC);
+}
+
+/* 内联编辑输入框：占满宽度，无发光，轻微过渡 */
+#tokens-content .kv-val .inline-edit {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  padding: 4px 2px; /* 由父容器提供可视边框与外间距 */
+  border: none;       /* 移除内层边框，避免出现两个框 */
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  box-shadow: none; /* 不要发光 */
+  outline: none;
+  resize: none;          /* 禁止拖拽改变大小 */
+  overflow: hidden;      /* 由 JS 自适应高度，隐藏滚动条 */
+  white-space: pre-wrap; /* 保留空格并自动换行 */
+  word-break: break-word;
+}
+
+/* 保存中禁用态（可选）：降低不必要的视觉跳变 */
+#tokens-content .kv-val.is-saving .inline-edit {
+  opacity: .7;
+  cursor: progress;
 }
 
 #tokens-content pre.token-json {
@@ -201,15 +259,26 @@
   overflow: hidden;
   height: 0;
   display: none; /* 初始由 JS 控制为 block，再测量 */
-  transition: height .28s ease;
+  opacity: 0;
+  transition: height .42s var(--ease-standard), opacity .28s var(--ease-standard);
+  will-change: height, opacity;
 }
 .collapsible.is-open {
   display: block;
   height: auto;
+  opacity: 1;
 }
 .collapsible.is-opening,
 .collapsible.is-closing {
   display: block;
+}
+.collapsible.is-opening {
+  opacity: 1;
+  transition: height .42s var(--ease-decel), opacity .28s var(--ease-decel);
+}
+.collapsible.is-closing {
+  opacity: 0;
+  transition: height .36s var(--ease-accel), opacity .24s var(--ease-accel);
 }
 
 @keyframes token-card-in {
@@ -220,6 +289,12 @@
 #tokens-content .token-card:hover {
   transform: translateY(-1px);
   box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+/* 减少动画以避免闪烁（系统偏好） */
+@media (prefers-reduced-motion: reduce) {
+  #tokens-content .token-card { animation: none !important; transform: none !important; }
+  .tokens-toast { animation: none !important; opacity: 1 !important; transform: none !important; }
 }
 
 /* 词元页更新成功后的绿色 Toast 提示 */

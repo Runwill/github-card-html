@@ -149,7 +149,7 @@
                 const style = accent ? ` style="--token-accent:${esc(accent)}"` : '';
                 return `<div class="arr-item"><div class="arr-index">#${idx}</div><div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
               }
-              return `<div class="kv-row" data-path="${esc(curPath)}.${idx}"><div class="kv-key">[${idx}]</div><div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="双击编辑">${esc(it)}</div></div>`;
+              return `<div class="kv-row" data-path="${esc(curPath)}.${idx}"><div class="kv-key">[${idx}]</div><div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div></div>`;
             }).join('');
             parts.push(`
               <div class="nest-block"${accent ? ` style=\"--token-accent:${esc(accent)}\"` : ''}>
@@ -165,7 +165,7 @@
               </div>
             `);
           } else {
-            parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="双击编辑">${esc(v)}</div></div>`);
+            parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="单击编辑">${esc(v)}</div></div>`);
           }
         }
         return parts.join('');
@@ -271,7 +271,7 @@
       if (!more) return;
 
       const expanded = root.getAttribute('data-expanded') === '1';
-      const transitionMs = 280;
+  const transitionMs = 400; // 与 CSS .collapsible 的高度过渡时长对齐
       const setBtn = (isOpen) => {
         if (btn) {
           btn.textContent = isOpen ? '收起' : '展开';
@@ -330,9 +330,20 @@
   
   // 事件委托与更新逻辑
   function enableInlineEdit(rootEl) {
-    rootEl.addEventListener('dblclick', function(ev) {
-      const target = ev.target;
-      if (!target || !target.classList || !target.classList.contains('kv-val')) return;
+    rootEl.addEventListener('click', function(ev) {
+      const host = ev.target && ev.target.closest ? ev.target.closest('.kv-val') : null;
+      if (!host) return;
+      const target = host;
+      // 若已有其他编辑框，先关闭它，避免两个动画叠加
+      const openEditing = rootEl.querySelector('.kv-val[data-editing="1"]');
+      if (openEditing && openEditing !== target) {
+        // 找到其输入框，触发一次安全的还原
+        const old = openEditing.getAttribute('data-old-text') || '';
+        openEditing.textContent = old;
+        openEditing.removeAttribute('data-editing');
+        openEditing.removeAttribute('data-old-text');
+        openEditing.classList.remove('is-editing','is-saving');
+      }
       const path = target.getAttribute('data-path');
       // 屏蔽非法或空路径、隐藏字段
       if (!path || path.startsWith('_') || path.includes('.__v')) return;
@@ -346,27 +357,38 @@
 
       // 避免重复编辑同一元素
       if (target.getAttribute('data-editing') === '1') return;
-      target.setAttribute('data-editing', '1');
-      const oldText = target.textContent;
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.value = oldText;
-      input.style.width = '100%';
-      input.style.boxSizing = 'border-box';
-      input.style.font = 'inherit';
-      input.style.padding = '2px 6px';
-      input.style.border = '1px solid #CBD5E0';
-      input.style.borderRadius = '4px';
+      // 若内部已有输入框（用户点击输入框本身），则忽略
+      if (target.querySelector('input.inline-edit')) return;
+    target.setAttribute('data-editing', '1');
+  const oldText = target.textContent;
+  // 存储原始文本，便于在强制关闭上一个编辑框时准确还原
+  target.setAttribute('data-old-text', oldText);
+  const input = document.createElement('textarea');
+  input.value = oldText;
+  input.className = 'inline-edit';
+  input.setAttribute('rows', '1');
+  input.setAttribute('wrap', 'soft');
+  // 标记编辑态，使用 CSS 控制视觉而非内联阴影
+  target.classList.add('is-editing');
       // 清空并插入输入框
       target.textContent = '';
       target.appendChild(input);
-      input.focus();
-      input.select();
+  // 自动高度：根据内容自适应高度
+  const autoSize = () => { try { input.style.height = 'auto'; input.style.height = Math.max(24, input.scrollHeight) + 'px'; } catch(_){} };
+  input.addEventListener('input', autoSize);
+  autoSize();
+  input.focus();
+  input.select();
 
       let committing = false; // 标记是否正在提交，避免 blur 触发还原造成闪烁
+      let revertTimer = null; // 延迟还原，平滑从一个编辑框切换到另一个
       const cleanup = () => {
         committing = false;
         target.removeAttribute('data-editing');
+        target.classList.remove('is-editing');
+        target.classList.remove('is-saving');
+        target.removeAttribute('data-old-text');
+        if (revertTimer) { clearTimeout(revertTimer); revertTimer = null; }
       };
 
       const revert = () => {
@@ -400,8 +422,8 @@
           alert(err.message || '值不合法');
           return;
         }
-        input.disabled = true;
-        input.style.opacity = '0.6';
+  input.disabled = true;
+  target.classList.add('is-saving');
         committing = true;
         try {
           const token = localStorage.getItem('token') || '';
@@ -467,14 +489,14 @@
       };
 
       input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); }
         else if (e.key === 'Escape') { e.preventDefault(); revert(); }
       });
       input.addEventListener('blur', () => {
         // 若正在提交，忽略 blur，防止提交成功设置文本后又被还原造成“闪一下”
         if (committing) return;
-        // 失焦取消编辑，不保存
-        revert();
+        // 失焦取消编辑，不保存（稍作延时，避免在切换到下一项时出现突兀闪烁）
+        revertTimer = setTimeout(() => { revert(); }, 110);
       });
     });
   }
