@@ -175,6 +175,7 @@
   gap: 8px;
   padding: 6px 0;
   border-bottom: 1px dashed #e2e8f0;
+  position: relative; /* 供行内操作按钮绝对定位 */
 }
 
 #tokens-content .kv-row:last-child {
@@ -198,6 +199,38 @@
               color .2s var(--ease-standard);
   cursor: text; /* 暗示可编辑 */
 }
+
+/* 行内操作容器（删除等） */
+#tokens-content .kv-row .kv-actions {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity .2s ease;
+  pointer-events: none; /* 默认不挡交互，内部按钮开启 */
+}
+#tokens-content .kv-row:hover .kv-actions { opacity: 1; }
+#tokens-content .kv-row .kv-actions .btn-del {
+  pointer-events: auto;
+  border: none;
+  background: transparent;
+  color: #A0AEC0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  transition: transform 140ms ease, color 140ms ease, background 140ms ease;
+}
+#tokens-content .kv-row .kv-actions .btn-del:hover {
+  color: #E53E3E;
+  background: rgba(229, 62, 62, 0.08);
+  transform: scale(1.05);
+}
+#tokens-content .kv-row .kv-actions .btn-del:active { transform: scale(0.97); }
 
 #tokens-content .kv-val:not(.is-editing):hover {
   background: rgba(226, 232, 240, 0.2); /* 轻微悬浮反馈 */

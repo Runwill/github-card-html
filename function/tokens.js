@@ -142,7 +142,11 @@
       // 递归渲染所有属性，隐藏 _id/__v/_v，并对嵌套对象/数组分层展示
       const renderKV = (obj, level = 0, accent = null, basePath = '') => {
         if (!obj || typeof obj !== 'object') {
-          return `<div class="kv-row" data-path="${esc(basePath)}"><div class="kv-key">value</div><div class="kv-val" data-path="${esc(basePath)}" data-type="${typeof obj}">${esc(obj)}</div></div>`;
+          return `<div class="kv-row" data-path="${esc(basePath)}">
+            <div class="kv-key">value</div>
+            <div class="kv-val" data-path="${esc(basePath)}" data-type="${typeof obj}" title="单击编辑">${esc(obj)}</div>
+            <div class="kv-actions" role="group" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div>
+          </div>`;
         }
         const parts = [];
         for (const k of Object.keys(obj)) {
@@ -155,7 +159,11 @@
                 const style = accent ? ` style="--token-accent:${esc(accent)}"` : '';
                 return `<div class="arr-item"><div class="arr-index">#${idx}</div><div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
               }
-              return `<div class="kv-row" data-path="${esc(curPath)}.${idx}"><div class="kv-key">[${idx}]</div><div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div></div>`;
+              return `<div class="kv-row" data-path="${esc(curPath)}.${idx}">
+                <div class="kv-key">[${idx}]</div>
+                <div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div>
+                <div class="kv-actions" role="group" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div>
+              </div>`;
             }).join('');
             parts.push(`
               <div class="nest-block"${accent ? ` style=\"--token-accent:${esc(accent)}\"` : ''}>
@@ -171,7 +179,11 @@
               </div>
             `);
           } else {
-            parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="单击编辑">${esc(v)}</div></div>`);
+            parts.push(`<div class="kv-row" data-path="${esc(curPath)}">
+              <div class="kv-key">${esc(k)}</div>
+              <div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="单击编辑">${esc(v)}</div>
+              <div class="kv-actions" role="group" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div>
+            </div>`);
           }
         }
         return parts.join('');
@@ -270,6 +282,7 @@
   const canEdit = !!token && role === 'admin';
       if (canEdit) {
         enableInlineEdit(contentEl);
+  enableInlineDelete(contentEl);
       }
     } catch (e) {
       console.error('加载词元数据失败:', e);
@@ -483,6 +496,85 @@
     autoSize();
     ta.focus();
     ta.select();
+  }
+
+  // 删除逻辑：点击删除按钮 -> 确认 -> 调用后端 -> 更新缓存与 DOM
+  function enableInlineDelete(rootEl) {
+    rootEl.addEventListener('click', async function(ev) {
+      const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
+      if (!btn) return;
+      const row = btn.closest('.kv-row');
+      if (!row) return;
+      const path = row.getAttribute('data-path');
+      if (!path || path.startsWith('_') || path.includes('.__v')) return;
+      const tokenCard = row.closest('.token-card[data-coll][data-id]');
+      if (!tokenCard) return;
+      const coll = tokenCard.getAttribute('data-coll');
+      const id = tokenCard.getAttribute('data-id');
+      // 二次确认
+      const keyNameEl = row.querySelector('.kv-key');
+      const keyName = keyNameEl ? keyNameEl.textContent.trim() : path.split('.').pop();
+      if (!confirm(`确定删除「${keyName}」吗？此操作不可撤销。`)) return;
+      // 调后端
+      try {
+        const token = localStorage.getItem('token') || '';
+        const resp = await fetch('http://localhost:3000/api/tokens/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+          },
+          body: JSON.stringify({ collection: coll, id, path })
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data && data.message || '删除失败');
+        // 成功：从缓存中移除
+        try {
+          if (state.data) {
+            const deleteIn = (arr) => {
+              if (!Array.isArray(arr)) return false;
+              for (const doc of arr) {
+                if (doc && String(doc._id) === String(id)) {
+                  // 走到父级，删除字段/元素
+                  const parts = String(path).split('.');
+                  let parent = doc;
+                  for (let i = 0; i < parts.length - 1; i++) {
+                    const k = parts[i];
+                    const key = /^\d+$/.test(k) ? Number(k) : k;
+                    parent = parent ? parent[key] : undefined;
+                  }
+                  const lastRaw = parts[parts.length - 1];
+                  const isIdx = /^\d+$/.test(lastRaw);
+                  const lastKey = isIdx ? Number(lastRaw) : lastRaw;
+                  if (Array.isArray(parent) && isIdx) parent.splice(lastKey, 1);
+                  else if (parent && typeof parent === 'object') delete parent[lastKey];
+                  return true;
+                }
+              }
+              return false;
+            };
+            let updated = false;
+            if (coll === 'term-fixed') updated = deleteIn(state.data.termFixed);
+            else if (coll === 'term-dynamic') updated = deleteIn(state.data.termDynamic);
+            else if (coll === 'card') updated = deleteIn(state.data.cards);
+            else if (coll === 'character') updated = deleteIn(state.data.characters);
+            else if (coll === 'skill') {
+              updated = deleteIn(state.data.s0) || deleteIn(state.data.s1) || deleteIn(state.data.s2);
+            }
+            if (!updated) {
+              for (const key of Object.keys(state.data)) {
+                if (deleteIn(state.data[key])) { updated = true; break; }
+              }
+            }
+          }
+        } catch(_){}
+        // 从 DOM 移除行
+        row.remove();
+        try { showTokensToast('已删除'); } catch(_){ }
+      } catch (e) {
+        alert(e.message || '删除失败');
+      }
+    });
   }
 
       let committing = false; // 标记是否正在提交，避免 blur 触发还原造成闪烁
