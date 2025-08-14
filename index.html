@@ -470,11 +470,13 @@
                     <div class="main">
                         <main>
                             <padding>
-                                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
-                                    <h2 style="margin:0;">词元</h2>
-                                    <div style="display:flex; gap:8px; align-items:center;">
-                                        <input id="tokens-search" type="text" placeholder="搜索..." style="height:30px; padding:4px 8px; border:1px solid #e2e8f0; border-radius:6px; min-width:180px;" />
-                                        <button class="btn" id="tokens-refresh-btn" onclick="if(window.tokensRefresh) tokensRefresh(); else if(window.renderTokensDashboard) renderTokensDashboard();">刷新</button>
+                                <div class="tokens-toolbar">
+                                    <h2>词元</h2>
+                                    <div class="toolbar-actions">
+                                        <div class="tokens-input-group">
+                                            <input id="tokens-search" class="tokens-input" type="text" placeholder="搜索..." />
+                                            <button class="btn btn--secondary tokens-btn tokens-refresh" id="tokens-refresh-btn" onclick="if(window.tokensRefresh) tokensRefresh(); else if(window.renderTokensDashboard) renderTokensDashboard();">刷新</button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div id="tokens-summary" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin-top:12px;"></div>

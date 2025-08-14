@@ -6,6 +6,28 @@
     q: '',
     timer: null,
   };
+  
+  // 工具：按 dot path 设置对象的值，支持数组索引
+  function setByPath(obj, path, value) {
+    if (!obj || !path) return;
+    const parts = path.split('.');
+    let cursor = obj;
+    for (let i = 0; i < parts.length; i++) {
+      const k = parts[i];
+      const isLast = i === parts.length - 1;
+      const key = /^\d+$/.test(k) ? Number(k) : k;
+      if (isLast) {
+        cursor[key] = value;
+      } else {
+        if (cursor[key] == null || typeof cursor[key] !== 'object') {
+          // 下一段是数字则建数组，否则建对象
+          const nextIsIndex = /^\d+$/.test(parts[i+1] || '');
+          cursor[key] = nextIsIndex ? [] : {};
+        }
+        cursor = cursor[key];
+      }
+    }
+  }
 
   function setupSearch() {
     const inp = document.getElementById('tokens-search');
@@ -84,24 +106,28 @@
 
   const section = (title, items, renderItem) => {
     const id = 'sec-' + Math.random().toString(36).slice(2,8);
-        const total = Array.isArray(items)? items.length : 0;
-        const preview = (items||[]).slice(0, 10);
-        const html = `
-          <div style="border:1px solid #e2e8f0; border-radius:8px; margin-top:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#F7FAFC; border-bottom:1px solid #e2e8f0;">
-      <div style=\"font-weight:600; color:#2D3748;\">${title} <span class=\"count-badge\" style=\"color:#718096;font-weight:400;\">(${total})</span></div>
-      ${total>10 ? `<button id=\"btn-${id}\" class=\"btn btn--sm\" onclick=\"(function(){var el=document.getElementById('${id}'); if(!el) return; var expanded=el.getAttribute('data-expanded')==='1'; var next=!expanded; el.setAttribute('data-expanded', next?'1':'0'); var more=el.querySelector('.js-more'); if(more){more.style.display= next?'block':'none';} var btn=document.getElementById('btn-${id}'); if(btn){btn.textContent= next?'收起':'展开';}})()\">展开</button>`: ''}
-            </div>
-            <div id="${id}" data-expanded="0" style="padding:10px 12px;">
-              <div class="token-list">
-                ${preview.map(renderItem).join('') || '<div style="color:#A0AEC0;">空</div>'}
-              </div>
-              ${total>10 ? `<div class=\"js-more token-list\" style=\"display:none; margin-top:8px;\">${(items||[]).slice(10).map(renderItem).join('')}</div>` : ''}
-            </div>
+    const total = Array.isArray(items)? items.length : 0;
+    const preview = (items||[]).slice(0, 2);
+    const html = `
+      <div style="border:1px solid #e2e8f0; border-radius:8px; margin-top:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#F7FAFC; border-bottom:1px solid #e2e8f0;">
+          <div style=\"font-weight:600; color:#2D3748;\">${title} <span class=\"count-badge\" style=\"color:#718096;font-weight:400;\">(${total})</span></div>
+          ${total>2 ? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn\" aria-expanded=\"false\" onclick=\"toggleTokensSection('${id}')\">展开</button>`: ''}
+        </div>
+        <div id="${id}" data-expanded="0" style="padding:10px 12px;">
+          <div class="token-list">
+            ${preview.map(renderItem).join('') || '<div style="color:#A0AEC0;">空</div>'}
           </div>
-        `;
-        return html;
-      };
+          ${total>2 ? `
+            <div id=\"more-${id}\" class=\"js-more token-list collapsible\" style=\"margin-top:8px;\">
+              ${(items||[]).slice(2).map(renderItem).join('')}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+    return html;
+  };
 
       const esc = (s) => (s==null? '' : String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])));
       const HIDE_KEYS = new Set(['_id','__v','_v']);
@@ -202,6 +228,14 @@
         section('技能', Array.isArray(skills)? filterByQuery(skills, q): [], skillItem),
       ].join('');
       contentEl.innerHTML = html;
+      // 为新渲染的卡片添加入场延迟（交错动画）
+      try {
+        const cards = contentEl.querySelectorAll('.token-card');
+        cards.forEach((el, i) => {
+          const delay = Math.min(i, 12) * 40; // 最多 12 个交错
+          el.style.setProperty('--enter-delay', delay + 'ms');
+        });
+      } catch (_) {}
       setupSearch();
 
       // 启用双击编辑（仅管理员或审核员）
@@ -227,6 +261,68 @@
 
   // 暴露到全局用于手动刷新
   window.renderTokensDashboard = renderTokensDashboard;
+  // 动画展开/收起区块
+  window.toggleTokensSection = function(baseId){
+    try {
+      const root = document.getElementById(baseId);
+      if (!root) return;
+      const btn = document.getElementById('btn-' + baseId);
+      const more = document.getElementById('more-' + baseId) || root.querySelector('.js-more');
+      if (!more) return;
+
+      const expanded = root.getAttribute('data-expanded') === '1';
+      const transitionMs = 280;
+      const setBtn = (isOpen) => {
+        if (btn) {
+          btn.textContent = isOpen ? '收起' : '展开';
+          btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          btn.classList.toggle('is-expanded', isOpen);
+        }
+      };
+
+      const onEnd = (cb) => {
+        let called = false;
+        const handler = () => { if (called) return; called = true; more.removeEventListener('transitionend', handler); cb && cb(); };
+        more.addEventListener('transitionend', handler, { once: true });
+        // 保险兜底
+        setTimeout(handler, transitionMs + 50);
+      };
+
+      if (!expanded) {
+        // 展开
+        more.style.display = 'block';
+        more.classList.add('is-opening');
+        more.style.height = '0px';
+        // 强制回流以应用初始高度
+        void more.offsetHeight;
+        const target = more.scrollHeight;
+        more.style.height = target + 'px';
+        onEnd(() => {
+          more.classList.remove('is-opening');
+          more.classList.add('is-open');
+          more.style.height = 'auto';
+        });
+        root.setAttribute('data-expanded', '1');
+        setBtn(true);
+      } else {
+        // 收起
+        const from = more.scrollHeight;
+        more.style.height = from + 'px';
+        // 强制回流
+        void more.offsetHeight;
+        more.classList.remove('is-open');
+        more.classList.add('is-closing');
+        more.style.height = '0px';
+        onEnd(() => {
+          more.classList.remove('is-closing');
+          more.style.display = 'none';
+          more.style.height = '0px';
+        });
+        root.setAttribute('data-expanded', '0');
+        setBtn(false);
+      }
+    } catch(_){}
+  };
   window.tokensRefresh = function(){
     state.data = null; // 强制重新拉取
     renderTokensDashboard(true);
@@ -241,7 +337,8 @@
       // 屏蔽非法或空路径、隐藏字段
       if (!path || path.startsWith('_') || path.includes('.__v')) return;
       const type = target.getAttribute('data-type') || 'string';
-      const tokenCard = target.closest('.token-card');
+  // 向上查找带数据属性的卡片（顶层 token-card 才有 data-coll/data-id）
+  const tokenCard = target.closest('.token-card[data-coll][data-id]');
       if (!tokenCard) return;
       const coll = tokenCard.getAttribute('data-coll');
       const id = tokenCard.getAttribute('data-id');
@@ -315,8 +412,41 @@
           });
           const data = await resp.json().catch(() => ({}));
           if (!resp.ok) throw new Error(data && data.message || '更新失败');
-          // 成功：更新文本
+          // 成功：更新文本并给出高亮反馈
           target.textContent = (type === 'boolean' || type === 'number') ? String(value) : value;
+          try {
+            target.classList.add('flash-updated');
+            setTimeout(() => target.classList.remove('flash-updated'), 700);
+          } catch(_){}
+          // 同步更新缓存数据，确保后续刷新/折叠展开不丢失
+          try {
+            if (state.data) {
+              const updateDocIn = (arr) => {
+                if (!Array.isArray(arr)) return false;
+                for (const doc of arr) {
+                  if (doc && String(doc._id) === String(id)) {
+                    setByPath(doc, path, value);
+                    return true;
+                  }
+                }
+                return false;
+              };
+              let updated = false;
+              if (coll === 'term-fixed') updated = updateDocIn(state.data.termFixed);
+              else if (coll === 'term-dynamic') updated = updateDocIn(state.data.termDynamic);
+              else if (coll === 'card') updated = updateDocIn(state.data.cards);
+              else if (coll === 'character') updated = updateDocIn(state.data.characters);
+              else if (coll === 'skill') {
+                updated = updateDocIn(state.data.s0) || updateDocIn(state.data.s1) || updateDocIn(state.data.s2);
+              }
+              // 兜底：全量扫描
+              if (!updated) {
+                for (const key of Object.keys(state.data)) {
+                  if (updateDocIn(state.data[key])) { updated = true; break; }
+                }
+              }
+            }
+          } catch (_) {}
           // 若修改的是顶层 color，则同步更新卡片样式
           if (path === 'color') {
             const col = value;
@@ -327,8 +457,6 @@
               tokenCard.style.borderLeft = `3px solid ${col}`;
             }
           }
-          target.style.background = '#F0FFF4';
-          setTimeout(() => { target.style.background = ''; }, 400);
           cleanup();
         } catch (e) {
           alert(e.message || '更新失败');

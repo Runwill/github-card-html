@@ -1,4 +1,83 @@
 /* 词元页样式：外置，避免内联注入 */
+#panel_tokens .tokens-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#panel_tokens .tokens-toolbar h2 {
+  margin: 0;
+}
+
+#panel_tokens .toolbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+
+/* 统一输入组（搜索+刷新） */
+#panel_tokens .tokens-input-group { display: inline-flex; align-items: stretch; max-width: 60vw; }
+#panel_tokens .tokens-input {
+  height: 36px;
+  min-width: 180px;
+  flex: 1 1 240px;
+  padding: 8px 10px;
+  border: 1px solid #e2e8f0;
+  border-right: none; /* 与按钮合并 */
+  border-radius: 6px 0 0 6px;
+  font-size: 14px;
+  color: #2d3748;
+  background: #fff;
+  line-height: 1.2;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+#panel_tokens .tokens-input:focus { outline: none; border-color: #cbd5e0; box-shadow: 0 0 0 3px rgba(66,153,225,0.15); }
+#panel_tokens .tokens-input::placeholder { color: #a0aec0; }
+#panel_tokens .tokens-btn {
+  height: 36px;
+  padding: 0 12px !important;
+  border-radius: 0 6px 6px 0 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-left: none !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 刷新按钮用二级按钮小号尺寸，已在 HTML 上使用 btn--secondary btn--sm */
+
+/* 展开/收起按钮的视觉提示 */
+#panel_tokens .expand-btn {
+  position: relative;
+  padding-left: 28px !important; /* 预留图标空间 */
+  white-space: nowrap;
+}
+#panel_tokens .expand-btn::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform-origin: 50% 50%;
+  opacity: .85;
+}
+#panel_tokens .expand-btn.is-expanded::before {
+  /* 展开后箭头指向上（旋转到 -135° 等效为向上） */
+  transform: translateY(-50%) rotate(-135deg);
+}
+
+/* 刷新按钮在窄屏保持不被压缩/换行 */
+#panel_tokens .tokens-refresh { white-space: nowrap; flex: 0 0 auto; }
+
+/* 当容器极窄时，允许整组换行，但刷新按钮与文字保持一行 */
+@media (max-width: 480px) {
+  #panel_tokens .tokens-toolbar { flex-wrap: wrap; gap: 8px; }
+  #panel_tokens .toolbar-actions { width: 100%; }
+  #panel_tokens .tokens-input-group { width: 100%; max-width: none; }
+  #panel_tokens .tokens-input { flex: 1 1 auto; min-width: 120px; }
+}
 #tokens-content .count-badge {
   animation: none !important;
   transition: none !important;
@@ -18,6 +97,12 @@
   border-radius: 6px;
   padding: 8px 10px;
   background: var(--token-bg, #fff);
+  box-shadow: 0 0 0 rgba(0,0,0,0);
+  transform: translateY(6px);
+  opacity: 0;
+  animation: token-card-in .36s ease both;
+  animation-delay: var(--enter-delay, 0ms);
+  transition: box-shadow .2s ease, transform .2s ease;
 }
 
 #tokens-content .token-list {
@@ -65,6 +150,7 @@
   color: #2D3748;
   white-space: pre-wrap;
   word-break: break-all;
+  transition: background-color .25s ease, color .25s ease;
 }
 
 #tokens-content pre.token-json {
@@ -108,4 +194,40 @@
 #tokens-content .arr-item,
 #tokens-content .nest-body {
   background: inherit;
+}
+
+/* 交互与动画 */
+.collapsible {
+  overflow: hidden;
+  height: 0;
+  display: none; /* 初始由 JS 控制为 block，再测量 */
+  transition: height .28s ease;
+}
+.collapsible.is-open {
+  display: block;
+  height: auto;
+}
+.collapsible.is-opening,
+.collapsible.is-closing {
+  display: block;
+}
+
+@keyframes token-card-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#tokens-content .token-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+}
+
+/* 内联编辑成功闪烁反馈 */
+.flash-updated {
+  animation: flash-bg .7s ease both;
+}
+@keyframes flash-bg {
+  0% { background-color: #F0FFF4; }
+  60% { background-color: #F0FFF4; }
+  100% { background-color: transparent; }
 }
