@@ -415,6 +415,8 @@
   if (isColorField) {
     const wrap = document.createElement('div');
     wrap.className = 'inline-edit-color';
+  // 入场动画触发：先加 is-enter 再下一帧移除
+  try { wrap.classList.add('is-enter'); requestAnimationFrame(() => { try { wrap.classList.remove('is-enter'); } catch(_){} }); } catch(_){ }
     colorPicker = document.createElement('input');
     colorPicker.type = 'color';
     colorPicker.className = 'color-picker';
@@ -445,6 +447,8 @@
       const v = colorPicker.value;
       input.value = v;
       applyPreview(v);
+  // 小脉冲提示
+  try { colorPicker.classList.remove('is-pulse'); void colorPicker.offsetWidth; colorPicker.classList.add('is-pulse'); } catch(_){ }
     });
     colorPicker.addEventListener('change', () => {
       const v = colorPicker.value;
@@ -464,7 +468,9 @@
   } else {
     const ta = document.createElement('textarea');
     ta.value = oldText;
-    ta.className = 'inline-edit';
+  ta.className = 'inline-edit';
+  // 入场动画：添加 is-enter 再在下一帧移除
+  try { ta.classList.add('is-enter'); requestAnimationFrame(() => { try { ta.classList.remove('is-enter'); } catch(_){} }); } catch(_){ }
     ta.setAttribute('rows', '1');
     ta.setAttribute('wrap', 'soft');
     // 清空并插入
