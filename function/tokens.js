@@ -238,10 +238,10 @@
       } catch (_) {}
       setupSearch();
 
-      // 启用双击编辑（仅管理员或审核员）
+  // 启用双击编辑（仅管理员）
       const role = localStorage.getItem('role');
       const token = localStorage.getItem('token');
-      const canEdit = !!token && (role === 'admin' || role === 'moderator');
+  const canEdit = !!token && role === 'admin';
       if (canEdit) {
         enableInlineEdit(contentEl);
       }
@@ -363,7 +363,9 @@
       input.focus();
       input.select();
 
+      let committing = false; // 标记是否正在提交，避免 blur 触发还原造成闪烁
       const cleanup = () => {
+        committing = false;
         target.removeAttribute('data-editing');
       };
 
@@ -400,6 +402,7 @@
         }
         input.disabled = true;
         input.style.opacity = '0.6';
+        committing = true;
         try {
           const token = localStorage.getItem('token') || '';
           const resp = await fetch('http://localhost:3000/api/tokens/update', {
@@ -412,12 +415,11 @@
           });
           const data = await resp.json().catch(() => ({}));
           if (!resp.ok) throw new Error(data && data.message || '更新失败');
-          // 成功：更新文本并给出高亮反馈
+          // 成功：更新文本并显示绿色提示小弹窗（toast）
           target.textContent = (type === 'boolean' || type === 'number') ? String(value) : value;
           try {
-            target.classList.add('flash-updated');
-            setTimeout(() => target.classList.remove('flash-updated'), 700);
-          } catch(_){}
+            showTokensToast('已保存');
+          } catch(_){ }
           // 同步更新缓存数据，确保后续刷新/折叠展开不丢失
           try {
             if (state.data) {
@@ -469,9 +471,34 @@
         else if (e.key === 'Escape') { e.preventDefault(); revert(); }
       });
       input.addEventListener('blur', () => {
+        // 若正在提交，忽略 blur，防止提交成功设置文本后又被还原造成“闪一下”
+        if (committing) return;
         // 失焦取消编辑，不保存
         revert();
       });
     });
+  }
+  // 词元页绿色提示小弹窗（toast）
+  function showTokensToast(message) {
+    try {
+      let container = document.querySelector('.tokens-toast-container');
+      if (!container) {
+        container = document.createElement('div');
+        container.className = 'tokens-toast-container';
+        document.body.appendChild(container);
+      }
+      const toast = document.createElement('div');
+      toast.className = 'tokens-toast';
+      toast.textContent = message || '操作成功';
+      container.appendChild(toast);
+      // 自动移除
+      setTimeout(() => {
+        try { toast.remove(); } catch(_) {}
+        // 若容器空了也移除
+        if (container && container.children.length === 0) {
+          try { container.remove(); } catch(_) {}
+        }
+      }, 2200);
+    } catch(_) { /* 忽略 */ }
   }
 })();

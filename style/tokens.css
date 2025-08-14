@@ -222,12 +222,51 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.06);
 }
 
-/* 内联编辑成功闪烁反馈 */
-.flash-updated {
-  animation: flash-bg .7s ease both;
+/* 词元页更新成功后的绿色 Toast 提示 */
+.tokens-toast-container {
+  position: fixed;
+  top: 14%; /* 页面中上 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none; /* 不阻挡页面点击 */
+  width: auto;
+  max-width: min(90vw, 560px);
 }
-@keyframes flash-bg {
-  0% { background-color: #F0FFF4; }
-  60% { background-color: #F0FFF4; }
-  100% { background-color: transparent; }
+.tokens-toast {
+  pointer-events: auto;
+  background: #F0FFF4; /* 绿底 */
+  border: 1px solid #9AE6B4; /* 绿边 */
+  color: #22543D; /* 深绿字 */
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  font-size: 14px;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(-6px);
+  animation: tokens-toast-in .25s ease forwards, tokens-toast-out .2s ease forwards 1.8s; /* 1.8s 后开始淡出 */
+}
+.tokens-toast::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid #38A169; /* 绿勾图标（用对勾角表示） */
+  border-bottom: 2px solid #38A169;
+  transform: rotate(45deg);
+  display: inline-block;
+}
+@keyframes tokens-toast-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes tokens-toast-out {
+  to { opacity: 0; transform: translateY(-6px); }
 }
