@@ -1,0 +1,111 @@
+/* 词元页样式：外置，避免内联注入 */
+#tokens-content .count-badge {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  position: static !important;
+  display: inline-block;
+  vertical-align: baseline;
+  line-height: 1;
+  margin-left: 4px;
+  font-size: 12px;
+}
+
+#tokens-content .token-card {
+  /* 使用 CSS 变量；不在此设置默认值，避免覆盖父级传递 */
+  border: 1px solid #e2e8f0;
+  border-left: 3px solid var(--token-accent, #E2E8F0);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--token-bg, #fff);
+}
+
+#tokens-content .token-list {
+  margin: 0;
+  padding: 0;
+}
+
+#tokens-content .token-list .token-card {
+  margin-bottom: 8px;
+}
+
+#tokens-content .token-list > .token-card:nth-child(odd) {
+  --token-bg: #F7FAFC;
+  --token-accent: #BEE3F8;
+  background: var(--token-bg);
+  border-left-color: var(--token-accent);
+}
+
+#tokens-content .token-list > .token-card:nth-child(even) {
+  --token-bg: #FFFFFF;
+  --token-accent: #C6F6D5;
+  background: var(--token-bg);
+  border-left-color: var(--token-accent);
+}
+
+#tokens-content .kv-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+#tokens-content .kv-row:last-child {
+  border-bottom: none;
+}
+
+#tokens-content .kv-key {
+  color: #4A5568;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+#tokens-content .kv-val {
+  color: #2D3748;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+#tokens-content pre.token-json {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  color: #2D3748;
+}
+
+#tokens-content .nest-block {
+  border-left: 3px solid var(--token-accent);
+  padding-left: 10px;
+  margin: 8px 0;
+}
+
+#tokens-content .nest-title {
+  color: #4A5568;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+#tokens-content .nest-body {
+  margin-left: 0;
+}
+
+#tokens-content .arr-item {
+  margin: 6px 0;
+}
+
+#tokens-content .arr-index {
+  color: #718096;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+/* 确保数组项容器不重置变量，从而不会阻断继承 */
+#tokens-content .arr-item,
+#tokens-content .nest-body {
+  background: inherit;
+}

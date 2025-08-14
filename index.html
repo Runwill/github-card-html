@@ -26,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="style/forms.css">
     <link rel="stylesheet" type="text/css" href="style/buttons.css">
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style/tokens.css">
 
     <!-- Avatar cropper: Cropper.js -->
     <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.css">
@@ -49,6 +50,8 @@
 
     <script src="function/login_check.js"></script>
     <script src="function/page_loading.js"></script>
+    <script src="function/tokens.js"></script>
+    <script src="function/ui_manager.js"></script>
     <script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
 
     <title>Document丨程序</title>
@@ -84,7 +87,6 @@
             </div>
         </nav>
         
-    <script src="function/ui_manager.js"></script>
         <nav id="sidebar">
             <ul class="tabs nav" data-tabs id="example-tabs">
                 <li id="nav-item" class="tabs-title is-active"><a id='title-a' class='title-a' href="#panel_term" aria-selected="true" onclick="changeTitle(0)">程序</a></li>
@@ -92,9 +94,10 @@
                 <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_card" onclick="changeTitle(2)">牌库</a></li>
                 <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_character" onclick="changeTitle(3)">将池</a></li>
                 <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_draft" onclick="changeTitle(4)">草稿</a></li>
+                <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_tokens" onclick="changeTitle(5); if(window.renderTokensDashboard) renderTokensDashboard();">词元</a></li>
                 <script>
                     function changeTitle(n) {
-                        title_name = ['程序','技能','牌库','将池','草稿']
+                        title_name = ['程序','技能','牌库','将池','草稿','词元']
                         document.title = "Document丨" + title_name[n]
                     }
                 </script>
@@ -142,7 +145,7 @@
         </form>
         <div id="responseMessage" class="modal-message"></div>
     </div>
-    
+
     <div id="approve-user-modal" class="modal approve-modal">
         <div class="modal-header">
             <h2>审核</h2>
@@ -462,6 +465,24 @@
     <div class="row">
         <div class="columns">
             <div class="tabs-content" data-tabs-content="example-tabs" id="termContainer">
+                <!-- 词元仪表盘面板：统计与列表（需置于 tabs-content 内） -->
+                <div class="tabs-panel" id="panel_tokens">
+                    <div class="main">
+                        <main>
+                            <padding>
+                                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                                    <h2 style="margin:0;">词元</h2>
+                                    <div style="display:flex; gap:8px; align-items:center;">
+                                        <input id="tokens-search" type="text" placeholder="搜索..." style="height:30px; padding:4px 8px; border:1px solid #e2e8f0; border-radius:6px; min-width:180px;" />
+                                        <button class="btn" id="tokens-refresh-btn" onclick="if(window.tokensRefresh) tokensRefresh(); else if(window.renderTokensDashboard) renderTokensDashboard();">刷新</button>
+                                    </div>
+                                </div>
+                                <div id="tokens-summary" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin-top:12px;"></div>
+                                <div id="tokens-content" style="margin-top:14px;"></div>
+                            </padding>
+                        </main>
+                    </div>
+                </div>
                 <div class="tabs-panel is-active" id="panel_term">
                     <div class="main">
                         <main>
