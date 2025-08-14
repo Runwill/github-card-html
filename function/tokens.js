@@ -108,21 +108,22 @@
       const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
 
       // 递归渲染所有属性，隐藏 _id/__v/_v，并对嵌套对象/数组分层展示
-      const renderKV = (obj, level = 0, accent = null) => {
+      const renderKV = (obj, level = 0, accent = null, basePath = '') => {
         if (!obj || typeof obj !== 'object') {
-          return `<div class="kv-row"><div class="kv-key">value</div><div class="kv-val">${esc(obj)}</div></div>`;
+          return `<div class="kv-row" data-path="${esc(basePath)}"><div class="kv-key">value</div><div class="kv-val" data-path="${esc(basePath)}" data-type="${typeof obj}">${esc(obj)}</div></div>`;
         }
         const parts = [];
         for (const k of Object.keys(obj)) {
           if (HIDE_KEYS.has(k)) continue;
           const v = obj[k];
+          const curPath = basePath ? `${basePath}.${k}` : k;
           if (Array.isArray(v)) {
             const items = v.map((it, idx) => {
               if (isObj(it) || Array.isArray(it)) {
                 const style = accent ? ` style="--token-accent:${esc(accent)}"` : '';
-                return `<div class="arr-item"><div class="arr-index">#${idx}</div><div class="token-card"${style}>${renderKV(it, level+1, accent)}</div></div>`;
+                return `<div class="arr-item"><div class="arr-index">#${idx}</div><div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
               }
-              return `<div class="kv-row"><div class="kv-key">[${idx}]</div><div class="kv-val">${esc(it)}</div></div>`;
+              return `<div class="kv-row" data-path="${esc(curPath)}.${idx}"><div class="kv-key">[${idx}]</div><div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="双击编辑">${esc(it)}</div></div>`;
             }).join('');
             parts.push(`
               <div class="nest-block"${accent ? ` style=\"--token-accent:${esc(accent)}\"` : ''}>
@@ -134,11 +135,11 @@
             parts.push(`
               <div class="nest-block"${accent ? ` style=\"--token-accent:${esc(accent)}\"` : ''}>
                 <div class="nest-title">${esc(k)}</div>
-                <div class="nest-body" style="background:transparent">${renderKV(v, level+1, accent)}</div>
+                <div class="nest-body" style="background:transparent">${renderKV(v, level+1, accent, curPath)}</div>
               </div>
             `);
           } else {
-            parts.push(`<div class="kv-row"><div class="kv-key">${esc(k)}</div><div class="kv-val">${esc(v)}</div></div>`);
+            parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="双击编辑">${esc(v)}</div></div>`);
           }
         }
         return parts.join('');
@@ -184,11 +185,12 @@
         return `color-mix(in srgb, ${col} ${Math.round(ratio*100)}%, white)`;
       };
 
-      const termFixedItem = (t) => { const col = getAccent(t); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}>${renderKV(t, 0, col)}</div>`; };
-      const termDynamicItem = (t) => { const col = getAccent(t); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}>${renderKV(t, 0, col)}</div>`; };
-      const cardItem = (c) => { const col = getAccent(c); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}>${renderKV(c, 0, col)}</div>`; };
-      const characterItem = (ch) => { const col = getAccent(ch); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}>${renderKV(ch, 0, col)}</div>`; };
-      const skillItem = (s) => { const col = getAccent(s); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}>${renderKV(s, 0, col)}</div>`; };
+  const tagAttrs = (coll, obj) => ` data-coll="${coll}" data-id="${esc(obj && obj._id || '')}"`;
+  const termFixedItem = (t) => { const col = getAccent(t); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('term-fixed', t)}>${renderKV(t, 0, col, '')}</div>`; };
+  const termDynamicItem = (t) => { const col = getAccent(t); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('term-dynamic', t)}>${renderKV(t, 0, col, '')}</div>`; };
+  const cardItem = (c) => { const col = getAccent(c); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('card', c)}>${renderKV(c, 0, col, '')}</div>`; };
+  const characterItem = (ch) => { const col = getAccent(ch); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('character', ch)}>${renderKV(ch, 0, col, '')}</div>`; };
+  const skillItem = (s) => { const col = getAccent(s); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('skill', s)}>${renderKV(s, 0, col, '')}</div>`; };
 
       // 过滤后的视图
       const q = state.q;
@@ -201,6 +203,14 @@
       ].join('');
       contentEl.innerHTML = html;
       setupSearch();
+
+      // 启用双击编辑（仅管理员或审核员）
+      const role = localStorage.getItem('role');
+      const token = localStorage.getItem('token');
+      const canEdit = !!token && (role === 'admin' || role === 'moderator');
+      if (canEdit) {
+        enableInlineEdit(contentEl);
+      }
     } catch (e) {
       console.error('加载词元数据失败:', e);
       summaryEl.innerHTML = '<div style="grid-column:1/-1;color:#E53E3E;">加载失败，请点击“刷新”重试</div>';
@@ -209,7 +219,10 @@
 
   // 初次进入页面时预取一次，便于用户切到该页立即可见
   document.addEventListener('DOMContentLoaded', function(){
-    try { renderTokensDashboard(); } catch(e){}
+    try {
+      const role = localStorage.getItem('role');
+      if (role === 'admin') renderTokensDashboard();
+    } catch(e){}
   });
 
   // 暴露到全局用于手动刷新
@@ -218,4 +231,119 @@
     state.data = null; // 强制重新拉取
     renderTokensDashboard(true);
   };
+  
+  // 事件委托与更新逻辑
+  function enableInlineEdit(rootEl) {
+    rootEl.addEventListener('dblclick', function(ev) {
+      const target = ev.target;
+      if (!target || !target.classList || !target.classList.contains('kv-val')) return;
+      const path = target.getAttribute('data-path');
+      // 屏蔽非法或空路径、隐藏字段
+      if (!path || path.startsWith('_') || path.includes('.__v')) return;
+      const type = target.getAttribute('data-type') || 'string';
+      const tokenCard = target.closest('.token-card');
+      if (!tokenCard) return;
+      const coll = tokenCard.getAttribute('data-coll');
+      const id = tokenCard.getAttribute('data-id');
+      if (!coll || !id) return;
+
+      // 避免重复编辑同一元素
+      if (target.getAttribute('data-editing') === '1') return;
+      target.setAttribute('data-editing', '1');
+      const oldText = target.textContent;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = oldText;
+      input.style.width = '100%';
+      input.style.boxSizing = 'border-box';
+      input.style.font = 'inherit';
+      input.style.padding = '2px 6px';
+      input.style.border = '1px solid #CBD5E0';
+      input.style.borderRadius = '4px';
+      // 清空并插入输入框
+      target.textContent = '';
+      target.appendChild(input);
+      input.focus();
+      input.select();
+
+      const cleanup = () => {
+        target.removeAttribute('data-editing');
+      };
+
+      const revert = () => {
+        target.textContent = oldText;
+        cleanup();
+      };
+
+      const convertValue = (txt, t) => {
+        if (t === 'number') {
+          const n = Number(txt.trim());
+          if (Number.isNaN(n)) throw new Error('请输入数字');
+          return n;
+        }
+        if (t === 'boolean') {
+          const s = txt.trim().toLowerCase();
+          if (s === 'true') return true;
+          if (s === 'false') return false;
+          throw new Error('请输入 true 或 false');
+        }
+        return txt; // 默认字符串
+      };
+
+      const commit = async () => {
+        const txt = input.value;
+        // 未变化直接还原
+        if (txt === oldText) { revert(); return; }
+        let value;
+        try {
+          value = convertValue(txt, type);
+        } catch (err) {
+          alert(err.message || '值不合法');
+          return;
+        }
+        input.disabled = true;
+        input.style.opacity = '0.6';
+        try {
+          const token = localStorage.getItem('token') || '';
+          const resp = await fetch('http://localhost:3000/api/tokens/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token ? `Bearer ${token}` : ''
+            },
+            body: JSON.stringify({ collection: coll, id, path, value, valueType: type })
+          });
+          const data = await resp.json().catch(() => ({}));
+          if (!resp.ok) throw new Error(data && data.message || '更新失败');
+          // 成功：更新文本
+          target.textContent = (type === 'boolean' || type === 'number') ? String(value) : value;
+          // 若修改的是顶层 color，则同步更新卡片样式
+          if (path === 'color') {
+            const col = value;
+            const tint = computeTint(col);
+            if (tokenCard && col) {
+              tokenCard.style.setProperty('--token-accent', col);
+              if (tint) tokenCard.style.setProperty('--token-bg', tint);
+              tokenCard.style.borderLeft = `3px solid ${col}`;
+            }
+          }
+          target.style.background = '#F0FFF4';
+          setTimeout(() => { target.style.background = ''; }, 400);
+          cleanup();
+        } catch (e) {
+          alert(e.message || '更新失败');
+          revert();
+        }
+      };
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); commit(); }
+        else if (e.key === 'Escape') { e.preventDefault(); revert(); }
+      });
+      input.addEventListener('blur', () => {
+        // 失焦取消编辑，不保存
+        revert();
+      });
+    });
+  }
 })();

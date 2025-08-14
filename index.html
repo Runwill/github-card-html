@@ -94,7 +94,7 @@
                 <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_card" onclick="changeTitle(2)">牌库</a></li>
                 <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_character" onclick="changeTitle(3)">将池</a></li>
                 <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_draft" onclick="changeTitle(4)">草稿</a></li>
-                <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_tokens" onclick="changeTitle(5); if(window.renderTokensDashboard) renderTokensDashboard();">词元</a></li>
+                <li id="nav-item" class="tabs-title"><a id='title-a' class='title-a' href="#panel_tokens" onclick="changeTitle(5); if(localStorage.getItem('role')==='admin' && window.renderTokensDashboard) renderTokensDashboard(); return localStorage.getItem('role')==='admin';">词元</a></li>
                 <script>
                     function changeTitle(n) {
                         title_name = ['程序','技能','牌库','将池','草稿','词元']

@@ -94,6 +94,17 @@ const UIManager = {
       const canReview = role === 'admin' || role === 'moderator';
       approveBtn.style.display = canReview ? '' : 'none';
     }
+
+    // 非 admin 隐藏“词元”页入口与面板
+    const tokensTab = document.querySelector('a[href="#panel_tokens"]')?.parentElement;
+    const tokensPanel = document.getElementById('panel_tokens');
+    if (role !== 'admin') {
+      if (tokensTab) tokensTab.style.display = 'none';
+      if (tokensPanel) tokensPanel.style.display = 'none';
+    } else {
+      if (tokensTab) tokensTab.style.display = '';
+      if (tokensPanel) tokensPanel.style.display = '';
+    }
   },
 
   // 统一解析头像地址（相对 -> 绝对）
