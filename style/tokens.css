@@ -105,6 +105,18 @@
   border-radius: 8px 0 0 8px;
 }
 
+/* 选中某类型时，摘要区中其他类型卡片灰化显示 */
+#panel_tokens .type-tile.is-dim {
+  filter: grayscale(0.6) saturate(0.6);
+  opacity: 0.45;
+  transition: filter .18s var(--ease-standard), opacity .18s var(--ease-standard);
+}
+#panel_tokens .type-tile.is-dim:hover,
+#panel_tokens .type-tile.is-dim:focus-visible {
+  opacity: 0.65;
+  filter: grayscale(0.4) saturate(0.75);
+}
+
 /* 各类型的强调色（与统计卡背景一致的色系） */
 #panel_tokens .type-tile[data-type="term-fixed"]    { --tile-accent: #A0AEC0; } /* gray-400 更浅 */
 #panel_tokens .type-tile[data-type="term-dynamic"]  { --tile-accent: #81E6D9; } /* teal-300 更浅 */
@@ -144,6 +156,48 @@
   animation: token-card-in .36s ease both;
   animation-delay: var(--enter-delay, 0ms);
   transition: box-shadow .2s ease, transform .2s ease;
+  position: relative; /* 作为悬浮工具条定位参考 */
+}
+
+/* 对象卡片工具条：悬浮角标，不占用布局高度 */
+#tokens-content .token-card__toolbar {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  display: inline-flex;
+  gap: 6px;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .16s ease, transform .16s ease;
+  pointer-events: none; /* 默认不接收事件，避免遮挡 */
+  z-index: 1; /* 置于卡片内容之上，便于点击 */
+}
+
+/* 仅在按下 Alt 且 hover/聚焦卡片时显示工具条 */
+.ctrl-down #tokens-content .token-card:hover .token-card__toolbar,
+.ctrl-down #tokens-content .token-card:focus-within .token-card__toolbar {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto; /* 仅在可见时可点 */
+}
+
+/* 按住 Ctrl 时隐藏属性删除按钮，仅保留整对象删除入口 */
+.ctrl-down #tokens-content .kv-row .kv-actions { display: none !important; }
+#tokens-content .btn--xs {
+  font-size: 12px;
+  padding: 2px 8px;
+  line-height: 1.2;
+  border-radius: 4px;
+}
+#tokens-content .btn--danger {
+  background: #FED7D7;
+  color: #742A2A;
+  border: 1px solid #FEB2B2;
+}
+#tokens-content .btn--danger:hover {
+  background: #FEB2B2;
+  color: #63171B;
 }
 
 #tokens-content .token-list {
@@ -235,6 +289,8 @@
 #tokens-content .kv-val:not(.is-editing):hover {
   background: rgba(226, 232, 240, 0.2); /* 轻微悬浮反馈 */
 }
+/* Ctrl 状态下禁用字段编辑交互，避免挡住删除对象入口 */
+.ctrl-down #tokens-content .kv-val { pointer-events: none; }
 
 /* 编辑态：柔和背景 + 内阴影边框（无发光） */
 #tokens-content .kv-val.is-editing {

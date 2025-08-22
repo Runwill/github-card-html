@@ -33,7 +33,7 @@
     pointer-events: none; /* 隐藏时不拦截事件 */
 }
 
-.modal-backdrop.show { opacity: 1; pointer-events: auto; }
+.modal-backdrop.show { opacity: 1; pointer-events: auto; display: block; }
 
 .modal {
     position: fixed !important;
@@ -62,6 +62,7 @@
     opacity: 1;
     transform: translate(-50%, -50%) !important;
     pointer-events: auto; /* 显示时可交互 */
+    display: block;
 }
 
 .modal.update-modal {
@@ -331,4 +332,139 @@
     .modal { border: 2px solid #000; }
     .modal-form input { border: 2px solid #000; }
     .modal-form button[type="submit"] { background: #000; border: 2px solid #000; }
+}
+
+/* =====================
+   词元新增弹窗（专用样式）
+   ===================== */
+#tokens-create-backdrop.modal-backdrop {
+    background: rgba(15, 23, 42, 0.35);
+}
+
+#tokens-create-modal.modal {
+    max-width: 900px;
+    width: 96%;
+}
+
+#tokens-create-modal .modal-header {
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e6eef5;
+}
+
+#tokens-create-modal .modal-header h2 {
+    font-size: 1.15rem;
+    letter-spacing: 0.2px;
+}
+
+#tokens-create-modal .modal-form {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 12px;
+}
+
+/* 关闭弹窗内部所有元素的 CSS 动画，避免提示文本出现循环动画 */
+#tokens-create-modal * { animation: none !important; }
+
+/* 左侧字段提示面板 */
+#tokens-create-hints {
+    background: linear-gradient(180deg, #f8fafc 0%, #f7fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    color: #334155;
+    font-size: 12.5px;
+    line-height: 1.55;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    max-height: calc(80vh - 140px);
+    overflow: auto;
+    position: sticky;
+    top: 8px;
+}
+
+/* 字段提示列表布局与对齐 */
+#tokens-create-hints .hints-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+
+#tokens-create-hints .hint-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+}
+
+#tokens-create-hints .hint-row:hover {
+    background: rgba(226, 232, 240, 0.35);
+}
+
+#tokens-create-hints .hint-name {
+    color: #1f2937;
+    overflow-wrap: anywhere;
+}
+
+#tokens-create-hints .hint-type {
+    color: #718096;
+    white-space: nowrap;
+}
+
+/* 右侧 JSON 编辑器 */
+#tokens-create-editor {
+    width: 100% !important;
+    min-height: 52vh !important;
+    height: clamp(280px, 62vh, 720px) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 12px 14px !important;
+    background: #ffffff !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important;
+    font-size: 12.5px !important;
+    line-height: 1.5 !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    transition: box-shadow .15s ease, border-color .15s ease;
+}
+
+#tokens-create-editor:focus {
+    border-color: #7084ff !important;
+    box-shadow: 0 0 0 3px rgba(112, 132, 255, 0.15);
+}
+
+/* 底部操作区（吸附底部，跨两列） */
+#tokens-create-actions,
+#tokens-create-modal .modal-form > div:last-child {
+    grid-column: 1 / -1;
+    display: flex !important;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid #eef2f7;
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.86) 0%, rgba(255,255,255,1) 60%);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+/* 按钮微调（继承现有 .btn 样式） */
+#tokens-create-cancel {
+    background: none;
+    border: 1px solid #e2e8f0;
+    color: #4a5568;
+}
+#tokens-create-cancel:hover { background: #f7fafc; }
+
+/* 响应式：窄屏改为单列 */
+@media (max-width: 860px) {
+    #tokens-create-modal .modal-form {
+        grid-template-columns: 1fr;
+    }
+    #tokens-create-hints {
+        position: static;
+        max-height: none;
+    }
 }

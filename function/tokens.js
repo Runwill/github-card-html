@@ -68,6 +68,10 @@
     if (!summaryEl || !contentEl) return;
     summaryEl.innerHTML = '<div style="grid-column:1/-1;color:#718096;">加载中…</div>';
     contentEl.innerHTML = '';
+  // 权限：仅管理员可新增/编辑
+  const role = localStorage.getItem('role');
+  const token = localStorage.getItem('token');
+  const canEdit = !!token && role === 'admin';
 
     const fetchJson = async (url) => {
       const r = await fetch(url);
@@ -101,8 +105,9 @@
       summaryEl.innerHTML = tiles.map(t => {
         const isActive = state.activeType === t.type;
         const active = isActive ? ' is-active' : '';
+        const dim = state.activeType && !isActive ? ' is-dim' : '';
         return `
-          <div class="type-tile${active}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"
+          <div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"
                style="border:1px solid #e2e8f0; border-radius:8px; padding:10px; background:${t.color}">
             <div style="font-size:12px;color:#4A5568;">${t.key}</div>
             <div style="font-weight:700; font-size:22px; color:#2D3748;">${t.value}</div>
@@ -110,23 +115,27 @@
         `;
       }).join('');
 
-  const section = (title, items, renderItem) => {
+  const section = (type, title, items, renderItem) => {
     const id = 'sec-' + Math.random().toString(36).slice(2,8);
     const total = Array.isArray(items)? items.length : 0;
-    const preview = (items||[]).slice(0, 2);
+    const preview = (items||[]).slice(0, 1);
+    const shouldPreOpen = !!state.activeType && state.activeType === type && total > 1;
     const html = `
       <div style="border:1px solid #e2e8f0; border-radius:8px; margin-top:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#F7FAFC; border-bottom:1px solid #e2e8f0;">
           <div style=\"font-weight:600; color:#2D3748;\">${title} <span class=\"count-badge\" style=\"color:#718096;font-weight:400;\">(${total})</span></div>
-          ${total>2 ? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn\" aria-expanded=\"false\" onclick=\"toggleTokensSection('${id}')\">展开</button>`: ''}
+          <div style=\"display:flex;align-items:center;gap:8px;\">
+            ${canEdit ? `<button class=\"btn btn--secondary btn--sm\" onclick=\"tokensOpenCreate('${type}')\">新增</button>` : ''}
+            ${total>1 ? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen ? ' is-expanded' : ''}\" aria-expanded=\"${shouldPreOpen ? 'true' : 'false'}\" onclick=\"toggleTokensSection('${id}')\">${shouldPreOpen ? '收起' : '展开'}</button>`: ''}
+          </div>
         </div>
-        <div id="${id}" data-expanded="0" style="padding:10px 12px;">
+        <div id="${id}" data-expanded="${shouldPreOpen ? '1' : '0'}" style="padding:10px 12px;">
           <div class="token-list">
             ${preview.map(renderItem).join('') || '<div style="color:#A0AEC0;">空</div>'}
           </div>
-          ${total>2 ? `
-            <div id=\"more-${id}\" class=\"js-more token-list collapsible\" style=\"margin-top:8px;\">
-              ${(items||[]).slice(2).map(renderItem).join('')}
+          ${total>1 ? `
+            <div id=\"more-${id}\" class=\"js-more token-list collapsible${shouldPreOpen ? ' is-open' : ''}\" style=\"margin-top:8px;\">
+              ${(items||[]).slice(1).map(renderItem).join('')}
             </div>
           ` : ''}
         </div>
@@ -230,11 +239,24 @@
       };
 
   const tagAttrs = (coll, obj) => ` data-coll="${coll}" data-id="${esc(obj && obj._id || '')}"`;
-  const termFixedItem = (t) => { const col = getAccent(t); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('term-fixed', t)}>${renderKV(t, 0, col, '')}</div>`; };
-  const termDynamicItem = (t) => { const col = getAccent(t); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('term-dynamic', t)}>${renderKV(t, 0, col, '')}</div>`; };
-  const cardItem = (c) => { const col = getAccent(c); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('card', c)}>${renderKV(c, 0, col, '')}</div>`; };
-  const characterItem = (ch) => { const col = getAccent(ch); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('character', ch)}>${renderKV(ch, 0, col, '')}</div>`; };
-  const skillItem = (s) => { const col = getAccent(s); const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : ''; return `<div class="token-card"${style}${tagAttrs('skill', s)}>${renderKV(s, 0, col, '')}</div>`; };
+  function cardShell(coll, obj, innerHtml) {
+    const col = getAccent(obj);
+    const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : '';
+      const role = localStorage.getItem('role');
+      const token = localStorage.getItem('token');
+      const canEdit = !!token && role === 'admin';
+      return `<div class="token-card"${style}${tagAttrs(coll, obj)}>
+        ${canEdit ? `<div class="token-card__toolbar" role="toolbar" aria-label="对象操作">` +
+          `<button class="btn btn--danger btn--xs btn-del-doc" title="删除对象" aria-label="删除对象">删除对象</button>` +
+        `</div>` : ''}
+        ${innerHtml}
+      </div>`;
+  }
+  const termFixedItem = (t) => cardShell('term-fixed', t, renderKV(t, 0, getAccent(t), ''));
+  const termDynamicItem = (t) => cardShell('term-dynamic', t, renderKV(t, 0, getAccent(t), ''));
+  const cardItem = (c) => cardShell('card', c, renderKV(c, 0, getAccent(c), ''));
+  const characterItem = (ch) => cardShell('character', ch, renderKV(ch, 0, getAccent(ch), ''));
+  const skillItem = (s) => cardShell('skill', s, renderKV(s, 0, getAccent(s), ''));
 
       // 过滤后的视图
       const q = state.q;
@@ -246,7 +268,7 @@
         { type: 'skill', title: '技能', items: Array.isArray(skills)? filterByQuery(skills, q): [], render: skillItem },
       ];
       const filteredSections = state.activeType ? sections.filter(s => s.type === state.activeType) : sections;
-      const html = filteredSections.map(s => section(s.title, s.items, s.render)).join('');
+  const html = filteredSections.map(s => section(s.type, s.title, s.items, s.render)).join('');
       contentEl.innerHTML = html;
       // 为新渲染的卡片添加入场延迟（交错动画）
       try {
@@ -276,13 +298,11 @@
         });
       })();
 
-  // 启用双击编辑（仅管理员）
-      const role = localStorage.getItem('role');
-      const token = localStorage.getItem('token');
-  const canEdit = !!token && role === 'admin';
+  // 启用编辑/删除（仅管理员）
       if (canEdit) {
-        enableInlineEdit(contentEl);
-  enableInlineDelete(contentEl);
+        if (!contentEl.__inlineEditBound) { enableInlineEdit(contentEl); contentEl.__inlineEditBound = true; }
+        if (!contentEl.__inlineDeleteBound) { enableInlineDelete(contentEl); contentEl.__inlineDeleteBound = true; }
+        if (!contentEl.__deleteDocBound) { enableDeleteDoc(contentEl); contentEl.__deleteDocBound = true; }
       }
     } catch (e) {
       console.error('加载词元数据失败:', e);
@@ -296,6 +316,22 @@
       const role = localStorage.getItem('role');
       if (role === 'admin') renderTokensDashboard();
     } catch(e){}
+    // Ctrl 键按下状态：用于启用危险操作 UI（删除对象）
+    try {
+      const setCtrl = (down) => {
+        if (down) document.body.classList.add('ctrl-down');
+        else document.body.classList.remove('ctrl-down');
+      };
+      let ctrlLatch = false;
+      window.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && !ctrlLatch) { ctrlLatch = true; setCtrl(true); }
+      });
+      window.addEventListener('keyup', (e) => {
+        // 当 Ctrl 松开或任意键事件报告 ctrlKey=false 时清除
+        if (!e.ctrlKey) { ctrlLatch = false; setCtrl(false); }
+      });
+      window.addEventListener('blur', () => { ctrlLatch = false; setCtrl(false); });
+    } catch(_){}
   });
 
   // 暴露到全局用于手动刷新
@@ -366,10 +402,180 @@
     state.data = null; // 强制重新拉取
     renderTokensDashboard(true);
   };
+  // —— 新增：打开创建弹窗 ——
+  window.tokensOpenCreate = async function(collection){
+    try {
+      const token = localStorage.getItem('token') || '';
+      const url = `http://localhost:3000/api/tokens/shape?collection=${encodeURIComponent(collection)}`;
+      const resp = await fetch(url, { headers: { 'Authorization': token ? `Bearer ${token}` : '' } });
+      const shape = await resp.json();
+      if (!resp.ok) throw new Error(shape && shape.message || '获取结构失败');
+      const tpl = buildTemplate(collection, shape);
+      showCreateModal(collection, shape, tpl);
+    } catch (e) {
+      alert(e.message || '获取结构失败');
+    }
+  };
+
+  function buildTemplate(collection, shape){
+    const byTypeDefault = (t) => t === 'String' ? '' : t === 'Number' ? 0 : t === 'Boolean' ? false : t === 'Array' ? [] : {};
+    const obj = {};
+    const fields = Array.isArray(shape.fields) ? shape.fields : [];
+    for (const f of fields) {
+      const name = f.name;
+      if (name === '_id' || name === '__v' || name.endsWith('[]')) continue;
+      if (f.required) obj[name] = (f.default !== undefined) ? f.default : byTypeDefault(f.type);
+    }
+    if (collection === 'character') {
+      if (shape.suggest && shape.suggest.nextId != null) obj.id = shape.suggest.nextId;
+      obj.name = obj.name || '新武将';
+      obj.health = obj.health || 1;
+      obj.dominator = obj.dominator || 0;
+    } else if (collection === 'card') {
+      obj.en = obj.en || 'new_card_en';
+      obj.cn = obj.cn || '新卡牌';
+      obj.type = obj.type || '';
+    } else if (collection === 'term-fixed') {
+      obj.en = obj.en || 'term_key';
+      obj.cn = obj.cn || '术语中文';
+      if (obj.part == null) obj.part = {};
+      if (obj.epithet == null) obj.epithet = {};
+    } else if (collection === 'term-dynamic') {
+      obj.en = obj.en || 'term_key';
+      if (obj.part == null) obj.part = {};
+    } else if (collection === 'skill') {
+      obj.name = obj.name || '新技能';
+      obj.content = obj.content || '技能描述';
+      obj.strength = obj.strength != null ? obj.strength : 0;
+      if (!Array.isArray(obj.role)) obj.role = [];
+    }
+    return obj;
+  }
+
+  function ensureCreateModal(){
+    let backdrop = document.getElementById('tokens-create-backdrop');
+    let modal = document.getElementById('tokens-create-modal');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.id = 'tokens-create-backdrop';
+      backdrop.className = 'modal-backdrop';
+      document.body.appendChild(backdrop);
+    }
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'tokens-create-modal';
+      modal.className = 'modal approve-modal';
+      modal.innerHTML = `
+        <div class="modal-header"><h2>新增对象</h2></div>
+        <div class="modal-form" style="display:grid;grid-template-columns:320px 1fr;gap:12px;">
+          <div id="tokens-create-hints" style="font-size:12px;color:#4A5568;background:#F7FAFC;border:1px solid #e2e8f0;border-radius:8px;padding:10px;"></div>
+          <textarea id="tokens-create-editor" style="min-height:200px;width:100%;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size:12px; line-height:1.4; border:1px solid #e2e8f0; border-radius:8px; padding:10px; background:#fff; box-sizing:border-box;"></textarea>
+          <div id="tokens-create-actions" style="grid-column:1 / -1;position:sticky;bottom:0;display:flex;gap:8px;justify-content:flex-end;">
+            <button type="button" class="btn btn--secondary" id="tokens-create-cancel">取消</button>
+            <button type="button" class="btn btn--primary" id="tokens-create-submit">创建</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+      backdrop.addEventListener('click', hideCreateModal);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hideCreateModal(); });
+    }
+    return { backdrop, modal };
+  }
+
+  function showCreateModal(collection, shape, tpl){
+    const { backdrop, modal } = ensureCreateModal();
+    const editor = modal.querySelector('#tokens-create-editor');
+    const hints = modal.querySelector('#tokens-create-hints');
+    const btnCancel = modal.querySelector('#tokens-create-cancel');
+    const btnSubmit = modal.querySelector('#tokens-create-submit');
+    const fields = shape && Array.isArray(shape.fields) ? shape.fields : [];
+    const escHtml = (s) => String(s == null ? '' : s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+    const list = (fields
+      .filter(f => !f.name.endsWith('[]') && f.name !== '_id' && f.name !== '__v')
+      .map(f => {
+        const badge = `(${f.type}${f.enum ? ': ' + f.enum.join('|') : ''})`;
+        const bullet = f.required ? '•' : '○';
+        return `
+          <div class="hint-row">
+            <div class="hint-name">${bullet} ${escHtml(f.name)}</div>
+            <div class="hint-type">${escHtml(badge)}</div>
+          </div>`;
+      })
+      .join(''));
+    const extra = shape && shape.suggest && shape.suggest.mixedKeys && shape.suggest.mixedKeys.length
+      ? `<div style="margin-top:6px;color:#718096;">可能的可选键：${shape.suggest.mixedKeys.slice(0,20).join(', ')}${shape.suggest.mixedKeys.length>20?' …':''}</div>`
+      : '';
+  hints.innerHTML = `<div><strong>${collection}</strong> 字段（• 必填）：</div><div class="hints-list" style="margin-top:6px;">${list || '无'}</div>${extra}`;
+    editor.value = JSON.stringify(tpl || {}, null, 2);
+    const submit = async () => {
+      try {
+        const token = localStorage.getItem('token') || '';
+        let payload;
+        try { payload = JSON.parse(editor.value); } catch (_) { throw new Error('JSON 不合法'); }
+        const resp = await fetch('http://localhost:3000/api/tokens/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
+          body: JSON.stringify({ collection, data: payload })
+        });
+        const out = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(out && out.message || '创建失败');
+        const doc = out.doc;
+        // 更新缓存
+        try {
+          if (!state.data) state.data = {};
+          if (collection === 'term-fixed') {
+            state.data.termFixed = Array.isArray(state.data.termFixed) ? state.data.termFixed : [];
+            state.data.termFixed.unshift(doc);
+          } else if (collection === 'term-dynamic') {
+            state.data.termDynamic = Array.isArray(state.data.termDynamic) ? state.data.termDynamic : [];
+            state.data.termDynamic.unshift(doc);
+          } else if (collection === 'card') {
+            state.data.cards = Array.isArray(state.data.cards) ? state.data.cards : [];
+            state.data.cards.unshift(doc);
+          } else if (collection === 'character') {
+            state.data.characters = Array.isArray(state.data.characters) ? state.data.characters : [];
+            state.data.characters.unshift(doc);
+          } else if (collection === 'skill') {
+            const s = Number(doc && doc.strength);
+            if (s === 1) {
+              state.data.s1 = Array.isArray(state.data.s1) ? state.data.s1 : [];
+              state.data.s1.unshift(doc);
+            } else if (s === 2) {
+              state.data.s2 = Array.isArray(state.data.s2) ? state.data.s2 : [];
+              state.data.s2.unshift(doc);
+            } else {
+              state.data.s0 = Array.isArray(state.data.s0) ? state.data.s0 : [];
+              state.data.s0.unshift(doc);
+            }
+          }
+        } catch(_){}
+        hideCreateModal();
+        try { showTokensToast('创建成功'); } catch(_){}
+        renderTokensDashboard(false);
+      } catch (e) {
+        alert(e.message || '创建失败');
+      }
+    };
+    btnCancel.onclick = hideCreateModal;
+    btnSubmit.onclick = submit;
+    backdrop.classList.add('show');
+    modal.classList.add('show');
+    setTimeout(() => { try { editor.focus(); } catch(_){} }, 50);
+  }
+
+  function hideCreateModal(){
+    const backdrop = document.getElementById('tokens-create-backdrop');
+    const modal = document.getElementById('tokens-create-modal');
+    if (backdrop) backdrop.classList.remove('show');
+    if (modal) modal.classList.remove('show');
+  }
   
   // 事件委托与更新逻辑
   function enableInlineEdit(rootEl) {
+  if (rootEl.__inlineEditBound) return; rootEl.__inlineEditBound = true;
     rootEl.addEventListener('click', function(ev) {
+  // 按住 Ctrl 时禁用属性编辑，保留整对象删除入口
+  if (ev.ctrlKey || document.body.classList.contains('ctrl-down')) return;
       const host = ev.target && ev.target.closest ? ev.target.closest('.kv-val') : null;
       if (!host) return;
       const target = host;
@@ -497,85 +703,9 @@
     ta.focus();
     ta.select();
   }
+  // 删除逻辑已在顶层定义
 
-  // 删除逻辑：点击删除按钮 -> 确认 -> 调用后端 -> 更新缓存与 DOM
-  function enableInlineDelete(rootEl) {
-    rootEl.addEventListener('click', async function(ev) {
-      const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
-      if (!btn) return;
-      const row = btn.closest('.kv-row');
-      if (!row) return;
-      const path = row.getAttribute('data-path');
-      if (!path || path.startsWith('_') || path.includes('.__v')) return;
-      const tokenCard = row.closest('.token-card[data-coll][data-id]');
-      if (!tokenCard) return;
-      const coll = tokenCard.getAttribute('data-coll');
-      const id = tokenCard.getAttribute('data-id');
-      // 二次确认
-      const keyNameEl = row.querySelector('.kv-key');
-      const keyName = keyNameEl ? keyNameEl.textContent.trim() : path.split('.').pop();
-      if (!confirm(`确定删除「${keyName}」吗？此操作不可撤销。`)) return;
-      // 调后端
-      try {
-        const token = localStorage.getItem('token') || '';
-        const resp = await fetch('http://localhost:3000/api/tokens/delete', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : ''
-          },
-          body: JSON.stringify({ collection: coll, id, path })
-        });
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) throw new Error(data && data.message || '删除失败');
-        // 成功：从缓存中移除
-        try {
-          if (state.data) {
-            const deleteIn = (arr) => {
-              if (!Array.isArray(arr)) return false;
-              for (const doc of arr) {
-                if (doc && String(doc._id) === String(id)) {
-                  // 走到父级，删除字段/元素
-                  const parts = String(path).split('.');
-                  let parent = doc;
-                  for (let i = 0; i < parts.length - 1; i++) {
-                    const k = parts[i];
-                    const key = /^\d+$/.test(k) ? Number(k) : k;
-                    parent = parent ? parent[key] : undefined;
-                  }
-                  const lastRaw = parts[parts.length - 1];
-                  const isIdx = /^\d+$/.test(lastRaw);
-                  const lastKey = isIdx ? Number(lastRaw) : lastRaw;
-                  if (Array.isArray(parent) && isIdx) parent.splice(lastKey, 1);
-                  else if (parent && typeof parent === 'object') delete parent[lastKey];
-                  return true;
-                }
-              }
-              return false;
-            };
-            let updated = false;
-            if (coll === 'term-fixed') updated = deleteIn(state.data.termFixed);
-            else if (coll === 'term-dynamic') updated = deleteIn(state.data.termDynamic);
-            else if (coll === 'card') updated = deleteIn(state.data.cards);
-            else if (coll === 'character') updated = deleteIn(state.data.characters);
-            else if (coll === 'skill') {
-              updated = deleteIn(state.data.s0) || deleteIn(state.data.s1) || deleteIn(state.data.s2);
-            }
-            if (!updated) {
-              for (const key of Object.keys(state.data)) {
-                if (deleteIn(state.data[key])) { updated = true; break; }
-              }
-            }
-          }
-        } catch(_){}
-        // 从 DOM 移除行
-        row.remove();
-        try { showTokensToast('已删除'); } catch(_){ }
-      } catch (e) {
-        alert(e.message || '删除失败');
-      }
-    });
-  }
+  // 删除逻辑已在顶层定义
 
       let committing = false; // 标记是否正在提交，避免 blur 触发还原造成闪烁
       let revertTimer = null; // 延迟还原，平滑从一个编辑框切换到另一个
@@ -708,6 +838,94 @@
       }
     });
   }
+  
+  // 删除逻辑：点击删除按钮 -> 确认 -> 调用后端 -> 更新缓存与 DOM（顶层）
+  function enableInlineDelete(rootEl) {
+  if (rootEl.__inlineDeleteBound) return; rootEl.__inlineDeleteBound = true;
+    rootEl.addEventListener('click', async function(ev) {
+      // 按住 Ctrl 时拦截属性删除
+      if (ev.ctrlKey || document.body.classList.contains('ctrl-down')) {
+        const maybe = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
+        if (maybe) {
+          try { showTokensToast('按 Ctrl 时仅支持删除对象'); } catch(_){}
+          ev.preventDefault();
+          return;
+        }
+      }
+      const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
+      if (!btn) return;
+      const row = btn.closest('.kv-row');
+      if (!row) return;
+      const path = row.getAttribute('data-path');
+      if (!path || path.startsWith('_') || path.includes('.__v')) return;
+      const tokenCard = row.closest('.token-card[data-coll][data-id]');
+      if (!tokenCard) return;
+      const coll = tokenCard.getAttribute('data-coll');
+      const id = tokenCard.getAttribute('data-id');
+      // 二次确认
+      const keyNameEl = row.querySelector('.kv-key');
+      const keyName = keyNameEl ? keyNameEl.textContent.trim() : path.split('.').pop();
+      if (!confirm(`确定删除「${keyName}」吗？此操作不可撤销。`)) return;
+      // 调后端
+      try {
+        const token = localStorage.getItem('token') || '';
+        const resp = await fetch('http://localhost:3000/api/tokens/delete', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+          },
+          body: JSON.stringify({ collection: coll, id, path })
+        });
+        const data = await resp.json().catch(() => ({}));
+        if (!resp.ok) throw new Error(data && data.message || '删除失败');
+        // 成功：从缓存中移除
+        try {
+          if (state.data) {
+            const deleteIn = (arr) => {
+              if (!Array.isArray(arr)) return false;
+              for (const doc of arr) {
+                if (doc && String(doc._id) === String(id)) {
+                  const parts = String(path).split('.');
+                  let parent = doc;
+                  for (let i = 0; i < parts.length - 1; i++) {
+                    const k = parts[i];
+                    const key = /^\d+$/.test(k) ? Number(k) : k;
+                    parent = parent ? parent[key] : undefined;
+                  }
+                  const lastRaw = parts[parts.length - 1];
+                  const isIdx = /^\d+$/.test(lastRaw);
+                  const lastKey = isIdx ? Number(lastRaw) : lastRaw;
+                  if (Array.isArray(parent) && isIdx) parent.splice(lastKey, 1);
+                  else if (parent && typeof parent === 'object') delete parent[lastKey];
+                  return true;
+                }
+              }
+              return false;
+            };
+            let updated = false;
+            if (coll === 'term-fixed') updated = deleteIn(state.data.termFixed);
+            else if (coll === 'term-dynamic') updated = deleteIn(state.data.termDynamic);
+            else if (coll === 'card') updated = deleteIn(state.data.cards);
+            else if (coll === 'character') updated = deleteIn(state.data.characters);
+            else if (coll === 'skill') {
+              updated = deleteIn(state.data.s0) || deleteIn(state.data.s1) || deleteIn(state.data.s2);
+            }
+            if (!updated) {
+              for (const key of Object.keys(state.data)) {
+                if (deleteIn(state.data[key])) { updated = true; break; }
+              }
+            }
+          }
+        } catch(_){ }
+        // 从 DOM 移除行
+        row.remove();
+        try { showTokensToast('已删除'); } catch(_){ }
+      } catch (e) {
+        alert(e.message || '删除失败');
+      }
+    });
+  }
   // 词元页绿色提示小弹窗（toast）
   function showTokensToast(message) {
     try {
@@ -730,5 +948,56 @@
         }
       }, 2200);
     } catch(_) { /* 忽略 */ }
+  }
+
+  // 删除整个对象（文档）
+  function enableDeleteDoc(rootEl){
+  if (rootEl.__deleteDocBound) return; rootEl.__deleteDocBound = true;
+    rootEl.addEventListener('click', async function(ev){
+      const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del-doc') : null;
+      if (!btn) return;
+      // 需要按住 Ctrl 键
+      if (!ev.ctrlKey && !document.body.classList.contains('ctrl-down')) {
+        try { showTokensToast('按住 Ctrl 键以启用删除'); } catch(_){}
+        return;
+      }
+      const card = btn.closest('.token-card[data-coll][data-id]');
+      if (!card) return;
+      const coll = card.getAttribute('data-coll');
+      const id = card.getAttribute('data-id');
+      if (!coll || !id) return;
+      if (!confirm('确定删除整个对象吗？此操作不可撤销。')) return;
+      try {
+        const token = localStorage.getItem('token') || '';
+        const resp = await fetch('http://localhost:3000/api/tokens/remove', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
+          body: JSON.stringify({ collection: coll, id })
+        });
+        const data = await resp.json().catch(()=>({}));
+        if (!resp.ok) throw new Error(data && data.message || '删除失败');
+        // 更新缓存
+        try {
+          if (state.data) {
+            const removeFrom = (arr) => {
+              if (!Array.isArray(arr)) return false;
+              const i = arr.findIndex(d => d && String(d._id) === String(id));
+              if (i >= 0) { arr.splice(i, 1); return true; }
+              return false;
+            };
+            if (coll === 'term-fixed') removeFrom(state.data.termFixed);
+            else if (coll === 'term-dynamic') removeFrom(state.data.termDynamic);
+            else if (coll === 'card') removeFrom(state.data.cards);
+            else if (coll === 'character') removeFrom(state.data.characters);
+            else if (coll === 'skill') { removeFrom(state.data.s0); removeFrom(state.data.s1); removeFrom(state.data.s2); }
+          }
+        } catch(_){ }
+        // 从 DOM 移除卡片
+        card.remove();
+        try { showTokensToast('对象已删除'); } catch(_){ }
+      } catch (e) {
+        alert(e.message || '删除失败');
+      }
+    });
   }
 })();
