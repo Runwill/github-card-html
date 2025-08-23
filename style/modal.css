@@ -344,6 +344,9 @@
 #tokens-create-modal.modal {
     max-width: 900px;
     width: 96%;
+    max-height: 86vh; /* 覆盖 approve-modal 的 80vh，减少内部滚动与底部留白 */
+    /* 统一左右内容区高度变量（可按需调整） */
+    --tokens-pane-h: 48vh;
 }
 
 #tokens-create-modal .modal-header {
@@ -363,9 +366,57 @@
     grid-template-columns: 320px 1fr;
     gap: 12px;
 }
+#tokens-create-hints {
+    font-size: 12px;
+    color: #4A5568;
+    background: #F7FAFC;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px;
+}
 
-/* 关闭弹窗内部所有元素的 CSS 动画，避免提示文本出现循环动画 */
-#tokens-create-modal * { animation: none !important; }
+#tokens-create-editor {
+    min-height: 200px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.tokens-create-actions {
+    grid-column: 1 / -1;
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.tokens-scheme {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start; /* 避免多行时纵向居中造成视觉叠压 */
+    gap: 8px 10px; /* 行/列间距更明确 */
+    padding: 6px 0;
+    border-bottom: 1px dashed #e2e8f0;
+}
+.tokens-scheme__title {
+    color: #4A5568;
+    flex: 0 0 auto; /* 保持标题占位，防止被后续项挤压覆盖 */
+}
+.tokens-scheme__option {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    flex: 0 0 auto; /* 禁止在换行时被压缩到重叠 */
+    white-space: nowrap; /* 单个选项内不换行，避免与相邻项叠盖 */
+}
+
+/* 仅关闭词元提示面板内的动画，避免循环闪烁；不影响标题等元素的入场动画 */
+#tokens-create-hints, #tokens-create-hints * { animation: none !important; }
 
 /* 左侧字段提示面板 */
 #tokens-create-hints {
@@ -376,7 +427,9 @@
     font-size: 12.5px;
     line-height: 1.55;
     box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-    max-height: calc(80vh - 140px);
+    height: var(--tokens-pane-h);     /* 固定与编辑器一致高度 */
+    min-height: var(--tokens-pane-h);
+    max-height: var(--tokens-pane-h);
     overflow: auto;
     position: sticky;
     top: 8px;
@@ -415,8 +468,9 @@
 /* 右侧 JSON 编辑器 */
 #tokens-create-editor {
     width: 100% !important;
-    min-height: 52vh !important;
-    height: clamp(280px, 62vh, 720px) !important;
+    height: var(--tokens-pane-h) !important;         /* 固定与提示面板一致 */
+    min-height: var(--tokens-pane-h) !important;
+    max-height: var(--tokens-pane-h) !important;
     border: 1px solid #e2e8f0 !important;
     border-radius: 10px !important;
     padding: 12px 14px !important;
@@ -426,6 +480,8 @@
     line-height: 1.5 !important;
     box-shadow: 0 1px 2px rgba(0,0,0,0.04);
     transition: box-shadow .15s ease, border-color .15s ease;
+    resize: none;                      /* 固定高度，保持两侧等高 */
+    overflow: auto;                    /* 超出时局部滚动，不影响外层布局 */
 }
 
 #tokens-create-editor:focus {
@@ -463,8 +519,127 @@
     #tokens-create-modal .modal-form {
         grid-template-columns: 1fr;
     }
+    #tokens-create-modal.modal { --tokens-pane-h: 44vh; }
     #tokens-create-hints {
         position: static;
-        max-height: none;
+        /* 与编辑器保持一致高度，移动端变量已降低 */
     }
+}
+
+/* =====================
+    Tokens create modal refinements
+    - Move inline styles to CSS
+    - Improve scheme radio styling
+    ===================== */
+#tokens-create-hints .hints-title { margin-bottom: 6px; }
+#tokens-create-hints .hints-extra { margin-top: 6px; color: #718096; }
+.tokens-scheme__option input[type="radio"] { accent-color: #7084ff; }
+.tokens-scheme__option:hover { background: #f7fafc; }
+
+/* 方案示例样式 */
+#tokens-create-hints .variant-sample { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e2e8f0; }
+#tokens-create-hints .variant-sample__title { font-weight: 600; color: #1f2937; margin-bottom: 6px; }
+#tokens-create-hints .variant-sample__pre {
+    margin: 0;
+    padding: 8px 10px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    color: #1f2937;
+}
+
+/* 分段按钮版方案选择器 */
+.tokens-scheme__group {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.tokens-scheme__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    background: #fff;
+    color: #1f2937;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.tokens-scheme__btn:hover { background: #f7fafc; }
+.tokens-scheme__btn:focus { outline: none; box-shadow: 0 0 0 3px rgba(112,132,255,0.18); border-color: #c3ccff; }
+.tokens-scheme__btn.is-selected {
+    /* 与原主按钮配色一致（参照 .btn--primary） */
+    background: linear-gradient(135deg, #8698ff 0%, #7084ff 50%, #5a6cff 100%);
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(134, 152, 255, 0.2);
+    color: #ffffff;
+}
+.tokens-scheme__btn.is-selected:hover {
+    background-position: 100% 50%;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px -1px rgba(134, 152, 255, 0.3);
+}
+.tokens-scheme__btn.is-selected:active { transform: translateY(0.5px); }
+
+/* 紧凑信息：默认仅显示序号及计数，选中时展开文本标签 */
+.tokens-scheme__btn .idx {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 600;
+}
+.tokens-scheme__btn .cnt {
+    font-size: 11px;
+    color: #64748b;
+    background: #e2e8f0;
+    border-radius: 10px;
+    padding: 0 6px;
+}
+.tokens-scheme__btn .label { display: none; color: #1f2937; }
+.tokens-scheme__btn.is-selected .label {
+    display: inline;
+    margin-left: 2px;
+    color: #ffffff;
+    background: rgba(112, 132, 255, 0.22); /* 取自主色 #7084ff 的半透明底色 */
+    padding: 2px 6px;
+    border-radius: 999px;
+}
+.tokens-scheme__btn.is-selected .idx { background: rgba(255,255,255,0.18); color: #ffffff; }
+.tokens-scheme__btn.is-selected .cnt { background: rgba(255,255,255,0.22); color: #ffffff; }
+/* 选中后已显示“方案N”，序号徽标冗余 -> 隐藏 */
+.tokens-scheme__btn.is-selected .idx { display: none; }
+
+/* 修正：全局 `span` 定义了绝对定位与动画，这里重置方案按钮内部的 span */
+.tokens-scheme__btn .idx,
+.tokens-scheme__btn .cnt,
+.tokens-scheme__btn .label {
+    position: static !important;
+    transform: none !important;
+    animation: none !important;
+    pointer-events: auto !important;
+}
+
+/* 在弹窗作用域内，强制播放标题/段落动画，保留过渡效果而不透明 */
+.modal h1,
+.modal h2,
+.modal h3,
+.modal .indent,
+.modal padding {
+    animation-play-state: running !important;
 }

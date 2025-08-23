@@ -143,6 +143,46 @@
   font-size: 12px;
 }
 
+/* 摘要 tiles：将背景与间距转移至 CSS */
+#tokens-summary .type-tile {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+}
+#tokens-summary .type-tile__label { font-size: 12px; color: #4A5568; }
+#tokens-summary .type-tile__value { font-weight: 700; font-size: 22px; color: #2D3748; }
+/* 类型背景色（从原内联移出） */
+#tokens-summary .type-tile[data-type="term-fixed"]   { background: #EDF2F7; }
+#tokens-summary .type-tile[data-type="term-dynamic"] { background: #E6FFFA; }
+#tokens-summary .type-tile[data-type="card"]         { background: #FEF3C7; }
+#tokens-summary .type-tile[data-type="character"]    { background: #E9D8FD; }
+#tokens-summary .type-tile[data-type="skill"]        { background: #C6F6D5; }
+
+/* 分区容器样式：替代内联边框/圆角/内边距/头部样式 */
+.tokens-section {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+.tokens-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: #F7FAFC;
+  border-bottom: 1px solid #e2e8f0;
+}
+.tokens-section__title { font-weight: 600; color: #2D3748; }
+.tokens-section__ops { display: flex; align-items: center; gap: 8px; }
+.tokens-section__body { padding: 10px 12px; }
+.tokens-section__more { margin-top: 8px; }
+.tokens-empty { color: #A0AEC0; }
+
+/* 列表状态提示（加载/错误） */
+.tokens-status { grid-column: 1 / -1; }
+.tokens-status--loading { color: #718096; }
+.tokens-status--error { color: #E53E3E; }
+
 #tokens-content .token-card {
   /* 使用 CSS 变量；不在此设置默认值，避免覆盖父级传递 */
   border: 1px solid #e2e8f0;

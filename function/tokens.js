@@ -7,6 +7,133 @@
     timer: null,
   activeType: null, // 当前筛选的类型：'term-fixed' | 'term-dynamic' | 'card' | 'character' | 'skill' | null
   };
+  // 统一的集合配置
+  const COLLECTIONS = Object.freeze({
+    'term-fixed':   { key: 'termFixed',   url: 'http://localhost:3000/api/term-fixed' },
+    'term-dynamic': { key: 'termDynamic', url: 'http://localhost:3000/api/term-dynamic' },
+    'card':         { key: 'cards',       url: 'http://localhost:3000/api/card' },
+    'character':    { key: 'characters',  url: 'http://localhost:3000/api/character' },
+    // skill 为多来源集合，单独处理
+    'skill':        { key: null,          url: null, urls: [
+      'http://localhost:3000/api/skill0',
+      'http://localhost:3000/api/skill1',
+      'http://localhost:3000/api/skill2'
+    ] }
+  });
+
+  // 统一鉴权与权限判断
+  function getAuth(){
+    const role = localStorage.getItem('role');
+    const token = localStorage.getItem('token');
+    return { role, token, canEdit: !!token && role === 'admin' };
+  }
+
+  // 通用 HTML 转义
+  function esc(s){ return (s==null? '' : String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))); }
+
+  // 统一 API JSON 请求助手
+  const API_BASE = 'http://localhost:3000/api';
+  async function apiJson(endpoint, opts){
+    const { method = 'GET', headers = {}, body, auth = false } = opts || {};
+    const { token } = getAuth();
+    const h = Object.assign({}, headers);
+    if (auth && token) h['Authorization'] = `Bearer ${token}`;
+    let payload = body;
+    if (body != null && typeof body !== 'string') {
+      h['Content-Type'] = h['Content-Type'] || 'application/json';
+      payload = JSON.stringify(body);
+    }
+    const resp = await fetch(endpoint.startsWith('http') ? endpoint : (API_BASE + endpoint), { method, headers: h, body: payload });
+    const out = await resp.json().catch(() => ({}));
+    if (!resp.ok) throw new Error(out && out.message || '请求失败');
+    return out;
+  }
+
+  // —— 缓存更新助手 ——
+  function ensureArraysForSkills(){
+    if (!state.data) state.data = {};
+    if (!Array.isArray(state.data.s0)) state.data.s0 = [];
+    if (!Array.isArray(state.data.s1)) state.data.s1 = [];
+    if (!Array.isArray(state.data.s2)) state.data.s2 = [];
+  }
+
+  function pushDocToState(collection, doc){
+    if (!state.data) state.data = {};
+    if (collection === 'term-fixed') {
+      if (!Array.isArray(state.data.termFixed)) state.data.termFixed = [];
+      state.data.termFixed.unshift(doc);
+    } else if (collection === 'term-dynamic') {
+      if (!Array.isArray(state.data.termDynamic)) state.data.termDynamic = [];
+      state.data.termDynamic.unshift(doc);
+    } else if (collection === 'card') {
+      if (!Array.isArray(state.data.cards)) state.data.cards = [];
+      state.data.cards.unshift(doc);
+    } else if (collection === 'character') {
+      if (!Array.isArray(state.data.characters)) state.data.characters = [];
+      state.data.characters.unshift(doc);
+    } else if (collection === 'skill') {
+      ensureArraysForSkills();
+      const s = Number(doc && doc.strength);
+      if (s === 1) state.data.s1.unshift(doc);
+      else if (s === 2) state.data.s2.unshift(doc);
+      else state.data.s0.unshift(doc);
+    }
+  }
+
+  function updateDocInState(collection, id, updater){
+    if (!state.data) return false;
+    const touch = (arr) => {
+      if (!Array.isArray(arr)) return false;
+      for (const doc of arr) {
+        if (doc && String(doc._id) === String(id)) { updater(doc); return true; }
+      }
+      return false;
+    };
+    let updated = false;
+    if (collection === 'term-fixed') updated = touch(state.data.termFixed);
+    else if (collection === 'term-dynamic') updated = touch(state.data.termDynamic);
+    else if (collection === 'card') updated = touch(state.data.cards);
+    else if (collection === 'character') updated = touch(state.data.characters);
+    else if (collection === 'skill') updated = touch(state.data.s0)||touch(state.data.s1)||touch(state.data.s2);
+    // 兜底：全量扫描
+    if (!updated) {
+      for (const key of Object.keys(state.data)) { if (touch(state.data[key])) { updated = true; break; } }
+    }
+    return updated;
+  }
+
+  function removeDocFromState(collection, id){
+    if (!state.data) return false;
+    const rm = (arr) => {
+      if (!Array.isArray(arr)) return false;
+      const i = arr.findIndex(d => d && String(d._id) === String(id));
+      if (i >= 0) { arr.splice(i, 1); return true; }
+      return false;
+    };
+    if (collection === 'term-fixed') return rm(state.data.termFixed);
+    if (collection === 'term-dynamic') return rm(state.data.termDynamic);
+    if (collection === 'card') return rm(state.data.cards);
+    if (collection === 'character') return rm(state.data.characters);
+    if (collection === 'skill') return rm(state.data.s0) || rm(state.data.s1) || rm(state.data.s2);
+    // 兜底：全量扫描
+    for (const key of Object.keys(state.data)) { if (rm(state.data[key])) return true; }
+    return false;
+  }
+
+  function deleteFieldInDocByPath(doc, path){
+    const parts = String(path).split('.');
+    let parent = doc;
+    for (let i = 0; i < parts.length - 1; i++) {
+      const k = parts[i];
+      const key = /^\d+$/.test(k) ? Number(k) : k;
+      parent = parent ? parent[key] : undefined;
+    }
+    const lastRaw = parts[parts.length - 1];
+    const isIdx = /^\d+$/.test(lastRaw);
+    const lastKey = isIdx ? Number(lastRaw) : lastRaw;
+    if (Array.isArray(parent) && isIdx) parent.splice(lastKey, 1);
+    else if (parent && typeof parent === 'object') delete parent[lastKey];
+  }
   
   // 工具：按 dot path 设置对象的值，支持数组索引
   function setByPath(obj, path, value) {
@@ -66,29 +193,21 @@
     const summaryEl = document.getElementById('tokens-summary');
     const contentEl = document.getElementById('tokens-content');
     if (!summaryEl || !contentEl) return;
-    summaryEl.innerHTML = '<div style="grid-column:1/-1;color:#718096;">加载中…</div>';
+  summaryEl.innerHTML = '<div class="tokens-status tokens-status--loading">加载中…</div>';
     contentEl.innerHTML = '';
   // 权限：仅管理员可新增/编辑
-  const role = localStorage.getItem('role');
-  const token = localStorage.getItem('token');
-  const canEdit = !!token && role === 'admin';
-
-    const fetchJson = async (url) => {
-      const r = await fetch(url);
-      if (!r.ok) throw new Error(url + ' ' + r.status);
-      return r.json();
-    };
+  const { canEdit } = getAuth();
 
   try {
       if (!state.data || forceReload) {
         const [termFixed, termDynamic, cards, characters, s0, s1, s2] = await Promise.all([
-          fetchJson('http://localhost:3000/api/term-fixed'),
-          fetchJson('http://localhost:3000/api/term-dynamic'),
-          fetchJson('http://localhost:3000/api/card'),
-          fetchJson('http://localhost:3000/api/character'),
-          fetchJson('http://localhost:3000/api/skill0'),
-          fetchJson('http://localhost:3000/api/skill1'),
-          fetchJson('http://localhost:3000/api/skill2')
+          apiJson('/term-fixed'),
+          apiJson('/term-dynamic'),
+          apiJson('/card'),
+          apiJson('/character'),
+          apiJson('/skill0'),
+          apiJson('/skill1'),
+          apiJson('/skill2')
         ]);
         state.data = { termFixed, termDynamic, cards, characters, s0, s1, s2 };
       }
@@ -107,10 +226,9 @@
         const active = isActive ? ' is-active' : '';
         const dim = state.activeType && !isActive ? ' is-dim' : '';
         return `
-          <div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"
-               style="border:1px solid #e2e8f0; border-radius:8px; padding:10px; background:${t.color}">
-            <div style="font-size:12px;color:#4A5568;">${t.key}</div>
-            <div style="font-weight:700; font-size:22px; color:#2D3748;">${t.value}</div>
+          <div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}">
+            <div class="type-tile__label">${t.key}</div>
+            <div class="type-tile__value">${t.value}</div>
           </div>
         `;
       }).join('');
@@ -121,20 +239,20 @@
     const preview = (items||[]).slice(0, 1);
     const shouldPreOpen = !!state.activeType && state.activeType === type && total > 1;
     const html = `
-      <div style="border:1px solid #e2e8f0; border-radius:8px; margin-top:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#F7FAFC; border-bottom:1px solid #e2e8f0;">
-          <div style=\"font-weight:600; color:#2D3748;\">${title} <span class=\"count-badge\" style=\"color:#718096;font-weight:400;\">(${total})</span></div>
-          <div style=\"display:flex;align-items:center;gap:8px;\">
+        <div class="tokens-section">
+          <div class="tokens-section__header">
+            <div class=\"tokens-section__title\">${title} <span class=\"count-badge\">(${total})</span></div>
+            <div class=\"tokens-section__ops\">
             ${canEdit ? `<button class=\"btn btn--secondary btn--sm\" onclick=\"tokensOpenCreate('${type}')\">新增</button>` : ''}
             ${total>1 ? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen ? ' is-expanded' : ''}\" aria-expanded=\"${shouldPreOpen ? 'true' : 'false'}\" onclick=\"toggleTokensSection('${id}')\">${shouldPreOpen ? '收起' : '展开'}</button>`: ''}
           </div>
         </div>
-        <div id="${id}" data-expanded="${shouldPreOpen ? '1' : '0'}" style="padding:10px 12px;">
+          <div id="${id}" data-expanded="${shouldPreOpen ? '1' : '0'}" class="tokens-section__body">
           <div class="token-list">
-            ${preview.map(renderItem).join('') || '<div style="color:#A0AEC0;">空</div>'}
+              ${preview.map(renderItem).join('') || '<div class="tokens-empty">空</div>'}
           </div>
           ${total>1 ? `
-            <div id=\"more-${id}\" class=\"js-more token-list collapsible${shouldPreOpen ? ' is-open' : ''}\" style=\"margin-top:8px;\">
+              <div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen ? ' is-open' : ''}\">
               ${(items||[]).slice(1).map(renderItem).join('')}
             </div>
           ` : ''}
@@ -144,7 +262,6 @@
     return html;
   };
 
-      const esc = (s) => (s==null? '' : String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])));
       const HIDE_KEYS = new Set(['_id','__v','_v']);
       const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
 
@@ -177,14 +294,14 @@
             parts.push(`
               <div class="nest-block"${accent ? ` style=\"--token-accent:${esc(accent)}\"` : ''}>
                 <div class="nest-title">${esc(k)} [${v.length}]</div>
-                <div class="nest-body" style="background:transparent">${items || '<div class="kv-row"><div class="kv-key">(空)</div><div class="kv-val"></div></div>'}</div>
+                <div class="nest-body">${items || '<div class="kv-row"><div class="kv-key">(空)</div><div class="kv-val"></div></div>'}</div>
               </div>
             `);
           } else if (isObj(v)) {
             parts.push(`
               <div class="nest-block"${accent ? ` style=\"--token-accent:${esc(accent)}\"` : ''}>
                 <div class="nest-title">${esc(k)}</div>
-                <div class="nest-body" style="background:transparent">${renderKV(v, level+1, accent, curPath)}</div>
+                <div class="nest-body">${renderKV(v, level+1, accent, curPath)}</div>
               </div>
             `);
           } else {
@@ -242,9 +359,7 @@
   function cardShell(coll, obj, innerHtml) {
     const col = getAccent(obj);
     const style = col ? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"` : '';
-      const role = localStorage.getItem('role');
-      const token = localStorage.getItem('token');
-      const canEdit = !!token && role === 'admin';
+      const { canEdit } = getAuth();
       return `<div class="token-card"${style}${tagAttrs(coll, obj)}>
         ${canEdit ? `<div class="token-card__toolbar" role="toolbar" aria-label="对象操作">` +
           `<button class="btn btn--danger btn--xs btn-del-doc" title="删除对象" aria-label="删除对象">删除对象</button>` +
@@ -268,7 +383,7 @@
         { type: 'skill', title: '技能', items: Array.isArray(skills)? filterByQuery(skills, q): [], render: skillItem },
       ];
       const filteredSections = state.activeType ? sections.filter(s => s.type === state.activeType) : sections;
-  const html = filteredSections.map(s => section(s.type, s.title, s.items, s.render)).join('');
+        const html = filteredSections.map(s => section(s.type, s.title, s.items, s.render)).join('');
       contentEl.innerHTML = html;
       // 为新渲染的卡片添加入场延迟（交错动画）
       try {
@@ -306,14 +421,14 @@
       }
     } catch (e) {
       console.error('加载词元数据失败:', e);
-      summaryEl.innerHTML = '<div style="grid-column:1/-1;color:#E53E3E;">加载失败，请点击“刷新”重试</div>';
+  summaryEl.innerHTML = '<div class="tokens-status tokens-status--error">加载失败，请点击“刷新”重试</div>';
     }
   }
 
   // 初次进入页面时预取一次，便于用户切到该页立即可见
   document.addEventListener('DOMContentLoaded', function(){
     try {
-      const role = localStorage.getItem('role');
+  const { role } = getAuth();
       if (role === 'admin') renderTokensDashboard();
     } catch(e){}
     // Ctrl 键按下状态：用于启用危险操作 UI（删除对象）
@@ -405,51 +520,311 @@
   // —— 新增：打开创建弹窗 ——
   window.tokensOpenCreate = async function(collection){
     try {
-      const token = localStorage.getItem('token') || '';
-      const url = `http://localhost:3000/api/tokens/shape?collection=${encodeURIComponent(collection)}`;
-      const resp = await fetch(url, { headers: { 'Authorization': token ? `Bearer ${token}` : '' } });
-      const shape = await resp.json();
-      if (!resp.ok) throw new Error(shape && shape.message || '获取结构失败');
+      // 优先从已存在对象推导结构方案
+      const dataArr = await getCollectionData(collection);
+      const variants = computeCollectionVariants(collection, dataArr || []);
+      if (variants && variants.length > 0) {
+        showCreateModal(collection, null, variants[0].tpl, variants);
+        return;
+      }
+      // 兜底：没有历史对象，退回到后端 shape
+  const shape = await apiJson(`/tokens/shape?collection=${encodeURIComponent(collection)}`, { auth: true });
       const tpl = buildTemplate(collection, shape);
-      showCreateModal(collection, shape, tpl);
+      showCreateModal(collection, shape, tpl, null);
     } catch (e) {
       alert(e.message || '获取结构失败');
     }
   };
 
+  // 拉取对应集合的数据（若 state.data 不完整则单独获取）
+  async function getCollectionData(collection){
+    try {
+      if (!state.data) state.data = {};
+      const conf = COLLECTIONS[collection];
+      if (!conf) return [];
+      if (collection === 'skill') {
+        // 聚合 s0/s1/s2
+        if (!state.data.s0 || !state.data.s1 || !state.data.s2) {
+          const [s0, s1, s2] = await Promise.all([
+            apiJson(conf.urls[0]),
+            apiJson(conf.urls[1]),
+            apiJson(conf.urls[2]),
+          ]);
+          state.data.s0 = s0 || [];
+          state.data.s1 = s1 || [];
+          state.data.s2 = s2 || [];
+        }
+        return ([]).concat(state.data.s0||[], state.data.s1||[], state.data.s2||[]);
+      }
+      if (!state.data[conf.key]) {
+        const arr = await apiJson(conf.url);
+        state.data[conf.key] = arr || [];
+      }
+      return state.data[conf.key] || [];
+    } catch(_) { return []; }
+  }
+
+  // —— 结构推导与模板生成 ——
+  function deriveSchema(val){
+    if (val === null || val === undefined) return { kind: 'null' };
+    if (Array.isArray(val)) {
+      if (val.length === 0) return { kind: 'arr', elem: { kind: 'empty' } };
+      const elemSchemas = val.map(deriveSchema);
+      const merged = mergeSchemas(elemSchemas);
+      return { kind: 'arr', elem: merged };
+    }
+    const t = typeof val;
+    if (t === 'string') return { kind: 'str' };
+    if (t === 'number') return { kind: 'num' };
+    if (t === 'boolean') return { kind: 'bool' };
+    if (t === 'object') {
+      const keys = Object.keys(val).filter(k => k !== '_id' && k !== '__v' && k !== '_v');
+      keys.sort();
+      const fields = {};
+      for (const k of keys) fields[k] = deriveSchema(val[k]);
+      return { kind: 'obj', fields };
+    }
+    return { kind: 'unknown' };
+  }
+
+  function mergeSchemas(schemas){
+    if (!schemas || schemas.length === 0) return { kind: 'empty' };
+    // 如果都是原始同类，保留该类
+    const kinds = new Set(schemas.map(s => s && s.kind));
+    if (kinds.size === 1) {
+      const kind = schemas[0].kind;
+      if (kind === 'obj') {
+        const allKeys = new Set();
+        schemas.forEach(s => { Object.keys(s.fields||{}).forEach(k => allKeys.add(k)); });
+        const fields = {};
+        Array.from(allKeys).sort().forEach(k => {
+          const subs = schemas.map(s => (s.fields||{})[k]).filter(Boolean);
+          fields[k] = mergeSchemas(subs);
+        });
+        return { kind: 'obj', fields };
+      }
+      if (kind === 'arr') {
+        const elems = schemas.map(s => s.elem).filter(Boolean);
+        return { kind: 'arr', elem: mergeSchemas(elems) };
+      }
+      return { kind };
+    }
+    // 混合类型，使用 union（对数组则合并 elem；对对象则合并字段）
+    const hasObj = schemas.some(s => s.kind === 'obj');
+    const hasArr = schemas.some(s => s.kind === 'arr');
+    if (hasObj) {
+      const objSchemas = schemas.filter(s => s.kind === 'obj');
+      return mergeSchemas([{ kind: 'obj', fields: {} }, ...objSchemas]);
+    }
+    if (hasArr) {
+      const arrSchemas = schemas.filter(s => s.kind === 'arr');
+      const elems = arrSchemas.map(s => s.elem).filter(Boolean);
+      return { kind: 'arr', elem: mergeSchemas(elems) };
+    }
+    // 不同原始类型，降级为 unknown
+    return { kind: 'unknown' };
+  }
+
+  function schemaSignature(s){
+    if (!s) return 'null';
+    switch(s.kind){
+      case 'str': case 'num': case 'bool': case 'null': case 'unknown': case 'empty': return s.kind;
+      case 'arr': return `arr<${schemaSignature(s.elem)}>`;
+      case 'obj': {
+        const keys = Object.keys(s.fields||{}).sort();
+        const inner = keys.map(k => `${k}:${schemaSignature(s.fields[k])}`).join(',');
+        return `{${inner}}`;
+      }
+      default: return 'unknown';
+    }
+  }
+
+  function skeletonFromSchema(s){
+    switch(s && s.kind){
+      case 'str': return '';
+      case 'num': return 0;
+      case 'bool': return false;
+      case 'null': return '';
+      case 'unknown': return '';
+      case 'empty': return [];
+      case 'arr': {
+        const elem = s.elem || { kind: 'str' };
+        // 为对象元素提供一个原型，原始元素则提供一个示例值
+        if (elem.kind === 'obj') return [ skeletonFromSchema(elem) ];
+        if (elem.kind === 'arr') return [ skeletonFromSchema(elem) ];
+        return [ skeletonFromSchema(elem) ];
+      }
+      case 'obj': {
+        const out = {};
+        const keys = Object.keys(s.fields||{}).sort();
+        for (const k of keys) out[k] = skeletonFromSchema(s.fields[k]);
+        return out;
+      }
+      default: return '';
+    }
+  }
+
+  function flattenHintsFromSchema(s, base=''){ const out=[]; _flatten(s, base); return out; function _flatten(sch, p){
+    if (!sch) return; const dot=(k)=> p?`${p}.${k}`:k;
+    switch(sch.kind){
+      case 'str': case 'num': case 'bool': case 'null': case 'unknown':
+        out.push({ name: p || '(root)', type: sch.kind }); break;
+      case 'arr': {
+        const t = schemaSignature(sch.elem);
+        if (sch.elem && sch.elem.kind === 'obj') {
+          // 展开对象元素字段
+          _flatten(sch.elem, (p?`${p}`:p) + '[]');
+        } else {
+          out.push({ name: (p?`${p}`:p) + '[]', type: `Array<${t}>` });
+        }
+        break;
+      }
+      case 'obj': {
+        const keys = Object.keys(sch.fields||{}).sort();
+        if (!p && keys.length===0) out.push({ name: '(root)', type: 'obj' });
+        for (const k of keys) _flatten(sch.fields[k], dot(k));
+        break;
+      }
+    }
+  }}
+
+  function applyCollectionDefaults(collection, obj, shape){
+    // 在基于结构的骨架上补充一些友好的默认字段
+    try {
+      if (collection === 'character') {
+        if (shape && shape.suggest && shape.suggest.nextId != null && obj.id == null) obj.id = shape.suggest.nextId;
+        if (obj.name == null) obj.name = '新武将';
+        if (obj.health == null) obj.health = 1;
+        if (obj.dominator == null) obj.dominator = 0;
+      } else if (collection === 'card') {
+        if (obj.en == null) obj.en = 'new_card_en';
+        if (obj.cn == null) obj.cn = '新卡牌';
+        if (obj.type == null) obj.type = '';
+      } else if (collection === 'term-fixed') {
+        if (obj.en == null) obj.en = 'term_key';
+        if (obj.cn == null) obj.cn = '术语中文';
+        if (!Array.isArray(obj.part)) obj.part = [];
+        if (!Array.isArray(obj.epithet)) obj.epithet = [];
+      } else if (collection === 'term-dynamic') {
+        if (obj.en == null) obj.en = 'term_key';
+        if (!Array.isArray(obj.part)) obj.part = [];
+      } else if (collection === 'skill') {
+        if (obj.name == null) obj.name = '新技能';
+        if (obj.content == null) obj.content = '技能描述';
+        if (obj.strength == null) obj.strength = 0;
+        if (!Array.isArray(obj.role)) obj.role = [];
+      }
+    } catch(_){}
+    return obj;
+  }
+
+  function computeCollectionVariants(collection, arr){
+    const map = new Map(); // sig -> { schema, count, samples: [] }
+    for (const doc of Array.isArray(arr)? arr : []){
+      const schema = deriveSchema(doc || {});
+      const sig = schemaSignature(schema);
+      let cur = map.get(sig);
+      if (!cur) { cur = { schema, count: 0, samples: [] }; map.set(sig, cur); }
+      cur.count += 1;
+      if (cur.samples.length < 3) cur.samples.push(doc);
+    }
+    const list = Array.from(map.values()).map((it, idx) => {
+  // 仅按方案结构生成骨架，不注入集合级默认字段，避免出现提示面板无而 JSON 中有的键
+  const base = skeletonFromSchema(it.schema);
+      const tpl = base;
+      const hints = flattenHintsFromSchema(it.schema);
+      return { id: `scheme-${idx+1}`, count: it.count, schema: it.schema, tpl, hints, samples: it.samples };
+    });
+    // 按字段多寡降序，其次按出现次数降序，优先更“完整”的方案
+    list.sort((a,b)=>{
+      const ak = a.hints.length, bk = b.hints.length;
+      if (bk !== ak) return bk - ak;
+      return b.count - a.count;
+    });
+    return list;
+  }
+
   function buildTemplate(collection, shape){
     const byTypeDefault = (t) => t === 'String' ? '' : t === 'Number' ? 0 : t === 'Boolean' ? false : t === 'Array' ? [] : {};
     const obj = {};
-    const fields = Array.isArray(shape.fields) ? shape.fields : [];
+  const fields = Array.isArray(shape && shape.fields) ? shape.fields : [];
+  const arrayBases = new Set(); // 记录诸如 part[].* 的顶层数组基名
+  const arrayChildren = new Map(); // base => [childPath relative to each item]
+
+    // 使用 dot-path 赋值，支持创建嵌套对象/数组
+    const setDefaultByPath = (path, defVal) => {
+      try { setByPath(obj, path, defVal); } catch(_) {}
+    };
+
     for (const f of fields) {
-      const name = f.name;
-      if (name === '_id' || name === '__v' || name.endsWith('[]')) continue;
-      if (f.required) obj[name] = (f.default !== undefined) ? f.default : byTypeDefault(f.type);
+      const raw = f && f.name;
+      if (!raw) continue;
+      if (raw === '_id' || raw === '__v') continue;
+
+      // 收集数组基名，如 part[] 或 part[].cn
+      if (raw.includes('[]')) {
+        try {
+          const base = raw.slice(0, raw.indexOf('[]'));
+          if (base) {
+            arrayBases.add(base);
+            const after = raw.slice(raw.indexOf('[]') + 2); // e.g. ".cn" or ".meta.en"
+            if (after.startsWith('.')) {
+              const rel = after.slice(1);
+              if (rel) {
+                if (!arrayChildren.has(base)) arrayChildren.set(base, []);
+                arrayChildren.get(base).push(rel);
+              }
+            }
+          }
+        } catch(_) {}
+      }
+
+      // 处理数组字段标记：例如 foo[]
+      if (raw.endsWith('[]')) {
+        if (f.required) {
+          const base = raw.slice(0, -2); // 去掉 []
+          const def = Array.isArray(f.default) ? f.default : [];
+          setDefaultByPath(base, def);
+        }
+        continue;
+      }
+
+      if (f.required) {
+        const def = (f.default !== undefined) ? f.default : byTypeDefault(f.type);
+        setDefaultByPath(raw, def);
+      }
     }
-    if (collection === 'character') {
-      if (shape.suggest && shape.suggest.nextId != null) obj.id = shape.suggest.nextId;
-      obj.name = obj.name || '新武将';
-      obj.health = obj.health || 1;
-      obj.dominator = obj.dominator || 0;
-    } else if (collection === 'card') {
-      obj.en = obj.en || 'new_card_en';
-      obj.cn = obj.cn || '新卡牌';
-      obj.type = obj.type || '';
-    } else if (collection === 'term-fixed') {
-      obj.en = obj.en || 'term_key';
-      obj.cn = obj.cn || '术语中文';
-      if (obj.part == null) obj.part = {};
-      if (obj.epithet == null) obj.epithet = {};
-    } else if (collection === 'term-dynamic') {
-      obj.en = obj.en || 'term_key';
-      if (obj.part == null) obj.part = {};
-    } else if (collection === 'skill') {
-      obj.name = obj.name || '新技能';
-      obj.content = obj.content || '技能描述';
-      obj.strength = obj.strength != null ? obj.strength : 0;
-      if (!Array.isArray(obj.role)) obj.role = [];
+
+    // 额外：为存在点路径的子字段填充默认值（即使非必填），避免父对象为空壳（例如 part.cn）
+    for (const f of fields) {
+      const raw = f && f.name;
+      if (!raw || raw === '_id' || raw === '__v') continue;
+      if (raw.includes('.')) {
+        const normalized = raw.replace(/\[\]/g, '');
+        const def = (f.default !== undefined) ? f.default : byTypeDefault(f.type);
+        setDefaultByPath(normalized, def);
+      }
     }
-    return obj;
+
+    // 将收集到的数组基名统一初始化为 []（若当前不是数组），并根据子字段生成一个原型元素
+    for (const base of arrayBases) {
+      if (!Array.isArray(obj[base])) obj[base] = [];
+      try {
+        const children = arrayChildren.get(base) || [];
+        if (obj[base].length === 0 && children.length > 0) {
+          const proto = {};
+          for (const rel of children) {
+            const defField = fields.find(ff => ff.name && (ff.name === `${base}[].${rel}`));
+            const defVal = defField && defField.default !== undefined ? defField.default : byTypeDefault(defField ? defField.type : 'String');
+            setByPath(proto, rel, defVal);
+          }
+          obj[base].push(proto);
+        }
+      } catch(_) {}
+    }
+
+  // 统一使用 applyCollectionDefaults 以避免重复代码
+  return applyCollectionDefaults(collection, obj, shape);
   }
 
   function ensureCreateModal(){
@@ -467,10 +842,10 @@
       modal.className = 'modal approve-modal';
       modal.innerHTML = `
         <div class="modal-header"><h2>新增对象</h2></div>
-        <div class="modal-form" style="display:grid;grid-template-columns:320px 1fr;gap:12px;">
-          <div id="tokens-create-hints" style="font-size:12px;color:#4A5568;background:#F7FAFC;border:1px solid #e2e8f0;border-radius:8px;padding:10px;"></div>
-          <textarea id="tokens-create-editor" style="min-height:200px;width:100%;font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size:12px; line-height:1.4; border:1px solid #e2e8f0; border-radius:8px; padding:10px; background:#fff; box-sizing:border-box;"></textarea>
-          <div id="tokens-create-actions" style="grid-column:1 / -1;position:sticky;bottom:0;display:flex;gap:8px;justify-content:flex-end;">
+        <div class="modal-form">
+          <div id="tokens-create-hints"></div>
+          <textarea id="tokens-create-editor"></textarea>
+          <div id="tokens-create-actions" class="tokens-create-actions">
             <button type="button" class="btn btn--secondary" id="tokens-create-cancel">取消</button>
             <button type="button" class="btn btn--primary" id="tokens-create-submit">创建</button>
           </div>
@@ -482,73 +857,213 @@
     return { backdrop, modal };
   }
 
-  function showCreateModal(collection, shape, tpl){
+  function showCreateModal(collection, shape, tpl, variants){
     const { backdrop, modal } = ensureCreateModal();
     const editor = modal.querySelector('#tokens-create-editor');
     const hints = modal.querySelector('#tokens-create-hints');
     const btnCancel = modal.querySelector('#tokens-create-cancel');
     const btnSubmit = modal.querySelector('#tokens-create-submit');
-    const fields = shape && Array.isArray(shape.fields) ? shape.fields : [];
-    const escHtml = (s) => String(s == null ? '' : s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-    const list = (fields
-      .filter(f => !f.name.endsWith('[]') && f.name !== '_id' && f.name !== '__v')
-      .map(f => {
-        const badge = `(${f.type}${f.enum ? ': ' + f.enum.join('|') : ''})`;
-        const bullet = f.required ? '•' : '○';
-        return `
-          <div class="hint-row">
-            <div class="hint-name">${bullet} ${escHtml(f.name)}</div>
-            <div class="hint-type">${escHtml(badge)}</div>
-          </div>`;
-      })
-      .join(''));
-    const extra = shape && shape.suggest && shape.suggest.mixedKeys && shape.suggest.mixedKeys.length
-      ? `<div style="margin-top:6px;color:#718096;">可能的可选键：${shape.suggest.mixedKeys.slice(0,20).join(', ')}${shape.suggest.mixedKeys.length>20?' …':''}</div>`
-      : '';
-  hints.innerHTML = `<div><strong>${collection}</strong> 字段（• 必填）：</div><div class="hints-list" style="margin-top:6px;">${list || '无'}</div>${extra}`;
+    const schemeBoxId = 'tokens-create-variants';
+    let schemeBox = modal.querySelector('#' + schemeBoxId);
+    if (!schemeBox) {
+      const form = modal.querySelector('.modal-form');
+      schemeBox = document.createElement('div');
+      schemeBox.id = schemeBoxId;
+      schemeBox.className = 'tokens-scheme';
+      form.insertBefore(schemeBox, form.firstElementChild);
+    }
+    // 仅在 shape 回退路径下做规范化，避免在方案路径增加额外键
+    if (shape) {
+      try {
+        const normArr = (val) => Array.isArray(val) ? val : [];
+        const pushProtoIfEmpty = (arr, base, fields) => {
+          try {
+            if (!Array.isArray(arr)) return arr;
+            if (arr.length > 0) return arr;
+            // 从 shape.fields 提取 base 的子字段原型
+            const proto = {};
+            const childPrefix = `${base}[].`;
+            const list = Array.isArray(fields) ? fields : [];
+            list.forEach(ff => {
+              if (!ff || !ff.name) return;
+              if (ff.name.startsWith(childPrefix)) {
+                const rel = ff.name.slice(childPrefix.length);
+                const def = ff.default !== undefined ? ff.default : (ff.type || '').toLowerCase() === 'number' ? 0 : (ff.type || '').toLowerCase() === 'boolean' ? false : '';
+                try { setByPath(proto, rel, def); } catch(_) {}
+              }
+            });
+            // 若未从结构推断出任何子键，给出常见原型
+            if (Object.keys(proto).length === 0) {
+              proto.cn = '';
+              proto.en = '';
+            }
+            arr.push(proto);
+            return arr;
+          } catch (_) { return arr; }
+        };
+        if (collection === 'term-fixed') {
+          tpl.part = normArr(tpl.part);
+          tpl.part = pushProtoIfEmpty(tpl.part, 'part', shape && shape.fields);
+          tpl.epithet = normArr(tpl.epithet);
+          // epithet 的子项可能只有 cn
+          if (Array.isArray(tpl.epithet) && tpl.epithet.length === 0) tpl.epithet.push({ cn: '' });
+        } else if (collection === 'term-dynamic') {
+          tpl.part = normArr(tpl.part);
+          tpl.part = pushProtoIfEmpty(tpl.part, 'part', shape && shape.fields);
+        }
+      } catch(_) {}
+    }
+  const fields = shape && Array.isArray(shape.fields) ? shape.fields : [];
+    function renderHintsFromVariants(curTpl, curVariants){
+      // 工具：按 schema 裁剪 sample，仅保留方案字段；并隐藏内部键
+      const HIDE = new Set(['_id','__v','_v']);
+      const stripHidden = (v) => {
+        if (!v || typeof v !== 'object') return v;
+        if (Array.isArray(v)) return v.map(stripHidden);
+        const o = {};
+        for (const k of Object.keys(v)) { if (!HIDE.has(k)) o[k] = stripHidden(v[k]); }
+        return o;
+      };
+      const pruneBySchema = (val, sch) => {
+        if (!sch) return stripHidden(val);
+        switch (sch.kind) {
+          case 'str': case 'num': case 'bool': case 'null': case 'unknown': return val;
+          case 'arr': {
+            const a = Array.isArray(val) ? val : [];
+            return a.slice(0, 3).map(it => pruneBySchema(it, sch.elem));
+          }
+          case 'obj': {
+            const out = {};
+            const keys = Object.keys(sch.fields||{});
+            for (const k of keys) { if (val && Object.prototype.hasOwnProperty.call(val, k)) out[k] = pruneBySchema(val[k], sch.fields[k]); }
+            return out;
+          }
+          default: return val;
+        }
+      };
+      if (curVariants && curVariants.length) {
+        // 取当前模板对应的 schema hints（通过比较字符串化匹配）
+        const match = curVariants.find(v => JSON.stringify(v.tpl) === JSON.stringify(curTpl));
+        const hintRows = (match ? match.hints : []).map(h => {
+          const badge = `(${h.type})`;
+      return `<div class="hint-row"><div class="hint-name">${esc(h.name)}</div><div class="hint-type">${esc(badge)}</div></div>`;
+        }).join('');
+        // 示例：取该方案归组下的第一个样本，按方案 schema 裁剪后展示
+        let sampleHtml = '';
+        try {
+          const sample = match && Array.isArray(match.samples) && match.samples[0];
+          if (sample) {
+            const pruned = pruneBySchema(stripHidden(sample), match.schema);
+            const pretty = esc(JSON.stringify(pruned, null, 2));
+            sampleHtml = `<div class="variant-sample"><div class="variant-sample__title">示例对象</div><pre class="variant-sample__pre">${pretty}</pre></div>`;
+          }
+        } catch(_) {}
+        hints.innerHTML = `<div class="hints-title"><strong>${collection}</strong> 结构字段：</div><div class="hints-list">${hintRows || '无'}</div>${sampleHtml}`;
+        return;
+      }
+      // fallback 到 shape.fields
+      const list = (fields
+        .filter(f => !f.name.endsWith('[]') && f.name !== '_id' && f.name !== '__v')
+        .map(f => {
+          const badge = `(${f.type}${f.enum ? ': ' + f.enum.join('|') : ''})`;
+          const bullet = f.required ? '•' : '○';
+          return `
+            <div class="hint-row">
+        <div class="hint-name">${bullet} ${esc(f.name)}</div>
+        <div class="hint-type">${esc(badge)}</div>
+            </div>`;
+        })
+        .join(''));
+      const extra = shape && shape.suggest && shape.suggest.mixedKeys && shape.suggest.mixedKeys.length
+        ? `<div class="hints-extra">可能的可选键：${shape.suggest.mixedKeys.slice(0,20).join(', ')}${shape.suggest.mixedKeys.length>20?' …':''}</div>`
+        : '';
+      hints.innerHTML = `<div class="hints-title"><strong>${collection}</strong> 字段（• 必填）：</div><div class="hints-list">${list || '无'}</div>${extra}`;
+    }
+
+    // 渲染方案选择器（改为分段按钮，支持键盘导航）
+    function renderSchemeSelector(curVariants) {
+      if (!curVariants || curVariants.length === 0) { schemeBox.innerHTML = ''; schemeBox.__variants = []; return; }
+      schemeBox.__variants = curVariants;
+      const groupHtml = `
+        <div class="tokens-scheme__title">结构方案：</div>
+        <div class="tokens-scheme__group" role="radiogroup" aria-label="结构方案">
+          ${curVariants.map((v, i) => {
+            const idx = i + 1;
+            const selCls = i === 0 ? ' is-selected' : '';
+            const aria = i === 0 ? 'true' : 'false';
+            const tab = i === 0 ? '0' : '-1';
+            const title = `方案${idx}，样本 ${v.count}`;
+            return `<div class="tokens-scheme__btn${selCls}" role="radio" aria-checked="${aria}" tabindex="${tab}" data-index="${i}" title="${esc(title)}">
+              <span class="idx">${idx}</span>
+              <span class="cnt">${v.count}</span>
+              <span class="label">方案${idx}</span>
+            </div>`;
+          }).join('')}
+        </div>`;
+      schemeBox.innerHTML = groupHtml;
+
+      // 选择并应用某个方案
+      const selectIdx = (idx) => {
+        try {
+          const variantsList = schemeBox.__variants || [];
+          if (!Number.isFinite(idx) || idx < 0 || idx >= variantsList.length) return;
+          const btns = Array.from(schemeBox.querySelectorAll('.tokens-scheme__btn'));
+          btns.forEach((b, i) => {
+            const on = i === idx;
+            b.classList.toggle('is-selected', on);
+            b.setAttribute('aria-checked', on ? 'true' : 'false');
+            b.setAttribute('tabindex', on ? '0' : '-1');
+          });
+          schemeBox.dataset.selectedIndex = String(idx);
+          const v = variantsList[idx];
+          if (v) {
+            editor.value = JSON.stringify(v.tpl || {}, null, 2);
+            renderHintsFromVariants(v.tpl, variantsList);
+          }
+        } catch(_) {}
+      };
+
+      // 只绑定一次事件，数据用 schemeBox.__variants 动态读取
+      if (!schemeBox.__bound) {
+        schemeBox.__bound = true;
+        schemeBox.addEventListener('click', (e) => {
+          const btn = e.target && e.target.closest ? e.target.closest('.tokens-scheme__btn') : null;
+          if (!btn) return;
+          const idx = Number(btn.getAttribute('data-index'));
+          if (!Number.isFinite(idx)) return;
+          selectIdx(idx);
+        });
+        schemeBox.addEventListener('keydown', (e) => {
+          const btns = Array.from(schemeBox.querySelectorAll('.tokens-scheme__btn'));
+          if (btns.length === 0) return;
+          const cur = Number(schemeBox.dataset.selectedIndex || '0');
+          let next = cur;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { next = (cur + 1) % btns.length; e.preventDefault(); }
+          else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { next = (cur - 1 + btns.length) % btns.length; e.preventDefault(); }
+          else if (e.key === 'Home') { next = 0; e.preventDefault(); }
+          else if (e.key === 'End') { next = btns.length - 1; e.preventDefault(); }
+          else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectIdx(cur); btns[cur].focus(); return; }
+          else { return; }
+          selectIdx(next);
+          try { btns[next].focus(); } catch(_) {}
+        });
+      }
+
+      // 初始化到第一个方案
+      selectIdx(0);
+    }
+
+    renderSchemeSelector(variants);
+    renderHintsFromVariants(tpl, variants);
     editor.value = JSON.stringify(tpl || {}, null, 2);
     const submit = async () => {
       try {
-        const token = localStorage.getItem('token') || '';
-        let payload;
+  let payload;
         try { payload = JSON.parse(editor.value); } catch (_) { throw new Error('JSON 不合法'); }
-        const resp = await fetch('http://localhost:3000/api/tokens/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
-          body: JSON.stringify({ collection, data: payload })
-        });
-        const out = await resp.json().catch(() => ({}));
-        if (!resp.ok) throw new Error(out && out.message || '创建失败');
-        const doc = out.doc;
+  const out = await apiJson('/tokens/create', { method: 'POST', auth: true, body: { collection, data: payload } });
+  const doc = out && out.doc;
         // 更新缓存
-        try {
-          if (!state.data) state.data = {};
-          if (collection === 'term-fixed') {
-            state.data.termFixed = Array.isArray(state.data.termFixed) ? state.data.termFixed : [];
-            state.data.termFixed.unshift(doc);
-          } else if (collection === 'term-dynamic') {
-            state.data.termDynamic = Array.isArray(state.data.termDynamic) ? state.data.termDynamic : [];
-            state.data.termDynamic.unshift(doc);
-          } else if (collection === 'card') {
-            state.data.cards = Array.isArray(state.data.cards) ? state.data.cards : [];
-            state.data.cards.unshift(doc);
-          } else if (collection === 'character') {
-            state.data.characters = Array.isArray(state.data.characters) ? state.data.characters : [];
-            state.data.characters.unshift(doc);
-          } else if (collection === 'skill') {
-            const s = Number(doc && doc.strength);
-            if (s === 1) {
-              state.data.s1 = Array.isArray(state.data.s1) ? state.data.s1 : [];
-              state.data.s1.unshift(doc);
-            } else if (s === 2) {
-              state.data.s2 = Array.isArray(state.data.s2) ? state.data.s2 : [];
-              state.data.s2.unshift(doc);
-            } else {
-              state.data.s0 = Array.isArray(state.data.s0) ? state.data.s0 : [];
-              state.data.s0.unshift(doc);
-            }
-          }
-        } catch(_){}
+  try { pushDocToState(collection, doc); } catch(_){ }
         hideCreateModal();
         try { showTokensToast('创建成功'); } catch(_){}
         renderTokensDashboard(false);
@@ -558,9 +1073,14 @@
     };
     btnCancel.onclick = hideCreateModal;
     btnSubmit.onclick = submit;
-    backdrop.classList.add('show');
-    modal.classList.add('show');
-    setTimeout(() => { try { editor.focus(); } catch(_){} }, 50);
+    // 与全局弹窗一致：先设置 display，再在下一帧添加 show 以触发过渡
+    backdrop.style.display = 'block';
+    modal.style.display = 'block';
+    requestAnimationFrame(() => {
+      backdrop.classList.add('show');
+      modal.classList.add('show');
+    });
+    setTimeout(() => { try { editor.focus(); } catch(_){} }, 80);
   }
 
   function hideCreateModal(){
@@ -568,6 +1088,13 @@
     const modal = document.getElementById('tokens-create-modal');
     if (backdrop) backdrop.classList.remove('show');
     if (modal) modal.classList.remove('show');
+    // 动画结束后恢复为 display:none，避免拦截点击
+    setTimeout(() => {
+      const bd = document.getElementById('tokens-create-backdrop');
+      const md = document.getElementById('tokens-create-modal');
+      if (bd && !bd.classList.contains('show')) bd.style.display = 'none';
+      if (md && !md.classList.contains('show')) md.style.display = 'none';
+    }, 320);
   }
   
   // 事件委托与更新逻辑
@@ -753,51 +1280,14 @@
   target.classList.add('is-saving');
         committing = true;
         try {
-          const token = localStorage.getItem('token') || '';
-          const resp = await fetch('http://localhost:3000/api/tokens/update', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': token ? `Bearer ${token}` : ''
-            },
-            body: JSON.stringify({ collection: coll, id, path, value, valueType: type })
-          });
-          const data = await resp.json().catch(() => ({}));
-          if (!resp.ok) throw new Error(data && data.message || '更新失败');
+          await apiJson('/tokens/update', { method: 'POST', auth: true, body: { collection: coll, id, path, value, valueType: type } });
           // 成功：更新文本并显示绿色提示小弹窗（toast）
           target.textContent = (type === 'boolean' || type === 'number') ? String(value) : value;
           try {
             showTokensToast('已保存');
           } catch(_){ }
           // 同步更新缓存数据，确保后续刷新/折叠展开不丢失
-          try {
-            if (state.data) {
-              const updateDocIn = (arr) => {
-                if (!Array.isArray(arr)) return false;
-                for (const doc of arr) {
-                  if (doc && String(doc._id) === String(id)) {
-                    setByPath(doc, path, value);
-                    return true;
-                  }
-                }
-                return false;
-              };
-              let updated = false;
-              if (coll === 'term-fixed') updated = updateDocIn(state.data.termFixed);
-              else if (coll === 'term-dynamic') updated = updateDocIn(state.data.termDynamic);
-              else if (coll === 'card') updated = updateDocIn(state.data.cards);
-              else if (coll === 'character') updated = updateDocIn(state.data.characters);
-              else if (coll === 'skill') {
-                updated = updateDocIn(state.data.s0) || updateDocIn(state.data.s1) || updateDocIn(state.data.s2);
-              }
-              // 兜底：全量扫描
-              if (!updated) {
-                for (const key of Object.keys(state.data)) {
-                  if (updateDocIn(state.data[key])) { updated = true; break; }
-                }
-              }
-            }
-          } catch (_) {}
+          try { updateDocInState(coll, id, (doc)=> setByPath(doc, path, value)); } catch(_){ }
           // 若修改的是顶层 color，则同步更新卡片样式
           if (path === 'color') {
             const col = value;
@@ -868,56 +1358,9 @@
       if (!confirm(`确定删除「${keyName}」吗？此操作不可撤销。`)) return;
       // 调后端
       try {
-        const token = localStorage.getItem('token') || '';
-        const resp = await fetch('http://localhost:3000/api/tokens/delete', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token ? `Bearer ${token}` : ''
-          },
-          body: JSON.stringify({ collection: coll, id, path })
-        });
-        const data = await resp.json().catch(() => ({}));
-        if (!resp.ok) throw new Error(data && data.message || '删除失败');
+  await apiJson('/tokens/delete', { method: 'POST', auth: true, body: { collection: coll, id, path } });
         // 成功：从缓存中移除
-        try {
-          if (state.data) {
-            const deleteIn = (arr) => {
-              if (!Array.isArray(arr)) return false;
-              for (const doc of arr) {
-                if (doc && String(doc._id) === String(id)) {
-                  const parts = String(path).split('.');
-                  let parent = doc;
-                  for (let i = 0; i < parts.length - 1; i++) {
-                    const k = parts[i];
-                    const key = /^\d+$/.test(k) ? Number(k) : k;
-                    parent = parent ? parent[key] : undefined;
-                  }
-                  const lastRaw = parts[parts.length - 1];
-                  const isIdx = /^\d+$/.test(lastRaw);
-                  const lastKey = isIdx ? Number(lastRaw) : lastRaw;
-                  if (Array.isArray(parent) && isIdx) parent.splice(lastKey, 1);
-                  else if (parent && typeof parent === 'object') delete parent[lastKey];
-                  return true;
-                }
-              }
-              return false;
-            };
-            let updated = false;
-            if (coll === 'term-fixed') updated = deleteIn(state.data.termFixed);
-            else if (coll === 'term-dynamic') updated = deleteIn(state.data.termDynamic);
-            else if (coll === 'card') updated = deleteIn(state.data.cards);
-            else if (coll === 'character') updated = deleteIn(state.data.characters);
-            else if (coll === 'skill') {
-              updated = deleteIn(state.data.s0) || deleteIn(state.data.s1) || deleteIn(state.data.s2);
-            }
-            if (!updated) {
-              for (const key of Object.keys(state.data)) {
-                if (deleteIn(state.data[key])) { updated = true; break; }
-              }
-            }
-          }
-        } catch(_){ }
+  try { updateDocInState(coll, id, (doc)=> deleteFieldInDocByPath(doc, path)); } catch(_){ }
         // 从 DOM 移除行
         row.remove();
         try { showTokensToast('已删除'); } catch(_){ }
@@ -968,30 +1411,9 @@
       if (!coll || !id) return;
       if (!confirm('确定删除整个对象吗？此操作不可撤销。')) return;
       try {
-        const token = localStorage.getItem('token') || '';
-        const resp = await fetch('http://localhost:3000/api/tokens/remove', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': token ? `Bearer ${token}` : '' },
-          body: JSON.stringify({ collection: coll, id })
-        });
-        const data = await resp.json().catch(()=>({}));
-        if (!resp.ok) throw new Error(data && data.message || '删除失败');
+        await apiJson('/tokens/remove', { method: 'POST', auth: true, body: { collection: coll, id } });
         // 更新缓存
-        try {
-          if (state.data) {
-            const removeFrom = (arr) => {
-              if (!Array.isArray(arr)) return false;
-              const i = arr.findIndex(d => d && String(d._id) === String(id));
-              if (i >= 0) { arr.splice(i, 1); return true; }
-              return false;
-            };
-            if (coll === 'term-fixed') removeFrom(state.data.termFixed);
-            else if (coll === 'term-dynamic') removeFrom(state.data.termDynamic);
-            else if (coll === 'card') removeFrom(state.data.cards);
-            else if (coll === 'character') removeFrom(state.data.characters);
-            else if (coll === 'skill') { removeFrom(state.data.s0); removeFrom(state.data.s1); removeFrom(state.data.s2); }
-          }
-        } catch(_){ }
+  try { removeDocFromState(coll, id); } catch(_){ }
         // 从 DOM 移除卡片
         card.remove();
         try { showTokensToast('对象已删除'); } catch(_){ }
