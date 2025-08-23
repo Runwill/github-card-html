@@ -236,8 +236,12 @@
   const section = (type, title, items, renderItem) => {
     const id = 'sec-' + Math.random().toString(36).slice(2,8);
     const total = Array.isArray(items)? items.length : 0;
-    const preview = (items||[]).slice(0, 1);
     const shouldPreOpen = !!state.activeType && state.activeType === type && total > 1;
+    // 收起时不显示任何对象：将所有条目放入可折叠区域；仅当 total <= 1 时直接展示
+    const allItemsHtml = (items||[]).map(renderItem).join('');
+    const collapsedAreaHtml = (total > 1)
+      ? ''
+      : (allItemsHtml || '<div class="tokens-empty">空</div>');
     const html = `
         <div class="tokens-section">
           <div class="tokens-section__header">
@@ -249,11 +253,11 @@
         </div>
           <div id="${id}" data-expanded="${shouldPreOpen ? '1' : '0'}" class="tokens-section__body">
           <div class="token-list">
-              ${preview.map(renderItem).join('') || '<div class="tokens-empty">空</div>'}
+              ${collapsedAreaHtml}
           </div>
           ${total>1 ? `
               <div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen ? ' is-open' : ''}\">
-              ${(items||[]).slice(1).map(renderItem).join('')}
+              ${allItemsHtml}
             </div>
           ` : ''}
         </div>
