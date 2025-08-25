@@ -286,6 +286,9 @@
   color: #2D3748;
   white-space: pre-wrap;
   word-break: break-all;
+  /* 预留右侧操作区空间，避免长文本与删除按钮重叠 */
+  padding-right: var(--kv-actions-space, 72px);
+  box-sizing: border-box;
   /* 使用内阴影模拟描边，避免 outline/边框引起的抖动与抗锯齿闪烁 */
   box-shadow: inset 0 0 0 0px transparent;
   transition: box-shadow .2s var(--ease-standard),
