@@ -40,7 +40,8 @@
   }
 
   // 监听滚动结束（无进一步滚动的静默期）后回调
-  function onScrollSettled(callback, settleDelay = 150, maxWait = 1500){
+  // 默认等待时间由 150ms 调整为 50ms（原来的 1/3）
+  function onScrollSettled(callback, settleDelay = 50, maxWait = 1500){
     if (typeof callback !== 'function') return
     let timer = null
     let deadline = null
@@ -61,6 +62,17 @@
     }, maxWait)
     // 立即触发一次，确保即便没有滚动事件也能在 settleDelay 后回调
     handler()
+  }
+
+  // 判断当前激活的 panel 是否为指定 panelId（支持传入 '#id' 或 'id'）
+  function isPanelActive(panelId){
+    try {
+      if (!panelId) return true
+      const activePane = document.querySelector('.tabs-panel.is-active')
+      if (!activePane) return true
+      const wantId = (panelId[0] === '#') ? panelId.slice(1) : panelId
+      return activePane.id === wantId
+    } catch(e) { return true }
   }
 
   // 在文档内容中绘制一条贯穿屏幕宽度、与元素同高的位置高亮条（相对文本静止）：淡入→停留→淡出
@@ -155,12 +167,13 @@
     const enableRowHighlight = !(opts && opts.highlightRow === false)
     if (scrollTarget && enableRowHighlight) {
       const behavior = (opts && opts.behavior) || 'smooth'
-      const fire = () => highlightRowAtElement(scrollTarget, opts)
+      const fire = () => { if (isPanelActive(panelId)) highlightRowAtElement(scrollTarget, opts) }
       if (behavior === 'smooth') {
-        onScrollSettled(fire)
+        const sd = (opts && typeof opts.rowSettleDelay === 'number') ? opts.rowSettleDelay : undefined
+        onScrollSettled(fire, sd)
       } else {
         // 非平滑滚动基本为即时完成
-        fire()
+        if (isPanelActive(panelId)) fire()
       }
     }
   }
@@ -210,11 +223,12 @@
     const enableRowHighlight = !(opts && opts.highlightRow === false)
     if (scrollTarget && enableRowHighlight) {
       const behavior = (opts && opts.behavior) || 'smooth'
-      const fire = () => highlightRowAtElement(scrollTarget, opts)
+      const fire = () => { if (isPanelActive(panelId)) highlightRowAtElement(scrollTarget, opts) }
       if (behavior === 'smooth') {
-        onScrollSettled(fire)
+        const sd = (opts && typeof opts.rowSettleDelay === 'number') ? opts.rowSettleDelay : undefined
+        onScrollSettled(fire, sd)
       } else {
-        fire()
+        if (isPanelActive(panelId)) fire()
       }
     }
   }
