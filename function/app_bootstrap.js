@@ -25,26 +25,30 @@
   }
 
   document.addEventListener('DOMContentLoaded', function(){
-    // 初始化 Foundation（一次）
-    try { $(document).foundation(); } catch(_) {}
+    // 等待 partialsReady（若存在）再初始化，避免拆分后 DOM 尚未插入
+    var ready = window.partialsReady instanceof Promise ? window.partialsReady : Promise.resolve();
+    ready.then(function(){
+      // 初始化 Foundation（一次）
+      try { $(document).foundation(); } catch(_) {}
 
-    // 召唤基础区块
-    safeRun(typeof window.summonCharacters === 'function' ? window.summonCharacters : null);
+      // 召唤基础区块
+      safeRun(typeof window.summonCharacters === 'function' ? window.summonCharacters : null);
 
-    var afterSkills = (typeof window.summonCharacterSkill === 'function')
-      ? Promise.resolve(window.summonCharacterSkill())
-      : Promise.resolve();
+      var afterSkills = (typeof window.summonCharacterSkill === 'function')
+        ? Promise.resolve(window.summonCharacterSkill())
+        : Promise.resolve();
 
-    afterSkills.then(function(){
-      safeRun(function(){ return window.decompress && window.decompress('base/compression.json'); });
-      safeRun(function(){ return window.replace_character_name && window.replace_character_name('http://localhost:3000/api/character'); });
-      safeRun(function(){ return window.replace_skill_name && window.replace_skill_name('http://localhost:3000/api/skill' + (localStorage.getItem('strength') || '')); });
-      safeRun(function(){ return window.replace_card_name && window.replace_card_name('http://localhost:3000/api/card'); });
-      safeRun(function(){ return window.check_strength && window.check_strength(); });
-      safeRun(function(){ return window.add_button_wave && window.add_button_wave(); });
-      safeRun(function(){ return window.replace_term && window.replace_term('http://localhost:3000/api/term-dynamic', 1); });
-      safeRun(function(){ return window.replace_term && window.replace_term('http://localhost:3000/api/term-fixed', 1); });
-      setTimeout(function(){ try { window.pronounCheck && window.pronounCheck(); } catch(_) {} }, 100);
-    }).catch(function(_){});
+      afterSkills.then(function(){
+        safeRun(function(){ return window.decompress && window.decompress('base/compression.json'); });
+        safeRun(function(){ return window.replace_character_name && window.replace_character_name('http://localhost:3000/api/character'); });
+        safeRun(function(){ return window.replace_skill_name && window.replace_skill_name('http://localhost:3000/api/skill' + (localStorage.getItem('strength') || '')); });
+        safeRun(function(){ return window.replace_card_name && window.replace_card_name('http://localhost:3000/api/card'); });
+        safeRun(function(){ return window.check_strength && window.check_strength(); });
+        safeRun(function(){ return window.add_button_wave && window.add_button_wave(); });
+        safeRun(function(){ return window.replace_term && window.replace_term('http://localhost:3000/api/term-dynamic', 1); });
+        safeRun(function(){ return window.replace_term && window.replace_term('http://localhost:3000/api/term-fixed', 1); });
+        setTimeout(function(){ try { window.pronounCheck && window.pronounCheck(); } catch(_) {} }, 100);
+      }).catch(function(_){});
+    });
   });
 })();

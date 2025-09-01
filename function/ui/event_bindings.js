@@ -13,6 +13,8 @@
   }
 
   onReady(function(){
+    var ready = window.partialsReady instanceof Promise ? window.partialsReady : Promise.resolve();
+    ready.then(function(){
     // 强度切换
     bind('.strength_title', function(){
       try { if (window.change_strength) window.change_strength(); } catch(_) {}
@@ -41,6 +43,7 @@
     // tickQuantifier 显隐
     bind('.button_tickQuantifier', function(event){
       try { if (window.elementHideCheck) window.elementHideCheck('tickQuantifier', event); } catch(_) {}
+    });
     });
   });
 })();

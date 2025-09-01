@@ -447,7 +447,10 @@ const UIManager = {
   }
 };
 
-// 初始化
-document.addEventListener('DOMContentLoaded', () => UIManager.init());
+// 初始化：等待 partialsReady 再初始化，避免在拆分后元素尚未插入
+document.addEventListener('DOMContentLoaded', () => {
+  const ready = window.partialsReady instanceof Promise ? window.partialsReady : Promise.resolve();
+  ready.then(() => UIManager.init());
+});
 // 兼容旧引用
 window.MenuModalManager = UIManager;

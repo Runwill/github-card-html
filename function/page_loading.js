@@ -52,30 +52,53 @@ function calculateProgressBarDuration(text) {
     return duration;
 }
 
-// 随机选择一句并设置动态字间距和进度条时间
-document.addEventListener('DOMContentLoaded', function () {
+// 等待 DOM 与 partials 注入完毕后再设置加载文本与进度条时间
+function whenDOMReady() {
+    return new Promise((resolve) => {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', resolve, { once: true });
+        } else {
+            resolve();
+        }
+    });
+}
+
+function whenPartialsReady() {
+    // 如果没有使用 partials，也立即继续
+    if (!window.partialsReady || typeof window.partialsReady.then !== 'function') {
+        return Promise.resolve();
+    }
+    return window.partialsReady.catch(() => {});
+}
+
+(async function initLoadingOverlay() {
+    await whenDOMReady();
+    await whenPartialsReady();
+
     const randomText = loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
     const titleElement = document.getElementById('loading-title');
-    
-    // 设置文本内容
-    titleElement.textContent = randomText;
-    
-    // 计算并应用动态字间距
-    const dynamicSpacing = calculateLetterSpacing(randomText);
-    titleElement.style.letterSpacing = `${dynamicSpacing}em`;
-    
-    // 计算动态进度条时间
+
+    if (titleElement) {
+        // 设置文本内容与字间距（带保护）
+        titleElement.textContent = randomText;
+        const dynamicSpacing = calculateLetterSpacing(randomText);
+        titleElement.style.letterSpacing = `${dynamicSpacing}em`;
+    }
+
+    // 计算并应用进度条动画时长
     const progressBarDuration = calculateProgressBarDuration(randomText);
-    
-    // 动态修改进度条CSS动画时间
     const loadingBar = document.querySelector('.loading-bar');
     if (loadingBar) {
         loadingBar.style.animationDuration = `${progressBarDuration}s`;
     }
-
-    // 将进度条时间传递给全局变量，供淡出逻辑使用
     window.currentProgressBarDuration = progressBarDuration;
-});
+
+    // 在容器淡入后、进度条约90%时启动完成检测（保持与原逻辑等价）
+    const checkStartTime = (progressBarDuration * 0.9 * 1000) + 800;
+    setTimeout(() => {
+        startCompletionCheck();
+    }, checkStartTime);
+})();
 
 // 加载状态跟踪
 let domReady = false;
@@ -135,13 +158,4 @@ window.addEventListener('load', function () {
     console.log('Resources ready');
 });
 
-// 在进度条减速阶段开始检查完成条件
-document.addEventListener('DOMContentLoaded', function () {
-    const progressBarDuration = window.currentProgressBarDuration || 1.2;
-    // 在进度条动画的90%时开始检查（此时进度条在85%左右）
-    const checkStartTime = (progressBarDuration * 0.9 * 1000) + 800; // 90%时间点 + 容器渐入时间
-    
-    setTimeout(() => {
-        startCompletionCheck();
-    }, checkStartTime);
-});
+// 进度检查的定时已在 initLoadingOverlay 中按 partialsReady 之后统一安排

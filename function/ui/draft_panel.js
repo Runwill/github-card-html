@@ -63,9 +63,27 @@
     inputEl.addEventListener('input', debounce(onInput, 250));
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else { init(); }
+  // 等待 DOM 与 partials 注入后再初始化，避免元素不存在
+  function whenDOMReady(){
+    return new Promise(function(resolve){
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', resolve, { once: true });
+      } else { resolve(); }
+    });
+  }
+
+  function whenPartialsReady(){
+    if (!window.partialsReady || typeof window.partialsReady.then !== 'function') {
+      return Promise.resolve();
+    }
+    return window.partialsReady.catch(function(){});
+  }
+
+  (async function boot(){
+    await whenDOMReady();
+    await whenPartialsReady();
+    init();
+  })();
 
   // 暴露少量 API 以便后续扩展
   window.draftPanel = {
