@@ -43,8 +43,29 @@
 
   function onInput(){
     var val = inputEl ? inputEl.value : '';
+    // 自适应高度：先重置为 auto，再按 scrollHeight 设高
+    try {
+      autosizeNow();
+    } catch(_) {}
     render(val);
     save(val);
+  }
+
+  function isVisible(el){
+    if (!el) return false;
+    var cs = window.getComputedStyle ? getComputedStyle(el) : null;
+    if (cs && (cs.display === 'none' || cs.visibility === 'hidden')) return false;
+    var rect = el.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
+  }
+
+  function autosizeNow(){
+    if (!inputEl) return;
+    // 若不可见，跳过本次（避免取到 0 高）
+    if (!isVisible(inputEl)) return;
+    inputEl.style.height = 'auto';
+    var next = Math.max(80, inputEl.scrollHeight);
+    inputEl.style.height = next + 'px';
   }
 
   function init(){
@@ -59,8 +80,50 @@
       render(saved);
     }
 
-    // 输入监听，去抖以减轻替换调用频率
-    inputEl.addEventListener('input', debounce(onInput, 250));
+    // 初始化时做一次高度自适应
+    try {
+      inputEl.style.height = 'auto';
+      inputEl.style.overflow = 'hidden';
+      inputEl.style.resize = 'none';
+      // 若当前不可见，等待可见后再测量
+      if (isVisible(inputEl)) {
+        autosizeNow();
+      }
+    } catch(_) {}
+
+    // 输入监听（内容渲染去抖，大小即时）
+    inputEl.addEventListener('input', function(e){
+      // 即时调整高度，避免输入时闪烁
+  try { autosizeNow(); } catch(_) {}
+      // 渲染与保存去抖
+      debouncedRender();
+    });
+
+    var debouncedRender = debounce(onInput, 250);
+
+    // 窗口大小变化时也重新测量（字体或宽度变化会影响换行）
+    window.addEventListener('resize', function(){ try { autosizeNow(); } catch(_) {} });
+
+    // 如果初始化时不可见，监听可见后自适应（一次）
+    try {
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function(entries){
+          for (var i=0;i<entries.length;i++){
+            var en = entries[i];
+            if (en && en.isIntersecting) { autosizeNow(); io.disconnect(); break; }
+          }
+        }, { root: null, threshold: 0 });
+        io.observe(inputEl);
+      } else {
+        // 兜底：短时轮询最多 20 次
+        var tries = 20;
+        (function poll(){
+          if (isVisible(inputEl)) { autosizeNow(); return; }
+          if (--tries <= 0) return;
+          setTimeout(poll, 150);
+        })();
+      }
+    } catch(_) {}
   }
 
   // 等待 DOM 与 partials 注入后再初始化，避免元素不存在
@@ -90,6 +153,7 @@
     render: render,
     save: save,
     load: load,
-    init: init
+  init: init,
+  autosize: function(){ try { autosizeNow(); } catch(_) {} }
   };
 })();

@@ -29,6 +29,12 @@
             if (window.renderTokensDashboard) window.renderTokensDashboard();
           } catch(_) {}
         }
+        // 草稿页：切换到该 tab 后，下一帧触发一次自适应高度
+        if (href === '#panel_draft'){
+          try {
+            requestAnimationFrame(function(){ if (window.draftPanel && window.draftPanel.autosize) window.draftPanel.autosize(); });
+          } catch(_) {}
+        }
         changeTitle(idx);
       });
     });

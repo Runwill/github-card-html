@@ -1,4 +1,10 @@
 /* 词元页样式：外置，避免内联注入 */
+/* 防止纵向滚动条出现/消失导致的布局抖动：稳定滚动槽 */
+html { scrollbar-gutter: stable both-edges; }
+@supports not (scrollbar-gutter: stable) {
+  /* 兼容旧浏览器：总是保留滚动条空间（可能会一直显示滚动条） */
+  html { overflow-y: scroll; }
+}
 /* 动画曲线变量（Material 风格） */
 :root {
   --ease-standard: cubic-bezier(.4, 0, .2, 1);
