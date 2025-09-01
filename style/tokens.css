@@ -84,7 +84,11 @@
   user-select: none;
   transition: transform .16s var(--ease-standard, ease),
               box-shadow .2s var(--ease-standard, ease),
-              border-color .2s var(--ease-standard, ease);
+              border-color .2s var(--ease-standard, ease),
+              background-color .2s var(--ease-standard, ease),
+              color .2s var(--ease-standard, ease),
+              filter .18s var(--ease-standard, ease),
+              opacity .18s var(--ease-standard, ease);
   outline: none;
   position: relative;
   /* 默认强调色（可被各类型覆盖） */
@@ -96,20 +100,23 @@
 #panel_tokens .type-tile:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
 #panel_tokens .type-tile:focus-visible { box-shadow: 0 0 0 3px var(--tile-accent-ring); }
 #panel_tokens .type-tile.is-active { border-color: var(--tile-accent-soft) !important; box-shadow: 0 8px 18px rgba(0,0,0,.08), 0 0 0 2px var(--tile-accent-ring); }
-#panel_tokens .type-tile.is-active::after {
+/* 激活态左侧强调条：通过宽度/透明度过渡出现 */
+#panel_tokens .type-tile::after {
   content: '';
   position: absolute;
   left: 0; top: 0; bottom: 0;
-  width: 3px;
+  width: 0;
+  opacity: 0;
   background: var(--tile-accent-soft);
   border-radius: 8px 0 0 8px;
+  transition: width .2s var(--ease-standard), opacity .2s var(--ease-standard), background-color .2s var(--ease-standard);
 }
+#panel_tokens .type-tile.is-active::after { width: 3px; opacity: 1; }
 
 /* 选中某类型时，摘要区中其他类型卡片灰化显示 */
 #panel_tokens .type-tile.is-dim {
   filter: grayscale(0.6) saturate(0.6);
   opacity: 0.45;
-  transition: filter .18s var(--ease-standard), opacity .18s var(--ease-standard);
 }
 #panel_tokens .type-tile.is-dim:hover,
 #panel_tokens .type-tile.is-dim:focus-visible {
@@ -152,11 +159,11 @@
 #tokens-summary .type-tile__label { font-size: 12px; color: #4A5568; }
 #tokens-summary .type-tile__value { font-weight: 700; font-size: 22px; color: #2D3748; }
 /* 类型背景色（从原内联移出） */
-#tokens-summary .type-tile[data-type="term-fixed"]   { background: #EDF2F7; }
-#tokens-summary .type-tile[data-type="term-dynamic"] { background: #E6FFFA; }
-#tokens-summary .type-tile[data-type="card"]         { background: #FEF3C7; }
-#tokens-summary .type-tile[data-type="character"]    { background: #E9D8FD; }
-#tokens-summary .type-tile[data-type="skill"]        { background: #C6F6D5; }
+#tokens-summary .type-tile[data-type="term-fixed"]   { background-color: #EDF2F7; }
+#tokens-summary .type-tile[data-type="term-dynamic"] { background-color: #E6FFFA; }
+#tokens-summary .type-tile[data-type="card"]         { background-color: #FEF3C7; }
+#tokens-summary .type-tile[data-type="character"]    { background-color: #E9D8FD; }
+#tokens-summary .type-tile[data-type="skill"]        { background-color: #C6F6D5; }
 
 /* 分区容器样式：替代内联边框/圆角/内边距/头部样式 */
 .tokens-section {

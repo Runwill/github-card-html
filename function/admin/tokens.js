@@ -193,7 +193,10 @@
 		const summaryEl = document.getElementById('tokens-summary');
 		const contentEl = document.getElementById('tokens-content');
 		if (!summaryEl || !contentEl) return;
-	summaryEl.innerHTML = '<div class="tokens-status tokens-status--loading">加载中…</div>';
+	// 首屏或强制刷新时才显示摘要 loading；否则保持现有节点以便过渡
+	if (!summaryEl.__initialized || forceReload) {
+		summaryEl.innerHTML = '<div class="tokens-status tokens-status--loading">加载中…</div>';
+	}
 		contentEl.innerHTML = '';
 	// 权限：仅管理员可新增/编辑
 	const { canEdit } = getAuth();
@@ -221,17 +224,37 @@
 				{ type: 'character', key: '武将', value: Array.isArray(characters)? characters.length : 0, color: '#E9D8FD' },
 				{ type: 'skill', key: '技能', value: Array.isArray(skills)? skills.length : 0, color: '#C6F6D5' },
 			];
-			summaryEl.innerHTML = tiles.map(t => {
-				const isActive = state.activeType === t.type;
-				const active = isActive ? ' is-active' : '';
-				const dim = state.activeType && !isActive ? ' is-dim' : '';
-				return `
-					<div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}">
-						<div class="type-tile__label">${t.key}</div>
-						<div class="type-tile__value">${t.value}</div>
-					</div>
-				`;
-			}).join('');
+
+			// 首次渲染创建摘要磁贴；之后仅更新类名与数值
+			if (!summaryEl.__initialized || forceReload) {
+				summaryEl.innerHTML = tiles.map(t => {
+					const isActive = state.activeType === t.type;
+					const active = isActive ? ' is-active' : '';
+					const dim = state.activeType && !isActive ? ' is-dim' : '';
+					return `
+						<div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}">
+							<div class="type-tile__label">${t.key}</div>
+							<div class="type-tile__value">${t.value}</div>
+						</div>
+					`;
+				}).join('');
+				summaryEl.__initialized = true;
+			} else {
+				// 更新现有节点
+				const map = new Map(tiles.map(t => [t.type, t]));
+				const nodes = summaryEl.querySelectorAll('.type-tile');
+				nodes.forEach(node => {
+					const tp = node.getAttribute('data-type');
+					const conf = map.get(tp);
+					if (!conf) return;
+					const isActive = state.activeType === tp;
+					node.classList.toggle('is-active', !!isActive);
+					node.classList.toggle('is-dim', !!(state.activeType && !isActive));
+					node.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+					const valEl = node.querySelector('.type-tile__value');
+					if (valEl) valEl.textContent = String(conf.value);
+				});
+			}
 
 	const section = (type, title, items, renderItem) => {
 		const id = 'sec-' + Math.random().toString(36).slice(2,8);
