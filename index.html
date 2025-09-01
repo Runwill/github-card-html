@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
     
-<script type="text/javascript">
-    let term_status = {}
-</script>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="function/state/term_status.js"></script>
     <script src="Foundation-Sites-CSS/js/vendor/jquery.js"></script>
     <script src="Foundation-Sites-CSS/js/vendor/foundation.js"></script>
     <script src="Foundation-Sites-CSS/js/vendor/what-input.js"></script>
@@ -49,17 +46,21 @@
     <script src="function/replace/term.js"></script>
     <script src="function/replace/card_name.js"></script>
 
-    <script src="function/login_check.js"></script>
+    <script src="function/auth/login_check.js"></script>
     <script src="function/page_loading.js"></script>
-    <script src="function/tokens.js"></script>
-    <script src="function/ui_manager.js"></script>
+    <script src="function/admin/tokens.js"></script>
+    <script src="function/admin/approvals.js"></script>
+    <script src="function/ui/ui_manager.js"></script>
+    <script src="function/ui/event_bindings.js"></script>
+    <script src="function/ui/draft_panel.js"></script>
+    <script src="function/app_bootstrap.js"></script>
     <script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
 
     <title>Document丨程序</title>
 </head>
 
 <body>
-    <script>$(document).foundation()</script>
+    
     <!-- 加载动画遮罩 -->
     <div id="loading-overlay">
         <div style="display: flex; flex-direction: column; align-items: center;">
@@ -76,15 +77,6 @@
             <div id="header_title">
                 <button id="menu-toggle" style="background: none; border: none; cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: all 0.2s ease; color: #4a5568; font-weight: 500;">05 wiki</button>
                 <p class="strength_title"></p>
-                <script type="text/javascript">
-                    document.querySelectorAll('.strength_title').forEach(button => {
-                        button.addEventListener(
-                            'click', () => {
-                                change_strength()
-                            }
-                        )
-                    })
-                </script>
             </div>
         </nav>
         
@@ -185,283 +177,7 @@
         </div>
     </div>
     
-    <script>
-    // 用户管理函数
-        window.renderPendingUsers = async function() {
-            try {
-                const users = await fetchPendingUsers();
-                const container = document.getElementById('pending-users-modal-content');
-                if (!container) return;
-                
-                container.innerHTML = '';
-
-                if (users.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; color: gray; padding: 20px;">空</p>';
-                    return;
-                }
-
-                users.forEach(user => {
-                    const userDiv = document.createElement('div');
-                    userDiv.style.cssText = `
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        margin-bottom: 10px;
-                        padding: 12px;
-                        border: 1px solid #e2e8f0;
-                        border-radius: 6px;
-                        background-color: #f8fafc;
-                        transition: background-color 0.2s ease;
-                    `;
-
-                    userDiv.innerHTML = `
-                        <p style="margin: 0; color: #2d3748; font-weight: 500;">注册: ${user.username}</p>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn--success btn--sm" onclick="handleUserApproval('${user._id}', 'approve')">通过</button>
-                            <button class="btn btn--danger btn--sm" onclick="handleUserApproval('${user._id}', 'reject')">取消</button>
-                        </div>
-                    `;
-                    container.appendChild(userDiv);
-                });
-            } catch (error) {
-                console.error('渲染未激活用户列表失败:', error);
-                const container = document.getElementById('pending-users-modal-content');
-                if (container) {
-                    container.innerHTML = '<p style="text-align: center; color: #e53e3e; padding: 20px;">加载失败，请重试</p>';
-                }
-            }
-        };
-        
-        // 获取待审核头像
-        window.fetchPendingAvatars = async function() {
-            try {
-                const response = await fetch('http://localhost:3000/api/avatar/pending', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
-                });
-                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                const data = await response.json();
-                return Array.isArray(data) ? data : [];
-            } catch (e) {
-                console.error('获取待审核头像失败:', e);
-                return [];
-            }
-        };
-
-        // 渲染待审核头像列表
-        window.renderPendingAvatars = async function() {
-            const container = document.getElementById('pending-avatars-modal-content');
-            if (!container) return;
-            container.innerHTML = '';
-            const list = await fetchPendingAvatars();
-            if (!list.length) {
-                container.innerHTML = '<p style="text-align:center;color:gray;padding:20px;">空</p>';
-                return;
-            }
-            list.forEach(item => {
-                const row = document.createElement('div');
-                row.style.cssText = `display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; border:1px solid #e2e8f0; border-radius:6px; background:#f8fafc; margin-bottom:10px;`;
-                const abs = (u) => /^https?:\/\//.test(u) ? u : `http://localhost:3000${u}`;
-                row.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <img src="${abs(item.url)}" alt="avatar" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid #e2e8f0;"/>
-                        <div>
-                            <div style="font-weight:500; color:#2d3748;">${item.user?.username || item.user}</div>
-                            <div style="font-size:12px;color:#718096;">${new Date(item.createdAt).toLocaleString()}</div>
-                        </div>
-                    </div>
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn btn--success btn--sm" onclick="handleAvatarApproval('${item._id}','approve')">通过</button>
-                        <button class="btn btn--danger btn--sm" onclick="handleAvatarApproval('${item._id}','reject')">拒绝</button>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-        };
-
-        // 审核头像
-        window.handleAvatarApproval = async function(recordId, action) {
-            try {
-                const response = await fetch('http://localhost:3000/api/avatar/approve', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` },
-                    body: JSON.stringify({ recordId, action })
-                });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                await renderPendingAvatars();
-                // 若通过且是当前登录用户，刷新本地头像
-                try {
-                    const id = localStorage.getItem('id');
-                    const list = await fetchPendingAvatars();
-                    // 简化：通过后由后端更新用户头像，下次刷新会显示；此处不强制刷新
-                } catch (_) {}
-            } catch (e) {
-                console.error('审核头像失败:', e);
-                alert('操作失败，请重试');
-            }
-        };
-        
-        // 获取未激活用户列表
-        window.fetchPendingUsers = async function() {
-            try {
-                const response = await fetch('http://localhost:3000/api/pending-users', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                return Array.isArray(data) ? data : [];
-            } catch (error) {
-                console.error('获取未激活用户失败:', error.message);
-                return [];
-            }
-        };
-        
-        // 处理用户审核
-        window.handleUserApproval = async function(userId, action) {
-            try {
-                const response = await fetch('http://localhost:3000/api/approve', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` },
-                    body: JSON.stringify({ userId, action })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log(data.message);
-
-                // 刷新统一审核列表（优先），否则回退到旧的用户列表
-                if (typeof renderApprovals === 'function') {
-                    await renderApprovals();
-                } else if (typeof renderPendingUsers === 'function') {
-                    await renderPendingUsers();
-                }
-            } catch (error) {
-                console.error('操作失败:', error.message);
-                alert('操作失败，请重试');
-            }
-        };
-
-        // 获取待审核头像
-        window.fetchPendingAvatars = async function() {
-            try {
-                const response = await fetch('http://localhost:3000/api/avatar/pending', {
-                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
-                });
-                if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-                const data = await response.json();
-                return Array.isArray(data) ? data : [];
-            } catch (e) {
-                console.error('获取待审核头像失败:', e);
-                return [];
-            }
-        };
-
-        // 审核头像
-        window.handleAvatarApproval = async function(recordId, action) {
-            try {
-                const response = await fetch('http://localhost:3000/api/avatar/approve', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` },
-                    body: JSON.stringify({ recordId, action })
-                });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                // 审核后刷新统一列表
-                if (typeof renderApprovals === 'function') await renderApprovals();
-                // 若通过，尝试从服务端刷新一下当前登录用户头像（便于管理员批准自己的头像时即时生效）
-                try { window.MenuModalManager && window.MenuModalManager.refreshCurrentUserFromServer && window.MenuModalManager.refreshCurrentUserFromServer(); } catch (e) {}
-            } catch (e) {
-                console.error('审核头像失败:', e);
-                alert('操作失败，请重试');
-            }
-        };
-
-        // 统一渲染：注册与头像审核合并单列展示
-        window.renderApprovals = async function() {
-            const container = document.getElementById('pending-approvals-modal-content');
-            if (!container) return;
-            container.innerHTML = '';
-            try {
-                const [users, avatars] = await Promise.all([
-                    typeof fetchPendingUsers === 'function' ? fetchPendingUsers() : Promise.resolve([]),
-                    typeof fetchPendingAvatars === 'function' ? fetchPendingAvatars() : Promise.resolve([])
-                ]);
-
-                // 统一数据模型
-                const items = [];
-                (users || []).forEach(u => items.push({
-                    type: 'register',
-                    id: u._id,
-                    createdAt: u.createdAt ? new Date(u.createdAt) : new Date(0),
-                    username: u.username
-                }));
-                (avatars || []).forEach(a => items.push({
-                    type: 'avatar',
-                    id: a._id,
-                    createdAt: a.createdAt ? new Date(a.createdAt) : new Date(0),
-                    username: (a.user && a.user.username) ? a.user.username : (a.user || ''),
-                    url: a.url
-                }));
-
-                // 按时间倒序
-                items.sort((x, y) => (y.createdAt - x.createdAt));
-
-                if (!items.length) {
-                    container.innerHTML = '<p style="text-align:center;color:gray;padding:20px;">空</p>';
-                    return;
-                }
-
-                const abs = (u) => /^https?:\/\//.test(u) ? u : (u ? `http://localhost:3000${u}` : '');
-
-                items.forEach(it => {
-                    const row = document.createElement('div');
-                    row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px; border:1px solid #e2e8f0; border-radius:6px; background:#f8fafc; margin-bottom:10px;';
-                    const left = document.createElement('div');
-                    left.style.cssText = 'display:flex; align-items:center; gap:10px;';
-                    if (it.type === 'avatar' && it.url) {
-                        const img = document.createElement('img');
-                        img.src = abs(it.url);
-                        img.alt = 'avatar';
-                        img.style.cssText = 'width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid #e2e8f0;';
-                        left.appendChild(img);
-                    }
-                    const text = document.createElement('div');
-                    text.innerHTML = `<div style="font-weight:600;color:#2d3748;">${it.type === 'register' ? '注册' : '头像'}：${it.username || ''}</div>` +
-                                     `<div style="font-size:12px;color:#718096;">${it.createdAt.toLocaleString()}</div>`;
-                    left.appendChild(text);
-
-                    const right = document.createElement('div');
-                    right.style.cssText = 'display:flex; gap:8px;';
-                    const approveBtn = document.createElement('button');
-                    approveBtn.className = 'btn btn--success btn--sm';
-                    approveBtn.textContent = '通过';
-                    approveBtn.onclick = () => {
-                        if (it.type === 'register') handleUserApproval(it.id, 'approve');
-                        else handleAvatarApproval(it.id, 'approve');
-                    };
-                    const rejectBtn = document.createElement('button');
-                    rejectBtn.className = 'btn btn--danger btn--sm';
-                    rejectBtn.textContent = '拒绝';
-                    rejectBtn.onclick = () => {
-                        if (it.type === 'register') handleUserApproval(it.id, 'reject');
-                        else handleAvatarApproval(it.id, 'reject');
-                    };
-                    right.appendChild(approveBtn);
-                    right.appendChild(rejectBtn);
-
-                    row.appendChild(left);
-                    row.appendChild(right);
-                    container.appendChild(row);
-                });
-            } catch (e) {
-                console.error('渲染审核项失败:', e);
-                container.innerHTML = '<p style="text-align:center;color:#e53e3e;padding:20px;">加载失败，请重试</p>';
-            }
-        };
-    </script>
+    
     
     <div class="row">
         <div class="columns">
@@ -499,13 +215,6 @@
                                         </div>
                                         <h2>
                                             <a class="button wave button_equaling"></a>
-                                            <script type="text/javascript">
-                                                document.querySelectorAll('.button_equaling').forEach(button => {
-                                                    button.addEventListener(
-                                                        'click', (event) => elementReplaceCheck('equaling', 'equalingHead', event)
-                                                    )
-                                                })
-                                            </script>
                                             <equaling class="scroll"><equalingHead0></equalingHead0>……</equaling>
                                         </h2>
                                         <div class="indent">
@@ -594,13 +303,6 @@
                                         </div>
                                         <h2>
                                             <a class="button wave button_roundUp"></a>
-                                            <script type="text/javascript">
-                                                document.querySelectorAll('.button_roundUp').forEach(button => {
-                                                    button.addEventListener(
-                                                        'click', (event) => elementReplaceCheck('roundUp', 'roundUp', event)
-                                                    )
-                                                })
-                                            </script>
                                             <roundUp class="scroll"><roundUp0></roundUp0></roundUp>
                                         </h2>
                                         <div class="indent">
@@ -608,13 +310,6 @@
                                         </div>
                                         <h2>
                                             <a class="button wave button_pronoun"></a>
-                                            <script type="text/javascript">
-                                                document.querySelectorAll('.button_pronoun').forEach(button => {
-                                                    button.addEventListener(
-                                                        'click', (event) => pronounReplaceCheck(event)
-                                                    )
-                                                })
-                                            </script>
                                             代词<pronoun1 class="scroll"></pronoun1><pronoun2 class="scroll"></pronoun2><pronoun3 class="scroll"></pronoun3>
                                         </h2>
                                         <padding>
@@ -622,13 +317,6 @@
                                         </padding>
                                         <h2>
                                             <a class="button wave button_include"></a>
-                                            <script type="text/javascript">
-                                                document.querySelectorAll('.button_include').forEach(button => {
-                                                    button.addEventListener(
-                                                        'click', (event) => elementReplaceCheck('include', 'include', event)
-                                                    )
-                                                })
-                                            </script>
                                             <include class="scroll"><include0></include0>……</include>
                                         </h2>
                                         <div class="indent">
@@ -699,13 +387,6 @@
                                                     </padding>
                                                     <div class="indent">
                                                         <a class="button wave button_tickQuantifier"></a>
-                                                        <script type="text/javascript">
-                                                            document.querySelectorAll('.button_tickQuantifier').forEach(button => {
-                                                                button.addEventListener(
-                                                                    'click', (event) => elementHideCheck('tickQuantifier', event)
-                                                                )
-                                                            })
-                                                        </script>
                                                         <tickLimit></tickLimit>中存在量词时，<ifC><coordination>对应<object></object>可能不唯一<stativeCoordination></stativeCoordination>不为全称量词</coordination>，则对<every><tickQuantifier><everyHead></everyHead>个</tickQuantifier><object></object></every><eachC>触发一次</eachC>，<else></else>，量词可省略</ifC>。
                                                     </div>
                                                     <padding>
@@ -2047,99 +1728,12 @@
                             <textarea id="htmlInput" placeholder="输入HTML代码" style="width: 100%; height: 150px;"></textarea>
                             <div class="draftBlock"></div>
                         </padding>
-                        <script type="text/javascript">
-                            // 页面加载时恢复内容
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const savedHtml = localStorage.getItem('draftBlockContent');
-                                if (savedHtml) {
-                                    document.getElementById('htmlInput').value = savedHtml;
-                                    document.querySelector('.draftBlock').innerHTML = savedHtml;
-                                }
-                            })
-                
-                            // 实现实时更新并保存到 localStorage
-                            document.getElementById('htmlInput').addEventListener('input', function () {
-                                const inputHtml = this.value.replace(/\\/g, '');
-                                document.querySelector('.draftBlock').innerHTML = inputHtml.replace('\\', ''); // 去除 HTML 标签
-                                localStorage.setItem('draftBlockContent', inputHtml) // 保存到 localStorage
-
-                                // 调用目标函数
-                                onTextChange(inputHtml)
-                            })
-
-                            // 定义要触发的函数
-                            function onTextChange(newValue) {
-                                console.log("文本框内容已更新:", newValue)
-                                draft_block = $('.draftBlock')[0]
-                                replace_character_name('http://localhost:3000/api/character', draft_block)
-                                replace_skill_name('http://localhost:3000/api/skill'+ localStorage.getItem('strength'), draft_block)
-                                replace_card_name('http://localhost:3000/api/card', draft_block)
-                                replace_term('http://localhost:3000/api/term-dynamic', 1, draft_block)
-                                replace_term('http://localhost:3000/api/term-fixed', 1, draft_block)
-                                pronounCheck(draft_block)
-                            }
-                        </script>
                     </main>
                 </div>
             </div>
         </div>
     </div>
 </body>
-
-<script type="text/javascript">
-    $(function () {
-        $(document).ready(function () {
-            $(document).foundation()
-        })
-        summonCharacters()
-        // 等待 summonCharacterSkill 完成后再执行其他函数
-        summonCharacterSkill().then(function() {
-            decompress('base/compression.json')
-            delay(500);
-            replace_character_name('http://localhost:3000/api/character')
-            delay(500);
-            replace_skill_name('http://localhost:3000/api/skill'+ localStorage.getItem('strength'))
-            delay(500);
-            replace_card_name('http://localhost:3000/api/card')
-            delay(500);
-            check_strength()
-            delay(500);
-            add_button_wave()
-            delay(500);
-            replace_term('http://localhost:3000/api/term-dynamic', 1)
-            delay(500);
-            replace_term('http://localhost:3000/api/term-fixed', 1)
-            delay(500);
-            setTimeout(function() {
-                pronounCheck()
-            }, 100)
-        })
-    })
-
-    function delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    function filterParagraphs() {
-        var query = document.getElementById('search-input').value.trim().toLowerCase()
-        var paragraphs = document.querySelectorAll('.characterParagraph')
-        paragraphs.forEach(function(paragraph) {
-            var paragraphText = paragraph.textContent.toLowerCase()
-            var isMatch = true
-            for (var i = 0; i < query.length; i++) {
-                if (paragraphText.indexOf(query[i]) === -1) {
-                    isMatch = false
-                    break
-                }
-            }
-            if (isMatch) {
-                paragraph.classList.remove('hidden')
-            } else {
-                paragraph.classList.add('hidden')
-            }
-        })
-    }
-</script>
 
 <script src="function/animation/panel_scroll_memory.js"></script>
 <script src="function/animation/scroll_actions.js"></script>
