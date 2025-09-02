@@ -643,3 +643,91 @@
 .modal padding {
     animation-play-state: running !important;
 }
+
+/* =====================
+   词元编辑弹窗（与新建弹窗对齐布局）
+   ===================== */
+#tokens-edit-backdrop.modal-backdrop { background: rgba(15, 23, 42, 0.35); }
+#tokens-edit-modal.modal {
+    max-width: 900px;
+    width: 96%;
+    max-height: 86vh;
+    /* 与创建弹窗保持一致高度变量 */
+    --tokens-pane-h: 48vh;
+}
+#tokens-edit-modal .modal-header {
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e6eef5;
+}
+#tokens-edit-modal .modal-header h2 { font-size: 1.15rem; letter-spacing: 0.2px; }
+#tokens-edit-modal .modal-form {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 12px;
+}
+
+/* 左侧字段提示面板（编辑弹窗） */
+#tokens-edit-hints,
+#tokens-edit-hints * { animation: none !important; }
+#tokens-edit-hints {
+    background: linear-gradient(180deg, #f8fafc 0%, #f7fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    color: #334155;
+    font-size: 12.5px;
+    line-height: 1.55;
+    padding: 10px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    height: var(--tokens-pane-h);
+    min-height: var(--tokens-pane-h);
+    max-height: var(--tokens-pane-h);
+    overflow: auto;
+    position: sticky;
+    top: 8px;
+}
+#tokens-edit-hints .hints-title { margin-bottom: 6px; }
+#tokens-edit-hints .hints-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+}
+#tokens-edit-hints .hint-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+}
+#tokens-edit-hints .hint-row:hover { background: rgba(226, 232, 240, 0.35); }
+#tokens-edit-hints .hint-name { color: #1f2937; overflow-wrap: anywhere; }
+#tokens-edit-hints .hint-type { color: #718096; white-space: nowrap; }
+
+/* 右侧 JSON 编辑器（编辑弹窗） */
+#tokens-edit-editor {
+    width: 100% !important;
+    height: var(--tokens-pane-h) !important;
+    min-height: var(--tokens-pane-h) !important;
+    max-height: var(--tokens-pane-h) !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 12px 14px !important;
+    background: #ffffff !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important;
+    font-size: 12.5px !important;
+    line-height: 1.5 !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    transition: box-shadow .15s ease, border-color .15s ease;
+    resize: none;
+    overflow: auto;
+}
+#tokens-edit-editor:focus { border-color: #7084ff !important; box-shadow: 0 0 0 3px rgba(112, 132, 255, 0.15); }
+
+/* 响应式：窄屏改为单列（编辑弹窗） */
+@media (max-width: 860px) {
+    #tokens-edit-modal .modal-form { grid-template-columns: 1fr; }
+    #tokens-edit-modal.modal { --tokens-pane-h: 44vh; }
+    #tokens-edit-hints { position: static; }
+}
