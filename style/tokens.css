@@ -45,6 +45,7 @@ html { scrollbar-gutter: stable both-edges; }
 #panel_tokens .tokens-btn {
   height: 36px;
   padding: 0 12px !important;
+  /* 默认按钮造型（单个按钮时也能圆角） */
   border-radius: 0 6px 6px 0 !important;
   border: 1px solid #e2e8f0 !important;
   border-left: none !important;
@@ -52,6 +53,23 @@ html { scrollbar-gutter: stable both-edges; }
   line-height: 1.2 !important;
   display: inline-flex;
   align-items: center;
+}
+/* 输入组内的相邻按钮做成“分段”连接：中间直角，最右侧带圆角 */
+#panel_tokens .tokens-input-group .tokens-btn { border-radius: 0 !important; }
+#panel_tokens .tokens-input-group .tokens-btn:last-of-type { border-radius: 0 6px 6px 0 !important; }
+#panel_tokens .tokens-input-group .tokens-btn + .tokens-btn { /* 紧邻按钮避免双重边框 */ border-left: none !important; }
+
+/* 缩略模式开关：激活时使用绿色语义色 */
+#panel_tokens #tokens-compact-toggle.is-active {
+  background: #48BB78 !important;  /* green-400 */
+  border-color: #38A169 !important; /* green-500 */
+  color: #FFFFFF !important;
+}
+#panel_tokens #tokens-compact-toggle.is-active:hover,
+#panel_tokens #tokens-compact-toggle.is-active:focus-visible {
+  background: #38A169 !important;  /* green-500 */
+  border-color: #2F855A !important; /* green-600 */
+  color: #FFFFFF !important;
 }
 
 /* 刷新按钮用二级按钮小号尺寸，已在 HTML 上使用 btn--secondary btn--sm */

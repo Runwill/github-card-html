@@ -1,7 +1,7 @@
 // 词元仪表盘（重构版，修复作用域/引用/语法错误）
 (function(){
   // 状态
-  const state = { data: null, q: '', timer: null, activeType: null, openTypes: new Set() };
+  const state = { data: null, q: '', timer: null, activeType: null, openTypes: new Set(), compactMode: false };
   // 搜索输入防抖间隔（毫秒）
   const SEARCH_DELAY_MS = 350;
 
@@ -60,7 +60,40 @@
       return (arr||[]).filter(it=> it && typeof it==='object' && deepContains(it, kw));
     }catch(_){ return Array.isArray(arr)? arr.slice(): []; }
   }
-  function setupSearch(){ try{ const input=document.getElementById('tokens-search'); const btn=document.getElementById('tokens-refresh-btn'); if(btn && !btn.__bound){ btn.__bound=true; btn.addEventListener('click', ()=> window.tokensRefresh && window.tokensRefresh()); } if(!input || input.__bound) return; input.__bound=true; const onChange=()=>{ clearTimeout(state.timer); state.timer=setTimeout(()=>{ const text=(input.value||''); if(text===state.q) return; state.q = text; renderTokensDashboard(false); }, SEARCH_DELAY_MS); }; input.addEventListener('input', onChange); }catch(_){}}
+  function setupSearch(){ try{ const input=document.getElementById('tokens-search'); const btn=document.getElementById('tokens-refresh-btn'); if(btn && !btn.__bound){ btn.__bound=true; btn.addEventListener('click', ()=> window.tokensRefresh && window.tokensRefresh()); }
+      // 确保缩略模式开关与刷新按钮并列
+      try{
+        const parent = btn && btn.parentElement ? btn.parentElement : null;
+        if(parent && !document.getElementById('tokens-compact-toggle')){
+          const tgl = document.createElement('button');
+          tgl.id = 'tokens-compact-toggle';
+          // 使用与刷新按钮相同的样式，保持一致的外观与“嵌入搜索框”布局
+          try{ tgl.className = btn.className || 'btn btn--secondary'; }catch(_){ tgl.className = 'btn btn--secondary'; }
+          tgl.type = 'button';
+          tgl.title = '切换显示模式';
+          const sync = ()=>{
+            // 当前为缩略模式时显示“缩略”，详细模式时显示“详细”
+            tgl.textContent = state.compactMode ? '缩略' : '详细';
+            tgl.setAttribute('aria-pressed', state.compactMode ? 'true':'false');
+            tgl.classList.toggle('is-active', !!state.compactMode);
+          };
+          tgl.addEventListener('click', ()=>{ state.compactMode = !state.compactMode; sync(); renderTokensDashboard(false); });
+          sync();
+          // 插入到刷新按钮后面
+          if(btn.nextSibling){ parent.insertBefore(tgl, btn.nextSibling); } else { parent.appendChild(tgl); }
+        }
+      }catch(_){ }
+      if(!input || input.__bound) return; input.__bound=true; const onChange=()=>{ clearTimeout(state.timer); state.timer=setTimeout(()=>{ const text=(input.value||''); if(text===state.q) return; const trimmed=(text||'').trim();
+          // 记录或恢复展开状态，并在有检索时自动展开所有类型
+          try{
+            if(trimmed){
+              if(!state.searchBackupOpenTypes){ state.searchBackupOpenTypes = new Set(state.openTypes ? Array.from(state.openTypes) : []); }
+              state.openTypes = new Set(['term-fixed','term-dynamic','card','character','skill']);
+            } else {
+              if(state.searchBackupOpenTypes){ state.openTypes = new Set(Array.from(state.searchBackupOpenTypes)); state.searchBackupOpenTypes = null; }
+            }
+          }catch(_){ }
+          state.q = text; renderTokensDashboard(false); }, SEARCH_DELAY_MS); }; input.addEventListener('input', onChange); }catch(_){}}
 
   // 值渲染
   const HIDE_KEYS=new Set(['_id','__v','_v']);
@@ -102,23 +135,34 @@
       const v=obj[k];
       const curPath = basePath? `${basePath}.${k}`: k;
       if(Array.isArray(v)){
-        const items = v.map((it, idx)=>{
-          if(isObj(it) || Array.isArray(it)){
-            const style = accent? ` style="--token-accent:${esc(accent)}"`: '';
-            return `<div class="arr-item"><div class="arr-index">#${idx}</div><div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
-          }
-          return `<div class="kv-row" data-path="${esc(curPath)}.${idx}">
-            <div class="kv-key">[${idx}]</div>
-            <div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div>
-            <div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div>
-          </div>`;
-        }).join('');
-        const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
-        const emptyHtml = '<div class="kv-row"><div class="kv-key">(空)</div><div class="kv-val"></div></div>';
-        parts.push(`<div class="nest-block"${style}><div class="nest-title">${esc(k)} [${v.length}]</div><div class="nest-body">${items || emptyHtml}</div></div>`);
+        if(state.compactMode){
+          const summary = `Array(${v.length})`;
+          parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="array" title="数组">${esc(summary)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
+        } else {
+          const items = v.map((it, idx)=>{
+            if(isObj(it) || Array.isArray(it)){
+              const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
+              return `<div class="arr-item"><div class="arr-index">#${idx}</div><div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
+            }
+            return `<div class="kv-row" data-path="${esc(curPath)}.${idx}">
+              <div class="kv-key">[${idx}]</div>
+              <div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div>
+              <div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div>
+            </div>`;
+          }).join('');
+          const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
+          const emptyHtml = '<div class="kv-row"><div class="kv-key">(空)</div><div class="kv-val"></div></div>';
+          parts.push(`<div class="nest-block"${style}><div class="nest-title">${esc(k)} [${v.length}]</div><div class="nest-body">${items || emptyHtml}</div></div>`);
+        }
       } else if (isObj(v)){
-        const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
-        parts.push(`<div class="nest-block"${style}><div class="nest-title">${esc(k)}</div><div class="nest-body">${renderKV(v, level+1, accent, curPath)}</div></div>`);
+        if(state.compactMode){
+          const keysCount = Object.keys(v||{}).filter(x=> !HIDE_KEYS.has(x)).length;
+          const summary = `Object(${keysCount})`;
+          parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="object" title="对象">${esc(summary)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
+        } else {
+          const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
+          parts.push(`<div class="nest-block"${style}><div class="nest-title">${esc(k)}</div><div class="nest-body">${renderKV(v, level+1, accent, curPath)}</div></div>`);
+        }
       } else {
         parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="单击编辑">${esc(v)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
       }
@@ -290,9 +334,10 @@
 
   // 编辑对象（整文档）
   function enableEditDoc(rootEl){ if(rootEl.__editDocBound) return; rootEl.__editDocBound=true; rootEl.addEventListener('click', async function(ev){ const btn= ev.target && ev.target.closest? ev.target.closest('.btn-edit-doc'): null; if(!btn) return; if(!ev.ctrlKey && !document.body.classList.contains('ctrl-down')){ try{ showTokensToast('按住 Ctrl 键以启用编辑'); }catch(_){ } return; } const card= btn.closest('.token-card[data-coll][data-id]'); if(!card) return; const coll= card.getAttribute('data-coll'); const id= card.getAttribute('data-id'); if(!coll||!id) return; try{ openEditModal(coll, id); }catch(e){ alert(e.message || '无法打开编辑'); } }); }
-  function ensureEditModal(){ let backdrop=document.getElementById('tokens-edit-backdrop'); let modal=document.getElementById('tokens-edit-modal'); if(!backdrop){ backdrop=document.createElement('div'); backdrop.id='tokens-edit-backdrop'; backdrop.className='modal-backdrop'; document.body.appendChild(backdrop); } if(!modal){ modal=document.createElement('div'); modal.id='tokens-edit-modal'; modal.className='modal approve-modal'; modal.innerHTML=`<div class="modal-header"><h2>编辑对象</h2></div><div class="modal-form"><div id="tokens-edit-hints"></div><textarea id="tokens-edit-editor"></textarea><div class="tokens-create-actions"><button type="button" class="btn btn--secondary" id="tokens-edit-cancel">取消</button><button type="button" class="btn btn--primary" id="tokens-edit-submit">保存</button></div></div>`; document.body.appendChild(modal); backdrop.addEventListener('click', hideEditModal); document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideEditModal(); }); } return { backdrop, modal }; }
+  function ensureEditModal(){ let backdrop=document.getElementById('tokens-edit-backdrop'); let modal=document.getElementById('tokens-edit-modal'); if(!backdrop){ backdrop=document.createElement('div'); backdrop.id='tokens-edit-backdrop'; backdrop.className='modal-backdrop'; document.body.appendChild(backdrop); } if(!modal){ modal=document.createElement('div'); modal.id='tokens-edit-modal'; modal.className='modal approve-modal'; modal.innerHTML=`<div class="modal-header"><h2>编辑对象</h2></div><div class="modal-form"><div id="tokens-edit-hints"></div><textarea id="tokens-edit-editor"></textarea><div class="tokens-create-actions"><button type="button" class="btn btn--secondary" id="tokens-edit-cancel">取消</button><button type="button" class="btn btn--secondary" id="tokens-edit-saveas">另存</button><button type="button" class="btn btn--primary" id="tokens-edit-submit">保存</button></div></div>`; document.body.appendChild(modal); backdrop.addEventListener('click', hideEditModal); document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideEditModal(); }); } return { backdrop, modal }; }
   function hideEditModal(){ const backdrop=document.getElementById('tokens-edit-backdrop'); const modal=document.getElementById('tokens-edit-modal'); if(backdrop) backdrop.classList.remove('show'); if(modal) modal.classList.remove('show'); setTimeout(()=>{ const bd=document.getElementById('tokens-edit-backdrop'); const md=document.getElementById('tokens-edit-modal'); if(bd && !bd.classList.contains('show')) bd.style.display='none'; if(md && !md.classList.contains('show')) md.style.display='none'; }, 320); }
-  function openEditModal(collection, id){ const doc=findDocInState(collection, id); if(!doc) throw new Error('未找到对象'); const HIDE=new Set(['_id','__v','_v']); const strip=(v)=>{ if(!v||typeof v!=='object') return v; if(Array.isArray(v)) return v.map(strip); const o={}; for(const k of Object.keys(v)){ if(!HIDE.has(k)) o[k]=strip(v[k]); } return o; }; const orig= strip(doc); const {backdrop, modal}= ensureEditModal(); const editor= modal.querySelector('#tokens-edit-editor'); const hints= modal.querySelector('#tokens-edit-hints'); const btnCancel= modal.querySelector('#tokens-edit-cancel'); const btnSubmit= modal.querySelector('#tokens-edit-submit'); try{ const schema= deriveSchema(orig); const list= flattenHintsFromSchema(schema).map(h=> `<div class="hint-row"><div class="hint-name">${esc(h.name)}</div><div class="hint-type">(${esc(h.type)})</div></div>`).join(''); hints.innerHTML= `<div class="hints-title">对象结构：</div><div class="hints-list">${list || '无'}</div>`; }catch(_){ hints.innerHTML=''; } editor.value= JSON.stringify(orig, null, 2); const submit= async ()=>{ let next; try{ next = JSON.parse(editor.value); }catch(_){ alert('JSON 不合法'); return; } try{ await applyObjectEdits(collection, id, orig, next); hideEditModal(); try{ showTokensToast('保存成功'); }catch(_){ } renderTokensDashboard(false); }catch(e){ alert(e.message || '保存失败'); } }; btnCancel.onclick= hideEditModal; btnSubmit.onclick= submit; backdrop.style.display='block'; modal.style.display='block'; requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); }); setTimeout(()=>{ try{ editor.focus(); }catch(_){ } }, 80); }
+  function openEditModal(collection, id){ const doc=findDocInState(collection, id); if(!doc) throw new Error('未找到对象'); const HIDE=new Set(['_id','__v','_v']); const strip=(v)=>{ if(!v||typeof v!=='object') return v; if(Array.isArray(v)) return v.map(strip); const o={}; for(const k of Object.keys(v)){ if(!HIDE.has(k)) o[k]=strip(v[k]); } return o; }; const orig= strip(doc); const {backdrop, modal}= ensureEditModal(); const editor= modal.querySelector('#tokens-edit-editor'); const hints= modal.querySelector('#tokens-edit-hints'); const btnCancel= modal.querySelector('#tokens-edit-cancel'); const btnSubmit= modal.querySelector('#tokens-edit-submit'); const btnSaveAs= modal.querySelector('#tokens-edit-saveas'); try{ const schema= deriveSchema(orig); const list= flattenHintsFromSchema(schema).map(h=> `<div class="hint-row"><div class="hint-name">${esc(h.name)}</div><div class="hint-type">(${esc(h.type)})</div></div>`).join(''); hints.innerHTML= `<div class="hints-title">对象结构：</div><div class="hints-list">${list || '无'}</div>`; }catch(_){ hints.innerHTML=''; } editor.value= JSON.stringify(orig, null, 2); const submit= async ()=>{ let next; try{ next = JSON.parse(editor.value); }catch(_){ alert('JSON 不合法'); return; } try{ await applyObjectEdits(collection, id, orig, next); hideEditModal(); try{ showTokensToast('保存成功'); }catch(_){ } renderTokensDashboard(false); }catch(e){ alert(e.message || '保存失败'); } }; const saveAs = async ()=>{ let next; try{ next = JSON.parse(editor.value); }catch(_){ alert('JSON 不合法'); return; } try{ const out = await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: next } }); const newDoc = out && out.doc; if(newDoc){ try{ pushDocToState(collection, newDoc); }catch(_){ } } hideEditModal(); try{ showTokensToast('已另存为新对象'); }catch(_){ } renderTokensDashboard(false); }catch(e){ alert(e.message || '另存失败'); } };
+    btnCancel.onclick= hideEditModal; btnSubmit.onclick= submit; if(btnSaveAs) btnSaveAs.onclick = saveAs; backdrop.style.display='block'; modal.style.display='block'; requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); }); setTimeout(()=>{ try{ editor.focus(); }catch(_){ } }, 80); }
   function pathJoin(base,key){ return base? (base+'.'+key): String(key); }
   function isPrimitive(v){ return v==null || typeof v==='string' || typeof v==='number' || typeof v==='boolean'; }
   function diffObjects(orig, next, base=''){ const sets=[]; const dels=[]; const addSet=(p,v)=>{ const t=(typeof v==='number')? 'number': (typeof v==='boolean')? 'boolean': 'string'; sets.push({ path:p, value:v, valueType:t }); }; const walk=(o,n,p)=>{ if(isPrimitive(o) || isPrimitive(n)){ if(JSON.stringify(o)!==JSON.stringify(n)) addSet(p, n); return; } if(Array.isArray(o) || Array.isArray(n)){ const oa= Array.isArray(o)? o: []; const na= Array.isArray(n)? n: []; const len=Math.max(oa.length, na.length); for(let i=0;i<len;i++){ const op= pathJoin(p, String(i)); if(i>=na.length){ dels.push(op); } else if(i>=oa.length){ if(isPrimitive(na[i])) addSet(op, na[i]); else { walk(undefined, na[i], op); } } else { if(isPrimitive(oa[i]) || isPrimitive(na[i])){ if(JSON.stringify(oa[i])!==JSON.stringify(na[i])) addSet(op, na[i]); } else { walk(oa[i], na[i], op); } } } return; } const ok= Object.keys(o||{}); const nk= Object.keys(n||{}); const keySet= new Set([...ok,...nk]); for (const k of keySet){ if(n && !Object.prototype.hasOwnProperty.call(n,k)){ dels.push(pathJoin(p,k)); continue; } if(o && !Object.prototype.hasOwnProperty.call(o,k)){ const v=n[k]; if(isPrimitive(v)) addSet(pathJoin(p,k), v); else walk(undefined, v, pathJoin(p,k)); continue; } const ov=o[k], nv=n[k]; if(isPrimitive(ov) || isPrimitive(nv)){ if(JSON.stringify(ov)!==JSON.stringify(nv)) addSet(pathJoin(p,k), nv); } else { walk(ov, nv, pathJoin(p,k)); } } }; walk(orig,next,base); return { sets, dels }; }
