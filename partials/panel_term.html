@@ -927,6 +927,46 @@
                   </padding>
                 </padding>
               </padding>
+              <h3><loss class="scroll"><lossBody /></loss></h3>
+              <div class="indent">
+                一类<event></event>。
+              </div>
+              <div class="indent">
+                包含以下输入：
+              </div>
+              <padding>
+                <h3><loss><lossRole class="scroll" /></loss></h3>
+                <div class="indent">
+                  一名<role></role>。
+                </div>
+                <h3><loss><lossValue class="scroll" /></loss></h3>
+                <div class="indent">
+                  一个正整数。
+                </div>
+              </padding>
+              <div class="indent">
+                包含以下<procedure></procedure>：
+              </div>
+              <padding>
+                <div class="h">
+                  <div class="indent">
+                    <advance></advance><tick></tick>“<beforeLoss class="scroll bold"><lossBody></lossBody><beforeEnd></beforeEnd></beforeLoss>”。
+                  </div>
+                  <div class="indent">
+                    <advance></advance><tick></tick>“<whenLoss class="scroll bold"><lossBody></lossBody><whenEnd></whenEnd></whenLoss>”。
+                  </div>
+                  <padding>
+                    <div class="h">
+                      <div class="indent">
+                        <damage><damagedRole></damagedRole></damage>减少<loss><lossValue></lossValue></loss>点<health></health>/<healthLimit></healthLimit>。
+                      </div>
+                    </div>
+                  </padding>
+                  <div class="indent">
+                    <advance></advance><tick></tick>“<afterLoss class="scroll bold"><lossBody></lossBody><afterEnd></afterEnd></afterLoss>”。
+                  </div>
+                </div>
+              </padding>
               <h3><damage class="scroll"><damageEnd /></damage></h3>
               <div class="indent">
                 一类<event></event>。可称为<or><damage><dealtBody></dealtBody><damageEnd></damageEnd></damage><orBody></orBody><damage><takeBody></takeBody><damageEnd></damageEnd></damage></or>。
@@ -954,16 +994,16 @@
               <padding>
                 <div class="h">
                   <div class="indent">
-                    <advance></advance><tick></tick>“<beforeDamage class="scroll bold"><dealtBody></dealtBody><beforeDamageEnd></beforeDamageEnd></beforeDamage>”。
+                    <advance></advance><tick></tick>“<beforeDamage class="scroll bold"><dealtBody></dealtBody><damageEnd></damageEnd><beforeEnd></beforeEnd></beforeDamage>”。
                   </div>
                   <div class="indent">
-                    <advance></advance><tick></tick>“<beforeDamaged class="scroll bold"><takeBody></takeBody><beforeDamageEnd></beforeDamageEnd></beforeDamaged>”。
+                    <advance></advance><tick></tick>“<beforeDamaged class="scroll bold"><takeBody></takeBody><damageEnd></damageEnd><beforeEnd></beforeEnd></beforeDamaged>”。
                   </div>
                   <div class="indent">
-                    <advance></advance><tick></tick>“<whenDamage class="scroll bold"><dealtBody></dealtBody><whenDamageEnd></whenDamageEnd></whenDamage>”。
+                    <advance></advance><tick></tick>“<whenDamage class="scroll bold"><dealtBody></dealtBody><damageEnd></damageEnd><whenEnd></whenEnd></whenDamage>”。
                   </div>
                   <div class="indent">
-                    <advance></advance><tick></tick>“<whenDamaged class="scroll bold"><takeBody></takeBody><whenDamageEnd></whenDamageEnd></whenDamaged>”：
+                    <advance></advance><tick></tick>“<whenDamaged class="scroll bold"><takeBody></takeBody><damageEnd></damageEnd><whenEnd></whenEnd></whenDamaged>”：
                   </div>
                   <padding>
                     <div class="h">
@@ -973,10 +1013,10 @@
                     </div>
                   </padding>
                   <div class="indent">
-                    <advance></advance><tick></tick>“<afterDamage class="scroll bold"><dealtBody></dealtBody><afterDamageEnd></afterDamageEnd></afterDamage>”。
+                    <advance></advance><tick></tick>“<afterDamage class="scroll bold"><dealtBody></dealtBody><damageEnd></damageEnd><afterEnd></afterEnd></afterDamage>”。
                   </div>
                   <div class="indent">
-                    <advance></advance><tick></tick>“<afterDamaged class="scroll bold"><takeBody></takeBody><afterDamageEnd></afterDamageEnd></afterDamaged>”。
+                    <advance></advance><tick></tick>“<afterDamaged class="scroll bold"><takeBody></takeBody><damageEnd></damageEnd><afterEnd></afterEnd></afterDamaged>”。
                   </div>
                 </div>
               </padding>
