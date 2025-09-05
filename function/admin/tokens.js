@@ -176,7 +176,7 @@
 
   // 卡片外壳
   const tagAttrs=(coll, obj)=>` data-coll="${coll}" data-id="${esc(obj&&obj._id||'')}"`;
-  function cardShell(coll, obj, innerHtml){ const col=getAccent(obj); const style= col? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"`: ''; const { canEdit }=getAuth(); return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${canEdit? `<div class="token-card__toolbar" role="工具栏" aria-label="对象操作"><button class="btn btn--secondary btn--xs btn-edit-doc" title="编辑对象" aria-label="编辑对象">编辑对象</button><button class="btn btn--danger btn--xs btn-del-doc" title="删除对象" aria-label="删除对象">删除对象</button></div>`: ''}${innerHtml}</div>`; }
+  function cardShell(coll, obj, innerHtml){ const col=getAccent(obj); const style= col? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"`: ''; const { canEdit }=getAuth(); return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${canEdit? `<div class="token-card__toolbar" role="工具栏" aria-label="对象操作"><button class="btn btn--secondary btn--xs btn-go-doc" title="跳转" aria-label="跳转">跳转</button><button class="btn btn--secondary btn--xs btn-edit-doc" title="编辑对象" aria-label="编辑对象">编辑对象</button><button class="btn btn--danger btn--xs btn-del-doc" title="删除对象" aria-label="删除对象">删除对象</button></div>`: ''}${innerHtml}</div>`; }
   const termFixedItem=(t)=> cardShell('term-fixed', t, renderKV(t,0,getAccent(t),'') );
   const termDynamicItem=(t)=> cardShell('term-dynamic', t, renderKV(t,0,getAccent(t),'') );
   const cardItem=(c)=> cardShell('card', c, renderKV(c,0,getAccent(c),'') );
@@ -239,7 +239,7 @@
       try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
       setupSearch();
       if(!summaryEl.__bindTypeFilter){ summaryEl.__bindTypeFilter=true; const handler=(ev)=>{ const t= ev.target && ev.target.closest? ev.target.closest('.type-tile'): null; if(!t) return; const tp=t.getAttribute('data-type'); if(!tp) return; state.activeType = (state.activeType===tp)? null: tp; renderTokensDashboard(false); }; summaryEl.addEventListener('click', handler); summaryEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); handler(e); } }); }
-      if(canEdit){ if(!contentEl.__inlineEditBound){ enableInlineEdit(contentEl); contentEl.__inlineEditBound=true; } if(!contentEl.__inlineDeleteBound){ enableInlineDelete(contentEl); contentEl.__inlineDeleteBound=true; } if(!contentEl.__deleteDocBound){ enableDeleteDoc(contentEl); contentEl.__deleteDocBound=true; } if(!contentEl.__editDocBound){ enableEditDoc(contentEl); contentEl.__editDocBound=true; } }
+  if(canEdit){ if(!contentEl.__inlineEditBound){ enableInlineEdit(contentEl); contentEl.__inlineEditBound=true; } if(!contentEl.__inlineDeleteBound){ enableInlineDelete(contentEl); contentEl.__inlineDeleteBound=true; } if(!contentEl.__deleteDocBound){ enableDeleteDoc(contentEl); contentEl.__deleteDocBound=true; } if(!contentEl.__editDocBound){ enableEditDoc(contentEl); contentEl.__editDocBound=true; } if(!contentEl.__goDocBound){ enableGoDoc(contentEl); contentEl.__goDocBound=true; } }
     }catch(e){ console.error('加载词元数据失败:', e); summaryEl.innerHTML='<div class="tokens-status tokens-status--error">加载失败，请点击“刷新”重试</div>'; }
   }
 
@@ -334,6 +334,44 @@
 
   // 编辑对象（整文档）
   function enableEditDoc(rootEl){ if(rootEl.__editDocBound) return; rootEl.__editDocBound=true; rootEl.addEventListener('click', async function(ev){ const btn= ev.target && ev.target.closest? ev.target.closest('.btn-edit-doc'): null; if(!btn) return; if(!ev.ctrlKey && !document.body.classList.contains('ctrl-down')){ try{ showTokensToast('按住 Ctrl 键以启用编辑'); }catch(_){ } return; } const card= btn.closest('.token-card[data-coll][data-id]'); if(!card) return; const coll= card.getAttribute('data-coll'); const id= card.getAttribute('data-id'); if(!coll||!id) return; try{ openEditModal(coll, id); }catch(e){ alert(e.message || '无法打开编辑'); } }); }
+  function enableGoDoc(rootEl){ if(rootEl.__goDocBound) return; rootEl.__goDocBound=true; rootEl.addEventListener('click', function(ev){ const btn= ev.target && ev.target.closest? ev.target.closest('.btn-go-doc'): null; if(!btn) return; const card= btn.closest('.token-card[data-coll][data-id]'); if(!card) return; const coll= card.getAttribute('data-coll'); const id= card.getAttribute('data-id'); const doc=findDocInState(coll, id) || {};
+      // 优先：在各自的面板内滚动定位（按 replace 模块约定）
+      try{
+        if(coll==='term-fixed' || coll==='term-dynamic'){
+          const tag = (doc && typeof doc.en==='string') ? doc.en : null;
+          if(tag && window.scrollActions && typeof window.scrollActions.scrollToTagAndFlash==='function'){
+            window.scrollActions.scrollToTagAndFlash('panel_term', tag, { behavior: 'smooth', stop: true });
+            return;
+          }
+        }
+        if(coll==='card'){
+          const tagSel = (doc && typeof doc.en==='string') ? (doc.en + '.scroll') : null; // 如 <deliver>.scroll
+          if(tagSel && window.scrollActions && typeof window.scrollActions.scrollToSelectorAndFlash==='function'){
+            window.scrollActions.scrollToSelectorAndFlash('panel_card', tagSel, { behavior: 'smooth', stop: true });
+            return;
+          }
+        }
+        if(coll==='character'){
+          const cls = (doc && (typeof doc.id==='number' || typeof doc.id==='string')) ? ('characterID' + String(doc.id)) : null;
+          if(cls && window.scrollActions && typeof window.scrollActions.scrollToClassWithCenter==='function'){
+            window.scrollActions.scrollToClassWithCenter('panel_character', cls, '.container', { behavior: 'smooth', stop: true });
+            return;
+          }
+        }
+        if(coll==='skill0' || coll==='skill1' || coll==='skill2'){
+          const skillClass = (doc && typeof doc.name==='string') ? doc.name : null;
+          if(skillClass && window.scrollActions && typeof window.scrollActions.scrollToClassAndFlash==='function'){
+            window.scrollActions.scrollToClassAndFlash('panel_skill', skillClass, { behavior: 'smooth', stop: true });
+            return;
+          }
+        }
+      }catch(_){ /* 忽略并回退到链接跳转 */ }
+      // 否则：尝试根据对象中出现的 .html 字符串打开新页面
+      const findHtml=(o)=>{ try{ if(!o||typeof o!=='object') return null; if(typeof o.html==='string' && /\.html(\?|#|$)/i.test(o.html)) return o.html; const stack=[o]; const seen=new Set(); while(stack.length){ const cur=stack.pop(); if(!cur||typeof cur!=='object' || seen.has(cur)) continue; seen.add(cur); for(const k of Object.keys(cur)){ const v=cur[k]; if(typeof v==='string' && /\.html(\?|#|$)/i.test(v)) return v; if(v && typeof v==='object') stack.push(v); } } return null; }catch(_){ return null; } };
+      const hrefRaw = findHtml(doc); if(!hrefRaw){ try{ showTokensToast('未找到跳转目标'); }catch(_){ } return; }
+      try{ let url = String(hrefRaw).trim(); if(!/^https?:\/\//i.test(url)){ if(url.startsWith('./') || url.startsWith('/')){ /* keep */ } else if(/^[\w-]+\.html(\?|#|$)/i.test(url)){ url = './pages/' + url; } } window.open(url, '_blank'); }
+      catch(e){ alert(e.message || '无法打开链接'); }
+    }); }
   function ensureEditModal(){ let backdrop=document.getElementById('tokens-edit-backdrop'); let modal=document.getElementById('tokens-edit-modal'); if(!backdrop){ backdrop=document.createElement('div'); backdrop.id='tokens-edit-backdrop'; backdrop.className='modal-backdrop'; document.body.appendChild(backdrop); } if(!modal){ modal=document.createElement('div'); modal.id='tokens-edit-modal'; modal.className='modal approve-modal'; modal.innerHTML=`<div class="modal-header"><h2>编辑对象</h2></div><div class="modal-form"><div id="tokens-edit-hints"></div><textarea id="tokens-edit-editor"></textarea><div class="tokens-create-actions"><button type="button" class="btn btn--secondary" id="tokens-edit-cancel">取消</button><button type="button" class="btn btn--secondary" id="tokens-edit-saveas">另存</button><button type="button" class="btn btn--primary" id="tokens-edit-submit">保存</button></div></div>`; document.body.appendChild(modal); backdrop.addEventListener('click', hideEditModal); document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideEditModal(); }); } return { backdrop, modal }; }
   function hideEditModal(){ const backdrop=document.getElementById('tokens-edit-backdrop'); const modal=document.getElementById('tokens-edit-modal'); if(backdrop) backdrop.classList.remove('show'); if(modal) modal.classList.remove('show'); setTimeout(()=>{ const bd=document.getElementById('tokens-edit-backdrop'); const md=document.getElementById('tokens-edit-modal'); if(bd && !bd.classList.contains('show')) bd.style.display='none'; if(md && !md.classList.contains('show')) md.style.display='none'; }, 320); }
   function openEditModal(collection, id){ const doc=findDocInState(collection, id); if(!doc) throw new Error('未找到对象'); const HIDE=new Set(['_id','__v','_v']); const strip=(v)=>{ if(!v||typeof v!=='object') return v; if(Array.isArray(v)) return v.map(strip); const o={}; for(const k of Object.keys(v)){ if(!HIDE.has(k)) o[k]=strip(v[k]); } return o; }; const orig= strip(doc); const {backdrop, modal}= ensureEditModal(); const editor= modal.querySelector('#tokens-edit-editor'); const hints= modal.querySelector('#tokens-edit-hints'); const btnCancel= modal.querySelector('#tokens-edit-cancel'); const btnSubmit= modal.querySelector('#tokens-edit-submit'); const btnSaveAs= modal.querySelector('#tokens-edit-saveas'); try{ const schema= deriveSchema(orig); const list= flattenHintsFromSchema(schema).map(h=> `<div class="hint-row"><div class="hint-name">${esc(h.name)}</div><div class="hint-type">(${esc(h.type)})</div></div>`).join(''); hints.innerHTML= `<div class="hints-title">对象结构：</div><div class="hints-list">${list || '无'}</div>`; }catch(_){ hints.innerHTML=''; } editor.value= JSON.stringify(orig, null, 2); const submit= async ()=>{ let next; try{ next = JSON.parse(editor.value); }catch(_){ alert('JSON 不合法'); return; } try{ await applyObjectEdits(collection, id, orig, next); hideEditModal(); try{ showTokensToast('保存成功'); }catch(_){ } renderTokensDashboard(false); }catch(e){ alert(e.message || '保存失败'); } }; const saveAs = async ()=>{ let next; try{ next = JSON.parse(editor.value); }catch(_){ alert('JSON 不合法'); return; } try{ const out = await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: next } }); const newDoc = out && out.doc; if(newDoc){ try{ pushDocToState(collection, newDoc); }catch(_){ } } hideEditModal(); try{ showTokensToast('已另存为新对象'); }catch(_){ } renderTokensDashboard(false); }catch(e){ alert(e.message || '另存失败'); } };
