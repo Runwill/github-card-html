@@ -14,6 +14,16 @@
       setTimeout(()=>{ try{ toast.remove(); }catch(_){ } if(container && container.children.length===0){ try{ container.remove(); }catch(_){ } } }, 2200);
     }catch(_){}
   }
+  // 统一 toast 出口：优先使用全局 tokensAdmin.showToast
+  function toast(msg){
+    try{
+      if (window.tokensAdmin && typeof window.tokensAdmin.showToast === 'function') {
+        window.tokensAdmin.showToast(msg);
+      } else {
+        showTokensToast(msg);
+      }
+    }catch(_){ }
+  }
   // 新建弹窗：懒加载构建 DOM 节点
   function ensureCreateModal(){
     let backdrop=document.getElementById('tokens-create-backdrop');
@@ -49,6 +59,8 @@
     const hints= modal.querySelector('#tokens-create-hints');
     const btnCancel= modal.querySelector('#tokens-create-cancel');
     const btnSubmit= modal.querySelector('#tokens-create-submit');
+    const { getAuth } = window.tokensAdmin;
+    const { canEdit } = getAuth ? getAuth() : { canEdit:false };
     const schemeBoxId='tokens-create-variants';
     let schemeBox= modal.querySelector('#'+schemeBoxId);
     if(!schemeBox){ const form = modal.querySelector('.modal-form'); schemeBox=document.createElement('div'); schemeBox.id=schemeBoxId; schemeBox.className='tokens-scheme'; form.insertBefore(schemeBox, form.firstElementChild); }
@@ -67,19 +79,24 @@
     renderSchemeSelector(variants);
     renderHintsFromVariants(tpl, variants);
     editor.value = JSON.stringify(tpl||{}, null, 2);
-    const submit= async ()=>{
+  const submit= async ()=>{
+  if(!canEdit){ toast('无权限'); return; }
       try{
         let payload;
-        try{ payload= JSON.parse(editor.value); }catch(_){ throw new Error('JSON 不合法'); }
+        try{ payload= JSON.parse(editor.value); }catch(_){ toast('JSON 不合法'); return; }
         const out= await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: payload } });
         const doc= out && out.doc;
         try{ window.tokensAdmin.pushDocToState(collection, doc); }catch(_){}
+    try{ window.tokensAdmin.logChange && window.tokensAdmin.logChange('create', { collection, id: doc && doc._id, doc }); }catch(_){ }
         hideCreateModal();
-        try{ showTokensToast('创建成功'); }catch(_){ }
+        try{ toast('创建成功'); }catch(_){ }
         if(window.renderTokensDashboard) window.renderTokensDashboard(false);
-      }catch(e){ alert(e.message || '创建失败'); }
+      }catch(e){ toast((e && e.message) || '创建失败'); }
     };
-    btnCancel.onclick= hideCreateModal; btnSubmit.onclick= submit;
+  btnCancel.onclick= hideCreateModal; btnSubmit.onclick= submit;
+  // 只读用户：仅做禁用视觉，去掉悬浮提示，点击再弹 toast
+  if(!canEdit){ try{ btnSubmit.classList.add('is-disabled'); }catch(_){ } }
+  else { try{ btnSubmit.classList.remove('is-disabled'); }catch(_){ } }
     backdrop.style.display='block'; modal.style.display='block'; requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); }); setTimeout(()=>{ try{ editor.focus(); }catch(_){} }, 80);
   }
   // 编辑弹窗：与新建弹窗布局一致，含“另存”按钮
@@ -129,27 +146,41 @@
       hints.innerHTML= `<div class="hints-title">对象结构：</div><div class="hints-list">${list || '无'}</div>`;
     }catch(_){ hints.innerHTML=''; }
     editor.value= JSON.stringify(orig, null, 2);
+    const { getAuth } = window.tokensAdmin;
+    const { canEdit } = getAuth ? getAuth() : { canEdit:false };
     const submit= async ()=>{
-      let next; try{ next = JSON.parse(editor.value); }catch(_){ alert('JSON 不合法'); return; }
+  if(!canEdit){ toast('无权限'); return; }
+      let next; try{ next = JSON.parse(editor.value); }catch(_){ toast('JSON 不合法'); return; }
       try{
-        await window.tokensAdmin.applyObjectEdits(collection, id, orig, next);
+        const detailed = await window.tokensAdmin.applyObjectEdits(collection, id, orig, next);
+        try{ window.tokensAdmin.logChange && window.tokensAdmin.logChange('save-edits', { collection, id, sets: detailed && detailed.sets, dels: detailed && detailed.dels }); }catch(_){ }
         hideEditModal();
-        try{ showTokensToast('保存成功'); }catch(_){ }
+        try{ toast('保存成功'); }catch(_){ }
         if(window.renderTokensDashboard) window.renderTokensDashboard(false);
-      }catch(e){ alert(e.message || '保存失败'); }
+      }catch(e){ toast((e && e.message) || '保存失败'); }
     };
     const saveAs = async ()=>{
-      let next; try{ next = JSON.parse(editor.value); }catch(_){ alert('JSON 不合法'); return; }
+  if(!canEdit){ toast('无权限'); return; }
+      let next; try{ next = JSON.parse(editor.value); }catch(_){ toast('JSON 不合法'); return; }
       try{
         const out = await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: next } });
         const newDoc = out && out.doc;
         if(newDoc){ try{ window.tokensAdmin.pushDocToState(collection, newDoc); }catch(_){ } }
+        try{ window.tokensAdmin.logChange && window.tokensAdmin.logChange('create', { collection, id: newDoc && newDoc._id, doc: newDoc }); }catch(_){ }
         hideEditModal();
-        try{ showTokensToast('已另存为新对象'); }catch(_){ }
+        try{ toast('已另存为新对象'); }catch(_){ }
         if(window.renderTokensDashboard) window.renderTokensDashboard(false);
-      }catch(e){ alert(e.message || '另存失败'); }
+      }catch(e){ toast((e && e.message) || '另存失败'); }
     };
     btnCancel.onclick= hideEditModal; btnSubmit.onclick= submit; if(btnSaveAs) btnSaveAs.onclick = saveAs;
+    // 只读用户：仅做禁用视觉，去掉悬浮提示，点击再弹 toast
+    if(!canEdit){
+      try{ btnSubmit.classList.add('is-disabled'); }catch(_){ }
+      try{ if(btnSaveAs){ btnSaveAs.classList.add('is-disabled'); } }catch(_){ }
+    } else {
+      try{ btnSubmit.classList.remove('is-disabled'); }catch(_){ }
+      try{ if(btnSaveAs){ btnSaveAs.classList.remove('is-disabled'); } }catch(_){ }
+    }
     backdrop.style.display='block'; modal.style.display='block'; requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); }); setTimeout(()=>{ try{ editor.focus(); }catch(_){ } }, 80);
   }
   Object.assign(window.tokensAdmin, { showCreateModal, hideCreateModal, openEditModal, hideEditModal });

@@ -3,6 +3,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative; /* 供禁用提示气泡定位 */
   padding: 12px 16px;
   border-radius: 8px; /* 与 modal 按钮一致 */
   font-size: 15px;
@@ -61,6 +62,19 @@
   border-color: #e2e8f0 !important;
   box-shadow: none !important;
 }
+
+/* 统一“禁用样式/悬浮”——用于只读用户下的可点提示（不屏蔽点击，以便弹 toast） */
+.btn.is-disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+.btn.is-disabled:hover {
+  background-color: inherit !important;
+  color: inherit !important;
+}
+/* 去掉悬浮提示，禁用态仅提供视觉弱化；提示改为点击后 toast */
 
 /* 成功/危险变体（用于审核列表） */
 .btn--success {

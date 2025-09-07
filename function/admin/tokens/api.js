@@ -16,6 +16,14 @@
   }
 
   const API_BASE = 'http://localhost:3000/api';
+  const CLIENT_ID = (()=>{
+    try{
+      const k='tokens_client_id';
+      let v=localStorage.getItem(k);
+      if(!v){ v = 'web_' + Math.random().toString(36).slice(2,10) + '_' + Date.now(); localStorage.setItem(k, v); }
+      return v;
+    }catch(_){ return 'web_' + Math.random().toString(36).slice(2,10); }
+  })();
 
   // 统一的 JSON 请求封装
   async function apiJson(endpoint, opts) {
@@ -23,7 +31,8 @@
     const { token } = getAuth();
 
     // 构建请求头
-    const h = Object.assign({}, headers);
+  const h = Object.assign({}, headers);
+  try { h['x-client-id'] = CLIENT_ID; } catch(_){}
     if (auth && token) h['Authorization'] = `Bearer ${token}`;
 
     // 处理 body 与 Content-Type
@@ -48,6 +57,20 @@
     return out;
   }
 
+  // 拉取统一存储的日志
+  async function fetchTokenLogs(params){
+    const q = new URLSearchParams();
+    if (params) {
+      if (params.page) q.set('page', String(params.page));
+      if (params.pageSize) q.set('pageSize', String(params.pageSize));
+      if (params.since) q.set('since', String(params.since));
+      if (params.until) q.set('until', String(params.until));
+      if (params.collection) q.set('collection', String(params.collection));
+      if (params.docId) q.set('docId', String(params.docId));
+    }
+    return apiJson('/tokens/logs' + (q.toString()? ('?' + q.toString()) : ''), { auth: true });
+  }
+
   // 统一的集合元信息
   const COLLECTIONS = Object.freeze({
     'term-fixed': { key: 'termFixed', url: API_BASE + '/term-fixed' },
@@ -57,5 +80,5 @@
     'skill': { key: null, url: null, urls: [API_BASE + '/skill0', API_BASE + '/skill1', API_BASE + '/skill2'] },
   });
 
-  Object.assign(window.tokensAdmin, { getAuth, apiJson, API_BASE, COLLECTIONS });
+  Object.assign(window.tokensAdmin, { getAuth, apiJson, API_BASE, COLLECTIONS, CLIENT_ID, fetchTokenLogs });
 })();

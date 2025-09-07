@@ -224,6 +224,7 @@
       };
 
       const commit = async () => {
+        const canEdit = (window.tokensAdmin && window.tokensAdmin.getAuth && window.tokensAdmin.getAuth().canEdit) || false;
         const txt = input.value;
         if (txt === oldText) { revert(); return; }
 
@@ -235,12 +236,20 @@
           return;
         }
 
+        // 审核员可编辑但不可保存：直接提示并还原文字，不提交
+        if (!canEdit) {
+          try { window.tokensAdmin.showToast && window.tokensAdmin.showToast('无权限'); } catch (_) {}
+          revert();
+          return;
+        }
+
         input.disabled = true;
         target.classList.add('is-saving');
         committing = true;
 
         try {
           await apiJson('/tokens/update', { method: 'POST', auth: true, body: { collection: coll, id, path, value, valueType: type } });
+          try { window.tokensAdmin.logChange && window.tokensAdmin.logChange('update', { collection: coll, id, path, from: oldText, to: value, value }); } catch (_) {}
 
           target.textContent = (type === 'boolean' || type === 'number') ? String(value) : value;
           try { showTokensToast('已保存'); } catch (_) {}
@@ -310,7 +319,7 @@
       if (ev.ctrlKey || document.body.classList.contains('ctrl-down')) {
         const maybe = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
         if (maybe) {
-          try { showTokensToast('按 Ctrl 时仅支持删除对象'); } catch (_) {}
+          try { window.tokensAdmin.showToast && window.tokensAdmin.showToast('按 Ctrl 时仅支持删除对象'); } catch (_) {}
           ev.preventDefault();
           return;
         }
@@ -335,10 +344,11 @@
       if (!confirm(`确定删除「${keyName}」吗？此操作不可撤销。`)) return;
 
       try {
-        await apiJson('/tokens/delete', { method: 'POST', auth: true, body: { collection: coll, id, path } });
+  await apiJson('/tokens/delete', { method: 'POST', auth: true, body: { collection: coll, id, path } });
+  try { window.tokensAdmin.logChange && window.tokensAdmin.logChange('delete-field', { collection: coll, id, path, from: (row && row.querySelector ? (row.querySelector('.kv-val')?.textContent) : undefined) }); } catch (_) {}
         try { window.tokensAdmin.updateDocInState(coll, id, (doc) => deleteFieldInDocByPath(doc, path)); } catch (_) {}
         row.remove();
-        try { showTokensToast('已删除'); } catch (_) {}
+  try { window.tokensAdmin.showToast && window.tokensAdmin.showToast('已删除'); } catch (_) {}
       } catch (e) {
         alert(e.message || '删除失败');
       }
@@ -368,10 +378,11 @@
       if (!confirm('确定删除整个对象吗？此操作不可撤销。')) return;
 
       try {
-        await apiJson('/tokens/remove', { method: 'POST', auth: true, body: { collection: coll, id } });
+  await apiJson('/tokens/remove', { method: 'POST', auth: true, body: { collection: coll, id } });
+  try { window.tokensAdmin.logChange && window.tokensAdmin.logChange('delete-doc', { collection: coll, id }); } catch (_) {}
         try { window.tokensAdmin.removeDocFromState(coll, id); } catch (_) {}
         card.remove();
-        try { showTokensToast('对象已删除'); } catch (_) {}
+  try { window.tokensAdmin.showToast && window.tokensAdmin.showToast('对象已删除'); } catch (_) {}
       } catch (e) {
         alert(e.message || '删除失败');
       }

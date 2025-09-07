@@ -56,7 +56,12 @@
     const col=getAccent(obj);
     const style= col? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"`: '';
     const { canEdit }=getAuth();
-    return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${canEdit? `<div class="token-card__toolbar" role="工具栏" aria-label="对象操作"><button class="btn btn--secondary btn--xs btn-go-doc" title="跳转" aria-label="跳转">跳转</button><button class="btn btn--secondary btn--xs btn-edit-doc" title="编辑对象" aria-label="编辑对象">编辑对象</button><button class="btn btn--danger btn--xs btn-del-doc" title="删除对象" aria-label="删除对象">删除对象</button></div>`: ''}${innerHtml}</div>`;
+    const toolbar = `<div class="token-card__toolbar" role="工具栏" aria-label="对象操作">
+      <button class="btn btn--secondary btn--xs btn-go-doc" title="跳转" aria-label="跳转">跳转</button>
+      <button class="btn btn--secondary btn--xs btn-edit-doc" title="编辑对象" aria-label="编辑对象">编辑对象</button>
+      <button class="btn btn--danger btn--xs btn-del-doc${canEdit? '':' is-disabled'}" title="删除对象" aria-label="删除对象">删除对象</button>
+    </div>`;
+    return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${toolbar}${innerHtml}</div>`;
   }
   const termFixedItem=(t)=> cardShell('term-fixed', t, renderKV(t,0,getAccent(t),'') );
   const termDynamicItem=(t)=> cardShell('term-dynamic', t, renderKV(t,0,getAccent(t),'') );
@@ -88,7 +93,7 @@
     const shouldPreOpen= ((state.activeType===type) || markedOpen) && total>1;
     const allItemsHtml=(items||[]).map(renderItem).join('');
     const collapsedAreaHtml = (total>1)? '': (allItemsHtml || '<div class="tokens-empty">空</div>');
-    return `<div class="tokens-section" data-type="${type}"><div class="tokens-section__header"><div class=\"tokens-section__title\">${title} <span class=\"count-badge\">(${total})</span></div><div class=\"tokens-section__ops\">${canEdit? `<button class=\"btn btn--secondary btn--sm\" onclick=\"tokensOpenCreate('${type}')\">新增</button>`: ''}${total>1? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen? ' is-expanded':''}\" aria-expanded=\"${shouldPreOpen? 'true':'false'}\" onclick=\"toggleTokensSection('${id}')\">${shouldPreOpen? '收起':'展开'}</button>`: ''}</div></div><div id="${id}" data-type="${type}" data-expanded="${shouldPreOpen? '1':'0'}" class="tokens-section__body"><div class="token-list">${collapsedAreaHtml}</div>${total>1? `<div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen? ' is-open':''}\">${allItemsHtml}</div>`: ''}</div></div>`;
+  return `<div class="tokens-section" data-type="${type}"><div class="tokens-section__header"><div class=\"tokens-section__title\">${title} <span class=\"count-badge\">(${total})</span></div><div class=\"tokens-section__ops\"><button class=\"btn btn--secondary btn--sm\" onclick=\"tokensOpenCreate('${type}')\">新增</button>${total>1? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen? ' is-expanded':''}\" aria-expanded=\"${shouldPreOpen? 'true':'false'}\" onclick=\"toggleTokensSection('${id}')\">${shouldPreOpen? '收起':'展开'}</button>`: ''}</div></div><div id="${id}" data-type="${type}" data-expanded="${shouldPreOpen? '1':'0'}" class="tokens-section__body"><div class="token-list">${collapsedAreaHtml}</div>${total>1? `<div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen? ' is-open':''}\">${allItemsHtml}</div>`: ''}</div></div>`;
   }
   async function renderTokensDashboard(forceReload=false){
     const summaryEl=document.getElementById('tokens-summary');
@@ -110,13 +115,27 @@
   // 搜索区初始化（刷新按钮和“详细/缩略”开关）
   window.tokensAdmin.setupSearch && window.tokensAdmin.setupSearch();
       if(!summaryEl.__bindTypeFilter){ summaryEl.__bindTypeFilter=true; const handler=(ev)=>{ const t= ev.target && ev.target.closest? ev.target.closest('.type-tile'): null; if(!t) return; const tp=t.getAttribute('data-type'); if(!tp) return; state.activeType = (state.activeType===tp)? null: tp; renderTokensDashboard(false); }; summaryEl.addEventListener('click', handler); summaryEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); handler(e); } }); }
-      // 行内编辑/删除、整卡删除、编辑弹窗、跳转绑定（仅管理员）
-      if(canEdit){
-        if(!contentEl.__inlineEditBound){ window.tokensAdmin.bindInlineEdit && window.tokensAdmin.bindInlineEdit(contentEl); contentEl.__inlineEditBound=true; }
+  // 行内删除、整卡删除（仅管理员）
+  if(canEdit){
         if(!contentEl.__inlineDeleteBound){ window.tokensAdmin.bindInlineDelete && window.tokensAdmin.bindInlineDelete(contentEl); contentEl.__inlineDeleteBound=true; }
         if(!contentEl.__deleteDocBound){ window.tokensAdmin.bindDeleteDoc && window.tokensAdmin.bindDeleteDoc(contentEl); contentEl.__deleteDocBound=true; }
-        if(!contentEl.__editDocBound){ window.tokensAdmin.bindEditDoc && window.tokensAdmin.bindEditDoc(contentEl); contentEl.__editDocBound=true; }
-        if(!contentEl.__goDocBound){ window.tokensAdmin.bindGo && window.tokensAdmin.bindGo(contentEl); contentEl.__goDocBound=true; }
+      }
+  // 行内编辑、Jump 与 编辑弹窗对所有角色开放
+  if(!contentEl.__inlineEditBound){ window.tokensAdmin.bindInlineEdit && window.tokensAdmin.bindInlineEdit(contentEl); contentEl.__inlineEditBound=true; }
+      if(!contentEl.__goDocBound){ window.tokensAdmin.bindGo && window.tokensAdmin.bindGo(contentEl); contentEl.__goDocBound=true; }
+    if(!contentEl.__editDocBound){ window.tokensAdmin.bindEditDoc && window.tokensAdmin.bindEditDoc(contentEl); contentEl.__editDocBound=true; }
+
+    // 只读角色点击删除时给出提示（编辑允许打开但无法保存）
+      if(!canEdit && !contentEl.__readonlyToolbarBound){
+        contentEl.__readonlyToolbarBound = true;
+        contentEl.addEventListener('click', (ev)=>{
+          const delBtn = ev.target && ev.target.closest ? ev.target.closest('.btn-del-doc') : null;
+      const inlineDel = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
+      if(delBtn || inlineDel){
+            ev.preventDefault();
+              try{ window.tokensAdmin.showToast && window.tokensAdmin.showToast('无权限'); }catch(_){ }
+          }
+        });
       }
     }catch(e){ console.error('加载词元数据失败:', e); summaryEl.innerHTML='<div class="tokens-status tokens-status--error">加载失败，请点击“刷新”重试</div>'; }
   }

@@ -59,15 +59,29 @@ html { scrollbar-gutter: stable both-edges; }
 #panel_tokens .tokens-input-group .tokens-btn:last-of-type { border-radius: 0 6px 6px 0 !important; }
 #panel_tokens .tokens-input-group .tokens-btn + .tokens-btn { /* 紧邻按钮避免双重边框 */ border-left: none !important; }
 
+/* 点击后残留的边框：使用 :focus-visible 仅在键盘导航时显示可视焦点 */
+#panel_tokens .tokens-btn:focus { outline: none !important; box-shadow: none !important; }
+#panel_tokens .tokens-btn:focus-visible { box-shadow: 0 0 0 3px rgba(66,153,225,0.15) !important; }
+
+/* 详细/刷新按钮也应用相同规则（可能未带 tokens-btn 类时的兜底） */
+#panel_tokens .btn:focus { outline: none !important; box-shadow: none !important; }
+#panel_tokens .btn:focus-visible { box-shadow: 0 0 0 3px rgba(66,153,225,0.15) !important; }
+
 /* 缩略模式开关：激活时使用绿色语义色 */
+/* 详细/缩略切换按钮：添加过渡并使用 background-color 以启用平滑动画 */
+#panel_tokens #tokens-compact-toggle {
+  transition: background-color .22s var(--ease-standard),
+              border-color .22s var(--ease-standard),
+              color .2s var(--ease-standard);
+}
 #panel_tokens #tokens-compact-toggle.is-active {
-  background: #48BB78 !important;  /* green-400 */
+  background-color: #48BB78 !important;  /* green-400 */
   border-color: #38A169 !important; /* green-500 */
   color: #FFFFFF !important;
 }
 #panel_tokens #tokens-compact-toggle.is-active:hover,
 #panel_tokens #tokens-compact-toggle.is-active:focus-visible {
-  background: #38A169 !important;  /* green-500 */
+  background-color: #38A169 !important;  /* green-500 */
   border-color: #2F855A !important; /* green-600 */
   color: #FFFFFF !important;
 }
@@ -293,6 +307,34 @@ html { scrollbar-gutter: stable both-edges; }
   background: var(--token-bg);
   border-left-color: var(--token-accent);
 }
+
+/* 变更日志 Panel（现代样式） */
+.tokens-log { margin-top: 14px; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: #fff; }
+.tokens-log__header { display:flex; align-items:center; justify-content: space-between; gap:8px; padding:8px 12px; background:#F8FAFC; border-bottom:1px solid #e2e8f0; }
+.tokens-log__title { font-weight: 600; color:#2D3748; }
+.tokens-log__ctrls { display:flex; gap:6px; }
+.tokens-log__body { max-height: 260px; overflow: auto; padding: 8px 12px; font-size: 13px; }
+.tokens-log.is-collapsed .tokens-log__body { display: none; }
+.tokens-log__entry { padding:6px 0; border-bottom: 1px dashed #edf2f7; }
+.tokens-log__entry:last-child { border-bottom: none; }
+.tokens-log .log-row { display:flex; flex-wrap: wrap; align-items: baseline; gap:8px; color:#2D3748; }
+.tokens-log .log-time { color:#A0AEC0; font-variant: tabular-nums; }
+.tokens-log .log-pill { display:inline-block; padding:2px 6px; border-radius:999px; font-size:12px; line-height:1; border:1px solid transparent; }
+.tokens-log .log-pill,
+.tokens-log .log-ctx,
+.tokens-log .log-msg,
+.tokens-log .log-path,
+.tokens-log .log-val { font-style: normal; }
+.tokens-log .log-pill.is-green { background:#ECFDF5; color:#065F46; border-color:#A7F3D0; }
+.tokens-log .log-pill.is-red { background:#FEF2F2; color:#7F1D1D; border-color:#FECACA; }
+.tokens-log .log-pill.is-blue { background:#EFF6FF; color:#1E3A8A; border-color:#BFDBFE; }
+.tokens-log .log-pill.is-indigo { background:#EEF2FF; color:#3730A3; border-color:#C7D2FE; }
+.tokens-log .log-ctx { color:#4A5568; }
+.tokens-log .log-path { color:#2B6CB0; }
+.tokens-log code.log-code { background:#F7FAFC; border:1px solid #E2E8F0; border-radius:4px; padding:1px 4px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:12px; color:#2D3748; }
+.tokens-log .log-val { color:#2D3748; }
+.tokens-log .log-sub { padding-left: 22px; margin-top: 3px; color:#4A5568; }
+.tokens-log .log-sub.is-del { color:#7F1D1D; }
 
 #tokens-content .kv-row {
   display: grid;
@@ -594,7 +636,7 @@ html { scrollbar-gutter: stable both-edges; }
   top: 14%; /* 页面中上 */
   left: 50%;
   transform: translateX(-50%);
-  z-index: 9999;
+  z-index: 11000; /* 高于 modal(10000) 与 backdrop(9999) */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -605,7 +647,7 @@ html { scrollbar-gutter: stable both-edges; }
 }
 .tokens-toast {
   pointer-events: auto;
-  background: #F0FFF4; /* 绿底 */
+  background: #F0FFF4; /* 绿底（默认成功态） */
   border: 1px solid #9AE6B4; /* 绿边 */
   color: #22543D; /* 深绿字 */
   padding: 8px 12px;
@@ -615,20 +657,20 @@ html { scrollbar-gutter: stable both-edges; }
   line-height: 1.2;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   opacity: 0;
   transform: translateY(-6px);
   animation: tokens-toast-in .25s ease forwards, tokens-toast-out .2s ease forwards 1.8s; /* 1.8s 后开始淡出 */
 }
-.tokens-toast::before {
-  content: '';
-  width: 10px;
-  height: 10px;
-  border-right: 2px solid #38A169; /* 绿勾图标（用对勾角表示） */
-  border-bottom: 2px solid #38A169;
-  transform: rotate(45deg);
-  display: inline-block;
+.tokens-toast.tokens-toast--error {
+  background: #FEF2F2; /* 红底 */
+  border-color: #FCA5A5; /* 红边 */
+  color: #7F1D1D; /* 深红字 */
 }
+/* 明确的 SVG 勾/叉图标 */
+/* inline SVG 图标样式（无额外 span） */
+.tokens-toast > svg { flex: 0 0 auto; display: inline-block; color: currentColor; }
+.tokens-toast.tokens-toast--error > svg { color: #B91C1C; }
 @keyframes tokens-toast-in {
   from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }

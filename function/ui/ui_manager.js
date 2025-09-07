@@ -47,7 +47,7 @@ const UIManager = {
     const fileInput = document.getElementById('upload-avatar-input');
     const uploadBtn = document.getElementById('upload-avatar-button');
     // 打开头像弹窗
-    uploadBtn?.addEventListener('click', async () => {
+  uploadBtn?.addEventListener('click', async () => {
       // 打开前先尝试从服务器刷新一次头像（防止审核通过后本地仍旧是旧值）
       await this.refreshCurrentUserFromServer();
       const modal = document.getElementById('avatar-modal');
@@ -55,7 +55,13 @@ const UIManager = {
       const saved = localStorage.getItem('avatar');
       if (preview) {
         const resolved = this.resolveAvatarUrl(saved);
-        preview.src = resolved || '';
+        if (resolved) {
+          preview.src = resolved;
+          preview.style.display = 'inline-block';
+        } else {
+          try { preview.removeAttribute('src'); } catch (_) {}
+          preview.style.display = 'none';
+        }
       }
   // 加载个人待审核头像并显示在小预览
   this.loadPendingAvatarPreview();
@@ -95,10 +101,11 @@ const UIManager = {
       approveBtn.style.display = canReview ? '' : 'none';
     }
 
-    // 非 admin 隐藏“词元”页入口与面板
+    // 仅非 admin/auditor 隐藏“词元”页入口与面板（admin 与 auditor 可见）
     const tokensTab = document.querySelector('a[href="#panel_tokens"]')?.parentElement;
     const tokensPanel = document.getElementById('panel_tokens');
-    if (role !== 'admin') {
+    const canViewTokens = (role === 'admin' || role === 'auditor');
+    if (!canViewTokens) {
       if (tokensTab) tokensTab.style.display = 'none';
       if (tokensPanel) tokensPanel.style.display = 'none';
     } else {
@@ -136,7 +143,15 @@ const UIManager = {
         if (headerAvatar && resolved) { headerAvatar.src = resolved; headerAvatar.style.display = 'inline-block'; }
         // 若头像弹窗开着，也同步一下
         const avatarModalPreview = document.getElementById('avatar-modal-preview');
-        if (avatarModalPreview && resolved) avatarModalPreview.src = resolved;
+        if (avatarModalPreview) {
+          if (resolved) {
+            avatarModalPreview.src = resolved;
+            avatarModalPreview.style.display = 'inline-block';
+          } else {
+            try { avatarModalPreview.removeAttribute('src'); } catch (_) {}
+            avatarModalPreview.style.display = 'none';
+          }
+        }
       }
     } catch (_) { /* 忽略错误 */ }
   },

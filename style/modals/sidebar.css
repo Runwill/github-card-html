@@ -1,0 +1,22 @@
+/* Sidebar/backdrop split from modal.css */
+#sidebar-backdrop { backdrop-filter: blur(2px); z-index: 7990; }
+
+#sidebar-menu {
+  border: 1px solid rgba(226,232,240,0.8);
+  background: rgba(255,255,255,0.98);
+  backdrop-filter: blur(16px);
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+  min-width: 200px;
+  padding: 20px;
+  z-index: 8000;
+}
+#sidebar-menu li { list-style: none; margin-bottom: 12px; }
+#sidebar-menu li:last-child { margin-bottom: 0; }
+
+.sidebar-menu_button { transition: all .2s cubic-bezier(0.4,0,0.2,1) !important; font-weight: 500 !important; width: 100%; text-align: left; padding: 12px 16px; border-radius: 6px; color: #4a5568; background: none; border: none; cursor: pointer; font-size: 15px; }
+.sidebar-menu_button:hover { background-color: #f7fafc !important; transform: translateX(2px); }
+#logout-button:hover { background-color: #fed7d7 !important; }
+#logout-button { color: #e53e3e; }
+
+@media (max-width: 768px) { #sidebar-menu { min-width: 180px; margin: 10px; } }
