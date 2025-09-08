@@ -111,69 +111,14 @@
     return 600
   }
 
-  // 在文档内容中绘制一条贯穿屏幕宽度、与元素同高的位置高亮条（相对文本静止）：淡入→停留→淡出
+  // 行高亮条改为独立模块（function/animation/row_highlight.js）
   function highlightRowAtElement(elem, opts){
-    if (!elem) return
-    const rect = elem.getBoundingClientRect()
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
-    const elemTop = rect.top + scrollTop
-    // 使用元素自身高度（最低 24px），并保持随内容滚动
-    let height = Math.max(24, elem.offsetHeight || Math.ceil(rect.height) || 24)
-
-  // 颜色与时长
-    const baseColor = (opts && opts.rowColor) || '#2196f3' // 主题蓝
-    const alpha = (opts && typeof opts.rowAlpha === 'number') ? opts.rowAlpha : 0.2
-    const rgba = `rgba(${parseInt(baseColor.slice(1,3),16)}, ${parseInt(baseColor.slice(3,5),16)}, ${parseInt(baseColor.slice(5,7),16)}, ${alpha})`
-    const prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const fadeIn = (opts && typeof opts.rowFadeIn === 'number') ? opts.rowFadeIn : (prefersReduce ? 0 : 400)
-    const hold = (opts && typeof opts.rowHold === 'number') ? opts.rowHold : (prefersReduce ? 0 : 400)
-    const fadeOut = (opts && typeof opts.rowFadeOut === 'number') ? opts.rowFadeOut : (prefersReduce ? 0 : 600)
-
-    // 清理现有覆盖层，避免叠加
-    const prev = document.getElementById('row-highlight-overlay')
-    if (prev && prev.parentNode) prev.parentNode.removeChild(prev)
-
-    const overlay = document.createElement('div')
-    overlay.id = 'row-highlight-overlay'
-    Object.assign(overlay.style, {
-      position: 'absolute', // 绝对定位，相对文档流滚动
-      left: '0',
-      right: '0',
-      top: `${elemTop}px`,
-      height: `${height}px`,
-      background: rgba,
-      pointerEvents: 'none',
-      zIndex: '2147483647',
-      opacity: '0', // 从 0 开始以实现淡入
-      transition: fadeIn ? `opacity ${fadeIn}ms ease-out` : 'none',
-      willChange: (fadeIn || fadeOut) ? 'opacity' : 'auto'
-    })
-  document.body.appendChild(overlay)
-
-    // 触发淡入
-    void overlay.offsetHeight // 强制回流以保证过渡生效
-    requestAnimationFrame(() => { overlay.style.opacity = '1' })
-
-    // 计划淡出：在淡入结束 + 停留后开始
-    const startFadeOutAfter = fadeIn + hold
-    const fadeOutTimer = setTimeout(() => {
-      if (!overlay.parentNode) return
-      if (fadeOut) {
-        overlay.style.transition = `opacity ${fadeOut}ms ease-out`
-      } else {
-        overlay.style.transition = 'none'
-      }
-      void overlay.offsetHeight
-      overlay.style.opacity = '0'
-      const removeDelay = fadeOut ? fadeOut + 80 : 0
-      setTimeout(() => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay) }, removeDelay)
-    }, startFadeOutAfter)
-
-    // 返回移除函数，供取消时调用
-    return function removeOverlay(){
-      try { clearTimeout(fadeOutTimer) } catch(_) {}
-      try { if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay) } catch(_) {}
+    if (!elem) return function(){}
+    if (window.rowHighlight && typeof window.rowHighlight.highlightRowAtElement === 'function') {
+      return window.rowHighlight.highlightRowAtElement(elem, opts)
     }
+    // 兜底：若模块未加载，返回空函数避免报错
+    return function(){}
   }
 
   // 执行滚动：默认改为居中；若需顶部对齐，可传 opts.center === false

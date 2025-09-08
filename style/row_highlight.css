@@ -1,0 +1,9 @@
+/* 行高亮条基础样式 */
+#row-highlight-overlay {
+  position: absolute; /* 相对文档滚动 */
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 2147483647;
+  /* 颜色、top、height、opacity、transition 由 JS 动态设置 */
+}
