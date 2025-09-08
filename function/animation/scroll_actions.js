@@ -104,6 +104,13 @@
     } catch(e) { return true }
   }
 
+  // “文本进场动画”的固定时长（毫秒），用于延迟高亮出现时间
+  // 说明：按当前样式约定取 600ms，不再做动态读取；若用户开启减少动态则为 0。
+  function textEnterDurationMs(){
+    try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0 } catch(_) {}
+    return 600
+  }
+
   // 在文档内容中绘制一条贯穿屏幕宽度、与元素同高的位置高亮条（相对文本静止）：淡入→停留→淡出
   function highlightRowAtElement(elem, opts){
     if (!elem) return
@@ -189,7 +196,9 @@
     // 每次新操作前取消旧操作
     cancelCurrentOp('new-op')
 
-    selectTab(panelId)
+  // 仅在将要切换到非当前活动的 panel 时，认为是“跨页/跨面板跳转”
+  const switching = panelId ? !isPanelActive(panelId) : false
+  selectTab(panelId)
 
     // 选择第一个可滚动的目标进行滚动（避免多次滚动抖动）
     let scrollTarget = null
@@ -218,7 +227,8 @@
         }
       }
       if (behavior === 'smooth') {
-        const sd = (opts && typeof opts.rowSettleDelay === 'number') ? opts.rowSettleDelay : undefined
+        // 仅在跨面板跳转时，默认延迟等于文本进场时长；否则使用 onScrollSettled 的默认值
+        const sd = (opts && typeof opts.rowSettleDelay === 'number') ? opts.rowSettleDelay : (switching ? textEnterDurationMs() : undefined)
         const settleCtrl = onScrollSettled(fire, sd)
         __currentOp = { id: myOpId, panelId, settle: settleCtrl, removeOverlay: null }
       } else {
@@ -256,7 +266,9 @@
     const $matches = $(`.scroll.${className}`)
     if (!$matches || !$matches.length) return
 
-    selectTab(panelId)
+  // 判断是否跨面板
+  const switching = panelId ? !isPanelActive(panelId) : false
+  selectTab(panelId)
 
     let scrollTarget = null
     $matches.each(function(){
@@ -276,7 +288,7 @@
       const behavior = (opts && opts.behavior) || 'smooth'
       const fire = () => { if (isPanelActive(panelId)) highlightRowAtElement(scrollTarget, opts) }
       if (behavior === 'smooth') {
-        const sd = (opts && typeof opts.rowSettleDelay === 'number') ? opts.rowSettleDelay : undefined
+        const sd = (opts && typeof opts.rowSettleDelay === 'number') ? opts.rowSettleDelay : (switching ? textEnterDurationMs() : undefined)
         onScrollSettled(fire, sd)
       } else {
         if (isPanelActive(panelId)) fire()
