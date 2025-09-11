@@ -48,6 +48,25 @@
     // 发起请求
     const resp = await fetch(url, { method, headers: h, body: payload });
 
+    // 401 统一处理：清理登录态并跳转登录页
+    if (resp.status === 401) {
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('id');
+        localStorage.removeItem('username');
+        localStorage.removeItem('role');
+        localStorage.removeItem('avatar');
+      } catch (_) {}
+      // 避免在登录页循环跳转
+      try {
+        if (!/login\.html$/i.test(location.pathname)) {
+          // 轻量提示（可选）
+          console.warn('登录已过期，请重新登录');
+          location.href = 'login.html';
+        }
+      } catch (_) {}
+    }
+
     // 尝试解析 JSON；解析失败回退为 {}
     const out = await resp.json().catch(() => ({}));
 
