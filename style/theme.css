@@ -1,0 +1,267 @@
+.tabs-content {
+  border-color: var(--border) !important;
+}
+/* 主题变量与覆盖（轻量接管现有硬编码颜色）
+   使用方法：在 <html> 上设置 data-theme="dark" 以启用深色；不设置为浅色默认。
+*/
+
+/* 色板变量：浅色默认 */
+:root {
+  /* 基础 */
+  --bg-start: #edf2f7; /* 页面背景渐变起点 */
+  --bg-end:   #f7fafc; /* 页面背景渐变终点 */
+  --surface:  #ffffff; /* 卡片/面板背景 */
+  --surface-soft: rgba(255,255,255,0.95);
+  --border:   #e2e8f0; /* 分隔/边框 */
+  --shadow-1: rgba(0,0,0,0.08);
+  --shadow-2: rgba(0,0,0,0.12);
+
+  /* 文本 */
+  --text:        #2d3748; /* 主文本 */
+  --text-muted:  #4a5568; /* 次文本 */
+  --text-subtle: #a0aec0; /* 占位/提示 */
+
+  /* 主色/语义色 */
+  --primary-1: #8698ff;
+  --primary-2: #7084ff;
+  --primary-3: #5a6cff;
+  --primary-ring: rgba(66,153,225,0.20);
+  --primary-shadow: rgba(134, 152, 255, 0.25);
+
+  --success:       #48bb78;
+  --success-hover: #38a169;
+
+  --danger:        #f56565;
+  --danger-hover:  #e53e3e;
+
+  /* 组件专用（tokens、toast 等） */
+  --token-odd-bg:  #F7FAFC;
+  --token-even-bg: #FFFFFF;
+  --token-accent-blue: #BEE3F8;
+  --token-accent-green:#C6F6D5;
+
+  --panel-header-bg: #F7FAFC;
+  --log-bg: #fff;
+  --log-header-bg: #F8FAFC;
+  --log-border: #e2e8f0;
+
+  --toast-ok-bg:   #F0FFF4; --toast-ok-border:#9AE6B4; --toast-ok-text:#22543D;
+  --toast-err-bg:  #FEF2F2; --toast-err-border:#FCA5A5; --toast-err-text:#7F1D1D; --toast-err-icon:#B91C1C;
+}
+
+/* 深色主题变量 */
+html[data-theme="dark"] {
+  --bg-start: #0f172a; /* slate-900-ish */
+  --bg-end:   #111827; /* gray-900 */
+  --surface:  #0b1220; /* 近黑蓝，提升对比 */
+  --surface-soft: rgba(17,24,39,0.9);
+  --border:   rgba(148,163,184,0.18); /* slate-400 @ 18% */
+  --shadow-1: rgba(0,0,0,0.35);
+  --shadow-2: rgba(0,0,0,0.5);
+
+  --text:        #e5e7eb; /* gray-200 */
+  --text-muted:  #cbd5e1; /* slate-300 */
+  --text-subtle: #94a3b8; /* slate-400 */
+
+  --primary-1: #5b6cff; /* indigo-500 近似 */
+  --primary-2: #4f46e5; /* indigo-600 */
+  --primary-3: #4338ca; /* indigo-700 */
+  --primary-ring: rgba(99,102,241,0.28); /* indigo-500 ring */
+  --primary-shadow: rgba(99,102,241,0.30);
+
+  --success:       #16a34a; /* green-600 */
+  --success-hover: #15803d; /* green-700 */
+
+  --danger:        #ef4444; /* red-500 */
+  --danger-hover:  #dc2626; /* red-600 */
+
+  --token-odd-bg:  rgba(148,163,184,0.08); /* 淡石板 */
+  --token-even-bg: rgba(148,163,184,0.04);
+  --token-accent-blue: rgba(56,189,248,0.55);
+  --token-accent-green:rgba(74,222,128,0.55);
+
+  --panel-header-bg: rgba(148,163,184,0.08);
+  --log-bg: #0f172a;
+  --log-header-bg: rgba(148,163,184,0.10);
+  --log-border: rgba(148,163,184,0.18);
+
+  --toast-ok-bg:   rgba(34,197,94,0.12);
+  --toast-ok-border:rgba(34,197,94,0.35);
+  --toast-ok-text: #bbf7d0;
+  --toast-err-bg:   rgba(239,68,68,0.12);
+  --toast-err-border:rgba(239,68,68,0.35);
+  --toast-err-text: #fecaca;
+  --toast-err-icon: #fca5a5;
+}
+
+/* 全局背景与文字 */
+html, body { color: var(--text); }
+body {
+  background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%) !important;
+}
+
+/* 面板/模态通用覆盖（登录也使用 .panel） */
+.panel, #login-container {
+  background: var(--surface-soft) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 8px 32px var(--shadow-2), 0 4px 16px var(--shadow-1) !important;
+}
+.modal {
+  background: var(--surface-soft) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 20px 25px -5px var(--shadow-2), 0 10px 10px -5px var(--shadow-1) !important;
+  color: var(--text) !important;
+}
+.modal-header { border-bottom-color: var(--border) !important; }
+.modal-header h2 { color: var(--text) !important; }
+.modal-message { color: var(--text-muted) !important; }
+.modal-message.success {
+  color: var(--success) !important;
+  background: color-mix(in srgb, var(--success) 10%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--success) 40%, transparent) !important;
+}
+.modal-message.error {
+  color: var(--danger) !important;
+  background: color-mix(in srgb, var(--danger) 10%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, transparent) !important;
+}
+
+/* 表单控件 */
+.modal-form input,
+#login-form input,
+#panel_tokens .tokens-input {
+  border: 1px solid var(--border) !important;
+  background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
+  color: var(--text) !important;
+}
+.modal-form input::placeholder,
+#panel_tokens .tokens-input::placeholder { color: var(--text-subtle) !important; }
+.modal-form input:focus,
+#panel_tokens .tokens-input:focus {
+  border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important;
+  box-shadow: 0 0 0 3px var(--primary-ring) !important;
+  background: var(--surface) !important;
+}
+
+/* 按钮系统 */
+.btn { color: var(--text) }
+.btn--primary {
+  background: linear-gradient(135deg, var(--primary-1) 0%, var(--primary-2) 50%, var(--primary-3) 100%) !important;
+  background-size: 200% 200% !important;
+  background-position: 0% 50% !important;
+  color: #ffffff !important;
+  border: none !important;
+  box-shadow: 0 4px 6px -1px var(--primary-shadow) !important;
+}
+.btn--primary:hover { background-position: 100% 50% !important; }
+.btn--secondary {
+  background: transparent !important;
+  color: color-mix(in srgb, var(--text) 86%, var(--bg-end)) !important;
+  border-color: var(--border) !important;
+}
+.btn--secondary:hover {
+  background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
+  border-color: color-mix(in srgb, var(--border) 80%, transparent) !important;
+  color: var(--primary-2) !important;
+}
+.btn--success { background: var(--success) !important; color: #fff !important; border: none !important; }
+.btn--success:hover { background: var(--success-hover) !important; }
+.btn--danger { background: var(--danger) !important; color: #fff !important; border: none !important; }
+.btn--danger:hover { background: var(--danger-hover) !important; }
+.btn:disabled {
+  background: color-mix(in srgb, var(--border) 70%, transparent) !important;
+  color: var(--text-subtle) !important;
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+
+/* 顶部 Header 与导航 */
+#header {
+  background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 92%, transparent) 100%) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: 0 2px 8px var(--shadow-1), 0 4px 16px color-mix(in srgb, var(--shadow-1) 50%, transparent) !important;
+}
+#title-a { color: var(--text) !important; }
+#title-a::after { background: var(--text) !important; }
+#sidebar { background: inherit !important; }
+#header-avatar { border-color: var(--border) !important; background: var(--surface) !important; box-shadow: 0 2px 8px var(--shadow-1) !important; }
+#menu-toggle:hover { background: color-mix(in srgb, var(--text) 10%, transparent) !important; }
+.sidebar-menu_button:hover {
+  background: color-mix(in srgb, var(--text) 8%, transparent) !important;
+  color: var(--text) !important;
+}
+#logout-button:hover {
+  background: color-mix(in srgb, var(--danger) 10%, transparent) !important;
+  color: color-mix(in srgb, var(--danger) 80%, white) !important;
+}
+/* 侧边栏通用按钮轻度悬浮反馈（主题自适应）*/
+.sidebar-menu_button { color: var(--text) !important; }
+.sidebar-menu_button:hover { background: color-mix(in srgb, var(--text) 8%, transparent) !important; }
+
+/* Tokens 页：容器与卡片/分区 */
+#tokens-summary .type-tile {
+  border-color: var(--border) !important;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+#tokens-summary .type-tile__label { color: var(--text-muted) !important; }
+#tokens-summary .type-tile__value { color: var(--text) !important; }
+
+.tabs.nav[data-tabs],
+#example-tabs {
+  /* Foundation tabs 容器继承 Header 背景 */
+  background: inherit !important;
+}
+
+.tokens-section { border-color: var(--border) !important; background: var(--surface) !important; }
+.tokens-section__header { background: var(--panel-header-bg) !important; border-bottom: 1px solid var(--border) !important; }
+.tokens-section__title { color: var(--text) !important; }
+.tokens-empty { color: var(--text-subtle) !important; }
+
+#termContainer {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+/* 将池（panel_character）搜索框主题适配 */
+#panel_character #search-input {
+  background-color: var(--surface) !important; /* 覆盖内联白底 */
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+}
+#panel_character #search-input::placeholder { color: var(--text-subtle) !important; }
+#panel_character #search-input:focus { border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important; }
+
+/* 面板内临时白底块统一随主题 */
+#panel_character #div4 { background-color: var(--surface) !important; }
+
+#tokens-content .token-card {
+  background: var(--token-bg, var(--surface)) !important;
+  border: 1px solid var(--border) !important;
+  border-left-color: var(--token-accent, var(--border)) !important;
+}
+#tokens-content .token-list > .token-card:nth-child(odd) {
+  --token-bg: var(--token-odd-bg);
+  --token-accent: var(--token-accent-blue);
+}
+#tokens-content .token-list > .token-card:nth-child(even) {
+  --token-bg: var(--token-even-bg);
+  --token-accent: var(--token-accent-green);
+}
+
+#tokens-content .kv-row { border-bottom-color: var(--border) !important; }
+#tokens-content .kv-key { color: var(--text-muted) !important; }
+#tokens-content .kv-val { color: var(--text) !important; }
+#tokens-content .kv-val:not(.is-editing):hover { background: color-mix(in srgb, var(--border) 30%, transparent) !important; }
+#tokens-content .kv-val.is-editing { background: color-mix(in srgb, var(--surface) 92%, transparent) !important; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--border) 80%, transparent) !important; }
+
+.tokens-log { background: var(--log-bg) !important; border-color: var(--log-border) !important; }
+.tokens-log__header { background: var(--log-header-bg) !important; border-bottom-color: var(--log-border) !important; }
+.tokens-log__title, .tokens-log .log-row, .tokens-log .log-val { color: var(--text) !important; }
+.tokens-log .log-time, .tokens-log .log-ctx { color: var(--text-subtle) !important; }
+.tokens-log code.log-code { background: var(--panel-header-bg) !important; border-color: var(--border) !important; color: var(--text) !important; }
+
+/* Toast 样式 */
+.tokens-toast { background: var(--toast-ok-bg) !important; border-color: var(--toast-ok-border) !important; color: var(--toast-ok-text) !important; }
+.tokens-toast.tokens-toast--error { background: var(--toast-err-bg) !important; border-color: var(--toast-err-border) !important; color: var(--toast-err-text) !important; }
+.tokens-toast.tokens-toast--error > svg { color: var(--toast-err-icon) !important; }
