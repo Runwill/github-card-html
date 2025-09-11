@@ -65,25 +65,14 @@
   };
 
   const computeTint = (col, ratio = 0.95) => {
+    // 返回与主题背景（var(--surface)）按比例混合的 CSS 表达式，随主题切换自动适配。
+    // 旧含义：ratio 为“白色占比”，例如 0.95 表示 95% 白 + 5% 原色。
+    // 新实现：将“白色”替换为主题表面色 var(--surface)。为保持观感一致，保留相同的原色占比。
     if (!col) return '';
-    const hexToRgb = (h) => {
-      let r, g, b;
-      if (/^#([\da-fA-F]{3})$/.test(h)) {
-        const m = h.slice(1); r = parseInt(m[0] + m[0], 16); g = parseInt(m[1] + m[1], 16); b = parseInt(m[2] + m[2], 16); return { r, g, b };
-      }
-      if (/^#([\da-fA-F]{6})$/.test(h)) {
-        const m = h.slice(1); r = parseInt(m.slice(0, 2), 16); g = parseInt(m.slice(2, 4), 16); b = parseInt(m.slice(4, 6), 16); return { r, g, b };
-      }
-      return null;
-    };
-    const rgb = hexToRgb(col);
-    if (rgb) {
-      const r = Math.round(rgb.r * (1 - ratio) + 255 * ratio);
-      const g = Math.round(rgb.g * (1 - ratio) + 255 * ratio);
-      const b = Math.round(rgb.b * (1 - ratio) + 255 * ratio);
-      return `rgba(${r}, ${g}, ${b}, 1)`;
-    }
-    return `color-mix(in srgb, ${col} ${Math.round(ratio * 100)}%, white)`;
+    const accentPct = Math.max(0, Math.min(100, Math.round((1 - ratio) * 100)));
+    // 例：ratio=0.95 -> accentPct=5（5% 原色 + 95% 主题表面色）
+    // 使用 CSS color-mix，确保在暗/亮主题切换时跟随 var(--surface) 变化。
+    return `color-mix(in srgb, ${col} ${accentPct}%, var(--surface))`;
   };
 
   Object.assign(window.tokensAdmin, { esc, setByPath, deleteFieldInDocByPath, getAccent, computeTint });

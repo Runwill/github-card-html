@@ -72,7 +72,7 @@
       const extra = shape && shape.suggest && shape.suggest.mixedKeys && shape.suggest.mixedKeys.length ? `<div class="hints-extra">可能的可选键：${shape.suggest.mixedKeys.slice(0,20).join(', ')}${shape.suggest.mixedKeys.length>20?' …':''}</div>`: '';
       hints.innerHTML = `<div class="hints-title"><strong>${collection}</strong> 字段（• 必填）：</div><div class="hints-list">${list || '无'}</div>${extra}`;
     }
-    function renderSchemeSelector(curVariants){ if(!curVariants||curVariants.length===0){ schemeBox.innerHTML=''; schemeBox.__variants=[]; return; } schemeBox.__variants=curVariants; const groupHtml = `<div class="tokens-scheme__title">结构方案：</div><div class="tokens-scheme__group" role="radiogroup" aria-label="结构方案">${curVariants.map((v,i)=>{ const idx=i+1; const selCls=i===0? ' is-selected': ''; const aria=i===0? 'true':'false'; const tab=i===0? '0':'-1'; const title=`方案${idx}，样本 ${v.count}`; return `<div class="tokens-scheme__btn${selCls}" role="radio" aria-checked="${aria}" tabindex="${tab}" data-index="${i}" title="${esc(title)}"><span class="idx">${idx}</span><span class="cnt">${v.count}</span><span class="label">方案${idx}</span></div>`; }).join('')}</div>`; schemeBox.innerHTML=groupHtml; const selectIdx=(idx)=>{ try{ const variantsList= schemeBox.__variants||[]; if(!Number.isFinite(idx) || idx<0 || idx>=variantsList.length) return; const btns= Array.from(schemeBox.querySelectorAll('.tokens-scheme__btn')); btns.forEach((b,i)=>{ const on=i===idx; b.classList.toggle('is-selected', on); b.setAttribute('aria-checked', on? 'true':'false'); b.setAttribute('tabindex', on? '0':'-1'); }); schemeBox.dataset.selectedIndex= String(idx); const v= variantsList[idx]; if(v){ editor.value= JSON.stringify(v.tpl||{}, null, 2); renderHintsFromVariants(v.tpl, variantsList); } }catch(_){ } };
+  function renderSchemeSelector(curVariants){ if(!curVariants||curVariants.length===0){ schemeBox.innerHTML=''; schemeBox.__variants=[]; return; } schemeBox.__variants=curVariants; const groupHtml = `<div class="tokens-scheme__group" role="radiogroup" aria-label="结构方案">${curVariants.map((v,i)=>{ const idx=i+1; const selCls=i===0? ' is-selected': ''; const aria=i===0? 'true':'false'; const tab=i===0? '0':'-1'; const title=`方案${idx}，样本 ${v.count}`; return `<div class="tokens-scheme__btn${selCls}" role="radio" aria-checked="${aria}" tabindex="${tab}" data-index="${i}" title="${esc(title)}"><span class="idx">${idx}</span><span class="cnt">${v.count}</span><span class="label">方案${idx}</span></div>`; }).join('')}</div>`; schemeBox.innerHTML=groupHtml; const selectIdx=(idx)=>{ try{ const variantsList= schemeBox.__variants||[]; if(!Number.isFinite(idx) || idx<0 || idx>=variantsList.length) return; const btns= Array.from(schemeBox.querySelectorAll('.tokens-scheme__btn')); btns.forEach((b,i)=>{ const on=i===idx; b.classList.toggle('is-selected', on); b.setAttribute('aria-checked', on? 'true':'false'); b.setAttribute('tabindex', on? '0':'-1'); }); schemeBox.dataset.selectedIndex= String(idx); const v= variantsList[idx]; if(v){ editor.value= JSON.stringify(v.tpl||{}, null, 2); renderHintsFromVariants(v.tpl, variantsList); } }catch(_){ } };
       if(!schemeBox.__bound){ schemeBox.__bound=true; schemeBox.addEventListener('click',(e)=>{ const btn=e.target && e.target.closest? e.target.closest('.tokens-scheme__btn'): null; if(!btn) return; const idx=Number(btn.getAttribute('data-index')); if(!Number.isFinite(idx)) return; selectIdx(idx); }); schemeBox.addEventListener('keydown',(e)=>{ const btns= Array.from(schemeBox.querySelectorAll('.tokens-scheme__btn')); if(btns.length===0) return; const cur=Number(schemeBox.dataset.selectedIndex||'0'); let next=cur; if(e.key==='ArrowRight'||e.key==='ArrowDown'){ next=(cur+1)%btns.length; e.preventDefault(); } else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){ next=(cur-1+btns.length)%btns.length; e.preventDefault(); } else if(e.key==='Home'){ next=0; e.preventDefault(); } else if(e.key==='End'){ next=btns.length-1; e.preventDefault(); } else if(e.key==='Enter'||e.key===' '){ e.preventDefault(); selectIdx(cur); btns[cur].focus(); return; } else { return; } selectIdx(next); try{ btns[next].focus(); }catch(_){ } }); }
       selectIdx(0);
     }
@@ -97,7 +97,14 @@
   // 只读用户：仅做禁用视觉，去掉悬浮提示，点击再弹 toast
   if(!canEdit){ try{ btnSubmit.classList.add('is-disabled'); }catch(_){ } }
   else { try{ btnSubmit.classList.remove('is-disabled'); }catch(_){ } }
-    backdrop.style.display='block'; modal.style.display='block'; requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); }); setTimeout(()=>{ try{ editor.focus(); }catch(_){} }, 80);
+    backdrop.style.display='block'; modal.style.display='block';
+    // 确保标题进入动画：移除残留的 visible，再触发 animate-in
+    try{
+      const h2 = modal.querySelector('.modal-header h2');
+      if(h2){ h2.classList.remove('animate-in','visible'); void h2.offsetWidth; h2.classList.add('animate-in'); }
+    }catch(_){ }
+    requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); });
+    setTimeout(()=>{ try{ editor.focus(); }catch(_){} }, 80);
   }
   // 编辑弹窗：与新建弹窗布局一致，含“另存”按钮
   function ensureEditModal(){
@@ -181,7 +188,13 @@
       try{ btnSubmit.classList.remove('is-disabled'); }catch(_){ }
       try{ if(btnSaveAs){ btnSaveAs.classList.remove('is-disabled'); } }catch(_){ }
     }
-    backdrop.style.display='block'; modal.style.display='block'; requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); }); setTimeout(()=>{ try{ editor.focus(); }catch(_){ } }, 80);
+    backdrop.style.display='block'; modal.style.display='block';
+    try{
+      const h2 = modal.querySelector('.modal-header h2');
+      if(h2){ h2.classList.remove('animate-in','visible'); void h2.offsetWidth; h2.classList.add('animate-in'); }
+    }catch(_){ }
+    requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); });
+    setTimeout(()=>{ try{ editor.focus(); }catch(_){ } }, 80);
   }
   Object.assign(window.tokensAdmin, { showCreateModal, hideCreateModal, openEditModal, hideEditModal });
 })();

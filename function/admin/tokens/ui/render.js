@@ -7,6 +7,60 @@
   const { apiJson, COLLECTIONS, getAuth } = T;
   const { filterByQuery, HIDE_KEYS } = T;
 
+  // 类型摘要卡（type-tile）的浅色基色映射（与 CSS 中保持一致）
+  const TYPE_TILE_BASE_BG = Object.freeze({
+    'term-fixed':   '#EDF2F7',
+    'term-dynamic': '#E6FFFA',
+    'card':         '#FEF3C7',
+    'character':    '#E9D8FD',
+    'skill':        '#C6F6D5'
+  });
+
+  function isDarkTheme(){
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+  }
+
+  // 根据当前主题为 #tokens-summary 内的 .type-tile 应用背景色；深色时反转亮度
+  function applyTypeTileTheme(){
+    try{
+      const list = document.querySelectorAll('#tokens-summary .type-tile');
+      if(!list || list.length===0) return;
+      const invert = (col)=>{
+        try{
+          if(window.ColorUtils && typeof ColorUtils.invertColor === 'function'){
+            // 仅反转亮度，保持色相/饱和度；输出使用 rgb/rgba
+            return ColorUtils.invertColor(col, { mode:'luma', amount:1, output:'rgb' });
+          }
+        }catch(_){ }
+        return col; // 兜底：原色
+      };
+      const dark = isDarkTheme();
+      list.forEach(tile=>{
+        const tp = tile.getAttribute('data-type') || '';
+        const base = TYPE_TILE_BASE_BG[tp];
+        if(!base) return;
+        // 仅设置 backgroundColor，避免干扰边框/阴影等
+        const color = dark ? invert(base) : base;
+        // 使用 !important 覆盖主题中对背景的强制设定
+        try { tile.style.setProperty('background-color', color, 'important'); }
+        catch(_) { tile.style.backgroundColor = color; }
+      });
+    }catch(_){ }
+  }
+
+  // 绑定主题切换监听，主题变化时重新应用
+  function ensureThemeObserverForTiles(){
+    const host = document.getElementById('tokens-summary');
+    if(!host) return;
+    if(host.__tileThemeObserverBound) return;
+    host.__tileThemeObserverBound = true;
+    try{
+      const mo = new MutationObserver(()=> applyTypeTileTheme());
+      mo.observe(document.documentElement, { attributes:true, attributeFilter:['data-theme'] });
+      host.__tileThemeObserver = mo;
+    }catch(_){ }
+  }
+
   // 以键值对树形形式渲染对象；支持缩略模式
   function renderKV(obj, level=0, accent=null, basePath=''){
     const isObj=(v)=> v && typeof v==='object' && !Array.isArray(v);
@@ -110,11 +164,18 @@
         ]);
         state.data={ termFixed, termDynamic, cards, characters, s0, s1, s2 };
       }
-      const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', key:'静态术语', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', key:'动态术语', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', key:'牌', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', key:'武将', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', key:'技能', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"><div class="type-tile__label">${t.key}</div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); summaryEl.__initialized=true; } else { const map=new Map(tiles.map(t=>[t.type,t])); summaryEl.querySelectorAll('.type-tile').forEach(node=>{ const tp=node.getAttribute('data-type'); const conf=map.get(tp); if(!conf) return; const isActive= state.activeType===tp; node.classList.toggle('is-active',!!isActive); node.classList.toggle('is-dim',!!(state.activeType && !isActive)); node.setAttribute('aria-pressed', isActive? 'true':'false'); const valEl=node.querySelector('.type-tile__value'); if(valEl) valEl.textContent=String(conf.value); }); }
+      const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', key:'静态术语', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', key:'动态术语', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', key:'牌', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', key:'武将', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', key:'技能', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"><div class="type-tile__label">${t.key}</div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); summaryEl.__initialized=true; 
+        // 初次渲染后应用主题色，并绑定主题观察者
+        applyTypeTileTheme();
+        ensureThemeObserverForTiles();
+      } else { const map=new Map(tiles.map(t=>[t.type,t])); summaryEl.querySelectorAll('.type-tile').forEach(node=>{ const tp=node.getAttribute('data-type'); const conf=map.get(tp); if(!conf) return; const isActive= state.activeType===tp; node.classList.toggle('is-active',!!isActive); node.classList.toggle('is-dim',!!(state.activeType && !isActive)); node.setAttribute('aria-pressed', isActive? 'true':'false'); const valEl=node.querySelector('.type-tile__value'); if(valEl) valEl.textContent=String(conf.value); }); 
+        // 更新统计值后也重新应用（防止列表被重建导致样式丢失）
+        applyTypeTileTheme();
+      }
       const q=state.q; const sections=[ { type:'term-fixed', title:'静态术语', items:Array.isArray(termFixed)? filterByQuery(termFixed,q): [], render: termFixedItem }, { type:'term-dynamic', title:'动态术语', items:Array.isArray(termDynamic)? filterByQuery(termDynamic,q): [], render: termDynamicItem }, { type:'card', title:'牌', items:Array.isArray(cards)? filterByQuery(cards,q): [], render: cardItem }, { type:'character', title:'武将', items:Array.isArray(characters)? filterByQuery(characters,q): [], render: characterItem }, { type:'skill', title:'技能', items:Array.isArray(skills)? filterByQuery(skills,q): [], render: skillItem } ]; const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.title,s.items,s.render, canEdit)).join(''); try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
   // 搜索区初始化（刷新按钮和“详细/缩略”开关）
   window.tokensAdmin.setupSearch && window.tokensAdmin.setupSearch();
-      if(!summaryEl.__bindTypeFilter){ summaryEl.__bindTypeFilter=true; const handler=(ev)=>{ const t= ev.target && ev.target.closest? ev.target.closest('.type-tile'): null; if(!t) return; const tp=t.getAttribute('data-type'); if(!tp) return; state.activeType = (state.activeType===tp)? null: tp; renderTokensDashboard(false); }; summaryEl.addEventListener('click', handler); summaryEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); handler(e); } }); }
+  if(!summaryEl.__bindTypeFilter){ summaryEl.__bindTypeFilter=true; const handler=(ev)=>{ const t= ev.target && ev.target.closest? ev.target.closest('.type-tile'): null; if(!t) return; const tp=t.getAttribute('data-type'); if(!tp) return; state.activeType = (state.activeType===tp)? null: tp; renderTokensDashboard(false); }; summaryEl.addEventListener('click', handler); summaryEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); handler(e); } }); }
   // 行内删除、整卡删除（仅管理员）
   if(canEdit){
         if(!contentEl.__inlineDeleteBound){ window.tokensAdmin.bindInlineDelete && window.tokensAdmin.bindInlineDelete(contentEl); contentEl.__inlineDeleteBound=true; }

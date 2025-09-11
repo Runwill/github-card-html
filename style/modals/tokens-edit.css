@@ -1,8 +1,6 @@
 /* Tokens edit modal split */
 #tokens-edit-backdrop.modal-backdrop { background: rgba(15, 23, 42, 0.35); }
 #tokens-edit-modal.modal { max-width: 900px; width: 96%; max-height: 86vh; --tokens-pane-h: 48vh; }
-#tokens-edit-modal .modal-header { justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid #e6eef5; }
-#tokens-edit-modal .modal-header h2 { font-size: 1.15rem; letter-spacing: .2px; }
 #tokens-edit-modal .modal-form { display: grid; grid-template-columns: 320px 1fr; gap: 12px; }
 
 #tokens-edit-hints, #tokens-edit-hints * { animation: none !important; }

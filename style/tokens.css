@@ -242,6 +242,9 @@ html { scrollbar-gutter: stable both-edges; }
   animation-delay: var(--enter-delay, 0ms);
   transition: box-shadow .2s ease, transform .2s ease;
   position: relative; /* 作为悬浮工具条定位参考 */
+  /* 优化：非可视区域跳过绘制，降低主题切换时重绘成本 */
+  content-visibility: auto;
+  contain-intrinsic-size: 0 160px; /* 估算高度，避免布局跳动 */
 }
 
 /* 对象卡片工具条：悬浮角标，不占用布局高度 */
@@ -579,6 +582,14 @@ html { scrollbar-gutter: stable both-edges; }
   color: #718096;
   font-size: 12px;
   margin-bottom: 4px;
+}
+
+/* 深色模式：提高标题与数组索引的可读性 */
+[data-theme="dark"] #tokens-content .nest-title {
+  color: #E2E8F0; /* gray-300 */
+}
+[data-theme="dark"] #tokens-content .arr-index {
+  color: #CBD5E0; /* gray-400 */
 }
 
 /* 确保数组项容器不重置变量，从而不会阻断继承 */
