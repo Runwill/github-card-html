@@ -291,3 +291,12 @@ body {
 
 /* 计数徽标：背景继承父元素 */
 .count-badge { background: inherit !important; }
+
+/* 将池：深色模式下提高武将图标水印可见度 */
+html[data-theme="dark"] .container:hover .role_icon.dominator,
+html[data-theme="dark"] .container:hover .role_icon.not_dominator {
+  opacity: 0.06 !important; /* 由 0.025 提升，避免在深色底上消失 */
+}
+
+/* 使用 mask 渲染的武将图标：颜色随主题文字色变化 */
+.role_icon--mask { background-color: var(--text) !important; }

@@ -36,15 +36,15 @@ function CharacterReplace(character,skill) {
 
                     standardCharacters += "<characterParagraph class='characterParagraph'><div class='container'><div class='role_title'>" + character[j].title + "</div>"
                     
-                    standardCharacters += "<img src='source/"
-                    standardCharacters += character[j].position
-                    if(character[j].dominator)standardCharacters += "_君主"
-                    standardCharacters += ".png' width='300' height='300' class='role_icon"
-
-                    if(character[j].dominator)standardCharacters += " dominator"
-                    else standardCharacters += " not_dominator"
-
-                    standardCharacters += "'><padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
+                    // 使用 CSS mask 将黑色形状渲染为主题文字色
+                    var iconPath = "source/" + character[j].position + (character[j].dominator ? "_君主" : "") + ".png";
+                    standardCharacters += "<div class='role_icon" + (character[j].dominator ? " dominator" : " not_dominator") + " role_icon--mask' "
+                        + "style=\"width:300px;height:300px;"
+                        + "-webkit-mask-image:url('" + iconPath + "');mask-image:url('" + iconPath + "');"
+                        + "-webkit-mask-size:contain;mask-size:contain;"
+                        + "-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;"
+                        + "-webkit-mask-position:center;mask-position:center;\"></div>"
+                        + "<padding><h3>" + characterID[i] + " <characterName class=\"characterID" + characterID[i] + " scroll\"></characterName> "
 
                     for (let a = 0; a < character[j].health; a++)standardCharacters += "<health epithet='2' style='font-size: 1.3em;letter-spacing: -2px;'></health>"
 

@@ -12,10 +12,19 @@ const HIGHLIGHT_CONFIG = {
 
 /**
  * 统一的高亮应用函数
+ * 在暗色主题下会对高亮颜色进行亮度反转（保持色相/饱和度），以获得更好的对比度
  * @param {string|jQuery} selector - 选择器或jQuery对象
  * @param {string} color - 高亮颜色
  */
 function applyHighlight(selector, color) {
+    // 在暗色模式反转亮度（依赖 ColorUtils），未加载则保持原色
+    try {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+        if (isDark && color && window.ColorUtils && typeof window.ColorUtils.invertColor === 'function') {
+            color = window.ColorUtils.invertColor(color, { mode: 'luma', output: 'auto' })
+        }
+    } catch (e) { /* 忽略安全失败，继续使用原色 */ }
+
     $(selector).css({
         'background-color': color,
         'transition': `background-color ${HIGHLIGHT_CONFIG.HIGHLIGHT_DURATION} ${HIGHLIGHT_CONFIG.EASE_TYPE}`
