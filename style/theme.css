@@ -143,6 +143,10 @@ body {
   background: var(--surface) !important;
 }
 
+/* Tokens 工具栏按钮与输入框边框颜色一致 */
+#panel_tokens .tokens-btn { border-color: var(--border) !important; }
+#panel_tokens #tokens-compact-toggle { border-color: var(--border) !important; }
+
 /* 按钮系统 */
 .btn { color: var(--text) }
 .btn--primary {
@@ -235,6 +239,25 @@ body {
 /* 面板内临时白底块统一随主题 */
 #panel_character #div4 { background-color: var(--surface) !important; }
 
+/* 草稿面板：继承父级色彩，并对输入框做主题化 */
+#panel_draft,
+#panel_draft * {
+  color: inherit;
+}
+#panel_draft .draftBlock { background: inherit !important; }
+#panel_draft #htmlInput {
+  background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px;
+}
+#panel_draft #htmlInput::placeholder { color: var(--text-subtle) !important; }
+#panel_draft #htmlInput:focus {
+  border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important;
+  box-shadow: 0 0 0 3px var(--primary-ring) !important;
+  background: var(--surface) !important;
+}
+
 #tokens-content .token-card {
   background: var(--token-bg, var(--surface)) !important;
   border: 1px solid var(--border) !important;
@@ -265,3 +288,6 @@ body {
 .tokens-toast { background: var(--toast-ok-bg) !important; border-color: var(--toast-ok-border) !important; color: var(--toast-ok-text) !important; }
 .tokens-toast.tokens-toast--error { background: var(--toast-err-bg) !important; border-color: var(--toast-err-border) !important; color: var(--toast-err-text) !important; }
 .tokens-toast.tokens-toast--error > svg { color: var(--toast-err-icon) !important; }
+
+/* 计数徽标：背景继承父元素 */
+.count-badge { background: inherit !important; }
