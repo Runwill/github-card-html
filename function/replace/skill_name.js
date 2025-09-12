@@ -44,22 +44,29 @@ function replace_skill_name(path, paragraphs = document){
                         // 只创建一次tooltip并复用（使用全局样式类，移除内联样式依赖）
                         if (!window._loreTooltipAppended) {
                             window._loreTooltipAppended = true;
-                            $('body').append('<div id="lore-tooltip" aria-hidden="true"></div>');
+                            $('body').append('<div id="lore-tooltip" aria-hidden="true" role="tooltip"></div>');
                         }
                         const $tooltip = $('#lore-tooltip');
 
+                        // 进入/离开延时，减少穿梭抖动
+                        let showTimer = null;
+                        let hideTimer = null;
+
                         element.on('mouseenter', function () {
+                            clearTimeout(hideTimer);
+                            const target = this;
+                            showTimer = setTimeout(() => {
                             const loreText = '「' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].lore + '」——《' + skill[$(this).prop('loreSkillPosition')].role[$(this).prop('loreRolePosition')].legend + '》';
                             
                             // 获取目标元素在页面上的位置和宽度
-                            const rect = this.getBoundingClientRect();
+                            const rect = target.getBoundingClientRect();
                             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
                             const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
                             const viewportWidth = window.innerWidth;
                             
                             // 计算最佳位置 - 默认居中显示在元素下方
                             let left = rect.left + scrollLeft + rect.width / 2;
-                            let top = rect.bottom + scrollTop + 8; // 无箭头时更贴近元素
+                            let top = rect.bottom + scrollTop + 10; // 保持与箭头的距离
                             let placement = 'bottom';
                             const margin = 12;
 
@@ -84,17 +91,7 @@ function replace_skill_name(path, paragraphs = document){
                                 scrollLeft + viewportWidth - tipWidth - margin
                             );
 
-                            // 如果超出可视宽度（即使已经尽量贴边），启用自适应：限制最大宽度并允许换行
-                            const availableWidth = viewportWidth - 2 * margin;
-                            if (tipWidth > availableWidth) {
-                                $tooltip.css({ 'max-width': availableWidth + 'px', 'white-space': 'normal' });
-                                tipWidth = $tooltip.outerWidth();
-                                tipHeight = $tooltip.outerHeight();
-                                left = Math.min(
-                                    Math.max(rect.left + scrollLeft + rect.width / 2 - tipWidth * 0.15, scrollLeft + margin),
-                                    scrollLeft + viewportWidth - tipWidth - margin
-                                );
-                            }
+                            // 取消限宽：不再强制设置 max-width，保持内容自然宽度
 
                             // 上下边界检测 - 如果下方空间不够，显示在上方
                             if (top + tipHeight > window.innerHeight + scrollTop - margin) {
@@ -118,10 +115,14 @@ function replace_skill_name(path, paragraphs = document){
                                 .addClass(fromLeft ? 'from-left' : 'from-right')
                                 .addClass('show')
                                 .attr('aria-hidden', 'false');
+                            }, 60); // 轻微延时，使体验更从容
                         })
                         // 鼠标离开时通过移除类隐藏，由 CSS 过渡控制
                         element.on('mouseleave', function () {
-                            $tooltip.removeClass('show from-left from-right').attr('aria-hidden', 'true');
+                            clearTimeout(showTimer);
+                            hideTimer = setTimeout(() => {
+                                $tooltip.removeClass('show from-left from-right').attr('aria-hidden', 'true');
+                            }, 60);
                         })
                     }
                 }
