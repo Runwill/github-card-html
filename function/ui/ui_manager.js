@@ -358,15 +358,23 @@ const UIManager = {
     backdrop.style.display = 'block';
     modal.style.display = 'block';
 
+    // 确保每次打开都能触发过渡：移除 show，强制 reflow，再添加
+    backdrop.classList.remove('show');
+    modal.classList.remove('show');
+    try { void backdrop.offsetWidth; void modal.offsetWidth; } catch (_) {}
+
     const responseMessage = modal.querySelector('#responseMessage');
     if (responseMessage) {
       responseMessage.textContent = '';
       responseMessage.className = 'modal-message';
     }
 
+    // 双 rAF，避免样式合并导致过渡不触发
     requestAnimationFrame(() => {
-      backdrop.classList.add('show');
-      modal.classList.add('show');
+      requestAnimationFrame(() => {
+        backdrop.classList.add('show');
+        modal.classList.add('show');
+      });
     });
 
     this.handleModalSpecialCases(modalId, modal);
@@ -383,10 +391,12 @@ const UIManager = {
     modal.classList.remove('show');
 
     setTimeout(() => {
+      // 若当前没有其它弹窗，则隐藏遮罩
       if (!this.state.currentModal) {
         backdrop.style.display = 'none';
-        modal.style.display = 'none';
       }
+      // 无论是否有其它弹窗，关闭的这个弹窗都应彻底隐藏
+      modal.style.display = 'none';
     }, 300);
   },
 
