@@ -100,6 +100,12 @@ body {
   background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%) !important;
 }
 
+/* 主题切换时的轻量过渡（全页淡入），避免对每个节点颜色/背景做昂贵过渡 */
+html.theme-switching body {
+  transition: opacity 180ms ease;
+  opacity: 0.96;
+}
+
 /* 面板/模态通用覆盖（登录也使用 .panel） */
 .panel, #login-container {
   background: var(--surface-soft) !important;

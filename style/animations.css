@@ -32,7 +32,12 @@ padding padding padding { animation-delay: 0.12s; }
 
 .ripple { position: absolute; border-radius: 50%; background: rgba(45, 55, 72, 0.3); transform: scale(0); animation: ripple-animation 0.6s linear; pointer-events: none; }
 
-.button, .wave { position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.button, .wave {
+    position: relative;
+    overflow: hidden;
+    /* 仅对可合成属性做过渡，避免主题切换时对 color/background/box-shadow 的大面积动画 */
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 .button:hover, .wave:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
 
 html { scroll-behavior: smooth; }
@@ -51,5 +56,10 @@ html { scroll-behavior: smooth; }
 
 .highlight-on-scroll { background: linear-gradient(120deg, transparent 0%, rgba(255, 215, 0, 0.3) 50%, transparent 100%); background-repeat: no-repeat; background-size: 0% 100%; animation: highlight 1s ease-out forwards; }
 
-.smart-fade-in { opacity: 0; transform: translateY(20px); transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+.smart-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    /* 限定为 opacity/transform，避免主题变量变动触发的 repaint 动画 */
+    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
 .smart-fade-in.loaded { opacity: 1; transform: translateY(0); }

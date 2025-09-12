@@ -89,10 +89,12 @@ span {
     line-height: 1.9em;
     position: relative;
     transform: translateX(0);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 仅对 transform/box-shadow/背景边线启用过渡，避免主题变量变动造成全局动画 */
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-left-color 0.2s ease, box-shadow 0.2s ease;
     border-left: 3px solid transparent;
     padding-left: 0;
-    will-change: transform, background, border-left, padding-left, box-shadow;
+    /* 降低 will-change 范围，避免持续的合成层开销 */
+    will-change: transform;
 }
 
 .indent .indent { transition-delay: 0.1s; }
