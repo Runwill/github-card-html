@@ -5,8 +5,9 @@
     display: block;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(4px) scale(0.98);
-    transition: opacity 180ms var(--animation-easing), transform 180ms var(--animation-easing), visibility 0s linear 180ms;
+    transform: translateY(6px) scale(0.985);
+    transition: opacity 220ms var(--animation-easing, cubic-bezier(0.4, 0, 0.2, 1)), transform 260ms var(--animation-easing, cubic-bezier(0.4, 0, 0.2, 1)), visibility 0s linear 220ms;
+    will-change: opacity, transform;
 
     /* 主题自适应：使用全局变量，随 data-theme 切换 */
     background: var(--surface-soft);
@@ -28,10 +29,19 @@
 }
 
 #lore-tooltip.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-    transition: opacity 200ms var(--animation-easing), transform 200ms var(--animation-easing), visibility 0s linear 0s;
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) translateX(0) scale(1);
+        transition: opacity 260ms var(--animation-easing, cubic-bezier(0.4, 0, 0.2, 1)), transform 320ms var(--animation-easing, cubic-bezier(0.4, 0, 0.2, 1)), visibility 0s linear 0s;
+}
+
+/* 方向类：根据进入方向提供轻微水平位移，提升“优雅感” */
+#lore-tooltip.from-left:not(.show)   { transform: translateY(6px) translateX(-8px) scale(0.985); }
+#lore-tooltip.from-right:not(.show)  { transform: translateY(6px) translateX( 8px) scale(0.985); }
+
+/* 减少运动时的模糊感（可选启用） */
+@media (prefers-reduced-motion: no-preference) {
+    #lore-tooltip { backface-visibility: hidden; }
 }
 
 #lore-tooltip::after {

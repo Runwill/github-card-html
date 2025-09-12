@@ -3,7 +3,8 @@
     position: fixed;
     z-index: 999999;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: #fff;
+    /* 主题自适应：轻薄蒙层，沿用 surface 体系 */
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -18,8 +19,10 @@
 .loading-bar-container {
     width: 39vw;
     height: 8px;
-    background: #e0e0e0;
-    border-radius: 4px;
+    background: color-mix(in srgb, var(--surface) 86%, transparent);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    box-shadow: 0 6px 16px var(--shadow-1);
     overflow: hidden;
     opacity: 0;
     animation: fade-in 0.5s ease-in 0.3s forwards;
@@ -28,8 +31,14 @@
 .loading-bar {
     width: 0%;
     height: 100%;
-    background: linear-gradient(90deg, #3f3f3f 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%);
-    border-radius: 4px;
+    /* 渐变条使用主题主色，并在深色下保持对比 */
+    background: linear-gradient(90deg,
+        color-mix(in srgb, var(--primary-3) 80%, var(--surface)) 0%,
+        color-mix(in srgb, var(--primary-2) 90%, var(--surface)) 12%,
+        color-mix(in srgb, var(--primary-1) 95%, var(--surface)) 96%,
+        color-mix(in srgb, var(--primary-2) 88%, var(--surface)) 100%
+    );
+    border-radius: 6px;
     animation: loading-progress 1.2s cubic-bezier(.4,0,.2,1) 0.8s forwards;
     transform: translateZ(0);
     will-change: width;
@@ -42,13 +51,18 @@
 .loading-title {
     margin-bottom: 18px;
     font-size: 1.5em;
-    color: #66666650;
+    color: color-mix(in srgb, var(--text) 55%, transparent);
     letter-spacing: 1em;
     font-family: '康熙';
     opacity: 0;
     animation: fade-in 0.5s ease-in forwards, pulse 2s ease-in-out infinite 1s;
     transform: translateZ(0);
     will-change: opacity, letter-spacing;
+}
+
+/* 日间模式：恢复原始进度条配色；夜间保持当前主题渐变 */
+html:not([data-theme="dark"]) .loading-bar {
+    background: linear-gradient(90deg, #3f3f3f 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%) !important;
 }
 
 @keyframes loading-progress {

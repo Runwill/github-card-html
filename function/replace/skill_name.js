@@ -59,7 +59,7 @@ function replace_skill_name(path, paragraphs = document){
                             
                             // 计算最佳位置 - 默认居中显示在元素下方
                             let left = rect.left + scrollLeft + rect.width / 2;
-                            let top = rect.bottom + scrollTop + 12;
+                            let top = rect.bottom + scrollTop + 8; // 无箭头时更贴近元素
                             let placement = 'bottom';
                             const margin = 12;
 
@@ -102,17 +102,26 @@ function replace_skill_name(path, paragraphs = document){
                                 placement = 'top';
                             }
 
+                            // 根据 tooltip 相对视口的水平位置选择进入方向类
+                            const tooltipCenterX = left + tipWidth / 2 - scrollLeft;
+                            const viewportCenterX = viewportWidth / 2;
+                            const fromLeft = tooltipCenterX > viewportCenterX; // 右侧区域 -> 从左略入
+
+                            // 先清理方向类，后续再按需添加
+                            $tooltip.removeClass('from-left from-right');
+
                             // 定位并显示（通过 class 触发 CSS 过渡），确保移除会干扰动画的 inline 样式
                             $tooltip
                                 .attr('data-placement', placement)
                                 .css({ left: left + 'px', top: top + 'px', visibility: 'visible' })
                                 .each(function(){ this.style.removeProperty('opacity'); this.style.removeProperty('transform'); })
+                                .addClass(fromLeft ? 'from-left' : 'from-right')
                                 .addClass('show')
                                 .attr('aria-hidden', 'false');
                         })
                         // 鼠标离开时通过移除类隐藏，由 CSS 过渡控制
                         element.on('mouseleave', function () {
-                            $tooltip.removeClass('show').attr('aria-hidden', 'true');
+                            $tooltip.removeClass('show from-left from-right').attr('aria-hidden', 'true');
                         })
                     }
                 }
