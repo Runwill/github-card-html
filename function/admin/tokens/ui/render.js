@@ -173,6 +173,28 @@
         applyTypeTileTheme();
       }
       const q=state.q; const sections=[ { type:'term-fixed', title:'静态术语', items:Array.isArray(termFixed)? filterByQuery(termFixed,q): [], render: termFixedItem }, { type:'term-dynamic', title:'动态术语', items:Array.isArray(termDynamic)? filterByQuery(termDynamic,q): [], render: termDynamicItem }, { type:'card', title:'牌', items:Array.isArray(cards)? filterByQuery(cards,q): [], render: cardItem }, { type:'character', title:'武将', items:Array.isArray(characters)? filterByQuery(characters,q): [], render: characterItem }, { type:'skill', title:'技能', items:Array.isArray(skills)? filterByQuery(skills,q): [], render: skillItem } ]; const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.title,s.items,s.render, canEdit)).join(''); try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
+
+      // 点击区段抬头，等效于点击“展开/收起”按钮
+      if(!contentEl.__sectionHeaderToggleBound){
+        contentEl.__sectionHeaderToggleBound = true;
+        contentEl.addEventListener('click', (ev)=>{
+          try{
+            const header = ev.target && ev.target.closest ? ev.target.closest('.tokens-section__header') : null;
+            if(!header) return;
+            // 若点在可交互元素上（按钮/链接/表单等），交由原逻辑处理
+            const interactive = ev.target.closest('button, a, input, textarea, select, [role="button"]');
+            if(interactive) return;
+            const section = header.closest('.tokens-section');
+            if(!section) return;
+            const body = section.querySelector('.tokens-section__body');
+            if(!body || !body.id) return;
+            // 触发展开/收起
+            if(typeof window.toggleTokensSection === 'function'){
+              window.toggleTokensSection(body.id);
+            }
+          }catch(_){ }
+        });
+      }
   // 搜索区初始化（刷新按钮和“详细/缩略”开关）
   window.tokensAdmin.setupSearch && window.tokensAdmin.setupSearch();
   if(!summaryEl.__bindTypeFilter){ summaryEl.__bindTypeFilter=true; const handler=(ev)=>{ const t= ev.target && ev.target.closest? ev.target.closest('.type-tile'): null; if(!t) return; const tp=t.getAttribute('data-type'); if(!tp) return; state.activeType = (state.activeType===tp)? null: tp; renderTokensDashboard(false); }; summaryEl.addEventListener('click', handler); summaryEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); handler(e); } }); }
