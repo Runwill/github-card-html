@@ -317,6 +317,26 @@ html { scrollbar-gutter: stable both-edges; }
 .tokens-log__title { font-weight: 600; color:#2D3748; }
 .tokens-log__ctrls { display:flex; gap:6px; }
 .tokens-log__body { max-height: 260px; overflow: auto; padding: 8px 12px; font-size: 13px; }
+.tokens-log__body {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #CBD5E0 transparent; /* thumb color | track color */
+}
+/* WebKit (Chromium/Edge/Safari) */
+.tokens-log__body::-webkit-scrollbar { width: 8px; height: 8px; }
+.tokens-log__body::-webkit-scrollbar-track { background: transparent; }
+.tokens-log__body::-webkit-scrollbar-thumb {
+  background-color: #CBD5E0; /* gray-300 */
+  border-radius: 8px;
+  border: 2px solid transparent; /* 细边留白，避免过粗 */
+  background-clip: content-box;
+}
+.tokens-log__body:hover::-webkit-scrollbar-thumb { background-color: #A0AEC0; /* gray-400 hover 提示 */ }
+
+/* 深色主题适配 */
+[data-theme="dark"] .tokens-log__body { scrollbar-color: #4A5568 transparent; }
+[data-theme="dark"] .tokens-log__body::-webkit-scrollbar-thumb { background-color: #4A5568; }
+[data-theme="dark"] .tokens-log__body:hover::-webkit-scrollbar-thumb { background-color: #718096; }
 .tokens-log.is-collapsed .tokens-log__body { display: none; }
 .tokens-log__entry { padding:6px 0; border-bottom: 1px dashed #edf2f7; }
 .tokens-log__entry:last-child { border-bottom: none; }

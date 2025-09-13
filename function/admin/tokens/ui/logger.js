@@ -5,6 +5,49 @@
   const MAX_LOGS = 200;
   // localStorage persistence removed; logs are pulled from server
 
+  // 折叠/展开动画：与 tokens.css 中的 .collapsible 配合
+  function isAnimating(el){ return !!(el && (el.classList.contains('is-opening') || el.classList.contains('is-closing'))); }
+  function isOpen(el){ return !!(el && el.classList.contains('is-open')); }
+  function openCollapsible(el){
+    try{
+      if (!el || isAnimating(el) || isOpen(el)) return;
+      const startH = el.offsetHeight; // 可能为 0
+      el.classList.add('is-opening');
+      el.style.height = startH + 'px';
+      // 读一次触发重排
+      void el.offsetHeight;
+      const targetH = el.scrollHeight;
+      el.style.height = targetH + 'px';
+      const onEnd = (e)=>{
+        if (e && e.target !== el) return;
+        el.removeEventListener('transitionend', onEnd);
+        el.classList.remove('is-opening');
+        el.classList.add('is-open');
+        el.style.height = 'auto';
+      };
+      el.addEventListener('transitionend', onEnd);
+    }catch(_){ }
+  }
+  function closeCollapsible(el){
+    try{
+      if (!el || isAnimating(el) || !isOpen(el)) return;
+      const startH = el.scrollHeight; // 已展开高度（可能被 max-height 限制）
+      el.style.height = startH + 'px';
+      // 读一次触发重排
+      void el.offsetHeight;
+      el.classList.add('is-closing');
+      el.classList.remove('is-open');
+      el.style.height = '0px';
+      const onEnd = (e)=>{
+        if (e && e.target !== el) return;
+        el.removeEventListener('transitionend', onEnd);
+        el.classList.remove('is-closing');
+        // 维持 0 高度
+      };
+      el.addEventListener('transitionend', onEnd);
+    }catch(_){ }
+  }
+
   function html(s) {
     try {
       if (s == null) return '';
@@ -30,15 +73,20 @@
 
         const header = document.createElement('div');
         header.className = 'tokens-log__header';
-        header.innerHTML = '<div class="tokens-log__title">变更日志</div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm js-log-collapse" title="收起/展开">收起</button><button class="btn btn--secondary btn--sm js-log-clear" title="清空">清空</button></div>';
+  header.innerHTML = '<div class="tokens-log__title">变更日志</div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" title="收起/展开">收起</button><button class="btn btn--secondary btn--sm js-log-clear" title="清空">清空</button></div>';
 
+        // 外包一层可折叠容器，内层保持可滚动
+        const wrap = document.createElement('div');
+        wrap.className = 'tokens-log__wrap collapsible is-open';
+        // 可滚动主体
         body = document.createElement('div');
         body.id = 'tokens-log';
         body.className = 'tokens-log__body';
         body.setAttribute('aria-live', 'polite');
+        wrap.appendChild(body);
 
         panel.appendChild(header);
-        panel.appendChild(body);
+        panel.appendChild(wrap);
 
         // 插入到 content 后
         if (content.parentElement) {
@@ -51,8 +99,17 @@
         try{
           header.querySelector('.js-log-clear')?.addEventListener('click',()=>{ try{ body.innerHTML=''; }catch(_){} });
           header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
-            const btn = e.currentTarget; const collapsed = panel.classList.toggle('is-collapsed');
-            if (btn) btn.textContent = collapsed ? '展开' : '收起';
+            const btn = e.currentTarget;
+            const w = panel.querySelector('.tokens-log__wrap');
+            if (!w) return;
+            if (isAnimating(w)) return; // 动画中忽略重复点击
+            if (isOpen(w)) {
+              closeCollapsible(w);
+              if (btn) { btn.textContent = '展开'; btn.classList.remove('is-expanded'); }
+            } else {
+              openCollapsible(w);
+              if (btn) { btn.textContent = '收起'; btn.classList.add('is-expanded'); }
+            }
           });
         }catch(_){ }
       } else {
@@ -61,8 +118,17 @@
   const headerEl = panel.querySelector('.tokens-log__header');
   headerEl?.querySelector('.js-log-clear')?.addEventListener('click',()=>{ try{ body.innerHTML=''; }catch(_){} });
         headerEl?.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
-          const btn = e.currentTarget; const collapsed = panel.classList.toggle('is-collapsed');
-          if (btn) btn.textContent = collapsed ? '展开' : '收起';
+          const btn = e.currentTarget;
+          const w = panel.querySelector('.tokens-log__wrap');
+          if (!w) return;
+          if (isAnimating(w)) return;
+          if (isOpen(w)) {
+            closeCollapsible(w);
+            if (btn) { btn.textContent = '展开'; btn.classList.remove('is-expanded'); }
+          } else {
+            openCollapsible(w);
+            if (btn) { btn.textContent = '收起'; btn.classList.add('is-expanded'); }
+          }
         });
       }
 
