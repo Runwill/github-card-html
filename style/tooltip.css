@@ -6,52 +6,33 @@
     opacity: 0;
     visibility: hidden;
     transform: translateY(6px) scale(0.985);
-    transition:
-        opacity 220ms var(--animation-easing, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        transform 260ms var(--animation-easing, cubic-bezier(0.2, 0.8, 0.2, 1)),
-        visibility 0s linear 220ms;
+    transition: opacity 220ms var(--animation-easing, cubic-bezier(0.4, 0, 0.2, 1)), transform 260ms var(--animation-easing, cubic-bezier(0.4, 0, 0.2, 1)), visibility 0s linear 220ms;
     will-change: opacity, transform;
 
     /* 主题自适应：使用全局变量，随 data-theme 切换 */
-    background: var(--surface-soft, rgba(26,26,26,0.92));
-    color: var(--text, #f5f5f5);
-    border: 1px solid var(--border, rgba(255,255,255,0.12));
-    border-radius: 12px;
-    box-shadow:
-        0 10px 28px var(--shadow-2, rgba(0,0,0,0.24)),
-        0 3px 10px var(--shadow-1, rgba(0,0,0,0.16));
-    padding: 12px 14px;
-    font-size: 0.95rem;
+    background: var(--surface-soft);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px var(--shadow-2), 0 4px 12px var(--shadow-1);
+    padding: 10px 14px;
+    font-size: 0.92rem;
     font-weight: 500;
-    line-height: 1.6;
+    line-height: 1.5;
     letter-spacing: 0.2px;
     pointer-events: none;
-    /* 取消限宽，允许内容自然扩展 */
     max-width: none;
-    white-space: normal;
-    text-wrap: pretty;
-    overflow-wrap: anywhere;
+    white-space: nowrap;
     word-break: break-word;
-    -webkit-backdrop-filter: blur(8px) saturate(1.06);
-    backdrop-filter: blur(8px) saturate(1.06);
+    -webkit-backdrop-filter: blur(8px) saturate(1.1);
+    backdrop-filter: blur(8px) saturate(1.1);
 }
 
 #lore-tooltip.show {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) translateX(0) scale(1);
-    transition:
-        opacity 260ms var(--animation-easing, cubic-bezier(0.22, 1, 0.36, 1)),
-        transform 320ms var(--animation-easing, cubic-bezier(0.22, 1, 0.36, 1)),
-        visibility 0s linear 0s;
-    /* 仅在出现时提供轻微「微弹」感 */
-    animation: tooltip-in 340ms var(--animation-easing, cubic-bezier(0.22, 1, 0.36, 1)) both;
-}
-
-@keyframes tooltip-in {
-    0%   { opacity: 0; transform: translateY(6px) scale(0.985); }
-    70%  { opacity: 1; transform: translateY(0) scale(1.015); }
-    100% { opacity: 1; transform: translateY(0) scale(1); }
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) translateX(0) scale(1);
+        transition: opacity 260ms var(--animation-easing, cubic-bezier(0.4, 0, 0.2, 1)), transform 320ms var(--animation-easing, cubic-bezier(0.4, 0, 0.2, 1)), visibility 0s linear 0s;
 }
 
 /* 方向类：根据进入方向提供轻微水平位移，提升“优雅感” */
@@ -63,12 +44,23 @@
     #lore-tooltip { backface-visibility: hidden; }
 }
 
-/* 取消箭头：不再渲染伪元素 */
-#lore-tooltip::before { content: none !important; display: none !important; }
-#lore-tooltip[data-placement="bottom"]::before { content: none !important; }
-#lore-tooltip[data-placement="top"]::before { content: none !important; }
+#lore-tooltip::after {
+    /* 移除用于模拟气泡三角形的伪元素 */
+    content: none !important;
+    display: none !important;
+}
+
+#lore-tooltip[data-placement="bottom"]::after {
+    top: -6px; left: 50%; transform: translateX(-50%);
+    border-bottom: 6px solid rgba(250,250,250,0.92);
+}
+
+#lore-tooltip[data-placement="top"]::after {
+    bottom: -6px; left: 50%; transform: translateX(-50%);
+    border-top: 6px solid rgba(250,250,250,0.92);
+}
 
 @media (prefers-reduced-motion: reduce) {
-    #lore-tooltip { transition: none !important; transform: none !important; animation: none !important; }
-    #lore-tooltip.show { transition: none !important; animation: none !important; }
+    #lore-tooltip { transition: none !important; transform: none !important; }
+    #lore-tooltip.show { transition: none !important; }
 }

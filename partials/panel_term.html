@@ -927,6 +927,46 @@
                   </padding>
                 </padding>
               </padding>
+              <h3><reply class="scroll"><replyBody /></reply></h3>
+              <div class="indent">
+                一类<event></event>。
+              </div>
+              <div class="indent">
+                包含以下输入：
+              </div>
+              <padding>
+                <h3><reply><replyRole class="scroll" /></reply></h3>
+                <div class="indent">
+                  一名<role></role>。
+                </div>
+                <h3><reply><replyValue class="scroll" /></reply></h3>
+                <div class="indent">
+                  一个正整数。
+                </div>
+              </padding>
+              <div class="indent">
+                包含以下<procedure></procedure>：
+              </div>
+              <padding>
+                <div class="h">
+                  <div class="indent">
+                    <advance></advance><tick></tick>“<beforeReply class="scroll bold"><replyBody></replyBody><beforeEnd></beforeEnd></beforeReply>”。
+                  </div>
+                  <div class="indent">
+                    <advance></advance><tick></tick>“<whenReply class="scroll bold"><replyBody></replyBody><whenEnd></whenEnd></whenReply>”。
+                  </div>
+                  <padding>
+                    <div class="h">
+                      <div class="indent">
+                        <reply><replyRole></replyRole></reply>减少<reply><replyValue></replyValue></reply>点<health></health>/<healthLimit></healthLimit>。
+                      </div>
+                    </div>
+                  </padding>
+                  <div class="indent">
+                    <advance></advance><tick></tick>“<afterReply class="scroll bold"><replyBody></replyBody><afterEnd></afterEnd></afterReply>”。
+                  </div>
+                </div>
+              </padding>
               <h3><loss class="scroll"><lossBody /></loss></h3>
               <div class="indent">
                 一类<event></event>。
@@ -958,7 +998,7 @@
                   <padding>
                     <div class="h">
                       <div class="indent">
-                        <damage><damagedRole></damagedRole></damage>减少<loss><lossValue></lossValue></loss>点<health></health>/<healthLimit></healthLimit>。
+                        <loss><lossRole></lossRole></loss>减少<loss><lossValue></lossValue></loss>点<health></health>/<healthLimit></healthLimit>。
                       </div>
                     </div>
                   </padding>

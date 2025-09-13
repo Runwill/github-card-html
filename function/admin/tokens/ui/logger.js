@@ -75,6 +75,51 @@
     try { return new Date(d || Date.now()).toLocaleTimeString(); } catch (_) { return '' + (d || Date.now()); }
   }
 
+  // 解析各种时间输入为时间戳（ms）
+  function parseTimeValue(v){
+    try{
+      if (v == null) return undefined;
+      if (v instanceof Date) return v.getTime();
+      if (typeof v === 'number') return v;
+      if (typeof v === 'string') { const t = Date.parse(v); return isNaN(t) ? undefined : t; }
+      return undefined;
+    }catch(_){ return undefined; }
+  }
+
+  function formatAbs(v){
+    try{ const t = parseTimeValue(v) ?? Date.now(); return new Date(t).toLocaleString(); }catch(_){ return String(v||''); }
+  }
+
+  function formatRel(v){
+    try{
+      const now = Date.now();
+      const t = parseTimeValue(v) ?? now;
+      let diff = Math.floor((now - t) / 1000); // 秒
+      if (diff < -5) { // 未来时间，简单处理为“刚刚”以避免困惑
+        return '刚刚';
+      }
+      if (diff < 5) return '刚刚';
+      if (diff < 60) return `${diff} 秒前`;
+      const m = Math.floor(diff / 60);
+      if (m < 60) return `${m} 分钟前`;
+      const h = Math.floor(m / 60);
+      if (h < 24) return `${h} 小时前`;
+      const d = Math.floor(h / 24);
+      if (d < 30) return `${d} 天前`;
+      const mo = Math.floor(d / 30);
+      if (mo < 12) return `${mo} 个月前`;
+      const y = Math.floor(mo / 12);
+      return `${y} 年前`;
+    }catch(_){ return ''; }
+  }
+
+  // 从对象中提取时间字段（服务端/前端均可用）
+  function pickLogTime(v){
+    try{
+      return v && (v.ts || v.time || v.createdAt || v.updatedAt || v.date || v.at || v.timestamp);
+    }catch(_){ return undefined; }
+  }
+
   function briefDoc(doc) {
     try {
       if (!doc || typeof doc !== 'object') return '';
@@ -96,6 +141,14 @@
       case 'skill': return '技能';
       default: return coll || '';
     }
+  }
+
+  // 取旧值/新值的通用帮助，兼容多种字段命名
+  function pickOld(v){
+    try{ return (v && (v.from !== undefined ? v.from : (v.prev !== undefined ? v.prev : (v.previous !== undefined ? v.previous : (v.old !== undefined ? v.old : v.before))))); }catch(_){ return undefined; }
+  }
+  function pickNew(v){
+    try{ return (v && (v.value !== undefined ? v.value : (v.to !== undefined ? v.to : (v.new !== undefined ? v.new : v.after)))); }catch(_){ return undefined; }
   }
 
   function shortId(id) {
@@ -121,7 +174,12 @@
   }
 
   function makeLine(type, payload) {
-    const t = fmtTime();
+    const rawTime = pickLogTime(payload);
+    const ts = parseTimeValue(rawTime) ?? Date.now();
+    const iso = new Date(ts).toISOString();
+    const timeAbs = formatAbs(ts);
+    const timeRel = formatRel(ts);
+    const timeHtml = `<time class="log-time" datetime="${html(iso)}" title="${html(timeAbs)}" data-ts="${html(String(ts))}" data-rel="${html(timeRel)}" data-abs="${html(timeAbs)}">${html(timeRel)}</time>`;
     const c = payload && payload.collection ? mapCollectionName(payload.collection) : '';
     const tag = (payload && payload.collection) ? resolveLabel(payload.collection, payload && payload.id, payload && payload.label) : '';
     const pill = (txt, cls='')=> `<i class="log-pill ${cls}">${html(txt||'')}</i>`;
@@ -129,50 +187,56 @@
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
     if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
-      return `<div class="log-row is-create"><time class="log-time">${html(t)}</time>${pill('新增','is-green')}<i class="log-ctx">${html(c)} [${html(label)}]</i><i class="log-msg">${html(briefDoc(payload && payload.doc))}</i></div>`;
+      return `<div class="log-row is-create">${timeHtml}${pill('新增','is-green')}<i class="log-ctx">${html(c)} [${html(label)}]</i><i class="log-msg">${html(briefDoc(payload && payload.doc))}</i></div>`;
     }
     if (type === 'delete-doc') {
-      return `<div class="log-row is-delete"><time class="log-time">${html(t)}</time>${pill('删除对象','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i></div>`;
+      return `<div class="log-row is-delete">${timeHtml}${pill('删除对象','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i></div>`;
     }
     if (type === 'delete-field') {
-      const from = payload && (payload.from !== undefined ? payload.from : (payload.prev !== undefined ? payload.prev : undefined));
-      return `<div class="log-row is-delete"><time class="log-time">${html(t)}</time>${pill('删除字段','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val">原：${code(json(from))}</i>`:''}</div>`;
+      const from = pickOld(payload);
+      return `<div class="log-row is-delete">${timeHtml}${pill('删除字段','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val">原：${code(json(from))}</i>`:''}</div>`;
     }
     if (type === 'update') {
-      const v = (payload && (payload.value !== undefined ? payload.value : payload.to));
-      const from = payload && (payload.from !== undefined ? payload.from : payload.prev);
-      return `<div class="log-row is-update"><time class="log-time">${html(t)}</time>${pill('修改','is-blue')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i></div>`;
+      const v = pickNew(payload);
+      const from = pickOld(payload);
+      return `<div class="log-row is-update">${timeHtml}${pill('修改','is-blue')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i></div>`;
     }
     if (type === 'save-edits') {
       const sets = (payload && payload.sets) || [];
       const dels = (payload && payload.dels) || [];
-      const head = `<div class="log-row is-save"><time class="log-time">${html(t)}</time>${pill('保存','is-indigo')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-head">修改 ${sets.length} 项，删除 ${dels.length} 项</i></div>`;
+      const head = `<div class="log-row is-save">${timeHtml}${pill('保存','is-indigo')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-head">修改 ${sets.length} 项，删除 ${dels.length} 项</i></div>`;
       const pick = (val) => (val && typeof val === 'object') ? JSON.stringify(val) : val;
       const detail = [];
       sets.slice(0, 10).forEach(s => { detail.push(`<div class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(pick(s.from))} → `:''}${code(pick(s.to))}</div>`); });
       dels.slice(0, 10).forEach(d => { detail.push(`<div class="log-sub is-del">删除 ${code(d.path)}${d.from!==undefined? `（原：${code(pick(d.from))}）`:''}</div>`); });
       return head + detail.join('');
     }
-    return `<div class=\"log-row\"><time class=\"log-time\">${html(t)}</time>${pill(type)}</div>`;
+    return `<div class=\"log-row\">${timeHtml}${pill(type)}</div>`;
   }
 
+  /**
+   * 追加一条日志到前端面板。
+   * 注意：若 payload 中包含 ts/time/createdAt/updatedAt/date/at/timestamp，将使用该时间显示；
+   * 否则回退到客户端当前时间。
+   */
   function logChange(type, payload) {
     try {
       const body = ensureTokensLogArea();
       if (!body) return;
 
-      const line = makeLine(type, payload || {});
-  const row = document.createElement('div');
-  row.className = 'tokens-log__entry';
-  row.innerHTML = line;
-      body.appendChild(row);
+    const line = makeLine(type, payload || {});
+    const row = document.createElement('div');
+    row.className = 'tokens-log__entry';
+    row.innerHTML = line;
+    // 新在上：头插
+    if (body.firstChild) body.insertBefore(row, body.firstChild); else body.appendChild(row);
 
   // Persistence removed; server is the source of truth
 
-      // 裁剪过长日志
+      // 裁剪过长日志（新在上，删除底部老的）
       try {
         const extra = (body.children.length - MAX_LOGS);
-        for (let i = 0; i < extra; i++) body.removeChild(body.firstChild);
+        for (let i = 0; i < extra; i++) body.removeChild(body.lastChild);
       } catch (_) {}
 
       // 滚动到底部
@@ -195,12 +259,32 @@
           const out = fetchTokenLogs ? await fetchTokenLogs({ page:1, pageSize: 100 }) : null;
           const list = (out && out.list) || [];
           if (Array.isArray(list) && list.length){
-            const items = list.slice().reverse(); // 旧在上，新在下
+            // 新在上：按时间降序排序（若缺时间则保持原顺序近似）
+            const items = list.slice();
+            try{
+              items.sort((a,b)=>{
+                const tb = parseTimeValue(pickLogTime(b)) ?? 0;
+                const ta = parseTimeValue(pickLogTime(a)) ?? 0;
+                return tb - ta;
+              });
+            }catch(_){ }
             const frag = document.createDocumentFragment();
             items.forEach(log=>{
               const payload = (function(){
-                const base = { collection: log.collection, id: log.docId, path: log.path, value: log.value, from: log.from, doc: log.doc };
-                return base;
+                // 兼容更多字段名：旧值/新值
+                const base = {
+                  collection: log.collection,
+                  id: log.docId,
+                  path: log.path,
+                  value: (log.value !== undefined ? log.value : (log.to !== undefined ? log.to : (log.new !== undefined ? log.new : log.after))),
+                  from: (log.from !== undefined ? log.from : (log.prev !== undefined ? log.prev : (log.previous !== undefined ? log.previous : (log.old !== undefined ? log.old : log.before)))),
+                  doc: log.doc,
+                  // 兜底标签：若服务端提供了简要 doc，则从中挑选一个可读字段（en/cn/name/key/code/slug/title）
+                  label: (function(){ try{ return log && log.doc ? pickUnique(log.doc) : ''; }catch(_){ return ''; } })()
+                };
+                // 注入时间字段，优先取服务端返回
+                const t = pickLogTime(log);
+                return t ? Object.assign(base, { ts: t }) : base;
               })();
               const row = document.createElement('div');
               row.className = 'tokens-log__entry';
@@ -208,7 +292,8 @@
               frag.appendChild(row);
             });
             body.appendChild(frag);
-            try { body.scrollTop = body.scrollHeight; } catch(_){}
+            // 新在上：滚动到顶部即可看到最新
+            try { body.scrollTop = 0; } catch(_){ }
             return; // 服务端已填充
           }
         }catch(_){ /* ignore and fallback to local */ }
@@ -219,6 +304,40 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     const ready = (window.partialsReady instanceof Promise) ? window.partialsReady : Promise.resolve();
-    ready.then(()=>{ try{ hydrateLogs(); }catch(_){ } });
+    ready.then(()=>{ try{ hydrateLogs(); }catch(_){ } }).then(()=>{
+      // 启动一个轻量的定时器，每分钟刷新一次相对时间显示
+      try{
+        if (!window.__tokensLogRelTimer){
+          window.__tokensLogRelTimer = setInterval(()=>{
+            try{
+                document.querySelectorAll('.log-time[data-ts]')?.forEach(el=>{
+                  const ts = Number(el.getAttribute('data-ts')) || Date.now();
+                  const rel = formatRel(ts);
+                  el.setAttribute('data-rel', rel);
+                  // 正在悬浮时不打断绝对时间展示
+                  if (!el.matches(':hover')) {
+                    el.textContent = rel;
+                  }
+                });
+            }catch(_){ }
+          }, 60000);
+        }
+      }catch(_){ }
+
+        // 悬浮时切换为绝对时间，移开恢复相对时间（事件委托）
+        try{
+          const root = document.getElementById('tokens-log') || document;
+          const onOver = (e)=>{
+            const t = e.target && e.target.closest ? e.target.closest('.log-time') : null;
+            if (t) { const abs = t.getAttribute('data-abs'); if (abs) t.textContent = abs; }
+          };
+          const onOut = (e)=>{
+            const t = e.target && e.target.closest ? e.target.closest('.log-time') : null;
+            if (t) { const rel = t.getAttribute('data-rel'); if (rel) t.textContent = rel; }
+          };
+          root.addEventListener('mouseover', onOver);
+          root.addEventListener('mouseout', onOut);
+        }catch(_){ }
+    });
   });
 })();
