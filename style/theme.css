@@ -96,9 +96,11 @@ html[data-theme="dark"] {
 
 /* 全局背景与文字 */
 html, body { color: var(--text); }
-body {
-  background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%) !important;
-}
+/* 让 html/body 覆盖满屏，避免短页面时出现“页面下方另一块底色” */
+html, body { min-height: 100vh; }
+/* 同步 html 与 body 的背景，避免某些浏览器在 body 不满屏时显示不同底色 */
+html { background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%) !important; }
+body { background: inherit !important; }
 
 /* 主题切换时的轻量过渡（全页淡入），避免对每个节点颜色/背景做昂贵过渡 */
 html.theme-switching body {
@@ -221,6 +223,8 @@ html.theme-switching body {
   /* Foundation tabs 容器继承 Header 背景 */
   background: inherit !important;
 }
+/* 避免短页面时 tabs 区域底部出现一条边框线 */
+.tabs-content { border-bottom: none !important; }
 
 .tokens-section { border-color: var(--border) !important; background: var(--surface) !important; }
 .tokens-section__header { background: var(--panel-header-bg) !important; border-bottom: 1px solid var(--border) !important; }
@@ -289,6 +293,10 @@ html.theme-switching body {
 .tokens-log__title, .tokens-log .log-row, .tokens-log .log-val { color: var(--text) !important; }
 .tokens-log .log-time, .tokens-log .log-ctx { color: var(--text-subtle) !important; }
 .tokens-log code.log-code { background: var(--panel-header-bg) !important; border-color: var(--border) !important; color: var(--text) !important; }
+
+/* Tokens 主面板占满可视高度，避免底部露出背景色差 */
+:root { --header-height: 64px; }
+#panel_tokens { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
 
 /* Toast 样式 */
 .tokens-toast { background: var(--toast-ok-bg) !important; border-color: var(--toast-ok-border) !important; color: var(--toast-ok-text) !important; }
