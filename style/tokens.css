@@ -359,6 +359,36 @@ html { scrollbar-gutter: stable both-edges; }
 .tokens-log .log-sub { padding-left: 22px; margin-top: 3px; color:#4A5568; }
 .tokens-log .log-sub.is-del { color:#7F1D1D; }
 
+/* 日志行右侧操作区：与字段行删除按钮风格保持一致 */
+.tokens-log .log-row { position: relative; }
+.tokens-log .log-actions {
+  margin-left: auto;           /* 将操作区推到最右侧 */
+  display: flex;
+  gap: 6px;
+  opacity: 0;                  /* 默认隐藏，hover 时显现 */
+  transition: opacity .2s ease;
+  pointer-events: none;        /* 默认不挡交互，内部按钮开启 */
+}
+.tokens-log .log-row:hover .log-actions { opacity: 1; }
+.tokens-log .log-actions .btn-del {
+  pointer-events: auto;
+  border: none;
+  background: transparent;
+  color: #A0AEC0;              /* 与属性删除按钮一致的初始灰色 */
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  transition: transform 140ms ease, color 140ms ease, background 140ms ease;
+}
+.tokens-log .log-actions .btn-del:hover {
+  color: #E53E3E;              /* 红色强调 */
+  background: rgba(229, 62, 62, 0.08);
+  transform: scale(1.05);
+}
+.tokens-log .log-actions .btn-del:active { transform: scale(0.97); }
+
 #tokens-content .kv-row {
   display: grid;
   grid-template-columns: 160px 1fr;

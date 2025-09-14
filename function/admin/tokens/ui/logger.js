@@ -97,7 +97,18 @@
 
         // 绑定按钮（首次创建时）
         try{
-          header.querySelector('.js-log-clear')?.addEventListener('click',()=>{ try{ body.innerHTML=''; }catch(_){} });
+          header.querySelector('.js-log-clear')?.addEventListener('click',async ()=>{
+            try{
+              const T = window.tokensAdmin || {}; const apiJson = T.apiJson; const getAuth = T.getAuth;
+              const auth = typeof getAuth === 'function' ? getAuth() : { canEdit:false };
+              if (!auth.canEdit) { try{ T.showToast && T.showToast('无权限'); }catch(_){ } return; }
+              if (typeof apiJson === 'function') {
+                await apiJson('/tokens/logs', { method: 'DELETE', auth: true });
+              }
+              try{ body.innerHTML=''; }catch(_){}
+              try{ (T && T.showToast) ? T.showToast('已清空') : null; }catch(_){}
+            }catch(e){ alert((e && e.message) || '清空失败'); }
+          });
           header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
             const btn = e.currentTarget;
             const w = panel.querySelector('.tokens-log__wrap');
@@ -131,6 +142,37 @@
           }
         });
       }
+
+      // 日志内“删除”按钮事件委托（样式与删除词元属性一致：.btn-del）；若有 _id 则请求后端删除
+      try {
+        if (body && !body.__delDelegationBound) {
+          body.__delDelegationBound = true;
+          body.addEventListener('click', (ev) => {
+            const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
+            if (!btn) return;
+            const entry = btn.closest('.tokens-log__entry');
+            if (!entry) return;
+            (async () => {
+              const T = window.tokensAdmin || {}; const getAuth = T.getAuth; const auth = typeof getAuth === 'function' ? getAuth() : { canEdit:false };
+              if (!auth.canEdit) { try{ T.showToast && T.showToast('无权限'); }catch(_){ } return; }
+              const id = entry.getAttribute('data-log-id');
+              if (id) {
+                try {
+                  const apiJson = T.apiJson;
+                  if (typeof apiJson === 'function') {
+                    await apiJson(`/tokens/logs/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
+                  }
+                } catch (e) {
+                  alert((e && e.message) || '删除失败');
+                  return;
+                }
+              }
+              try { entry.remove(); } catch (_) {}
+              try { (T && T.showToast) ? T.showToast('已删除') : null; } catch (_) {}
+            })();
+          });
+        }
+      } catch (_) {}
 
       if (body) body.__ready = true;
       return body || null;
@@ -253,31 +295,31 @@
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
     if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
-      return `<div class="log-row is-create">${timeHtml}${pill('新增','is-green')}<i class="log-ctx">${html(c)} [${html(label)}]</i><i class="log-msg">${html(briefDoc(payload && payload.doc))}</i></div>`;
+      return `<div class="log-row is-create">${timeHtml}${pill('新增','is-green')}<i class="log-ctx">${html(c)} [${html(label)}]</i><i class="log-msg">${html(briefDoc(payload && payload.doc))}</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
     }
     if (type === 'delete-doc') {
-      return `<div class="log-row is-delete">${timeHtml}${pill('删除对象','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i></div>`;
+      return `<div class="log-row is-delete">${timeHtml}${pill('删除对象','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
     }
     if (type === 'delete-field') {
       const from = pickOld(payload);
-      return `<div class="log-row is-delete">${timeHtml}${pill('删除字段','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val">原：${code(json(from))}</i>`:''}</div>`;
+      return `<div class="log-row is-delete">${timeHtml}${pill('删除字段','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val">原：${code(json(from))}</i>`:''}<div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
     }
     if (type === 'update') {
       const v = pickNew(payload);
       const from = pickOld(payload);
-      return `<div class="log-row is-update">${timeHtml}${pill('修改','is-blue')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i></div>`;
+      return `<div class="log-row is-update">${timeHtml}${pill('修改','is-blue')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
     }
     if (type === 'save-edits') {
       const sets = (payload && payload.sets) || [];
       const dels = (payload && payload.dels) || [];
-      const head = `<div class="log-row is-save">${timeHtml}${pill('保存','is-indigo')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-head">修改 ${sets.length} 项，删除 ${dels.length} 项</i></div>`;
+      const head = `<div class="log-row is-save">${timeHtml}${pill('保存','is-indigo')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-head">修改 ${sets.length} 项，删除 ${dels.length} 项</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
       const pick = (val) => (val && typeof val === 'object') ? JSON.stringify(val) : val;
       const detail = [];
       sets.slice(0, 10).forEach(s => { detail.push(`<div class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(pick(s.from))} → `:''}${code(pick(s.to))}</div>`); });
       dels.slice(0, 10).forEach(d => { detail.push(`<div class="log-sub is-del">删除 ${code(d.path)}${d.from!==undefined? `（原：${code(pick(d.from))}）`:''}</div>`); });
       return head + detail.join('');
     }
-    return `<div class=\"log-row\">${timeHtml}${pill(type)}</div>`;
+    return `<div class=\"log-row\">${timeHtml}${pill(type)}<div class=\"log-actions\"><button class=\"btn-del\" title=\"删除\" aria-label=\"删除\">删除</button></div></div>`;
   }
 
   /**
@@ -354,6 +396,7 @@
               })();
               const row = document.createElement('div');
               row.className = 'tokens-log__entry';
+              if (log && log._id) { try { row.setAttribute('data-log-id', String(log._id)); }catch(_){} }
               row.innerHTML = makeLine(log.type, payload);
               frag.appendChild(row);
             });
