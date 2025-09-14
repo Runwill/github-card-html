@@ -94,13 +94,42 @@
       if (depth > 6) return false;
       if (v == null) return false;
       const t = typeof v;
-      if (t === 'string') return v.toLowerCase().includes(kw);
+      // 统一关键字：原样小写匹配 + 归一化（仅字母数字，去空白/连字符等）匹配
+      const kwRaw = String(kw || '').toLowerCase();
+      const kwNorm = kwRaw.replace(/[^a-z0-9]/g, '');
+
+      if (t === 'string') {
+        const s = v.toLowerCase();
+        // 常规包含
+        if (s.includes(kwRaw)) return true;
+        // 对 ASCII 字段（如拼音/英文）再做归一化匹配：移除非字母数字，避免空格影响
+        if (/[a-z0-9]/.test(s)) {
+          const sNorm = s.replace(/[^a-z0-9]/g, '');
+          if (kwNorm && sNorm.includes(kwNorm)) return true;
+        }
+        return false;
+      }
       if (t === 'number' || t === 'boolean') return String(v).toLowerCase().includes(kw);
       if (Array.isArray(v)) {
         for (const it of v) { if (deepContains(it, kw, depth + 1)) return true; }
         return false;
       }
       if (t === 'object') {
+        // 优先：若对象上存在 py / py_abbr 字段，则先匹配它们，以支持拼音搜索
+        try {
+          const py = v.py ? String(v.py).toLowerCase() : '';
+          const ab = v.py_abbr ? String(v.py_abbr).toLowerCase() : '';
+          if (py || ab) {
+            // 原样匹配
+            if ((py && py.includes(kwRaw)) || (ab && ab.includes(kwRaw))) return true;
+            // 归一化匹配（移除非字母数字，解决 "xun wen" vs "xunwen"）
+            if (kwNorm) {
+              const pyNorm = py.replace(/[^a-z0-9]/g, '');
+              const abNorm = ab.replace(/[^a-z0-9]/g, '');
+              if ((pyNorm && pyNorm.includes(kwNorm)) || (abNorm && abNorm.includes(kwNorm))) return true;
+            }
+          }
+        } catch (_) {}
         for (const k of Object.keys(v)) {
           if (HIDE_KEYS.has(k)) continue;
           if (deepContains(v[k], kw, depth + 1)) return true;
