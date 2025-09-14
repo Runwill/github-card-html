@@ -18,7 +18,7 @@ body { overflow-x: hidden; margin: 0; font-size: .9rem; }
 pronounName {
     font-family: '大篆';
     line-height: 0;
-    color: #d60000bb;
+    color: var(--pronoun-color, #d60000bb);
 }
 
 .glowing {

@@ -295,7 +295,18 @@
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
     if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
-      return `<div class="log-row is-create">${timeHtml}${pill('新增','is-green')}<i class="log-ctx">${html(c)} [${html(label)}]</i><i class="log-msg">${html(briefDoc(payload && payload.doc))}</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+      const msg = (function(){
+        try{
+          const d = payload && payload.doc;
+          if (!d || typeof d !== 'object') return '';
+          if (d.cn) return String(d.cn);
+          if (d.en) return String(d.en);
+          if (d.name) return String(d.name);
+          if (d.id != null) return String(d.id);
+          return '';
+        }catch(_){ return ''; }
+      })();
+      return `<div class="log-row is-create">${timeHtml}${pill('新增','is-green')}<i class="log-ctx">${html(c)} [${html(label)}]</i><i class="log-msg">${code(msg)}</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
     }
     if (type === 'delete-doc') {
       return `<div class="log-row is-delete">${timeHtml}${pill('删除对象','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
