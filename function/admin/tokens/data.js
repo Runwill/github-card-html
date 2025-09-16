@@ -86,7 +86,7 @@
     return null;
   }
 
-  const HIDE_KEYS = new Set(['_id', '__v', '_v']);
+  const HIDE_KEYS = new Set(['_id', '__v', '_v', 'py']);
 
   // 递归包含判断（限制深度，忽略隐藏字段）
   function deepContains(v, kw, depth = 0) {
@@ -115,18 +115,14 @@
         return false;
       }
       if (t === 'object') {
-        // 优先：若对象上存在 py / py_abbr 字段，则先匹配它们，以支持拼音搜索
+        // 优先：若对象上存在聚合拼音字段 py（原 _py），以支持拼音搜索
         try {
-          const py = v.py ? String(v.py).toLowerCase() : '';
-          const ab = v.py_abbr ? String(v.py_abbr).toLowerCase() : '';
-          if (py || ab) {
-            // 原样匹配
-            if ((py && py.includes(kwRaw)) || (ab && ab.includes(kwRaw))) return true;
-            // 归一化匹配（移除非字母数字，解决 "xun wen" vs "xunwen"）
+          const p = v.py ? String(v.py).toLowerCase() : '';
+          if (p) {
+            if (p.includes(kwRaw)) return true;
             if (kwNorm) {
-              const pyNorm = py.replace(/[^a-z0-9]/g, '');
-              const abNorm = ab.replace(/[^a-z0-9]/g, '');
-              if ((pyNorm && pyNorm.includes(kwNorm)) || (abNorm && abNorm.includes(kwNorm))) return true;
+              const pNorm = p.replace(/[^a-z0-9]/g, '');
+              if (pNorm && pNorm.includes(kwNorm)) return true;
             }
           }
         } catch (_) {}
