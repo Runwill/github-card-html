@@ -11,13 +11,17 @@ function summonCharacterSkill(){
                 deferred1.resolve(characterData)
             }
         })
+        const skillUrl = 'http://localhost:3000/api/skill?strength=' + encodeURIComponent(localStorage.getItem('strength'));
         $.ajax({
-            url:'http://localhost:3000/api/skill'+ localStorage.getItem('strength'),
+            url: skillUrl,
             type:"GET",
             datatype:"json",
             success:
             function (skillData){
                 deferred2.resolve(skillData);
+            },
+            error: function(){
+                deferred2.resolve([]);
             }
         })
         $.when(deferred1, deferred2).done(function (characterData, skillData) {

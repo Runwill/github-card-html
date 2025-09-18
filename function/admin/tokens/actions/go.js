@@ -45,7 +45,7 @@
           }
         }
 
-        if (coll === 'skill0' || coll === 'skill1' || coll === 'skill2' || coll === 'skill') {
+  if (coll === 'skill') {
           const skillClass = (doc && typeof doc.name === 'string') ? doc.name : null;
           if (skillClass && window.scrollActions && typeof window.scrollActions.scrollToClassAndFlash === 'function') {
             window.scrollActions.scrollToClassAndFlash('panel_skill', skillClass, { behavior: 'smooth', stop: true });

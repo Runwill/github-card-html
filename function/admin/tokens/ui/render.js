@@ -129,9 +129,13 @@
       const conf=COLLECTIONS[collection];
       if(!conf) return [];
       if(collection==='skill'){
+        // unified single fetch
         if(!state.data.s0 || !state.data.s1 || !state.data.s2){
-          const [s0,s1,s2] = await Promise.all(conf.urls.map(u=> apiJson(u)));
-          state.data.s0=s0||[]; state.data.s1=s1||[]; state.data.s2=s2||[];
+          const all = await apiJson('/skill');
+          const bucket = (arr, n)=> (arr||[]).filter(s=> Number(s && s.strength)===n);
+          state.data.s0 = bucket(all,0);
+          state.data.s1 = bucket(all,1);
+          state.data.s2 = bucket(all,2);
         }
         return [].concat(state.data.s0||[], state.data.s1||[], state.data.s2||[]);
       }
@@ -159,10 +163,23 @@
     try{
       // 需要时并行拉取所有集合
       if(!state.data || forceReload){
-        const [termFixed, termDynamic, cards, characters, s0, s1, s2] = await Promise.all([
-          apiJson('/term-fixed'), apiJson('/term-dynamic'), apiJson('/card'), apiJson('/character'), apiJson('/skill0'), apiJson('/skill1'), apiJson('/skill2')
+        const [termFixed, termDynamic, cards, characters, allSkills] = await Promise.all([
+          apiJson('/term-fixed'),
+          apiJson('/term-dynamic'),
+          apiJson('/card'),
+          apiJson('/character'),
+          apiJson('/skill')
         ]);
-        state.data={ termFixed, termDynamic, cards, characters, s0, s1, s2 };
+        const bucket = (arr, n)=> (arr||[]).filter(s=> Number(s && s.strength)===n);
+        state.data={
+          termFixed,
+          termDynamic,
+          cards,
+          characters,
+          s0: bucket(allSkills,0),
+          s1: bucket(allSkills,1),
+          s2: bucket(allSkills,2)
+        };
       }
       const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', key:'静态术语', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', key:'动态术语', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', key:'牌', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', key:'武将', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', key:'技能', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"><div class="type-tile__label">${t.key}</div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); summaryEl.__initialized=true; 
         // 初次渲染后应用主题色，并绑定主题观察者

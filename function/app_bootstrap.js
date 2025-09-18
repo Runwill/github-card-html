@@ -41,7 +41,9 @@
       afterSkills.then(function(){
         safeRun(function(){ return window.decompress && window.decompress('base/compression.json'); });
         safeRun(function(){ return window.replace_character_name && window.replace_character_name('http://localhost:3000/api/character'); });
-        safeRun(function(){ return window.replace_skill_name && window.replace_skill_name('http://localhost:3000/api/skill' + (localStorage.getItem('strength') || '')); });
+        safeRun(function(){
+          return window.replace_skill_name && window.replace_skill_name('http://localhost:3000/api/skill?strength=' + encodeURIComponent(localStorage.getItem('strength')));
+        });
         safeRun(function(){ return window.replace_card_name && window.replace_card_name('http://localhost:3000/api/card'); });
         safeRun(function(){ return window.check_strength && window.check_strength(); });
         safeRun(function(){ return window.add_button_wave && window.add_button_wave(); });

@@ -96,7 +96,7 @@
     'term-dynamic': { key: 'termDynamic', url: API_BASE + '/term-dynamic' },
     'card': { key: 'cards', url: API_BASE + '/card' },
     'character': { key: 'characters', url: API_BASE + '/character' },
-    'skill': { key: null, url: null, urls: [API_BASE + '/skill0', API_BASE + '/skill1', API_BASE + '/skill2'] },
+    'skill': { key: 'skills', url: API_BASE + '/skill' },
   });
 
   Object.assign(window.tokensAdmin, { getAuth, apiJson, API_BASE, COLLECTIONS, CLIENT_ID, fetchTokenLogs });
