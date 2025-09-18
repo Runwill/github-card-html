@@ -29,9 +29,12 @@
 }
 
 .loading-bar {
-    width: 0%;
+    /* 平滑动画：单段 scaleX，从 0 -> var(--pb-end,0.88) */
+    --pb-duration: 1.2s; /* JS 可覆盖 */
+    --pb-end: 0.88;      /* JS 可覆盖 */
+    --pb-delay: 0.8s;    /* 初始延迟 */
+    width: 100%;
     height: 100%;
-    /* 渐变条使用主题主色，并在深色下保持对比 */
     background: linear-gradient(90deg,
         color-mix(in srgb, var(--primary-3) 80%, var(--surface)) 0%,
         color-mix(in srgb, var(--primary-2) 90%, var(--surface)) 12%,
@@ -39,13 +42,15 @@
         color-mix(in srgb, var(--primary-2) 88%, var(--surface)) 100%
     );
     border-radius: 6px;
-    animation: loading-progress 1.2s cubic-bezier(.4,0,.2,1) 0.8s forwards;
-    transform: translateZ(0);
-    will-change: width;
+    transform-origin: left center;
+    transform: translateZ(0) scaleX(0);
+    animation: loading-progress var(--pb-duration) cubic-bezier(.33,.01,.18,1) var(--pb-delay) forwards;
+    will-change: transform;
 }
 
 .loading-bar.accelerate {
-    animation: loading-complete 0.4s cubic-bezier(.2,0,.2,1) forwards;
+    /* 使用补间到 1 的加速动画，easeOutQuint 风格 */
+    animation: loading-complete 0.55s cubic-bezier(.19,1,.22,1) forwards;
 }
 
 .loading-title {
@@ -66,15 +71,13 @@ html:not([data-theme="dark"]) .loading-bar {
 }
 
 @keyframes loading-progress {
-    0% { width: 0%; }
-    70% { width: 75%; }
-    90% { width: 85%; }
-    100% { width: 88%; }
+    0% { transform: translateZ(0) scaleX(0); }
+    100% { transform: translateZ(0) scaleX(var(--pb-end,0.88)); }
 }
 
 @keyframes loading-complete {
-    from { width: 88%; }
-    to { width: 100%; }
+    0% { transform: translateZ(0) scaleX(var(--pb-end,0.88)); }
+    100% { transform: translateZ(0) scaleX(1); }
 }
 
 @keyframes fade-in {

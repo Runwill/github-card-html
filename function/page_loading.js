@@ -89,7 +89,10 @@ function whenPartialsReady() {
     const progressBarDuration = calculateProgressBarDuration(randomText);
     const loadingBar = document.querySelector('.loading-bar');
     if (loadingBar) {
-        loadingBar.style.animationDuration = `${progressBarDuration}s`;
+        loadingBar.style.setProperty('--pb-duration', `${progressBarDuration}s`);
+        // 根据进度条整体时长微调结束比例，使时间长时稍微多前进一点点
+        const adaptiveEnd = progressBarDuration <= 1.2 ? 0.88 : Math.min(0.93, 0.88 + (progressBarDuration - 1.2) * 0.08);
+        loadingBar.style.setProperty('--pb-end', adaptiveEnd.toString());
     }
     window.currentProgressBarDuration = progressBarDuration;
 
@@ -104,6 +107,7 @@ function whenPartialsReady() {
 let domReady = false;
 let resourcesReady = false;
 let canComplete = false;
+let completionStarted = false; // 防止重复触发
 
 // 检查是否可以完成进度条
 function checkLoadingComplete() {
@@ -112,50 +116,54 @@ function checkLoadingComplete() {
 
 // 平滑完成进度条
 function completeProgressBar() {
+    if (completionStarted) return; // 双重保护
+    completionStarted = true;
     const loadingBar = document.querySelector('.loading-bar');
-    if (loadingBar) {
-        loadingBar.classList.add('accelerate');
-    }
-    
-    // 等待最终动画完成后开始淡出
-    setTimeout(() => {
-        // 进度条完成，开始淡出和文本动画
-        const overlay = document.getElementById('loading-overlay');
-        overlay.classList.add('fade-out');
-        
-        // 进度条完成时立即触发文本动画（与遮罩淡出同时进行）
-        if (window.textAnimationController) {
-            window.textAnimationController.startAnimations();
-        }
-        
+    const overlay = document.getElementById('loading-overlay');
+    // 使用 rAF 把样式修改放到同一帧，减少 layout 合并时机不确定性
+    requestAnimationFrame(() => {
+        if (loadingBar) loadingBar.classList.add('accelerate');
+        // 进度条最终加速后，延时处理淡出
         setTimeout(() => {
-            overlay.style.display = 'none';
-        }, 3000); // 淡出时间保持不变
-    }, 400); // 等待final动画完成
+            requestAnimationFrame(() => {
+                if (!overlay) return;
+                overlay.classList.add('fade-out');
+                if (window.textAnimationController) {
+                    window.textAnimationController.startAnimations();
+                }
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                }, 3000);
+            });
+        }, 400);
+    });
 }
 
 // 开始检查完成条件的循环
 function startCompletionCheck() {
     canComplete = true;
-    
-    const checkInterval = setInterval(() => {
-        if (checkLoadingComplete() && canComplete) {
-            clearInterval(checkInterval);
-            completeProgressBar();
-        }
-    }, 16); // 约60fps的检查频率，更流畅
+    attemptCompletion(); // 立即尝试一次
+}
+
+function attemptCompletion() {
+    if (!canComplete || completionStarted) return;
+    if (checkLoadingComplete()) {
+        completeProgressBar();
+    }
 }
 
 // DOM加载完成
 document.addEventListener('DOMContentLoaded', function() {
     domReady = true;
     console.log('DOM ready');
+    attemptCompletion();
 });
 
 // 所有资源加载完成
 window.addEventListener('load', function () {
     resourcesReady = true;
     console.log('Resources ready');
+    attemptCompletion();
 });
 
 // 进度检查的定时已在 initLoadingOverlay 中按 partialsReady 之后统一安排

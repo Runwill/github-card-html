@@ -40,8 +40,10 @@
     <h2>账号</h2>
   </div>
   <form id="updateForm" class="modal-form">
-    <input type="text" id="newUsername" name="newUsername" placeholder="新用户名" required>
-    <input type="password" id="newPassword" name="newPassword" placeholder="新密码" required>
+    <!-- 为了更好地支持浏览器自动填充，添加 autocomplete 属性 -->
+    <input type="text" id="newUsername" name="newUsername" placeholder="新用户名" required autocomplete="username">
+    <!-- 这是设置新密码，因此使用 new-password；如果以后增加当前密码字段，可使用 current-password -->
+    <input type="password" id="newPassword" name="newPassword" placeholder="新密码" required autocomplete="new-password">
     <button type="submit" class="btn btn--primary btn--block">更新</button>
   </form>
   <div id="responseMessage" class="modal-message"></div>
