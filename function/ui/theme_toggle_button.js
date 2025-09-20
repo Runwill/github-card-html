@@ -1,5 +1,3 @@
-// 将侧边栏的“切换主题”按钮与 setTheme 绑定
-// 侧边栏“切换主题”按钮：与 window.setTheme 配合，自动同步按钮文案
 ;(function(){
   const mode=()=> document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'light'
   const label=btn=> btn && (btn.textContent = mode()==='dark' ? '切换为浅色' : '切换为深色')

@@ -1,49 +1,19 @@
 (function(){
-  function onReady(fn){
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, { once: true });
-    else fn();
-  }
-
-  function bind(selector, handler){
-    try {
-      document.querySelectorAll(selector).forEach(function(el){
-        el.addEventListener('click', handler);
-      });
-    } catch(_) {}
-  }
+  var onReady=function(fn){ document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', fn, { once:true }) : fn(); };
+  var bind=function(sel, handler){ try{ document.querySelectorAll(sel).forEach(function(el){ el.addEventListener('click', handler); }); }catch(_){} };
+  var call=function(name){ try{ var fn=window[name]; if(!fn) return; return fn.apply(window, Array.prototype.slice.call(arguments,1)); }catch(_){} };
 
   onReady(function(){
-    var ready = window.partialsReady instanceof Promise ? window.partialsReady : Promise.resolve();
-    ready.then(function(){
-    // 强度切换
-    bind('.strength_title', function(){
-      try { if (window.change_strength) window.change_strength(); } catch(_) {}
-    });
-
-    // 等号（equaling）
-    bind('.button_equaling', function(event){
-      try { if (window.elementReplaceCheck) window.elementReplaceCheck('equaling', 'equalingHead', event); } catch(_) {}
-    });
-
-    // 向上取整（roundUp）
-    bind('.button_roundUp', function(event){
-      try { if (window.elementReplaceCheck) window.elementReplaceCheck('roundUp', 'roundUp', event); } catch(_) {}
-    });
-
-    // 代词（pronoun）
-    bind('.button_pronoun', function(event){
-      try { if (window.pronounReplaceCheck) window.pronounReplaceCheck(event); } catch(_) {}
-    });
-
-    // include
-    bind('.button_include', function(event){
-      try { if (window.elementReplaceCheck) window.elementReplaceCheck('include', 'include', event); } catch(_) {}
-    });
-
-    // tickQuantifier 显隐
-    bind('.button_tickQuantifier', function(event){
-      try { if (window.elementHideCheck) window.elementHideCheck('tickQuantifier', event); } catch(_) {}
-    });
+    (window.partialsReady instanceof Promise ? window.partialsReady : Promise.resolve()).then(function(){
+      var pairs=[
+        ['.strength_title', function(){ call('change_strength'); }],
+        ['.button_equaling', function(e){ call('elementReplaceCheck','equaling','equalingHead',e); }],
+        ['.button_roundUp', function(e){ call('elementReplaceCheck','roundUp','roundUp',e); }],
+        ['.button_pronoun', function(e){ call('pronounReplaceCheck',e); }],
+        ['.button_include', function(e){ call('elementReplaceCheck','include','include',e); }],
+        ['.button_tickQuantifier', function(e){ call('elementHideCheck','tickQuantifier',e); }]
+      ];
+      for(var i=0;i<pairs.length;i++) bind(pairs[i][0], pairs[i][1]);
     });
   });
 })();

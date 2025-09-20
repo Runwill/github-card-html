@@ -1,31 +1,31 @@
-// 统一弹窗和菜单管理器
 const UIManager = {
   state: { sidebarVisible: false, currentModal: null },
+  $: (s)=>document.getElementById(s),
+  qs: (s)=>document.querySelector(s),
+  show:(el,display)=>{ if(el){ el.style.display = display==null? 'block' : display; } },
+  hide:(el)=>{ if(el){ el.style.display='none'; } },
+  abs:(u)=> (endpoints && endpoints.abs ? endpoints.abs(u) : u),
+  api:(u)=> (endpoints && endpoints.api ? endpoints.api(u) : u),
 
   init() {
     this.bindEvents();
     this.bindMenuActions();
     this.bindFormEvents();
-  // 初始化时尝试从服务端刷新一次用户信息（可能刚被管理员通过头像审核）
-  this.refreshCurrentUserFromServer();
+    this.refreshCurrentUserFromServer();
   },
 
   bindEvents() {
     // 菜单切换
-    document.getElementById('menu-toggle')?.addEventListener('click', (e) => {
+    this.$('menu-toggle')?.addEventListener('click', (e) => {
       e.stopPropagation();
       this.toggleSidebar();
     });
 
-    // 背景遮罩点击关闭
-    document.getElementById('sidebar-backdrop')?.addEventListener('click', () => this.hideSidebar());
-    document.getElementById('modal-backdrop')?.addEventListener('click', () => this.hideAllModals());
+    this.$('sidebar-backdrop')?.addEventListener('click', () => this.hideSidebar());
+    this.$('modal-backdrop')?.addEventListener('click', () => this.hideAllModals());
 
-    // 阻止内部点击冒泡
-    document.getElementById('sidebar-menu')?.addEventListener('click', (e) => e.stopPropagation());
-    ['update-account-modal', 'approve-user-modal'].forEach(id => {
-      document.getElementById(id)?.addEventListener('click', (e) => e.stopPropagation());
-    });
+    this.$('sidebar-menu')?.addEventListener('click', (e) => e.stopPropagation());
+    ['update-account-modal', 'approve-user-modal'].forEach(id => { this.$(id)?.addEventListener('click', (e) => e.stopPropagation()); });
 
     // ESC键关闭
     document.addEventListener('keydown', (e) => {
@@ -37,21 +37,19 @@ const UIManager = {
   },
 
   bindMenuActions() {
-    document.getElementById('update-account-button')?.addEventListener('click', () =>
-      this.showModal('update-account-modal'));
-    document.getElementById('approve-request-button')?.addEventListener('click', () =>
-      this.showModal('approve-user-modal'));
-    document.getElementById('logout-button')?.addEventListener('click', () => this.handleLogout());
+    this.$('update-account-button')?.addEventListener('click', () => this.showModal('update-account-modal'));
+    this.$('approve-request-button')?.addEventListener('click', () => this.showModal('approve-user-modal'));
+    this.$('logout-button')?.addEventListener('click', () => this.handleLogout());
 
     // 头像上传
-    const fileInput = document.getElementById('upload-avatar-input');
-    const uploadBtn = document.getElementById('upload-avatar-button');
+  const fileInput = this.$('upload-avatar-input');
+  const uploadBtn = this.$('upload-avatar-button');
     // 打开头像弹窗
   uploadBtn?.addEventListener('click', async () => {
       // 打开前先尝试从服务器刷新一次头像（防止审核通过后本地仍旧是旧值）
       await this.refreshCurrentUserFromServer();
-      const modal = document.getElementById('avatar-modal');
-      const preview = document.getElementById('avatar-modal-preview');
+  const modal = this.$('avatar-modal');
+  const preview = this.$('avatar-modal-preview');
       const saved = localStorage.getItem('avatar');
       if (preview) {
         const resolved = this.resolveAvatarUrl(saved);
@@ -68,8 +66,8 @@ const UIManager = {
       this.showModal('avatar-modal');
     });
     // 弹窗中的“上传头像”按钮
-    document.getElementById('avatar-modal-upload')?.addEventListener('click', () => fileInput?.click());
-    document.getElementById('avatar-modal-close')?.addEventListener('click', () => this.hideModal('avatar-modal'));
+  this.$('avatar-modal-upload')?.addEventListener('click', () => fileInput?.click());
+  this.$('avatar-modal-close')?.addEventListener('click', () => this.hideModal('avatar-modal'));
     // 文件选择后进入裁剪
     fileInput?.addEventListener('change', (e) => this.openAvatarCropper(e));
 
@@ -80,30 +78,30 @@ const UIManager = {
     });
 
     // 初始化预览
-    const preview = document.getElementById('sidebar-avatar-preview');
+  const preview = this.$('sidebar-avatar-preview');
     const saved = localStorage.getItem('avatar');
     const resolved = this.resolveAvatarUrl(saved);
     if (preview && resolved) {
       preview.src = resolved;
       preview.style.display = 'inline-block';
     }
-    const headerAvatar = document.getElementById('header-avatar');
+  const headerAvatar = this.$('header-avatar');
     if (resolved && headerAvatar) {
       headerAvatar.src = resolved;
       headerAvatar.style.display = 'inline-block';
     }
 
     // 按角色显示/隐藏“审核”入口（moderator / admin 可见）
-    const role = localStorage.getItem('role');
-    const approveBtn = document.getElementById('approve-request-button');
+  const role = localStorage.getItem('role');
+  const approveBtn = this.$('approve-request-button');
     if (approveBtn) {
       const canReview = role === 'admin' || role === 'moderator';
       approveBtn.style.display = canReview ? '' : 'none';
     }
 
     // 仅非 admin/auditor 隐藏“词元”页入口与面板（admin 与 auditor 可见）
-    const tokensTab = document.querySelector('a[href="#panel_tokens"]')?.parentElement;
-    const tokensPanel = document.getElementById('panel_tokens');
+  const tokensTab = this.qs('a[href="#panel_tokens"]')?.parentElement;
+  const tokensPanel = this.$('panel_tokens');
     const canViewTokens = (role === 'admin' || role === 'auditor');
     if (!canViewTokens) {
       if (tokensTab) tokensTab.style.display = 'none';
@@ -118,7 +116,7 @@ const UIManager = {
   resolveAvatarUrl(u) {
     if (!u) return '';
     if (/^https?:\/\//i.test(u)) return u; // 已是绝对地址
-    if (u.startsWith('/')) return (endpoints && endpoints.abs ? endpoints.abs(u) : u);
+    if (u.startsWith('/')) return this.abs(u);
     return u;
   },
 
@@ -127,7 +125,7 @@ const UIManager = {
     try {
       const id = localStorage.getItem('id');
       if (!id) return;
-  const resp = await fetch((endpoints && endpoints.api ? endpoints.api('/api/user/' + encodeURIComponent(id)) : '/api/user/' + encodeURIComponent(id)));
+    const resp = await fetch(this.api('/api/user/' + encodeURIComponent(id)));
       if (!resp.ok) return;
       const data = await resp.json();
       if (!data) return;
@@ -136,13 +134,13 @@ const UIManager = {
       if (old !== next) {
         localStorage.setItem('avatar', next);
         // 立即刷新两处头像
-        const resolved = this.resolveAvatarUrl(next);
-        const preview = document.getElementById('sidebar-avatar-preview');
-        const headerAvatar = document.getElementById('header-avatar');
+  const resolved = this.resolveAvatarUrl(next);
+  const preview = this.$('sidebar-avatar-preview');
+  const headerAvatar = this.$('header-avatar');
         if (preview && resolved) { preview.src = resolved; preview.style.display = 'inline-block'; }
         if (headerAvatar && resolved) { headerAvatar.src = resolved; headerAvatar.style.display = 'inline-block'; }
         // 若头像弹窗开着，也同步一下
-        const avatarModalPreview = document.getElementById('avatar-modal-preview');
+  const avatarModalPreview = this.$('avatar-modal-preview');
         if (avatarModalPreview) {
           if (resolved) {
             avatarModalPreview.src = resolved;
@@ -158,17 +156,17 @@ const UIManager = {
 
   // 打开裁剪器
   openAvatarCropper(event) {
-    const file = event?.target?.files?.[0];
+  const file = event?.target?.files?.[0];
     if (!file) return;
     if (!/^image\//i.test(file.type)) {
       alert('请选择图片文件');
       return;
     }
-    const img = document.getElementById('avatar-crop-image');
+  const img = this.$('avatar-crop-image');
     const modalId = 'avatar-crop-modal';
-    const cancelBtn = document.getElementById('avatar-crop-cancel');
-    const confirmBtn = document.getElementById('avatar-crop-confirm');
-    const msg = document.getElementById('avatar-crop-message');
+  const cancelBtn = this.$('avatar-crop-cancel');
+  const confirmBtn = this.$('avatar-crop-confirm');
+  const msg = this.$('avatar-crop-message');
     if (!img || !cancelBtn || !confirmBtn) {
       // 回退：直接上传原图
       this.handleCroppedUpload(file);
@@ -212,15 +210,10 @@ const UIManager = {
 
     const cleanup = () => {
       if (this._cropper) { try { this._cropper.destroy(); } catch (_) {} this._cropper = null; }
-      const input = document.getElementById('upload-avatar-input');
+  const input = this.$('upload-avatar-input');
       if (input) input.value = '';
     };
-    const onCancel = () => {
-      cleanup();
-    this.hideModal(modalId);
-    // 返回“头像”弹窗
-    this.showModal('avatar-modal');
-    };
+    const onCancel = () => { cleanup(); this.hideModal(modalId); this.showModal('avatar-modal'); };
     const onConfirm = async () => {
       try {
         msg.textContent = '正在裁剪…';
@@ -231,10 +224,7 @@ const UIManager = {
           if (!blob) { msg.textContent = '导出失败'; msg.className = 'modal-message error'; return; }
           const croppedFile = new File([blob], 'avatar.png', { type: 'image/png' });
           await this.handleCroppedUpload(croppedFile, msg);
-          this.hideModal(modalId);
-          cleanup();
-      // 返回“头像”弹窗
-      this.showModal('avatar-modal');
+          this.hideModal(modalId); cleanup(); this.showModal('avatar-modal');
         }, 'image/png');
       } catch (e) {
         console.error(e);
@@ -245,15 +235,15 @@ const UIManager = {
     // 先移除旧监听，避免叠加
     cancelBtn.replaceWith(cancelBtn.cloneNode(true));
     confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-    const newCancel = document.getElementById('avatar-crop-cancel');
-    const newConfirm = document.getElementById('avatar-crop-confirm');
+  const newCancel = this.$('avatar-crop-cancel');
+  const newConfirm = this.$('avatar-crop-confirm');
     newCancel.addEventListener('click', onCancel);
     newConfirm.addEventListener('click', onConfirm);
   },
 
   // 上传裁剪结果
   async handleCroppedUpload(file, messageEl) {
-    const id = localStorage.getItem('id');
+  const id = localStorage.getItem('id');
     if (!id) {
       alert('请先登录');
       return;
@@ -262,13 +252,13 @@ const UIManager = {
     form.append('avatar', file);
     form.append('userId', id);
     try {
-      messageEl && (messageEl.textContent = '正在上传…');
-  const resp = await fetch((endpoints && endpoints.api ? endpoints.api('/api/upload/avatar') : '/api/upload/avatar'), { method: 'POST', body: form });
+    messageEl && (messageEl.textContent = '正在上传…');
+    const resp = await fetch(this.api('/api/upload/avatar'), { method: 'POST', body: form });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.message || '上传失败');
   // 审核流程：不立即替换“当前头像”预览，避免误以为已生效
   // 在“头像”弹窗中提示
-  this.showMessage(document.getElementById('avatar-modal-message'), '头像已提交审核，待管理员批准后生效。', 'success');
+    this.showMessage(this.$('avatar-modal-message'), '头像已提交审核，待管理员批准后生效。', 'success');
       messageEl && (messageEl.textContent = '已提交审核');
   // 刷新“审核中头像”预览
   await this.loadPendingAvatarPreview();
@@ -283,28 +273,27 @@ const UIManager = {
   // 拉取并显示个人“审核中头像”
   async loadPendingAvatarPreview() {
     try {
-      const userId = localStorage.getItem('id');
-      const wrap = document.getElementById('avatar-pending-wrap');
-      const img = document.getElementById('avatar-pending-preview');
+  const userId = localStorage.getItem('id');
+  const wrap = this.$('avatar-pending-wrap');
+  const img = this.$('avatar-pending-preview');
       if (!userId || !wrap || !img) return;
-  const resp = await fetch((endpoints && endpoints.api ? endpoints.api('/api/avatar/pending/me?userId=' + encodeURIComponent(userId)) : '/api/avatar/pending/me?userId=' + encodeURIComponent(userId)));
+    const resp = await fetch(this.api('/api/avatar/pending/me?userId=' + encodeURIComponent(userId)));
       if (!resp.ok) throw new Error('load pending failed');
       const data = await resp.json();
       if (data && data.url) {
-  const abs = (endpoints && endpoints.abs ? endpoints.abs(data.url) : data.url);
-        img.src = abs;
+        img.src = this.abs(data.url);
         wrap.style.display = 'block';
       } else {
         wrap.style.display = 'none';
       }
     } catch (_) {
-      const wrap = document.getElementById('avatar-pending-wrap');
+      const wrap = this.$('avatar-pending-wrap');
       if (wrap) wrap.style.display = 'none';
     }
   },
 
   bindFormEvents() {
-    document.getElementById('updateForm')?.addEventListener('submit', (e) => this.handleUpdateFormSubmit(e));
+    this.$('updateForm')?.addEventListener('submit', (e) => this.handleUpdateFormSubmit(e));
   },
 
   toggleSidebar() {
@@ -315,7 +304,7 @@ const UIManager = {
     if (this.state.sidebarVisible) return;
     this.hideAllModals();
 
-    const [menu, backdrop] = [document.getElementById('sidebar-menu'), document.getElementById('sidebar-backdrop')];
+  const [menu, backdrop] = [this.$('sidebar-menu'), this.$('sidebar-backdrop')];
     if (!menu || !backdrop) return;
 
     this.state.sidebarVisible = true;
@@ -332,7 +321,7 @@ const UIManager = {
   hideSidebar() {
     if (!this.state.sidebarVisible) return;
 
-    const [menu, backdrop] = [document.getElementById('sidebar-menu'), document.getElementById('sidebar-backdrop')];
+  const [menu, backdrop] = [this.$('sidebar-menu'), this.$('sidebar-backdrop')];
     if (!menu || !backdrop) return;
 
     this.state.sidebarVisible = false;
@@ -351,7 +340,7 @@ const UIManager = {
     this.hideAllModals();
     this.hideSidebar();
 
-    const [backdrop, modal] = [document.getElementById('modal-backdrop'), document.getElementById(modalId)];
+  const [backdrop, modal] = [this.$('modal-backdrop'), this.$(modalId)];
     if (!backdrop || !modal) return;
 
     this.state.currentModal = modalId;
@@ -363,7 +352,7 @@ const UIManager = {
     modal.classList.remove('show');
     try { void backdrop.offsetWidth; void modal.offsetWidth; } catch (_) {}
 
-    const responseMessage = modal.querySelector('#responseMessage');
+  const responseMessage = modal.querySelector('#responseMessage');
     if (responseMessage) {
       responseMessage.textContent = '';
       responseMessage.className = 'modal-message';
@@ -383,7 +372,7 @@ const UIManager = {
   hideModal(modalId) {
     if (this.state.currentModal !== modalId) return;
 
-    const [backdrop, modal] = [document.getElementById('modal-backdrop'), document.getElementById(modalId)];
+  const [backdrop, modal] = [this.$('modal-backdrop'), this.$(modalId)];
     if (!backdrop || !modal) return;
 
     this.state.currentModal = null;
@@ -406,13 +395,13 @@ const UIManager = {
 
   handleModalSpecialCases(modalId, modal) {
     if (modalId === 'update-account-modal') {
-      const input = modal.querySelector('#newUsername');
+  const input = modal.querySelector('#newUsername');
       if (input) {
         input.value = localStorage.getItem('username') || '';
         input.focus();
       }
     } else if (modalId === 'approve-user-modal') {
-      if (typeof renderApprovals === 'function') renderApprovals();
+  if (typeof renderApprovals === 'function') renderApprovals();
   // 审核面板打开时，后台可能会修改头像，尝试刷新一次本地缓存
   this.refreshCurrentUserFromServer();
     }
@@ -420,12 +409,8 @@ const UIManager = {
 
   async handleUpdateFormSubmit(event) {
     event.preventDefault();
-    const [id, username, password] = [
-      localStorage.getItem('id'),
-      document.getElementById('newUsername').value.trim(),
-      document.getElementById('newPassword').value.trim()
-    ];
-    const responseMessage = document.getElementById('responseMessage');
+    const [id, username, password] = [ localStorage.getItem('id'), this.$('newUsername').value.trim(), this.$('newPassword').value.trim() ];
+    const responseMessage = this.$('responseMessage');
 
     if (!username || !password) {
       this.showMessage(responseMessage, '用户名和密码不能为空。', 'error');
@@ -439,7 +424,7 @@ const UIManager = {
     try {
       this.showMessage(responseMessage, '正在更新...', '');
 
-  const response = await fetch((endpoints && endpoints.api ? endpoints.api('/api/update') : '/api/update'), {
+  const response = await fetch(this.api('/api/update'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, newUsername: username, newPassword: password })

@@ -1,7 +1,3 @@
-/* 主题初始化与切换（等价精简）：
- * - 读取 localStorage.theme（light/dark/system）
- * - 暴露 window.setTheme 供 UI 调用；跟随系统时监听 prefers-color-scheme
- */
 ;(function(){
   const KEY='theme', root=document.documentElement, media=matchMedia('(prefers-color-scheme: dark)')
   let timer=null

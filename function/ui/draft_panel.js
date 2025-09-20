@@ -7,28 +7,27 @@
   function $(sel){ return document.querySelector(sel); }
 
   function debounce(fn, wait){
-    var t; return function(){
-      var ctx = this, args = arguments;
-      clearTimeout(t); t = setTimeout(function(){ fn.apply(ctx, args); }, wait);
-    };
+    var t; return function(){ var c=this,a=arguments; clearTimeout(t); t=setTimeout(function(){ fn.apply(c,a); }, wait); };
   }
 
   function callReplacers(root){
-    // 顺序与原页面保持一致
-  safe(function(){ return window.replace_character_name && window.replace_character_name(endpoints.character(), root); });
-  safe(function(){ return window.replace_skill_name && window.replace_skill_name(endpoints.skill(), root); });
-  safe(function(){ return window.replace_card_name && window.replace_card_name(endpoints.card(), root); });
-  safe(function(){ return window.replace_term && window.replace_term(endpoints.termDynamic(), 1, root); });
-  safe(function(){ return window.replace_term && window.replace_term(endpoints.termFixed(), 1, root); });
-    // 稍后确保代词追加
+    var reps = [
+      ['replace_character_name', endpoints.character()],
+      ['replace_skill_name', endpoints.skill()],
+      ['replace_card_name', endpoints.card()],
+      ['replace_term', endpoints.termDynamic(), 1],
+      ['replace_term', endpoints.termFixed(), 1]
+    ];
+    for (var i=0;i<reps.length;i++) (function(it){
+      safe(function(){ var fn = window[it[0]]; if(!fn) return; var args = it.slice(1); args.push(root); return fn.apply(window, args); });
+    })(reps[i]);
     setTimeout(function(){ safe(function(){ return window.pronounCheck && window.pronounCheck(root); }); }, 50);
   }
 
   function render(html){
     if (!previewEl) return;
     try {
-      var cleaned = (html || '').replace(/\\/g, '');
-      previewEl.innerHTML = cleaned;
+      previewEl.innerHTML = (html || '').replace(/\\/g, '');
       callReplacers(previewEl);
     } catch(_) {}
   }
@@ -43,12 +42,7 @@
 
   function onInput(){
     var val = inputEl ? inputEl.value : '';
-    // 自适应高度：先重置为 auto，再按 scrollHeight 设高
-    try {
-      autosizeNow();
-    } catch(_) {}
-    render(val);
-    save(val);
+    render(val); save(val);
   }
 
   function isVisible(el){
@@ -61,7 +55,6 @@
 
   function autosizeNow(){
     if (!inputEl) return;
-    // 若不可见，跳过本次（避免取到 0 高）
     if (!isVisible(inputEl)) return;
     inputEl.style.height = 'auto';
     var next = Math.max(80, inputEl.scrollHeight);
@@ -70,41 +63,24 @@
 
   function init(){
     inputEl = $('#htmlInput');
-    previewEl = document.querySelector('.draftBlock');
+    previewEl = $('.draftBlock');
     if (!inputEl || !previewEl) return;
 
-    // 恢复
     var saved = load();
     if (saved) {
       inputEl.value = saved;
       render(saved);
     }
 
-    // 初始化时做一次高度自适应
-    try {
-      inputEl.style.height = 'auto';
-      inputEl.style.overflow = 'hidden';
-      inputEl.style.resize = 'none';
-      // 若当前不可见，等待可见后再测量
-      if (isVisible(inputEl)) {
-        autosizeNow();
-      }
-    } catch(_) {}
-
-    // 输入监听（内容渲染去抖，大小即时）
-    inputEl.addEventListener('input', function(e){
-      // 即时调整高度，避免输入时闪烁
-  try { autosizeNow(); } catch(_) {}
-      // 渲染与保存去抖
-      debouncedRender();
-    });
+    try { inputEl.style.height='auto'; inputEl.style.overflow='hidden'; inputEl.style.resize='none'; if (isVisible(inputEl)) autosizeNow(); } catch(_) {}
 
     var debouncedRender = debounce(onInput, 250);
+    inputEl.addEventListener('input', function(e){
+      safe(autosizeNow);
+      debouncedRender();
+    });
+    window.addEventListener('resize', function(){ safe(autosizeNow); });
 
-    // 窗口大小变化时也重新测量（字体或宽度变化会影响换行）
-    window.addEventListener('resize', function(){ try { autosizeNow(); } catch(_) {} });
-
-    // 如果初始化时不可见，监听可见后自适应（一次）
     try {
       if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function(entries){
@@ -112,27 +88,18 @@
             var en = entries[i];
             if (en && en.isIntersecting) { autosizeNow(); io.disconnect(); break; }
           }
-        }, { root: null, threshold: 0 });
+        });
         io.observe(inputEl);
       } else {
-        // 兜底：短时轮询最多 20 次
-        var tries = 20;
-        (function poll(){
-          if (isVisible(inputEl)) { autosizeNow(); return; }
-          if (--tries <= 0) return;
-          setTimeout(poll, 150);
-        })();
+        var tries = 20; (function poll(){ if (isVisible(inputEl)) { autosizeNow(); return; } if (--tries <= 0) return; setTimeout(poll, 150); })();
       }
     } catch(_) {}
   }
 
-  // 等待 DOM 与 partials 注入后再初始化，避免元素不存在
   function whenDOMReady(){
-    return new Promise(function(resolve){
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', resolve, { once: true });
-      } else { resolve(); }
-    });
+    return document.readyState === 'loading'
+      ? new Promise(function(r){ document.addEventListener('DOMContentLoaded', r, { once: true }); })
+      : Promise.resolve();
   }
 
   function whenPartialsReady(){
@@ -148,12 +115,5 @@
     init();
   })();
 
-  // 暴露少量 API 以便后续扩展
-  window.draftPanel = {
-    render: render,
-    save: save,
-    load: load,
-  init: init,
-  autosize: function(){ try { autosizeNow(); } catch(_) {} }
-  };
+  window.draftPanel = { render: render, save: save, load: load, init: init, autosize: function(){ safe(autosizeNow); } };
 })();
