@@ -1,77 +1,49 @@
-function elementReplaceCheck(key,name,event){
-    const clickedButton = event.target
-    fetch('http://localhost:3000/api/term-dynamic').then(response => response.json()).then(term => {
-        const targetObject = term.find(item => item.en === key)
-        const partLength = targetObject ? targetObject.part.length : 0
-        if(term_status[name] >= partLength - 1){
-            reset_color(clickedButton)
-            clickedButton.classList.add('button_color_blue')
-            term_status[name] = 0
-            elementReplace(name + String(partLength - 1), name + '0')
-        }else if(term_status[name] < partLength - 1){
-            reset_color(clickedButton)
-            clickedButton.classList.add('button_color_red')
-            term_status[name] = term_status[name] + 1
-            elementReplace(name + String(term_status[name] - 1), name + String(term_status[name]))
-        }else{
-            reset_color(clickedButton)
-            clickedButton.classList.add('button_color_red')
-            term_status[name] = 1
-            elementReplace(name + '0', name + '1')
+function elementReplaceCheck(key, name, event){
+    const clickedButton = event.target;
+    const applyBlue = () => ButtonUtils.setButtonBlue(clickedButton);
+    const applyRed = () => ButtonUtils.setButtonRed(clickedButton);
+    const doReplace = (fromSel, toSel) => {
+        ButtonUtils.replaceTag(fromSel, toSel);
+        // 原逻辑：替换后刷新术语
+        if(typeof replace_term === 'function'){
+            replace_term('http://localhost:3000/api/term-dynamic');
         }
-    })
-}
-function pronounReplaceCheck(event){
-    if(term_status['pronoun'] == 0){
-        reset_color(event.target)
-        event.target.classList.add('button_color_blue')
-        term_status['pronoun'] = 1
-    }else{
-        reset_color(event.target)
-        event.target.classList.add('button_color_red')
-        term_status['pronoun'] = 0
-    }
-    pronounCheck()
-}
+    };
 
-function pronounCheck(paragraphs = document){
-    if(term_status['pronoun'] != 0){
-        term_status['pronoun'] = 1
-        add_pronoun(paragraphs)
-    }else{
-        term_status['pronoun'] = 0
-        for(const i of [1, 2, 3]){
-            $(paragraphs).find('pronoun'+i).each(function() { //替换
-                if(this.innerHTML.endsWith('</pronounname>')){
-                    this.innerHTML = this.innerHTML.slice(0, -28)
-                }
-            })
+    const setStatus = (v) => { term_status[name] = v; };
+
+    // 引入缓存的数据源
+    const getData = () => ButtonUtils.getTermDynamic('http://localhost:3000/api/term-dynamic');
+
+    getData().then(term => {
+        const targetObject = term.find(item => item.en === key);
+        const partLength = targetObject ? targetObject.part.length : 0;
+        const cur = Number(term_status[name] || 0);
+
+        if(cur >= partLength - 1){
+            ButtonUtils.resetButtonColor(clickedButton);
+            applyBlue();
+            setStatus(0);
+            doReplace(name + String(partLength - 1), name + '0');
+        } else if(cur < partLength - 1){
+            ButtonUtils.resetButtonColor(clickedButton);
+            applyRed();
+            setStatus(cur + 1);
+            doReplace(name + String(cur), name + String(cur + 1));
+        } else {
+            ButtonUtils.resetButtonColor(clickedButton);
+            applyRed();
+            setStatus(1);
+            doReplace(name + '0', name + '1');
         }
+    });
+}
+function reset_color(target){ ButtonUtils.resetButtonColor(target); }
+
+function elementReplace(name1, name2){
+    ButtonUtils.replaceTag(name1, name2);
+    if(typeof replace_term === 'function'){
+        replace_term('http://localhost:3000/api/term-dynamic');
     }
 }
-
-function reset_color(target){
-    target.classList.remove('button_color_blue')
-    target.classList.remove('button_color_red')
-}
-
-function elementReplace(name1,name2){
-    document.querySelectorAll(name1).forEach(function(element) {
-        let newElement = document.createElement(name2)
-        newElement.innerHTML = element.innerHTML
-        element.parentNode.replaceChild(newElement, element)
-    })
-    replace_term('http://localhost:3000/api/term-dynamic')
-}
-function add_pronoun(paragraphs = document){
-    // 定义一个数组，包含三个代名词：甲、乙、丙
-    const pronounName = ['甲','乙','丙']
-    // 使用for...of循环遍历数组[1, 2, 3]
-    for(const i of [1, 2, 3]){
-        $(paragraphs).find('pronoun'+i).each(function() { //替换
-            if(!this.innerHTML.endsWith('</pronounname>')){
-                this.innerHTML = this.innerHTML + '<pronounName>' + pronounName[i-1] + '</pronounName>'
-            }
-        })
-    }
-}
+// pronoun* 已拆分到 function/button/pronoun.js 中

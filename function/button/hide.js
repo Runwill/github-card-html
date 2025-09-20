@@ -1,22 +1,18 @@
-function elementHideCheck(name,event){
-    const clickedButton = event.target
-        if(term_status[name] == 1){
-            clickedButton.style.background='#ff8686'
-            term_status[name] = 0
-            $(name).each(function() {
-                $(this).css('display','none')
-            })
-        }else if(term_status[name] == 0){
-            clickedButton.style.background='#8698ff'
-            term_status[name] = 1
-            $(name).each(function() {
-                $(this).css('display','inline')
-            })
-        }else{
-            clickedButton.style.background='#ff8686'
-            term_status[name] = 0
-            $(name).each(function() {
-                $(this).css('display','none')
-            })
-        }
+function elementHideCheck(name, event){
+    const clickedButton = event.target;
+    // 兼容未知初始值：将非1视作0
+    const current = Number(term_status[name]) === 1 ? 1 : 0;
+    const next = current === 1 ? 0 : 1;
+
+    if(next === 1){
+        // 显示
+        ButtonUtils.setButtonBlue(clickedButton);
+        ButtonUtils.toggleDisplay(name, true);
+    } else {
+        // 隐藏
+        ButtonUtils.setButtonRed(clickedButton);
+        ButtonUtils.toggleDisplay(name, false);
+    }
+
+    term_status[name] = next;
 }
