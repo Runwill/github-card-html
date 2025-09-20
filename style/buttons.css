@@ -21,11 +21,7 @@
   box-shadow: 0 0 0 3px rgba(66,153,225,0.2);
 }
 
-.btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-  transform: none;
-}
+.btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
 .btn--block { width: 100%; }
 
@@ -56,12 +52,7 @@
 .btn--secondary:active { transform: translateY(0.5px); }
 
 /* 常用禁用态覆盖，确保一致 */
-.btn:disabled {
-  background: #e2e8f0 !important;
-  color: #a0aec0 !important;
-  border-color: #e2e8f0 !important;
-  box-shadow: none !important;
-}
+.btn:disabled { background: #e2e8f0 !important; color: #a0aec0 !important; border-color: #e2e8f0 !important; box-shadow: none !important; }
 
 /* 统一“禁用样式/悬浮”——用于只读用户下的可点提示（不屏蔽点击，以便弹 toast） */
 .btn.is-disabled {

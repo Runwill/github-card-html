@@ -5,7 +5,6 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
     display: flex;
     left: 0;
-    position: sticky;
     right: 0;
     top: 0;
     z-index: 4;
@@ -15,7 +14,7 @@
     border-bottom: 1px solid rgba(0,0,0,0.06);
     align-items: center;
     padding-right: 56px; /* 给右侧头像预留空间，避免与内容重叠 */
-    position: sticky; /* 保持原有粘性定位 */
+    position: sticky; /* 粘性定位 */
 }
 
 #header:hover {
@@ -141,13 +140,10 @@
 
 #nav {
     overflow: hidden;
-    flex-wrap: nowrap;
     flex-direction: column;
-    flex-wrap: wrap;
-    margin-bottom: 0;
-    margin-top: 10px;
+    margin: 10px 0 0 0;
     list-style: none;
-    padding: 0px 0 0 0px;
+    padding: 0;
 }
 
 #nav-item {

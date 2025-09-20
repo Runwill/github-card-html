@@ -1,12 +1,13 @@
 /* 响应式样式 */
+/* 基础缺省：小中屏默认搜索框靠右 0，底部占位 0.5em；大屏断点再覆盖 */
+#search-input { right: 0; }
+#block-under-search { height: 0.5em; }
 @media (max-width: 500px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 20px; }
     #nav-item { margin: 0 -25px 0 0; }
-    #search-input { right: 0; }
-    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 501px) and (max-width: 600px) {
@@ -15,8 +16,6 @@
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 30px; }
     #nav-item { margin: 0 -20px 0 0; }
-    #search-input { right: 0; }
-    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 601px) and (max-width: 700px) {
@@ -25,8 +24,6 @@
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 40px; }
     #nav-item { margin: 0 -10px 0 0; }
-    #search-input { right: 0; }
-    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 701px) and (max-width: 800px) {
@@ -35,8 +32,6 @@
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 50px; }
     #nav-item { margin: 0 -10px 0 0; }
-    #search-input { right: 0; }
-    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 801px) and (max-width: 900px) {
@@ -45,8 +40,6 @@
     .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 10px 0 0; }
-    #search-input { right: 0; }
-    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 901px) and (max-width: 1100px) {
@@ -55,8 +48,6 @@
     .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 20px 0 0; }
-    #search-input { right: 0; }
-    #block-under-search { height: 0.5em; }
 }
 
 @media (min-width: 1101px) and (max-width: 1200px) {

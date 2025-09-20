@@ -43,23 +43,4 @@ padding padding padding { animation-delay: 0.12s; }
 html { scroll-behavior: smooth; }
 
 ::selection { background: rgba(45, 55, 72, 0.2); color: #2d3748; }
-
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
-}
-
-.animations-disabled * { animation: none !important; transition: none !important; opacity: 1 !important; transform: none !important; }
-.animations-disabled .main { transform: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
-
-.animate-in, .visible { will-change: transform, opacity; }
-.animate-in.animation-complete, .visible.animation-complete { will-change: auto; }
-
-.highlight-on-scroll { background: linear-gradient(120deg, transparent 0%, rgba(255, 215, 0, 0.3) 50%, transparent 100%); background-repeat: no-repeat; background-size: 0% 100%; animation: highlight 1s ease-out forwards; }
-
-.smart-fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    /* 限定为 opacity/transform，避免主题变量变动触发的 repaint 动画 */
-    transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.smart-fade-in.loaded { opacity: 1; transform: translateY(0); }
+/* 以下通用动画/无障碍规则已在 style.css 中提供，避免重复定义以减少体积 */
