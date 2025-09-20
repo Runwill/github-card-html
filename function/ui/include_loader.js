@@ -1,41 +1,21 @@
-// Lightweight HTML partial include loader
-// Usage: <div data-include="partials/header.html"></div>
-// Exposes window.partialsReady (Promise) to allow other scripts to wait.
-(function(){
-  function onReady(cb){
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', cb);
-    } else {
-      cb();
-    }
+// HTML partial include loader（等价精简）：
+// - 支持 data-include 属性的片段注入
+// - 暴露 window.partialsReady Promise 供其他脚本等待
+;(function(){
+  const onReady = (cb)=> document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', cb) : cb()
+  async function load(){
+    const nodes=[...document.querySelectorAll('[data-include]')]
+    if(!nodes.length) return
+    await Promise.all(nodes.map(async el=>{
+      const url=el.getAttribute('data-include'); if(!url) return
+      try{
+        const html=await (await fetch(url,{cache:'no-cache'})).text()
+        el.insertAdjacentHTML('beforebegin', html)
+        el.parentNode && el.parentNode.removeChild(el)
+      }catch(_){ try{ el.innerHTML='<!-- include failed: '+(url||'')+' -->' }catch(_){} }
+    }))
   }
-
-  async function loadPartials(){
-    const nodes = Array.prototype.slice.call(document.querySelectorAll('[data-include]'));
-    if (!nodes.length) return;
-    await Promise.all(nodes.map(async function(el){
-      const url = el.getAttribute('data-include');
-      if (!url) return;
-      try {
-        const res = await fetch(url, { cache: 'no-cache' });
-        const html = await res.text();
-        // Replace the placeholder node with fetched HTML
-        el.insertAdjacentHTML('beforebegin', html);
-        el.parentNode && el.parentNode.removeChild(el);
-      } catch (err) {
-        try {
-          el.innerHTML = '<!-- include failed: ' + (url || '') + ' -->';
-        } catch(_) {}
-      }
-    }));
-  }
-
-  // Create a promise others can await
-  var resolveFn, rejectFn;
-  var p = new Promise(function(resolve, reject){ resolveFn = resolve; rejectFn = reject; });
-  try { Object.defineProperty(window, 'partialsReady', { value: p, writable: false, configurable: true }); } catch(_) { window.partialsReady = p; }
-
-  onReady(function(){
-    loadPartials().then(function(){ resolveFn(); }).catch(function(e){ rejectFn(e); });
-  });
-})();
+  let res,rej; const p=new Promise((r,j)=>{res=r;rej=j})
+  try{ Object.defineProperty(window,'partialsReady',{ value:p, writable:false, configurable:true }) }catch(_){ window.partialsReady=p }
+  onReady(()=>{ load().then(()=>res()).catch(e=>rej(e)) })
+})()
