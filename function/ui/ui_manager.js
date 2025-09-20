@@ -118,7 +118,7 @@ const UIManager = {
   resolveAvatarUrl(u) {
     if (!u) return '';
     if (/^https?:\/\//i.test(u)) return u; // 已是绝对地址
-    if (u.startsWith('/uploads/')) return `http://localhost:3000${u}`;
+    if (u.startsWith('/')) return (endpoints && endpoints.abs ? endpoints.abs(u) : u);
     return u;
   },
 
@@ -127,7 +127,7 @@ const UIManager = {
     try {
       const id = localStorage.getItem('id');
       if (!id) return;
-      const resp = await fetch(`http://localhost:3000/api/user/${encodeURIComponent(id)}`);
+  const resp = await fetch((endpoints && endpoints.api ? endpoints.api('/api/user/' + encodeURIComponent(id)) : '/api/user/' + encodeURIComponent(id)));
       if (!resp.ok) return;
       const data = await resp.json();
       if (!data) return;
@@ -263,7 +263,7 @@ const UIManager = {
     form.append('userId', id);
     try {
       messageEl && (messageEl.textContent = '正在上传…');
-      const resp = await fetch('http://localhost:3000/api/upload/avatar', { method: 'POST', body: form });
+  const resp = await fetch((endpoints && endpoints.api ? endpoints.api('/api/upload/avatar') : '/api/upload/avatar'), { method: 'POST', body: form });
       const data = await resp.json();
       if (!resp.ok) throw new Error(data.message || '上传失败');
   // 审核流程：不立即替换“当前头像”预览，避免误以为已生效
@@ -287,11 +287,11 @@ const UIManager = {
       const wrap = document.getElementById('avatar-pending-wrap');
       const img = document.getElementById('avatar-pending-preview');
       if (!userId || !wrap || !img) return;
-      const resp = await fetch(`http://localhost:3000/api/avatar/pending/me?userId=${encodeURIComponent(userId)}`);
+  const resp = await fetch((endpoints && endpoints.api ? endpoints.api('/api/avatar/pending/me?userId=' + encodeURIComponent(userId)) : '/api/avatar/pending/me?userId=' + encodeURIComponent(userId)));
       if (!resp.ok) throw new Error('load pending failed');
       const data = await resp.json();
       if (data && data.url) {
-        const abs = /^https?:\/\//i.test(data.url) ? data.url : `http://localhost:3000${data.url}`;
+  const abs = (endpoints && endpoints.abs ? endpoints.abs(data.url) : data.url);
         img.src = abs;
         wrap.style.display = 'block';
       } else {
@@ -439,7 +439,7 @@ const UIManager = {
     try {
       this.showMessage(responseMessage, '正在更新...', '');
 
-      const response = await fetch('http://localhost:3000/api/update', {
+  const response = await fetch((endpoints && endpoints.api ? endpoints.api('/api/update') : '/api/update'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, newUsername: username, newPassword: password })

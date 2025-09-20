@@ -1,5 +1,5 @@
 function replace_term(path, mode, paragraphs = document) {
-    fetch(path).then(response => response.json()).then(term => {
+    fetchJsonCached(path).then(term => {
         for (var i in term) {
             if (!term[i].part) {//不分段术语
                 $(paragraphs).find(term[i].en).each(function() { //替换

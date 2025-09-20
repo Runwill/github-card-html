@@ -3,7 +3,7 @@ function summonCharacterSkill(){
         var deferred1 = $.Deferred();
         var deferred2 = $.Deferred();
         $.ajax({
-            url:"http://localhost:3000/api/character",
+            url: (endpoints && endpoints.character ? endpoints.character() : '/api/character'),
             type:"GET",
             datatype:"json",
             success:
@@ -11,7 +11,7 @@ function summonCharacterSkill(){
                 deferred1.resolve(characterData)
             }
         })
-        const skillUrl = 'http://localhost:3000/api/skill?strength=' + encodeURIComponent(localStorage.getItem('strength'));
+    const skillUrl = (endpoints && endpoints.skill ? endpoints.skill() : '/api/skill?strength=' + encodeURIComponent(localStorage.getItem('strength')));
         $.ajax({
             url: skillUrl,
             type:"GET",

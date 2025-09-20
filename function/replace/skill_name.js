@@ -12,7 +12,7 @@ if (typeof jQuery !== 'undefined') {
 }
 
 function replace_skill_name(path, paragraphs = document){
-    fetch(path).then(response => response.json()).then(skill => {
+  fetchJsonCached(path).then(skill => {
         // 获取技能名并排序
         const skillNames = skill.filter(s => s && s.role).map(s => s.name).sort()
         // name -> skill 的映射（若有重名以首个为准，保持现有行为语义）
@@ -36,8 +36,8 @@ function replace_skill_name(path, paragraphs = document){
               highlightColor: '#df90ff'
             })
 
-            // 不同武将的技能名悬浮个性化文本
-            const sk = nameToSkill.get(name)
+      // 不同武将的技能名悬浮个性化文本
+      const sk = nameToSkill.get(name)
             if (sk && sk.role && sk.role.length) {
                 // 为该技能构建 id -> roleIndex 的映射，避免内层循环
                 const idToRoleIdx = new Map()
@@ -55,13 +55,15 @@ function replace_skill_name(path, paragraphs = document){
                 // 为每个角色 ID 直接定位元素，避免 j 遍历
                 idToRoleIdx.forEach((roleIdx, rid) => {
                     const $els = $(paragraphs).find('.' + name + 'LoreCharacterID' + rid)
-                    $els.prop('loreSkillPosition', nameToSkill.get(name) ? skill.indexOf(nameToSkill.get(name)) : -1)
+          const skObj = nameToSkill.get(name)
+          $els.prop('loreSkillPosition', skObj ? skill.indexOf(skObj) : -1)
                     $els.prop('loreRolePosition', roleIdx)
 
                     $els.on('mouseenter', function () {
                         const sIdx = $(this).prop('loreSkillPosition')
                         const rIdx = $(this).prop('loreRolePosition')
-                        const loreText = '「' + skill[sIdx].role[rIdx].lore + '」——《' + skill[sIdx].role[rIdx].legend + '》'
+                        const loreData = skill[sIdx].role[rIdx]
+                        const loreText = '「' + loreData.lore + '」——《' + loreData.legend + '》'
 
                         const rect = this.getBoundingClientRect()
                         const scrollTop = window.pageYOffset || document.documentElement.scrollTop

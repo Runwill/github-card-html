@@ -4,14 +4,14 @@ function elementReplaceCheck(key, name, event){
         ButtonUtils.replaceTag(fromSel, toSel);
         // 原逻辑：替换后刷新术语
         if(typeof replace_term === 'function'){
-            replace_term('http://localhost:3000/api/term-dynamic');
+            replace_term(endpoints.termDynamic());
         }
     };
 
     const setStatus = (v) => { term_status[name] = v; };
 
     // 引入缓存的数据源
-    const getData = () => ButtonUtils.getTermDynamic('http://localhost:3000/api/term-dynamic');
+    const getData = () => ButtonUtils.getTermDynamic(endpoints.termDynamic());
 
     getData().then(term => {
         const targetObject = term.find(item => item.en === key);

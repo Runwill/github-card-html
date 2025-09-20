@@ -1,6 +1,6 @@
 // 审核模块：统一管理注册与头像审核（管理员/版主）
 (function(){
-  const API = 'http://localhost:3000/api';
+  const API = (endpoints && endpoints.base ? endpoints.base() : '').replace(/\/$/, '') + '/api';
   const authHeader = () => ({ 'Authorization': `Bearer ${localStorage.getItem('token')||''}` });
 
   async function jsonGet(path){
@@ -61,7 +61,7 @@
     container.innerHTML = '';
     const list = await fetchPendingAvatars();
     if (!list.length) { container.innerHTML = '<p style="text-align:center;color:gray;padding:20px;">空</p>'; return; }
-    const abs = (u) => /^https?:\/\//.test(u) ? u : `http://localhost:3000${u}`;
+    const abs = (u) => (endpoints && endpoints.abs ? endpoints.abs(u) : (u || ''));
     list.forEach(a => {
       const row = document.createElement('div');
       row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;margin-bottom:10px;';
@@ -91,7 +91,7 @@
       (avatars||[]).forEach(a => items.push({ type:'avatar', id:a._id, createdAt: a.createdAt ? new Date(a.createdAt) : new Date(0), username: (a.user && a.user.username) ? a.user.username : (a.user || ''), url: a.url }));
       items.sort((a,b)=> b.createdAt - a.createdAt);
       if (!items.length) { container.innerHTML = '<p style="text-align:center;color:gray;padding:20px;">空</p>'; return; }
-      const abs = (u) => /^https?:\/\//.test(u) ? u : (u ? `http://localhost:3000${u}` : '');
+      const abs = (u) => (endpoints && endpoints.abs ? endpoints.abs(u) : (u || ''));
       items.forEach(it => {
         const row = document.createElement('div');
         row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;margin-bottom:10px;';

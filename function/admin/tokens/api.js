@@ -15,7 +15,7 @@
     }
   }
 
-  const API_BASE = 'http://localhost:3000/api';
+  const API_BASE = (endpoints && endpoints.base ? endpoints.base() : '').replace(/\/$/, '') + '/api';
   const CLIENT_ID = (()=>{
     try{
       const k='tokens_client_id';

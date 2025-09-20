@@ -39,7 +39,7 @@
   // 轻量缓存：term-dynamic
   let termDynamicCache = null;
   async function getTermDynamic(url){
-    const endpoint = url || 'http://localhost:3000/api/term-dynamic';
+    const endpoint = url || (window.endpoints && endpoints.termDynamic ? endpoints.termDynamic() : '/api/term-dynamic');
     if(termDynamicCache) return termDynamicCache;
     const res = await fetch(endpoint);
     const data = await res.json();

@@ -15,6 +15,19 @@
  *     getHighlightColor?: (el) => string
  *   }
  */
+// 轻量 JSON 缓存，避免相同 URL 重复请求
+const __jsonCache = new Map()
+function fetchJsonCached(url, options){
+  if (__jsonCache.has(url)) return __jsonCache.get(url)
+  const p = fetch(url, options).then(r => {
+    if (!r.ok) throw new Error('HTTP '+r.status+' for '+url)
+    return r.json()
+  })
+  .catch(err => { __jsonCache.delete(url); throw err })
+  __jsonCache.set(url, p)
+  return p
+}
+
 function bindDblclickAndHighlight($elements, options){
   const onDblclick = options && typeof options.onDblclick === 'function' ? options.onDblclick : null
   const getScrollSelector = options && typeof options.getScrollSelector === 'function' ? options.getScrollSelector : null
@@ -38,3 +51,4 @@ function bindDblclickAndHighlight($elements, options){
 
 // 暴露到全局，保持与现有模块风格一致
 window.bindDblclickAndHighlight = bindDblclickAndHighlight
+window.fetchJsonCached = fetchJsonCached
