@@ -71,11 +71,14 @@ function whenPartialsReady() {
     return window.partialsReady.catch(() => {});
 }
 
+// 统一的随机选文案
+function pickRandom(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
 (async function initLoadingOverlay() {
     await whenDOMReady();
     await whenPartialsReady();
 
-    const randomText = loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
+    const randomText = pickRandom(loadingTexts);
     const titleElement = document.getElementById('loading-title');
 
     if (titleElement) {

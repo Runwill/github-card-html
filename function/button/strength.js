@@ -14,10 +14,7 @@ function check_strength(){
     )
 }
 function change_strength(){
-    if(Number(localStorage.getItem('strength')) > 1){
-        localStorage.setItem('strength', 0)
-    }else{
-        localStorage.setItem('strength', Number(localStorage.getItem('strength')) + 1)
-    }
+    const cur = Number(localStorage.getItem('strength')) || 0;
+    localStorage.setItem('strength', (cur + 1) % 3);
     location.reload()
 }
