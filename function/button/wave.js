@@ -3,22 +3,12 @@ class WaveButtonManager {
     constructor() {
         this.activeRipples = new Set();
         this.animationFrameId = null;
-        this.pendingCleanup = new Set();
-        this.isDocumentReady = false;
         this.init();
     }
 
     init() {
-        // 确保DOM加载完成
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                this.isDocumentReady = true;
-                this.setupEventListeners();
-            });
-        } else {
-            this.isDocumentReady = true;
-            this.setupEventListeners();
-        }
+        // 直接绑定事件（本文件已在 DOMContentLoaded 时初始化实例）
+        this.setupEventListeners();
     }
 
     setupEventListeners() {
@@ -56,8 +46,7 @@ class WaveButtonManager {
         );
 
         // 获取按钮的主题色调
-        const computedStyle = window.getComputedStyle(button);
-        const rippleColor = this.getRippleColor(computedStyle);
+    const rippleColor = this.getRippleColor(window.getComputedStyle(button));
 
         const ripple = document.createElement('span');
         ripple.className = 'wave-ripple';
@@ -88,20 +77,10 @@ class WaveButtonManager {
         button.appendChild(ripple);
         this.activeRipples.add(ripple);
 
-        // 优化的清理机制
-        const cleanup = () => {
-            this.removeRipple(ripple, button);
-        };
-
-        // 使用事件监听而不是定时器
-        ripple.addEventListener('animationend', cleanup, { once: true });
-
-        // 备用清理机制，缩短时间提高响应速度
-        setTimeout(() => {
-            if (this.activeRipples.has(ripple)) {
-                cleanup();
-            }
-        }, 400);
+        // 清理机制：优先依赖动画结束事件，备用超时兜底
+        const remove = () => this.removeRipple(ripple, button);
+        ripple.addEventListener('animationend', remove, { once: true });
+        setTimeout(() => { if (this.activeRipples.has(ripple)) remove(); }, 400);
     }
 
     getRippleColor(computedStyle) {
@@ -161,15 +140,6 @@ class WaveButtonManager {
         });
 
         this.activeRipples.clear();
-        this.pendingCleanup.clear();
-    }
-
-    // 获取性能统计
-    getStats() {
-        return {
-            activeRipples: this.activeRipples.size,
-            isReady: this.isDocumentReady
-        };
     }
 }
 

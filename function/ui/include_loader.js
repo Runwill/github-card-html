@@ -1,5 +1,5 @@
 ;(function(){
-  const onReady=cb=> document.readyState==='loading'? document.addEventListener('DOMContentLoaded', cb) : cb();
+  const onReady=cb=> document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', cb, {once:true}) : cb();
   async function load(){
     const nodes=[...document.querySelectorAll('[data-include]')]; if(!nodes.length) return;
     await Promise.all(nodes.map(async el=>{
@@ -11,7 +11,5 @@
       }catch(_){ try{ el.innerHTML='<!-- include failed: '+(url||'')+' -->' }catch(_){} }
     }));
   }
-  let res,rej; const p=new Promise((r,j)=>{res=r;rej=j});
-  try{ Object.defineProperty(window,'partialsReady',{ value:p, writable:false, configurable:true }) }catch(_){ window.partialsReady=p }
-  onReady(()=>{ load().then(()=>res()).catch(rej) })
+  window.partialsReady = new Promise(resolve=> onReady(()=> load().then(resolve)));
 })()

@@ -1,6 +1,5 @@
-/* Header 与导航 */
 #header {
-    background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+    background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
     text-align: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
     display: flex;
@@ -13,8 +12,8 @@
     backdrop-filter: blur(8px) saturate(1.1);
     border-bottom: 1px solid rgba(0,0,0,0.06);
     align-items: center;
-    padding-right: 56px; /* 给右侧头像预留空间，避免与内容重叠 */
-    position: sticky; /* 粘性定位 */
+    padding-right: 56px;
+    position: sticky;
 }
 
 #header:hover {
@@ -60,9 +59,8 @@
 
 #title-a:hover::after { width: 100%; }
 
-#sidebar { background: #ffffff; padding: 0; z-index: 11; margin-left: 10; }
+#sidebar { background: #fff; padding: 0; z-index: 11; }
 
-/* 头栏右侧头像 */
 #header-avatar {
     position: absolute;
     top: 8px;
@@ -75,9 +73,9 @@
     background: #fff;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     cursor: pointer;
-    display: none; /* JS 初始化为 inline-block */
+    display: none;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    z-index: 8010; /* 高于 header 内元素 */
+    z-index: 8010;
 }
 
 #header-avatar:hover {
@@ -96,7 +94,6 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* 菜单和导航样式 */
 .sidebar-menu_button:hover {
     background: rgba(74, 85, 104, 0.08) !important;
     transform: translateX(2px);
@@ -127,16 +124,11 @@
 
 #nav .tabs-title a:hover::before { left: 100%; }
 
-/* 仅在活动标签页加粗 */
 .tabs-title.is-active > a,
 .tabs-title > a[aria-selected="true"] {
     font-weight: 600;
 }
 
-#active {
-    text-decoration: overline;
-    font-weight: 900;
-}
 
 #nav {
     overflow: hidden;

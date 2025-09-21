@@ -1,4 +1,3 @@
-/* 页面背景 */
 html, body { height: 100%; }
 body {
     min-height: 100vh;
@@ -7,7 +6,6 @@ body {
     background: linear-gradient(135deg, #edf2f7 0%, #f7fafc 100%);
 }
 
-/* 中心面板（与首页 .panel 一致） */
 .panel {
     position: fixed;
     top: 50%; left: 50%;
@@ -33,7 +31,6 @@ body {
     transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0s;
 }
 
-/* 表单与标题（与首页弹窗一致） */
 .modal-header { margin-bottom: 12px; }
 .modal-header h2 {
     margin: 0;
@@ -67,7 +64,6 @@ body {
 .modal-message.success { color: #38a169; }
 .modal-message.error { color: #e53e3e; }
 
-/* 轻微错误抖动动画 */
 @keyframes shake {
     10%, 90% { transform: translate(-50%, -50%) translateX(-1px); }
     20%, 80% { transform: translate(-50%, -50%) translateX(2px); }
@@ -76,28 +72,11 @@ body {
 }
 .shake { animation: shake 0.5s; }
 
-/* 尺寸 */
 #login-container { width: 360px; max-width: 92vw; z-index: 8000; }
 @media (max-width: 480px) {
     #login-container { width: 92vw; }
 }
 
-/* 覆盖旧样式，确保与 index 的弹窗/面板一致 */
-#login-form.modal-form input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.9);
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    font-size: 15px;
-}
-#login-form.modal-form input:focus {
-    border-color: #a0aec0;
-    box-shadow: 0 0 0 3px rgba(66,153,225,0.2);
-    background: #fff;
-}
 #login-container {
     background: rgba(255,255,255,0.95);
     border: 1px solid rgba(226,232,240,0.8);

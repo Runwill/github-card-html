@@ -1,6 +1,6 @@
 // 页面加载覆盖层：随机文案 + 动态字距 + 进度条时长与完成时机
 // 加载提示语
-const loadingTexts = ["多少事 从来急","雖萬被戲 觧有悔哉","書不能尽意 故略陳固陋"]
+const loadingTexts = ["多少事 从来急","雖萬被戮 豈有悔哉","書不能盡意 故略陳固陋"]
 
 // 计算动态字间距的函数
 function calculateLetterSpacing(text){
@@ -33,7 +33,7 @@ function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
         const end = dur<=1.2 ? 0.88 : Math.min(0.93, 0.88 + (dur-1.2)*0.08)
         bar.style.setProperty('--pb-end', String(end))
     }
-    window.currentProgressBarDuration = dur
+    // 开始延时检查完成条件
     setTimeout(startCompletionCheck, (dur*0.9*1000)+800)
 })()
 
@@ -42,7 +42,6 @@ function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 let domReady=false, resourcesReady=false, canComplete=false, completionStarted=false
 
 // 检查是否可以完成进度条
-function checkLoadingComplete(){ return domReady && resourcesReady }
 
 // 平滑完成进度条
 function completeProgressBar(){
@@ -64,7 +63,7 @@ function completeProgressBar(){
 // 开始检查完成条件的循环
 function startCompletionCheck(){ canComplete=true; attemptCompletion() }
 
-function attemptCompletion(){ if(!canComplete || completionStarted) return; if(checkLoadingComplete()) completeProgressBar() }
+function attemptCompletion(){ if(!canComplete || completionStarted) return; if(domReady && resourcesReady) completeProgressBar() }
 
 // DOM加载完成
 document.addEventListener('DOMContentLoaded', ()=>{ domReady=true; attemptCompletion() })
