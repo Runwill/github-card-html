@@ -7,9 +7,9 @@
       try{
         const html=await (await fetch(url,{cache:'no-cache'})).text();
         el.insertAdjacentHTML('beforebegin', html);
-        el.parentNode && el.parentNode.removeChild(el);
+        el.parentNode?.removeChild(el);
       }catch(_){ try{ el.innerHTML='<!-- include failed: '+(url||'')+' -->' }catch(_){} }
     }));
   }
-  window.partialsReady = new Promise(resolve=> onReady(()=> load().then(resolve)));
+  window.partialsReady=new Promise(r=>onReady(()=>load().then(r)));
 })()

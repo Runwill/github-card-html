@@ -3,25 +3,15 @@ class WaveButtonManager {
     constructor() {
         this.activeRipples = new Set();
         this.animationFrameId = null;
-        this.init();
-    }
-
-    init() {
-        // 直接绑定事件（本文件已在 DOMContentLoaded 时初始化实例）
+        // 直接绑定事件（实例在 DOMContentLoaded 时创建）
         this.setupEventListeners();
     }
 
     setupEventListeners() {
-        // 使用被动监听器优化性能，立即响应点击
-        document.addEventListener('click', this.handleClick.bind(this), { 
-            passive: false, 
-            capture: true  // 在捕获阶段处理，提前响应
-        });
-
+        // 捕获阶段处理点击
+        document.addEventListener('click', this.handleClick.bind(this), true);
         // 页面卸载时清理资源
-        window.addEventListener('beforeunload', () => {
-            this.cleanup();
-        });
+        window.addEventListener('beforeunload', this.cleanup.bind(this));
     }
 
     handleClick(event) {
@@ -38,12 +28,13 @@ class WaveButtonManager {
         const y = event.clientY - rect.top;
 
         // 计算最大扩散半径，确保覆盖整个按钮
-        const maxRadius = Math.max(
-            Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)),
-            Math.sqrt(Math.pow(rect.width - x, 2) + Math.pow(y, 2)),
-            Math.sqrt(Math.pow(x, 2) + Math.pow(rect.height - y, 2)),
-            Math.sqrt(Math.pow(rect.width - x, 2) + Math.pow(rect.height - y, 2))
-        );
+        const d=(a,b)=>a*a+b*b;
+        const maxRadius = Math.sqrt(Math.max(
+            d(x, y),
+            d(rect.width - x, y),
+            d(x, rect.height - y),
+            d(rect.width - x, rect.height - y)
+        ));
 
         // 获取按钮的主题色调
     const rippleColor = this.getRippleColor(window.getComputedStyle(button));
@@ -73,7 +64,6 @@ class WaveButtonManager {
         }
         button.style.overflow = 'hidden';
 
-        button.classList.add('ripple-active');
         button.appendChild(ripple);
         this.activeRipples.add(ripple);
 
@@ -85,33 +75,18 @@ class WaveButtonManager {
 
     getRippleColor(computedStyle) {
         const bgColor = computedStyle.backgroundColor;
-        const textColor = computedStyle.color;
-
         // 如果是透明背景，使用文字颜色的透明版本
         if (bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
-            return this.addOpacity(textColor, 0.2);
+            const rgb = computedStyle.color.match(/\d+/g);
+            return (rgb && rgb.length >= 3) ? `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, 0.2)` : 'rgba(255, 255, 255, 0.2)';
         }
 
         // 否则使用白色或黑色，根据背景亮度决定
-        const brightness = this.getBrightness(bgColor);
+        const m = bgColor.match(/\d+/g);
+        const brightness = (m && m.length >= 3)
+          ? (parseInt(m[0]) * 299 + parseInt(m[1]) * 587 + parseInt(m[2]) * 114) / 1000
+          : 128;
         return brightness > 128 ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.3)';
-    }
-
-    getBrightness(color) {
-        // 简单的亮度计算
-        const rgb = color.match(/\d+/g);
-        if (rgb && rgb.length >= 3) {
-            return (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
-        }
-        return 128; // 默认中等亮度
-    }
-
-    addOpacity(color, opacity) {
-        const rgb = color.match(/\d+/g);
-        if (rgb && rgb.length >= 3) {
-            return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${opacity})`;
-        }
-        return `rgba(255, 255, 255, ${opacity})`;
     }
 
     removeRipple(ripple, button) {
@@ -119,7 +94,6 @@ class WaveButtonManager {
             // 使用requestAnimationFrame优化DOM操作
             this.animationFrameId = requestAnimationFrame(() => {
                 ripple.parentNode.removeChild(ripple);
-                button.classList.remove('ripple-active');
             });
         }
         this.activeRipples.delete(ripple);
@@ -132,11 +106,7 @@ class WaveButtonManager {
         }
 
         this.activeRipples.forEach(ripple => {
-            if (ripple && ripple.parentNode) {
-                const button = ripple.parentNode;
-                ripple.parentNode.removeChild(ripple);
-                button.classList.remove('ripple-active');
-            }
+            if (ripple && ripple.parentNode) ripple.parentNode.removeChild(ripple);
         });
 
         this.activeRipples.clear();
