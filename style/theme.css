@@ -309,6 +309,23 @@ html.theme-switching body {
 .tokens-toast.tokens-toast--error { background: var(--toast-err-bg) !important; border-color: var(--toast-err-border) !important; color: var(--toast-err-text) !important; }
 .tokens-toast.tokens-toast--error > svg { color: var(--toast-err-icon) !important; }
 
+/* 审核窗口列表项（暗色/浅色自适应） */
+.approval-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px; margin-bottom: 10px;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px; background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
+}
+.approval-left { display: flex; align-items: center; gap: 10px; }
+.approval-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border) !important; background: var(--surface) !important; }
+.approval-title { font-weight: 600; color: var(--text) !important; }
+.approval-sub { font-size: 12px; color: var(--text-subtle) !important; }
+.approval-right { display: flex; gap: 8px; }
+
+/* 空列表提示（遵循主题色） */
+.empty-hint { text-align: center; color: var(--text-subtle) !important; padding: 20px; }
+.empty-hint.error { color: var(--danger) !important; }
+
 /* 计数徽标：背景继承父元素 */
 .count-badge { background: inherit !important; }
 

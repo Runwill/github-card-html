@@ -42,15 +42,29 @@
     if (!container) return;
     container.innerHTML = '';
     const users = await fetchPendingUsers();
-    if (!users.length) { container.innerHTML = '<p style="text-align:center;color:gray;padding:20px;">空</p>'; return; }
+    if (!users.length) { container.innerHTML = '<p class="empty-hint">空</p>'; return; }
     users.forEach(u => {
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;margin-bottom:10px;';
-      row.innerHTML = `<div style="font-weight:500;color:#2d3748;">注册: ${u.username}</div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn--success btn--sm" onclick="handleUserApproval('${u._id}','approve')">通过</button>
-          <button class="btn btn--danger btn--sm" onclick="handleUserApproval('${u._id}','reject')">取消</button>
-        </div>`;
+      row.className = 'approval-row';
+      const left = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'approval-title';
+      title.textContent = `注册: ${u.username}`;
+      left.appendChild(title);
+      const right = document.createElement('div');
+      right.className = 'approval-right';
+      const approveBtn = document.createElement('button');
+      approveBtn.className = 'btn btn--success btn--sm';
+      approveBtn.textContent = '通过';
+      approveBtn.onclick = () => handleUserApproval(u._id, 'approve');
+      const rejectBtn = document.createElement('button');
+      rejectBtn.className = 'btn btn--danger btn--sm';
+      rejectBtn.textContent = '取消';
+      rejectBtn.onclick = () => handleUserApproval(u._id, 'reject');
+      right.appendChild(approveBtn);
+      right.appendChild(rejectBtn);
+      row.appendChild(left);
+      row.appendChild(right);
       container.appendChild(row);
     });
   };
@@ -60,22 +74,42 @@
     if (!container) return;
     container.innerHTML = '';
     const list = await fetchPendingAvatars();
-    if (!list.length) { container.innerHTML = '<p style="text-align:center;color:gray;padding:20px;">空</p>'; return; }
+    if (!list.length) { container.innerHTML = '<p class="empty-hint">空</p>'; return; }
     const abs = (u) => (endpoints && endpoints.abs ? endpoints.abs(u) : (u || ''));
     list.forEach(a => {
       const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;margin-bottom:10px;';
-      row.innerHTML = `<div style="display:flex;align-items:center;gap:10px;">
-          <img src="${abs(a.url)}" alt="avatar" style="width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid #e2e8f0;"/>
-          <div>
-            <div style="font-weight:500;color:#2d3748;">${a.user?.username || a.user}</div>
-            <div style="font-size:12px;color:#718096;">${a.createdAt ? new Date(a.createdAt).toLocaleString() : ''}</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;">
-          <button class="btn btn--success btn--sm" onclick="handleAvatarApproval('${a._id}','approve')">通过</button>
-          <button class="btn btn--danger btn--sm" onclick="handleAvatarApproval('${a._id}','reject')">拒绝</button>
-        </div>`;
+      row.className = 'approval-row';
+      const left = document.createElement('div');
+      left.className = 'approval-left';
+      const img = document.createElement('img');
+      img.className = 'approval-img';
+      img.src = abs(a.url);
+      img.alt = 'avatar';
+      const info = document.createElement('div');
+      const title = document.createElement('div');
+      title.className = 'approval-title';
+      title.textContent = a.user?.username || a.user || '';
+      const sub = document.createElement('div');
+      sub.className = 'approval-sub';
+      sub.textContent = a.createdAt ? new Date(a.createdAt).toLocaleString() : '';
+      info.appendChild(title);
+      info.appendChild(sub);
+      left.appendChild(img);
+      left.appendChild(info);
+      const right = document.createElement('div');
+      right.className = 'approval-right';
+      const approveBtn = document.createElement('button');
+      approveBtn.className = 'btn btn--success btn--sm';
+      approveBtn.textContent = '通过';
+      approveBtn.onclick = () => handleAvatarApproval(a._id, 'approve');
+      const rejectBtn = document.createElement('button');
+      rejectBtn.className = 'btn btn--danger btn--sm';
+      rejectBtn.textContent = '拒绝';
+      rejectBtn.onclick = () => handleAvatarApproval(a._id, 'reject');
+      right.appendChild(approveBtn);
+      right.appendChild(rejectBtn);
+      row.appendChild(left);
+      row.appendChild(right);
       container.appendChild(row);
     });
   };
@@ -90,27 +124,23 @@
       (users||[]).forEach(u => items.push({ type:'register', id:u._id, createdAt: u.createdAt ? new Date(u.createdAt) : new Date(0), username: u.username }));
       (avatars||[]).forEach(a => items.push({ type:'avatar', id:a._id, createdAt: a.createdAt ? new Date(a.createdAt) : new Date(0), username: (a.user && a.user.username) ? a.user.username : (a.user || ''), url: a.url }));
       items.sort((a,b)=> b.createdAt - a.createdAt);
-      if (!items.length) { container.innerHTML = '<p style="text-align:center;color:gray;padding:20px;">空</p>'; return; }
+      if (!items.length) { container.innerHTML = '<p class="empty-hint">空</p>'; return; }
       const abs = (u) => (endpoints && endpoints.abs ? endpoints.abs(u) : (u || ''));
       items.forEach(it => {
-        const row = document.createElement('div');
-        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;margin-bottom:10px;';
-        const left = document.createElement('div');
-        left.style.cssText = 'display:flex;align-items:center;gap:10px;';
+        const row = document.createElement('div'); row.className = 'approval-row';
+        const left = document.createElement('div'); left.className = 'approval-left';
         if (it.type === 'avatar' && it.url) {
           const img = document.createElement('img');
-          img.src = abs(it.url);
-          img.alt = 'avatar';
-          img.style.cssText = 'width:48px;height:48px;border-radius:50%;object-fit:cover;border:1px solid #e2e8f0;';
+          img.src = abs(it.url); img.alt = 'avatar'; img.className = 'approval-img';
           left.appendChild(img);
         }
         const text = document.createElement('div');
-        text.innerHTML = `<div style="font-weight:600;color:#2d3748;">${it.type === 'register' ? '注册' : '头像'}：${it.username || ''}</div>`+
-                         `<div style="font-size:12px;color:#718096;">${it.createdAt.toLocaleString()}</div>`;
+        const t1 = document.createElement('div'); t1.className = 'approval-title'; t1.textContent = `${it.type === 'register' ? '注册' : '头像'}：${it.username || ''}`;
+        const t2 = document.createElement('div'); t2.className = 'approval-sub'; t2.textContent = it.createdAt.toLocaleString();
+        text.appendChild(t1); text.appendChild(t2);
         left.appendChild(text);
 
-        const right = document.createElement('div');
-        right.style.cssText = 'display:flex; gap:8px;';
+        const right = document.createElement('div'); right.className = 'approval-right';
         const approveBtn = document.createElement('button');
         approveBtn.className = 'btn btn--success btn--sm';
         approveBtn.textContent = '通过';
@@ -128,7 +158,7 @@
       });
     } catch(e){
       console.error('渲染审核项失败:', e);
-      container.innerHTML = '<p style="text-align:center;color:#e53e3e;padding:20px;">加载失败，请重试</p>';
+      container.innerHTML = '<p class="empty-hint error">加载失败，请重试</p>';
     }
   };
 })();
