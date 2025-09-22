@@ -1,0 +1,65 @@
+/* 技能行复制：样式控制 */
+
+/* 按钮位置/显隐：具体视觉风格复用 .btn + 变体类 */
+.skill-row { position: relative; }
+.skill-copy-btn {
+  position: absolute;
+  left: -48px; /* 行首偏左，避免遮挡正文 */
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none; /* 默认不可点，防止误触 */
+  transition: opacity .15s ease;
+  user-select: none;
+  z-index: 2;
+  /* 造型对齐 tokens 的“跳转”按钮（等效于 .btn .btn--secondary .btn--xs） */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  /* 尺寸：对齐 btn--xs */
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  padding: 2px 8px !important;
+  border-radius: 4px !important;
+  min-height: 0 !important;
+  /* 配色：对齐 btn--secondary */
+  background: transparent !important;
+  color: #4a5568 !important; /* gray-700 */
+  border: 1px solid #e2e8f0 !important; /* gray-200 */
+  /* 过渡：对齐全局按钮 */
+  transition: opacity .15s ease, background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .08s ease !important;
+}
+
+/* 悬浮态：对齐 btn--secondary:hover */
+.skill-copy-btn:hover {
+  background-color: #f7fafc !important; /* gray-50 */
+  border-color: #cbd5e0 !important;     /* gray-300 */
+  color: #2563eb !important;            /* blue-600 */
+}
+
+/* 激活态微动效（与全局按钮一致） */
+.skill-copy-btn:active { transform: translateY(0.5px); }
+
+/* 仅在“按下 Ctrl 且 hover 行/按钮”时显示 */
+/* 按下 Ctrl 时先允许按钮捕获指针（避免从行移到偏左按钮时闪烁）*/
+html.ctrl-pressed .skill-copy-btn {
+  pointer-events: auto;
+}
+/* hover 行或按钮自身时再显示 */
+html.ctrl-pressed .skill-row:hover .skill-copy-btn,
+html.ctrl-pressed .skill-copy-btn:hover,
+html.ctrl-pressed .skill-copy-btn:focus {
+  opacity: 1;
+}
+
+/* hover 态保持使用 .btn 变体的默认样式 */
+
+/* 为了防止页面在没有足够左边距时遮挡，可在小屏时改为内联显示 */
+@media (max-width: 640px) {
+  .skill-copy-btn {
+    position: static;
+    transform: none;
+    margin-bottom: 4px; /* 与内容分隔 */
+  }
+}

@@ -91,7 +91,7 @@ const UIManager = {
       headerAvatar.style.display = 'inline-block';
     }
 
-    // 按角色显示/隐藏“审核”入口（moderator / admin 可见）
+  // 按角色显示/隐藏“审核”入口（moderator / admin 可见）
   const role = localStorage.getItem('role');
   const approveBtn = this.$('approve-request-button');
     if (approveBtn) {
@@ -99,10 +99,10 @@ const UIManager = {
       approveBtn.style.display = canReview ? '' : 'none';
     }
 
-    // 仅非 admin/auditor 隐藏“词元”页入口与面板（admin 与 auditor 可见）
+  // 仅非 admin/moderator 隐藏“词元”页入口与面板（admin 与 moderator 可见）
   const tokensTab = this.qs('a[href="#panel_tokens"]')?.parentElement;
   const tokensPanel = this.$('panel_tokens');
-    const canViewTokens = (role === 'admin' || role === 'auditor');
+  const canViewTokens = (role === 'admin' || role === 'moderator');
     if (!canViewTokens) {
       if (tokensTab) tokensTab.style.display = 'none';
       if (tokensPanel) tokensPanel.style.display = 'none';

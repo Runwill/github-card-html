@@ -23,7 +23,9 @@ function CharacterSkillReplace(character, skill) {
                     ? '<' + `<characterName class="characterID${c.id}"></characterName>${r.skill_order}${r.dominator ? '<dominatorSkill epithet="1"></dominatorSkill>' : ''}` + '>'
                     : ''
             }).join('')
-            return `<pronounScope><skillQuote class="bold"><skillQuoteLeft></skillQuoteLeft><characterSkillElement class="${s.name} scroll"></characterSkillElement><skillQuoteRight></skillQuoteRight></skillQuote>${s.content || ''}${roles}</pronounScope><br><br>`
+            // 在每行开头插入隐藏的复制按钮（在按下 Ctrl 时显示）
+            // 行容器为 <pronounScope>，用于事件委托与文本收集
+              return `<pronounScope class="skill-row"><button class="btn btn--danger btn--sm skill-copy-btn" title="复制本行" aria-label="复制本行" type="button">复制</button><skillQuote class="bold"><skillQuoteLeft></skillQuoteLeft><characterSkillElement class="${s.name} scroll"></characterSkillElement><skillQuoteRight></skillQuoteRight></skillQuote>${s.content || ''}${roles}</pronounScope><br><br>`
         }).join('')
     $('.standardCharacterSkillsBlock').html(html)
 }

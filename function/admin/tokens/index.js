@@ -3,7 +3,7 @@
   const { getAuth } = T;
   document.addEventListener('DOMContentLoaded', function(){
     try{
-      const boot=()=>{ try{ const { role }=getAuth(); const canView=(role==='admin'||role==='auditor'); if(canView && window.renderTokensDashboard) window.renderTokensDashboard(); }catch(_){ } };
+  const boot=()=>{ try{ const { role }=getAuth(); const canView=(role==='admin'||role==='moderator'); if(canView && window.renderTokensDashboard) window.renderTokensDashboard(); }catch(_){ } };
       const ready = window.partialsReady instanceof Promise ? window.partialsReady : Promise.resolve();
       ready.then(boot);
     }catch(_){ }
