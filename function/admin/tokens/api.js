@@ -70,8 +70,12 @@
     // 尝试解析 JSON；解析失败回退为 {}
     const out = await resp.json().catch(() => ({}));
 
-    // 非 2xx 抛错，优先使用返回的 message
-    if (!resp.ok) throw new Error((out && out.message) || '请求失败');
+    // 非 2xx 抛错，优先使用返回的 message，并附带状态码与原始响应体，便于上层展示详细原因
+    if (!resp.ok) {
+      const err = new Error((out && out.message) || '请求失败');
+      try { err.status = resp.status; err.data = out; } catch(_){}
+      throw err;
+    }
 
     return out;
   }
