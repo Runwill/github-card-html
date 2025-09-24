@@ -347,8 +347,28 @@
     const row = document.createElement('div');
     row.className = 'tokens-log__entry';
     row.innerHTML = line;
+    // 在插入前记录当前滚动位置，用于插入后恢复视口
+    const prevTop = body.scrollTop || 0;
+    const atTop = prevTop <= 5; // 视为已置顶
     // 新在上：头插
     if (body.firstChild) body.insertBefore(row, body.firstChild); else body.appendChild(row);
+    // 若用户不在顶部，保持当前可见内容不跳动（补偿新增节点高度）
+    if (!atTop) {
+      try {
+        // 计算新增节点的可视高度（包含外边距）
+        let delta = row.offsetHeight || 0;
+        try {
+          const cs = window.getComputedStyle(row);
+          const mt = parseFloat(cs.marginTop) || 0;
+          const mb = parseFloat(cs.marginBottom) || 0;
+          delta += mt + mb;
+        } catch (_) { /* ignore */ }
+        body.scrollTop = prevTop + delta;
+      } catch (_) { /* ignore */ }
+    } else {
+      // 在顶部时，保持顶部即可看到最新日志
+      try { body.scrollTop = 0; } catch (_) { }
+    }
 
   // Persistence removed; server is the source of truth
 
@@ -358,8 +378,7 @@
         for (let i = 0; i < extra; i++) body.removeChild(body.lastChild);
       } catch (_) {}
 
-      // 滚动到底部
-      try { body.scrollTop = body.scrollHeight; } catch (_) {}
+      // 不再强制滚动到底部；保持用户当前位置或置顶
     } catch (_) {}
   }
 
