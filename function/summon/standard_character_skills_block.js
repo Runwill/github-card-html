@@ -28,4 +28,6 @@ function CharacterSkillReplace(character, skill) {
               return `<pronounScope class="skill-row"><button class="btn btn--danger btn--sm skill-copy-btn" title="复制本行" aria-label="复制本行" type="button">复制</button><skillQuote class="bold"><skillQuoteLeft></skillQuoteLeft><characterSkillElement class="${s.name} scroll"></characterSkillElement><skillQuoteRight></skillQuoteRight></skillQuote>${s.content || ''}${roles}</pronounScope><br><br>`
         }).join('')
     $('.standardCharacterSkillsBlock').html(html)
+    // 渲染后若搜索框有关键字，应用技能筛选
+    try { window.filterSkills && window.filterSkills() } catch(_) {}
 }

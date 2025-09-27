@@ -44,25 +44,8 @@ function CharacterReplace(character, skill) {
         out += '</padding></div><br><br><br><br></characterParagraph>'
     }
 
-    $('.standardCharactersBlock').html(`<br><div class="search-container" style="z-index: 100; top: 10%;"><input type="text" id="search-input" placeholder="搜检" oninput="filterParagraphs()" autocomplete="off" style="background-color: rgba(255,255,255,1); position: relative; transition: right 1s ease, transform 0.2s ease, box-shadow 0.2s ease; transform: translateY(0) scale(1); box-shadow: 0 1px 4px rgba(0,0,0,0.08);"></div><div id="block-under-search"></div>${out}`)
-    ;(() => {
-        const searchContainer = document.querySelector('.search-container')
-        const searchInput = document.getElementById('search-input')
-        let isFocused = false, isShowingAnimation = false, isDropped = false, animationTimers = []
-        const clear = () => { animationTimers.forEach(t => clearTimeout(t)); animationTimers = [] }
-        const lift = () => { searchInput.style.transform = 'translateY(-3px) scale(1.01)'; searchInput.style.boxShadow = '0 5px 10px rgba(0,0,0,0.15)'; isDropped = false }
-        const drop = () => { searchInput.style.transform = 'translateY(0) scale(1)'; searchInput.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)'; isDropped = true }
-        const show = () => { clear(); isShowingAnimation = true; lift(); animationTimers.push(setTimeout(() => { searchInput.style.right = '0' }, 200), setTimeout(() => { isShowingAnimation = false; if (isFocused) drop() }, 1200)) }
-        const hide = () => {
-            if (!isFocused && window.innerWidth > 1101) {
-                clear(); isShowingAnimation = false
-                const delay = isDropped ? 200 : 0; if (isDropped) lift()
-                animationTimers.push(setTimeout(() => { searchInput.style.right = '-95%' }, delay), setTimeout(drop, 1200))
-            }
-        }
-        searchContainer.addEventListener('mouseenter', () => { if (!isFocused) show() })
-        searchContainer.addEventListener('mouseleave', hide)
-        searchInput.addEventListener('focus', () => { isFocused = true; if (!isShowingAnimation) drop() })
-        searchInput.addEventListener('blur', () => { isFocused = false; hide() })
-    })()
+    // 仅渲染角色内容本体；共享筛选框由 function/ui/shared_search.js 负责挂载
+    $('.standardCharactersBlock').html(`<br>${out}`)
+        // 渲染后若搜索框有关键字，应用将池筛选
+        try { window.filterParagraphs && window.filterParagraphs() } catch(_) {}
 }

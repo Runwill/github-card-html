@@ -252,6 +252,16 @@ html.theme-switching body {
 #panel_character #search-input::placeholder { color: var(--text-subtle) !important; }
 #panel_character #search-input:focus { border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important; }
 
+/* 技能（panel_skill）搜索框主题适配（与将池一致） */
+#panel_skill #search-input {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+}
+#panel_skill #search-input::placeholder { color: var(--text-subtle) !important; }
+#panel_skill #search-input:focus { border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important; }
+
 /* 面板内临时白底块统一随主题 */
 #panel_character #div4 { background-color: var(--surface) !important; }
 
