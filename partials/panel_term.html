@@ -5,10 +5,147 @@
         <padding>
           <h1><procedure class="scroll" /></h1>
           <padding>
-            <h2><if class="scroll"><ifHead></ifHead>……</if></h2>
+            <h2><condition class="scroll" /></h2>
             <div class="indent">
-              声明条件。
+              <procedure></procedure>的元件。
             </div>
+            <padding>
+              <h3><if class="scroll"><ifHead></ifHead>……</if></h3>
+              <div class="indent">
+                声明<condition></condition>。
+              </div>
+              <padding>
+                <h3><if class="scroll"><ifBody></ifBody>……</if></h3>
+                <div class="indent">
+                  <condition></condition>不成立时执行。
+                </div>
+                <h3><if class="scroll"><else></else>……</if></h3>
+                <div class="indent">
+                  <condition></condition>不成立时执行。
+                </div>
+              </padding>
+            </padding>
+            <h2><operation class="scroll" /></h2>
+            <div class="indent">
+              <procedure></procedure>的元件。
+            </div>
+            <padding>
+              <h3><except class="scroll"><exceptHead />……</except></h3>
+              <div class="indent">
+                前件<operation></operation><illegal></illegal>时执行。
+              </div>
+              <padding>
+                <h3><legal class="scroll"/></h3>
+                <h3><illegal class="scroll"/></h3>
+                <div class="indent">
+                  不<legal></legal>。<if><ifHead></ifHead><operation></operation><illegal></illegal>，<ifBody></ifBody>跳过执行。</if>
+                </div>
+                <padding>
+                  <h3><cannot class="scroll" /></h3>
+                  <div class="indent">
+                    <deemAs></deemAs><illegal></illegal>。
+                  </div>
+                </padding>
+              </padding>
+              <h3><each class="scroll"><eachHead></eachHead>……</each></h3>
+              <div class="indent">
+                表示<inTurn><inTurnHead></inTurnHead>执行若干个相同但执行者不同的<operation></operation></inTurn>。
+              </div>
+              <h3><inTurn class="scroll"><inTurnHead></inTurnHead>……</inTurn></h3>
+              <div class="indent">
+                表示执行若干个相同但执行者可能不同的<operation></operation>。
+              </div>
+            </padding>
+            <h2><procedureTrigger class="scroll" /></h2>
+            <div class="indent">
+              <procedure></procedure>的元件。
+            </div>
+            <div class="indent">
+              覆盖时，以输入的<procedureTrigger></procedureTrigger>中的每项非空<attribute></attribute>覆盖原<procedureTrigger></procedureTrigger>中的对应<attribute></attribute>。
+            </div>
+            <div class="indent">
+              包含以下数据：
+            </div>
+            <padding>
+              <h3><tickingTimeLimit class="scroll" /></h3>
+              <div class="indent">
+                一种<ticking></ticking>。
+              </div>
+              <div class="indent">
+                包含以下数据：
+              </div>
+              <padding>
+                <h3><tickingLimit class="scroll" /></h3>
+                <div class="indent">
+                  一种<ticking></ticking>。
+                </div>
+                <div class="indent">
+                  如果可能，限制为<you></you>的。
+                </div>
+                <div class="indent">
+                  满足<tickingLimit></tickingLimit>，即存在正在<advance></advance>的<ticking></ticking>符合<tickingLimit></tickingLimit>。
+                </div>
+                <h3><numberLimit class="scroll" /></h3>
+                <div class="indent">
+                  一项<attribute></attribute>。整型变量。
+                </div>
+                <div class="indent">
+                  满足<numberLimit></numberLimit>，即<coordination>存在正在<advance></advance>的<ticking></ticking>符合<thisC><tickingTimeLimit></tickingTimeLimit></thisC>的<tickingLimit></tickingLimit>，<stativeCoordination></stativeCoordination><inTicking>该<ticking></ticking><inEnd></inEnd></inTicking><currentC><procedure></procedure></currentC>的执行次数<lessC><procedure></procedure>的<numberLimit></numberLimit></lessC></coordination>。
+                </div>
+                <padding>
+                  <h3><numberLimiting class="scroll"><numberLimitingHead></numberLimitingHead>……<numberLimitingEnd /></numberLimitingHead></h3>
+                  <div class="indent">
+                    输入<numberLimit></numberLimit>。
+                  </div>
+                </padding>
+              </padding>
+              <h3><tickLimit class="scroll" /></h3>
+              <div class="indent">
+                一种<tick></tick>。
+              </div>
+              <div class="indent">
+                满足<tickLimit></tickLimit>，即<currentTick></currentTick>符合<tickLimit></tickLimit>。
+              </div>
+              <div class="indent">
+                未规定<tickLimit></tickLimit>的<procedureTrigger></procedureTrigger>，<ifC>其对应的<tickingLimit></tickingLimit>为：
+              </div>
+              <padding>
+                <div class="h">
+                  <div class="indent">
+                    <preparingStage></preparingStage>，<ifBody></ifBody>其的<tickLimit></tickLimit>值视为<preparing></preparing>。
+                  </div>
+                  <div class="indent">
+                    <actingStage></actingStage>，<ifBody></ifBody>其的<tickLimit></tickLimit>值视为<acting></acting>。</ifC>
+                  </div>
+                </div>
+              </padding>
+              <div class="indent">
+                <a class="button wave button_tickQuantifier"></a>
+                <tickLimit></tickLimit>中存在量词时，<ifC><coordination>对应<object></object>可能不唯一<stativeCoordination></stativeCoordination>不为全称量词</coordination>，则对<every><tickQuantifier><everyHead></everyHead>个</tickQuantifier><object></object></every><eachC>触发一次</eachC>，<else></else>，量词可省略</ifC>。
+              </div>
+              <padding>
+                <h3><when class="scroll"><whenHead></whenHead>……</when></h3>
+                <div class="indent">
+                  声明<tick></tick>。
+                </div>
+              </padding>
+            </padding>
+            <padding>
+              <h3><command class="scroll" /></h3>
+              <div class="indent">
+                有<procedureTrigger></procedureTrigger>的<procedure></procedure>。
+              </div>
+              <h3><status class="scroll" /></h3>
+              <div class="indent">
+                没有<procedureTrigger></procedureTrigger>的<procedure></procedure>。
+              </div>
+              <padding>
+                <h3><deemAs class="scroll" /></h3>
+                <div class="indent">
+                  设置<status></status>，<or>修改<attribute></attribute><orBody></orBody>覆盖<condition></condition></or>。
+                </div>
+              </padding>
+            </padding>
             <h2>
               <a class="button wave button_equaling"></a>
               <equaling class="scroll"><equalingHead0></equalingHead0>……</equaling>
@@ -31,10 +168,6 @@
             <h2><current class="scroll"><currentHead></currentHead>……</current></h2>
             <div class="indent">
               指向当前的。
-            </div>
-            <h2><except class="scroll"><exceptHead />……</except></h2>
-            <div class="indent">
-              前块异常时执行。
             </div>
             <h2>比较</h2>
             <padding>
@@ -104,9 +237,6 @@
               <a class="button wave button_pronoun"></a>
               代词<pronoun1 class="scroll"></pronoun1><pronoun2 class="scroll"></pronoun2><pronoun3 class="scroll"></pronoun3>
             </h2>
-            <padding>
-              <h3><self class="scroll" /></h3>
-            </padding>
             <h2>
               <a class="button wave button_include"></a>
               <include class="scroll"><include0></include0>……</include>
@@ -114,107 +244,19 @@
             <div class="indent">
               <or>属<orBody></orBody>包含</or>。
             </div>
-            <h2><procedureTrigger class="scroll" /></h2>
-            <div class="indent">
-              一种数据结构。用于执行<procedure></procedure>。
-            </div>
-            <div class="indent">
-              覆盖时，以输入的<procedureTrigger></procedureTrigger>中的每项非空<attribute></attribute>覆盖原<procedureTrigger></procedureTrigger>中的对应<attribute></attribute>。
-            </div>
-            <div class="indent">
-              包含以下数据：
-            </div>
-            <padding>
-              <h3><tickingTimeLimit class="scroll" /></h3>
-              <div class="indent">
-                一种<ticking></ticking>。
-              </div>
-              <div class="indent">
-                包含以下数据：
-              </div>
-              <padding>
-                <h3><tickingLimit class="scroll" /></h3>
-                <div class="indent">
-                  一种<ticking></ticking>。
-                </div>
-                <div class="indent">
-                  如果可能，限制为<you></you>的。
-                </div>
-                <div class="indent">
-                  满足<tickingLimit></tickingLimit>，即存在正在<advance></advance>的<ticking></ticking>符合<tickingLimit></tickingLimit>。
-                </div>
-                <h3><numberLimit class="scroll" /></h3>
-                <div class="indent">
-                  一项<attribute></attribute>。整型变量。
-                </div>
-                <div class="indent">
-                  满足<numberLimit></numberLimit>，即<coordination>存在正在<advance></advance>的<ticking></ticking>符合<thisC><tickingTimeLimit></tickingTimeLimit></thisC>的<tickingLimit></tickingLimit>，<stativeCoordination></stativeCoordination><inTicking>该<ticking></ticking><inEnd></inEnd></inTicking><currentC><procedure></procedure></currentC>的执行次数<lessC><procedure></procedure>的<numberLimit></numberLimit></lessC></coordination>。
-                </div>
-                <padding>
-                  <h3><numberLimiting class="scroll"><numberLimitingHead></numberLimitingHead>……<numberLimitingEnd /></numberLimitingHead></h3>
-                  <div class="indent">
-                    输入<numberLimit></numberLimit>。
-                  </div>
-                </padding>
-              </padding>
-              <h3><tickLimit class="scroll" /></h3>
-              <div class="indent">
-                一种<tick></tick>。
-              </div>
-              <div class="indent">
-                满足<tickLimit></tickLimit>，即<currentTick></currentTick>符合<tickLimit></tickLimit>。
-              </div>
-              <div class="indent">
-                未规定<tickLimit></tickLimit>的<procedureTrigger></procedureTrigger>，<ifC>其对应的<tickingLimit></tickingLimit>为：
-              </div>
-              <padding>
-                <div class="h">
-                  <div class="indent">
-                    <preparingStage></preparingStage>，<ifBody></ifBody>其的<tickLimit></tickLimit>值视为<preparing></preparing>。
-                  </div>
-                  <div class="indent">
-                    <actingStage></actingStage>，<ifBody></ifBody>其的<tickLimit></tickLimit>值视为<acting></acting>。</ifC>
-                  </div>
-                </div>
-              </padding>
-              <div class="indent">
-                <a class="button wave button_tickQuantifier"></a>
-                <tickLimit></tickLimit>中存在量词时，<ifC><coordination>对应<object></object>可能不唯一<stativeCoordination></stativeCoordination>不为全称量词</coordination>，则对<every><tickQuantifier><everyHead></everyHead>个</tickQuantifier><object></object></every><eachC>触发一次</eachC>，<else></else>，量词可省略</ifC>。
-              </div>
-              <padding>
-                <h3><when class="scroll"><whenHead></whenHead>……</when></h3>
-                <div class="indent">
-                  输入<tick></tick>。
-                </div>
-              </padding>
-            </padding>
-            <h2><command class="scroll" /></h2>
-            <div class="indent">
-              有<procedureTrigger></procedureTrigger>的<procedure></procedure>。
-            </div>
-            <h2><status class="scroll" /></h2>
-            <div class="indent">
-              没有<procedureTrigger></procedureTrigger>的<procedure></procedure>。
-            </div>
-            <padding>
-              <h3><deemAs class="scroll" /></h3>
-              <div class="indent">
-                设置<status></status>，<or>修改<attribute></attribute><orBody></orBody>覆盖条件</or>。
-              </div>
-            </padding>
-            <h2><each class="scroll"><eachHead></eachHead><<procedure></procedure>></each></h2>
-            <div class="indent">
-              表示<procedure></procedure>可以被输入重复的执行者。
-            </div>
             <h2><priority class="scroll" /></h2>
             <div class="indent">
               <characterSkill></characterSkill>><equipmentSkill></equipmentSkill>><card></card>>其他，<ifC>同级<ifBody></ifBody>按照从<or><living></living>的<currentTurnRole></currentTurnRole><orBody></orBody><dead></dead>的<currentTurnRole></currentTurnRole>的<nextSeat><nextSeatHead></nextSeatHead><seatEnd></seatEnd></nextSeat></or>开始的<seatOrder></seatOrder>顺序</ifC>。
             </div>
             <h2><you class="scroll" /></h2>
             <div class="indent">
-              执行<procedure></procedure>的<role></role>。
+              <procedure></procedure>所属的<role></role>。
             </div>
             <padding>
+              <h3><self class="scroll" /></h3>
+              <div class="indent">
+                执行<procedure></procedure>的<role></role>。
+              </div>
               <h3><elseRole class="scroll" /></h3>
               <div class="indent">
                 不为<you></you>的<roleDefault></roleDefault>。
@@ -1236,7 +1278,7 @@
               <advance></advance><tick></tick>时，检测所有可执行的<procedure></procedure>，<choose>><chooseBody></chooseBody><priority></priority>最高的<procedure></procedure>之一</choose>，执行，<ifC>包含“<can class="scroll bold"><canHead></canHead></can>”，<ifBody></ifBody><ask></ask>是否执行</ifC>。重复<thisC><process></process></thisC>直到不存在可执行的<procedure></procedure>。
             </div>
             <div class="indent">
-              <procedure></procedure>在某<tick></tick>可执行的条件：
+              <procedure></procedure>在某<tick></tick>可执行的<condition></condition>：
             </div>
             <padding>
               <div class="h">

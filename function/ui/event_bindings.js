@@ -5,6 +5,18 @@
 
   onReady(()=>{
     Promise.resolve(window.partialsReady).then(()=>{
+      // 初始同步：根据 term_status 设置按钮颜色与页面状态，避免首次点击才加载/切换
+      try {
+        const pOn = Number(window.term_status?.pronoun) === 1;
+        document.querySelectorAll('.button_pronoun').forEach(btn=> ButtonUtils.applyButtonState(btn, pOn));
+        // 应用一次代词显示/隐藏到文档
+        pOn ? (window.add_pronoun && window.add_pronoun()) : (window.pronounCheck && window.pronounCheck());
+
+        const tOn = Number(window.term_status?.tickQuantifier) === 1;
+        document.querySelectorAll('.button_tickQuantifier').forEach(btn=> ButtonUtils.applyButtonState(btn, tOn));
+        ButtonUtils.toggleDisplay('tickQuantifier', tOn);
+      } catch(_) {}
+
       const pairs=[
         ['.strength_title', ()=> call('change_strength')],
         ['.button_equaling', e=> call('elementReplaceCheck','equaling','equalingHead',e)],
