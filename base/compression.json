@@ -115,16 +115,6 @@
         "suf":"</current>"
     },
     {
-        "name":"greaterC",
-        "pre":"<greater><greaterHead></greaterHead>",
-        "suf":"</greater>"
-    },
-    {
-        "name":"lessC",
-        "pre":"<less><lessHead></lessHead>",
-        "suf":"</less>"
-    },
-    {
         "name":"moreC",
         "pre":"<more><moreHead></moreHead>",
         "suf":"</more>"
