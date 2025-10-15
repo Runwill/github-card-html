@@ -24,11 +24,65 @@
             <input type="password" id="password" placeholder="密码" required autocomplete="current-password" />
             <button type="submit" id="login-button" class="btn btn--primary btn--block">登录</button>
             <button type="button" id="register-button" class="btn btn--secondary btn--block">注册</button>
+                        <button type="button" id="backend-toggle" class="btn btn--block btn--mt-2">切换后端</button>
         </form>
         <div id="login-message" class="modal-message"></div>
     </div>
 
     <script src="function/api/endpoints.js"></script>
     <script src="function/auth/login.js"></script>
+        <script>
+            (function(){
+            var PUBLIC_URL = 'http://ewdu7894156.vicp.fun:53473';
+                var LOCAL_URL = 'http://localhost:3000';
+                var btn = document.getElementById('backend-toggle');
+                var msg = document.getElementById('login-message');
+
+                function isPublic(u){ return typeof u==='string' && u.indexOf('ewdu7894156.vicp.fun')>=0; }
+                function normalize(u){ return String(u||'').replace(/\/$/,''); }
+
+                function applyStyle(current){
+                    // 复用按钮基础样式，根据状态加上 success(公网=绿) / danger(本地=红) 的配色
+                    btn.classList.remove('btn--primary','btn--secondary','btn--success','btn--danger');
+                    if (isPublic(current)) {
+                        btn.classList.add('btn--success');
+                        btn.textContent = '使用公网后端 (已选)';
+                    } else {
+                        btn.classList.add('btn--danger');
+                        btn.textContent = '使用本地后端 (已选)';
+                    }
+                }
+
+                function currentBase(){ try { return endpoints && endpoints.getBase ? endpoints.getBase() : LOCAL_URL; } catch(e){ return LOCAL_URL; } }
+                function setBase(u){ try { if (endpoints && endpoints.setBase) endpoints.setBase(u); } catch(e){} }
+
+                        function refreshMessage(){
+                            var b = currentBase();
+                            if (msg) {
+                                msg.className = 'modal-message'; // 重置为默认态，清除 error/success 颜色
+                                msg.textContent = '当前后端：' + normalize(b);
+                            }
+                        }
+
+                        function init(){
+                            var b = currentBase();
+                    applyStyle(b);
+                    refreshMessage();
+                }
+
+                if (btn) {
+                    btn.addEventListener('click', function(){
+                        var b = currentBase();
+                        var next = isPublic(b) ? LOCAL_URL : PUBLIC_URL;
+                        setBase(next);
+                        applyStyle(next);
+                        refreshMessage();
+                    });
+                }
+
+                // 初次进入根据 localStorage/endpoints 状态渲染
+                document.addEventListener('DOMContentLoaded', init);
+            })();
+        </script>
 </body>
 </html>

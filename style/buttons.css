@@ -88,3 +88,6 @@
   font-size: 13px !important;
   border-radius: 6px !important;
 }
+
+/* 间距工具（用于堆叠按钮轻微错位） */
+.btn--mt-2 { margin-top: 2px !important; }
