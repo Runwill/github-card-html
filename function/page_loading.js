@@ -26,8 +26,8 @@ function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 })()
 
 // 加载状态跟踪
-// domReady/resourcesReady：两条件满足且 canComplete=true 时触发完成
-let domReady=false, resourcesReady=false, canComplete=false, completionStarted=false
+// domReady/resourcesReady/fontsReady：三条件满足且 canComplete=true 时触发完成
+let domReady=false, resourcesReady=false, fontsReady=false, canComplete=false, completionStarted=false
 
 // 检查是否可以完成进度条
 
@@ -44,12 +44,26 @@ function completeProgressBar(){
 // 开始检查完成条件的循环
 function startCompletionCheck(){ canComplete=true; attemptCompletion() }
 
-function attemptCompletion(){ if(!canComplete || completionStarted) return; if(domReady && resourcesReady) completeProgressBar() }
+function attemptCompletion(){ if(!canComplete || completionStarted) return; if(domReady && resourcesReady && fontsReady) completeProgressBar() }
 
 // DOM加载完成
 document.addEventListener('DOMContentLoaded', ()=>{ domReady=true; attemptCompletion() })
 
 // 所有资源加载完成
 window.addEventListener('load', ()=>{ resourcesReady=true; attemptCompletion() })
+
+// 字体加载完成（使用 FontFaceSet API；若不支持则回退为已就绪）
+;(function(){
+    try{
+        if(document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function'){
+            document.fonts.ready.then(()=>{ fontsReady=true; attemptCompletion() })
+        } else {
+            // 不支持 FontFaceSet：不阻塞完成
+            fontsReady=true; attemptCompletion()
+        }
+    }catch(e){
+        fontsReady=true; attemptCompletion()
+    }
+})()
 
 // 进度检查的定时已在 initLoadingOverlay 中按 partialsReady 之后统一安排
