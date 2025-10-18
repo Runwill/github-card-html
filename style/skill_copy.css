@@ -55,11 +55,20 @@ html.ctrl-pressed .skill-copy-btn:focus {
 
 /* hover 态保持使用 .btn 变体的默认样式 */
 
-/* 为了防止页面在没有足够左边距时遮挡，可在小屏时改为内联显示 */
+/* 小屏策略（方案B）：默认不占位，只有在可见状态时才占位 */
 @media (max-width: 640px) {
+  /* 默认隐藏且不占位 */
   .skill-copy-btn {
     position: static;
     transform: none;
     margin-bottom: 4px; /* 与内容分隔 */
+    display: none;      /* 不占位 */
+  }
+
+  /* 按下 Ctrl 且 hover/聚焦时显示并占位（内联弹性布局） */
+  html.ctrl-pressed .skill-row:hover .skill-copy-btn,
+  html.ctrl-pressed .skill-copy-btn:hover,
+  html.ctrl-pressed .skill-copy-btn:focus {
+    display: inline-flex;
   }
 }

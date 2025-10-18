@@ -2,36 +2,70 @@
 /* 基础缺省：小中屏默认搜索框靠右 0，底部占位 0.5em；大屏断点再覆盖 */
 #search-input { right: 0; }
 #block-under-search { height: 0.5em; }
-@media (max-width: 500px) {
+@media (max-width: 380px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
-    #header_title { margin-right: 60px; }
-    #nav-item { margin: 0 30px 0 0; }
+    #header_title { margin-right: 40px; }
+    #nav-item { margin: 0 10px 0 0; }
+    #menu-toggle {
+        padding: 8px 2px;
+    }
+}
+
+@media (min-width: 381px) and (max-width: 400px) {
+    html { font-size: 15px; }
+    padding { padding-left: 0.8em; padding-right: 0.6em; }
+    .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 40px; }
+    #nav-item { margin: 0 10px 0 0; }
+    #menu-toggle {
+        padding: 8px 10px;
+    }
+}
+
+@media (min-width: 401px) and (max-width: 500px) {
+    html { font-size: 15px; }
+    padding { padding-left: 0.8em; padding-right: 0.6em; }
+    .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 50px; }
+    #nav-item { margin: 0 10px 0 0; }
+    #menu-toggle {
+        padding: 8px 10px;
+    }
 }
 
 @media (min-width: 501px) and (max-width: 600px) {
     html { font-size: 15px; }
     padding { padding-left: 1.2em; padding-right: 1.2em; }
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
-    #header_title { margin-right: 60px; }
-    #nav-item { margin: 0 20px 0 0; }
+    #header_title { margin-right: 50px; }
+    #nav-item { margin: 0 25px 0 0; }
+    #menu-toggle {
+        padding: 8px 12px;
+    }
 }
 
 @media (min-width: 601px) and (max-width: 700px) {
     html { font-size: 15px; }
     padding { padding-left: 1.6em; padding-right: 1.6em; }
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
-    #header_title { margin-right: 60px; }
-    #nav-item { margin: 0 23px 0 0; }
+    #header_title { margin-right: 50px; }
+    #nav-item { margin: 0 25px 0 0; }
+    #menu-toggle {
+        padding: 8px 12px;
+    }
 }
 
 @media (min-width: 701px) and (max-width: 800px) {
     html { font-size: 17px; }
     padding { padding-left: 1.8em; padding-right: 1.8em; }
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
-    #header_title { margin-right: 70px; }
-    #nav-item { margin: 0 30px 0 0; }
+    #header_title { margin-right: 50px; }
+    #nav-item { margin: 0 25px 0 0; }
+    #menu-toggle {
+        padding: 8px 12px;
+    }
 }
 
 @media (min-width: 801px) and (max-width: 900px) {
@@ -39,7 +73,10 @@
     padding { padding-left: 2.0em; padding-right: 2.0em; }
     .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 75px; }
-    #nav-item { margin: 0 30px 0 0; }
+    #nav-item { margin: 0 25px 0 0; }
+    #menu-toggle {
+        padding: 8px 12px;
+    }
 }
 
 @media (min-width: 901px) and (max-width: 1100px) {
@@ -47,7 +84,10 @@
     padding { padding-left: 2.2em; padding-right: 2.2em; }
     .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 75px; }
-    #nav-item { margin: 0 30px 0 0; }
+    #nav-item { margin: 0 28px 0 0; }
+    #menu-toggle {
+        padding: 8px 12px;
+    }
 }
 
 @media (min-width: 1101px) and (max-width: 1200px) {
@@ -56,6 +96,9 @@
     .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 30px 0 0; }
+    #menu-toggle {
+        padding: 8px 12px;
+    }
 }
 
 @media (min-width: 1201px) and (max-width: 1400px) {
@@ -64,6 +107,9 @@
     .button { padding: 10px 15px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 30px 0 0; }
+    #menu-toggle {
+        padding: 8px 12px;
+    }
 }
 
 @media (min-width: 1401px) {
@@ -73,38 +119,20 @@
     .strength_button { padding: 8px 8px; margin-left: 0.5%; margin-top: 15px; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 30px 0 0; }
-}
-
-
-/* ---------------- 固定头栏按钮字体（不随媒体查询变化）---------------- */
-/* 需求：头栏的各按钮文字不参与 media 的字体变动，始终使用“次宽”断点的字号。
-   因此这里将头栏按钮文字固定为 18px，避免受 rem 根字号变化影响。 */
-#header #menu-toggle,
-#header .tabs-title > a,
-#header a.title-a {
-    font-size: 18px !important;
-}
-
-/* strength_title 固定字号 */
-#header .strength_title {
-    font-size: 18px !important;
-}
-
-/* 头栏按钮高度固定（不随媒体查询变化） */
-#header #menu-toggle,
-#header .tabs-title > a,
-#header a.title-a {
-    display: inline-block !important; /* 保证高度可生效（a 默认 inline 时 height 无效） */
-    height: 48px !important;         /* 与 header_title 的 2.4rem 在 20px 根字号时一致 */
-    line-height: 48px !important;    /* 保证文字垂直居中且高度固定 */
-    padding-top: 0 !important;       /* 覆盖内联/框架的垂直内边距，防止高度变化 */
-    padding-bottom: 0 !important;
+    #menu-toggle {
+        padding: 8px 12px;
+    }
 }
 
 /* 头栏标题容器高度固定，避免根字号降低时相对 48px 容器看起来“下沉” */
 #header #header_title {
     height: 48px !important;
     line-height: 48px !important;
+}
+
+/* strength_title 固定字号 */
+#header .strength_title {
+    font-size: 18px !important;
 }
 
 #search-input { right: -95%; }
