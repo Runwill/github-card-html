@@ -2,7 +2,29 @@
 /* 基础缺省：小中屏默认搜索框靠右 0，底部占位 0.5em；大屏断点再覆盖 */
 #search-input { right: 0; }
 #block-under-search { height: 0.5em; }
-@media (max-width: 380px) {
+@media (max-width: 370px) {
+    html { font-size: 15px; }
+    padding { padding-left: 0.8em; padding-right: 0.6em; }
+    .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 35px; }
+    #nav-item { margin: 0 9px 0 0; }
+    #menu-toggle {
+        padding: 8px 0px;
+    }
+}
+
+@media (min-width: 371px) and (max-width: 380px) {
+    html { font-size: 15px; }
+    padding { padding-left: 0.8em; padding-right: 0.6em; }
+    .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
+    #header_title { margin-right: 35px; }
+    #nav-item { margin: 0 10px 0 0; }
+    #menu-toggle {
+        padding: 8px 0px;
+    }
+}
+
+@media (min-width: 381px) and (max-width: 390px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
@@ -13,7 +35,7 @@
     }
 }
 
-@media (min-width: 381px) and (max-width: 400px) {
+@media (min-width: 391px) and (max-width: 400px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
     .button { padding: 8px 12px; margin-left: -2em; margin-top: -1em; }
