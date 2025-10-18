@@ -33,12 +33,12 @@
     <script src="function/auth/login.js"></script>
         <script>
             (function(){
-            var PUBLIC_URL = 'http://ewdu7894156.vicp.fun:53473';
+                var PUBLIC_URL = 'http://120.55.7.7:3000';
                 var LOCAL_URL = 'http://localhost:3000';
                 var btn = document.getElementById('backend-toggle');
                 var msg = document.getElementById('login-message');
 
-                function isPublic(u){ return typeof u==='string' && u.indexOf('ewdu7894156.vicp.fun')>=0; }
+                function isPublic(u){ return typeof u==='string' && u.indexOf('120.55.7.7')>=0; }
                 function normalize(u){ return String(u||'').replace(/\/$/,''); }
 
                 function applyStyle(current){

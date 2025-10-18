@@ -14,7 +14,7 @@
     const input = document.createElement('input');
     input.type = 'text';
     input.id = 'search-input';
-    input.placeholder = '搜检';
+    input.placeholder = '检索';
     input.autocomplete = 'off';
     input.style.position = 'relative';
     input.style.transition = 'right 1s ease, transform 0.2s ease, box-shadow 0.2s ease';

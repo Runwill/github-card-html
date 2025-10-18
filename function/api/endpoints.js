@@ -6,7 +6,8 @@
       var saved = (typeof localStorage!== 'undefined') ? localStorage.getItem('apiBase') : '';
       if (saved && /^https?:\/\//i.test(saved)) return saved;
     } catch(e) {}
-    return 'http://localhost:3000';
+    // 如未通过 localStorage 指定，默认走公网后端
+    return 'http://120.55.7.7:3000';
   })();
 
   function base(){ return String(DEFAULT_BASE||'').replace(/\/$/,'') }
