@@ -18,6 +18,10 @@
 
 .loading-bar-container {
     width: 39vw;
+    /* 保证进度条在小屏下也不会太短，可按需调大或通过 CSS 变量覆盖 */
+    min-width: var(--pb-min-width, 260px);
+    /* 可选上限，防止超宽屏过长（保留现有 39vw 主导宽度） */
+    max-width: 86vw;
     height: 8px;
     background: color-mix(in srgb, var(--surface) 86%, transparent);
     border: 1px solid var(--border);
@@ -43,7 +47,7 @@
     );
     border-radius: 6px;
     transform-origin: left center;
-    transform: translateZ(0) scaleX(0);
+    transform: translateZ(0) scaleX(var(--pb-start, 0));
     animation: loading-progress var(--pb-duration) cubic-bezier(.33,.01,.18,1) var(--pb-delay) forwards;
     will-change: transform;
 }
@@ -71,7 +75,7 @@ html:not([data-theme="dark"]) .loading-bar {
 }
 
 @keyframes loading-progress {
-    0% { transform: translateZ(0) scaleX(0); }
+    0% { transform: translateZ(0) scaleX(var(--pb-start, 0)); }
     100% { transform: translateZ(0) scaleX(var(--pb-end,0.88)); }
 }
 
