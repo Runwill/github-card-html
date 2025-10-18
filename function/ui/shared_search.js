@@ -67,7 +67,8 @@
       setTimeout(() => { isShowingAnimation = false; if (isFocused) drop() }, 1200)
     ); };
     const hide  = () => {
-      if (!isFocused && window.innerWidth > 1101) {
+      // 让小屏也自动缩回：去掉仅限大屏 (window.innerWidth > 1101) 的条件
+      if (!isFocused) {
         clear(); isShowingAnimation = false;
         const delay = isDropped ? 200 : 0; if (isDropped) lift();
         animationTimers.push(
