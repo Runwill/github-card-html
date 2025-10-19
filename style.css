@@ -68,20 +68,9 @@ pronounName {
 .container:hover .role_icon.dominator { opacity: 0.025; left: 5%; }
 .container:hover .role_icon.not_dominator { opacity: 0.025; left: 4.5%; }
 
-/* 动画和交互样式 */
-span {
-    position: absolute;
-    background: #ffffff;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    border-radius: 50%;
-    animation: animate 1s linear infinite;
-}
-
-@keyframes animate {
-    0% { width: 0px; height: 0px; opacity: 0.5; }
-    100% { width: 500px; height: 500px; opacity: 0; }
-}
+/* 说明：原先这里使用全局 span 选择器实现“水波动画”，会影响所有 span 文本元素。
+   已移除该全局样式，避免导致全站 span 出现异常放大动画。若需要点击水波效果，
+   请使用 function/button/wave.js 中的 .wave-ripple 专有动画。 */
 
 /* 缩进和布局样式 */
 .indent {
