@@ -30,8 +30,6 @@
     transition: all 0.2s ease;
 }
 
-#header_title:hover { transform: scale(1.02); }
-
 #title-a {
     text-decoration: none;
     color: #2d3748;
