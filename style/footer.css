@@ -18,7 +18,7 @@
   gap: 10px;
   font-size: 13px;
   color: #9aa4b2; /* 较浅的中性灰（原 #4a5568） */
-  opacity: 0.5; /* 页脚文字整体 50% 透明度 */
+  opacity: 0.4; /* 页脚文字整体 50% 透明度 */
 }
 .site-footer .footer-text { color: #a0aec0; }
 .site-footer .footer-sep { color: #cbd5e0; }

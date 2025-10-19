@@ -398,6 +398,20 @@ html { scrollbar-gutter: stable both-edges; }
   position: relative; /* 供行内操作按钮绝对定位 */
 }
 
+/* 响应式优化：缩短 kv-key 列，避免小屏下键名后留白过长 */
+@media (max-width: 1024px) {
+  #tokens-content .kv-row { grid-template-columns: 140px 1fr; }
+}
+@media (max-width: 768px) {
+  /* 使用自适应最小宽 + 百分比上限，让短键名不占太多空白 */
+  #tokens-content .kv-row { grid-template-columns: minmax(96px, 38%) 1fr; }
+}
+@media (max-width: 480px) {
+  /* 极窄屏进一步压缩键名列，并减少右侧操作区预留 */
+  #tokens-content .kv-row { grid-template-columns: minmax(80px, 44%) 1fr; }
+  #tokens-content .kv-val { --kv-actions-space: 56px; }
+}
+
 #tokens-content .kv-row:last-child {
   border-bottom: none;
 }
