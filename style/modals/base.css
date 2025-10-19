@@ -84,12 +84,14 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .modal { margin: 15px; max-width: calc(100vw - 30px); max-height: calc(100vh - 30px); padding: 16px; }
+  /* 注意：不要给 fixed + left:50% + translateX(-50%) 的元素再加 margin，否则会产生水平偏移（left 参照的是 margin box） */
+  .modal { margin: 0; max-width: calc(100vw - 30px); max-height: calc(100vh - 30px); padding: 16px; }
   .modal-header h2 { font-size: 1.1rem; }
   .modal.approve-modal { max-height: 85vh; }
 }
 @media (max-width: 480px) {
-  .modal { margin: 10px; max-width: calc(100vw - 20px); padding: 12px; }
+  /* 同理，移除 margin，使用更小的 max-width 维持与屏幕边缘的留白 */
+  .modal { margin: 0; max-width: calc(100vw - 20px); padding: 12px; }
   .modal-form { gap: 12px; }
   .modal-form input, .modal-form button[type="submit"] { padding: 10px 12px; font-size: 13px; }
 }
