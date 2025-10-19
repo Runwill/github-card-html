@@ -203,7 +203,9 @@ html.theme-switching body {
 #title-a::after { background: var(--text) !important; }
 #sidebar { background: inherit !important; }
 #header-avatar { border-color: var(--border) !important; background: var(--surface) !important; box-shadow: 0 2px 8px var(--shadow-1) !important; }
-#menu-toggle:hover { background: color-mix(in srgb, var(--text) 10%, transparent) !important; }
+
+
+
 .sidebar-menu_button:hover {
   background: color-mix(in srgb, var(--text) 8%, transparent) !important;
   color: var(--text) !important;
