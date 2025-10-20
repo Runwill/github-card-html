@@ -1,0 +1,58 @@
+/* Account info modal - modern card layout with avatar, title and detail list */
+.account-info-modal { padding: 16px 16px 14px; }
+.account-info__header { display: flex; align-items: center; gap: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.account-info__avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--surface); box-shadow: 0 2px 6px var(--shadow-1); }
+.account-info__title { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.account-info__name { font-size: 18px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; height: 1.2em; display: inline-block; }
+.account-info__name.is-editable { cursor: text; }
+.account-info__name.is-editable:hover { box-shadow: inset 0 -1px 0 0 var(--border); }
+.account-info__name.is-editing { outline: none; box-shadow: inset 0 -1px 0 0 var(--border); }
+.account-info__name-input {
+  /* 外观尽量贴近原文字，避免撑大布局 */
+  font: inherit; color: inherit; line-height: 1.2; height: 1.2em;
+  border: none; outline: none; background: transparent; padding: 0; margin: 0;
+  display: inline-block; vertical-align: baseline;
+  width: auto; min-width: 2ch; /* 起始宽度，后续用 JS 自适应 */
+  box-sizing: content-box; appearance: none; -webkit-appearance: none; border-radius: 0; min-height: 0;
+}
+.account-info__name-input:focus {
+  /* 使用内阴影作为“下划线”，不改变高度 */
+  box-shadow: inset 0 -1px 0 0 var(--border);
+}
+.account-info__role .badge { font-size: 12px; }
+
+.account-info__body { padding-top: 10px; }
+.account-info__body .info-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 2px; border-bottom: 1px dashed var(--border); }
+.account-info__body .info-row:last-child { border-bottom: none; }
+.account-info__body .info-label { color: var(--text-subtle); font-size: 13px; }
+.account-info__body .info-value { color: var(--text); font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* 提示区域为空时不占空间 */
+#account-info-message:empty { margin: 0; padding: 0; border: 0; }
+/* 提示更新动画：使用轻微高亮的覆盖层而非位移，观感更柔和 */
+#account-info-message { position: relative; }
+@keyframes account-info-msg-overlay {
+  0% { opacity: 0; }
+  25% { opacity: .55; }
+  100% { opacity: 0; }
+}
+#account-info-message.msg-flash::after {
+  content: "";
+  position: absolute; inset: 0; border-radius: 8px;
+  pointer-events: none;
+  animation: account-info-msg-overlay 500ms ease-out;
+}
+/* 按状态使用不同的高亮色 */
+#account-info-message.success.msg-flash::after { background: color-mix(in srgb, var(--success) 28%, transparent); }
+#account-info-message.error.msg-flash::after { background: color-mix(in srgb, var(--danger) 28%, transparent); }
+#account-info-message.msg-flash::after { background: color-mix(in srgb, var(--primary-1) 22%, transparent); }
+
+/* 无障碍：尊重减少动态偏好 */
+@media (prefers-reduced-motion: reduce) {
+  #account-info-message.msg-flash::after { animation: none !important; display: none !important; }
+}
+
+@media (max-width: 480px) {
+  .account-info__avatar { width: 48px; height: 48px; }
+  .account-info__name { font-size: 16px; }
+}

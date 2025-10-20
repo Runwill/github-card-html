@@ -14,15 +14,11 @@
 <!-- 侧边栏菜单背景遮罩 -->
 <div id="sidebar-backdrop" class="modal-backdrop"></div>
 
-<!-- 侧边栏菜单 -->
+<!-- 侧边栏菜单（主菜单） -->
 <div id="sidebar-menu" class="panel">
   <li style="display:flex; align-items:center; gap:10px;">
     <img id="sidebar-avatar-preview" src="" alt="avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid #e2e8f0; display:none;" />
-    <button id="update-account-button" class="sidebar-menu_button" style="flex:1;">账号</button>
-  </li>
-  <li>
-    <button id="upload-avatar-button" class="sidebar-menu_button">头像</button>
-    <input type="file" id="upload-avatar-input" accept="image/*" style="display:none" />
+    <button id="open-account-menu-button" class="sidebar-menu_button" style="flex:1;">账号</button>
   </li>
   <li>
     <button id="approve-request-button" class="sidebar-menu_button">审核</button>
@@ -33,17 +29,36 @@
   <li>
     <button id="logout-button" class="sidebar-menu_button">退出</button>
   </li>
+  
+</div>
+
+<!-- 账号菜单（与侧边栏同样式） -->
+<div id="account-menu" class="panel">
+  <li>
+    <button id="account-menu-back" class="sidebar-menu_button">返回</button>
+  </li>
+  <li>
+    <button id="account-info-button" class="sidebar-menu_button">名片</button>
+  </li>
+  <li>
+    <button id="update-account-button" class="sidebar-menu_button">密码</button>
+  </li>
+  <li>
+    <button id="upload-avatar-button" class="sidebar-menu_button">头像</button>
+    <input type="file" id="upload-avatar-input" accept="image/*" style="display:none" />
+  </li>
 </div>
 
 <div id="update-account-modal" class="modal update-modal">
   <div class="modal-header">
-    <h2>账号</h2>
+    <h2>密码</h2>
   </div>
   <form id="updateForm" class="modal-form">
-    <!-- 为了更好地支持浏览器自动填充，添加 autocomplete 属性 -->
-    <input type="text" id="newUsername" name="newUsername" placeholder="新用户名" required autocomplete="username">
-    <!-- 这是设置新密码，因此使用 new-password；如果以后增加当前密码字段，可使用 current-password -->
+    <!-- 旧密码用于验证当前身份，autocomplete 使用 current-password -->
+    <input type="password" id="oldPassword" name="oldPassword" placeholder="旧密码" required autocomplete="current-password">
+    <!-- 新密码与确认新密码，autocomplete 使用 new-password -->
     <input type="password" id="newPassword" name="newPassword" placeholder="新密码" required autocomplete="new-password">
+    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="确认新密码" required autocomplete="new-password">
     <button type="submit" class="btn btn--primary btn--block">更新</button>
   </form>
   <div id="responseMessage" class="modal-message"></div>
@@ -86,3 +101,19 @@
     <div id="avatar-crop-message" class="modal-message" style="margin-top:8px;"></div>
   </div>
 </div>
+
+  <!-- 名片弹窗（新版样式） -->
+  <div id="account-info-modal" class="modal update-modal account-info-modal">
+    <div class="account-info__header">
+      <img id="account-info-avatar" class="account-info__avatar" alt="avatar" />
+      <div class="account-info__title">
+        <div class="account-info__name" id="account-info-username"></div>
+        <div class="account-info__role"><span class="badge" id="account-info-role"></span></div>
+      </div>
+    </div>
+    <div class="account-info__body">
+      <div class="info-row"><span class="info-label">用户名</span><span class="info-value" id="account-info-username-text"></span></div>
+      <div class="info-row"><span class="info-label">用户ID</span><span class="info-value" id="account-info-id"></span></div>
+    </div>
+    <div id="account-info-message" class="modal-message"></div>
+  </div>
