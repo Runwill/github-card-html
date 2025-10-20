@@ -404,7 +404,7 @@ const UIManager = {
   setupUsernameInlineEdit() {
     const nameEl = this.$('account-info-username');
     if (!nameEl) return;
-    try { nameEl.classList.add('is-editable'); nameEl.setAttribute('title', '点击编辑用户名'); } catch(_){}
+  try { nameEl.classList.add('is-editable'); } catch(_){}
 
     const startEdit = () => {
       if (this._isEditingUsername) return;
