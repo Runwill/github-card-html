@@ -56,7 +56,10 @@ window.addEventListener('load', ()=>{ resourcesReady=true; attemptCompletion() }
 ;(function(){
     try{
         if(document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function'){
-            document.fonts.ready.then(()=>{ fontsReady=true; attemptCompletion() })
+            // 严格等待：全局字体就绪 + 关键字体（康熙）加载完毕
+            const allFontsReady = document.fonts.ready
+            const keyFontPromise = document.fonts.load("1em '康熙'").catch(()=>{})
+            Promise.all([allFontsReady, keyFontPromise]).then(()=>{ fontsReady=true; attemptCompletion() })
         } else {
             // 不支持 FontFaceSet：不阻塞完成
             fontsReady=true; attemptCompletion()
