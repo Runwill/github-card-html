@@ -27,6 +27,30 @@
 .account-info__body .info-label { color: var(--text-subtle); font-size: 13px; }
 .account-info__body .info-value { color: var(--text); font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* 简介（多行）在可编辑/编辑中时的微样式 */
+/* 新版简介区域：显式文本框与提示 */
+.account-info__intro { padding: 10px 2px 0; display: flex; flex-direction: column; gap: 6px; }
+.intro-textarea {
+  width: 100%; min-height: 96px; resize: vertical; padding: 8px 10px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+  color: var(--text); font-size: 14px; line-height: 1.5; box-shadow: 0 1px 2px var(--shadow-0) inset;
+}
+.intro-textarea::placeholder { color: var(--text-subtle); }
+.intro-textarea:focus { outline: none; border-color: var(--primary-2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-2) 20%, transparent); }
+
+/* 夜间模式：确保文本域背景不变白，随主题颜色 */
+html[data-theme="dark"] .intro-textarea {
+  background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+html[data-theme="dark"] .intro-textarea::placeholder { color: var(--text-subtle) !important; }
+html[data-theme="dark"] .intro-textarea:focus {
+  background: var(--surface) !important;
+  border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important;
+  box-shadow: 0 0 0 3px var(--primary-ring) !important;
+}
+
 /* 提示区域为空时不占空间 */
 #account-info-message:empty { margin: 0; padding: 0; border: 0; }
 /* 提示更新动画：使用轻微高亮的覆盖层而非位移，观感更柔和 */

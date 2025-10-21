@@ -35,7 +35,8 @@ if (loginForm) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('id', data.user.id);
         localStorage.setItem('username', data.user.username);
-        localStorage.setItem('role', data.user.role);
+  localStorage.setItem('role', data.user.role);
+  if (data.user.intro !== undefined) { localStorage.setItem('intro', data.user.intro || ''); }
         if (data.user.avatar !== undefined) { localStorage.setItem('avatar', data.user.avatar || ''); }
         setMessage('登录成功！', 'success');
         window.location.href = 'index.html';
