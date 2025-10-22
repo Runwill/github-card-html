@@ -3,7 +3,17 @@
 .account-info__header { display: flex; align-items: center; gap: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
 .account-info__avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--surface); box-shadow: 0 2px 6px var(--shadow-1); }
 .account-info__title { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.account-info__name { font-size: 18px; font-weight: 700; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; height: 1.2em; display: inline-block; }
+.account-info__name {
+  font-size: 18px;
+  color: var(--text);
+  line-height: 1.2;
+  /* 改为弹性布局：用户名本体可省略号，右侧“审核中/撤回”不再影响主文本宽度测量 */
+  display: flex; align-items: center; gap: 8px;
+  /* 保留整体字重在子元素上分别控制 */
+  font-weight: 700;
+  /* 强制单行，防止右侧状态出现时换行导致高度增加 */
+  white-space: nowrap;
+}
 .account-info__name.is-editable { cursor: text; }
 .account-info__name.is-editable:hover { box-shadow: inset 0 -1px 0 0 var(--border); }
 .account-info__name.is-editing { outline: none; box-shadow: inset 0 -1px 0 0 var(--border); }
@@ -20,6 +30,82 @@
   box-shadow: inset 0 -1px 0 0 var(--border);
 }
 .account-info__role .badge { font-size: 12px; }
+
+/* 主用户名文本：保持粗体、单行省略，不受右侧元素影响 */
+#account-info-username-main {
+  font-weight: 700;
+  flex: 1 1 auto; min-width: 0; /* 允许缩小并触发省略 */
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;
+}
+
+/* 审核中文本：不加粗、颜色更淡，尽量不抢视觉，并尽可能不撑开布局 */
+#account-info-username-pending-inline,
+#account-info-intro-pending-inline {
+  font-weight: 400 !important;
+  /* 先提供兼容性回退色，再用更浅的混合色 */
+  color: var(--text-subtle);
+  color: color-mix(in srgb, var(--text-subtle) 30%, transparent);
+  /* 再缩小字号，进一步弱化视觉占比 */
+  font-size: 0.7em;
+  white-space: nowrap; /* 避免自身换行造成跳动 */
+  line-height: 1; /* 与按钮统一行高，避免撑高行盒 */
+  vertical-align: baseline;
+}
+
+/* 撤回：轻量化为链接风格，减少占位影响 */
+#account-info-username-cancel-inline,
+#account-info-intro-cancel-inline {
+  /* 彻底压制通用 .btn 样式，避免高度被内边距/行高撑大 */
+  all: unset;
+  display: inline;
+  /* 与“审核中”一致：更浅的中性灰，避免喧宾夺主 */
+  color: var(--text-subtle);
+  color: color-mix(in srgb, var(--text-subtle) 30%, transparent);
+  /* 与“审核中”一样大：去掉左右内边距，靠容器 gap 控制间距 */
+  padding: 0 !important;
+  line-height: 1 !important;
+  /* 与“审核中”一致的相对字号 */
+  font-size: 0.7em !important;
+  font-weight: 400 !important;
+  text-decoration: none;
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
+#account-info-username-cancel-inline:hover,
+#account-info-username-cancel-inline:focus-visible,
+#account-info-intro-cancel-inline:hover,
+#account-info-intro-cancel-inline:focus-visible {
+  /* 悬停/聚焦保持同色，不加深 */
+  color: var(--text-subtle);
+  color: color-mix(in srgb, var(--text-subtle) 80%, transparent);
+  text-decoration: none;
+}
+
+/* 简介待审行内提示与撤回：对齐用户名的视觉权重 */
+#account-info-intro-pending {
+  display: flex; /* 占满行宽，便于内部文字根据容器宽度省略 */
+  align-items: center;
+  gap: 8px;
+  color: var(--text-subtle);
+  color: color-mix(in srgb, var(--text-subtle) 30%, transparent);
+  line-height: 1;
+  width: 100%;
+  flex-wrap: nowrap; /* 强制同一行，不允许换行 */
+}
+
+/* 审核中的简介文本：启用基于容器宽度的省略号 */
+#account-info-intro-pending-inline {
+  flex: 1 1 auto;
+  min-width: 0;           /* 允许在 flex 布局下收缩 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 关键：过长用省略号 */
+  white-space: nowrap;     /* 单行显示 */
+  max-width: 100%;
+}
+
+/* 确保撤回按钮不被挤压到下一行 */
+#account-info-intro-cancel-inline { flex-shrink: 0; }
 
 .account-info__body { padding-top: 10px; }
 .account-info__body .info-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 2px; border-bottom: 1px dashed var(--border); }

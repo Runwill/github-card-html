@@ -107,7 +107,12 @@
     <div class="account-info__header">
       <img id="account-info-avatar" class="account-info__avatar" alt="avatar" />
       <div class="account-info__title">
-        <div class="account-info__name" id="account-info-username"></div>
+        <div class="account-info__name" id="account-info-username">
+          <span id="account-info-username-main"></span>
+          <!-- 移除内联颜色/字号/外边距，统一由 CSS 控制（与容器 gap 保持一致） -->
+          <span id="account-info-username-pending-inline" style="display:none;"></span>
+          <button id="account-info-username-cancel-inline" class="btn btn--sm" style="display:none;">撤回</button>
+        </div>
         <div class="account-info__role"><span class="badge" id="account-info-role"></span></div>
       </div>
     </div>
@@ -116,6 +121,7 @@
       <div class="info-row"><span class="info-label">用户ID</span><span class="info-value" id="account-info-id"></span></div>
       <div class="account-info__intro">
         <textarea id="account-info-intro" class="intro-textarea" rows="4" maxlength="500" placeholder="（暂无简介）"></textarea>
+        <div id="account-info-intro-pending" class="info-hint" style="display:none;"></div>
       </div>
     </div>
     <div id="account-info-message" class="modal-message"></div>

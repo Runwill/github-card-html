@@ -52,7 +52,33 @@
       $('account-menu-back')?.addEventListener('click', () => { this.hideAccountMenu(); this.showSidebar(); });
       $('update-account-button')?.addEventListener('click', () => this.showModal('update-account-modal'));
       $('account-info-button')?.addEventListener('click', () => this.openAccountInfo());
-      $('approve-request-button')?.addEventListener('click', () => this.showModal('approve-user-modal'));
+      $('approve-request-button')?.addEventListener('click', async () => {
+        const token = localStorage.getItem('token') || '';
+        const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+        try {
+          // 并行检测四类待审
+          const [u, a, n, i] = await Promise.all([
+            fetch(api('/api/pending-users'), { headers }),
+            fetch(api('/api/avatar/pending'), { headers }),
+            fetch(api('/api/username/pending'), { headers }),
+            fetch(api('/api/intro/pending'), { headers }),
+          ]);
+          const toJson = async (r) => (r && r.ok ? (await r.json()) : []);
+          const [users, avatars, names, intros] = await Promise.all([toJson(u), toJson(a), toJson(n), toJson(i)]);
+          const total = (Array.isArray(users)?users.length:0) + (Array.isArray(avatars)?avatars.length:0) + (Array.isArray(names)?names.length:0) + (Array.isArray(intros)?intros.length:0);
+          if (total > 0) {
+            this.showModal('approve-user-modal');
+          } else {
+            // 与“修改词元的已修改”一致的提示：使用 tokensAdmin.showToast
+            try { window.tokensAdmin && window.tokensAdmin.showToast && window.tokensAdmin.showToast('无申请'); }
+            catch(_) { alert('无申请'); }
+          }
+        } catch (_) {
+          // 网络或权限问题：仍提示无申请（或可提示错误）
+          try { window.tokensAdmin && window.tokensAdmin.showToast && window.tokensAdmin.showToast('无申请'); }
+          catch(_) { alert('无申请'); }
+        }
+      });
       $('logout-button')?.addEventListener('click', () => this.handleLogout());
 
       const fileInput = $('upload-avatar-input');
@@ -92,6 +118,17 @@
         if (!resp.ok) return;
         const data = await resp.json(); if (!data) return;
         if (typeof data.intro === 'string') localStorage.setItem('intro', data.intro || '');
+
+        // 同步用户名（例如审核通过后），并立刻刷新已打开的名片弹窗
+        if (typeof data.username === 'string') {
+          const oldName = localStorage.getItem('username') || '';
+          const nextName = data.username || '';
+          if (oldName !== nextName) {
+            localStorage.setItem('username', nextName);
+            try { this.refreshUsernameUI(nextName); } catch {}
+            try { this.loadPendingUsernameBadge(); } catch {}
+          }
+        }
         const old = localStorage.getItem('avatar') || ''; const next = data.avatar || '';
         if (old !== next) {
           localStorage.setItem('avatar', next);
@@ -172,19 +209,22 @@
         const role = (localStorage.getItem('role') || '').toLowerCase();
         const roleMap = { admin: { text: '管理员', cls: 'badge-admin' }, moderator: { text: '版主', cls: 'badge-moderator' }, user: { text: '用户', cls: 'badge-user' }, guest: { text: '访客', cls: 'badge-guest' } };
         const roleInfo = roleMap[role] || { text: '用户', cls: 'badge-user' };
-        const nameEl = $('account-info-username'); const nameTextEl = $('account-info-username-text'); const roleEl = $('account-info-role'); const idEl = $('account-info-id'); const introEl = $('account-info-intro'); const avatarEl = $('account-info-avatar');
-        if (nameEl) nameEl.textContent = name; if (nameTextEl) nameTextEl.textContent = name; if (idEl) idEl.textContent = id;
+        const nameMainEl = $('account-info-username-main'); const nameTextEl = $('account-info-username-text'); const roleEl = $('account-info-role'); const idEl = $('account-info-id'); const introEl = $('account-info-intro'); const avatarEl = $('account-info-avatar');
+        if (nameMainEl) nameMainEl.textContent = name; if (nameTextEl) nameTextEl.textContent = name; if (idEl) idEl.textContent = id;
         if (introEl) { if (introEl.tagName === 'TEXTAREA') introEl.value = intro || ''; else introEl.textContent = intro || '（暂无简介）'; }
         if (avatarEl) { if (resolvedAvatar) { avatarEl.src = resolvedAvatar; avatarEl.style.display = 'inline-block'; } else { try { avatarEl.removeAttribute('src'); } catch {} avatarEl.style.display = 'none'; } }
         if (roleEl) { roleEl.textContent = roleInfo.text; roleEl.className = 'badge ' + roleInfo.cls; }
         const msg = $('account-info-message'); if (msg) { msg.textContent = ''; msg.className = 'modal-message'; msg.classList.remove('msg-flash'); }
-        if (!this._bindUsernameInlineEditOnce) { this._bindUsernameInlineEditOnce = true; this.setupUsernameInlineEdit(); }
-        if (!this._bindIntroInlineEditOnce) { this._bindIntroInlineEditOnce = true; this.setupIntroInlineEdit(); }
+  if (!this._bindUsernameInlineEditOnce) { this._bindUsernameInlineEditOnce = true; this.setupUsernameInlineEdit(); }
+  // 展示“用户名审核中”提示（若存在）
+  this.loadPendingUsernameBadge();
+  if (!this._bindIntroInlineEditOnce) { this._bindIntroInlineEditOnce = true; this.setupIntroInlineEdit(); }
+  this.loadPendingIntroBadge();
       } catch {}
       this.showModal('account-info-modal');
     },
 
-    refreshUsernameUI(newName) { const nameEl = $('account-info-username'); const nameTextEl = $('account-info-username-text'); if (nameEl) nameEl.textContent = newName || ''; if (nameTextEl) nameTextEl.textContent = newName || ''; },
+    refreshUsernameUI(newName) { const nameMainEl = $('account-info-username-main'); const nameTextEl = $('account-info-username-text'); if (nameMainEl) nameMainEl.textContent = newName || ''; if (nameTextEl) nameTextEl.textContent = newName || ''; },
 
     setupIntroInlineEdit() {
       const introEl = $('account-info-intro'); if (!introEl || introEl.tagName !== 'TEXTAREA') return; const msgEl = $('account-info-message'); let original = introEl.value || '';
@@ -197,9 +237,16 @@
         if (newIntro.length > 500) { showFlash('error', '简介最多 500 个字符'); return; }
         this._savingIntro = true; introEl.setAttribute('aria-busy', 'true');
         try {
-          const resp = await fetch(api('/api/update'), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, newIntro }) });
-          if (!resp.ok) { let msg = '更新失败'; try { const data = await resp.json(); msg = data && (data.message || msg); } catch {} showFlash('error', msg); this._introSaveFailed = true; this._introLastTried = newIntro; this._savingIntro = false; introEl.removeAttribute('aria-busy'); return; }
-          localStorage.setItem('intro', newIntro); original = newIntro; this._introSaveFailed = false; this._introLastTried = ''; showFlash('success', '已更新'); this._savingIntro = false; introEl.removeAttribute('aria-busy');
+          // 改为“提交审核”流程
+          const resp = await fetch(api('/api/intro/change'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: id, newIntro }) });
+          if (!resp.ok) { let msg = '提交失败'; try { const data = await resp.json(); msg = data && (data.message || msg); } catch {} showFlash('error', msg); this._introSaveFailed = true; this._introLastTried = newIntro; this._savingIntro = false; introEl.removeAttribute('aria-busy'); return; }
+          // 提交成功：不立刻更改本地简介，恢复显示旧简介，并提示“审核中”
+          this._introSaveFailed = false; this._introLastTried = '';
+          showFlash('success', '简介变更已提交审核，待通过后生效。');
+          introEl.value = original; // 恢复旧简介，避免与实际生效值不一致
+          // 展示待审提示
+          await this.loadPendingIntroBadge();
+          this._savingIntro = false; introEl.removeAttribute('aria-busy');
         } catch (e) { console.error('更新简介失败:', e); showFlash('error', '网络异常，稍后再试'); this._introSaveFailed = true; this._introLastTried = newIntro; this._savingIntro = false; introEl.removeAttribute('aria-busy'); }
       };
       const onKeydown = (ev) => {
@@ -212,8 +259,37 @@
       introEl.addEventListener('blur', () => { if (!this._savingIntro) doSave(); });
     },
 
+    async loadPendingIntroBadge(){
+      try {
+        const id = localStorage.getItem('id'); if (!id) return;
+        const container = $('account-info-intro-pending'); if (!container) return;
+        const resp = await fetch(api('/api/intro/pending/me?userId=' + encodeURIComponent(id)));
+        if (!resp.ok) { container.style.display = 'none'; return; }
+        const data = await resp.json();
+        const show = !!(data && typeof data.newIntro === 'string');
+        if (!show) { container.style.display = 'none'; container.innerHTML=''; return; }
+        const full = (data.newIntro || '').replace(/\s+/g,' ');
+        container.innerHTML = '';
+        const span = document.createElement('span');
+        span.id = 'account-info-intro-pending-inline';
+        span.textContent = '审核中：' + full;
+        span.title = full; // 悬停可查看完整内容
+        const btn = document.createElement('button'); btn.id = 'account-info-intro-cancel-inline'; btn.textContent = '撤回'; btn.addEventListener('click', () => this.cancelPendingIntroChange());
+        container.appendChild(span); container.appendChild(btn); container.style.display = '';
+      } catch { const container = $('account-info-intro-pending'); if (container) { container.style.display = 'none'; container.innerHTML=''; } }
+    },
+
+    async cancelPendingIntroChange(){
+      try {
+        const id = localStorage.getItem('id'); if (!id) return;
+        const resp = await fetch(api('/api/intro/cancel'), { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ userId: id }) });
+        if (!resp.ok) { try { const e = await resp.json(); alert(e && e.message ? e.message : '撤回失败'); } catch { alert('撤回失败'); } return; }
+        await this.loadPendingIntroBadge();
+      } catch (_) { alert('网络异常，撤回失败'); }
+    },
+
     setupUsernameInlineEdit() {
-      const nameEl = $('account-info-username'); if (!nameEl) return; try { nameEl.classList.add('is-editable'); } catch {}
+      const nameEl = $('account-info-username-main'); if (!nameEl) return; try { nameEl.classList.add('is-editable'); } catch {}
       const startEdit = () => {
         if (this._isEditingUsername) return; this._isEditingUsername = true;
         const oldName = nameEl.textContent || '';
@@ -224,17 +300,23 @@
           const newName = (nameEl.textContent || '').trim(); const msgEl = $('account-info-message');
           if (this._usernameSaveFailed && newName === this._usernameLastTried) { try { nameEl.focus(); } catch {} return; }
           if (!newName || newName === oldName) { cleanup(); return; }
+          if (newName.length > 12) { if (msgEl) { msgEl.textContent = '用户名最多 12 个字符'; msgEl.className = 'modal-message error'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); } try { nameEl.focus(); } catch {} return; }
           const id = localStorage.getItem('id'); if (!id) { alert('未检测到登录信息'); cleanup(); return; }
           this._savingUsername = true; nameEl.setAttribute('aria-busy', 'true');
           try {
-            const resp = await fetch(api('/api/update'), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, newUsername: newName }) });
+            // 新流程：提交用户名变更审核
+            const resp = await fetch(api('/api/username/change'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: id, newUsername: newName }) });
             if (!resp.ok) {
               let msg = '更新失败'; try { const data = await resp.json(); msg = data && (data.message || msg); } catch {}
               if (msgEl) { msgEl.textContent = msg; msgEl.className = 'modal-message error'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); }
               this._usernameSaveFailed = true; this._usernameLastTried = newName; this._savingUsername = false; nameEl.removeAttribute('aria-busy'); return;
             }
-            localStorage.setItem('username', newName); this.refreshUsernameUI(newName); this._usernameSaveFailed = false; this._usernameLastTried = '';
-            if (msgEl) { msgEl.textContent = '已更新'; msgEl.className = 'modal-message success'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); }
+            // 审核提交成功：不立刻更改本地用户名，恢复显示旧名并提示“已提交审核”
+            this._usernameSaveFailed = false; this._usernameLastTried = '';
+            if (msgEl) { msgEl.textContent = '用户名变更已提交审核，待通过后生效。'; msgEl.className = 'modal-message success'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); }
+            // 恢复显示旧名，避免误导
+            nameEl.textContent = oldName;
+            this.loadPendingUsernameBadge();
             this._savingUsername = false; nameEl.removeAttribute('aria-busy'); cleanup();
           } catch (e) { console.error('更新用户名失败:', e); if (msgEl) { msgEl.textContent = '网络异常，稍后再试'; msgEl.className = 'modal-message error'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); } this._usernameSaveFailed = true; this._usernameLastTried = newName; this._savingUsername = false; nameEl.removeAttribute('aria-busy'); }
         };
@@ -245,6 +327,36 @@
         nameEl.addEventListener('input', onInput, { once: false });
       };
       nameEl.addEventListener('click', startEdit); nameEl.setAttribute('tabindex', '0'); nameEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); startEdit(); } });
+    },
+
+    async loadPendingUsernameBadge(){
+      try {
+        const id = localStorage.getItem('id'); if (!id) return;
+        const tag = $('account-info-username-pending-inline');
+        const cancelBtn = $('account-info-username-cancel-inline');
+        const resp = await fetch(api('/api/username/pending/me?userId=' + encodeURIComponent(id)));
+        if (!resp.ok) return;
+        const data = await resp.json();
+        const show = !!(data && data.newUsername);
+        if (tag) { tag.textContent = show ? ('审核中：' + data.newUsername) : ''; tag.style.display = show ? '' : 'none'; }
+        if (cancelBtn) {
+          cancelBtn.style.display = show ? '' : 'none';
+          cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+          const freshBtn = $('account-info-username-cancel-inline');
+          freshBtn && freshBtn.addEventListener('click', () => this.cancelPendingUsernameChange());
+        }
+      } catch {}
+    },
+
+    async cancelPendingUsernameChange(){
+      try {
+        const id = localStorage.getItem('id'); if (!id) return;
+        const resp = await fetch(api('/api/username/cancel'), { method: 'POST', headers: { 'Content-Type':'application/json' }, body: JSON.stringify({ userId: id }) });
+        // 不强依赖返回内容，成功/无记录都刷新 UI
+        if (!resp.ok) { try { const e = await resp.json(); alert(e && e.message ? e.message : '撤回失败'); } catch { alert('撤回失败'); } return; }
+        // 刷新待审提示
+        this.loadPendingUsernameBadge();
+      } catch (_) { alert('网络异常，撤回失败'); }
     },
 
     showSidebar() {
