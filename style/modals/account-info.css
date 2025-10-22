@@ -97,11 +97,12 @@
 /* 审核中的简介文本：启用基于容器宽度的省略号 */
 #account-info-intro-pending-inline {
   flex: 1 1 auto;
-  min-width: 0;           /* 允许在 flex 布局下收缩 */
+  min-width: 0;             /* 允许在 flex 布局下收缩 */
   overflow: hidden;
-  text-overflow: ellipsis; /* 关键：过长用省略号 */
-  white-space: nowrap;     /* 单行显示 */
-  max-width: 100%;
+  text-overflow: ellipsis;   /* 关键：过长用省略号 */
+  white-space: nowrap;       /* 单行显示 */
+  /* 将可见宽度进一步收紧，确保文本更早使用省略号，避免挤占按钮空间 */
+  max-width: min(70%, 40ch);
 }
 
 /* 确保撤回按钮不被挤压到下一行 */
