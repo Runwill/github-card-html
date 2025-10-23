@@ -70,13 +70,15 @@
             this.showModal('approve-user-modal');
           } else {
             // 与“修改词元的已修改”一致的提示：使用 tokensAdmin.showToast
-            try { window.tokensAdmin && window.tokensAdmin.showToast && window.tokensAdmin.showToast('无申请'); }
-            catch(_) { alert('无申请'); }
+            const msg = (window.i18n && window.i18n.t) ? window.i18n.t('toast.noRequests') : '无申请';
+            try { window.tokensAdmin && window.tokensAdmin.showToast && window.tokensAdmin.showToast(msg); }
+            catch(_) { alert(msg); }
           }
         } catch (_) {
           // 网络或权限问题：仍提示无申请（或可提示错误）
-          try { window.tokensAdmin && window.tokensAdmin.showToast && window.tokensAdmin.showToast('无申请'); }
-          catch(_) { alert('无申请'); }
+          const msg = (window.i18n && window.i18n.t) ? window.i18n.t('toast.noRequests') : '无申请';
+          try { window.tokensAdmin && window.tokensAdmin.showToast && window.tokensAdmin.showToast(msg); }
+          catch(_) { alert(msg); }
         }
       });
       $('logout-button')?.addEventListener('click', () => this.handleLogout());
@@ -166,7 +168,7 @@
 
     openAvatarCropper(event) {
       const file = event?.target?.files?.[0]; if (!file) return;
-      if (!/^image\//i.test(file.type)) { alert('请选择图片文件'); return; }
+  if (!/^image\//i.test(file.type)) { alert((window.i18n&&window.i18n.t)?window.i18n.t('alert.selectImage'):'请选择图片文件'); return; }
       const img = $('avatar-crop-image'); const modalId = 'avatar-crop-modal'; const cancelBtn = $('avatar-crop-cancel'); const confirmBtn = $('avatar-crop-confirm'); const msg = $('avatar-crop-message');
       if (!img || !cancelBtn || !confirmBtn) { this.handleCroppedUpload(file); return; }
       msg.textContent = ''; msg.className = 'modal-message';
@@ -182,10 +184,10 @@
       const onCancel = () => { cleanup(); this.hideModal(modalId); this.showModal('avatar-modal'); };
       const onConfirm = async () => {
         try {
-          msg.textContent = '正在裁剪…';
+          msg.textContent = (window.i18n&&window.i18n.t)?window.i18n.t('status.cropping'):'正在裁剪…';
           const canvas = this._cropper.getCroppedCanvas({ width: 512, height: 512, imageSmoothingQuality: 'high' });
-          if (!canvas) throw new Error('裁剪失败');
-          canvas.toBlob(async (blob) => { if (!blob) { msg.textContent = '导出失败'; msg.className = 'modal-message error'; return; } const croppedFile = new File([blob], 'avatar.png', { type: 'image/png' }); await this.handleCroppedUpload(croppedFile, msg); this.hideModal(modalId); cleanup(); this.showModal('avatar-modal'); }, 'image/png');
+          if (!canvas) throw new Error((window.i18n&&window.i18n.t)?window.i18n.t('error.cropFailed'):'裁剪失败');
+          canvas.toBlob(async (blob) => { if (!blob) { msg.textContent = (window.i18n&&window.i18n.t)?window.i18n.t('error.exportFailed'):'导出失败'; msg.className = 'modal-message error'; return; } const croppedFile = new File([blob], 'avatar.png', { type: 'image/png' }); await this.handleCroppedUpload(croppedFile, msg); this.hideModal(modalId); cleanup(); this.showModal('avatar-modal'); }, 'image/png');
         } catch (e) { console.error(e); msg.textContent = e.message || '裁剪失败'; msg.className = 'modal-message error'; }
       };
       cancelBtn.replaceWith(cancelBtn.cloneNode(true));
@@ -195,10 +197,10 @@
     },
 
     async handleCroppedUpload(file, messageEl) {
-      const id = localStorage.getItem('id'); if (!id) { alert('请先登录'); return; }
+  const id = localStorage.getItem('id'); if (!id) { alert((window.i18n&&window.i18n.t)?window.i18n.t('alert.loginFirst'):'请先登录'); return; }
       const form = new FormData(); form.append('avatar', file); form.append('userId', id);
       try {
-        messageEl && (messageEl.textContent = '正在上传…');
+  messageEl && (messageEl.textContent = (window.i18n&&window.i18n.t)?window.i18n.t('status.uploading'):'正在上传…');
         const resp = await fetch(api('/api/upload/avatar'), { method: 'POST', body: form });
         let data = null; try { data = await resp.clone().json(); } catch {}
         if (!resp.ok) { const err = await this.parseErrorResponse(resp); throw new Error(err.message || (data && data.message) || '上传失败'); }
@@ -213,15 +215,15 @@
             if (sidebarPrev && resolved) { sidebarPrev.src = resolved; sidebarPrev.style.display = 'inline-block'; }
             if (headerAvatar && resolved) { headerAvatar.src = resolved; headerAvatar.style.display = 'inline-block'; }
           } catch {}
-          this.showMessage($('avatar-modal-message'), '头像已更新（免审核）', 'success');
-          messageEl && (messageEl.textContent = '已更新');
+          this.showMessage($('avatar-modal-message'), (window.i18n&&window.i18n.t)?window.i18n.t('success.avatarUpdatedImmediate'):'头像已更新（免审核）', 'success');
+          messageEl && (messageEl.textContent = (window.i18n&&window.i18n.t)?window.i18n.t('status.updated'):'已更新');
           const wrap = $('avatar-pending-wrap'); if (wrap) wrap.style.display = 'none';
         } else {
-          this.showMessage($('avatar-modal-message'), '头像已提交审核，待管理员批准后生效。', 'success');
-          messageEl && (messageEl.textContent = '已提交审核');
+          this.showMessage($('avatar-modal-message'), (window.i18n&&window.i18n.t)?window.i18n.t('success.avatarSubmitted'):'头像已提交审核，待管理员批准后生效。', 'success');
+          messageEl && (messageEl.textContent = (window.i18n&&window.i18n.t)?window.i18n.t('status.submitted'):'已提交审核');
           await this.loadPendingAvatarPreview();
         }
-      } catch (err) { console.error('上传头像失败:', err); alert('上传失败：' + err.message); messageEl && (messageEl.textContent = '上传失败'); messageEl && (messageEl.className = 'modal-message error'); }
+  } catch (err) { console.error('上传头像失败:', err); const prefix=(window.i18n&&window.i18n.t)?window.i18n.t('error.uploadFailedPrefix'):'上传失败：'; alert(prefix + (err && err.message ? err.message : '')); messageEl && (messageEl.textContent = (window.i18n&&window.i18n.t)?window.i18n.t('error.uploadFailed'):'上传失败'); messageEl && (messageEl.className = 'modal-message error'); }
     },
 
     async loadPendingAvatarPreview() {
@@ -234,7 +236,7 @@
       } catch { const wrap = $('avatar-pending-wrap'); if (wrap) wrap.style.display = 'none'; }
     },
 
-    bindFormEvents() { $('updateForm')?.addEventListener('submit', (e) => this.handleUpdateFormSubmit(e)); },
+  bindFormEvents() { $('updateForm')?.addEventListener('submit', (e) => this.handleUpdateFormSubmit(e)); },
 
     toggleSidebar() { this.state.sidebarVisible ? this.hideSidebar() : this.showSidebar(); },
 
@@ -477,19 +479,20 @@
     async handleUpdateFormSubmit(event) {
       event.preventDefault();
       const id = localStorage.getItem('id'); const token = localStorage.getItem('token'); const oldPassword = ($('oldPassword')?.value || '').trim(); const newPassword = ($('newPassword')?.value || '').trim(); const confirmPassword = ($('confirmPassword')?.value || '').trim(); const responseMessage = $('responseMessage');
-      if (!id || !token) { this.showMessage(responseMessage, '未检测到登录信息，请重新登录。', 'error'); return; }
-      if (!oldPassword || !newPassword || !confirmPassword) { this.showMessage(responseMessage, '请填写完整。', 'error'); return; }
-      if (newPassword.length < 6) { this.showMessage(responseMessage, '新密码至少 6 位。', 'error'); return; }
-      if (newPassword !== confirmPassword) { this.showMessage(responseMessage, '两次输入的新密码不一致。', 'error'); return; }
+      const t = (k)=> (window.i18n&&window.i18n.t)?window.i18n.t(k):null;
+      if (!id || !token) { this.showMessage(responseMessage, t('error.noLogin') || '未检测到登录信息，请重新登录。', 'error'); return; }
+      if (!oldPassword || !newPassword || !confirmPassword) { this.showMessage(responseMessage, t('error.fillAll') || '请填写完整。', 'error'); return; }
+      if (newPassword.length < 6) { this.showMessage(responseMessage, t('error.pwdMin') || '新密码至少 6 位。', 'error'); return; }
+      if (newPassword !== confirmPassword) { this.showMessage(responseMessage, t('error.pwdNotMatch') || '两次输入的新密码不一致。', 'error'); return; }
       try {
-        this.showMessage(responseMessage, '正在更新...', '');
+        this.showMessage(responseMessage, t('status.updating') || '正在更新...', '');
         const response = await fetch(api('/api/change-password'), { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ id, oldPassword, newPassword }) });
-        if (response.ok) { this.showMessage(responseMessage, '密码已更新！请使用新密码重新登录。', 'success'); setTimeout(() => { this.hideModal('update-account-modal'); this.handleLogout(); }, 2000); }
-        else { const err = await this.parseErrorResponse(response); this.showMessage(responseMessage, err.message || '更新失败', 'error'); }
-      } catch (error) { this.showMessage(responseMessage, '请求失败，请稍后重试。', 'error'); console.error('请求失败:', error); }
+        if (response.ok) { this.showMessage(responseMessage, t('success.pwdUpdated') || '密码已更新！请使用新密码重新登录。', 'success'); setTimeout(() => { this.hideModal('update-account-modal'); this.handleLogout(); }, 2000); }
+        else { const err = await this.parseErrorResponse(response); this.showMessage(responseMessage, err.message || t('error.updateFailed') || '更新失败', 'error'); }
+      } catch (error) { this.showMessage(responseMessage, t('error.requestFailed') || '请求失败，请稍后重试。', 'error'); console.error('请求失败:', error); }
     },
 
-    handleLogout() { ['token', 'username', 'id'].forEach(k=>localStorage.removeItem(k)); window.location.href = 'login.html'; },
+  handleLogout() { ['token', 'username', 'id'].forEach(k=>localStorage.removeItem(k)); window.location.href = 'login.html'; },
 
     showMessage(element, message, type) { if (element) { element.textContent = message; element.className = `modal-message ${type}`; } },
   };
