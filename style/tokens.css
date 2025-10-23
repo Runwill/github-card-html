@@ -11,22 +11,27 @@ html { scrollbar-gutter: stable both-edges; }
   --ease-decel:    cubic-bezier(0, 0, .2, 1);
   --ease-accel:    cubic-bezier(.4, 0, 1, 1);
 }
-#panel_tokens .tokens-toolbar {
+#panel_tokens .tokens-toolbar,
+#panel_permissions .tokens-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-#panel_tokens .tokens-toolbar h2 {
+#panel_tokens .tokens-toolbar h2,
+#panel_permissions .tokens-toolbar h2 {
   margin: 0;
 }
 
-#panel_tokens .toolbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
+#panel_tokens .toolbar-actions,
+#panel_permissions .toolbar-actions { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
 
 /* 统一输入组（搜索+刷新） */
-#panel_tokens .tokens-input-group { display: inline-flex; align-items: stretch; max-width: 60vw; }
-#panel_tokens .tokens-input {
+#panel_tokens .tokens-input-group,
+#panel_permissions .tokens-input-group { display: inline-flex; align-items: stretch; max-width: 60vw; }
+#panel_tokens .tokens-input,
+#panel_permissions .tokens-input {
   height: 36px;
   min-width: 180px;
   flex: 1 1 240px;
@@ -40,9 +45,12 @@ html { scrollbar-gutter: stable both-edges; }
   line-height: 1.2;
   transition: border-color .15s ease, box-shadow .15s ease;
 }
-#panel_tokens .tokens-input:focus { outline: none; border-color: #cbd5e0; box-shadow: 0 0 0 3px rgba(66,153,225,0.15); }
-#panel_tokens .tokens-input::placeholder { color: #a0aec0; }
-#panel_tokens .tokens-btn {
+#panel_tokens .tokens-input:focus,
+#panel_permissions .tokens-input:focus { outline: none; border-color: #cbd5e0; box-shadow: 0 0 0 3px rgba(66,153,225,0.15); }
+#panel_tokens .tokens-input::placeholder,
+#panel_permissions .tokens-input::placeholder { color: #a0aec0; }
+#panel_tokens .tokens-btn,
+#panel_permissions .tokens-btn {
   height: 36px;
   padding: 0 12px !important;
   /* 默认按钮造型（单个按钮时也能圆角） */
@@ -55,17 +63,24 @@ html { scrollbar-gutter: stable both-edges; }
   align-items: center;
 }
 /* 输入组内的相邻按钮做成“分段”连接：中间直角，最右侧带圆角 */
-#panel_tokens .tokens-input-group .tokens-btn { border-radius: 0 !important; }
-#panel_tokens .tokens-input-group .tokens-btn:last-of-type { border-radius: 0 6px 6px 0 !important; }
-#panel_tokens .tokens-input-group .tokens-btn + .tokens-btn { /* 紧邻按钮避免双重边框 */ border-left: none !important; }
+#panel_tokens .tokens-input-group .tokens-btn,
+#panel_permissions .tokens-input-group .tokens-btn { border-radius: 0 !important; }
+#panel_tokens .tokens-input-group .tokens-btn:last-of-type,
+#panel_permissions .tokens-input-group .tokens-btn:last-of-type { border-radius: 0 6px 6px 0 !important; }
+#panel_tokens .tokens-input-group .tokens-btn + .tokens-btn,
+#panel_permissions .tokens-input-group .tokens-btn + .tokens-btn { /* 紧邻按钮避免双重边框 */ border-left: none !important; }
 
 /* 点击后残留的边框：使用 :focus-visible 仅在键盘导航时显示可视焦点 */
-#panel_tokens .tokens-btn:focus { outline: none !important; box-shadow: none !important; }
-#panel_tokens .tokens-btn:focus-visible { box-shadow: 0 0 0 3px rgba(66,153,225,0.15) !important; }
+#panel_tokens .tokens-btn:focus,
+#panel_permissions .tokens-btn:focus { outline: none !important; box-shadow: none !important; }
+#panel_tokens .tokens-btn:focus-visible,
+#panel_permissions .tokens-btn:focus-visible { box-shadow: 0 0 0 3px rgba(66,153,225,0.15) !important; }
 
 /* 详细/刷新按钮也应用相同规则（可能未带 tokens-btn 类时的兜底） */
-#panel_tokens .btn:focus { outline: none !important; box-shadow: none !important; }
-#panel_tokens .btn:focus-visible { box-shadow: 0 0 0 3px rgba(66,153,225,0.15) !important; }
+#panel_tokens .btn:focus,
+#panel_permissions .btn:focus { outline: none !important; box-shadow: none !important; }
+#panel_tokens .btn:focus-visible,
+#panel_permissions .btn:focus-visible { box-shadow: 0 0 0 3px rgba(66,153,225,0.15) !important; }
 
 /* 缩略模式开关：激活时使用绿色语义色 */
 /* 详细/缩略切换按钮：添加过渡并使用 background-color 以启用平滑动画 */
@@ -81,6 +96,24 @@ html { scrollbar-gutter: stable both-edges; }
 }
 #panel_tokens #tokens-compact-toggle.is-active:hover,
 #panel_tokens #tokens-compact-toggle.is-active:focus-visible {
+  background-color: #38A169 !important;  /* green-500 */
+  border-color: #2F855A !important; /* green-600 */
+  color: #FFFFFF !important;
+}
+
+/* 权限面板的模式切换按钮，复用与 tokens 详/略 切换一致的风格 */
+#panel_permissions #perm-mode-toggle {
+  transition: background-color .22s var(--ease-standard),
+              border-color .22s var(--ease-standard),
+              color .2s var(--ease-standard);
+}
+#panel_permissions #perm-mode-toggle.is-active {
+  background-color: #48BB78 !important;  /* green-400 */
+  border-color: #38A169 !important; /* green-500 */
+  color: #FFFFFF !important;
+}
+#panel_permissions #perm-mode-toggle.is-active:hover,
+#panel_permissions #perm-mode-toggle.is-active:focus-visible {
   background-color: #38A169 !important;  /* green-500 */
   border-color: #2F855A !important; /* green-600 */
   color: #FFFFFF !important;
@@ -114,7 +147,8 @@ html { scrollbar-gutter: stable both-edges; }
 }
 
 /* 刷新按钮在窄屏保持不被压缩/换行 */
-#panel_tokens .tokens-refresh { white-space: nowrap; flex: 0 0 auto; }
+#panel_tokens .tokens-refresh,
+#panel_permissions .tokens-refresh { white-space: nowrap; flex: 0 0 auto; }
 
 /* 类型筛选卡片：可点击 + 激活样式 */
 #panel_tokens .type-tile {
@@ -171,10 +205,14 @@ html { scrollbar-gutter: stable both-edges; }
 
 /* 当容器极窄时，允许整组换行，但刷新按钮与文字保持一行 */
 @media (max-width: 480px) {
-  #panel_tokens .tokens-toolbar { flex-wrap: wrap; gap: 8px; }
-  #panel_tokens .toolbar-actions { width: 100%; }
-  #panel_tokens .tokens-input-group { width: 100%; max-width: none; }
-  #panel_tokens .tokens-input { flex: 1 1 auto; min-width: 120px; }
+  #panel_tokens .tokens-toolbar,
+  #panel_permissions .tokens-toolbar { flex-wrap: wrap; gap: 8px; }
+  #panel_tokens .toolbar-actions,
+  #panel_permissions .toolbar-actions { width: 100%; }
+  #panel_tokens .tokens-input-group,
+  #panel_permissions .tokens-input-group { width: 100%; max-width: none; }
+  #panel_tokens .tokens-input,
+  #panel_permissions .tokens-input { flex: 1 1 auto; min-width: 120px; }
 }
 #tokens-content .count-badge {
   animation: none !important;

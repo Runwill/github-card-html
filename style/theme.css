@@ -146,22 +146,26 @@ html.theme-switching body {
 /* 表单控件 */
 .modal-form input,
 #login-form input,
-#panel_tokens .tokens-input {
+#panel_tokens .tokens-input,
+#panel_permissions .tokens-input {
   border: 1px solid var(--border) !important;
   background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
   color: var(--text) !important;
 }
 .modal-form input::placeholder,
-#panel_tokens .tokens-input::placeholder { color: var(--text-subtle) !important; }
+#panel_tokens .tokens-input::placeholder,
+#panel_permissions .tokens-input::placeholder { color: var(--text-subtle) !important; }
 .modal-form input:focus,
-#panel_tokens .tokens-input:focus {
+#panel_tokens .tokens-input:focus,
+#panel_permissions .tokens-input:focus {
   border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important;
   box-shadow: 0 0 0 3px var(--primary-ring) !important;
   background: var(--surface) !important;
 }
 
 /* Tokens 工具栏按钮与输入框边框颜色一致 */
-#panel_tokens .tokens-btn { border-color: var(--border) !important; }
+#panel_tokens .tokens-btn,
+#panel_permissions .tokens-btn { border-color: var(--border) !important; }
 #panel_tokens #tokens-compact-toggle { border-color: var(--border) !important; }
 
 /* 按钮系统 */
@@ -318,6 +322,7 @@ html.theme-switching body {
 /* Tokens 主面板占满可视高度，避免底部露出背景色差 */
 :root { --header-height: 64px; }
 #panel_tokens { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
+#panel_permissions { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
 
 /* Toast 样式 */
 .tokens-toast { background: var(--toast-ok-bg) !important; border-color: var(--toast-ok-border) !important; color: var(--toast-ok-text) !important; }

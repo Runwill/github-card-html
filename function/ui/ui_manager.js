@@ -105,10 +105,30 @@
 
       const role = localStorage.getItem('role');
       const approveBtn = $('approve-request-button'); if (approveBtn) approveBtn.style.display = (role === 'admin' || role === 'moderator') ? '' : 'none';
-      const tokensTab = qs('a[href="#panel_tokens"]')?.parentElement; const tokensPanel = $('panel_tokens');
+      // 权限管理入口仅管理员可见
+      const permBtn = $('permissions-manage-button');
+      if (permBtn) {
+        permBtn.style.display = (role === 'admin') ? '' : 'none';
+        permBtn.addEventListener('click', () => {
+          // 关闭面板/遮罩，并切换到“权限”标签页（仅管理员）
+          this.hideAccountMenu(); this.hideSidebar(); this.hideAllModals();
+          try {
+            const a = document.querySelector('#example-tabs a[href="#panel_permissions"]');
+            if (a) { a.click(); }
+            // 渲染一次，确保首次进入有内容
+            if (typeof window.renderPermissionsPanel === 'function') window.renderPermissionsPanel('');
+          } catch {}
+        });
+      }
+  const tokensTab = qs('a[href="#panel_tokens"]')?.parentElement; const tokensPanel = $('panel_tokens');
       const canViewTokens = (role === 'admin' || role === 'moderator');
       if (!canViewTokens) { if (tokensTab) tokensTab.style.display = 'none'; if (tokensPanel) tokensPanel.style.display = 'none'; }
       else { if (tokensTab) tokensTab.style.display = ''; if (tokensPanel) tokensPanel.style.display = ''; }
+  // 权限面板仅管理员可见
+  const permTabEl = qs('a[href="#panel_permissions"]')?.parentElement; const permPanelEl = $('panel_permissions');
+  const canViewPerms = (role === 'admin');
+  if (!canViewPerms) { if (permTabEl) permTabEl.style.display = 'none'; if (permPanelEl) permPanelEl.style.display = 'none'; }
+  else { if (permTabEl) permTabEl.style.display = ''; if (permPanelEl) permPanelEl.style.display = ''; }
     },
 
     async refreshCurrentUserFromServer() {
@@ -179,9 +199,25 @@
         const resp = await fetch(api('/api/upload/avatar'), { method: 'POST', body: form });
         let data = null; try { data = await resp.clone().json(); } catch {}
         if (!resp.ok) { const err = await this.parseErrorResponse(resp); throw new Error(err.message || (data && data.message) || '上传失败'); }
-        this.showMessage($('avatar-modal-message'), '头像已提交审核，待管理员批准后生效。', 'success');
-        messageEl && (messageEl.textContent = '已提交审核');
-        await this.loadPendingAvatarPreview();
+        if (data && data.applied) {
+          // 免审核：立即更新本地头像与 UI
+          if (typeof data.relativeUrl === 'string') localStorage.setItem('avatar', data.relativeUrl);
+          const resolved = this.resolveAvatarUrl(localStorage.getItem('avatar'));
+          const preview = $('avatar-modal-preview'); if (preview) { if (resolved) { preview.src = resolved; preview.style.display = 'inline-block'; } }
+          // 同步侧边栏与页头
+          try {
+            const sidebarPrev = $('sidebar-avatar-preview'); const headerAvatar = $('header-avatar');
+            if (sidebarPrev && resolved) { sidebarPrev.src = resolved; sidebarPrev.style.display = 'inline-block'; }
+            if (headerAvatar && resolved) { headerAvatar.src = resolved; headerAvatar.style.display = 'inline-block'; }
+          } catch {}
+          this.showMessage($('avatar-modal-message'), '头像已更新（免审核）', 'success');
+          messageEl && (messageEl.textContent = '已更新');
+          const wrap = $('avatar-pending-wrap'); if (wrap) wrap.style.display = 'none';
+        } else {
+          this.showMessage($('avatar-modal-message'), '头像已提交审核，待管理员批准后生效。', 'success');
+          messageEl && (messageEl.textContent = '已提交审核');
+          await this.loadPendingAvatarPreview();
+        }
       } catch (err) { console.error('上传头像失败:', err); alert('上传失败：' + err.message); messageEl && (messageEl.textContent = '上传失败'); messageEl && (messageEl.className = 'modal-message error'); }
     },
 
@@ -239,13 +275,24 @@
         try {
           // 改为“提交审核”流程
           const resp = await fetch(api('/api/intro/change'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: id, newIntro }) });
+          const respJson = await resp.clone().json().catch(()=>null);
           if (!resp.ok) { let msg = '提交失败'; try { const data = await resp.json(); msg = data && (data.message || msg); } catch {} showFlash('error', msg); this._introSaveFailed = true; this._introLastTried = newIntro; this._savingIntro = false; introEl.removeAttribute('aria-busy'); return; }
-          // 提交成功：不立刻更改本地简介，恢复显示旧简介，并提示“审核中”
+          // 根据是否免审核作出不同处理
           this._introSaveFailed = false; this._introLastTried = '';
-          showFlash('success', '简介变更已提交审核，待通过后生效。');
-          introEl.value = original; // 恢复旧简介，避免与实际生效值不一致
-          // 展示待审提示
-          await this.loadPendingIntroBadge();
+          if (respJson && respJson.applied) {
+            // 免审核：直接更新本地值
+            localStorage.setItem('intro', newIntro);
+            original = newIntro;
+            introEl.value = newIntro;
+            showFlash('success', '简介已更新（免审核）');
+            // 隐藏/清空待审提示
+            try { const wrap = document.getElementById('account-info-intro-pending'); if (wrap) { wrap.style.display='none'; wrap.innerHTML=''; } } catch {}
+          } else {
+            // 正常审核流程
+            showFlash('success', '简介变更已提交审核，待通过后生效。');
+            introEl.value = original; // 恢复旧简介
+            await this.loadPendingIntroBadge();
+          }
           this._savingIntro = false; introEl.removeAttribute('aria-busy');
         } catch (e) { console.error('更新简介失败:', e); showFlash('error', '网络异常，稍后再试'); this._introSaveFailed = true; this._introLastTried = newIntro; this._savingIntro = false; introEl.removeAttribute('aria-busy'); }
       };
@@ -304,19 +351,29 @@
           const id = localStorage.getItem('id'); if (!id) { alert('未检测到登录信息'); cleanup(); return; }
           this._savingUsername = true; nameEl.setAttribute('aria-busy', 'true');
           try {
-            // 新流程：提交用户名变更审核
+            // 新流程：提交用户名变更审核（若具备“仪同三司”将免审核直接生效）
             const resp = await fetch(api('/api/username/change'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: id, newUsername: newName }) });
+            const respJson = await resp.clone().json().catch(()=>null);
             if (!resp.ok) {
               let msg = '更新失败'; try { const data = await resp.json(); msg = data && (data.message || msg); } catch {}
               if (msgEl) { msgEl.textContent = msg; msgEl.className = 'modal-message error'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); }
               this._usernameSaveFailed = true; this._usernameLastTried = newName; this._savingUsername = false; nameEl.removeAttribute('aria-busy'); return;
             }
-            // 审核提交成功：不立刻更改本地用户名，恢复显示旧名并提示“已提交审核”
+            // 根据是否免审核作出不同处理
             this._usernameSaveFailed = false; this._usernameLastTried = '';
-            if (msgEl) { msgEl.textContent = '用户名变更已提交审核，待通过后生效。'; msgEl.className = 'modal-message success'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); }
-            // 恢复显示旧名，避免误导
-            nameEl.textContent = oldName;
-            this.loadPendingUsernameBadge();
+            if (respJson && respJson.applied) {
+              // 免审核：直接更新本地用户名与 UI
+              localStorage.setItem('username', newName);
+              this.refreshUsernameUI(newName);
+              if (msgEl) { msgEl.textContent = '用户名已更新（免审核）'; msgEl.className = 'modal-message success'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); }
+              // 隐藏待审提示
+              try { const tag = $('account-info-username-pending-inline'); if (tag) { tag.style.display = 'none'; tag.textContent = ''; } const btn = $('account-info-username-cancel-inline'); if (btn) btn.style.display = 'none'; } catch {}
+            } else {
+              // 正常提交审核：恢复旧名并提示
+              if (msgEl) { msgEl.textContent = '用户名变更已提交审核，待通过后生效。'; msgEl.className = 'modal-message success'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); }
+              nameEl.textContent = oldName; // 恢复显示旧名
+              this.loadPendingUsernameBadge();
+            }
             this._savingUsername = false; nameEl.removeAttribute('aria-busy'); cleanup();
           } catch (e) { console.error('更新用户名失败:', e); if (msgEl) { msgEl.textContent = '网络异常，稍后再试'; msgEl.className = 'modal-message error'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); const onAnimEnd = () => { msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); }; msgEl.addEventListener('animationend', onAnimEnd); } this._usernameSaveFailed = true; this._usernameLastTried = newName; this._savingUsername = false; nameEl.removeAttribute('aria-busy'); }
         };
@@ -388,6 +445,7 @@
     handleModalSpecialCases(modalId, modal) {
       if (modalId === 'update-account-modal') { const oldPwd = modal.querySelector('#oldPassword'); const newPwd = modal.querySelector('#newPassword'); const confirmPwd = modal.querySelector('#confirmPassword'); if (oldPwd) oldPwd.value = ''; if (newPwd) newPwd.value = ''; if (confirmPwd) confirmPwd.value = ''; if (oldPwd) oldPwd.focus(); }
       else if (modalId === 'approve-user-modal') { if (typeof window.renderApprovals === 'function') window.renderApprovals(); this.refreshCurrentUserFromServer(); }
+      else if (modalId === 'permissions-modal') { try { typeof window.renderPermissionsPanel === 'function' && window.renderPermissionsPanel(''); } catch {} }
     },
 
     async handleUpdateFormSubmit(event) {
