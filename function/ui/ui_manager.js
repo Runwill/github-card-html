@@ -267,10 +267,11 @@
             if (perms.length === 1) {
               const p = String(perms[0]);
               badge.textContent = p;
-              badge.title = PERM_DESC[p] || ('权限：' + p);
+              const tip = PERM_DESC[p] || ('权限：' + p); try { badge.setAttribute('data-tooltip', tip); } catch { badge.title = tip; }
             } else {
               badge.textContent = '权限×' + perms.length;
-              badge.title = perms.map(p => (PERM_DESC[p] ? (p + '：' + PERM_DESC[p]) : p)).join('\n');
+              const tip = perms.map(p => (PERM_DESC[p] ? (p + '：' + PERM_DESC[p]) : p)).join(' | ');
+              try { badge.setAttribute('data-tooltip', tip); } catch { badge.title = tip; }
             }
             container.appendChild(badge);
           }

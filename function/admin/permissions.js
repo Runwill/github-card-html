@@ -20,9 +20,10 @@
   const MAX_TAGS_SHOWN = 4; // 每行最多展示的权限标签数，超出用 +N 折叠
 
   function makeEl(tag, cls, text){ const el = document.createElement(tag); if (cls) el.className = cls; if (text != null) el.textContent = text; return el; }
-  function tag(text, more=false, title){
+  function tag(text, more=false, tip){
     const s = makeEl('span', 'perm-tag' + (more ? ' perm-tag--more' : ''), text);
-    if (title) s.title = title; else s.title = text;
+    const tooltip = (tip || text);
+    try { s.setAttribute('data-tooltip', tooltip); } catch { s.title = tooltip; }
     return s;
   }
   function spinnerBtn(btn, spinning){
@@ -128,9 +129,10 @@
       function renderChecklist(){
         list.innerHTML = '';
         allPerms.forEach(p => {
-          const item = makeEl('label', 'perm-editor__item'); item.title = PERM_DESC[p] || p;
+          const item = makeEl('label', 'perm-editor__item');
+          const tip = PERM_DESC[p] || p; try { item.setAttribute('data-tooltip', tip); } catch { item.title = tip; }
           const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = p; cb.checked = current.includes(p);
-          const text = makeEl('span', 'perm-editor__item-text', p); text.title = PERM_DESC[p] || p;
+          const text = makeEl('span', 'perm-editor__item-text', p);
           item.appendChild(cb); item.appendChild(text);
           list.appendChild(item);
         });
