@@ -38,6 +38,7 @@
     'account.info.username': '用户名',
     'account.info.userId': '用户ID',
     'account.info.placeholder.intro': '（暂无简介）',
+  'account.info.editUsername': '编辑用户名',
     'account.info.pending': '审核中：',
     'account.info.cancel': '撤回',
 
@@ -160,6 +161,7 @@
     'account.info.username': 'Username',
     'account.info.userId': 'User ID',
     'account.info.placeholder.intro': '(No intro yet)',
+  'account.info.editUsername': 'Edit username',
     'account.info.pending': 'Pending: ',
     'account.info.cancel': 'Revoke',
 
