@@ -67,6 +67,14 @@
 /* guest -> 灰白系 */
 .badge.badge-guest { color: #4a5568; background: #f7fafc; border-color: #e2e8f0; }
 
+/* Permission badge (deep red series) */
+.badge.badge-permission { color: #ffffff; background: #991b1b; border-color: #7f1d1d; }
+
+/* 名片页角色区域：徽标间距 */
+.account-info__role { display: inline-flex; align-items: center; gap: 4px; }
+/* 旧浏览器兜底（无 gap 支持）*/
+.account-info__role .badge + .badge { margin-left: 4px; }
+
 /* Header */
 .modal-header {
   display: flex; justify-content: center; align-items: center;

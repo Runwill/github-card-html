@@ -16,6 +16,20 @@
   async function revoke(userId, perm){ return jsonPost('/user/permissions/update', { userId, action:'revoke', permission: perm }); }
 
   const PERM = '仪同三司';
+  const PERM_DESC = { '仪同三司': '可免审直接生效（用户名/简介/头像）' };
+  const MAX_TAGS_SHOWN = 4; // 每行最多展示的权限标签数，超出用 +N 折叠
+
+  function makeEl(tag, cls, text){ const el = document.createElement(tag); if (cls) el.className = cls; if (text != null) el.textContent = text; return el; }
+  function tag(text, more=false, title){
+    const s = makeEl('span', 'perm-tag' + (more ? ' perm-tag--more' : ''), text);
+    if (title) s.title = title; else s.title = text;
+    return s;
+  }
+  function spinnerBtn(btn, spinning){
+    if (!btn) return;
+    btn.disabled = !!spinning;
+    btn.classList.toggle('is-loading', !!spinning);
+  }
 
   // 模式：partial=部分（当搜索为空时仅显示有权限的用户），all=全部
   let permMode = 'partial';
@@ -60,28 +74,113 @@
       users = users.filter(u => Array.isArray(u.permissions) && u.permissions.length > 0);
     }
     if (!users.length){ box.innerHTML = '<p class="empty-hint">空</p>'; return; }
+
+    // 汇总可用权限（来自所有用户已有权限的并集，并确保包含基础权限 PERM）
+    const allPermsSet = new Set();
+    users.forEach(u => (Array.isArray(u.permissions)?u.permissions:[]).forEach(p => { if (p) allPermsSet.add(p); }));
+    allPermsSet.add(PERM);
+    const allPerms = Array.from(allPermsSet).sort();
+
     users.forEach(u => {
-      const row = document.createElement('div'); row.className = 'approval-row';
-      const left = document.createElement('div'); left.className = 'approval-left';
-      const title = document.createElement('div'); title.className = 'approval-title'; title.textContent = u.username || '';
-      const sub = document.createElement('div'); sub.className = 'approval-sub';
-      const has = Array.isArray(u.permissions) && u.permissions.includes(PERM);
-      sub.textContent = '角色: ' + (u.role || '-') + ' | 权限: ' + (has ? PERM : '无');
-      left.appendChild(title); left.appendChild(sub);
-      const right = document.createElement('div'); right.className = 'approval-right';
-      const btn = document.createElement('button'); btn.className = has ? 'btn btn--danger btn--sm' : 'btn btn--primary btn--sm'; btn.textContent = has ? ('移除“'+PERM+'”') : ('授予“'+PERM+'”');
-      btn.onclick = async () => {
-        btn.disabled = true;
-        try {
-          const fn = has ? revoke : grant;
-          await fn(u._id || u.id, PERM);
-          await window.renderPermissionsPanel(search||'');
-        } catch(e){ alert(e.message||'操作失败'); }
-        finally { btn.disabled=false; }
-      };
-      right.appendChild(btn);
+      const userId = u._id || u.id;
+      const current = Array.isArray(u.permissions) ? [...u.permissions] : [];
+
+      const row = makeEl('div', 'approval-row');
+      const left = makeEl('div', 'approval-left');
+      const meta = makeEl('div');
+      const title = makeEl('div', 'approval-title', u.username || '');
+      const sub = makeEl('div', 'approval-sub', '角色: ' + (u.role || '-'));
+      meta.appendChild(title); meta.appendChild(sub);
+
+      // 权限标签区域
+      const tagsWrap = makeEl('div', 'perm-tags');
+  const shown = current.slice(0, MAX_TAGS_SHOWN);
+  shown.forEach(p => tagsWrap.appendChild(tag(p, false, PERM_DESC[p] || p)));
+      const extra = current.slice(MAX_TAGS_SHOWN);
+      if (extra.length){
+        tagsWrap.appendChild(tag('+' + extra.length, true, extra.join('、')));
+      }
+
+      left.appendChild(meta);
+      left.appendChild(tagsWrap);
+
+      // 右侧：编辑按钮
+      const right = makeEl('div', 'approval-right');
+      const editBtn = makeEl('button', 'btn btn--secondary btn--sm', '编辑权限');
+      right.appendChild(editBtn);
+
       row.appendChild(left); row.appendChild(right);
       box.appendChild(row);
+
+      // 行内编辑器（默认隐藏）
+      const editor = makeEl('div', 'perm-editor');
+      editor.style.display = 'none';
+
+      // 工具栏：全选/清空（不需要权限筛选）
+      const toolbar = makeEl('div', 'perm-editor__toolbar');
+  const btnSelectAll = makeEl('button', 'btn btn--secondary btn--sm tokens-refresh', '全选');
+      toolbar.appendChild(btnSelectAll);
+      
+
+      // 列表
+      const list = makeEl('div', 'perm-editor__list');
+
+      function renderChecklist(){
+        list.innerHTML = '';
+        allPerms.forEach(p => {
+          const item = makeEl('label', 'perm-editor__item'); item.title = PERM_DESC[p] || p;
+          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = p; cb.checked = current.includes(p);
+          const text = makeEl('span', 'perm-editor__item-text', p); text.title = PERM_DESC[p] || p;
+          item.appendChild(cb); item.appendChild(text);
+          list.appendChild(item);
+        });
+      }
+      renderChecklist();
+
+      // 底部操作：取消/保存
+      const actions = makeEl('div', 'perm-editor__actions');
+      const btnCancel = makeEl('button', 'btn btn--secondary', '取消');
+      const btnSave = makeEl('button', 'btn btn--primary', '保存');
+      actions.appendChild(btnCancel); actions.appendChild(btnSave);
+
+      editor.appendChild(toolbar);
+      editor.appendChild(list);
+      editor.appendChild(actions);
+      box.appendChild(editor);
+
+      // 交互绑定
+      editBtn.addEventListener('click', () => {
+        const visible = editor.style.display !== 'none';
+        editor.style.display = visible ? 'none' : 'block';
+      });
+      btnSelectAll.addEventListener('click', () => {
+        const cbs = Array.from(list.querySelectorAll('input[type="checkbox"]').values());
+        const total = cbs.length;
+        const checkedCount = cbs.filter(cb => cb.checked).length;
+        const shouldSelectAll = checkedCount < total; // 不是全选 -> 全选；已全选 -> 清空
+        cbs.forEach(cb => { cb.checked = shouldSelectAll; });
+      });
+      btnCancel.addEventListener('click', () => { editor.style.display = 'none'; });
+      btnSave.addEventListener('click', async () => {
+        // 采集勾选并与 current 求差集
+        const selected = Array.from(list.querySelectorAll('input[type="checkbox"]'))
+          .filter(cb => cb.checked).map(cb => cb.value);
+        const curSet = new Set(current);
+        const selSet = new Set(selected);
+        const toGrant = selected.filter(p => !curSet.has(p));
+        const toRevoke = current.filter(p => !selSet.has(p));
+
+        if (!toGrant.length && !toRevoke.length) { editor.style.display = 'none'; return; }
+
+        spinnerBtn(btnSave, true);
+        try {
+          for (const p of toGrant) { await grant(userId, p); }
+          for (const p of toRevoke) { await revoke(userId, p); }
+          // 保存成功后重新渲染列表
+          await window.renderPermissionsPanel((document.getElementById('perm-search-input')?.value||'').trim());
+        } catch(e){ alert(e.message || '保存失败'); }
+        finally { spinnerBtn(btnSave, false); editor.style.display = 'none'; }
+      });
     });
   };
 

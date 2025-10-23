@@ -131,13 +131,16 @@
   else { if (permTabEl) permTabEl.style.display = ''; if (permPanelEl) permPanelEl.style.display = ''; }
     },
 
-    async refreshCurrentUserFromServer() {
+  async refreshCurrentUserFromServer() {
       try {
         const id = localStorage.getItem('id'); if (!id) return;
         const resp = await fetch(api('/api/user/' + encodeURIComponent(id)));
         if (!resp.ok) return;
         const data = await resp.json(); if (!data) return;
         if (typeof data.intro === 'string') localStorage.setItem('intro', data.intro || '');
+        if (Array.isArray(data.permissions)) {
+          try { localStorage.setItem('permissions', JSON.stringify(data.permissions)); } catch {}
+        }
 
         // 同步用户名（例如审核通过后），并立刻刷新已打开的名片弹窗
         if (typeof data.username === 'string') {
@@ -235,7 +238,7 @@
 
     toggleSidebar() { this.state.sidebarVisible ? this.hideSidebar() : this.showSidebar(); },
 
-    openAccountInfo() {
+  openAccountInfo() {
       try {
         const name = localStorage.getItem('username') || '';
         const id = localStorage.getItem('id') || '';
@@ -250,6 +253,28 @@
         if (introEl) { if (introEl.tagName === 'TEXTAREA') introEl.value = intro || ''; else introEl.textContent = intro || '（暂无简介）'; }
         if (avatarEl) { if (resolvedAvatar) { avatarEl.src = resolvedAvatar; avatarEl.style.display = 'inline-block'; } else { try { avatarEl.removeAttribute('src'); } catch {} avatarEl.style.display = 'none'; } }
         if (roleEl) { roleEl.textContent = roleInfo.text; roleEl.className = 'badge ' + roleInfo.cls; }
+        // 在角色徽标后追加“权限徽标”（深红），并提供悬浮说明
+        try {
+          const permRaw = localStorage.getItem('permissions');
+          const perms = permRaw ? JSON.parse(permRaw) : [];
+          const container = roleEl && roleEl.parentElement; // .account-info__role
+          // 清理旧徽标
+          if (container) Array.from(container.querySelectorAll('.badge-permission')).forEach(n => n.remove());
+          if (container && Array.isArray(perms) && perms.length) {
+            const PERM_DESC = { '仪同三司': '可免审直接生效（用户名/简介/头像）' };
+            const badge = document.createElement('span');
+            badge.className = 'badge badge-permission';
+            if (perms.length === 1) {
+              const p = String(perms[0]);
+              badge.textContent = p;
+              badge.title = PERM_DESC[p] || ('权限：' + p);
+            } else {
+              badge.textContent = '权限×' + perms.length;
+              badge.title = perms.map(p => (PERM_DESC[p] ? (p + '：' + PERM_DESC[p]) : p)).join('\n');
+            }
+            container.appendChild(badge);
+          }
+        } catch {}
         const msg = $('account-info-message'); if (msg) { msg.textContent = ''; msg.className = 'modal-message'; msg.classList.remove('msg-flash'); }
   if (!this._bindUsernameInlineEditOnce) { this._bindUsernameInlineEditOnce = true; this.setupUsernameInlineEdit(); }
   // 展示“用户名审核中”提示（若存在）
