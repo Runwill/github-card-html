@@ -90,6 +90,11 @@
     'error.parse.json': '服务器返回非 JSON 响应',
     'error.parse.unknown': '无法解析服务器响应',
 
+    // Error prefixes for developer console messages
+    'error.updateIntroFailedPrefix': '更新简介失败：',
+    'error.updateUsernameFailedPrefix': '更新用户名失败：',
+    'error.requestFailedPrefix': '请求失败：',
+
     // Password modal
     'error.fillAll': '请填写完整。',
     'error.pwdMin': '新密码至少 6 位。',
@@ -212,6 +217,11 @@
     'error.networkRevokeFailed': 'Network error, revoke failed',
     'error.parse.json': 'Server returned non-JSON response',
     'error.parse.unknown': 'Unable to parse server response',
+
+    // Error prefixes for developer console messages
+    'error.updateIntroFailedPrefix': 'Update intro failed:',
+    'error.updateUsernameFailedPrefix': 'Update username failed:',
+    'error.requestFailedPrefix': 'Request failed:',
 
     // Password modal
     'error.fillAll': 'Please fill out all fields.',

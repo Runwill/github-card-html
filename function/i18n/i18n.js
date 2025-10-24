@@ -1,6 +1,9 @@
 (function(){
   const STORAGE_KEY = 'lang';
   const DEFAULT_LANG = 'zh';
+  // 明确定义语言循环顺序：zh -> en -> debug -> zh ...
+  // 注意：保留通过按钮切换到调试语言（debug）的能力
+  const CYCLE_ORDER = ['zh','en','debug'];
 
   function current(){
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -23,9 +26,8 @@
   }
 
   function nextLang(){
-    const order = ['zh','en','debug'];
-    const idx = order.indexOf(current());
-    return order[(idx+1)%order.length];
+    const idx = CYCLE_ORDER.indexOf(current());
+    return CYCLE_ORDER[(idx+1)%CYCLE_ORDER.length];
   }
 
   function dict(){
@@ -45,9 +47,18 @@
     const packs = window.I18N_STRINGS || {};
     const cur = packs[lang] || {};
     let val = cur && cur[key];
-    if (val == null && lang !== 'zh') { val = packs.zh && packs.zh[key]; }
-    if (val == null && lang === 'debug') { val = key; }
-    if (val == null) { val = key; }
+    const missing = (val == null);
+    // debug 语言用于显示 key，本身不提示告警
+    if (missing && lang === 'debug') { val = key; }
+    // 非 debug 语言：缺失键时仅告警一次（按 key+lang 去重）
+    if (missing && lang !== 'debug') {
+      try {
+        const sig = lang + '|' + key;
+        const store = (window.__I18N_WARNED__ = window.__I18N_WARNED__ || new Set());
+        if (!store.has(sig)) { console.warn(`[i18n] Missing translation: "${key}" (lang=${lang})`); store.add(sig); }
+      } catch {}
+      val = key;
+    }
     return format(val, params);
   }
 
@@ -83,8 +94,36 @@
   ready.then(() => {
     document.documentElement.setAttribute('data-lang', current());
     apply();
+    // 语言按钮点击绑定交由 function/ui/lang_toggle_button.js 统一处理，避免重复绑定导致跳两步
+    // 观察后续注入的节点，自动对含 i18n 标记的区域应用翻译（防止局部异步注入导致默认中文残留）
+    try {
+      const hasI18nMarks = (el)=>{
+        if (!(el instanceof Element)) return false;
+        if (el.hasAttribute('data-i18n') || el.hasAttribute('data-i18n-attr')) return true;
+        return !!el.querySelector?.('[data-i18n], [data-i18n-attr]');
+      };
+      let scheduled = false; const queue = new Set();
+      const flush = ()=>{
+        scheduled = false;
+        // 针对每个加入队列的根节点单独 apply，减少整页重绘
+        queue.forEach(root => { try { apply(root); } catch {} });
+        queue.clear();
+      };
+      const observer = new MutationObserver((mutations)=>{
+        let found = false;
+        for (const m of mutations) {
+          if (!m.addedNodes) continue;
+          for (const n of m.addedNodes) {
+            if (hasI18nMarks(n)) { queue.add(n); found = true; }
+          }
+        }
+        if (found && !scheduled) { scheduled = true; requestAnimationFrame(flush); }
+      });
+      observer.observe(document.body || document.documentElement, { childList: true, subtree: true });
+    } catch {}
   });
 
-  // 暴露全局 API
+  // 暴露全局 API：提供单一全局函数 t，避免重复别名
+  window.t = t;
   window.i18n = { t, apply, setLang, getLang: current, nextLang, nameOf };
 })();
