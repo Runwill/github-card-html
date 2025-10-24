@@ -57,6 +57,9 @@
     'tokens.title': '词元',
     'tokens.search.placeholder': '搜索...',
     'tokens.refresh': '刷新',
+  'tokens.mode.toggle.title': '切换显示模式',
+  'tokens.mode.compact': '缩略',
+  'tokens.mode.detail': '详细',
 
     // Permissions panel
     'permissions.title': '权限',
@@ -65,9 +68,18 @@
     'permissions.mode.toggle.title': '切换展示模式：部分/全部',
     'permissions.mode.partial': '部分',
     'permissions.mode.all': '全部',
+  'permissions.fetchUsersFailedPrefix': '获取用户失败：',
+  'permissions.user.role': '角色: {role}',
+  'permissions.edit': '编辑权限',
+  'permissions.selectAll': '全选',
+  'permissions.saveFailed': '保存失败',
 
     // Draft panel
     'draft.input.placeholder': '输入HTML代码',
+  // Common
+  'common.empty': '空',
+  'common.cancel': '取消',
+  'common.save': '保存',
 
     // UI messages / alerts / statuses
     'toast.noRequests': '无申请',
@@ -185,6 +197,9 @@
     'tokens.title': 'Tokens',
     'tokens.search.placeholder': 'Search...',
     'tokens.refresh': 'Refresh',
+  'tokens.mode.toggle.title': 'Toggle display mode',
+  'tokens.mode.compact': 'Compact',
+  'tokens.mode.detail': 'Detailed',
 
     // Permissions panel
     'permissions.title': 'Permissions',
@@ -193,9 +208,18 @@
     'permissions.mode.toggle.title': 'Toggle view: Partial/All',
     'permissions.mode.partial': 'Partial',
     'permissions.mode.all': 'All',
+  'permissions.fetchUsersFailedPrefix': 'Fetch users failed:',
+  'permissions.user.role': 'Role: {role}',
+  'permissions.edit': 'Edit permissions',
+  'permissions.selectAll': 'Select all',
+  'permissions.saveFailed': 'Save failed',
 
     // Draft panel
     'draft.input.placeholder': 'Enter HTML code',
+  // Common
+  'common.empty': 'Empty',
+  'common.cancel': 'Cancel',
+  'common.save': 'Save',
 
     // UI messages / alerts / statuses
     'toast.noRequests': 'No requests',

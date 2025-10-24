@@ -10,7 +10,10 @@
 
   async function fetchUsers(search){
     const q = search ? ('?search=' + encodeURIComponent(search)) : '';
-    try { const arr = await jsonGet('/users/permissions' + q); return Array.isArray(arr) ? arr : []; } catch(e){ console.error('获取用户失败:', e); return []; }
+    try { const arr = await jsonGet('/users/permissions' + q); return Array.isArray(arr) ? arr : []; } catch(e){
+      try { if (window.t) console.error(window.t('permissions.fetchUsersFailedPrefix'), e); else console.error(e); } catch(_){ }
+      return [];
+    }
   }
   async function grant(userId, perm){ return jsonPost('/user/permissions/update', { userId, action:'grant', permission: perm }); }
   async function revoke(userId, perm){ return jsonPost('/user/permissions/update', { userId, action:'revoke', permission: perm }); }
@@ -56,12 +59,26 @@
         toggle.__permBound = true;
         toggle.addEventListener('click', ()=>{
           permMode = (permMode === 'partial') ? 'all' : 'partial';
+          try {
+            // 同步 i18n key，确保语言切换后文案与当前模式一致
+            const key = (permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all';
+            toggle.setAttribute('data-i18n', key);
+            window.i18n && window.i18n.apply && window.i18n.apply(toggle);
+          } catch {
+            try { toggle.textContent = (window.t && window.t((permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all')) || ((permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all'); } catch(_){ }
+          }
           window.renderPermissionsPanel((input?.value||'').trim());
         });
       }
       // 同步按钮 UI 文案/激活态
       if (toggle) {
-        toggle.textContent = (permMode === 'partial') ? '部分' : '全部';
+        try {
+          const key = (permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all';
+          toggle.setAttribute('data-i18n', key);
+          window.i18n && window.i18n.apply && window.i18n.apply(toggle);
+        } catch {
+          try { toggle.textContent = (window.t && window.t((permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all')) || ((permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all'); } catch(_){}
+        }
         toggle.classList.toggle('is-active', permMode === 'all');
       }
     } catch {}
@@ -74,7 +91,15 @@
     if (!s && permMode === 'partial') {
       users = users.filter(u => Array.isArray(u.permissions) && u.permissions.length > 0);
     }
-    if (!users.length){ box.innerHTML = '<p class="empty-hint">空</p>'; return; }
+    if (!users.length){
+      box.innerHTML = '';
+      const p = document.createElement('p');
+      p.className = 'empty-hint';
+      try { p.setAttribute('data-i18n', 'common.empty'); } catch(_){ }
+      box.appendChild(p);
+      try { window.i18n && window.i18n.apply && window.i18n.apply(p); } catch(_){}
+      return;
+    }
 
     // 汇总可用权限（来自所有用户已有权限的并集，并确保包含基础权限 PERM）
     const allPermsSet = new Set();
@@ -90,7 +115,11 @@
       const left = makeEl('div', 'approval-left');
       const meta = makeEl('div');
       const title = makeEl('div', 'approval-title', u.username || '');
-      const sub = makeEl('div', 'approval-sub', '角色: ' + (u.role || '-'));
+      const sub = makeEl('div', 'approval-sub');
+      try {
+        sub.setAttribute('data-i18n', 'permissions.user.role');
+        sub.setAttribute('data-i18n-params', JSON.stringify({ role: (u.role || '-') }));
+  } catch(_){ try { if (window.t) sub.textContent = window.t('permissions.user.role', { role: (u.role || '-') }); } catch(__){} }
       meta.appendChild(title); meta.appendChild(sub);
 
       // 权限标签区域
@@ -107,7 +136,8 @@
 
       // 右侧：编辑按钮
       const right = makeEl('div', 'approval-right');
-      const editBtn = makeEl('button', 'btn btn--secondary btn--sm', '编辑权限');
+  const editBtn = makeEl('button', 'btn btn--secondary btn--sm');
+  try { editBtn.setAttribute('data-i18n', 'permissions.edit'); } catch(_){ try { if (window.t) editBtn.textContent = window.t('permissions.edit'); } catch(__){} }
       right.appendChild(editBtn);
 
       row.appendChild(left); row.appendChild(right);
@@ -119,7 +149,8 @@
 
       // 工具栏：全选/清空（不需要权限筛选）
       const toolbar = makeEl('div', 'perm-editor__toolbar');
-  const btnSelectAll = makeEl('button', 'btn btn--secondary btn--sm tokens-refresh', '全选');
+  const btnSelectAll = makeEl('button', 'btn btn--secondary btn--sm tokens-refresh');
+  try { btnSelectAll.setAttribute('data-i18n', 'permissions.selectAll'); } catch(_){ try { if (window.t) btnSelectAll.textContent = window.t('permissions.selectAll'); } catch(__){} }
       toolbar.appendChild(btnSelectAll);
       
 
@@ -141,8 +172,10 @@
 
       // 底部操作：取消/保存
       const actions = makeEl('div', 'perm-editor__actions');
-      const btnCancel = makeEl('button', 'btn btn--secondary', '取消');
-      const btnSave = makeEl('button', 'btn btn--primary', '保存');
+  const btnCancel = makeEl('button', 'btn btn--secondary');
+  const btnSave = makeEl('button', 'btn btn--primary');
+  try { btnCancel.setAttribute('data-i18n', 'common.cancel'); } catch(_){ try { if (window.t) btnCancel.textContent = window.t('common.cancel'); } catch(__){} }
+  try { btnSave.setAttribute('data-i18n', 'common.save'); } catch(_){ try { if (window.t) btnSave.textContent = window.t('common.save'); } catch(__){} }
       actions.appendChild(btnCancel); actions.appendChild(btnSave);
 
       editor.appendChild(toolbar);
@@ -180,10 +213,13 @@
           for (const p of toRevoke) { await revoke(userId, p); }
           // 保存成功后重新渲染列表
           await window.renderPermissionsPanel((document.getElementById('perm-search-input')?.value||'').trim());
-        } catch(e){ alert(e.message || '保存失败'); }
+  } catch(e){ try { alert(e && e.message ? e.message : (window.t ? window.t('permissions.saveFailed') : '')); } catch(_){ alert(''); } }
         finally { spinnerBtn(btnSave, false); editor.style.display = 'none'; }
       });
     });
+
+    // 渲染完成后应用 i18n 到列表容器
+    try { window.i18n && window.i18n.apply && window.i18n.apply(box); } catch(_){}
   };
 
   document.addEventListener('DOMContentLoaded', () => {

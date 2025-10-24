@@ -12,8 +12,8 @@
   }
 
   function nameOf(lang){
-    const m = { zh: (window.I18N_STRINGS?.zh?.['lang.name.zh']||'中文'), en: (window.I18N_STRINGS?.en?.['lang.name.en']||'English'), debug: (window.I18N_STRINGS?.zh?.['lang.name.debug']||'调试') };
-    return m[lang] || lang;
+    // 返回当前界面语言包中的目标语言名称；若缺失，则返回键名本身，避免使用中文/英文等硬编码兜底
+    try { return t(`lang.name.${lang}`); } catch (_) { return `lang.name.${lang}`; }
   }
 
   function setLang(lang){
@@ -64,24 +64,37 @@
 
   function apply(root){
     const scope = root || document;
-    // data-i18n: 替换 textContent
-    scope.querySelectorAll('[data-i18n]').forEach(el => {
-      const key = el.getAttribute('data-i18n');
-      const paramsRaw = el.getAttribute('data-i18n-params');
-      let params = null; if (paramsRaw) { try { params = JSON.parse(paramsRaw); } catch(_){} }
-      el.textContent = t(key, params);
-    });
-    // data-i18n-attr: 逗号分隔的属性名
-    scope.querySelectorAll('[data-i18n-attr]').forEach(el => {
-      const attrs = (el.getAttribute('data-i18n-attr')||'').split(',').map(s=>s.trim()).filter(Boolean);
-      attrs.forEach(attr => {
-        const key = el.getAttribute('data-i18n-'+attr);
-        if (!key) return;
-        const paramsRaw = el.getAttribute('data-i18n-params-'+attr);
+
+    // 针对单个元素应用 i18n（含自身与属性）
+    const applyOne = (el) => {
+      if (!el || !(el instanceof Element)) return;
+      if (el.hasAttribute('data-i18n')) {
+        const key = el.getAttribute('data-i18n');
+        const paramsRaw = el.getAttribute('data-i18n-params');
         let params = null; if (paramsRaw) { try { params = JSON.parse(paramsRaw); } catch(_){} }
-        try { el.setAttribute(attr, t(key, params)); } catch {}
-      });
-    });
+        el.textContent = t(key, params);
+      }
+      if (el.hasAttribute('data-i18n-attr')) {
+        const attrs = (el.getAttribute('data-i18n-attr')||'').split(',').map(s=>s.trim()).filter(Boolean);
+        attrs.forEach(attr => {
+          const key = el.getAttribute('data-i18n-'+attr);
+          if (!key) return;
+          const paramsRaw = el.getAttribute('data-i18n-params-'+attr);
+          let params = null; if (paramsRaw) { try { params = JSON.parse(paramsRaw); } catch(_){} }
+          try { el.setAttribute(attr, t(key, params)); } catch {}
+        });
+      }
+    };
+
+    // 先应用到根元素自身（若是元素）
+    try { if (scope instanceof Element) applyOne(scope); } catch {}
+
+    // 再应用到后代元素
+    if (scope.querySelectorAll) {
+      scope.querySelectorAll('[data-i18n]').forEach(applyOne);
+      scope.querySelectorAll('[data-i18n-attr]').forEach(applyOne);
+    }
+
     // 语言切换按钮（若存在）
     try {
       const btn = document.getElementById('lang-toggle-button');

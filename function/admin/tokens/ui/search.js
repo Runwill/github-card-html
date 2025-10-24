@@ -24,10 +24,21 @@
           tgl.id = 'tokens-compact-toggle';
           try { tgl.className = btn.className || 'btn btn--secondary'; } catch (_) { tgl.className = 'btn btn--secondary'; }
           tgl.type = 'button';
-          tgl.title = '切换显示模式';
+          // i18n: 标题通过 data-i18n-attr 绑定
+          try {
+            tgl.setAttribute('data-i18n-attr', 'title');
+            tgl.setAttribute('data-i18n-title', 'tokens.mode.toggle.title');
+          } catch(_){}
 
           const sync = () => {
-            tgl.textContent = state.compactMode ? '缩略' : '详细';
+            try {
+              const key = state.compactMode ? 'tokens.mode.compact' : 'tokens.mode.detail';
+              tgl.setAttribute('data-i18n', key);
+              window.i18n && window.i18n.apply && window.i18n.apply(tgl);
+            } catch {
+              // 兜底中文
+              tgl.textContent = state.compactMode ? '缩略' : '详细';
+            }
             tgl.setAttribute('aria-pressed', state.compactMode ? 'true' : 'false');
             tgl.classList.toggle('is-active', !!state.compactMode);
           };
