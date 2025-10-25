@@ -5,6 +5,38 @@
   // 注意：保留通过按钮切换到调试语言（debug）的能力
   const CYCLE_ORDER = ['zh','en','debug'];
 
+  // 读取并解析本地权限数组
+  function readPermissions(){
+    try {
+      const raw = localStorage.getItem('permissions');
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr.map(String) : [];
+    } catch(_) { return []; }
+  }
+
+  // 是否拥有切换到调试语言的权限
+  function hasDebugPermission(){
+    try { return readPermissions().includes('赞拜不名'); } catch(_) { return false; }
+  }
+
+  // 尝试从后端拉取并缓存当前用户权限（若已登录且本地未缓存）
+  async function ensurePermissionsCached(){
+    try {
+      if (readPermissions().length) return; // 已有缓存
+      const id = localStorage.getItem('id');
+      const token = localStorage.getItem('token');
+      if (!id || !token) return; // 未登录
+      const api = (window.endpoints && window.endpoints.api) ? window.endpoints.api : (p=>p);
+      const url = api('/api/user/' + encodeURIComponent(id));
+      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+      if (!res.ok) return;
+      const data = await res.json().catch(()=>null);
+      const perms = (data && Array.isArray(data.permissions)) ? data.permissions : [];
+      try { localStorage.setItem('permissions', JSON.stringify(perms)); } catch(_){ }
+    } catch(_){ }
+  }
+
   function current(){
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved && (saved === 'zh' || saved === 'en' || saved === 'debug')) return saved;
@@ -18,6 +50,11 @@
 
   function setLang(lang){
     if (!['zh','en','debug'].includes(lang)) return;
+    // 权限校验：无“赞拜不名”则不允许切至 debug
+    if (lang === 'debug' && !hasDebugPermission()) {
+      try { console.warn('[i18n] Debug language is restricted by permission.'); } catch(_){}
+      return;
+    }
     localStorage.setItem(STORAGE_KEY, lang);
     document.documentElement.setAttribute('data-lang', lang);
     apply();
@@ -26,8 +63,12 @@
   }
 
   function nextLang(){
-    const idx = CYCLE_ORDER.indexOf(current());
-    return CYCLE_ORDER[(idx+1)%CYCLE_ORDER.length];
+    // 无权限时，循环仅在 zh/en 之间；有权限则包含 debug
+    const order = hasDebugPermission() ? CYCLE_ORDER : ['zh','en'];
+    const cur = current();
+    const idx = order.indexOf(cur);
+    const next = order[(idx+1) % order.length];
+    return next;
   }
 
   function dict(){
@@ -107,6 +148,8 @@
   ready.then(() => {
     document.documentElement.setAttribute('data-lang', current());
     apply();
+    // 登录后的页面尽早缓存权限，供语言切换使用
+    ensurePermissionsCached();
     // 语言按钮点击绑定交由 function/ui/lang_toggle_button.js 统一处理，避免重复绑定导致跳两步
     // 观察后续注入的节点，自动对含 i18n 标记的区域应用翻译（防止局部异步注入导致默认中文残留）
     try {

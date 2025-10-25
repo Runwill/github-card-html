@@ -18,8 +18,38 @@
   async function grant(userId, perm){ return jsonPost('/user/permissions/update', { userId, action:'grant', permission: perm }); }
   async function revoke(userId, perm){ return jsonPost('/user/permissions/update', { userId, action:'revoke', permission: perm }); }
 
-  const PERM = '仪同三司';
-  const PERM_DESC = { '仪同三司': '可免审直接生效（用户名/简介/头像）' };
+  // 仅从后端获取统一清单（不再在前端维护基线）
+  // 注意：如请求失败将抛出异常，调用方自行降级为“仅展示用户已拥有的历史权限”
+  async function getMasterPermissions(){
+    const arr = await jsonGet('/permissions');
+    return Array.isArray(arr) ? arr.map(String) : [];
+  }
+  // 使用 i18n 提示，不再写死中文描述
+  function bindPermTooltip(el, permName){
+    try {
+      if (!el) return;
+      const specializedKey = 'perm.tooltip.' + String(permName);
+      let keyForAttr = specializedKey;
+      let params = null;
+      try {
+        const lang = (window.i18n && window.i18n.getLang && window.i18n.getLang()) || 'zh';
+        const resolved = window.t ? window.t(specializedKey) : specializedKey;
+        // 若当前语言不是 debug 且未提供专用翻译，则回退到通用前缀文案
+        if (lang !== 'debug' && resolved === specializedKey) {
+          keyForAttr = 'perm.tooltip.prefix';
+          params = { name: String(permName) };
+        }
+      } catch(_) {
+        keyForAttr = 'perm.tooltip.prefix';
+        params = { name: String(permName) };
+      }
+      el.setAttribute('data-i18n-attr', 'data-tooltip');
+      el.setAttribute('data-i18n-data-tooltip', keyForAttr);
+      if (params) el.setAttribute('data-i18n-params-data-tooltip', JSON.stringify(params)); else el.removeAttribute('data-i18n-params-data-tooltip');
+      // 立即设置一次，以便初次渲染就有正确提示
+      try { el.setAttribute('data-tooltip', window.t ? window.t(keyForAttr, params) : (params ? (params.name||'') : keyForAttr)); } catch(_){}
+    } catch(_){}
+  }
   const MAX_TAGS_SHOWN = 4; // 每行最多展示的权限标签数，超出用 +N 折叠
 
   function makeEl(tag, cls, text){ const el = document.createElement(tag); if (cls) el.className = cls; if (text != null) el.textContent = text; return el; }
@@ -101,10 +131,15 @@
       return;
     }
 
-    // 汇总可用权限（来自所有用户已有权限的并集，并确保包含基础权限 PERM）
-    const allPermsSet = new Set();
-    users.forEach(u => (Array.isArray(u.permissions)?u.permissions:[]).forEach(p => { if (p) allPermsSet.add(p); }));
-    allPermsSet.add(PERM);
+    // 使用后端清单为主，并补入用户已有的历史权限，避免“看不见但已拥有”的情况
+    let master = [];
+    try {
+      master = await getMasterPermissions();
+    } catch(e) {
+      try { if (window.t) console.error(window.t('permissions.fetchMasterFailedPrefix'), e); else console.error(e); } catch(_) { console.error(e); }
+    }
+    const allPermsSet = new Set(master);
+    users.forEach(u => (Array.isArray(u.permissions)?u.permissions:[]).forEach(p => { if (p) allPermsSet.add(String(p)); }));
     const allPerms = Array.from(allPermsSet).sort();
 
     users.forEach(u => {
@@ -124,8 +159,8 @@
 
       // 权限标签区域
       const tagsWrap = makeEl('div', 'perm-tags');
-  const shown = current.slice(0, MAX_TAGS_SHOWN);
-  shown.forEach(p => tagsWrap.appendChild(tag(p, false, PERM_DESC[p] || p)));
+      const shown = current.slice(0, MAX_TAGS_SHOWN);
+      shown.forEach(p => { const el = tag(p, false); bindPermTooltip(el, p); tagsWrap.appendChild(el); });
       const extra = current.slice(MAX_TAGS_SHOWN);
       if (extra.length){
         tagsWrap.appendChild(tag('+' + extra.length, true, extra.join('、')));
@@ -161,7 +196,7 @@
         list.innerHTML = '';
         allPerms.forEach(p => {
           const item = makeEl('label', 'perm-editor__item');
-          const tip = PERM_DESC[p] || p; try { item.setAttribute('data-tooltip', tip); } catch { item.title = tip; }
+          bindPermTooltip(item, p);
           const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = p; cb.checked = current.includes(p);
           const text = makeEl('span', 'perm-editor__item-text', p);
           item.appendChild(cb); item.appendChild(text);

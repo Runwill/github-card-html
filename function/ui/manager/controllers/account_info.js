@@ -36,28 +36,27 @@
         roleEl.textContent = roleText;
         roleEl.className = 'badge ' + roleCls;
       }
-      // 权限徽标
+      // 权限徽标（每个权限一个徽标，不合并）
       try {
         const permRaw = localStorage.getItem('permissions');
         const perms = permRaw ? JSON.parse(permRaw) : [];
         const container = roleEl && roleEl.parentElement;
         if (container) Array.from(container.querySelectorAll('.badge-permission')).forEach(n => n.remove());
         if (container && Array.isArray(perms) && perms.length) {
-          const PERM_DESC = { '仪同三司': t('perm.tooltip.仪同三司') };
-          const badge = document.createElement('span');
-          badge.className = 'badge badge-permission';
-          if (perms.length === 1) {
-            const p = String(perms[0]);
+          const PERM_DESC = {
+            '仪同三司': t('perm.tooltip.仪同三司'),
+            '赞拜不名': t('perm.tooltip.赞拜不名')
+          };
+          perms.forEach(raw => {
+            const p = String(raw);
+            const badge = document.createElement('span');
+            badge.className = 'badge badge-permission';
             badge.textContent = p;
             const tipPrefix = t('perm.tooltip.prefix', { name: p });
-            const tip = PERM_DESC[p] || tipPrefix; try { badge.setAttribute('data-tooltip', tip); } catch { badge.title = tip; }
-          } else {
-            const multi = t('perm.badge.multiple', { count: perms.length });
-            badge.textContent = multi;
-            const tip = perms.map(p => (PERM_DESC[p] ? (p + ': ' + PERM_DESC[p]) : p)).join(' | ');
+            const tip = PERM_DESC[p] || tipPrefix;
             try { badge.setAttribute('data-tooltip', tip); } catch { badge.title = tip; }
-          }
-          container.appendChild(badge);
+            container.appendChild(badge);
+          });
         }
       } catch {}
       const msg = $('account-info-message'); if (msg) { msg.textContent = ''; msg.className = 'modal-message'; msg.classList.remove('msg-flash'); }

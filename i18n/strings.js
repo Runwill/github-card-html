@@ -209,9 +209,10 @@
     'role.guest': '访客',
 
     // Permissions badge
-    'perm.badge.multiple': '权限×{count}',
-    'perm.tooltip.prefix': '权限：{name}',
-    'perm.tooltip.仪同三司': '可免审直接生效（用户名/简介/头像）'
+  'perm.badge.multiple': '权限×{count}',
+  'perm.tooltip.prefix': '权限：{name}',
+  'perm.tooltip.仪同三司': '可免审直接生效（用户名/简介/头像）',
+  'perm.tooltip.赞拜不名': '允许切换到调试语言（Debug）'
     ,
     // Login page
     'login.title': '登录',
@@ -444,9 +445,10 @@
     'role.guest': 'Guest',
 
     // Permissions badge
-    'perm.badge.multiple': 'Permissions×{count}',
-    'perm.tooltip.prefix': 'Permission: {name}',
-    'perm.tooltip.仪同三司': 'Bypass approval (username/intro/avatar)'
+  'perm.badge.multiple': 'Permissions×{count}',
+  'perm.tooltip.prefix': 'Permission: {name}',
+  'perm.tooltip.仪同三司': 'Bypass approval (username/intro/avatar)',
+  'perm.tooltip.赞拜不名': 'Allow switching to Debug language'
     ,
     // Login page
     'login.title': 'Login',
