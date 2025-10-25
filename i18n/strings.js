@@ -211,8 +211,8 @@
     // Permissions badge
   'perm.badge.multiple': '权限×{count}',
   'perm.tooltip.prefix': '权限：{name}',
-  'perm.tooltip.仪同三司': '可免审直接生效（用户名/简介/头像）',
-  'perm.tooltip.赞拜不名': '允许切换到调试语言（Debug）'
+  'perm.tooltip.仪同三司': '修改账号信息免审核', //修改
+  'perm.tooltip.赞拜不名': '允许切换到调试语言'
     ,
     // Login page
     'login.title': '登录',

@@ -195,8 +195,27 @@
     }catch(_){ return undefined; }
   }
 
+  function getLocaleFromI18n(){
+    try{
+      const lang = (window.i18n && window.i18n.getLang && window.i18n.getLang()) || 'zh';
+      if (lang === 'zh') return 'zh-CN';
+      if (lang === 'en') return 'en-US';
+      // debug 或未知语言，退回 en-US，避免浏览器环境差异
+      return 'en-US';
+    }catch(_){ return 'en-US'; }
+  }
+
   function formatAbs(v){
     try{ const t = parseTimeValue(v) ?? Date.now(); return new Date(t).toLocaleString(); }catch(_){ return String(v||''); }
+  }
+
+  function formatAbsForLang(v){
+    try{
+      const t = parseTimeValue(v) ?? Date.now();
+      const locale = getLocaleFromI18n();
+      // 降低差异性：不依赖系统默认区域
+      return new Date(t).toLocaleString(locale);
+    }catch(_){ return formatAbs(v); }
   }
 
   function formatRel(v){
@@ -241,18 +260,18 @@
     } catch (_) { return ''; }
   }
 
-  function mapCollectionName(coll) {
+  // 返回集合名称对应的 i18n key（而非直接翻译），以便语言切换时可动态更新
+  function mapCollectionKey(coll) {
     try {
-      const t = (window && window.t) ? window.t : null;
       switch (coll) {
-        case 'term-fixed': return t ? t('tokens.section.termFixed') : 'term-fixed';
-        case 'term-dynamic': return t ? t('tokens.section.termDynamic') : 'term-dynamic';
-        case 'card': return t ? t('tokens.section.card') : 'card';
-        case 'character': return t ? t('tokens.section.character') : 'character';
-        case 'skill': return t ? t('tokens.section.skill') : 'skill';
-        default: return coll || '';
+        case 'term-fixed': return 'tokens.section.termFixed';
+        case 'term-dynamic': return 'tokens.section.termDynamic';
+        case 'card': return 'tokens.section.card';
+        case 'character': return 'tokens.section.character';
+        case 'skill': return 'tokens.section.skill';
+        default: return '';
       }
-    } catch (_) { return coll || ''; }
+    } catch (_) { return ''; }
   }
 
   // 取旧值/新值的通用帮助，兼容多种字段命名
@@ -289,15 +308,15 @@
     const rawTime = pickLogTime(payload);
     const ts = parseTimeValue(rawTime) ?? Date.now();
     const iso = new Date(ts).toISOString();
-    const timeAbs = formatAbs(ts);
+  const timeAbs = formatAbsForLang(ts);
     const timeRel = formatRel(ts);
     const timeHtml = `<time class="log-time" datetime="${html(iso)}" title="${html(timeAbs)}" data-ts="${html(String(ts))}" data-rel="${html(timeRel)}" data-abs="${html(timeAbs)}">${html(timeRel)}</time>`;
-    const c = payload && payload.collection ? mapCollectionName(payload.collection) : '';
+  const cKey = payload && payload.collection ? mapCollectionKey(payload.collection) : '';
     const tag = (payload && payload.collection) ? resolveLabel(payload.collection, payload && payload.id, payload && payload.label) : '';
-    const pill = (txt, cls='')=> `<i class="log-pill ${cls}">${html(txt||'')}</i>`;
+  const pill = (key, cls='')=> `<i class="log-pill ${cls}" data-i18n="${key}"></i>`;
     const code = (txt)=> `<code class="log-code">${html(txt||'')}</code>`;
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
-    if (type === 'create') {
+  if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
       const msg = (function(){
         try{
@@ -310,29 +329,28 @@
           return '';
         }catch(_){ return ''; }
       })();
-  return `<div class="log-row is-create">${timeHtml}${pill(window.t('tokens.log.create'),'is-green')}<i class="log-ctx">${html(c)} [${html(label)}]</i><i class="log-msg">${code(msg)}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
+  return `<div class="log-row is-create">${timeHtml}${pill('tokens.log.create','is-green')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(label)}]</i><i class="log-msg">${code(msg)}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
     }
     if (type === 'delete-doc') {
-  return `<div class="log-row is-delete">${timeHtml}${pill(window.t('tokens.log.deleteDoc'),'is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
+  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteDoc','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
     }
     if (type === 'delete-field') {
       const from = pickOld(payload);
-  return `<div class="log-row is-delete">${timeHtml}${pill(window.t('tokens.log.deleteField'),'is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val">${window.t('tokens.log.prev')}${code(json(from))}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
+  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteField','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val"><span data-i18n="tokens.log.prev"></span>${code(json(from))}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
     }
     if (type === 'update') {
       const v = pickNew(payload);
       const from = pickOld(payload);
-  return `<div class="log-row is-update">${timeHtml}${pill(window.t('tokens.log.update'),'is-blue')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
+  return `<div class="log-row is-update">${timeHtml}${pill('tokens.log.update','is-blue')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
     }
     if (type === 'save-edits') {
       const sets = (payload && payload.sets) || [];
       const dels = (payload && payload.dels) || [];
-  const summary = window.t('tokens.log.saveSummary', { sets: sets.length, dels: dels.length });
-  const head = `<div class="log-row is-save">${timeHtml}${pill(window.t('tokens.edit.submit'),'is-indigo')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-head">${html(summary)}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
+  const head = `<div class="log-row is-save">${timeHtml}${pill('tokens.edit.submit','is-indigo')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-head" data-i18n="tokens.log.saveSummary" data-i18n-params='${html(JSON.stringify({ sets: sets.length, dels: dels.length }))}'></i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
       const pick = (val) => (val && typeof val === 'object') ? JSON.stringify(val) : val;
       const detail = [];
       sets.slice(0, 10).forEach(s => { detail.push(`<div class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(pick(s.from))} → `:''}${code(pick(s.to))}</div>`); });
-  dels.slice(0, 10).forEach(d => { detail.push(`<div class="log-sub is-del">${window.t('common.delete')} ${code(d.path)}${d.from!==undefined? ` (${window.t('tokens.log.prev')}${code(pick(d.from))})`:''}</div>`); });
+  dels.slice(0, 10).forEach(d => { detail.push(`<div class="log-sub is-del"><span data-i18n="common.delete"></span> ${code(d.path)}${d.from!==undefined? ` (<span data-i18n="tokens.log.prev"></span>${code(pick(d.from))})`:''}</div>`); });
       return head + detail.join('');
     }
     return `<div class=\"log-row\">${timeHtml}${pill(type)}<div class=\"log-actions\"><button class=\"btn-del\" data-i18n=\"common.delete\" data-i18n-attr=\"title,aria-label\" data-i18n-title=\"common.delete\" data-i18n-aria-label=\"common.delete\"></button></div></div>`;
@@ -485,5 +503,29 @@
           root.addEventListener('mouseout', onOut);
         }catch(_){ }
     });
+
+    // 语言切换时：
+    // 1) 重新应用 i18n 到日志面板（更新所有 data-i18n 文案）
+    // 2) 立即刷新一次相对时间文案，避免等待下一分钟
+    function onI18nChanged(){
+      try {
+        const panel = document.getElementById('tokens-log-panel');
+        if (panel && window.i18n && window.i18n.apply) window.i18n.apply(panel);
+      } catch (_){ }
+      try{
+        document.querySelectorAll('.log-time[data-ts]')?.forEach(el=>{
+          const ts = Number(el.getAttribute('data-ts')) || Date.now();
+          const rel = formatRel(ts);
+          const abs = formatAbsForLang(ts);
+          el.setAttribute('data-rel', rel);
+          el.setAttribute('data-abs', abs);
+          el.setAttribute('title', abs);
+          // 悬浮显示绝对时间；非悬浮显示相对时间
+          el.textContent = el.matches(':hover') ? abs : rel;
+        });
+      }catch(_){ }
+    }
+    try{ document.addEventListener('i18n:changed', onI18nChanged); }catch(_){ }
+    try{ window.addEventListener && window.addEventListener('i18n:changed', onI18nChanged); }catch(_){ }
   });
 })();
