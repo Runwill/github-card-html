@@ -212,6 +212,26 @@
     'perm.badge.multiple': '权限×{count}',
     'perm.tooltip.prefix': '权限：{name}',
     'perm.tooltip.仪同三司': '可免审直接生效（用户名/简介/头像）'
+    ,
+    // Login page
+    'login.title': '登录',
+    'login.header': '登录',
+    'login.username.placeholder': '用户名',
+    'login.password.placeholder': '密码',
+    'login.submit': '登录',
+    'login.register': '注册',
+    'login.loggingIn': '正在登录…',
+    'login.success': '登录成功！',
+    'login.failed': '登录失败',
+    'login.failedRetry': '登录失败，请稍后再试',
+    'login.backend.toggle': '切换后端',
+    'login.backend.publicSelected': '使用公网后端 (已选)',
+    'login.backend.localSelected': '使用本地后端 (已选)',
+    'login.backend.currentPrefix': '当前后端：{url}',
+    'register.needUserPass': '请输入用户名和密码进行注册',
+    'register.success': '注册成功',
+    'register.fail': '注册失败',
+    'register.failRetry': '注册失败，请稍后重试。'
   };
 
   const en = {
@@ -427,6 +447,26 @@
     'perm.badge.multiple': 'Permissions×{count}',
     'perm.tooltip.prefix': 'Permission: {name}',
     'perm.tooltip.仪同三司': 'Bypass approval (username/intro/avatar)'
+    ,
+    // Login page
+    'login.title': 'Login',
+    'login.header': 'Login',
+    'login.username.placeholder': 'Username',
+    'login.password.placeholder': 'Password',
+    'login.submit': 'Log in',
+    'login.register': 'Register',
+    'login.loggingIn': 'Logging in…',
+    'login.success': 'Logged in!',
+    'login.failed': 'Login failed',
+    'login.failedRetry': 'Login failed, please try again later',
+    'login.backend.toggle': 'Switch backend',
+    'login.backend.publicSelected': 'Public backend (selected)',
+    'login.backend.localSelected': 'Local backend (selected)',
+    'login.backend.currentPrefix': 'Current backend: {url}',
+    'register.needUserPass': 'Please enter username and password to register',
+    'register.success': 'Registered successfully',
+    'register.fail': 'Registration failed',
+    'register.failRetry': 'Registration failed, please try again later.'
   };
 
   // debug 语言：直接返回 key

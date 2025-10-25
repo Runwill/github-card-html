@@ -8,9 +8,36 @@ document.addEventListener('DOMContentLoaded', () => {
 function setMessage(text, type) {
   const el = document.getElementById('login-message');
   if (!el) return;
+  // 清除已存的 i18n 键，转而显示原始文本
+  try { delete el.dataset.i18nKey; delete el.dataset.i18nParams; } catch(_){}
   el.textContent = text || '';
   el.className = `modal-message${type ? ' ' + type : ''}`;
 }
+
+// 使用 i18n 键设置消息，并在语言切换时自动更新
+function setMessageKey(key, params, type){
+  const el = document.getElementById('login-message');
+  if (!el) return;
+  try {
+    el.dataset.i18nKey = String(key || '');
+    if (params) { el.dataset.i18nParams = JSON.stringify(params); } else { delete el.dataset.i18nParams; }
+  } catch(_){}
+  try { el.textContent = window.t(key, params); } catch(_) { el.textContent = String(key || ''); }
+  el.className = `modal-message${type ? ' ' + type : ''}`;
+}
+
+// 监听语言切换，若当前消息基于 i18n 键，则自动刷新
+try{
+  window.addEventListener('i18n:changed', ()=>{
+    const el = document.getElementById('login-message');
+    if (!el) return;
+    const key = el.dataset && el.dataset.i18nKey;
+    if (!key) return;
+    let params = undefined;
+    try { if (el.dataset.i18nParams) params = JSON.parse(el.dataset.i18nParams); } catch(_){}
+    try { el.textContent = window.t(key, params); } catch(_){}
+  });
+}catch(_){}
 
 // 登录功能
 const loginForm = document.getElementById('login-form');
@@ -22,7 +49,7 @@ if (loginForm) {
     const loginBtn = document.getElementById('login-button');
     const registerBtn = document.getElementById('register-button');
     loginBtn.disabled = true; registerBtn.disabled = true;
-    setMessage('正在登录…');
+  setMessageKey('login.loggingIn');
 
     try {
   const response = await fetch((endpoints && endpoints.api ? endpoints.api('/api/login') : '/api/login'), {
@@ -38,17 +65,21 @@ if (loginForm) {
   localStorage.setItem('role', data.user.role);
   if (data.user.intro !== undefined) { localStorage.setItem('intro', data.user.intro || ''); }
         if (data.user.avatar !== undefined) { localStorage.setItem('avatar', data.user.avatar || ''); }
-        setMessage('登录成功！', 'success');
+  setMessageKey('login.success', null, 'success');
         window.location.href = 'index.html';
       } else {
         const errorData = await response.json();
-        setMessage(errorData.message || '登录失败', 'error');
+        if (errorData && errorData.message) {
+          setMessage(errorData.message, 'error');
+        } else {
+          setMessageKey('login.failed', null, 'error');
+        }
         const panel = document.getElementById('login-container');
         if (panel) { panel.classList.remove('shake'); void panel.offsetWidth; panel.classList.add('shake'); }
       }
     } catch (err) {
-      console.error('登录失败:', err);
-      setMessage('登录失败，请稍后再试', 'error');
+  console.error('登录失败:', err);
+  setMessageKey('login.failedRetry', null, 'error');
     } finally {
       loginBtn.disabled = false; registerBtn.disabled = false;
     }
@@ -61,7 +92,7 @@ if (registerBtn) {
   registerBtn.addEventListener('click', async function () {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
-    if (!username || !password) { setMessage('请输入用户名和密码进行注册', 'error'); return; }
+    if (!username || !password) { setMessageKey('register.needUserPass', null, 'error'); return; }
     try {
   const response = await fetch((endpoints && endpoints.api ? endpoints.api('/api/register') : '/api/register'), {
         method: 'POST',
@@ -70,15 +101,23 @@ if (registerBtn) {
       });
       const data = await response.json();
       if (response.ok) {
-        setMessage(data.message || '注册成功', 'success');
+        if (data && data.message) {
+          setMessage(data.message, 'success');
+        } else {
+          setMessageKey('register.success', null, 'success');
+        }
       } else {
-        setMessage(data.message || '注册失败', 'error');
+        if (data && data.message) {
+          setMessage(data.message, 'error');
+        } else {
+          setMessageKey('register.fail', null, 'error');
+        }
         const panel = document.getElementById('login-container');
         if (panel) { panel.classList.remove('shake'); void panel.offsetWidth; panel.classList.add('shake'); }
       }
     } catch (error) {
-      console.error('注册请求失败:', error);
-      setMessage('注册失败，请稍后重试。', 'error');
+  console.error('注册请求失败:', error);
+  setMessageKey('register.failRetry', null, 'error');
     }
   });
 }
