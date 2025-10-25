@@ -77,7 +77,7 @@
 
       const hrefRaw = findHtml(doc);
       if (!hrefRaw) {
-        try { if (window.showTokensToast) window.showTokensToast('未找到跳转目标'); } catch (_) {}
+        try { if (window.showTokensToast) window.showTokensToast(window.t('tokens.go.notFound')); } catch (_) {}
         return;
       }
 
@@ -92,7 +92,7 @@
         }
         window.open(url, '_blank');
       } catch (e) {
-        alert(e.message || '无法打开链接');
+        alert(e.message || window.t('tokens.go.openFailed'));
       }
     });
   }

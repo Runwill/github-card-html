@@ -71,9 +71,10 @@
         panel.id = 'tokens-log-panel';
         panel.className = 'tokens-log';
 
-        const header = document.createElement('div');
-        header.className = 'tokens-log__header';
-  header.innerHTML = '<div class="tokens-log__title">变更日志</div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" title="收起/展开">收起</button><button class="btn btn--secondary btn--sm js-log-clear" title="清空">清空</button></div>';
+    const header = document.createElement('div');
+    header.className = 'tokens-log__header';
+  header.innerHTML = '<div class="tokens-log__title" data-i18n="tokens.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse" data-i18n-attr="title" data-i18n-title="common.collapse"></button><button class="btn btn--secondary btn--sm js-log-clear" data-i18n="tokens.log.clear" data-i18n-attr="title" data-i18n-title="tokens.log.clear"></button></div>';
+    try { if (window.i18n && window.i18n.apply) { window.i18n.apply(header); } } catch (_) {}
 
         // 外包一层可折叠容器，内层保持可滚动
         const wrap = document.createElement('div');
@@ -101,13 +102,13 @@
             try{
               const T = window.tokensAdmin || {}; const apiJson = T.apiJson; const getAuth = T.getAuth;
               const auth = typeof getAuth === 'function' ? getAuth() : { canEdit:false };
-              if (!auth.canEdit) { try{ T.showToast && T.showToast('无权限'); }catch(_){ } return; }
+              if (!auth.canEdit) { try{ T.showToast && T.showToast(window.t('common.noPermission')); }catch(_){ } return; }
               if (typeof apiJson === 'function') {
                 await apiJson('/tokens/logs', { method: 'DELETE', auth: true });
               }
               try{ body.innerHTML=''; }catch(_){}
-              try{ (T && T.showToast) ? T.showToast('已清空') : null; }catch(_){}
-            }catch(e){ alert((e && e.message) || '清空失败'); }
+              try{ (T && T.showToast) ? T.showToast(window.t('tokens.toast.cleared')) : null; }catch(_){ }
+            }catch(e){ alert((e && e.message) || window.t('tokens.error.updateFailed')); }
           });
           header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
             const btn = e.currentTarget;
@@ -116,10 +117,10 @@
             if (isAnimating(w)) return; // 动画中忽略重复点击
             if (isOpen(w)) {
               closeCollapsible(w);
-              if (btn) { btn.textContent = '展开'; btn.classList.remove('is-expanded'); }
+              if (btn) { try{ btn.setAttribute('data-i18n','common.expand'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.remove('is-expanded'); }
             } else {
               openCollapsible(w);
-              if (btn) { btn.textContent = '收起'; btn.classList.add('is-expanded'); }
+              if (btn) { try{ btn.setAttribute('data-i18n','common.collapse'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.add('is-expanded'); }
             }
           });
         }catch(_){ }
@@ -135,10 +136,10 @@
           if (isAnimating(w)) return;
           if (isOpen(w)) {
             closeCollapsible(w);
-            if (btn) { btn.textContent = '展开'; btn.classList.remove('is-expanded'); }
+            if (btn) { try{ btn.setAttribute('data-i18n','common.expand'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.remove('is-expanded'); }
           } else {
             openCollapsible(w);
-            if (btn) { btn.textContent = '收起'; btn.classList.add('is-expanded'); }
+            if (btn) { try{ btn.setAttribute('data-i18n','common.collapse'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.add('is-expanded'); }
           }
         });
       }
@@ -154,7 +155,7 @@
             if (!entry) return;
             (async () => {
               const T = window.tokensAdmin || {}; const getAuth = T.getAuth; const auth = typeof getAuth === 'function' ? getAuth() : { canEdit:false };
-              if (!auth.canEdit) { try{ T.showToast && T.showToast('无权限'); }catch(_){ } return; }
+              if (!auth.canEdit) { try{ T.showToast && T.showToast(window.t('common.noPermission')); }catch(_){ } return; }
               const id = entry.getAttribute('data-log-id');
               if (id) {
                 try {
@@ -163,12 +164,12 @@
                     await apiJson(`/tokens/logs/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
                   }
                 } catch (e) {
-                  alert((e && e.message) || '删除失败');
+                  alert((e && e.message) || window.t('tokens.error.deleteFailed'));
                   return;
                 }
               }
               try { entry.remove(); } catch (_) {}
-              try { (T && T.showToast) ? T.showToast('已删除') : null; } catch (_) {}
+              try { (T && T.showToast) ? T.showToast(window.t('tokens.toast.deleted')) : null; } catch (_) {}
             })();
           });
         }
@@ -204,20 +205,20 @@
       const t = parseTimeValue(v) ?? now;
       let diff = Math.floor((now - t) / 1000); // 秒
       if (diff < -5) { // 未来时间，简单处理为“刚刚”以避免困惑
-        return '刚刚';
+  return window.t('time.justNow');
       }
-      if (diff < 5) return '刚刚';
-      if (diff < 60) return `${diff} 秒前`;
+  if (diff < 5) return window.t('time.justNow');
+  if (diff < 60) return window.t('time.secondsAgo', { n: diff });
       const m = Math.floor(diff / 60);
-      if (m < 60) return `${m} 分钟前`;
+  if (m < 60) return window.t('time.minutesAgo', { n: m });
       const h = Math.floor(m / 60);
-      if (h < 24) return `${h} 小时前`;
+  if (h < 24) return window.t('time.hoursAgo', { n: h });
       const d = Math.floor(h / 24);
-      if (d < 30) return `${d} 天前`;
+  if (d < 30) return window.t('time.daysAgo', { n: d });
       const mo = Math.floor(d / 30);
-      if (mo < 12) return `${mo} 个月前`;
+  if (mo < 12) return window.t('time.monthsAgo', { n: mo });
       const y = Math.floor(mo / 12);
-      return `${y} 年前`;
+  return window.t('time.yearsAgo', { n: y });
     }catch(_){ return ''; }
   }
 
@@ -241,14 +242,17 @@
   }
 
   function mapCollectionName(coll) {
-    switch (coll) {
-      case 'term-fixed': return '静态术语';
-      case 'term-dynamic': return '动态术语';
-      case 'card': return '牌';
-      case 'character': return '武将';
-      case 'skill': return '技能';
-      default: return coll || '';
-    }
+    try {
+      const t = (window && window.t) ? window.t : null;
+      switch (coll) {
+        case 'term-fixed': return t ? t('tokens.section.termFixed') : 'term-fixed';
+        case 'term-dynamic': return t ? t('tokens.section.termDynamic') : 'term-dynamic';
+        case 'card': return t ? t('tokens.section.card') : 'card';
+        case 'character': return t ? t('tokens.section.character') : 'character';
+        case 'skill': return t ? t('tokens.section.skill') : 'skill';
+        default: return coll || '';
+      }
+    } catch (_) { return coll || ''; }
   }
 
   // 取旧值/新值的通用帮助，兼容多种字段命名
@@ -306,31 +310,32 @@
           return '';
         }catch(_){ return ''; }
       })();
-      return `<div class="log-row is-create">${timeHtml}${pill('新增','is-green')}<i class="log-ctx">${html(c)} [${html(label)}]</i><i class="log-msg">${code(msg)}</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+  return `<div class="log-row is-create">${timeHtml}${pill(window.t('tokens.log.create'),'is-green')}<i class="log-ctx">${html(c)} [${html(label)}]</i><i class="log-msg">${code(msg)}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
     }
     if (type === 'delete-doc') {
-      return `<div class="log-row is-delete">${timeHtml}${pill('删除对象','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+  return `<div class="log-row is-delete">${timeHtml}${pill(window.t('tokens.log.deleteDoc'),'is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
     }
     if (type === 'delete-field') {
       const from = pickOld(payload);
-      return `<div class="log-row is-delete">${timeHtml}${pill('删除字段','is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val">原：${code(json(from))}</i>`:''}<div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+  return `<div class="log-row is-delete">${timeHtml}${pill(window.t('tokens.log.deleteField'),'is-red')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val">${window.t('tokens.log.prev')}${code(json(from))}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
     }
     if (type === 'update') {
       const v = pickNew(payload);
       const from = pickOld(payload);
-      return `<div class="log-row is-update">${timeHtml}${pill('修改','is-blue')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+  return `<div class="log-row is-update">${timeHtml}${pill(window.t('tokens.log.update'),'is-blue')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
     }
     if (type === 'save-edits') {
       const sets = (payload && payload.sets) || [];
       const dels = (payload && payload.dels) || [];
-      const head = `<div class="log-row is-save">${timeHtml}${pill('保存','is-indigo')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-head">修改 ${sets.length} 项，删除 ${dels.length} 项</i><div class="log-actions"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+  const summary = window.t('tokens.log.saveSummary', { sets: sets.length, dels: dels.length });
+  const head = `<div class="log-row is-save">${timeHtml}${pill(window.t('tokens.edit.submit'),'is-indigo')}<i class="log-ctx">${html(c)} [${html(tag)}]</i><i class="log-head">${html(summary)}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
       const pick = (val) => (val && typeof val === 'object') ? JSON.stringify(val) : val;
       const detail = [];
       sets.slice(0, 10).forEach(s => { detail.push(`<div class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(pick(s.from))} → `:''}${code(pick(s.to))}</div>`); });
-      dels.slice(0, 10).forEach(d => { detail.push(`<div class="log-sub is-del">删除 ${code(d.path)}${d.from!==undefined? `（原：${code(pick(d.from))}）`:''}</div>`); });
+  dels.slice(0, 10).forEach(d => { detail.push(`<div class="log-sub is-del">${window.t('common.delete')} ${code(d.path)}${d.from!==undefined? ` (${window.t('tokens.log.prev')}${code(pick(d.from))})`:''}</div>`); });
       return head + detail.join('');
     }
-    return `<div class=\"log-row\">${timeHtml}${pill(type)}<div class=\"log-actions\"><button class=\"btn-del\" title=\"删除\" aria-label=\"删除\">删除</button></div></div>`;
+    return `<div class=\"log-row\">${timeHtml}${pill(type)}<div class=\"log-actions\"><button class=\"btn-del\" data-i18n=\"common.delete\" data-i18n-attr=\"title,aria-label\" data-i18n-title=\"common.delete\" data-i18n-aria-label=\"common.delete\"></button></div></div>`;
   }
 
   /**
@@ -343,10 +348,11 @@
       const body = ensureTokensLogArea();
       if (!body) return;
 
-    const line = makeLine(type, payload || {});
+  const line = makeLine(type, payload || {});
     const row = document.createElement('div');
     row.className = 'tokens-log__entry';
     row.innerHTML = line;
+  try { if (window.i18n && window.i18n.apply) window.i18n.apply(row); } catch (_) {}
     // 在插入前记录当前滚动位置，用于插入后恢复视口
     const prevTop = body.scrollTop || 0;
     const atTop = prevTop <= 5; // 视为已置顶
@@ -428,6 +434,7 @@
               row.className = 'tokens-log__entry';
               if (log && log._id) { try { row.setAttribute('data-log-id', String(log._id)); }catch(_){} }
               row.innerHTML = makeLine(log.type, payload);
+              try { if (window.i18n && window.i18n.apply) window.i18n.apply(row); } catch (_) {}
               frag.appendChild(row);
             });
             body.appendChild(frag);

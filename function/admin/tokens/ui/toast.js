@@ -3,7 +3,13 @@
     try{
       let container=document.querySelector('.tokens-toast-container');
       if(!container){ container=document.createElement('div'); container.className='tokens-toast-container'; document.body.appendChild(container); }
-      const isError = (typeof message==='string' && message.trim()==='无权限');
+      let isError = false;
+      try{
+        if(typeof message === 'string'){
+          const noPerm = window.t('common.noPermission');
+          if(noPerm){ isError = (message.trim() === String(noPerm).trim()); }
+        }
+      }catch(_){ /* ignore */ }
       const toast=document.createElement('div'); toast.className='tokens-toast' + (isError? ' tokens-toast--error': '');
       // 创建 SVG 图标（无 span 包裹）
       const NS='http://www.w3.org/2000/svg';

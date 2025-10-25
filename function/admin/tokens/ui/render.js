@@ -111,9 +111,9 @@
     const style= col? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"`: '';
     const { canEdit }=getAuth();
     const toolbar = `<div class="token-card__toolbar" role="工具栏" aria-label="对象操作">
-      <button class="btn btn--secondary btn--xs btn-go-doc" title="跳转" aria-label="跳转">跳转</button>
-      <button class="btn btn--secondary btn--xs btn-edit-doc" title="编辑对象" aria-label="编辑对象">编辑对象</button>
-      <button class="btn btn--danger btn--xs btn-del-doc${canEdit? '':' is-disabled'}" title="删除对象" aria-label="删除对象">删除对象</button>
+      <button class="btn btn--secondary btn--xs btn-go-doc" data-i18n="tokens.toolbar.go" data-i18n-attr="title,aria-label" data-i18n-title="tokens.toolbar.go" data-i18n-aria-label="tokens.toolbar.go"></button>
+      <button class="btn btn--secondary btn--xs btn-edit-doc" data-i18n="tokens.toolbar.editDoc" data-i18n-attr="title,aria-label" data-i18n-title="tokens.toolbar.editDoc" data-i18n-aria-label="tokens.toolbar.editDoc"></button>
+      <button class="btn btn--danger btn--xs btn-del-doc${canEdit? '':' is-disabled'}" data-i18n="tokens.toolbar.deleteDoc" data-i18n-attr="title,aria-label" data-i18n-title="tokens.toolbar.deleteDoc" data-i18n-aria-label="tokens.toolbar.deleteDoc"></button>
     </div>`;
     return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${toolbar}${innerHtml}</div>`;
   }
@@ -144,20 +144,20 @@
     }catch(_){ return []; }
   }
   // 区段：抬头（数量、展开按钮）+ 列表（首屏+更多）
-  function section(type,title,items,renderItem, canEdit){
+  function section(type,titleKey,items,renderItem, canEdit){
     const id='sec-'+Math.random().toString(36).slice(2,8);
     const total=Array.isArray(items)? items.length: 0;
     const markedOpen = !!(state.openTypes && state.openTypes.has && state.openTypes.has(type));
     const shouldPreOpen= ((state.activeType===type) || markedOpen) && total>1;
     const allItemsHtml=(items||[]).map(renderItem).join('');
-    const collapsedAreaHtml = (total>1)? '': (allItemsHtml || '<div class="tokens-empty">空</div>');
-  return `<div class="tokens-section" data-type="${type}"><div class="tokens-section__header"><div class=\"tokens-section__title\">${title} <span class=\"count-badge\">(${total})</span></div><div class=\"tokens-section__ops\"><button class=\"btn btn--secondary btn--sm\" onclick=\"tokensOpenCreate('${type}')\">新增</button>${total>1? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen? ' is-expanded':''}\" aria-expanded=\"${shouldPreOpen? 'true':'false'}\" onclick=\"toggleTokensSection('${id}')\">${shouldPreOpen? '收起':'展开'}</button>`: ''}</div></div><div id="${id}" data-type="${type}" data-expanded="${shouldPreOpen? '1':'0'}" class="tokens-section__body"><div class="token-list">${collapsedAreaHtml}</div>${total>1? `<div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen? ' is-open':''}\">${allItemsHtml}</div>`: ''}</div></div>`;
+    const collapsedAreaHtml = (total>1)? '': (allItemsHtml || '<div class="tokens-empty" data-i18n="common.empty"></div>');
+  return `<div class="tokens-section" data-type="${type}"><div class="tokens-section__header"><div class=\"tokens-section__title\"><span data-i18n="${titleKey}"></span> <span class=\"count-badge\">(${total})</span></div><div class=\"tokens-section__ops\"><button class=\"btn btn--secondary btn--sm\" onclick=\"tokensOpenCreate('${type}')\" data-i18n="tokens.section.new"></button>${total>1? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen? ' is-expanded':''}\" aria-expanded=\"${shouldPreOpen? 'true':'false'}\" onclick=\"toggleTokensSection('${id}')\" data-i18n="${shouldPreOpen? 'common.collapse':'common.expand'}"></button>`: ''}</div></div><div id="${id}" data-type="${type}" data-expanded="${shouldPreOpen? '1':'0'}" class="tokens-section__body"><div class="token-list">${collapsedAreaHtml}</div>${total>1? `<div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen? ' is-open':''}\">${allItemsHtml}</div>`: ''}</div></div>`;
   }
   async function renderTokensDashboard(forceReload=false){
     const summaryEl=document.getElementById('tokens-summary');
     const contentEl=document.getElementById('tokens-content');
-    if(!summaryEl||!contentEl) return;
-    if(!summaryEl.__initialized||forceReload){ summaryEl.innerHTML='<div class="tokens-status tokens-status--loading">加载中…</div>'; }
+  if(!summaryEl||!contentEl) return;
+  if(!summaryEl.__initialized||forceReload){ summaryEl.innerHTML='<div class="tokens-status tokens-status--loading" data-i18n="tokens.status.loading"></div>'; try{ window.i18n && window.i18n.apply && window.i18n.apply(summaryEl); }catch(_){ } }
     contentEl.innerHTML='';
     const { canEdit }=getAuth();
     try{
@@ -181,7 +181,7 @@
           s2: bucket(allSkills,2)
         };
       }
-      const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', key:'静态术语', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', key:'动态术语', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', key:'牌', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', key:'武将', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', key:'技能', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"><div class="type-tile__label">${t.key}</div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); summaryEl.__initialized=true; 
+  const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', i18nKey:'tokens.summary.termFixed', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', i18nKey:'tokens.summary.termDynamic', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', i18nKey:'tokens.summary.card', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', i18nKey:'tokens.summary.character', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', i18nKey:'tokens.summary.skill', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"><div class="type-tile__label" data-i18n="${t.i18nKey}"></div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); try{ window.i18n && window.i18n.apply && window.i18n.apply(summaryEl); }catch(_){ } summaryEl.__initialized=true; 
         // 初次渲染后应用主题色，并绑定主题观察者
         applyTypeTileTheme();
         ensureThemeObserverForTiles();
@@ -189,7 +189,7 @@
         // 更新统计值后也重新应用（防止列表被重建导致样式丢失）
         applyTypeTileTheme();
       }
-      const q=state.q; const sections=[ { type:'term-fixed', title:'静态术语', items:Array.isArray(termFixed)? filterByQuery(termFixed,q): [], render: termFixedItem }, { type:'term-dynamic', title:'动态术语', items:Array.isArray(termDynamic)? filterByQuery(termDynamic,q): [], render: termDynamicItem }, { type:'card', title:'牌', items:Array.isArray(cards)? filterByQuery(cards,q): [], render: cardItem }, { type:'character', title:'武将', items:Array.isArray(characters)? filterByQuery(characters,q): [], render: characterItem }, { type:'skill', title:'技能', items:Array.isArray(skills)? filterByQuery(skills,q): [], render: skillItem } ]; const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.title,s.items,s.render, canEdit)).join(''); try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
+  const q=state.q; const sections=[ { type:'term-fixed', titleKey:'tokens.section.termFixed', items:Array.isArray(termFixed)? filterByQuery(termFixed,q): [], render: termFixedItem }, { type:'term-dynamic', titleKey:'tokens.section.termDynamic', items:Array.isArray(termDynamic)? filterByQuery(termDynamic,q): [], render: termDynamicItem }, { type:'card', titleKey:'tokens.section.card', items:Array.isArray(cards)? filterByQuery(cards,q): [], render: cardItem }, { type:'character', titleKey:'tokens.section.character', items:Array.isArray(characters)? filterByQuery(characters,q): [], render: characterItem }, { type:'skill', titleKey:'tokens.section.skill', items:Array.isArray(skills)? filterByQuery(skills,q): [], render: skillItem } ]; const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.titleKey,s.items,s.render, canEdit)).join(''); try{ window.i18n && window.i18n.apply && window.i18n.apply(contentEl); }catch(_){ } try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
 
       // 点击区段抬头，等效于点击“展开/收起”按钮
       if(!contentEl.__sectionHeaderToggleBound){
@@ -226,18 +226,18 @@
     if(!contentEl.__editDocBound){ window.tokensAdmin.bindEditDoc && window.tokensAdmin.bindEditDoc(contentEl); contentEl.__editDocBound=true; }
 
     // 只读角色点击删除时给出提示（编辑允许打开但无法保存）
-      if(!canEdit && !contentEl.__readonlyToolbarBound){
+  if(!canEdit && !contentEl.__readonlyToolbarBound){
         contentEl.__readonlyToolbarBound = true;
         contentEl.addEventListener('click', (ev)=>{
           const delBtn = ev.target && ev.target.closest ? ev.target.closest('.btn-del-doc') : null;
       const inlineDel = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
       if(delBtn || inlineDel){
             ev.preventDefault();
-              try{ window.tokensAdmin.showToast && window.tokensAdmin.showToast('无权限'); }catch(_){ }
+              try{ window.tokensAdmin.showToast && window.tokensAdmin.showToast(window.t('common.noPermission')); }catch(_){ }
           }
         });
       }
-    }catch(e){ console.error('加载词元数据失败:', e); summaryEl.innerHTML='<div class="tokens-status tokens-status--error">加载失败，请点击“刷新”重试</div>'; }
+  }catch(e){ console.error('加载词元数据失败:', e); summaryEl.innerHTML='<div class="tokens-status tokens-status--error" data-i18n="tokens.status.loadFailedWithRefresh"></div>'; try{ window.i18n && window.i18n.apply && window.i18n.apply(summaryEl); }catch(_){ } }
   }
   // 区段展开/收起（带动画 + 状态记忆）
   function toggleTokensSection(baseId){
@@ -250,7 +250,7 @@
       if(!more) return;
       const expanded=root.getAttribute('data-expanded')==='1';
       const transitionMs=400;
-      const setBtn=(isOpen)=>{ if(btn){ btn.textContent=isOpen? '收起':'展开'; btn.setAttribute('aria-expanded', isOpen? 'true':'false'); btn.classList.toggle('is-expanded', isOpen); } };
+  const setBtn=(isOpen)=>{ if(btn){ try{ btn.setAttribute('data-i18n', isOpen? 'common.collapse':'common.expand'); if(window.i18n && window.i18n.apply) window.i18n.apply(btn); }catch(_){ btn.textContent=isOpen? '收起':'展开'; } btn.setAttribute('aria-expanded', isOpen? 'true':'false'); btn.classList.toggle('is-expanded', isOpen); } };
       const onEnd=(cb)=>{ let called=false; const handler=()=>{ if(called) return; called=true; more.removeEventListener('transitionend',handler); cb&&cb(); }; more.addEventListener('transitionend', handler, { once:true }); setTimeout(handler, transitionMs+50); };
       if(!expanded){
         more.style.display='block';

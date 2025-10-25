@@ -17,7 +17,7 @@
       }
       const toast = document.createElement('div');
       toast.className = 'tokens-toast';
-      toast.textContent = message || '操作成功';
+  toast.textContent = message || window.t('status.updated') || '';
       container.appendChild(toast);
       setTimeout(() => {
         try { toast.remove(); } catch (_) {}
@@ -319,7 +319,7 @@
       if (ev.ctrlKey || document.body.classList.contains('ctrl-down')) {
         const maybe = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
         if (maybe) {
-          try { window.tokensAdmin.showToast && window.tokensAdmin.showToast('按 Ctrl 时仅支持删除对象'); } catch (_) {}
+          try { window.tokensAdmin.showToast && window.tokensAdmin.showToast(window.t('tokens.toast.useCtrlToDelete')); } catch (_) {}
           ev.preventDefault();
           return;
         }
@@ -341,16 +341,16 @@
 
       const keyNameEl = row.querySelector('.kv-key');
       const keyName = keyNameEl ? keyNameEl.textContent.trim() : path.split('.').pop();
-      if (!confirm(`确定删除「${keyName}」吗？此操作不可撤销。`)) return;
+  if (!confirm(window.t('common.confirm.deleteField', { name: keyName }))) return;
 
       try {
   await apiJson('/tokens/delete', { method: 'POST', auth: true, body: { collection: coll, id, path } });
   try { window.tokensAdmin.logChange && window.tokensAdmin.logChange('delete-field', { collection: coll, id, path, from: (row && row.querySelector ? (row.querySelector('.kv-val')?.textContent) : undefined) }); } catch (_) {}
         try { window.tokensAdmin.updateDocInState(coll, id, (doc) => deleteFieldInDocByPath(doc, path)); } catch (_) {}
         row.remove();
-  try { window.tokensAdmin.showToast && window.tokensAdmin.showToast('已删除'); } catch (_) {}
+  try { window.tokensAdmin.showToast && window.tokensAdmin.showToast(window.t('tokens.toast.deleted')); } catch (_) {}
       } catch (e) {
-        alert(e.message || '删除失败');
+  alert(e.message || window.t('tokens.error.deleteFailed'));
       }
     });
   }
@@ -365,7 +365,7 @@
       if (!btn) return;
 
       if (!ev.ctrlKey && !document.body.classList.contains('ctrl-down')) {
-        try { showTokensToast('按住 Ctrl 键以启用删除'); } catch (_) {}
+  try { showTokensToast(window.t('tokens.toast.useCtrlToDelete')); } catch (_) {}
         return;
       }
 
@@ -375,16 +375,16 @@
       const id = card.getAttribute('data-id');
       if (!coll || !id) return;
 
-      if (!confirm('确定删除整个对象吗？此操作不可撤销。')) return;
+  if (!confirm(window.t('common.confirm.deleteDoc'))) return;
 
       try {
   await apiJson('/tokens/remove', { method: 'POST', auth: true, body: { collection: coll, id } });
   try { window.tokensAdmin.logChange && window.tokensAdmin.logChange('delete-doc', { collection: coll, id }); } catch (_) {}
         try { window.tokensAdmin.removeDocFromState(coll, id); } catch (_) {}
         card.remove();
-  try { window.tokensAdmin.showToast && window.tokensAdmin.showToast('对象已删除'); } catch (_) {}
+  try { window.tokensAdmin.showToast && window.tokensAdmin.showToast(window.t('tokens.toast.deleted')); } catch (_) {}
       } catch (e) {
-        alert(e.message || '删除失败');
+  alert(e.message || window.t('tokens.error.deleteFailed'));
       }
     });
   }
@@ -399,7 +399,7 @@
       if (!btn) return;
 
       if (!ev.ctrlKey && !document.body.classList.contains('ctrl-down')) {
-        try { showTokensToast('按住 Ctrl 键以启用编辑'); } catch (_) {}
+  try { showTokensToast(window.t('tokens.toast.useCtrlToEdit')); } catch (_) {}
         return;
       }
 
@@ -410,7 +410,7 @@
       if (!coll || !id) return;
 
       try { window.tokensAdmin.openEditModal(coll, id); }
-      catch (e) { alert(e.message || '无法打开编辑'); }
+  catch (e) { alert(e.message || window.t('tokens.error.openEditFailed')); }
     });
   }
 

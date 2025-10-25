@@ -213,7 +213,7 @@
           for (const p of toRevoke) { await revoke(userId, p); }
           // 保存成功后重新渲染列表
           await window.renderPermissionsPanel((document.getElementById('perm-search-input')?.value||'').trim());
-  } catch(e){ try { alert(e && e.message ? e.message : (window.t ? window.t('permissions.saveFailed') : '')); } catch(_){ alert(''); } }
+  } catch(e){ try { alert(e && e.message ? e.message : window.t('permissions.saveFailed')); } catch(_){ alert(''); } }
         finally { spinnerBtn(btnSave, false); editor.style.display = 'none'; }
       });
     });
