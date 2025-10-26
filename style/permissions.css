@@ -1,0 +1,48 @@
+/* 权限页：用户变更日志筛选条样式 */
+.tokens-log__filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;          /* 单行显示，避免换行导致的错位 */
+  overflow-x: auto;           /* 空间不足时横向滚动 */
+  overflow-y: visible;        /* 允许按钮的下方阴影/边框可见 */
+  white-space: nowrap;        /* 文本不换行 */
+  padding-bottom: 2px;        /* 为按钮底部边框/阴影预留空间，避免被父容器裁剪 */
+}
+
+/* 统一子控件的对齐与外观，避免“下沉”和左右圆角不一致 */
+.tokens-log__filters input.tokens-input,
+.tokens-log__filters select.tokens-input,
+.tokens-log__filters button,
+.tokens-log__filters .btn,
+.tokens-log__filters .tokens-btn,
+.tokens-log__filters input,
+.tokens-log__filters select {
+  vertical-align: middle;
+  margin-top: 0;
+  margin-bottom: 0;
+  border-radius: 0 !important;   /* 强制直角，避免被全局按钮样式覆盖 */
+}
+
+/* 统一控件高度，保证筛选/重置按钮与筛选条件控件等高 */
+.tokens-log__filters * { box-sizing: border-box; }
+.tokens-log__filters .btn,
+.tokens-log__filters .tokens-btn {
+  height: 32px !important;
+  line-height: 32px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 14px !important;
+}
+.tokens-log__filters input.tokens-input,
+.tokens-log__filters select.tokens-input,
+.tokens-log__filters input,
+.tokens-log__filters select {
+  height: 32px !important;
+  font-size: 14px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+/* 如果未来需要固定间距，可以按需开启：
+.tokens-log__filters > * + * { margin-left: 6px; }
+*/

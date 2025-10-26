@@ -44,10 +44,39 @@
         try { window.i18n && window.i18n.apply && window.i18n.apply(header); } catch(_){ }
         const wrap = document.createElement('div');
         wrap.className = 'tokens-log__wrap collapsible is-open';
+
+    // 筛选工具条（布局样式移至 style/permissions.css）
+        const filters = document.createElement('div');
+        filters.className = 'tokens-log__filters tokens-input-group';
+        filters.innerHTML = [
+          '<input id="perms-log-q" class="tokens-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
+          '<select id="perms-log-cat" class="tokens-input">\
+            <option value="all" data-i18n="permissions.log.filter.cat.all">全部类型</option>\
+            <option value="register" data-i18n="permissions.log.filter.cat.register">注册</option>\
+            <option value="username" data-i18n="permissions.log.filter.cat.username">用户名</option>\
+            <option value="intro" data-i18n="permissions.log.filter.cat.intro">简介</option>\
+            <option value="avatar" data-i18n="permissions.log.filter.cat.avatar">头像</option>\
+            <option value="permissions" data-i18n="permissions.log.filter.cat.permissions">权限</option>\
+            <option value="password" data-i18n="permissions.log.filter.cat.password">密码</option>\
+          </select>',
+          '<select id="perms-log-outcome" class="tokens-input">\
+            <option value="any" data-i18n="permissions.log.filter.outcome.any">全部结果</option>\
+            <option value="submitted" data-i18n="permissions.log.filter.outcome.submitted">已提交</option>\
+            <option value="approved" data-i18n="permissions.log.filter.outcome.approved">已通过</option>\
+            <option value="rejected" data-i18n="permissions.log.filter.outcome.rejected">已拒绝</option>\
+            <option value="cancelled" data-i18n="permissions.log.filter.outcome.cancelled">已撤回</option>\
+          </select>',
+          '<button id="perms-log-apply" class="btn btn--secondary tokens-btn tokens-refresh" data-i18n="permissions.log.filter.apply">筛选</button>',
+          '<button id="perms-log-reset" class="btn btn--secondary tokens-btn" data-i18n="permissions.log.filter.reset">重置</button>'
+        ].join('');
+        try { window.i18n && window.i18n.apply && window.i18n.apply(filters); } catch(_){ }
+        // 对齐/圆角等外观统一由 permissions.css 控制
+
         body = document.createElement('div');
         body.id = 'perms-log';
         body.className = 'tokens-log__body';
         body.setAttribute('aria-live','polite');
+        wrap.appendChild(filters);
         wrap.appendChild(body);
         panel.appendChild(header);
         panel.appendChild(wrap);
@@ -60,6 +89,26 @@
         });
         header.querySelector('.js-log-clear')?.addEventListener('click', async ()=>{
           try { await apiJson('/user/logs', { method:'DELETE', headers: authHeader() }); body.innerHTML=''; } catch(e){ alert((e&&e.message)||''); }
+        });
+
+        // 绑定筛选事件
+        const apply = ()=>{ try { hydrateUserLogs(true); }catch(_){ } };
+        filters.querySelector('#perms-log-apply')?.addEventListener('click', apply);
+        filters.querySelector('#perms-log-reset')?.addEventListener('click', ()=>{
+          try{
+            const q = filters.querySelector('#perms-log-q'); if(q) q.value = '';
+            const cat = filters.querySelector('#perms-log-cat'); if(cat) cat.value = 'all';
+            const oc = filters.querySelector('#perms-log-outcome'); if(oc) oc.value = 'any';
+          }catch(_){ }
+          apply();
+        });
+        ['change','keyup'].forEach(evt=>{
+          filters.querySelector('#perms-log-q')?.addEventListener(evt, (e)=>{ if(evt==='keyup' && e.key!=='Enter') return; apply(); });
+        });
+        ['change'].forEach(evt=>{
+          ['#perms-log-cat','#perms-log-outcome'].forEach(sel=>{
+            filters.querySelector(sel)?.addEventListener(evt, apply);
+          });
         });
       }
       if (body) body.__ready = true;
@@ -166,11 +215,84 @@
     }catch(_){ return ''; }
   }
 
-  async function hydrateUserLogs(){
+  function allTypes(){
+    return [
+      'user-registered','user-approved','user-rejected','password-change',
+      'avatar-submitted','avatar-approved','avatar-rejected',
+      'username-submitted','username-approved','username-rejected','username-cancelled',
+      'intro-submitted','intro-approved','intro-rejected','intro-cancelled',
+      'permissions-granted','permissions-revoked','permissions-replaced'
+    ];
+  }
+
+  function mapFilterToTypes(cat, outcome){
+    const byCat = {
+      'register': ['user-registered','user-approved','user-rejected'],
+      'username': ['username-submitted','username-approved','username-rejected','username-cancelled'],
+      'intro': ['intro-submitted','intro-approved','intro-rejected','intro-cancelled'],
+      'avatar': ['avatar-submitted','avatar-approved','avatar-rejected'],
+      'permissions': ['permissions-granted','permissions-revoked','permissions-replaced'],
+      'password': ['password-change'],
+      'all': allTypes()
+    };
+    const base = byCat[cat] || allTypes();
+    if (!outcome || outcome === 'any') return base;
+
+    // 结果过滤按分类分别处理
+    if (cat === 'register') {
+      if (outcome === 'submitted') return ['user-registered'];
+      if (outcome === 'approved') return ['user-approved'];
+      if (outcome === 'rejected') return ['user-rejected'];
+      return []; // cancelled 等无对应
+    }
+    if (cat === 'permissions' || cat === 'password') {
+      // 这些类型没有 submitted/approved/rejected/cancelled 细分
+      return [];
+    }
+    if (cat === 'all') {
+      if (outcome === 'submitted') return allTypes().filter(t => t.endsWith('-submitted')).concat(['user-registered']);
+      if (outcome === 'approved') return allTypes().filter(t => t.endsWith('-approved')).concat(['user-approved']);
+      if (outcome === 'rejected') return allTypes().filter(t => t.endsWith('-rejected')).concat(['user-rejected']);
+      if (outcome === 'cancelled') return allTypes().filter(t => t.endsWith('-cancelled'));
+      return allTypes();
+    }
+    const suffix = '-' + outcome;
+    return base.filter(t => t.endsWith(suffix));
+  }
+
+  function buildQuery(){
+    const panel = document.getElementById('perms-log-panel');
+    const filters = panel ? panel.querySelector('.tokens-log__filters') : null;
+    const p = new URLSearchParams();
+    p.set('page','1'); p.set('pageSize', String(MAX_LOGS));
+    if (filters){
+      const q = filters.querySelector('#perms-log-q');
+      const cat = filters.querySelector('#perms-log-cat');
+      const oc = filters.querySelector('#perms-log-outcome');
+      const qv = q && q.value && q.value.trim(); if(qv) p.set('q', qv);
+      const catV = (cat && cat.value) || 'all';
+      const ocV = (oc && oc.value) || 'any';
+      const types = mapFilterToTypes(catV, ocV);
+      const filtersApplied = (catV !== 'all') || (ocV !== 'any');
+      if (filtersApplied) {
+        if (types && types.length) {
+          p.set('types', types.join(','));
+        } else {
+          // 无匹配时传入一个不可能匹配的类型，确保后端返回空
+          p.set('types', '__none__');
+        }
+      }
+    }
+    return p;
+  }
+
+  async function hydrateUserLogs(fromFilters){
     try{
       const body = ensureUserLogArea();
       if (!body) return;
-      const out = await apiJson('/user/logs', { method:'GET', headers: authHeader() });
+      const qs = buildQuery();
+      const url = '/user/logs' + (qs.toString() ? ('?' + qs.toString()) : '');
+      const out = await apiJson(url, { method:'GET', headers: authHeader() });
       const list = (out && out.list) || [];
       const frag = document.createDocumentFragment();
       list.forEach(l => { const row = document.createElement('div'); row.className='tokens-log__entry'; if (l && l._id) { try { row.setAttribute('data-log-id', String(l._id)); }catch(_){ } } row.innerHTML = makeRow(l); try{ window.i18n && window.i18n.apply && window.i18n.apply(row);}catch(_){} frag.appendChild(row); });

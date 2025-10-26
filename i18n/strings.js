@@ -186,6 +186,25 @@
   'permissions.msg.revoked': '权限：{perm}',
   'permissions.msg.replaced': '已替换权限集',
 
+  // Permissions log filters
+  'permissions.log.filter.keyword': '按申请人/审核人/内容搜索',
+  'permissions.log.filter.cat.all': '全部类型',
+  'permissions.log.filter.cat.register': '注册',
+  'permissions.log.filter.cat.username': '用户名',
+  'permissions.log.filter.cat.intro': '简介',
+  'permissions.log.filter.cat.avatar': '头像',
+  'permissions.log.filter.cat.permissions': '权限',
+  'permissions.log.filter.cat.password': '密码',
+  'permissions.log.filter.outcome.any': '全部结果',
+  'permissions.log.filter.outcome.submitted': '已提交',
+  'permissions.log.filter.outcome.approved': '已通过',
+  'permissions.log.filter.outcome.rejected': '已拒绝',
+  'permissions.log.filter.outcome.cancelled': '已撤回',
+  'permissions.log.filter.from': '起始日期',
+  'permissions.log.filter.to': '结束日期',
+  'permissions.log.filter.apply': '筛选',
+  'permissions.log.filter.reset': '重置',
+
     // Draft panel
     'draft.input.placeholder': '输入HTML代码',
   // Common
@@ -462,6 +481,25 @@
   'permissions.msg.granted': 'Permission: {perm}',
   'permissions.msg.revoked': 'Permission: {perm}',
   'permissions.msg.replaced': 'Permissions set replaced',
+
+  // Permissions log filters
+  'permissions.log.filter.keyword': 'Search by applicant/reviewer/content',
+  'permissions.log.filter.cat.all': 'All types',
+  'permissions.log.filter.cat.register': 'Register',
+  'permissions.log.filter.cat.username': 'Username',
+  'permissions.log.filter.cat.intro': 'Intro',
+  'permissions.log.filter.cat.avatar': 'Avatar',
+  'permissions.log.filter.cat.permissions': 'Permissions',
+  'permissions.log.filter.cat.password': 'Password',
+  'permissions.log.filter.outcome.any': 'Any result',
+  'permissions.log.filter.outcome.submitted': 'Submitted',
+  'permissions.log.filter.outcome.approved': 'Approved',
+  'permissions.log.filter.outcome.rejected': 'Rejected',
+  'permissions.log.filter.outcome.cancelled': 'Cancelled',
+  'permissions.log.filter.from': 'From',
+  'permissions.log.filter.to': 'To',
+  'permissions.log.filter.apply': 'Apply',
+  'permissions.log.filter.reset': 'Reset',
 
     // Draft panel
     'draft.input.placeholder': 'Enter HTML code',
