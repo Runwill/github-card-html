@@ -134,7 +134,7 @@
       const msg = (log && log.message) ? log.message : '';
       const detail = (log && log.data) ? `<code class="log-code">${JSON.stringify(log.data)}</code>` : '';
       // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
-      return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
+    return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
     }catch(_){ return ''; }
   }
 
