@@ -133,8 +133,8 @@
       const who = (log && log.actorName) ? log.actorName : '';
       const msg = (log && log.message) ? log.message : '';
       const detail = (log && log.data) ? `<code class="log-code">${JSON.stringify(log.data)}</code>` : '';
-      // 不显示用户ID
-      return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class="log-msg">${msg}</i>`:''}${detail? `<i class="log-val">${detail}</i>`:''}</div>`;
+      // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
+      return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="title,aria-label" data-i18n-title="common.delete" data-i18n-aria-label="common.delete"></button></div></div>`;
     }catch(_){ return ''; }
   }
 
@@ -145,7 +145,7 @@
       const out = await apiJson('/user/logs', { method:'GET', headers: authHeader() });
       const list = (out && out.list) || [];
       const frag = document.createDocumentFragment();
-      list.forEach(l => { const row = document.createElement('div'); row.className='tokens-log__entry'; row.innerHTML = makeRow(l); try{ window.i18n && window.i18n.apply && window.i18n.apply(row);}catch(_){} frag.appendChild(row); });
+      list.forEach(l => { const row = document.createElement('div'); row.className='tokens-log__entry'; if (l && l._id) { try { row.setAttribute('data-log-id', String(l._id)); }catch(_){ } } row.innerHTML = makeRow(l); try{ window.i18n && window.i18n.apply && window.i18n.apply(row);}catch(_){} frag.appendChild(row); });
       body.innerHTML=''; body.appendChild(frag);
       try { body.scrollTop = 0; } catch(_){ }
     }catch(_){ }
@@ -190,7 +190,7 @@
       }catch(_){ }
     });
 
-    // 每分钟刷新相对时间
+  // 每分钟刷新相对时间
     if (!window.__permsLogTimer){
       window.__permsLogTimer = setInterval(()=>{
         try{ document.querySelectorAll('#perms-log .log-time[data-ts]')?.forEach(el=>{ const ts=Number(el.getAttribute('data-ts'))||Date.now(); const rel=formatRel(ts); el.setAttribute('data-rel', rel); if(!el.matches(':hover')) el.textContent = rel; }); }catch(_){}
@@ -210,6 +210,27 @@
       };
       root.addEventListener('mouseover', onOver);
       root.addEventListener('mouseout', onOut);
+    }catch(_){ }
+
+    // 日志内“删除”按钮事件委托（单条删除）
+    try{
+      const root = document.getElementById('perms-log');
+      if (root && !root.__delDelegationBound) {
+        root.__delDelegationBound = true;
+        root.addEventListener('click', (ev)=>{
+          const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
+          if (!btn) return;
+          const entry = btn.closest('.tokens-log__entry');
+          if (!entry) return;
+          (async ()=>{
+            const id = entry.getAttribute('data-log-id');
+            if (id) {
+              try { await apiJson(`/user/logs/${encodeURIComponent(id)}`, { method:'DELETE', headers: authHeader() }); } catch(e){ alert((e && e.message) || ''); return; }
+            }
+            try { entry.remove(); } catch(_){ }
+          })();
+        });
+      }
     }catch(_){ }
 
     // 语言切换：重渲染 i18n + 刷新时间格式

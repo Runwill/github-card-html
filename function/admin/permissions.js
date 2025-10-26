@@ -112,8 +112,9 @@
         toggle.classList.toggle('is-active', permMode === 'all');
       }
     } catch {}
-    box.innerHTML = ''; msg && (msg.textContent='');
-    let users = await fetchUsers(search);
+  // 不要立即清空，避免高度瞬间塌陷导致上方/下方区域跳动（日志面板闪烁）
+  msg && (msg.textContent='');
+  let users = await fetchUsers(search);
     // 若期间有新的渲染请求进来，则丢弃本次结果，避免双倍追加
     if (thisSeq !== renderSeq) return;
     // 当搜索为空且模式为“部分”时，仅显示有至少一个权限的用户
@@ -121,14 +122,13 @@
     if (!s && permMode === 'partial') {
       users = users.filter(u => Array.isArray(u.permissions) && u.permissions.length > 0);
     }
+    // 预先构建新内容到片段，准备替换
+    const frag = document.createDocumentFragment();
     if (!users.length){
-      box.innerHTML = '';
       const p = document.createElement('p');
       p.className = 'empty-hint';
       try { p.setAttribute('data-i18n', 'common.empty'); } catch(_){ }
-      box.appendChild(p);
-      try { window.i18n && window.i18n.apply && window.i18n.apply(p); } catch(_){}
-      return;
+      frag.appendChild(p);
     }
 
     // 使用后端清单为主，并补入用户已有的历史权限，避免“看不见但已拥有”的情况
@@ -142,7 +142,7 @@
     users.forEach(u => (Array.isArray(u.permissions)?u.permissions:[]).forEach(p => { if (p) allPermsSet.add(String(p)); }));
     const allPerms = Array.from(allPermsSet).sort();
 
-    users.forEach(u => {
+  users.forEach(u => {
       const userId = u._id || u.id;
       const current = Array.isArray(u.permissions) ? [...u.permissions] : [];
 
@@ -176,7 +176,7 @@
       right.appendChild(editBtn);
 
       row.appendChild(left); row.appendChild(right);
-      box.appendChild(row);
+  frag.appendChild(row);
 
       // 行内编辑器（默认隐藏）
       const editor = makeEl('div', 'perm-editor');
@@ -216,7 +216,7 @@
       editor.appendChild(toolbar);
       editor.appendChild(list);
       editor.appendChild(actions);
-      box.appendChild(editor);
+  frag.appendChild(editor);
 
       // 交互绑定
       editBtn.addEventListener('click', () => {
@@ -253,8 +253,41 @@
       });
     });
 
-    // 渲染完成后应用 i18n 到列表容器
-    try { window.i18n && window.i18n.apply && window.i18n.apply(box); } catch(_){}
+    // 使用高度过渡替换内容，避免列表高度瞬间变为 0 造成页面布局跳动
+    const oldH = box.offsetHeight;
+    // 若期间有新的渲染请求进来，则丢弃本次结果
+    if (thisSeq !== renderSeq) return;
+    // 设置起始高度并启用过渡
+    try {
+      box.style.height = oldH + 'px';
+      box.style.transition = 'height .25s ease';
+      // 触发一次重排，确保起始高度生效
+      void box.offsetHeight;
+    } catch(_){ }
+    // 替换内容
+    box.innerHTML = '';
+    box.appendChild(frag);
+    // 应用 i18n 到新内容
+    try { window.i18n && window.i18n.apply && window.i18n.apply(box); } catch(_){ }
+    // 目标高度
+    const newH = box.scrollHeight;
+    if (newH === oldH) {
+      // 高度未变化，直接清理行内样式
+      box.style.transition = '';
+      box.style.height = '';
+      return;
+    }
+    // 过渡到新高度
+    try {
+      box.style.height = newH + 'px';
+      const onEnd = (e)=>{
+        if (e && e.target !== box) return;
+        box.removeEventListener('transitionend', onEnd);
+        box.style.transition = '';
+        box.style.height = '';
+      };
+      box.addEventListener('transitionend', onEnd);
+    } catch(_){ box.style.transition = ''; box.style.height = ''; }
   };
 
   document.addEventListener('DOMContentLoaded', () => {
