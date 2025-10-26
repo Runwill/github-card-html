@@ -96,7 +96,8 @@
 
 /* 审核中的简介文本：启用基于容器宽度的省略号 */
 #account-info-intro-pending-inline {
-  flex: 1 1 auto;
+  /* 不再拉伸占位，确保撤回按钮紧跟在简短文本后 */
+  flex: 0 1 auto;
   min-width: 0;             /* 允许在 flex 布局下收缩 */
   overflow: hidden;
   text-overflow: ellipsis;   /* 关键：过长用省略号 */

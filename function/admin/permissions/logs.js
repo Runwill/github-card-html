@@ -69,9 +69,36 @@
 
   function pill(key, cls){ return `<i class="log-pill ${cls||''}" data-i18n="${key}"></i>`; }
 
+  // 与词元日志保持一致的色彩语义
+  function typeCls(t){
+    switch(String(t||'')){
+      case 'register': return 'is-green'; // 兼容旧类型名
+      case 'user-registered': return 'is-green';
+      case 'password-change': return 'is-indigo';
+      case 'avatar-submitted': return 'is-indigo';
+      case 'avatar-approved': return 'is-green';
+      case 'avatar-rejected': return 'is-red';
+      case 'username-submitted': return 'is-indigo';
+      case 'username-approved': return 'is-green';
+      case 'username-rejected': return 'is-red';
+      case 'username-cancelled': return 'is-blue';
+      case 'intro-submitted': return 'is-indigo';
+      case 'intro-approved': return 'is-green';
+      case 'intro-rejected': return 'is-red';
+      case 'intro-cancelled': return 'is-blue';
+      case 'user-approved': return 'is-green';
+      case 'user-rejected': return 'is-red';
+      case 'permissions-granted': return 'is-green';
+      case 'permissions-revoked': return 'is-red';
+      case 'permissions-replaced': return 'is-indigo';
+      default: return '';
+    }
+  }
+
   function typeKey(t){
     switch(String(t||'')){
-      case 'register': return 'permissions.log.register';
+      case 'register': return 'permissions.log.register'; // 兼容旧类型名
+      case 'user-registered': return 'permissions.log.register';
       case 'password-change': return 'permissions.log.passwordChanged';
       case 'avatar-submitted': return 'permissions.log.avatarSubmitted';
       case 'avatar-approved': return 'permissions.log.avatarApproved';
@@ -102,11 +129,12 @@
       const rel = formatRel(t);
       const timeHtml = `<time class="log-time" datetime="${iso}" title="${abs}" data-ts="${t}" data-rel="${rel}" data-abs="${abs}">${rel}</time>`;
       const k = typeKey(log && log.type);
+      const cls = typeCls(log && log.type);
       const who = (log && log.actorName) ? log.actorName : '';
-      const to = (log && log.userId) ? log.userId : '';
       const msg = (log && log.message) ? log.message : '';
       const detail = (log && log.data) ? `<code class="log-code">${JSON.stringify(log.data)}</code>` : '';
-      return `<div class="log-row">${timeHtml}${k? pill(k):''}<i class="log-ctx">${who? `[${who}]`:''}${to? ` → #${to}`:''}</i>${msg? `<i class="log-msg">${msg}</i>`:''}${detail? `<i class="log-val">${detail}</i>`:''}</div>`;
+      // 不显示用户ID
+      return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class="log-msg">${msg}</i>`:''}${detail? `<i class="log-val">${detail}</i>`:''}</div>`;
     }catch(_){ return ''; }
   }
 
@@ -117,7 +145,7 @@
       const out = await apiJson('/user/logs', { method:'GET', headers: authHeader() });
       const list = (out && out.list) || [];
       const frag = document.createDocumentFragment();
-      list.forEach(l => { const row = document.createElement('div'); row.className='perms-log__entry'; row.innerHTML = makeRow(l); try{ window.i18n && window.i18n.apply && window.i18n.apply(row);}catch(_){} frag.appendChild(row); });
+      list.forEach(l => { const row = document.createElement('div'); row.className='tokens-log__entry'; row.innerHTML = makeRow(l); try{ window.i18n && window.i18n.apply && window.i18n.apply(row);}catch(_){} frag.appendChild(row); });
       body.innerHTML=''; body.appendChild(frag);
       try { body.scrollTop = 0; } catch(_){ }
     }catch(_){ }
@@ -125,7 +153,42 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     const ready = (window.partialsReady instanceof Promise) ? window.partialsReady : Promise.resolve();
-    ready.then(()=>{ try{ hydrateUserLogs(); }catch(_){ } });
+    ready.then(()=>{ try{ hydrateUserLogs(); }catch(_){ } }).then(()=>{
+      // 进入权限页时自动刷新：监听面板可见性变化
+      try{
+        const panel = document.getElementById('panel_permissions');
+        if (panel && !panel.__permsLogObsBound){
+          panel.__permsLogObsBound = true;
+          const isVisible = (el)=>{
+            try{
+              if (!el) return false;
+              const style = window.getComputedStyle(el);
+              if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+              const rect = el.getBoundingClientRect();
+              return rect.width > 0 && rect.height > 0;
+            }catch(_){ return !!(el && el.offsetParent); }
+          };
+          let wasVisible = isVisible(panel);
+          const check = ()=>{
+            try{
+              const vis = isVisible(panel);
+              if (vis && !wasVisible) { wasVisible = true; try{ hydrateUserLogs(); }catch(_){ } }
+              else if (!vis && wasVisible) { wasVisible = false; }
+            }catch(_){ }
+          };
+          // 初始检查
+          try{ check(); }catch(_){ }
+          // 监听 class/style 变化
+          try{
+            const obs = new MutationObserver(()=>{ check(); });
+            obs.observe(panel, { attributes: true, attributeFilter: ['class','style'] });
+            panel.__permsLogObserver = obs;
+          }catch(_){ }
+          // 兜底：hash 变化也检查一次
+          try{ window.addEventListener('hashchange', check); }catch(_){ }
+        }
+      }catch(_){ }
+    });
 
     // 每分钟刷新相对时间
     if (!window.__permsLogTimer){
@@ -133,6 +196,21 @@
         try{ document.querySelectorAll('#perms-log .log-time[data-ts]')?.forEach(el=>{ const ts=Number(el.getAttribute('data-ts'))||Date.now(); const rel=formatRel(ts); el.setAttribute('data-rel', rel); if(!el.matches(':hover')) el.textContent = rel; }); }catch(_){}
       }, 60000);
     }
+
+    // 悬浮时切换为绝对时间，移开恢复相对时间（与词元日志一致）
+    try{
+      const root = document.getElementById('perms-log') || document;
+      const onOver = (e)=>{
+        const t = e.target && e.target.closest ? e.target.closest('.log-time') : null;
+        if (t) { const abs = t.getAttribute('data-abs'); if (abs) t.textContent = abs; }
+      };
+      const onOut = (e)=>{
+        const t = e.target && e.target.closest ? e.target.closest('.log-time') : null;
+        if (t) { const rel = t.getAttribute('data-rel'); if (rel) t.textContent = rel; }
+      };
+      root.addEventListener('mouseover', onOver);
+      root.addEventListener('mouseout', onOut);
+    }catch(_){ }
 
     // 语言切换：重渲染 i18n + 刷新时间格式
     const onLang = ()=>{
