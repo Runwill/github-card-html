@@ -11,7 +11,12 @@ function setMessage(text, type) {
   // 清除已存的 i18n 键，转而显示原始文本
   try { delete el.dataset.i18nKey; delete el.dataset.i18nParams; } catch(_){}
   el.textContent = text || '';
-  el.className = `modal-message${type ? ' ' + type : ''}`;
+  // 统一先重置样式再赋予类型，避免残留 error/success
+  el.className = 'modal-message';
+  try { el.classList.remove('error','success'); } catch(_){}
+  if (type) {
+    try { el.classList.add(type); } catch(_){ el.className = `modal-message ${type}`; }
+  }
 }
 
 // 使用 i18n 键设置消息，并在语言切换时自动更新
@@ -23,7 +28,12 @@ function setMessageKey(key, params, type){
     if (params) { el.dataset.i18nParams = JSON.stringify(params); } else { delete el.dataset.i18nParams; }
   } catch(_){}
   try { el.textContent = window.t(key, params); } catch(_) { el.textContent = String(key || ''); }
-  el.className = `modal-message${type ? ' ' + type : ''}`;
+  // 统一先重置样式再赋予类型
+  el.className = 'modal-message';
+  try { el.classList.remove('error','success'); } catch(_){}
+  if (type) {
+    try { el.classList.add(type); } catch(_){ el.className = `modal-message ${type}`; }
+  }
 }
 
 // 监听语言切换，若当前消息基于 i18n 键，则自动刷新
@@ -57,7 +67,7 @@ if (loginForm) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-      if (response.ok) {
+  if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.token);
         localStorage.setItem('id', data.user.id);
@@ -66,7 +76,9 @@ if (loginForm) {
   if (data.user.intro !== undefined) { localStorage.setItem('intro', data.user.intro || ''); }
         if (data.user.avatar !== undefined) { localStorage.setItem('avatar', data.user.avatar || ''); }
   setMessageKey('login.success', null, 'success');
-        window.location.href = 'index.html';
+    // 给予浏览器一次重绘机会，避免上一条错误样式残留（与注册成功的视觉一致）
+    try { await new Promise(r => setTimeout(r, 60)); } catch(_){}
+    window.location.href = 'index.html';
       } else {
         const errorData = await response.json();
         if (errorData && errorData.message) {

@@ -96,12 +96,18 @@
                 }
 
                 // 初次进入根据 localStorage/endpoints 状态渲染
-                document.addEventListener('DOMContentLoaded', function(){
+                function boot(){
                     try { if (window.i18n && window.i18n.apply) window.i18n.apply(document); } catch(_){ }
                     init();
-                        // 语言切换后刷新后端相关文案
-                        try{ window.addEventListener('i18n:changed', function(){ applyStyle(currentBase()); refreshMessage(); }); }catch(_){ }
-                });
+                    // 语言切换后刷新后端相关文案
+                    try{ window.addEventListener('i18n:changed', function(){ applyStyle(currentBase()); refreshMessage(); }); }catch(_){ }
+                }
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', boot);
+                } else {
+                    // 若 DOMContentLoaded 已触发，直接执行初始化，避免刷新后按钮文案停留在“切换后端”
+                    boot();
+                }
             })();
         </script>
 </body>
