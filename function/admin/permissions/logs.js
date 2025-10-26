@@ -120,6 +120,31 @@
     }
   }
 
+  // 根据日志类型返回消息 i18n key
+  function msgKey(t){
+    switch(String(t||'')){
+      case 'user-registered': return 'permissions.msg.userRegistered';
+      case 'user-approved': return 'permissions.msg.userApproved';
+      case 'user-rejected': return 'permissions.msg.userRejected';
+      case 'password-change': return 'permissions.msg.passwordChanged';
+      case 'avatar-submitted': return 'permissions.msg.avatarSubmitted';
+      case 'avatar-approved': return 'permissions.msg.avatarApproved';
+      case 'avatar-rejected': return 'permissions.msg.avatarRejected';
+      case 'username-submitted': return 'permissions.msg.usernameSubmitted';
+      case 'username-approved': return 'permissions.msg.usernameApproved';
+      case 'username-rejected': return 'permissions.msg.usernameRejected';
+      case 'username-cancelled': return 'permissions.msg.usernameCancelled';
+      case 'intro-submitted': return 'permissions.msg.introSubmitted';
+      case 'intro-approved': return 'permissions.msg.introApproved';
+      case 'intro-rejected': return 'permissions.msg.introRejected';
+      case 'intro-cancelled': return 'permissions.msg.introCancelled';
+      case 'permissions-granted': return 'permissions.msg.granted';
+      case 'permissions-revoked': return 'permissions.msg.revoked';
+      case 'permissions-replaced': return 'permissions.msg.replaced';
+      default: return '';
+    }
+  }
+
   function makeRow(log){
     try{
       const ts = log && log.createdAt;
@@ -131,10 +156,13 @@
       const k = typeKey(log && log.type);
       const cls = typeCls(log && log.type);
       const who = (log && log.actorName) ? log.actorName : '';
-      const msg = (log && log.message) ? log.message : '';
-      const detail = (log && log.data) ? `<code class="log-code">${JSON.stringify(log.data)}</code>` : '';
+  const data = (log && log.data) || {};
+  const msgK = msgKey(log && log.type);
+  const msgParams = (function(d){ try { return JSON.stringify(d||{}); } catch(_){ return '{}'; } })(data);
+  const msg = msgK ? `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'></span>` : (log && log.message ? `<span>${String(log.message)}</span>` : '');
+  const detail = '';
       // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
-    return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
+  return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
     }catch(_){ return ''; }
   }
 

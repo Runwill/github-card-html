@@ -166,6 +166,26 @@
   'permissions.log.revoked': '撤销权限',
   'permissions.log.replaced': '替换权限集',
 
+  // Permissions log messages (body)
+  'permissions.msg.userRegistered': '申请人：{applicantName}',
+  'permissions.msg.userApproved': '申请人：{applicantName}',
+  'permissions.msg.userRejected': '申请人：{applicantName}',
+  'permissions.msg.passwordChanged': '',
+  'permissions.msg.avatarSubmitted': '申请人：{applicantName}，URL：{url}',
+  'permissions.msg.avatarApproved': '申请人：{applicantName}，URL：{url}',
+  'permissions.msg.avatarRejected': '申请人：{applicantName}，原因：{reason}，URL：{url}',
+  'permissions.msg.usernameSubmitted': '申请人：{applicantName}，新用户名：{newUsername}',
+  'permissions.msg.usernameApproved': '申请人：{applicantName}，用户名：{username}',
+  'permissions.msg.usernameRejected': '申请人：{applicantName}，新用户名：{newUsername}，原因：{reason}',
+  'permissions.msg.usernameCancelled': '申请人：{applicantName}',
+  'permissions.msg.introSubmitted': '申请人：{applicantName}，新简介：{newIntro}',
+  'permissions.msg.introApproved': '申请人：{applicantName}，简介已更新',
+  'permissions.msg.introRejected': '申请人：{applicantName}，原因：{reason}，新简介：{newIntro}',
+  'permissions.msg.introCancelled': '申请人：{applicantName}',
+  'permissions.msg.granted': '权限：{perm}',
+  'permissions.msg.revoked': '权限：{perm}',
+  'permissions.msg.replaced': '已替换权限集',
+
     // Draft panel
     'draft.input.placeholder': '输入HTML代码',
   // Common
@@ -422,6 +442,26 @@
   'permissions.log.granted': 'Permission granted',
   'permissions.log.revoked': 'Permission revoked',
   'permissions.log.replaced': 'Permissions replaced',
+
+  // Permissions log messages (body)
+  'permissions.msg.userRegistered': 'Applicant: {applicantName}',
+  'permissions.msg.userApproved': 'Applicant: {applicantName}',
+  'permissions.msg.userRejected': 'Applicant: {applicantName}',
+  'permissions.msg.passwordChanged': '',
+  'permissions.msg.avatarSubmitted': 'Applicant: {applicantName}, URL: {url}',
+  'permissions.msg.avatarApproved': 'Applicant: {applicantName}, URL: {url}',
+  'permissions.msg.avatarRejected': 'Applicant: {applicantName}, Reason: {reason}, URL: {url}',
+  'permissions.msg.usernameSubmitted': 'Applicant: {applicantName}, New username: {newUsername}',
+  'permissions.msg.usernameApproved': 'Applicant: {applicantName}, Username: {username}',
+  'permissions.msg.usernameRejected': 'Applicant: {applicantName}, New username: {newUsername}, Reason: {reason}',
+  'permissions.msg.usernameCancelled': 'Applicant: {applicantName}',
+  'permissions.msg.introSubmitted': 'Applicant: {applicantName}, New intro: {newIntro}',
+  'permissions.msg.introApproved': 'Applicant: {applicantName}, Intro updated',
+  'permissions.msg.introRejected': 'Applicant: {applicantName}, Reason: {reason}, New intro: {newIntro}',
+  'permissions.msg.introCancelled': 'Applicant: {applicantName}',
+  'permissions.msg.granted': 'Permission: {perm}',
+  'permissions.msg.revoked': 'Permission: {perm}',
+  'permissions.msg.replaced': 'Permissions set replaced',
 
     // Draft panel
     'draft.input.placeholder': 'Enter HTML code',
