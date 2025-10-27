@@ -1,0 +1,65 @@
+/* Collapsible headings - no text shift version */
+
+.collapsible__toggle {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: var(--text-muted, #4a5568);
+  position: absolute;
+  left: 0.2em; /* inside heading box, works with heading padding-left */
+  top: 0.15em;
+  width: 1em;
+  height: 1em;
+  line-height: 1em;
+}
+
+.collapsible__chevron {
+  display: inline-block;
+  transition: transform 0.18s ease;
+}
+.collapsible__toggle.is-collapsed .collapsible__chevron {
+  transform: rotate(-90deg);
+}
+
+.collapsible__content.is-collapsed {
+  display: none !important;
+}
+
+/* Make headings feel clickable without shifting layout */
+#panel_term h1, #panel_term h2, #panel_term h3 {
+  position: relative; /* anchor for absolute toggle button */
+  cursor: pointer;
+  /* Expand hit area to the left without shifting text visually */
+  padding-left: 1.4em;
+  margin-left: -1.4em;
+}
+
+/* H1 toggle always visible */
+#panel_term h1 > .collapsible__toggle {
+  opacity: 0.3; /* always visible at 30% */
+  pointer-events: auto;
+}
+
+/* H2/H3 toggles hidden by default, visible on hover or when collapsed */
+#panel_term h2 > .collapsible__toggle,
+#panel_term h3 > .collapsible__toggle {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+#panel_term h2:hover > .collapsible__toggle,
+#panel_term h3:hover > .collapsible__toggle,
+#panel_term .collapsible__toggle.is-collapsed {
+  opacity: 0.3; /* visible states at 30% */
+  pointer-events: auto;
+}
+
+/* Ensure hovering the toggle itself keeps it visible */
+.collapsible__toggle:hover {
+  opacity: 0.3; /* keep at 30% even when hovering the icon */
+}
