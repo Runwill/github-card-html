@@ -1,0 +1,52 @@
+/* 回到顶部按钮样式 */
+.back-to-top {
+  position: fixed;
+  right: 16px;
+  /* 避让固定页脚，预留空间；同时考虑移动端安全区域 */
+  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  z-index: 6000; /* 高于 .site-footer 的 5000 */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+  color: #334155;
+  cursor: pointer;
+  transition: opacity .2s ease, transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none; /* 隐藏时不占交互 */
+}
+
+.back-to-top.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top:hover { background: #ffffff; }
+.back-to-top:active { transform: translateY(1px); }
+.back-to-top:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+
+.back-to-top__icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+}
+
+/* 深色主题适配 */
+[data-theme="dark"] .back-to-top {
+  background: rgba(26,32,44,0.9);
+  color: #e2e8f0;
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+[data-theme="dark"] .back-to-top:hover { background: rgba(45,55,72,0.95); }
+
+@media (max-width: 480px) {
+  .back-to-top { right: 12px; bottom: calc(56px + env(safe-area-inset-bottom, 0px)); width: 44px; height: 44px; }
+}
