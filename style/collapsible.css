@@ -41,7 +41,7 @@
 /* Make headings feel clickable without shifting layout */
 #panel_term h1, #panel_term h2, #panel_term h3 {
   position: relative; /* anchor for absolute toggle button */
-  cursor: pointer;
+  cursor: default; /* clicking text won't toggle */
   /* Expand hit area to the left without shifting text visually */
   padding-left: 1.4em;
   margin-left: -1.4em;
@@ -49,7 +49,7 @@
 
 /* H1 toggle always visible */
 #panel_term h1 > .collapsible__toggle {
-  opacity: 0.2;
+  opacity: 0.25;
   pointer-events: auto;
 }
 
@@ -64,11 +64,11 @@
 #panel_term h2:hover > .collapsible__toggle,
 #panel_term h3:hover > .collapsible__toggle,
 #panel_term .collapsible__toggle.is-collapsed {
-  opacity: 0.3; /* visible states at 30% */
+  opacity: 0.25; /* visible states at 30% */
   pointer-events: auto;
 }
 
 /* Ensure hovering the toggle itself keeps it visible */
 .collapsible__toggle:hover {
-  opacity: 0.3; /* keep at 30% even when hovering the icon */
+  opacity: 0.25; /* keep at 30% even when hovering the icon */
 }

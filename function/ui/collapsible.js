@@ -80,11 +80,10 @@
       }
     });
 
-    // Also allow clicking the whole heading to toggle (except when clicking links/buttons inside)
+    // Restrict toggle to the icon only; clicking heading text does not toggle
     h.addEventListener('click', (e) => {
-      if (e.target.closest('a, button, input, textarea, select')) return;
-      // If click on heading area (including whitespace), toggle
-      if (e.currentTarget === h) btn.click();
+      if (!e.target.closest('.collapsible__toggle')) return;
+      // Click on the toggle icon will be handled by the button listener
     });
 
     return btn;

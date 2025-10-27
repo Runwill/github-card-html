@@ -4,6 +4,7 @@
 @font-face { font-family: '小篆'; src: url('../source/汉仪篆书繁.TTF') format('truetype'); font-display: swap; }
 @font-face { font-family: '大篆'; src: url('../source/金文大篆体.TTF') format('truetype'); font-display: swap; }
 @font-face { font-family: '碑楷'; src: url('../source/方正北魏楷书.TTF') format('truetype'); font-display: swap; }
-@font-face { font-family: '康熙'; src: url('../source/康熙字典体.TTF') format('truetype'); font-display: swap; }
+/* 与 index.html 中的 preload 链接保持完全一致（路径与 ?v 参数都要一致），避免重复下载 */
+@font-face { font-family: '康熙'; src: url('../source/康熙字典体.TTF?v=202510212031') format('truetype'); font-display: swap; }
 @font-face { font-family: '邯郸'; src: url('../source/邯郸康熙字典体.TTF') format('truetype'); font-display: swap; }
 @font-face { font-family: '毛体'; src: url('../source/草檀斋毛泽东字体.ttf') format('truetype'); font-display: swap; }
