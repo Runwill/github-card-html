@@ -154,7 +154,11 @@
       }
     })
 
-    if (scrollTarget) performScroll(scrollTarget, opts)
+    // 若目标在 panel_term 内，先展开其路径上的所有折叠，再滚动
+    if (scrollTarget) {
+      try { expandCollapsibleAncestorsIfNeeded(scrollTarget) } catch(_) {}
+      performScroll(scrollTarget, opts)
+    }
     // 滚动结束后，给目标位置打一条蓝色贯穿屏幕的高亮条
     const enableRowHighlight = !(opts && opts.highlightRow === false)
     if (scrollTarget && enableRowHighlight) {
@@ -182,6 +186,33 @@
         __currentOp = { id: ++__opSeq, panelId, settle: { cancel: function(){} }, removeOverlay: remover }
       }
     }
+  }
+
+  // 展开目标元素到 panel_term 的路径上所有被折叠的 collapsible 节点，然后再滚动
+  function expandCollapsibleAncestorsIfNeeded(elem){
+    try {
+      const panel = document.getElementById('panel_term')
+      if (!panel || !elem || !panel.contains(elem)) return
+      let node = elem
+      while (node && node !== panel) {
+        if (node.classList && node.classList.contains('collapsible__content') && node.classList.contains('is-collapsed')) {
+          // 立刻展开（无动画），以便正确计算滚动位置
+          node.classList.remove('is-collapsed')
+          node.style.height = 'auto'
+          node.setAttribute('aria-hidden', 'false')
+          // 同步更新对应按钮状态（按钮在 wrapper 前一个兄弟节点的 heading 内）
+          const heading = node.previousElementSibling
+          if (heading) {
+            const btn = heading.querySelector && heading.querySelector('.collapsible__toggle')
+            if (btn) {
+              btn.classList.remove('is-collapsed')
+              btn.setAttribute('aria-expanded', 'true')
+            }
+          }
+        }
+        node = node.parentElement
+      }
+    } catch(_) {}
   }
 
   // 根据选择器
@@ -226,7 +257,10 @@
       }
     })
 
-  if (scrollTarget) performScroll(scrollTarget, Object.assign({}, opts, { center: true }))
+  if (scrollTarget) {
+    try { expandCollapsibleAncestorsIfNeeded(scrollTarget) } catch(_) {}
+    performScroll(scrollTarget, Object.assign({}, opts, { center: true }))
+  }
     // 滚动结束后行高亮
     const enableRowHighlight = !(opts && opts.highlightRow === false)
     if (scrollTarget && enableRowHighlight) {

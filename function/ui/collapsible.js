@@ -73,9 +73,11 @@
     h.insertBefore(btn, h.firstChild);
 
     btn.addEventListener('click', () => {
-      const collapsed = content.classList.toggle('is-collapsed');
-      btn.setAttribute('aria-expanded', String(!collapsed));
-      btn.classList.toggle('is-collapsed', collapsed);
+      if (content.classList.contains('is-collapsed')) {
+        expandSection(content, btn);
+      } else {
+        collapseSection(content, btn);
+      }
     });
 
     // Also allow clicking the whole heading to toggle (except when clicking links/buttons inside)
@@ -119,6 +121,47 @@
     });
 
     return true;
+  }
+
+  function onTransitionEnd(e, el) {
+    if (e.propertyName !== 'height') return;
+    // When expansion finished, set height auto for flexible content
+    if (!el.classList.contains('is-collapsed')) {
+      el.style.height = 'auto';
+    }
+    el.removeEventListener('transitionend', el._collapseTEnd);
+    el._collapseTEnd = null;
+  }
+
+  function collapseSection(el, btn) {
+    // Freeze current height, then animate to 0
+    el.style.height = el.scrollHeight + 'px';
+    // force reflow
+    void el.offsetHeight;
+    el._collapseTEnd && el.removeEventListener('transitionend', el._collapseTEnd);
+    el._collapseTEnd = (ev) => onTransitionEnd(ev, el);
+    el.addEventListener('transitionend', el._collapseTEnd);
+    el.style.height = '0px';
+    el.classList.add('is-collapsed');
+    el.setAttribute('aria-hidden', 'true');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.classList.add('is-collapsed');
+  }
+
+  function expandSection(el, btn) {
+    // Start from 0, animate to scrollHeight
+    el.classList.remove('is-collapsed');
+    // from collapsed state, current computed height is 0; set to 0 explicitly
+    el.style.height = '0px';
+    // force reflow
+    void el.offsetHeight;
+    el._collapseTEnd && el.removeEventListener('transitionend', el._collapseTEnd);
+    el._collapseTEnd = (ev) => onTransitionEnd(ev, el);
+    el.addEventListener('transitionend', el._collapseTEnd);
+    el.style.height = el.scrollHeight + 'px';
+    el.setAttribute('aria-hidden', 'false');
+    btn.setAttribute('aria-expanded', 'true');
+    btn.classList.remove('is-collapsed');
   }
 
 
