@@ -15,6 +15,11 @@
   width: 1em;
   height: 1em;
   line-height: 1em;
+  /* Prevent mobile long-press blue/gray highlight and text selection */
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .collapsible__chevron {
@@ -71,4 +76,9 @@
 /* Ensure hovering the toggle itself keeps it visible */
 .collapsible__toggle:hover {
   opacity: 0.25; /* keep at 30% even when hovering the icon */
+}
+
+/* Ensure no background flash on active/pressed state */
+.collapsible__toggle:active {
+  background: transparent !important;
 }
