@@ -23,6 +23,16 @@
 
   function parseTimeValue(v){ try{ if(v==null) return undefined; if(v instanceof Date) return v.getTime(); if(typeof v==='number') return v; if(typeof v==='string'){ const t=Date.parse(v); return isNaN(t)? undefined : t; } return undefined; }catch(_){ return undefined; } }
   function getLocaleFromI18n(){ try{ const lang=(window.i18n&&window.i18n.getLang&&window.i18n.getLang())||'zh'; if(lang==='zh') return 'zh-CN'; if(lang==='en') return 'en-US'; return 'en-US'; }catch(_){ return 'en-US'; } }
+  // 让日期输入控件的地区跟随当前语言
+  function setDateInputLang(container){
+    try{
+      const locale = getLocaleFromI18n();
+      ['#perms-log-from', '#perms-log-to'].forEach(sel=>{
+        const el = (container && container.querySelector) ? container.querySelector(sel) : document.querySelector(sel);
+        if (el) el.setAttribute('lang', locale);
+      });
+    }catch(_){ }
+  }
   function formatAbsForLang(v){ try{ const t = parseTimeValue(v) ?? Date.now(); const locale = getLocaleFromI18n(); return new Date(t).toLocaleString(locale); }catch(_){ return String(v||''); } }
   function formatRel(v){ try{ const now=Date.now(); const t=parseTimeValue(v) ?? now; let diff=Math.floor((now-t)/1000); if(diff < -5) return window.t('time.justNow'); if(diff<5) return window.t('time.justNow'); if(diff<60) return window.t('time.secondsAgo',{n:diff}); const m=Math.floor(diff/60); if(m<60) return window.t('time.minutesAgo',{n:m}); const h=Math.floor(m/60); if(h<24) return window.t('time.hoursAgo',{n:h}); const d=Math.floor(h/24); if(d<30) return window.t('time.daysAgo',{n:d}); const mo=Math.floor(d/30); if(mo<12) return window.t('time.monthsAgo',{n:mo}); const y=Math.floor(mo/12); return window.t('time.yearsAgo',{n:y}); }catch(_){ return ''; } }
 
@@ -66,10 +76,14 @@
             <option value="rejected" data-i18n="permissions.log.filter.outcome.rejected">已拒绝</option>\
             <option value="cancelled" data-i18n="permissions.log.filter.outcome.cancelled">已撤回</option>\
           </select>',
+          '<input id="perms-log-from" class="tokens-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.from" placeholder="起始日期" />',
+          '<input id="perms-log-to" class="tokens-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.to" placeholder="结束日期" />',
           '<button id="perms-log-apply" class="btn btn--secondary tokens-btn tokens-refresh" data-i18n="permissions.log.filter.apply">筛选</button>',
           '<button id="perms-log-reset" class="btn btn--secondary tokens-btn" data-i18n="permissions.log.filter.reset">重置</button>'
         ].join('');
         try { window.i18n && window.i18n.apply && window.i18n.apply(filters); } catch(_){ }
+        // 根据语言为日期输入设置地区
+        try { setDateInputLang(filters); } catch(_){ }
         // 对齐/圆角等外观统一由 permissions.css 控制
 
         body = document.createElement('div');
@@ -99,6 +113,8 @@
             const q = filters.querySelector('#perms-log-q'); if(q) q.value = '';
             const cat = filters.querySelector('#perms-log-cat'); if(cat) cat.value = 'all';
             const oc = filters.querySelector('#perms-log-outcome'); if(oc) oc.value = 'any';
+            const f = filters.querySelector('#perms-log-from'); if(f) f.value = '';
+            const t = filters.querySelector('#perms-log-to'); if(t) t.value = '';
           }catch(_){ }
           apply();
         });
@@ -106,7 +122,7 @@
           filters.querySelector('#perms-log-q')?.addEventListener(evt, (e)=>{ if(evt==='keyup' && e.key!=='Enter') return; apply(); });
         });
         ['change'].forEach(evt=>{
-          ['#perms-log-cat','#perms-log-outcome'].forEach(sel=>{
+          ['#perms-log-cat','#perms-log-outcome','#perms-log-from','#perms-log-to'].forEach(sel=>{
             filters.querySelector(sel)?.addEventListener(evt, apply);
           });
         });
@@ -269,6 +285,8 @@
       const q = filters.querySelector('#perms-log-q');
       const cat = filters.querySelector('#perms-log-cat');
       const oc = filters.querySelector('#perms-log-outcome');
+      const from = filters.querySelector('#perms-log-from');
+      const to = filters.querySelector('#perms-log-to');
       const qv = q && q.value && q.value.trim(); if(qv) p.set('q', qv);
       const catV = (cat && cat.value) || 'all';
       const ocV = (oc && oc.value) || 'any';
@@ -282,6 +300,8 @@
           p.set('types', '__none__');
         }
       }
+      const fv = from && from.value; if (fv) p.set('since', fv);
+      const tv = to && to.value; if (tv) p.set('until', tv);
     }
     return p;
   }
@@ -386,6 +406,8 @@
     // 语言切换：重渲染 i18n + 刷新时间格式
     const onLang = ()=>{
       try{ const panel=document.getElementById('perms-log-panel'); if(panel && window.i18n && window.i18n.apply) window.i18n.apply(panel);}catch(_){ }
+      // 语言变化时同步更新日期输入的地区
+      try{ const panel=document.getElementById('perms-log-panel'); const filters = panel ? panel.querySelector('.tokens-log__filters') : null; setDateInputLang(filters||panel); }catch(_){ }
       try{ document.querySelectorAll('#perms-log .log-time[data-ts]')?.forEach(el=>{ const ts=Number(el.getAttribute('data-ts'))||Date.now(); const rel=formatRel(ts); const abs=formatAbsForLang(ts); el.setAttribute('data-rel', rel); el.setAttribute('data-abs', abs); el.setAttribute('title', abs); el.textContent = el.matches(':hover')? abs : rel; }); }catch(_){ }
     };
     try{ document.addEventListener('i18n:changed', onLang);}catch(_){}

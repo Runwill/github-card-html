@@ -9,6 +9,9 @@
   padding-bottom: 2px;        /* 为按钮底部边框/阴影预留空间，避免被父容器裁剪 */
 }
 
+/* 让筛选条在权限面板中占满可用宽度，避免受 60vw 限制导致出现滚动条 */
+#panel_permissions .tokens-log__filters { width: 100%; max-width: none; }
+
 /* 统一子控件的对齐与外观，避免“下沉”和左右圆角不一致 */
 .tokens-log__filters input.tokens-input,
 .tokens-log__filters select.tokens-input,
