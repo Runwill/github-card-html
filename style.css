@@ -4,6 +4,17 @@
 body { overflow-x: hidden; margin: 0; font-size: .9rem; }
 .hidden { display: none; }
 
+/* 移动端长按波纹按钮（.button.wave）时，去除蓝色高亮/选中框 */
+.button.wave,
+.button.wave * {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.button.wave:focus { outline: none; }
+.button.wave::-moz-focus-inner { border: 0; }
+
 /* 标题和特殊元素样式 */
 .strength_title {
     display: inline;
