@@ -31,7 +31,10 @@
 }
 
 .collapsible__content {
-  overflow: hidden;
+  /* 展开状态允许溢出可见，避免按钮或阴影被裁剪 */
+  overflow: visible;
+  /* 建立独立的格式化上下文，避免子元素外边距塌陷导致展开结束时的“回弹” */
+  display: flow-root;
   height: auto;
   opacity: 1;
   transition: height 180ms ease, opacity 150ms ease;
@@ -41,6 +44,8 @@
   height: 0 !important;
   opacity: 0 !important;
   pointer-events: none;
+  /* 收起状态才裁剪，避免布局抖动 */
+  overflow: hidden;
 }
 
 /* Make headings feel clickable without shifting layout */

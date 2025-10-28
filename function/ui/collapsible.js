@@ -1,7 +1,7 @@
-// Collapsible headings for panel_term
-// - Adds a toggle button to H1/H2/H3 inside #panel_term
-// - Wraps following sibling blocks (indent/padding/etc.) into a collapsible container
-// - Defaults: H1/H2 expanded, H3 collapsed
+// panel_term 面板的折叠式标题
+// - 在 #panel_term 内的 H1/H2/H3 前添加切换按钮（小三角）
+// - 将标题后连续的兄弟块（indent/padding 等）包裹进可折叠容器
+// - 默认状态：H1/H2 展开，H3 收起
 
 (function () {
   const PANEL_ID = 'panel_term';
@@ -20,7 +20,7 @@
   }
 
   function nextElement(el) {
-    // Skip text nodes etc.
+    // 跳过文本节点等非元素节点，返回下一个元素节点
     let n = el.nextSibling;
     while (n && n.nodeType !== 1) n = n.nextSibling;
     return n;
@@ -38,13 +38,25 @@
     return items;
   }
 
+  // 仅识别“术语段落”相关的块，避免把无关元素（如首页的固定按钮容器）也包裹进去
+  function isSectionContentNode(n) {
+    if (!n || n.nodeType !== 1) return false;
+    if (isHeading(n)) return false;
+    const tag = (n.tagName || '').toLowerCase();
+    // panel_term 中用于内容结构的自定义标签/类
+    if (tag === 'padding') return true;
+    if (n.classList && (n.classList.contains('indent') || n.classList.contains('h'))) return true;
+    // 容器型节点，内部包含上述内容时也允许（例如某些生成的包裹层）
+    if (n.querySelector && n.querySelector('padding, .indent, .h')) return true;
+    return false;
+  }
+
   function hasLowerOrSameHeading(nodes, currentLevel) {
-    // Return true if within the section there exists any descendant heading
-    // with level >= currentLevel (i.e., lower or same level headings nested inside)
+    // 若该标题段内存在层级 >= 当前层级的后代标题（即同级或更低级标题），则返回 true
     for (const n of nodes) {
       if (isHeading(n) && getLevel(n) >= currentLevel) return true;
       if (n.querySelector) {
-        // Optimize query by level needed (include same and lower levels)
+        // 按需优化选择器（仅匹配同级及更低级的标题）
         let selector = '';
         if (currentLevel <= 1) selector = 'h1, h2, h3';
         else if (currentLevel === 2) selector = 'h2, h3';
@@ -56,20 +68,20 @@
   }
 
   function ensureButton(h, content) {
-    // Avoid duplicate
+    // 避免重复创建按钮
     if (h.querySelector('.collapsible__toggle')) return h.querySelector('.collapsible__toggle');
 
     const btn = document.createElement('button');
     btn.className = 'collapsible__toggle';
     btn.type = 'button';
     btn.setAttribute('aria-expanded', 'true');
-    // Prepend a chevron symbol
+  // 添加下拉小三角图标
     const icon = document.createElement('span');
     icon.className = 'collapsible__chevron';
     icon.textContent = '▾';
     btn.appendChild(icon);
 
-    // Place at the start of heading content
+  // 插入到标题内容最前面
     h.insertBefore(btn, h.firstChild);
 
     btn.addEventListener('click', () => {
@@ -80,7 +92,7 @@
       }
     });
 
-    // Restrict toggle to the icon only; clicking heading text does not toggle
+    // 仅允许点击图标触发折叠；点击标题文字不触发
     h.addEventListener('click', (e) => {
       if (!e.target.closest('.collapsible__toggle')) return;
       // Click on the toggle icon will be handled by the button listener
@@ -104,19 +116,22 @@
     const headings = Array.from(container.querySelectorAll('h1, h2, h3'));
     if (!headings.length) return false;
 
-    // Process in DOM order
+    // 按 DOM 顺序处理
     headings.forEach(h => {
-      const sectionNodes = collectSectionSiblings(h);
-      if (!sectionNodes.length) return; // nothing to fold
+      // 收集当前标题后属于该段落的兄弟节点
+      const sectionNodesAll = collectSectionSiblings(h);
+      // 过滤仅保留 panel_term 的“段落内容”节点，避免误包裹到其他页面的按钮/容器，造成遮挡
+      const sectionNodes = sectionNodesAll.filter(isSectionContentNode);
+      if (!sectionNodes.length) return; // 无可折叠内容
 
       const lvl = getLevel(h);
-  // Only add collapsible if there exists a lower or same-level heading inside this section
+  // 仅在该段内容内存在“同级或更低级标题”时，才添加折叠容器（否则折叠没有意义）
   if (!hasLowerOrSameHeading(sectionNodes, lvl)) return;
 
       const wrapper = wrapContent(sectionNodes);
       const btn = ensureButton(h, wrapper);
 
-      // Defaults: all expanded per user preference (no 'is-collapsed')
+      // 默认：全部展开（不加 'is-collapsed'）
     });
 
     return true;
@@ -124,19 +139,23 @@
 
   function onTransitionEnd(e, el) {
     if (e.propertyName !== 'height') return;
-    // When expansion finished, set height auto for flexible content
+    // 展开完成后，将高度改为 auto 以适配内容动态变化
     if (!el.classList.contains('is-collapsed')) {
       el.style.height = 'auto';
+      // 展开完成后允许可见溢出，避免内容被裁剪
+      el.style.overflow = '';
     }
     el.removeEventListener('transitionend', el._collapseTEnd);
     el._collapseTEnd = null;
   }
 
   function collapseSection(el, btn) {
-    // Freeze current height, then animate to 0
+    // 先固定当前高度，再动画收起到 0
     el.style.height = el.scrollHeight + 'px';
-    // force reflow
+    // 强制重排以启动过渡
     void el.offsetHeight;
+    // 动画期间裁剪溢出，避免收起过程闪动
+    el.style.overflow = 'hidden';
     el._collapseTEnd && el.removeEventListener('transitionend', el._collapseTEnd);
     el._collapseTEnd = (ev) => onTransitionEnd(ev, el);
     el.addEventListener('transitionend', el._collapseTEnd);
@@ -148,12 +167,14 @@
   }
 
   function expandSection(el, btn) {
-    // Start from 0, animate to scrollHeight
+    // 从 0 高度开始，动画展开到 scrollHeight
     el.classList.remove('is-collapsed');
-    // from collapsed state, current computed height is 0; set to 0 explicitly
+    // 从折叠态开始，计算高度为 0；显式设置为 0
     el.style.height = '0px';
-    // force reflow
+    // 强制重排以启动过渡
     void el.offsetHeight;
+    // 动画期间裁剪溢出，待动画完成后在 onTransitionEnd 里恢复
+    el.style.overflow = 'hidden';
     el._collapseTEnd && el.removeEventListener('transitionend', el._collapseTEnd);
     el._collapseTEnd = (ev) => onTransitionEnd(ev, el);
     el.addEventListener('transitionend', el._collapseTEnd);
@@ -167,7 +188,7 @@
   function tryInit() {
     const panel = document.getElementById(PANEL_ID);
     if (!panel) {
-      // Panel not yet injected (data-include still loading). Observe the body until it appears.
+      // 面板尚未注入（data-include 仍在加载），监听 body，待出现后再初始化
       const bodyObserver = new MutationObserver(() => {
         const p = document.getElementById(PANEL_ID);
         if (p) {
@@ -187,7 +208,7 @@
 
     if (setup(container)) return;
 
-    // If headings not yet injected into the panel (include_loader async), observe and init once
+    // 若标题内容尚未注入面板（include_loader 异步），监听变更并在就绪后初始化一次
     const mo = new MutationObserver(() => {
       if (setup(container)) {
         mo.disconnect();
