@@ -15,7 +15,8 @@ class WaveButtonManager {
     }
 
     handleClick(event) {
-        const button = event.target.closest('.button.wave');
+    // 仅匹配新类名 .ripple-button
+    const button = event.target.closest('.ripple-button');
         if (button) {
             // 立即创建波纹效果，不等待DOM检查
             this.createRipple(event, button);
@@ -121,7 +122,7 @@ function add_button_wave() {
         waveButtonManager = new WaveButtonManager();
 
         // 添加CSS动画样式
-        if (!document.getElementById('wave-ripple-styles')) {
+    if (!document.getElementById('wave-ripple-styles')) {
             const style = document.createElement('style');
             style.id = 'wave-ripple-styles';
             style.textContent = `
@@ -139,16 +140,17 @@ function add_button_wave() {
                     }
                 }
 
-                .button.wave {
+                /* 波纹按钮的悬停/按下过渡效果 */
+                .ripple-button {
                     transition: all 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94);
                 }
 
-                .button.wave:hover {
+                .ripple-button:hover {
                     transform: translateY(-1px);
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
                 }
 
-                .button.wave:active {
+                .ripple-button:active {
                     transform: translateY(0);
                     transition-duration: 0.05s;
                 }

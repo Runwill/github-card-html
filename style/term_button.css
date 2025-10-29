@@ -1,5 +1,5 @@
-/* 按钮样式 */
-.button {
+/* 波纹按钮样式（使用专用类 .ripple-button） */
+.ripple-button {
     position: relative;
     border-radius: 24px;
     overflow: hidden;
@@ -10,11 +10,10 @@
     display: inline-block;
     box-shadow: 0 2px 8px #8698ff22;
     cursor: pointer;
-    padding: 10px 22px;
     border: none;
 }
 
-.button.button_color_red {
+.ripple-button.button_color_red {
     background: linear-gradient(90deg, hsl(1, 100%, 78%) 0%, hsl(1, 100%, 73%) 100%);
 }
 
