@@ -6,11 +6,12 @@
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
     .ripple-button { padding: 8px 17px; margin-left: -2em; margin-top: -1em; }
-    #header_title { margin-right: 37px; }
+    #header_title { margin-right: 35px; }
     #nav-item { margin: 0 8px 0 0; }
     #menu-toggle {
         padding: 8px 1px;
     }
+    #header .strength_title { font-size: 16px !important; }
 }
 
 @media (min-width: 391px) and (max-width: 400px) {
@@ -22,6 +23,7 @@
     #menu-toggle {
         padding: 8px 10px;
     }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 401px) and (max-width: 500px) {
@@ -33,6 +35,7 @@
     #menu-toggle {
         padding: 8px 10px;
     }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 501px) and (max-width: 600px) {
@@ -44,6 +47,7 @@
     #menu-toggle {
         padding: 8px 12px;
     }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 601px) and (max-width: 700px) {
@@ -55,6 +59,7 @@
     #menu-toggle {
         padding: 8px 12px;
     }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 701px) and (max-width: 800px) {
@@ -66,6 +71,7 @@
     #menu-toggle {
         padding: 8px 12px;
     }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 801px) and (max-width: 900px) {
@@ -77,6 +83,7 @@
     #menu-toggle {
         padding: 8px 12px;
     }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 901px) and (max-width: 1100px) {
@@ -88,6 +95,7 @@
     #menu-toggle {
         padding: 8px 12px;
     }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 1101px) and (max-width: 1200px) {
@@ -100,6 +108,7 @@
         padding: 8px 12px;
     }
     #block-under-search { height: 1.5em; }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 1201px) and (max-width: 1400px) {
@@ -112,6 +121,7 @@
         padding: 8px 12px;
     }
     #block-under-search { height: 1.5em; }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 1401px) {
@@ -125,6 +135,7 @@
         padding: 8px 12px;
     }
     #block-under-search { height: 1.5em; }
+    #header .strength_title { font-size: 18px !important; }
 }
 
 /* 头栏标题容器高度固定，避免根字号降低时相对 48px 容器看起来“下沉” */
@@ -133,10 +144,7 @@
     line-height: 48px !important;
 }
 
-/* strength_title 固定字号 */
-#header .strength_title {
-    font-size: 18px !important;
-}
+/* strength_title 的字号已分发到各断点，保持一致（18px） */
 
 #search-input { right: -95%; }
 .search-container { margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky; }
