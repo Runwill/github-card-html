@@ -5,8 +5,8 @@
     btn.id = 'back-to-top';
     btn.className = 'back-to-top';
     btn.type = 'button';
-    btn.setAttribute('aria-label', '返回顶部');
-    btn.title = '返回顶部';
+  btn.setAttribute('aria-label', '返回顶部');
+  // 不设置 title，避免悬浮提示气泡
     // 使用内联 SVG，避免额外请求
     btn.innerHTML = '<svg class="back-to-top__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 19V5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6 10l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
     document.body.appendChild(btn);

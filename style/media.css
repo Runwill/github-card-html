@@ -5,7 +5,7 @@
 @media (max-width: 390px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 8px 17px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 37px; }
     #nav-item { margin: 0 8px 0 0; }
     #menu-toggle {
@@ -16,7 +16,7 @@
 @media (min-width: 391px) and (max-width: 400px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 8px 17px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 40px; }
     #nav-item { margin: 0 10px 0 0; }
     #menu-toggle {
@@ -27,7 +27,7 @@
 @media (min-width: 401px) and (max-width: 500px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 9px 20px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 50px; }
     #nav-item { margin: 0 10px 0 0; }
     #menu-toggle {
@@ -38,7 +38,7 @@
 @media (min-width: 501px) and (max-width: 600px) {
     html { font-size: 15px; }
     padding { padding-left: 1.2em; padding-right: 1.2em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 9px 20px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 50px; }
     #nav-item { margin: 0 25px 0 0; }
     #menu-toggle {
@@ -49,7 +49,7 @@
 @media (min-width: 601px) and (max-width: 700px) {
     html { font-size: 15px; }
     padding { padding-left: 1.6em; padding-right: 1.6em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 9px 20px; margin-left: -2em; margin-top: -1em; }
     #header_title { margin-right: 50px; }
     #nav-item { margin: 0 25px 0 0; }
     #menu-toggle {

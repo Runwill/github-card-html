@@ -20,6 +20,11 @@
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none; /* 隐藏时不占交互 */
+  /* 移动端长按去蓝色高亮/选中/呼出菜单 */
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .back-to-top.is-visible {
@@ -30,7 +35,9 @@
 
 .back-to-top:hover { background: #ffffff; }
 .back-to-top:active { transform: translateY(1px); }
-.back-to-top:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+/* 去除移动端长按产生的聚焦外框；如需键盘可见焦点，可按需改为 .back-to-top[data-a11y-focus] */
+.back-to-top:focus,
+.back-to-top:focus-visible { outline: none; }
 
 .back-to-top__icon {
   width: 18px;

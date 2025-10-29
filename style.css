@@ -178,6 +178,6 @@ h3 { font-size: 1.0rem; }
 /* 水波按钮微上移，贴齐文本左上角视觉（不影响悬停时的 transform 动画） */
 .ripple-button {
     position: relative;
-    top: 0.5em;
+    top: 0.55em;
     vertical-align: text-top;
 }
