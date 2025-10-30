@@ -5,6 +5,35 @@
 
   async function jsonGet(path){ const r = await fetch(`${API}${path}`, { headers: authHeader() }); if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }
   async function jsonPost(path, body){ const r = await fetch(`${API}${path}`, { method:'POST', headers: { 'Content-Type':'application/json', ...authHeader() }, body: JSON.stringify(body||{}) }); const out = await r.json().catch(()=>({})); if (!r.ok) throw new Error(out && out.message || `HTTP ${r.status}`); return out; }
+  async function setPassword(userId, newPassword){ return jsonPost('/user/password/set', { userId, newPassword }); }
+
+  // 统一吐司：可强制 error 样式
+  function showToast(message, type){
+    const forceError = (type === 'error');
+    // 若需强制错误样式，走本地构造，避免外部 API 无法指定样式的问题
+    if (forceError) {
+      try{
+        let container=document.querySelector('.tokens-toast-container');
+        if(!container){ container=document.createElement('div'); container.className='tokens-toast-container'; document.body.appendChild(container); }
+        const toast=document.createElement('div'); toast.className='tokens-toast tokens-toast--error';
+        const NS='http://www.w3.org/2000/svg';
+        const svg=document.createElementNS(NS,'svg'); svg.setAttribute('width','18'); svg.setAttribute('height','18'); svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none'); svg.setAttribute('aria-hidden','true');
+        const path=document.createElementNS(NS,'path'); path.setAttribute('d','M18 6L6 18M6 6l12 12'); path.setAttribute('stroke','currentColor'); path.setAttribute('stroke-width','2.5'); path.setAttribute('stroke-linecap','round'); path.setAttribute('stroke-linejoin','round');
+        svg.appendChild(path); toast.appendChild(svg);
+        toast.appendChild(document.createTextNode(' ' + (message || '错误')));
+        container.appendChild(toast);
+        setTimeout(()=>{ try{ toast.remove(); }catch(_){} if(container && container.children.length===0){ try{ container.remove(); }catch(_){} } }, 2200);
+        return;
+      }catch(_){ /* ignore and fallback */ }
+    }
+    // 非强制错误样式：优先通用 Admin Toast，其次 CardUI 消息
+    try { if (window.tokensAdmin && typeof window.tokensAdmin.showToast === 'function') { window.tokensAdmin.showToast(message); return; } } catch(_){ }
+    try {
+      const toast = window.CardUI && window.CardUI.Manager && window.CardUI.Manager.Core && window.CardUI.Manager.Core.messages && window.CardUI.Manager.Core.messages.toast;
+      if (typeof toast === 'function') { toast(message); return; }
+    } catch(_){ }
+    try { alert(message); } catch(_){ }
+  }
 
   function badge(text, cls){ const s = document.createElement('span'); s.className = 'badge ' + (cls||''); s.textContent = text; return s; }
 
@@ -169,16 +198,19 @@
       left.appendChild(meta);
       left.appendChild(tagsWrap);
 
-      // 右侧：编辑按钮
+    // 右侧：编辑按钮 + 修改密码按钮
       const right = makeEl('div', 'approval-right');
   const editBtn = makeEl('button', 'btn btn--secondary btn--sm');
   try { editBtn.setAttribute('data-i18n', 'permissions.edit'); } catch(_){ try { if (window.t) editBtn.textContent = window.t('permissions.edit'); } catch(__){} }
-      right.appendChild(editBtn);
+    const pwdBtn = makeEl('button', 'btn btn--secondary btn--sm');
+    try { pwdBtn.setAttribute('data-i18n', 'permissions.changePassword'); } catch(_){ try { if (window.t) pwdBtn.textContent = window.t('permissions.changePassword'); } catch(__){} }
+    right.appendChild(editBtn);
+    right.appendChild(pwdBtn);
 
       row.appendChild(left); row.appendChild(right);
   frag.appendChild(row);
 
-      // 行内编辑器（默认隐藏）
+  // 行内编辑器（默认隐藏）
       const editor = makeEl('div', 'perm-editor');
       editor.style.display = 'none';
 
@@ -218,6 +250,31 @@
       editor.appendChild(actions);
   frag.appendChild(editor);
 
+    // 密码编辑器（默认隐藏）
+  const pwdEditor = makeEl('div', 'perm-editor perm-editor--plain');
+    pwdEditor.style.display = 'none';
+    const pwdList = makeEl('div', 'perm-editor__list');
+    const rowNew = makeEl('div', 'perm-editor__item');
+    const inputNew = document.createElement('input'); inputNew.type = 'password'; inputNew.className = 'tokens-input';
+    try { inputNew.setAttribute('placeholder', (window.t && window.t('modal.password.new')) || '新密码'); } catch(_){ inputNew.placeholder = '新密码'; }
+    rowNew.appendChild(inputNew);
+    const rowConfirm = makeEl('div', 'perm-editor__item');
+    const inputConfirm = document.createElement('input'); inputConfirm.type = 'password'; inputConfirm.className = 'tokens-input';
+    try { inputConfirm.setAttribute('placeholder', (window.t && window.t('modal.password.confirm')) || '确认新密码'); } catch(_){ inputConfirm.placeholder = '确认新密码'; }
+    rowConfirm.appendChild(inputConfirm);
+    pwdList.appendChild(rowNew);
+    pwdList.appendChild(rowConfirm);
+    const pwdActions = makeEl('div', 'perm-editor__actions');
+    const btnPwdCancel = makeEl('button', 'btn btn--secondary');
+    const btnPwdSave = makeEl('button', 'btn btn--primary');
+    try { btnPwdCancel.setAttribute('data-i18n', 'common.cancel'); } catch(_){ try { if (window.t) btnPwdCancel.textContent = window.t('common.cancel'); } catch(__){} }
+    try { btnPwdSave.setAttribute('data-i18n', 'common.save'); } catch(_){ try { if (window.t) btnPwdSave.textContent = window.t('common.save'); } catch(__){} }
+    pwdActions.appendChild(btnPwdCancel);
+    pwdActions.appendChild(btnPwdSave);
+    pwdEditor.appendChild(pwdList);
+    pwdEditor.appendChild(pwdActions);
+    frag.appendChild(pwdEditor);
+
       // 交互绑定
       editBtn.addEventListener('click', () => {
         const visible = editor.style.display !== 'none';
@@ -248,8 +305,34 @@
           for (const p of toRevoke) { await revoke(userId, p); }
           // 保存成功后重新渲染列表
           await window.renderPermissionsPanel((document.getElementById('perm-search-input')?.value||'').trim());
-  } catch(e){ try { alert(e && e.message ? e.message : window.t('permissions.saveFailed')); } catch(_){ alert(''); } }
+  } catch(e){ try { showToast((e && e.message) ? e.message : (window.t && window.t('permissions.saveFailed')), 'error'); } catch(_){ showToast('', 'error'); } }
         finally { spinnerBtn(btnSave, false); editor.style.display = 'none'; }
+      });
+
+      // 修改密码交互
+      pwdBtn.addEventListener('click', () => {
+        const visible = pwdEditor.style.display !== 'none';
+        pwdEditor.style.display = visible ? 'none' : 'block';
+      });
+      btnPwdCancel.addEventListener('click', () => { pwdEditor.style.display = 'none'; });
+      btnPwdSave.addEventListener('click', async () => {
+        const p1 = (inputNew.value || '').trim();
+        const p2 = (inputConfirm.value || '').trim();
+        if (!p1 || !p2) { try { showToast((window.t && window.t('error.fillAll')) || '请填写完整。', 'error'); } catch(_){} return; }
+        if (p1.length < 6) { try { showToast((window.t && window.t('error.pwdMin')) || '新密码至少 6 位。', 'error'); } catch(_){} return; }
+        if (p1 !== p2) { try { showToast((window.t && window.t('error.pwdNotMatch')) || '两次输入的新密码不一致。', 'error'); } catch(_){} return; }
+        spinnerBtn(btnPwdSave, true);
+        try {
+          await setPassword(userId, p1);
+          // 成功改为 toast 提示
+          try { showToast((window.t && window.t('status.updated')) || '已更新'); } catch(_){ }
+          // 清空并收起
+          inputNew.value = '';
+          inputConfirm.value = '';
+          pwdEditor.style.display = 'none';
+        } catch(e) {
+          try { showToast(e && e.message ? e.message : ((window.t && window.t('error.updateFailed')) || '更新失败'), 'error'); } catch(_){ showToast('', 'error'); }
+        } finally { spinnerBtn(btnPwdSave, false); }
       });
     });
 

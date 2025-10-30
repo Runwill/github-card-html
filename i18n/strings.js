@@ -142,6 +142,7 @@
   'permissions.fetchUsersFailedPrefix': '获取用户失败：',
   'permissions.user.role': '角色: {role}',
   'permissions.edit': '编辑权限',
+  'permissions.changePassword': '修改密码',
   'permissions.selectAll': '全选',
   'permissions.saveFailed': '保存失败',
   // Permissions logs
@@ -438,6 +439,7 @@
   'permissions.fetchUsersFailedPrefix': 'Fetch users failed:',
   'permissions.user.role': 'Role: {role}',
   'permissions.edit': 'Edit permissions',
+  'permissions.changePassword': 'Change password',
   'permissions.selectAll': 'Select all',
   'permissions.saveFailed': 'Save failed',
   // Permissions logs
