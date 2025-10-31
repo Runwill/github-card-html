@@ -4,7 +4,11 @@
     if(!btn) return;
   const tSafe = (typeof window.t==='function') ? window.t : (k=>k)
     try{
-      btn.textContent = mode()==='dark' ? tSafe('theme.toggle.toLight') : tSafe('theme.toggle.toDark');
+      const key = mode()==='dark' ? 'theme.toggle.toLight' : 'theme.toggle.toDark';
+      // 同步 i18n key，避免后续 i18n.apply 覆盖为错误文案
+      btn.setAttribute('data-i18n', key);
+      // 立即设置一次文本，确保无需等待 i18n.apply
+      btn.textContent = tSafe(key);
     }catch(_){ btn.textContent = mode()==='dark' ? 'theme.toggle.toLight' : 'theme.toggle.toDark'; }
   }
   const onClick=()=>{ const next=mode()==='dark'?'light':'dark'; window.setTheme?.(next); label(document.getElementById('theme-toggle-button')) }

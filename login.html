@@ -61,10 +61,13 @@
                     btn.classList.remove('btn--primary','btn--secondary','btn--success','btn--danger');
                     if (isPublic(current)) {
                         btn.classList.add('btn--success');
-                                btn.textContent = window.t('login.backend.publicSelected');
+                                // 同步 i18n key，防止后续 i18n.apply 覆盖回“切换后端”
+                                try { btn.setAttribute('data-i18n', 'login.backend.publicSelected'); } catch(_){}
+                                try { btn.textContent = window.t('login.backend.publicSelected'); } catch(_) { btn.textContent = '公网后端 (已选)'; }
                     } else {
                         btn.classList.add('btn--danger');
-                                btn.textContent = window.t('login.backend.localSelected');
+                                try { btn.setAttribute('data-i18n', 'login.backend.localSelected'); } catch(_){}
+                                try { btn.textContent = window.t('login.backend.localSelected'); } catch(_) { btn.textContent = '本地后端 (已选)'; }
                     }
                 }
 
