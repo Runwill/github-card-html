@@ -134,7 +134,9 @@
 
     // Permissions panel
     'permissions.title': '权限',
-    'permissions.search.placeholder': '按用户名/ID搜索',
+  'permissions.search.placeholder': '按用户名/ID搜索',
+  // 权限页：分离“角色”标签，便于点击角色值进行编辑
+  'permissions.user.roleLabel': '角色：',
     'permissions.search': '搜索',
     'permissions.mode.toggle.title': '切换展示模式：部分/全部',
     'permissions.mode.partial': '部分',
@@ -143,6 +145,7 @@
   'permissions.user.role': '角色: {role}',
   'permissions.edit': '编辑权限',
   'permissions.changePassword': '修改密码',
+  'permissions.changeRole': '修改角色',
   'permissions.selectAll': '全选',
   'permissions.saveFailed': '保存失败',
   // Permissions logs
@@ -432,6 +435,8 @@
     // Permissions panel
     'permissions.title': 'Permissions',
     'permissions.search.placeholder': 'Search by username/ID',
+    // Permissions: split role label for clickable value editing
+    'permissions.user.roleLabel': 'Role:',
     'permissions.search': 'Search',
     'permissions.mode.toggle.title': 'Toggle view: Partial/All',
     'permissions.mode.partial': 'Partial',
@@ -440,6 +445,7 @@
   'permissions.user.role': 'Role: {role}',
   'permissions.edit': 'Edit permissions',
   'permissions.changePassword': 'Change password',
+  'permissions.changeRole': 'Change role',
   'permissions.selectAll': 'Select all',
   'permissions.saveFailed': 'Save failed',
   // Permissions logs

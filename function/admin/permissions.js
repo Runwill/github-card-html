@@ -46,6 +46,7 @@
   }
   async function grant(userId, perm){ return jsonPost('/user/permissions/update', { userId, action:'grant', permission: perm }); }
   async function revoke(userId, perm){ return jsonPost('/user/permissions/update', { userId, action:'revoke', permission: perm }); }
+  async function setRole(userId, role){ return jsonPost('/user/role/set', { userId, role }); }
 
   // 仅从后端获取统一清单（不再在前端维护基线）
   // 注意：如请求失败将抛出异常，调用方自行降级为“仅展示用户已拥有的历史权限”
@@ -235,12 +236,15 @@
       const left = makeEl('div', 'approval-left');
       const meta = makeEl('div');
       const title = makeEl('div', 'approval-title', u.username || '');
-      const sub = makeEl('div', 'approval-sub');
-      try {
-        sub.setAttribute('data-i18n', 'permissions.user.role');
-        sub.setAttribute('data-i18n-params', JSON.stringify({ role: (u.role || '-') }));
-  } catch(_){ try { if (window.t) sub.textContent = window.t('permissions.user.role', { role: (u.role || '-') }); } catch(__){} }
-      meta.appendChild(title); meta.appendChild(sub);
+  const sub = makeEl('div', 'approval-sub');
+  // 拆分为“标签 + 值”，以便让角色值可点击进入编辑
+  const subLabel = makeEl('span', 'approval-sub__label');
+  try { subLabel.setAttribute('data-i18n', 'permissions.user.roleLabel'); } catch(_){ try { if (window.t) subLabel.textContent = window.t('permissions.user.roleLabel'); } catch(__){} }
+  const roleValue = makeEl('span', 'approval-role', u.role || '-');
+  try { roleValue.classList.add('is-editable'); roleValue.setAttribute('tabindex', '0'); roleValue.setAttribute('role', 'button'); } catch(_){ }
+  sub.appendChild(subLabel);
+  sub.appendChild(roleValue);
+  meta.appendChild(title); meta.appendChild(sub);
 
       // 权限标签区域
       const tagsWrap = makeEl('div', 'perm-tags');
@@ -254,7 +258,7 @@
       left.appendChild(meta);
       left.appendChild(tagsWrap);
 
-    // 右侧：编辑按钮 + 修改密码按钮
+    // 右侧：编辑权限按钮 + 修改密码按钮（角色改为点击“角色值”进入编辑，不再使用按钮）
       const right = makeEl('div', 'approval-right');
   const editBtn = makeEl('button', 'btn btn--secondary btn--sm');
   try { editBtn.setAttribute('data-i18n', 'permissions.edit'); } catch(_){ try { if (window.t) editBtn.textContent = window.t('permissions.edit'); } catch(__){} }
@@ -262,6 +266,7 @@
     try { pwdBtn.setAttribute('data-i18n', 'permissions.changePassword'); } catch(_){ try { if (window.t) pwdBtn.textContent = window.t('permissions.changePassword'); } catch(__){} }
     right.appendChild(editBtn);
     right.appendChild(pwdBtn);
+    // 不再添加“修改角色”按钮
 
       row.appendChild(left); row.appendChild(right);
   frag.appendChild(row);
@@ -333,6 +338,40 @@
     pwdEditor.appendChild(pwdActions);
     frag.appendChild(pwdEditor);
 
+      // 角色编辑器（默认隐藏）
+      const roleEditor = makeEl('div', 'perm-editor perm-editor--plain');
+      roleEditor.style.display = 'none';
+      roleEditor.classList.add('is-collapsed');
+      const roleList = makeEl('div', 'perm-editor__list');
+      const roleRow = makeEl('div', 'perm-editor__item');
+      const select = document.createElement('select');
+      select.className = 'tokens-input';
+      const ROLES = [
+        { v: 'admin', k: 'role.admin' },
+        { v: 'moderator', k: 'role.moderator' },
+        { v: 'user', k: 'role.user' },
+        { v: 'guest', k: 'role.guest' }
+      ];
+      ROLES.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.v;
+        try { opt.textContent = (window.t && window.t(r.k)) || r.v; } catch(_){ opt.textContent = r.v; }
+        if (String(u.role) === r.v) opt.selected = true;
+        select.appendChild(opt);
+      });
+      roleRow.appendChild(select);
+      roleList.appendChild(roleRow);
+      const roleActions = makeEl('div', 'perm-editor__actions');
+      const btnRoleCancel = makeEl('button', 'btn btn--secondary');
+      const btnRoleSave = makeEl('button', 'btn btn--primary');
+      try { btnRoleCancel.setAttribute('data-i18n', 'common.cancel'); } catch(_){ try { if (window.t) btnRoleCancel.textContent = window.t('common.cancel'); } catch(__){} }
+      try { btnRoleSave.setAttribute('data-i18n', 'common.save'); } catch(_){ try { if (window.t) btnRoleSave.textContent = window.t('common.save'); } catch(__){} }
+      roleActions.appendChild(btnRoleCancel);
+      roleActions.appendChild(btnRoleSave);
+      roleEditor.appendChild(roleList);
+      roleEditor.appendChild(roleActions);
+      frag.appendChild(roleEditor);
+
       // 交互绑定
       editBtn.addEventListener('click', () => {
         const visible = editor.style.display !== 'none' && !editor.classList.contains('is-collapsed');
@@ -391,6 +430,39 @@
         } catch(e) {
           try { showToast(e && e.message ? e.message : ((window.t && window.t('error.updateFailed')) || '更新失败'), 'error'); } catch(_){ showToast('', 'error'); }
         } finally { spinnerBtn(btnPwdSave, false); }
+      });
+
+      // 修改角色交互：点击“角色值”进入编辑
+      const openRoleEditor = () => {
+        const visible = roleEditor.style.display !== 'none' && !roleEditor.classList.contains('is-collapsed');
+        if (!visible) {
+          toggleSection(roleEditor, true);
+          try { select.focus(); } catch(_){ }
+        }
+      };
+      roleValue.addEventListener('click', openRoleEditor);
+      roleValue.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRoleEditor(); } });
+      // 在下拉框内：Enter 保存，Escape 取消；变更不自动保存，仍走显式保存
+      select.addEventListener('keydown', (e)=>{
+        if (e.key === 'Enter') { e.preventDefault(); btnRoleSave.click(); }
+        else if (e.key === 'Escape') { e.preventDefault(); btnRoleCancel.click(); }
+      });
+      btnRoleCancel.addEventListener('click', () => { toggleSection(roleEditor, false); });
+      btnRoleSave.addEventListener('click', async () => {
+        const newRole = select.value;
+        if (!newRole) { toggleSection(roleEditor, false); return; }
+        spinnerBtn(btnRoleSave, true);
+        try {
+          await setRole(userId, newRole);
+          try { showToast((window.t && window.t('status.updated')) || '已更新'); } catch(_){ }
+          // 刷新列表以反映新角色
+          await window.renderPermissionsPanel((document.getElementById('perm-search-input')?.value||'').trim());
+        } catch(e) {
+          try { showToast(e && e.message ? e.message : ((window.t && window.t('error.updateFailed')) || '更新失败'), 'error'); } catch(_){ showToast('', 'error'); }
+        } finally {
+          spinnerBtn(btnRoleSave, false);
+          toggleSection(roleEditor, false);
+        }
       });
     });
 
