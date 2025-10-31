@@ -56,12 +56,28 @@
   border-radius: 8px;
   padding: 10px 12px;
   background: #fff;
-  margin-top: 8px;
+  /* 打开时上下各留出 8px 间距，避免紧贴上下用户条目 */
+  margin: 8px 0;
+  /* 过渡动画：展开/收起（与 collapsible.css 行为一致） */
+  overflow: hidden;                 /* 收起时裁剪内容，避免溢出 */
+  height: auto;                     /* 展开后的自然高度 */
+  opacity: 1;                       /* 展开态不透明 */
+  transition: height 200ms ease, opacity 150ms ease, transform 200ms ease;
+  will-change: height, opacity, transform;
 }
 .perm-editor--plain {
   border: none;           /* 去除外框，避免与输入框边框叠加 */
   background: transparent;
   padding: 8px 0 0;       /* 上方留一点间距，与上方按钮分隔 */
+}
+/* 收起态（由 JS 切换该类） */
+.perm-editor.is-collapsed {
+  height: 0 !important;
+  opacity: 0 !important;
+  transform: translateY(-4px);
+  pointer-events: none;
+  /* 收起时不保留上下间距，避免出现空白 */
+  margin: 0 !important;
 }
 /* 精简模式下，避免“边框+发光环”看起来像双框：仅保留边框颜色变化 */
 .perm-editor--plain .tokens-input,

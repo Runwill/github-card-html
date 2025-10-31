@@ -94,6 +94,62 @@
     btn.classList.toggle('is-loading', !!spinning);
   }
 
+  // 内联编辑器展开/收起过渡
+  function toggleSection(panel, open){
+    if (!panel) return;
+    const DURATION = 220; // 与 CSS 基本一致
+    if (panel.__animating) return;
+    const isHidden = (panel.style.display === 'none') || panel.classList.contains('is-collapsed');
+    const shouldOpen = (open == null) ? isHidden : !!open;
+    panel.__animating = true;
+
+    if (shouldOpen){
+      // 初始为可测量状态
+      panel.style.display = 'block';
+      panel.classList.add('is-collapsed');
+      panel.style.height = '0px';
+      panel.style.opacity = '0';
+      // 读取自然高度
+      const target = panel.scrollHeight;
+      requestAnimationFrame(()=>{
+        panel.style.transition = 'height 200ms ease, opacity 150ms ease, transform 200ms ease';
+        panel.classList.remove('is-collapsed');
+        panel.style.height = target + 'px';
+        panel.style.opacity = '1';
+        const done = (e)=>{
+          if (e && e.target !== panel) return;
+          panel.removeEventListener('transitionend', done);
+          panel.style.transition = '';
+          panel.style.height = '';
+          panel.style.opacity = '';
+          panel.__animating = false;
+        };
+        panel.addEventListener('transitionend', done);
+      });
+    } else {
+      // 关闭：从当前高度到 0
+      const start = panel.scrollHeight;
+      panel.style.height = start + 'px';
+      panel.style.opacity = '1';
+      // 强制回流，确保起点生效
+      void panel.offsetHeight;
+      panel.style.transition = 'height 200ms ease, opacity 150ms ease, transform 200ms ease';
+      panel.style.height = '0px';
+      panel.style.opacity = '0';
+      panel.classList.add('is-collapsed');
+      const done = (e)=>{
+        if (e && e.target !== panel) return;
+        panel.removeEventListener('transitionend', done);
+        panel.style.transition = '';
+        panel.style.height = '';
+        panel.style.opacity = '';
+        panel.style.display = 'none';
+        panel.__animating = false;
+      };
+      panel.addEventListener('transitionend', done);
+    }
+  }
+
   // 模式：partial=部分（当搜索为空时仅显示有权限的用户），all=全部
   let permMode = 'partial';
   // 渲染并发保护：仅处理最后一次调用的结果
@@ -211,8 +267,9 @@
   frag.appendChild(row);
 
   // 行内编辑器（默认隐藏）
-      const editor = makeEl('div', 'perm-editor');
-      editor.style.display = 'none';
+  const editor = makeEl('div', 'perm-editor');
+  editor.style.display = 'none';
+  editor.classList.add('is-collapsed');
 
       // 工具栏：全选/清空（不需要权限筛选）
       const toolbar = makeEl('div', 'perm-editor__toolbar');
@@ -238,7 +295,7 @@
       renderChecklist();
 
       // 底部操作：取消/保存
-      const actions = makeEl('div', 'perm-editor__actions');
+  const actions = makeEl('div', 'perm-editor__actions');
   const btnCancel = makeEl('button', 'btn btn--secondary');
   const btnSave = makeEl('button', 'btn btn--primary');
   try { btnCancel.setAttribute('data-i18n', 'common.cancel'); } catch(_){ try { if (window.t) btnCancel.textContent = window.t('common.cancel'); } catch(__){} }
@@ -253,6 +310,7 @@
     // 密码编辑器（默认隐藏）
   const pwdEditor = makeEl('div', 'perm-editor perm-editor--plain');
     pwdEditor.style.display = 'none';
+    pwdEditor.classList.add('is-collapsed');
     const pwdList = makeEl('div', 'perm-editor__list');
     const rowNew = makeEl('div', 'perm-editor__item');
     const inputNew = document.createElement('input'); inputNew.type = 'password'; inputNew.className = 'tokens-input';
@@ -277,8 +335,8 @@
 
       // 交互绑定
       editBtn.addEventListener('click', () => {
-        const visible = editor.style.display !== 'none';
-        editor.style.display = visible ? 'none' : 'block';
+        const visible = editor.style.display !== 'none' && !editor.classList.contains('is-collapsed');
+        toggleSection(editor, !visible);
       });
       btnSelectAll.addEventListener('click', () => {
         const cbs = Array.from(list.querySelectorAll('input[type="checkbox"]').values());
@@ -287,7 +345,7 @@
         const shouldSelectAll = checkedCount < total; // 不是全选 -> 全选；已全选 -> 清空
         cbs.forEach(cb => { cb.checked = shouldSelectAll; });
       });
-      btnCancel.addEventListener('click', () => { editor.style.display = 'none'; });
+  btnCancel.addEventListener('click', () => { toggleSection(editor, false); });
       btnSave.addEventListener('click', async () => {
         // 采集勾选并与 current 求差集
         const selected = Array.from(list.querySelectorAll('input[type="checkbox"]'))
@@ -306,15 +364,15 @@
           // 保存成功后重新渲染列表
           await window.renderPermissionsPanel((document.getElementById('perm-search-input')?.value||'').trim());
   } catch(e){ try { showToast((e && e.message) ? e.message : (window.t && window.t('permissions.saveFailed')), 'error'); } catch(_){ showToast('', 'error'); } }
-        finally { spinnerBtn(btnSave, false); editor.style.display = 'none'; }
+  finally { spinnerBtn(btnSave, false); toggleSection(editor, false); }
       });
 
       // 修改密码交互
       pwdBtn.addEventListener('click', () => {
-        const visible = pwdEditor.style.display !== 'none';
-        pwdEditor.style.display = visible ? 'none' : 'block';
+        const visible = pwdEditor.style.display !== 'none' && !pwdEditor.classList.contains('is-collapsed');
+        toggleSection(pwdEditor, !visible);
       });
-      btnPwdCancel.addEventListener('click', () => { pwdEditor.style.display = 'none'; });
+      btnPwdCancel.addEventListener('click', () => { toggleSection(pwdEditor, false); });
       btnPwdSave.addEventListener('click', async () => {
         const p1 = (inputNew.value || '').trim();
         const p2 = (inputConfirm.value || '').trim();
@@ -329,7 +387,7 @@
           // 清空并收起
           inputNew.value = '';
           inputConfirm.value = '';
-          pwdEditor.style.display = 'none';
+          toggleSection(pwdEditor, false);
         } catch(e) {
           try { showToast(e && e.message ? e.message : ((window.t && window.t('error.updateFailed')) || '更新失败'), 'error'); } catch(_){ showToast('', 'error'); }
         } finally { spinnerBtn(btnPwdSave, false); }
