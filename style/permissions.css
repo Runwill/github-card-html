@@ -62,8 +62,16 @@
   overflow: hidden;                 /* 收起时裁剪内容，避免溢出 */
   height: auto;                     /* 展开后的自然高度 */
   opacity: 1;                       /* 展开态不透明 */
-  transition: height 200ms ease, opacity 150ms ease, transform 200ms ease;
-  will-change: height, opacity, transform;
+  /* 同步过渡 padding/margin/border，避免收起时残留“细条”再瞬间消失的视觉跳变 */
+  transition: height 200ms ease,
+              opacity 150ms ease,
+              transform 200ms ease,
+              padding-top 200ms ease,
+              padding-bottom 200ms ease,
+              margin-top 200ms ease,
+              margin-bottom 200ms ease,
+              border-width 200ms ease;
+  will-change: height, opacity, transform, padding, margin, border-width;
 }
 .perm-editor--plain {
   border: none;           /* 去除外框，避免与输入框边框叠加 */
@@ -78,6 +86,10 @@
   pointer-events: none;
   /* 收起时不保留上下间距，避免出现空白 */
   margin: 0 !important;
+  /* 收起时同时将上下内边距与边框宽度过渡为 0，避免最后一瞬的残留高度 */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-width: 0 !important;
 }
 /* 精简模式下，避免“边框+发光环”看起来像双框：仅保留边框颜色变化 */
 .perm-editor--plain .tokens-input,
