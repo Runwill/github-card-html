@@ -1,353 +1,408 @@
-(function(w){
-  const ns = w.TokensPerm = w.TokensPerm || {};
+((w)=>{
+  // 命名空间与状态
+  const ns = (w.TokensPerm = w.TokensPerm || {});
   ns.state = ns.state || { permMode: 'partial', renderSeq: 0 };
   const S = ns.state;
+
+  // 依赖
   const UI = ns.UI || {};
   const API = ns.API || {};
-
   const { makeEl, tag, bindPermTooltip, spinnerBtn, toggleSection, showToast } = UI;
 
-  ns.renderPermissionsPanel = async function(search){
-    const thisSeq = ++S.renderSeq;
-    const box = document.getElementById('perm-list'); const msg = document.getElementById('perm-message'); if (!box) return;
-
-    // 确保搜索事件已绑定（面板通过 include 异步注入，可能比 DOMContentLoaded 更晚）
+  // 工具：i18n/文本/提示
+  const t = (key, fallback) => {
+    try { return (w.t && w.t(key)) || fallback; } catch { return fallback; }
+  };
+  const setI18nAttr = (el, key, fallbackText) => {
+    if (!el) return;
     try {
-      const searchBtn = document.getElementById('perm-search-btn');
+      el.setAttribute('data-i18n', key);
+      w.i18n && w.i18n.apply && w.i18n.apply(el);
+    } catch { if (fallbackText != null) el.textContent = fallbackText; }
+  };
+  const setText = (el, key, fallback) => {
+    if (!el) return;
+    try { el.textContent = (w.t && w.t(key)) || fallback || ''; }
+    catch { el.textContent = fallback || ''; }
+  };
+  const toast = (keyOrText, type) => {
+    try { showToast((w.t && w.t(keyOrText)) || keyOrText || '', type); }
+    catch { showToast('', type); }
+  };
+
+  // 动效能力缓存
+  const CAN_WAAPI = !!(Element.prototype && Element.prototype.animate);
+  const PREFERS_REDUCED = !!(w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const STAGGER_EXIT = 18; // ms
+  const STAGGER_ENTER = 14; // ms
+
+  // 绑定搜索/切换模式控件（仅一次）
+  function ensureSearchBindings(){
+    try {
+      const btn = document.getElementById('perm-search-btn');
       const input = document.getElementById('perm-search-input');
       const toggle = document.getElementById('perm-mode-toggle');
-      if (searchBtn && !searchBtn.__permBound) {
-        searchBtn.__permBound = true;
-        searchBtn.addEventListener('click', ()=> w.renderPermissionsPanel((input?.value||'').trim()));
+      if (btn && !btn.__permBound) {
+        btn.__permBound = true;
+        btn.addEventListener('click', ()=> w.renderPermissionsPanel((input?.value || '').trim()));
       }
       if (input && !input.__permBound) {
         input.__permBound = true;
-        input.addEventListener('keydown', (e)=>{ if (e.key==='Enter') w.renderPermissionsPanel((input.value||'').trim()); });
+        input.addEventListener('keydown', (e)=>{
+          if (e.key === 'Enter') w.renderPermissionsPanel((input.value || '').trim());
+        });
       }
       if (toggle && !toggle.__permBound) {
         toggle.__permBound = true;
         toggle.addEventListener('click', ()=>{
           S.permMode = (S.permMode === 'partial') ? 'all' : 'partial';
-          try {
-            const key = (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all';
-            toggle.setAttribute('data-i18n', key);
-            w.i18n && w.i18n.apply && w.i18n.apply(toggle);
-          } catch {
-            try { toggle.textContent = (w.t && w.t((S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all')) || ((S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all'); } catch(_){ }
-          }
-          w.renderPermissionsPanel((input?.value||'').trim());
+          setI18nAttr(toggle, (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all', (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all');
+          toggle.classList.toggle('is-active', S.permMode === 'all');
+          w.renderPermissionsPanel((input?.value || '').trim());
         });
       }
       if (toggle) {
-        try {
-          const key = (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all';
-          toggle.setAttribute('data-i18n', key);
-          w.i18n && w.i18n.apply && w.i18n.apply(toggle);
-        } catch {
-          try { toggle.textContent = (w.t && w.t((S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all')) || ((S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all'); } catch(_){}
-        }
+        setI18nAttr(toggle, (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all', (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all');
         toggle.classList.toggle('is-active', S.permMode === 'all');
       }
-    } catch {}
 
-    // 不要立即清空，避免高度瞬间塌陷导致上方/下方区域跳动（日志面板闪烁）
-    msg && (msg.textContent='');
+      // 点击空白处：收起全部编辑器（仅绑定一次）
+      if (!S.__docClickBound) {
+        S.__docClickBound = true;
+        document.addEventListener('click', (e)=>{
+          const panel = document.getElementById('perm-list');
+          if (!panel) return;
+          const target = e.target;
+          // 如果点击在任一编辑器内部，忽略
+          if (target && (target.closest && (target.closest('.perm-editor')))) return;
+          // 如果点击在触发器上（编辑按钮/修改密码按钮/角色值），忽略，避免立刻被折叠
+          if (target && (target.closest && target.closest('[data-perm-trigger]'))) return;
+          // 其它区域（包括面板外部或行空白处）则收起全部编辑器
+          const editors = panel.querySelectorAll('.perm-editor');
+          editors.forEach(ed => { try { toggleSection(ed, false); } catch {} });
+        });
+      }
+    } catch {}
+  }
+
+  // 计算新内容高度（用于高度过渡）
+  function measureNewHeight(container, fragment, fallbackH){
+    try {
+      const probe = document.createElement('div');
+      probe.style.position = 'absolute';
+      probe.style.left = '-10000px';
+      probe.style.top = '0';
+      probe.style.visibility = 'hidden';
+      probe.style.pointerEvents = 'none';
+      probe.style.width = container.clientWidth + 'px';
+      probe.className = container.className || '';
+      const parent = container.parentNode || document.body;
+      parent.appendChild(probe);
+      probe.appendChild(fragment.cloneNode(true));
+      const h = probe.scrollHeight;
+      parent.removeChild(probe);
+      return h;
+    } catch { return fallbackH; }
+  }
+
+  // 旧行淡出
+  function animateExitRows(rows){
+    return new Promise(resolve => {
+      if (!rows.length) return resolve();
+      if (CAN_WAAPI && !PREFERS_REDUCED) {
+        const animations = [];
+        rows.forEach((el, idx)=>{
+          try {
+            el.style.willChange = 'opacity, transform';
+            el.style.pointerEvents = 'none';
+            const anim = el.animate([
+              { opacity: 1, transform: 'translateY(0px)' },
+              { opacity: 0, transform: 'translateY(-4px)' }
+            ], { duration: 220, easing: 'cubic-bezier(0.39, 0.575, 0.565, 1)', delay: idx * STAGGER_EXIT, fill: 'forwards' });
+            animations.push(anim.finished.catch(()=>{}).then(()=>{ try { el.style.willChange = ''; } catch{} }));
+          } catch {}
+        });
+        const fallback = 220 + (rows.length > 0 ? (rows.length - 1) * STAGGER_EXIT : 0) + 80;
+        const timer = new Promise(r => setTimeout(r, fallback));
+        Promise.race([Promise.all(animations), timer]).then(resolve);
+      } else {
+        let pending = rows.length;
+        const done = ()=>{ if (!--pending) resolve(); };
+        rows.forEach((el, idx)=>{
+          try {
+            el.style.transitionDelay = (idx * STAGGER_EXIT) + 'ms';
+            el.classList.add('perm-row-exit');
+            const onEnd = (e)=>{ if (e && e.target !== el) return; el.removeEventListener('transitionend', onEnd); try { el.style.transitionDelay=''; } catch{} done(); };
+            el.addEventListener('transitionend', onEnd);
+          } catch { done(); }
+        });
+        const fallback = 220 + (rows.length > 0 ? (rows.length - 1) * STAGGER_EXIT : 0) + 80;
+        setTimeout(resolve, fallback);
+      }
+    });
+  }
+
+  // 新行淡入
+  function animateEnterRows(rows){
+    if (CAN_WAAPI && !PREFERS_REDUCED) {
+      rows.forEach((el, idx)=>{
+        try {
+          el.style.willChange = 'opacity, transform';
+          const anim = el.animate([
+            { opacity: 0, transform: 'translateY(6px)' },
+            { opacity: 1, transform: 'translateY(0px)' }
+          ], { duration: 260, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', delay: idx * STAGGER_ENTER, fill: 'both' });
+          anim.finished.catch(()=>{}).then(()=>{ try { el.style.willChange=''; } catch{} });
+        } catch {}
+      });
+    } else {
+      rows.forEach((el, idx)=>{ try { el.classList.add('perm-row-enter'); el.style.transitionDelay = (idx * STAGGER_ENTER) + 'ms'; } catch{} });
+      requestAnimationFrame(()=>{
+        rows.forEach(el => { try { el.classList.add('perm-row-enter-active'); } catch{} });
+        const maxDelay = (rows.length > 0 ? (rows.length - 1) * STAGGER_ENTER : 0);
+        const tidy = ()=> rows.forEach(el => { try { el.classList.remove('perm-row-enter'); el.classList.remove('perm-row-enter-active'); el.style.transitionDelay=''; } catch{} });
+        setTimeout(tidy, 260 + maxDelay);
+      });
+    }
+  }
+
+  // 单个用户块（行 + 三个编辑器）
+  function createUserBlocks(u, allPerms){
+    const block = document.createDocumentFragment();
+    const userId = u._id || u.id;
+    const current = Array.isArray(u.permissions) ? [...u.permissions] : [];
+
+    // 行
+    const row = makeEl('div', 'approval-row');
+    const left = makeEl('div', 'approval-left');
+    const meta = makeEl('div');
+    const title = makeEl('div', 'approval-title', u.username || '');
+    const sub = makeEl('div', 'approval-sub');
+    const subLabel = makeEl('span', 'approval-sub__label');
+    setI18nAttr(subLabel, 'permissions.user.roleLabel', t('permissions.user.roleLabel', 'role'));
+    const roleValue = makeEl('span', 'approval-role', u.role || '-');
+  try { roleValue.classList.add('is-editable'); roleValue.setAttribute('tabindex', '0'); roleValue.setAttribute('role', 'button'); roleValue.setAttribute('data-perm-trigger',''); } catch {}
+    sub.appendChild(subLabel); sub.appendChild(roleValue);
+    meta.appendChild(title); meta.appendChild(sub);
+
+    const tagsWrap = makeEl('div', 'perm-tags');
+    const shown = current.slice(0, ns.constants.MAX_TAGS_SHOWN);
+    shown.forEach(p => { const el = tag(p, false); bindPermTooltip(el, p); tagsWrap.appendChild(el); });
+    const extra = current.slice(ns.constants.MAX_TAGS_SHOWN);
+    if (extra.length) tagsWrap.appendChild(tag('+' + extra.length, true, extra.join('、')));
+    left.appendChild(meta); left.appendChild(tagsWrap);
+
+    const right = makeEl('div', 'approval-right');
+  const editBtn = makeEl('button', 'btn btn--secondary btn--sm');
+    setI18nAttr(editBtn, 'permissions.edit', t('permissions.edit', '编辑权限'));
+  const pwdBtn = makeEl('button', 'btn btn--secondary btn--sm');
+    setI18nAttr(pwdBtn, 'permissions.changePassword', t('permissions.changePassword', '修改密码'));
+  try { editBtn.setAttribute('data-perm-trigger', ''); pwdBtn.setAttribute('data-perm-trigger', ''); } catch {}
+    right.appendChild(editBtn); right.appendChild(pwdBtn);
+    row.appendChild(left); row.appendChild(right);
+    block.appendChild(row);
+
+    // 权限编辑器
+    const editor = makeEl('div', 'perm-editor'); editor.style.display = 'none'; editor.classList.add('is-collapsed');
+    const toolbar = makeEl('div', 'perm-editor__toolbar');
+    const btnSelectAll = makeEl('button', 'btn btn--secondary btn--sm tokens-refresh');
+    setI18nAttr(btnSelectAll, 'permissions.selectAll', t('permissions.selectAll', '全选/清空'));
+    toolbar.appendChild(btnSelectAll);
+    const list = makeEl('div', 'perm-editor__list');
+    const renderChecklist = ()=>{
+      list.innerHTML = '';
+      allPerms.forEach(p => {
+        const item = makeEl('label', 'perm-editor__item');
+        bindPermTooltip(item, p);
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = p; cb.checked = current.includes(p);
+        const text = makeEl('span', 'perm-editor__item-text', p);
+        item.appendChild(cb); item.appendChild(text); list.appendChild(item);
+      });
+    };
+    renderChecklist();
+
+    const refreshTags = ()=>{
+      tagsWrap.innerHTML = '';
+      const shown2 = current.slice(0, ns.constants.MAX_TAGS_SHOWN);
+      shown2.forEach(p => { const el = tag(p, false); bindPermTooltip(el, p); tagsWrap.appendChild(el); });
+      const extra2 = current.slice(ns.constants.MAX_TAGS_SHOWN);
+      if (extra2.length) tagsWrap.appendChild(tag('+' + extra2.length, true, extra2.join('、')));
+    };
+    const actions = makeEl('div', 'perm-editor__actions');
+    const btnCancel = makeEl('button', 'btn btn--secondary');
+    const btnSave = makeEl('button', 'btn btn--primary');
+    setI18nAttr(btnCancel, 'common.cancel', t('common.cancel', '取消'));
+    setI18nAttr(btnSave, 'common.save', t('common.save', '保存'));
+    actions.appendChild(btnCancel); actions.appendChild(btnSave);
+    editor.appendChild(toolbar); editor.appendChild(list); editor.appendChild(actions);
+    block.appendChild(editor);
+
+    // 密码编辑器
+    const pwdEditor = makeEl('div', 'perm-editor perm-editor--plain'); pwdEditor.style.display='none'; pwdEditor.classList.add('is-collapsed');
+    const pwdList = makeEl('div', 'perm-editor__list');
+    const rowNew = makeEl('div', 'perm-editor__item');
+    const inputNew = document.createElement('input'); inputNew.type='password'; inputNew.className='tokens-input'; inputNew.autocomplete='new-password'; inputNew.placeholder = t('modal.password.new','新密码'); rowNew.appendChild(inputNew);
+    const rowConfirm = makeEl('div', 'perm-editor__item');
+    const inputConfirm = document.createElement('input'); inputConfirm.type='password'; inputConfirm.className='tokens-input'; inputConfirm.autocomplete='new-password'; inputConfirm.placeholder = t('modal.password.confirm','确认新密码'); rowConfirm.appendChild(inputConfirm);
+    pwdList.appendChild(rowNew); pwdList.appendChild(rowConfirm);
+    const pwdActions = makeEl('div', 'perm-editor__actions');
+    const btnPwdCancel = makeEl('button', 'btn btn--secondary');
+    const btnPwdSave = makeEl('button', 'btn btn--primary');
+    setI18nAttr(btnPwdCancel, 'common.cancel', t('common.cancel','取消'));
+    setI18nAttr(btnPwdSave, 'common.save', t('common.save','保存'));
+    pwdActions.appendChild(btnPwdCancel); pwdActions.appendChild(btnPwdSave);
+    pwdEditor.appendChild(pwdList); pwdEditor.appendChild(pwdActions);
+    block.appendChild(pwdEditor);
+
+    // 角色编辑器
+    const roleEditor = makeEl('div', 'perm-editor perm-editor--plain'); roleEditor.style.display='none'; roleEditor.classList.add('is-collapsed');
+    const roleList = makeEl('div', 'perm-editor__list');
+    const roleRow = makeEl('div', 'perm-editor__item');
+    const select = document.createElement('select'); select.className='tokens-input';
+    const ROLES = [ { v: 'admin', k: 'role.admin' }, { v: 'moderator', k: 'role.moderator' }, { v: 'user', k: 'role.user' }, { v: 'guest', k: 'role.guest' } ];
+    ROLES.forEach(r => { const opt = document.createElement('option'); opt.value = r.v; setText(opt, r.k, r.v); if (String(u.role) === r.v) opt.selected = true; select.appendChild(opt); });
+    roleRow.appendChild(select); roleList.appendChild(roleRow);
+    const roleActions = makeEl('div', 'perm-editor__actions');
+    const btnRoleCancel = makeEl('button', 'btn btn--secondary');
+    const btnRoleSave = makeEl('button', 'btn btn--primary');
+    setI18nAttr(btnRoleCancel, 'common.cancel', t('common.cancel','取消'));
+    setI18nAttr(btnRoleSave, 'common.save', t('common.save','保存'));
+    roleActions.appendChild(btnRoleCancel); roleActions.appendChild(btnRoleSave);
+    roleEditor.appendChild(roleList); roleEditor.appendChild(roleActions);
+    block.appendChild(roleEditor);
+
+    // 交互绑定 —— 权限
+    editBtn.addEventListener('click', ()=>{
+      const visible = editor.style.display !== 'none' && !editor.classList.contains('is-collapsed');
+      toggleSection(editor, !visible);
+    });
+    btnSelectAll.addEventListener('click', ()=>{
+      const cbs = Array.from(list.querySelectorAll('input[type="checkbox"]').values());
+      const shouldSelectAll = cbs.some(cb => !cb.checked);
+      cbs.forEach(cb => { cb.checked = shouldSelectAll; });
+    });
+  btnCancel.addEventListener('click', ()=> toggleSection(editor, false));
+  btnSave.addEventListener('click', async ()=>{
+      const selected = Array.from(list.querySelectorAll('input[type="checkbox"]')).filter(cb=>cb.checked).map(cb=>cb.value);
+      const curSet = new Set(current); const selSet = new Set(selected);
+      const toGrant = selected.filter(p => !curSet.has(p));
+      const toRevoke = current.filter(p => !selSet.has(p));
+      if (!toGrant.length && !toRevoke.length) { editor.style.display = 'none'; return; }
+      spinnerBtn(btnSave, true);
+      try {
+        for (const p of toGrant) { await API.grant(userId, p); if (!curSet.has(p)) { curSet.add(p); current.push(p); } }
+        for (const p of toRevoke) { await API.revoke(userId, p); if (curSet.has(p)) { curSet.delete(p); const idx = current.indexOf(p); if (idx>-1) current.splice(idx,1); } }
+        // 局部更新标签展示，不刷新整页
+        refreshTags();
+      } catch(e) { toast((e && e.message) ? e.message : 'permissions.saveFailed', 'error'); }
+      finally { spinnerBtn(btnSave, false); toggleSection(editor, false); }
+    });
+
+    // 交互绑定 —— 密码
+    pwdBtn.addEventListener('click', ()=>{
+      const visible = pwdEditor.style.display !== 'none' && !pwdEditor.classList.contains('is-collapsed');
+      toggleSection(pwdEditor, !visible);
+    });
+    btnPwdCancel.addEventListener('click', ()=> toggleSection(pwdEditor, false));
+    btnPwdSave.addEventListener('click', async ()=>{
+      const p1 = (inputNew.value || '').trim(); const p2 = (inputConfirm.value || '').trim();
+      if (!p1 || !p2) { toast('error.fillAll', 'error'); return; }
+      if (p1.length < 6) { toast('error.pwdMin', 'error'); return; }
+      if (p1 !== p2) { toast('error.pwdNotMatch', 'error'); return; }
+      spinnerBtn(btnPwdSave, true);
+      try {
+        await API.setPassword(userId, p1);
+        toast('status.updated'); inputNew.value=''; inputConfirm.value=''; toggleSection(pwdEditor, false);
+      } catch(e) { toast(e && e.message ? e.message : 'error.updateFailed', 'error'); }
+      finally { spinnerBtn(btnPwdSave, false); }
+    });
+
+    // 交互绑定 —— 角色
+    const openRoleEditor = ()=>{
+      const visible = roleEditor.style.display !== 'none' && !roleEditor.classList.contains('is-collapsed');
+      if (!visible) { toggleSection(roleEditor, true); try { select.focus(); } catch{} }
+    };
+    roleValue.addEventListener('click', openRoleEditor);
+    roleValue.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' ') { e.preventDefault(); openRoleEditor(); }});
+    select.addEventListener('keydown', (e)=>{ if (e.key==='Enter') { e.preventDefault(); btnRoleSave.click(); } else if (e.key==='Escape') { e.preventDefault(); btnRoleCancel.click(); }});
+    btnRoleCancel.addEventListener('click', ()=> toggleSection(roleEditor, false));
+    btnRoleSave.addEventListener('click', async ()=>{
+      const newRole = select.value; if (!newRole) { toggleSection(roleEditor, false); return; }
+      spinnerBtn(btnRoleSave, true);
+      try {
+        await API.setRole(userId, newRole); toast('status.updated');
+        // 局部更新角色文本，不刷新整页
+        try { roleValue.textContent = select.options[select.selectedIndex]?.textContent || newRole; } catch { roleValue.textContent = newRole; }
+      } catch(e) { toast(e && e.message ? e.message : 'error.updateFailed', 'error'); }
+      finally { spinnerBtn(btnRoleSave, false); toggleSection(roleEditor, false); }
+    });
+
+    return block;
+  }
+
+  // 主渲染入口
+  ns.renderPermissionsPanel = async function(search){
+    const thisSeq = ++S.renderSeq;
+    const box = document.getElementById('perm-list');
+    const msg = document.getElementById('perm-message');
+    if (!box) return;
+
+    ensureSearchBindings();
+    if (msg) msg.textContent = '';
+
+    // 加载数据
     let users = await API.fetchUsers(search);
     if (thisSeq !== S.renderSeq) return;
 
-    // 当搜索为空且模式为“部分”时，仅显示有至少一个权限的用户
-    const s = (search||'').trim();
-    if (!s && S.permMode === 'partial') {
-      users = users.filter(u => Array.isArray(u.permissions) && u.permissions.length > 0);
-    }
+    const s = (search || '').trim();
+    if (!s && S.permMode === 'partial') users = users.filter(u => Array.isArray(u.permissions) && u.permissions.length > 0);
 
-    // 预先构建新内容到片段，准备替换
-    const frag = document.createDocumentFragment();
-    if (!users.length){
-      const p = document.createElement('p');
-      p.className = 'empty-hint';
-      try { p.setAttribute('data-i18n', 'common.empty'); } catch(_){ }
-      frag.appendChild(p);
-    }
-
-    // 使用后端清单为主，并补入用户已有的历史权限，避免“看不见但已拥有”的情况
+    // 全量权限集合
     let master = [];
-    try { master = await API.getMasterPermissions(); } catch(e) {
-      try { if (w.t) console.error(w.t('permissions.fetchMasterFailedPrefix'), e); else console.error(e); } catch(_) { console.error(e); }
-    }
+    try { master = await API.getMasterPermissions(); }
+    catch(e) { try { console.error(t('permissions.fetchMasterFailedPrefix', '获取权限清单失败：'), e); } catch { console.error(e); } }
     const allPermsSet = new Set(master);
-    users.forEach(u => (Array.isArray(u.permissions)?u.permissions:[]).forEach(p => { if (p) allPermsSet.add(String(p)); }));
+    users.forEach(u => (Array.isArray(u.permissions) ? u.permissions : []).forEach(p => { if (p) allPermsSet.add(String(p)); }));
     const allPerms = Array.from(allPermsSet).sort();
 
-    users.forEach(u => {
-      const userId = u._id || u.id;
-      const current = Array.isArray(u.permissions) ? [...u.permissions] : [];
+    // 构建新内容
+    const frag = document.createDocumentFragment();
+    if (!users.length){
+      const p = document.createElement('p'); p.className = 'empty-hint'; setI18nAttr(p, 'common.empty', t('common.empty','暂无数据'));
+      frag.appendChild(p);
+    } else {
+      users.forEach(u => frag.appendChild(createUserBlocks(u, allPerms)));
+    }
 
-      const row = makeEl('div', 'approval-row');
-      const left = makeEl('div', 'approval-left');
-      const meta = makeEl('div');
-      const title = makeEl('div', 'approval-title', u.username || '');
-      const sub = makeEl('div', 'approval-sub');
-      // 拆分为“标签 + 值”，以便让角色值可点击进入编辑
-      const subLabel = makeEl('span', 'approval-sub__label');
-      try { subLabel.setAttribute('data-i18n', 'permissions.user.roleLabel'); } catch(_){ try { if (w.t) subLabel.textContent = w.t('permissions.user.roleLabel'); } catch(__){} }
-      const roleValue = makeEl('span', 'approval-role', u.role || '-');
-      try { roleValue.classList.add('is-editable'); roleValue.setAttribute('tabindex', '0'); roleValue.setAttribute('role', 'button'); } catch(_){ }
-      sub.appendChild(subLabel);
-      sub.appendChild(roleValue);
-      meta.appendChild(title); meta.appendChild(sub);
-
-      // 权限标签区域
-      const tagsWrap = makeEl('div', 'perm-tags');
-      const shown = current.slice(0, ns.constants.MAX_TAGS_SHOWN);
-      shown.forEach(p => { const el = tag(p, false); bindPermTooltip(el, p); tagsWrap.appendChild(el); });
-      const extra = current.slice(ns.constants.MAX_TAGS_SHOWN);
-      if (extra.length){
-        tagsWrap.appendChild(tag('+' + extra.length, true, extra.join('、')));
-      }
-
-      left.appendChild(meta);
-      left.appendChild(tagsWrap);
-
-      // 右侧：编辑权限按钮 + 修改密码按钮（角色改为点击“角色值”进入编辑，不再使用按钮）
-      const right = makeEl('div', 'approval-right');
-      const editBtn = makeEl('button', 'btn btn--secondary btn--sm');
-      try { editBtn.setAttribute('data-i18n', 'permissions.edit'); } catch(_){ try { if (w.t) editBtn.textContent = w.t('permissions.edit'); } catch(__){} }
-      const pwdBtn = makeEl('button', 'btn btn--secondary btn--sm');
-      try { pwdBtn.setAttribute('data-i18n', 'permissions.changePassword'); } catch(_){ try { if (w.t) pwdBtn.textContent = w.t('permissions.changePassword'); } catch(__){} }
-      right.appendChild(editBtn);
-      right.appendChild(pwdBtn);
-
-      row.appendChild(left); row.appendChild(right);
-      frag.appendChild(row);
-
-      // 行内编辑器（默认隐藏）
-      const editor = makeEl('div', 'perm-editor');
-      editor.style.display = 'none';
-      editor.classList.add('is-collapsed');
-
-      // 工具栏：全选/清空（不需要权限筛选）
-      const toolbar = makeEl('div', 'perm-editor__toolbar');
-      const btnSelectAll = makeEl('button', 'btn btn--secondary btn--sm tokens-refresh');
-      try { btnSelectAll.setAttribute('data-i18n', 'permissions.selectAll'); } catch(_){ try { if (w.t) btnSelectAll.textContent = w.t('permissions.selectAll'); } catch(__){} }
-      toolbar.appendChild(btnSelectAll);
-      
-      // 列表
-      const list = makeEl('div', 'perm-editor__list');
-
-      function renderChecklist(){
-        list.innerHTML = '';
-        allPerms.forEach(p => {
-          const item = makeEl('label', 'perm-editor__item');
-          bindPermTooltip(item, p);
-          const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = p; cb.checked = current.includes(p);
-          const text = makeEl('span', 'perm-editor__item-text', p);
-          item.appendChild(cb); item.appendChild(text);
-          list.appendChild(item);
-        });
-      }
-      renderChecklist();
-
-      // 底部操作：取消/保存
-      const actions = makeEl('div', 'perm-editor__actions');
-      const btnCancel = makeEl('button', 'btn btn--secondary');
-      const btnSave = makeEl('button', 'btn btn--primary');
-      try { btnCancel.setAttribute('data-i18n', 'common.cancel'); } catch(_){ try { if (w.t) btnCancel.textContent = w.t('common.cancel'); } catch(__){} }
-      try { btnSave.setAttribute('data-i18n', 'common.save'); } catch(_){ try { if (w.t) btnSave.textContent = w.t('common.save'); } catch(__){} }
-      actions.appendChild(btnCancel); actions.appendChild(btnSave);
-
-      editor.appendChild(toolbar);
-      editor.appendChild(list);
-      editor.appendChild(actions);
-      frag.appendChild(editor);
-
-      // 密码编辑器（默认隐藏）
-      const pwdEditor = makeEl('div', 'perm-editor perm-editor--plain');
-      pwdEditor.style.display = 'none';
-      pwdEditor.classList.add('is-collapsed');
-      const pwdList = makeEl('div', 'perm-editor__list');
-      const rowNew = makeEl('div', 'perm-editor__item');
-      const inputNew = document.createElement('input'); inputNew.type = 'password'; inputNew.className = 'tokens-input';
-      try { inputNew.setAttribute('placeholder', (w.t && w.t('modal.password.new')) || '新密码'); } catch(_){ inputNew.placeholder = '新密码'; }
-      rowNew.appendChild(inputNew);
-      const rowConfirm = makeEl('div', 'perm-editor__item');
-      const inputConfirm = document.createElement('input'); inputConfirm.type = 'password'; inputConfirm.className = 'tokens-input';
-      try { inputConfirm.setAttribute('placeholder', (w.t && w.t('modal.password.confirm')) || '确认新密码'); } catch(_){ inputConfirm.placeholder = '确认新密码'; }
-      rowConfirm.appendChild(inputConfirm);
-      pwdList.appendChild(rowNew);
-      pwdList.appendChild(rowConfirm);
-      const pwdActions = makeEl('div', 'perm-editor__actions');
-      const btnPwdCancel = makeEl('button', 'btn btn--secondary');
-      const btnPwdSave = makeEl('button', 'btn btn--primary');
-      try { btnPwdCancel.setAttribute('data-i18n', 'common.cancel'); } catch(_){ try { if (w.t) btnPwdCancel.textContent = w.t('common.cancel'); } catch(__){} }
-      try { btnPwdSave.setAttribute('data-i18n', 'common.save'); } catch(_){ try { if (w.t) btnPwdSave.textContent = w.t('common.save'); } catch(__){} }
-      pwdActions.appendChild(btnPwdCancel);
-      pwdActions.appendChild(btnPwdSave);
-      pwdEditor.appendChild(pwdList);
-      pwdEditor.appendChild(pwdActions);
-      frag.appendChild(pwdEditor);
-
-      // 角色编辑器（默认隐藏）
-      const roleEditor = makeEl('div', 'perm-editor perm-editor--plain');
-      roleEditor.style.display = 'none';
-      roleEditor.classList.add('is-collapsed');
-      const roleList = makeEl('div', 'perm-editor__list');
-      const roleRow = makeEl('div', 'perm-editor__item');
-      const select = document.createElement('select');
-      select.className = 'tokens-input';
-      const ROLES = [
-        { v: 'admin', k: 'role.admin' },
-        { v: 'moderator', k: 'role.moderator' },
-        { v: 'user', k: 'role.user' },
-        { v: 'guest', k: 'role.guest' }
-      ];
-      ROLES.forEach(r => {
-        const opt = document.createElement('option');
-        opt.value = r.v;
-        try { opt.textContent = (w.t && w.t(r.k)) || r.v; } catch(_){ opt.textContent = r.v; }
-        if (String(u.role) === r.v) opt.selected = true;
-        select.appendChild(opt);
-      });
-      roleRow.appendChild(select);
-      roleList.appendChild(roleRow);
-      const roleActions = makeEl('div', 'perm-editor__actions');
-      const btnRoleCancel = makeEl('button', 'btn btn--secondary');
-      const btnRoleSave = makeEl('button', 'btn btn--primary');
-      try { btnRoleCancel.setAttribute('data-i18n', 'common.cancel'); } catch(_){ try { if (w.t) btnRoleCancel.textContent = w.t('common.cancel'); } catch(__){} }
-      try { btnRoleSave.setAttribute('data-i18n', 'common.save'); } catch(_){ try { if (w.t) btnRoleSave.textContent = w.t('common.save'); } catch(__){} }
-      roleActions.appendChild(btnRoleCancel);
-      roleActions.appendChild(btnRoleSave);
-      roleEditor.appendChild(roleList);
-      roleEditor.appendChild(roleActions);
-      frag.appendChild(roleEditor);
-
-      // 交互绑定
-      editBtn.addEventListener('click', () => {
-        const visible = editor.style.display !== 'none' && !editor.classList.contains('is-collapsed');
-        toggleSection(editor, !visible);
-      });
-      btnSelectAll.addEventListener('click', () => {
-        const cbs = Array.from(list.querySelectorAll('input[type="checkbox"]').values());
-        const total = cbs.length;
-        const checkedCount = cbs.filter(cb => cb.checked).length;
-        const shouldSelectAll = checkedCount < total; // 不是全选 -> 全选；已全选 -> 清空
-        cbs.forEach(cb => { cb.checked = shouldSelectAll; });
-      });
-      btnCancel.addEventListener('click', () => { toggleSection(editor, false); });
-      btnSave.addEventListener('click', async () => {
-        // 采集勾选并与 current 求差集
-        const selected = Array.from(list.querySelectorAll('input[type="checkbox"]'))
-          .filter(cb => cb.checked).map(cb => cb.value);
-        const curSet = new Set(current);
-        const selSet = new Set(selected);
-        const toGrant = selected.filter(p => !curSet.has(p));
-        const toRevoke = current.filter(p => !selSet.has(p));
-
-        if (!toGrant.length && !toRevoke.length) { editor.style.display = 'none'; return; }
-
-        spinnerBtn(btnSave, true);
-        try {
-          for (const p of toGrant) { await API.grant(userId, p); }
-          for (const p of toRevoke) { await API.revoke(userId, p); }
-          // 保存成功后重新渲染列表
-          await w.renderPermissionsPanel((document.getElementById('perm-search-input')?.value||'').trim());
-        } catch(e){ try { showToast((e && e.message) ? e.message : (w.t && w.t('permissions.saveFailed')), 'error'); } catch(_){ showToast('', 'error'); } }
-        finally { spinnerBtn(btnSave, false); toggleSection(editor, false); }
-      });
-
-      // 修改密码交互
-      pwdBtn.addEventListener('click', () => {
-        const visible = pwdEditor.style.display !== 'none' && !pwdEditor.classList.contains('is-collapsed');
-        toggleSection(pwdEditor, !visible);
-      });
-      btnPwdCancel.addEventListener('click', () => { toggleSection(pwdEditor, false); });
-      btnPwdSave.addEventListener('click', async () => {
-        const p1 = (inputNew.value || '').trim();
-        const p2 = (inputConfirm.value || '').trim();
-        if (!p1 || !p2) { try { showToast((w.t && w.t('error.fillAll')) || '请填写完整。', 'error'); } catch(_){} return; }
-        if (p1.length < 6) { try { showToast((w.t && w.t('error.pwdMin')) || '新密码至少 6 位。', 'error'); } catch(_){} return; }
-        if (p1 !== p2) { try { showToast((w.t && w.t('error.pwdNotMatch')) || '两次输入的新密码不一致。', 'error'); } catch(_){} return; }
-        spinnerBtn(btnPwdSave, true);
-        try {
-          await API.setPassword(userId, p1);
-          // 成功改为 toast 提示
-          try { showToast((w.t && w.t('status.updated')) || '已更新'); } catch(_){ }
-          // 清空并收起
-          inputNew.value = '';
-          inputConfirm.value = '';
-          toggleSection(pwdEditor, false);
-        } catch(e) {
-          try { showToast(e && e.message ? e.message : ((w.t && w.t('error.updateFailed')) || '更新失败'), 'error'); } catch(_){ showToast('', 'error'); }
-        } finally { spinnerBtn(btnPwdSave, false); }
-      });
-
-      // 修改角色交互：点击“角色值”进入编辑
-      const openRoleEditor = () => {
-        const visible = roleEditor.style.display !== 'none' && !roleEditor.classList.contains('is-collapsed');
-        if (!visible) {
-          toggleSection(roleEditor, true);
-          try { select.focus(); } catch(_){ }
-        }
-      };
-      roleValue.addEventListener('click', openRoleEditor);
-      roleValue.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRoleEditor(); } });
-      // 在下拉框内：Enter 保存，Escape 取消；变更不自动保存，仍走显式保存
-      select.addEventListener('keydown', (e)=>{
-        if (e.key === 'Enter') { e.preventDefault(); btnRoleSave.click(); }
-        else if (e.key === 'Escape') { e.preventDefault(); btnRoleCancel.click(); }
-      });
-      btnRoleCancel.addEventListener('click', () => { toggleSection(roleEditor, false); });
-      btnRoleSave.addEventListener('click', async () => {
-        const newRole = select.value;
-        if (!newRole) { toggleSection(roleEditor, false); return; }
-        spinnerBtn(btnRoleSave, true);
-        try {
-          await API.setRole(userId, newRole);
-          try { showToast((w.t && w.t('status.updated')) || '已更新'); } catch(_){ }
-          // 刷新列表以反映新角色
-          await w.renderPermissionsPanel((document.getElementById('perm-search-input')?.value||'').trim());
-        } catch(e) {
-          try { showToast(e && e.message ? e.message : ((w.t && w.t('error.updateFailed')) || '更新失败'), 'error'); } catch(_){ showToast('', 'error'); }
-        } finally {
-          spinnerBtn(btnRoleSave, false);
-          toggleSection(roleEditor, false);
-        }
-      });
-    });
-
-    // 使用高度过渡替换内容，避免列表高度瞬间变为 0 造成页面布局跳动
+    // 过渡：旧行淡出 + 容器高度过渡
     const oldH = box.offsetHeight;
     if (thisSeq !== S.renderSeq) return;
-    // 设置起始高度并启用过渡
+    const measuredNewH = measureNewHeight(box, frag, oldH);
+    const oldRows = Array.from(box.children || []).filter(el => el?.classList?.contains('approval-row'));
+
     try {
       box.style.height = oldH + 'px';
-      box.style.transition = 'height .25s ease';
-      // 触发一次重排，确保起始高度生效
+      box.style.transition = 'height 300ms cubic-bezier(0.22, 1, 0.36, 1)';
+      box.style.overflow = 'hidden';
+      // 强制回流
       void box.offsetHeight;
-    } catch(_){ }
-    // 替换内容
+      if (measuredNewH !== oldH) box.style.height = measuredNewH + 'px';
+    } catch {}
+
+    await animateExitRows(oldRows);
+    if (thisSeq !== S.renderSeq) return;
+
+    // 替换内容并淡入新行
     box.innerHTML = '';
     box.appendChild(frag);
-    // 应用 i18n 到新内容
-    try { w.i18n && w.i18n.apply && w.i18n.apply(box); } catch(_){ }
-    // 目标高度
-    const newH = box.scrollHeight;
-    if (newH === oldH) {
-      // 高度未变化，直接清理行内样式
-      box.style.transition = '';
-      box.style.height = '';
-      return;
-    }
-    // 过渡到新高度
-    try {
-      box.style.height = newH + 'px';
-      const onEnd = (e)=>{
-        if (e && e.target !== box) return;
-        box.removeEventListener('transitionend', onEnd);
-        box.style.transition = '';
-        box.style.height = '';
-      };
-      box.addEventListener('transitionend', onEnd);
-    } catch(_){ box.style.transition = ''; box.style.height = ''; }
+    try { w.i18n && w.i18n.apply && w.i18n.apply(box); } catch {}
+    const newRows = Array.from(box.children || []).filter(el => el?.classList?.contains('approval-row'));
+    animateEnterRows(newRows);
+
+    // 清理容器内联样式
+    try { box.style.transition=''; box.style.height=''; box.style.overflow=''; } catch {}
   };
+
+  // 兼容：在 window 级别暴露，文件内部也通过 w.renderPermissionsPanel 调用
+  w.renderPermissionsPanel = ns.renderPermissionsPanel;
 })(window);

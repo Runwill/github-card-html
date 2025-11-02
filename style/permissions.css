@@ -139,3 +139,38 @@
 @media (max-width: 480px) {
   .perm-editor__list { max-width: none; }
 }
+
+/* ===== 权限页：用户条目进出场过渡 ===== */
+#panel_permissions .approval-row {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+/* 旧行淡出（JS 添加/移除） */
+#panel_permissions .approval-row.perm-row-exit {
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity 160ms cubic-bezier(0.39, 0.575, 0.565, 1), transform 200ms cubic-bezier(0.39, 0.575, 0.565, 1);
+  pointer-events: none;
+}
+/* 新行淡入（JS 添加 perm-row-enter，然后下一帧添加 perm-row-enter-active） */
+#panel_permissions .approval-row.perm-row-enter {
+  opacity: 0;
+  transform: translateY(4px);
+}
+#panel_permissions .approval-row.perm-row-enter.perm-row-enter-active {
+  opacity: 1;
+  transform: none;
+  transition: opacity 220ms cubic-bezier(0.22, 1, 0.36, 1), transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 遵循用户的“减少动态效果”偏好 */
+@media (prefers-reduced-motion: reduce) {
+  #panel_permissions .approval-row,
+  #panel_permissions .approval-row.perm-row-exit,
+  #panel_permissions .approval-row.perm-row-enter.perm-row-enter-active {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
