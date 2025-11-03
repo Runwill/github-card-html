@@ -11,6 +11,8 @@
   }
 
   const MAX_LOGS = 200;
+  // 动态类型缓存（用于类型下拉与“结果”过滤映射）
+  let KNOWN_TYPES = new Set();
 
   function isAnimating(el){ return !!(el && (el.classList.contains('is-opening') || el.classList.contains('is-closing'))); }
   function isOpen(el){ return !!(el && el.classList.contains('is-open')); }
@@ -60,14 +62,9 @@
         filters.className = 'tokens-log__filters tokens-input-group';
         filters.innerHTML = [
           '<input id="perms-log-q" class="tokens-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
-          '<select id="perms-log-cat" class="tokens-input">\
+          // 动态类型下拉：初始仅包含“全部类型”，后续由 hydrateUserLogs 基于后端返回补齐
+          '<select id="perms-log-type" class="tokens-input">\
             <option value="all" data-i18n="permissions.log.filter.cat.all">全部类型</option>\
-            <option value="register" data-i18n="permissions.log.filter.cat.register">注册</option>\
-            <option value="username" data-i18n="permissions.log.filter.cat.username">用户名</option>\
-            <option value="intro" data-i18n="permissions.log.filter.cat.intro">简介</option>\
-            <option value="avatar" data-i18n="permissions.log.filter.cat.avatar">头像</option>\
-            <option value="permissions" data-i18n="permissions.log.filter.cat.permissions">权限</option>\
-            <option value="password" data-i18n="permissions.log.filter.cat.password">密码</option>\
           </select>',
           '<select id="perms-log-outcome" class="tokens-input">\
             <option value="any" data-i18n="permissions.log.filter.outcome.any">全部结果</option>\
@@ -122,7 +119,7 @@
           filters.querySelector('#perms-log-q')?.addEventListener(evt, (e)=>{ if(evt==='keyup' && e.key!=='Enter') return; apply(); });
         });
         ['change'].forEach(evt=>{
-          ['#perms-log-cat','#perms-log-outcome','#perms-log-from','#perms-log-to'].forEach(sel=>{
+          ['#perms-log-type','#perms-log-outcome','#perms-log-from','#perms-log-to'].forEach(sel=>{
             filters.querySelector(sel)?.addEventListener(evt, apply);
           });
         });
@@ -140,6 +137,7 @@
       case 'register': return 'is-green'; // 兼容旧类型名
       case 'user-registered': return 'is-green';
       case 'password-change': return 'is-indigo';
+      case 'role-changed': return 'is-indigo';
       case 'avatar-submitted': return 'is-indigo';
       case 'avatar-approved': return 'is-green';
       case 'avatar-rejected': return 'is-red';
@@ -165,6 +163,7 @@
       case 'register': return 'permissions.log.register'; // 兼容旧类型名
       case 'user-registered': return 'permissions.log.register';
       case 'password-change': return 'permissions.log.passwordChanged';
+      case 'role-changed': return 'permissions.log.roleChanged';
       case 'avatar-submitted': return 'permissions.log.avatarSubmitted';
       case 'avatar-approved': return 'permissions.log.avatarApproved';
       case 'avatar-rejected': return 'permissions.log.avatarRejected';
@@ -192,6 +191,7 @@
       case 'user-approved': return 'permissions.msg.userApproved';
       case 'user-rejected': return 'permissions.msg.userRejected';
       case 'password-change': return 'permissions.msg.passwordChanged';
+      case 'role-changed': return 'permissions.msg.roleChanged';
       case 'avatar-submitted': return 'permissions.msg.avatarSubmitted';
       case 'avatar-approved': return 'permissions.msg.avatarApproved';
       case 'avatar-rejected': return 'permissions.msg.avatarRejected';
@@ -231,49 +231,16 @@
     }catch(_){ return ''; }
   }
 
-  function allTypes(){
-    return [
-      'user-registered','user-approved','user-rejected','password-change',
-      'avatar-submitted','avatar-approved','avatar-rejected',
-      'username-submitted','username-approved','username-rejected','username-cancelled',
-      'intro-submitted','intro-approved','intro-rejected','intro-cancelled',
-      'permissions-granted','permissions-revoked','permissions-replaced'
-    ];
-  }
-
-  function mapFilterToTypes(cat, outcome){
-    const byCat = {
-      'register': ['user-registered','user-approved','user-rejected'],
-      'username': ['username-submitted','username-approved','username-rejected','username-cancelled'],
-      'intro': ['intro-submitted','intro-approved','intro-rejected','intro-cancelled'],
-      'avatar': ['avatar-submitted','avatar-approved','avatar-rejected'],
-      'permissions': ['permissions-granted','permissions-revoked','permissions-replaced'],
-      'password': ['password-change'],
-      'all': allTypes()
-    };
-    const base = byCat[cat] || allTypes();
-    if (!outcome || outcome === 'any') return base;
-
-    // 结果过滤按分类分别处理
-    if (cat === 'register') {
-      if (outcome === 'submitted') return ['user-registered'];
-      if (outcome === 'approved') return ['user-approved'];
-      if (outcome === 'rejected') return ['user-rejected'];
-      return []; // cancelled 等无对应
-    }
-    if (cat === 'permissions' || cat === 'password') {
-      // 这些类型没有 submitted/approved/rejected/cancelled 细分
-      return [];
-    }
-    if (cat === 'all') {
-      if (outcome === 'submitted') return allTypes().filter(t => t.endsWith('-submitted')).concat(['user-registered']);
-      if (outcome === 'approved') return allTypes().filter(t => t.endsWith('-approved')).concat(['user-approved']);
-      if (outcome === 'rejected') return allTypes().filter(t => t.endsWith('-rejected')).concat(['user-rejected']);
-      if (outcome === 'cancelled') return allTypes().filter(t => t.endsWith('-cancelled'));
-      return allTypes();
-    }
-    const suffix = '-' + outcome;
-    return base.filter(t => t.endsWith(suffix));
+  function outcomeMatches(type, outcome){
+    try{
+      if (!outcome || outcome==='any') return true;
+      const t = String(type||'');
+      if (outcome==='submitted') return t.endsWith('-submitted') || t==='user-registered';
+      if (outcome==='approved')  return t.endsWith('-approved')  || t==='user-approved';
+      if (outcome==='rejected')  return t.endsWith('-rejected')  || t==='user-rejected';
+      if (outcome==='cancelled') return t.endsWith('-cancelled');
+      return false;
+    }catch(_){ return false; }
   }
 
   function buildQuery(){
@@ -283,27 +250,63 @@
     p.set('page','1'); p.set('pageSize', String(MAX_LOGS));
     if (filters){
       const q = filters.querySelector('#perms-log-q');
-      const cat = filters.querySelector('#perms-log-cat');
+      const typeSel = filters.querySelector('#perms-log-type');
       const oc = filters.querySelector('#perms-log-outcome');
       const from = filters.querySelector('#perms-log-from');
       const to = filters.querySelector('#perms-log-to');
       const qv = q && q.value && q.value.trim(); if(qv) p.set('q', qv);
-      const catV = (cat && cat.value) || 'all';
+      const typeV = (typeSel && typeSel.value) || 'all';
       const ocV = (oc && oc.value) || 'any';
-      const types = mapFilterToTypes(catV, ocV);
-      const filtersApplied = (catV !== 'all') || (ocV !== 'any');
-      if (filtersApplied) {
-        if (types && types.length) {
-          p.set('types', types.join(','));
-        } else {
-          // 无匹配时传入一个不可能匹配的类型，确保后端返回空
-          p.set('types', '__none__');
+      // 按动态类型与结果构建 types 参数
+      if (typeV === 'all'){
+        if (ocV !== 'any'){
+          const all = Array.from(KNOWN_TYPES.values());
+          const subset = all.filter(t => outcomeMatches(t, ocV));
+          if (subset.length) p.set('types', subset.join(',')); else p.set('types','__none__');
         }
+      } else {
+        // 指定了具体类型：直接按该类型查询；若结果不匹配，后端会返回空
+        p.set('types', typeV);
       }
       const fv = from && from.value; if (fv) p.set('since', fv);
       const tv = to && to.value; if (tv) p.set('until', tv);
     }
     return p;
+  }
+
+  function renderTypeOptions(types){
+    try{
+      const panel = document.getElementById('perms-log-panel');
+      const select = panel ? panel.querySelector('#perms-log-type') : null;
+      if (!select) return;
+      const prev = select.value || 'all';
+      // 先清空，仅保留“全部类型”
+      select.innerHTML = '';
+      const optAll = document.createElement('option');
+      optAll.value = 'all';
+      optAll.setAttribute('data-i18n','permissions.log.filter.cat.all');
+      optAll.textContent = '全部类型';
+      select.appendChild(optAll);
+      // 按字母序插入所有类型
+      const sorted = Array.isArray(types) ? types.slice().sort() : [];
+      sorted.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = String(t);
+        // 若有已知映射则用 i18n key，否则直接显示类型名
+        const key = typeKey(t);
+        if (key) {
+          opt.setAttribute('data-i18n', key);
+          opt.textContent = key; // 先放 key，稍后 i18n.apply 会替换
+        } else {
+          opt.textContent = String(t);
+        }
+        select.appendChild(opt);
+      });
+      // 恢复之前选择
+      try { select.value = prev; } catch(_){ }
+      // 应用 i18n
+      try { window.i18n && window.i18n.apply && window.i18n.apply(select); } catch(_){ }
+    }catch(_){ }
   }
 
   async function hydrateUserLogs(fromFilters){
@@ -314,6 +317,12 @@
       const url = '/user/logs' + (qs.toString() ? ('?' + qs.toString()) : '');
       const out = await apiJson(url, { method:'GET', headers: authHeader() });
       const list = (out && out.list) || [];
+      // 动态填充类型下拉
+      try {
+        const types = Array.from(new Set(list.map(l => l && l.type).filter(Boolean)));
+        if (types.length) { KNOWN_TYPES = new Set([...KNOWN_TYPES, ...types]); }
+        renderTypeOptions(Array.from(KNOWN_TYPES.values()));
+      } catch(_){ }
       const frag = document.createDocumentFragment();
       list.forEach(l => { const row = document.createElement('div'); row.className='tokens-log__entry'; if (l && l._id) { try { row.setAttribute('data-log-id', String(l._id)); }catch(_){ } } row.innerHTML = makeRow(l); try{ window.i18n && window.i18n.apply && window.i18n.apply(row);}catch(_){} frag.appendChild(row); });
       body.innerHTML=''; body.appendChild(frag);

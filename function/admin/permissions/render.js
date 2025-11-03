@@ -30,6 +30,69 @@
     catch { showToast('', type); }
   };
 
+  // 预加载用户列表与权限清单，避免面板首次打开时短暂空白导致布局抖动
+  const DEFAULT_SEARCH_KEY = '__default__';
+  const prefetchState = S.prefetch = S.prefetch || { users: new Map(), master: {} };
+  if (!(prefetchState.users instanceof Map)) prefetchState.users = new Map();
+  if (!prefetchState.master || typeof prefetchState.master !== 'object') prefetchState.master = {};
+  const searchKeyFromInput = (raw)=>{
+    try {
+      const trimmed = (raw == null ? '' : String(raw)).trim();
+      return trimmed ? trimmed : DEFAULT_SEARCH_KEY;
+    } catch { return DEFAULT_SEARCH_KEY; }
+  };
+  const searchValueFromKey = (key)=> key === DEFAULT_SEARCH_KEY ? '' : key;
+  const getUsersData = (key, forceRefresh)=>{
+    try {
+      const store = prefetchState.users;
+      const entry = store.get(key) || {};
+      if (!forceRefresh) {
+        if (entry.data) return Promise.resolve(entry.data);
+        if (entry.promise) return entry.promise;
+      }
+      const query = searchValueFromKey(key);
+      const promise = (API.fetchUsers ? API.fetchUsers(query) : Promise.resolve([])).then(users => {
+        const list = Array.isArray(users) ? users : [];
+        store.set(key, { data: list });
+        return list;
+      }).catch(()=>{
+        store.set(key, { data: [] });
+        return [];
+      });
+      store.set(key, { ...entry, promise });
+      return promise;
+    } catch {
+      prefetchState.users.set(key, { data: [] });
+      return Promise.resolve([]);
+    }
+  };
+  const getMasterData = (forceRefresh)=>{
+    try {
+      const entry = prefetchState.master || {};
+      if (!forceRefresh) {
+        if (entry.data) return Promise.resolve(entry.data);
+        if (entry.promise) return entry.promise;
+      }
+      const promise = (API.getMasterPermissions ? API.getMasterPermissions() : Promise.resolve([])).then(perms => {
+        const list = Array.isArray(perms) ? perms.map(String) : [];
+        prefetchState.master = { data: list };
+        return list;
+      }).catch(()=>{
+        prefetchState.master = { data: [] };
+        return [];
+      });
+      prefetchState.master = { ...entry, promise };
+      return promise;
+    } catch {
+      prefetchState.master = { data: [] };
+      return Promise.resolve([]);
+    }
+  };
+
+  // 提前启动默认查询的预加载
+  try { getUsersData(DEFAULT_SEARCH_KEY, false); } catch {}
+  try { getMasterData(false); } catch {}
+
   // 动效能力缓存
   const CAN_WAAPI = !!(Element.prototype && Element.prototype.animate);
   const PREFERS_REDUCED = !!(w.matchMedia && w.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -44,12 +107,12 @@
       const toggle = document.getElementById('perm-mode-toggle');
       if (btn && !btn.__permBound) {
         btn.__permBound = true;
-        btn.addEventListener('click', ()=> w.renderPermissionsPanel((input?.value || '').trim()));
+        btn.addEventListener('click', ()=> w.renderPermissionsPanel((input?.value || '').trim(), { forceRefresh: true }));
       }
       if (input && !input.__permBound) {
         input.__permBound = true;
         input.addEventListener('keydown', (e)=>{
-          if (e.key === 'Enter') w.renderPermissionsPanel((input.value || '').trim());
+          if (e.key === 'Enter') w.renderPermissionsPanel((input.value || '').trim(), { forceRefresh: true });
         });
       }
       if (toggle && !toggle.__permBound) {
@@ -58,7 +121,7 @@
           S.permMode = (S.permMode === 'partial') ? 'all' : 'partial';
           setI18nAttr(toggle, (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all', (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all');
           toggle.classList.toggle('is-active', S.permMode === 'all');
-          w.renderPermissionsPanel((input?.value || '').trim());
+          w.renderPermissionsPanel((input?.value || '').trim(), { forceRefresh: true });
         });
       }
       if (toggle) {
@@ -341,7 +404,9 @@
   }
 
   // 主渲染入口
-  ns.renderPermissionsPanel = async function(search){
+  ns.renderPermissionsPanel = async function(search, options){
+    const opts = options && typeof options === 'object' ? options : {};
+    const forceRefresh = !!opts.forceRefresh;
     const thisSeq = ++S.renderSeq;
     const box = document.getElementById('perm-list');
     const msg = document.getElementById('perm-message');
@@ -351,16 +416,17 @@
     if (msg) msg.textContent = '';
 
     // 加载数据
-    let users = await API.fetchUsers(search);
+  const s = (search || '').trim();
+  const searchKey = searchKeyFromInput(s);
+  const usersRaw = await getUsersData(searchKey, forceRefresh || !!s);
     if (thisSeq !== S.renderSeq) return;
-
-    const s = (search || '').trim();
-    if (!s && S.permMode === 'partial') users = users.filter(u => Array.isArray(u.permissions) && u.permissions.length > 0);
+  let users = Array.isArray(usersRaw) ? usersRaw.slice() : [];
+  if (!s && S.permMode === 'partial') users = users.filter(u => Array.isArray(u.permissions) && u.permissions.length > 0);
 
     // 全量权限集合
-    let master = [];
-    try { master = await API.getMasterPermissions(); }
-    catch(e) { try { console.error(t('permissions.fetchMasterFailedPrefix', '获取权限清单失败：'), e); } catch { console.error(e); } }
+  let master = [];
+  try { master = await getMasterData(forceRefresh); }
+  catch(e) { try { console.error(t('permissions.fetchMasterFailedPrefix', '获取权限清单失败：'), e); } catch { console.error(e); } }
     const allPermsSet = new Set(master);
     users.forEach(u => (Array.isArray(u.permissions) ? u.permissions : []).forEach(p => { if (p) allPermsSet.add(String(p)); }));
     const allPerms = Array.from(allPermsSet).sort();
@@ -372,6 +438,26 @@
       frag.appendChild(p);
     } else {
       users.forEach(u => frag.appendChild(createUserBlocks(u, allPerms)));
+    }
+
+    // 若面板当前不可见（如首次后台预渲染）或无旧内容，跳过进出场动画以提升首屏响应
+    const panelEl = document.getElementById('panel_permissions');
+    const isVisible = (el)=>{
+      try{
+        if (!el) return true; // 保守认为可见
+        const style = window.getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+        const rect = el.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      }catch(_){ return true; }
+    };
+    const noOldContent = !box.hasChildNodes();
+    const skipAnim = !isVisible(panelEl) || noOldContent;
+    if (skipAnim){
+      box.innerHTML = '';
+      box.appendChild(frag);
+      try { w.i18n && w.i18n.apply && w.i18n.apply(box); } catch {}
+      return;
     }
 
     // 过渡：旧行淡出 + 容器高度过渡

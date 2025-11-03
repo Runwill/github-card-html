@@ -21,16 +21,42 @@
   }
 
   // 尝试从后端拉取并缓存当前用户权限（若已登录且本地未缓存）
+  let ensureRetryTimer = null;
+  let ensureRetryCount = 0;
+  const MAX_ENSURE_RETRY = 12;
+  const scheduleEnsureRetry = () => {
+    if (ensureRetryCount >= MAX_ENSURE_RETRY) return;
+    if (ensureRetryTimer) return;
+    ensureRetryTimer = setTimeout(() => {
+      ensureRetryTimer = null;
+      ensureRetryCount += 1;
+      try { ensurePermissionsCached(); } catch(_){}
+    }, 140);
+  };
+
   async function ensurePermissionsCached(){
     try {
       if (readPermissions().length) return; // 已有缓存
       const id = localStorage.getItem('id');
       const token = localStorage.getItem('token');
       if (!id || !token) return; // 未登录
-      const api = (window.endpoints && window.endpoints.api) ? window.endpoints.api : (p=>p);
-      const url = api('/api/user/' + encodeURIComponent(id));
+      const apiFn = (window.endpoints && typeof window.endpoints.api === 'function') ? window.endpoints.api : null;
+      if (!apiFn) { scheduleEnsureRetry(); return; }
+      const url = apiFn('/api/user/' + encodeURIComponent(id));
       const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
+      if (res && res.status === 404) {
+        try {
+          localStorage.removeItem('id');
+          localStorage.removeItem('token');
+          localStorage.removeItem('username');
+          localStorage.removeItem('avatar');
+          localStorage.removeItem('intro');
+          localStorage.removeItem('permissions');
+        } catch(_){}
+        return;
+      }
       if (!res.ok) return;
+      ensureRetryCount = 0;
       const data = await res.json().catch(()=>null);
       const perms = (data && Array.isArray(data.permissions)) ? data.permissions : [];
       try { localStorage.setItem('permissions', JSON.stringify(perms)); } catch(_){ }

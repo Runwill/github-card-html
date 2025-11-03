@@ -13,8 +13,10 @@
         }
         if(href==='#panel_permissions'){
           if(!isAdmin()) { e.preventDefault(); return; }
-          // 打开权限面板时渲染列表
-          window.renderPermissionsPanel && window.renderPermissionsPanel('');
+          // 打开权限面板时渲染列表：若已预渲染过且存在行，则不重复触发，避免二次动画/重排
+          const list = document.getElementById('perm-list');
+          const hasRow = !!(list && list.querySelector && list.querySelector('.approval-row'));
+          if(window.renderPermissionsPanel && !hasRow){ window.renderPermissionsPanel(''); }
         }
         if(href==='#panel_draft'){
           requestAnimationFrame(()=>{ window.draftPanel?.autosize && window.draftPanel.autosize(); });

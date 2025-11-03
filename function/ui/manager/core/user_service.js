@@ -17,7 +17,20 @@
       var d = _dom();
       var api = d.api || (function(u){ return u; });
       var resp = await fetch(api('/api/user/' + encodeURIComponent(id)));
-      if (!resp || !resp.ok) return;
+      if (!resp) return;
+      if (resp.status === 404) {
+        if (w.localStorage) {
+          try {
+            w.localStorage.removeItem('id');
+            w.localStorage.removeItem('username');
+            w.localStorage.removeItem('avatar');
+            w.localStorage.removeItem('intro');
+            w.localStorage.removeItem('permissions');
+          } catch(_){}
+        }
+        return;
+      }
+      if (!resp.ok) return;
       var data = await resp.json();
       if (!data) return;
 
