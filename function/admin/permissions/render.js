@@ -144,9 +144,12 @@
           const editors = panel.querySelectorAll('.perm-editor');
           editors.forEach(ed => { try { toggleSection(ed, false); } catch {} });
         });
+
+        
       }
     } catch {}
   }
+  
 
   // 计算新内容高度（用于高度过渡）
   function measureNewHeight(container, fragment, fallbackH){
@@ -400,7 +403,7 @@
       finally { spinnerBtn(btnRoleSave, false); toggleSection(roleEditor, false); }
     });
 
-    return block;
+  return block;
   }
 
   // 主渲染入口
@@ -481,7 +484,7 @@
     // 替换内容并淡入新行
     box.innerHTML = '';
     box.appendChild(frag);
-    try { w.i18n && w.i18n.apply && w.i18n.apply(box); } catch {}
+  try { w.i18n && w.i18n.apply && w.i18n.apply(box); } catch {}
     const newRows = Array.from(box.children || []).filter(el => el?.classList?.contains('approval-row'));
     animateEnterRows(newRows);
 

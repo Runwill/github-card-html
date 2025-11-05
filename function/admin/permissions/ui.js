@@ -66,6 +66,7 @@
   function toggleSection(panel, open){
     if (!panel) return;
     const DURATION = 220;
+    const FALLBACK = DURATION + 160; // 兜底计时，防止 transitionend 未触发导致卡死
     if (panel.__animating) return;
     const isHidden = (panel.style.display === 'none') || panel.classList.contains('is-collapsed');
     const shouldOpen = (open == null) ? isHidden : !!open;
@@ -83,8 +84,9 @@
       panel.style.pointerEvents = 'none';
       panel.classList.remove('is-collapsed');
       panel.style.height = 'auto';
-      const target = panel.scrollHeight;
+      let target = panel.scrollHeight;
 
+      // 还原到起始收起状态
       panel.classList.add('is-collapsed');
       panel.style.height = '0px';
       panel.style.opacity = '0';
@@ -93,20 +95,32 @@
       panel.style.pointerEvents = prevPointer || '';
       void panel.offsetHeight;
 
+      // 若无法测得高度，直接无动画展开，避免卡死
+      if (!target || target <= 0) {
+        panel.classList.remove('is-collapsed');
+        panel.style.transition = prevTransition || '';
+        panel.style.height = '';
+        panel.style.opacity = '';
+        panel.__animating = false;
+        return;
+      }
+
       requestAnimationFrame(()=>{
         panel.style.transition = 'height 200ms ease, opacity 150ms ease, transform 200ms ease, padding-top 200ms ease, padding-bottom 200ms ease, margin-top 200ms ease, margin-bottom 200ms ease, border-width 200ms ease';
         panel.classList.remove('is-collapsed');
         panel.style.height = target + 'px';
         panel.style.opacity = '1';
+        let timer = setTimeout(()=>done(), FALLBACK);
         const done = (e)=>{
           if (e && e.target !== panel) return;
           panel.removeEventListener('transitionend', done);
+          if (timer) { clearTimeout(timer); timer = null; }
           panel.style.transition = prevTransition || '';
           panel.style.height = '';
           panel.style.opacity = '';
           panel.__animating = false;
         };
-        panel.addEventListener('transitionend', done);
+        panel.addEventListener('transitionend', done, { once: true });
       });
     } else {
       const start = panel.scrollHeight;
@@ -117,16 +131,18 @@
       panel.style.height = '0px';
       panel.style.opacity = '0';
       panel.classList.add('is-collapsed');
+      let timer = setTimeout(()=>done(), FALLBACK);
       const done = (e)=>{
         if (e && e.target !== panel) return;
         panel.removeEventListener('transitionend', done);
+        if (timer) { clearTimeout(timer); timer = null; }
         panel.style.transition = '';
         panel.style.height = '';
         panel.style.opacity = '';
         panel.style.display = 'none';
         panel.__animating = false;
       };
-      panel.addEventListener('transitionend', done);
+      panel.addEventListener('transitionend', done, { once: true });
     }
   }
 

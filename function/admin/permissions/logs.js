@@ -50,22 +50,9 @@
   function extractPlaceholders(tmpl){
     try{ const out=[]; if(!tmpl) return out; tmpl.replace(/\{([\w]+)\}/g,(_,p)=>{ if(!out.includes(p)) out.push(p); return ''; }); return out; }catch(_){ return []; }
   }
-  // 为特定键提供兜底值
-  function paramFallback(key, data, log){
-    try{
-      const d = data||{}; const l = log||{};
-      switch(String(key)){
-        case 'applicantName': return d.applicantName || d.applicant || d.username || d.userName || d.user || d.name || d.newUsername || l.applicantName || '';
-        case 'username': return d.username || d.userName || d.newUsername || d.applicantName || d.applicant || '';
-        case 'newUsername': return d.newUsername || d.username || d.userName || '';
-        case 'reason': return d.reason || d.msg || d.message || '';
-        case 'url': return d.url || d.avatarUrl || d.link || d.href || '';
-        case 'perm': return d.perm || d.permission || d.name || '';
-        case 'oldRole': return d.oldRole || '';
-        case 'newRole': return d.newRole || '';
-        default: return d[key] ?? '';
-      }
-    }catch(_){ return ''; }
+  // 不兼容旧日志：仅返回同名字段，不做别名/推断兜底
+  function paramFallback(key, data, _log){
+    try { return (data && data[key]) ?? ''; } catch(_){ return ''; }
   }
   // 基于模板占位符构建消息参数（填补缺失字段）
   function buildMsgParamsForLog(log){
@@ -468,7 +455,32 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     const ready = (window.partialsReady instanceof Promise) ? window.partialsReady : Promise.resolve();
+    // 封装一次性绑定：在 #perms-log 出现后再绑定事件委托，避免绑定时机早于 DOM 创建
+    function bindDeleteDelegation(){
+      try{
+        const root = document.getElementById('perms-log');
+        if (root && !root.__delDelegationBound) {
+          root.__delDelegationBound = true;
+          root.addEventListener('click', (ev)=>{
+            const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
+            if (!btn) return;
+            const entry = btn.closest('.tokens-log__entry');
+            if (!entry) return;
+            (async ()=>{
+              const id = entry.getAttribute('data-log-id');
+              if (id) {
+                try { await apiJson(`/user/logs/${encodeURIComponent(id)}`, { method:'DELETE', headers: authHeader() }); } catch(e){ alert((e && e.message) || ''); return; }
+              }
+              try { entry.remove(); } catch(_){ }
+            })();
+          });
+        }
+      }catch(_){ }
+    }
+
+    // 首次分片就绪后渲染日志，并在渲染后绑定删除委托
     ready.then(()=>{ try{ hydrateUserLogs(); }catch(_){ } }).then(()=>{
+      try { bindDeleteDelegation(); } catch(_){ }
       // 进入权限页时自动刷新：监听面板可见性变化
       try{
         const panel = document.getElementById('panel_permissions');
@@ -487,7 +499,7 @@
           const check = ()=>{
             try{
               const vis = isVisible(panel);
-              if (vis && !wasVisible) { wasVisible = true; try{ hydrateUserLogs(); }catch(_){ } }
+              if (vis && !wasVisible) { wasVisible = true; try{ hydrateUserLogs(); }catch(_){ } try { bindDeleteDelegation(); } catch(_){ } }
               else if (!vis && wasVisible) { wasVisible = false; }
             }catch(_){ }
           };
@@ -527,26 +539,8 @@
       root.addEventListener('mouseout', onOut);
     }catch(_){ }
 
-    // 日志内“删除”按钮事件委托（单条删除）
-    try{
-      const root = document.getElementById('perms-log');
-      if (root && !root.__delDelegationBound) {
-        root.__delDelegationBound = true;
-        root.addEventListener('click', (ev)=>{
-          const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
-          if (!btn) return;
-          const entry = btn.closest('.tokens-log__entry');
-          if (!entry) return;
-          (async ()=>{
-            const id = entry.getAttribute('data-log-id');
-            if (id) {
-              try { await apiJson(`/user/logs/${encodeURIComponent(id)}`, { method:'DELETE', headers: authHeader() }); } catch(e){ alert((e && e.message) || ''); return; }
-            }
-            try { entry.remove(); } catch(_){ }
-          })();
-        });
-      }
-    }catch(_){ }
+    // 日志内“删除”按钮事件委托（单条删除）：兜底绑定（若上方未能绑定，这里再尝试一次）
+    try { bindDeleteDelegation(); } catch(_){ }
 
     // 语言切换：重渲染 i18n + 刷新时间格式
     const onLang = ()=>{
