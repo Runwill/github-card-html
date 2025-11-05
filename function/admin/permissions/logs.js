@@ -38,6 +38,52 @@
   function formatAbsForLang(v){ try{ const t = parseTimeValue(v) ?? Date.now(); const locale = getLocaleFromI18n(); return new Date(t).toLocaleString(locale); }catch(_){ return String(v||''); } }
   function formatRel(v){ try{ const now=Date.now(); const t=parseTimeValue(v) ?? now; let diff=Math.floor((now-t)/1000); if(diff < -5) return window.t('time.justNow'); if(diff<5) return window.t('time.justNow'); if(diff<60) return window.t('time.secondsAgo',{n:diff}); const m=Math.floor(diff/60); if(m<60) return window.t('time.minutesAgo',{n:m}); const h=Math.floor(m/60); if(h<24) return window.t('time.hoursAgo',{n:h}); const d=Math.floor(h/24); if(d<30) return window.t('time.daysAgo',{n:d}); const mo=Math.floor(d/30); if(mo<12) return window.t('time.monthsAgo',{n:mo}); const y=Math.floor(mo/12); return window.t('time.yearsAgo',{n:y}); }catch(_){ return ''; } }
 
+  // 获取当前 i18n 语言代码（zh/en/debug）
+  function getI18nLang(){
+    try{ const lang=(window.i18n&&window.i18n.getLang&&window.i18n.getLang())||'zh'; return (lang==='zh'||lang==='en'||lang==='debug')? lang : 'en'; }catch(_){ return 'en'; }
+  }
+  // 读取当前语言的原始 i18n 模板字符串
+  function getI18nString(key){
+    try{ if(!key) return ''; const lang=getI18nLang(); const dict=(window.I18N_STRINGS&&window.I18N_STRINGS[lang])||{}; const s=dict[key]; return (typeof s==='string')? s : (s==null? '' : String(s)); }catch(_){ return ''; }
+  }
+  // 提取模板占位符
+  function extractPlaceholders(tmpl){
+    try{ const out=[]; if(!tmpl) return out; tmpl.replace(/\{([\w]+)\}/g,(_,p)=>{ if(!out.includes(p)) out.push(p); return ''; }); return out; }catch(_){ return []; }
+  }
+  // 为特定键提供兜底值
+  function paramFallback(key, data, log){
+    try{
+      const d = data||{}; const l = log||{};
+      switch(String(key)){
+        case 'applicantName': return d.applicantName || d.applicant || d.username || d.userName || d.user || d.name || d.newUsername || l.applicantName || '';
+        case 'username': return d.username || d.userName || d.newUsername || d.applicantName || d.applicant || '';
+        case 'newUsername': return d.newUsername || d.username || d.userName || '';
+        case 'reason': return d.reason || d.msg || d.message || '';
+        case 'url': return d.url || d.avatarUrl || d.link || d.href || '';
+        case 'perm': return d.perm || d.permission || d.name || '';
+        case 'oldRole': return d.oldRole || '';
+        case 'newRole': return d.newRole || '';
+        default: return d[key] ?? '';
+      }
+    }catch(_){ return ''; }
+  }
+  // 基于模板占位符构建消息参数（填补缺失字段）
+  function buildMsgParamsForLog(log){
+    try{
+      const d = (log && log.data) || {};
+      const k = msgKey(log && log.type);
+      const tmpl = getI18nString(k) || '';
+      const needs = extractPlaceholders(tmpl);
+      if (!needs.length) return JSON.stringify(d||{});
+      const out = { ...d };
+      needs.forEach(key=>{
+        const v = out[key];
+        if (v===undefined || v===null || v==='') out[key] = paramFallback(key, d, log);
+      });
+      return JSON.stringify(out);
+    }catch(_){ return JSON.stringify((log&&log.data)||{}); }
+  }
+
   function ensureUserLogArea(){
     try{
       let body = document.getElementById('perms-log');
@@ -88,6 +134,15 @@
         body.className = 'tokens-log__body';
         body.setAttribute('aria-live','polite');
         wrap.appendChild(filters);
+        // 日志类型格式预览容器：用于在选择具体类型时展示该类型的消息模板与参数
+        const fmtBox = document.createElement('div');
+        fmtBox.id = 'perms-log-format';
+        fmtBox.className = 'tokens-log__format';
+        fmtBox.style.display = 'none';
+        // 预览已插入日志体内，此处不再渲染内容
+        fmtBox.innerHTML = '';
+        wrap.appendChild(fmtBox);
+        try { window.i18n && window.i18n.apply && window.i18n.apply(fmtBox); } catch(_){ }
         wrap.appendChild(body);
         panel.appendChild(header);
         panel.appendChild(wrap);
@@ -108,7 +163,7 @@
         filters.querySelector('#perms-log-reset')?.addEventListener('click', ()=>{
           try{
             const q = filters.querySelector('#perms-log-q'); if(q) q.value = '';
-            const cat = filters.querySelector('#perms-log-cat'); if(cat) cat.value = 'all';
+            const cat = filters.querySelector('#perms-log-type'); if(cat) cat.value = 'all';
             const oc = filters.querySelector('#perms-log-outcome'); if(oc) oc.value = 'any';
             const f = filters.querySelector('#perms-log-from'); if(f) f.value = '';
             const t = filters.querySelector('#perms-log-to'); if(t) t.value = '';
@@ -120,7 +175,12 @@
         });
         ['change'].forEach(evt=>{
           ['#perms-log-type','#perms-log-outcome','#perms-log-from','#perms-log-to'].forEach(sel=>{
-            filters.querySelector(sel)?.addEventListener(evt, apply);
+            const el = filters.querySelector(sel);
+            if (!el) return;
+            el.addEventListener(evt, (e)=>{
+              if (sel === '#perms-log-type') { try { updateFormatPreview(); } catch(_){ } }
+              apply();
+            });
           });
         });
       }
@@ -223,7 +283,7 @@
       const who = (log && log.actorName) ? log.actorName : '';
   const data = (log && log.data) || {};
   const msgK = msgKey(log && log.type);
-  const msgParams = (function(d){ try { return JSON.stringify(d||{}); } catch(_){ return '{}'; } })(data);
+  const msgParams = buildMsgParamsForLog(log);
   const msg = msgK ? `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'></span>` : (log && log.message ? `<span>${String(log.message)}</span>` : '');
   const detail = '';
       // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
@@ -306,6 +366,69 @@
       try { select.value = prev; } catch(_){ }
       // 应用 i18n
       try { window.i18n && window.i18n.apply && window.i18n.apply(select); } catch(_){ }
+      // 更新类型格式预览（保持与当前选择一致）
+      try { updateFormatPreview(); } catch(_){ }
+    }catch(_){ }
+  }
+
+  // 根据选择的日志类型，展示单行示例：用样式标示模板中的参数占位符
+  function updateFormatPreview(){
+    try{
+      const panel = document.getElementById('perms-log-panel');
+      if (!panel) return;
+      const sel = panel.querySelector('#perms-log-type');
+      const body = panel.querySelector('#perms-log');
+      if (!sel || !body) return;
+      const val = (sel.value||'all');
+      // 查找或创建预览行节点
+      let preview = body.querySelector('#perms-log-preview');
+      const ensurePreview = ()=>{
+        if (!preview) {
+          preview = document.createElement('div');
+          preview.className = 'tokens-log__entry tokens-log__entry--preview';
+          preview.id = 'perms-log-preview';
+          const row = document.createElement('div');
+          row.className = 'log-row';
+          const msg = document.createElement('i');
+          msg.className = 'log-msg';
+          const span = document.createElement('span');
+          span.className = 'fmt-one';
+          msg.appendChild(span);
+          row.appendChild(msg);
+          preview.appendChild(row);
+          body.insertBefore(preview, body.firstChild || null);
+        }
+        return preview;
+      };
+      if (!val || val==='all') { if (preview) try{ preview.remove(); }catch(_){ } return; }
+      const key = msgKey(val);
+      if (!key) { if (preview) try{ preview.remove(); }catch(_){ } return; }
+      const lang = getI18nLang();
+      const tmpl = getI18nString(key) || '';
+      if (!tmpl.trim()) { if (preview) try{ preview.remove(); }catch(_){ } return; }
+      const esc = (s)=> String(s)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#39;');
+      // 构造 HTML：非占位符部分做 HTML 转义，占位符使用样式突出显示
+      let html = '';
+      let last = 0;
+      const re = /\{([\w]+)\}/g;
+      let m;
+      while ((m = re.exec(tmpl))){
+        const idx = m.index;
+        const full = m[0];
+        const name = m[1];
+        if (idx > last) html += esc(tmpl.slice(last, idx));
+        html += `<span class="fmt-param" title="${esc(name)}">{${esc(name)}}` + `</span>`;
+        last = idx + full.length;
+      }
+      if (last < tmpl.length) html += esc(tmpl.slice(last));
+      ensurePreview();
+      const one = preview && preview.querySelector('.fmt-one');
+      if (one) one.innerHTML = html;
     }catch(_){ }
   }
 
@@ -324,9 +447,22 @@
         renderTypeOptions(Array.from(KNOWN_TYPES.values()));
       } catch(_){ }
       const frag = document.createDocumentFragment();
-      list.forEach(l => { const row = document.createElement('div'); row.className='tokens-log__entry'; if (l && l._id) { try { row.setAttribute('data-log-id', String(l._id)); }catch(_){ } } row.innerHTML = makeRow(l); try{ window.i18n && window.i18n.apply && window.i18n.apply(row);}catch(_){} frag.appendChild(row); });
+      list.forEach(l => {
+        const row = document.createElement('div');
+        row.className='tokens-log__entry';
+        if (l && l._id) { try { row.setAttribute('data-log-id', String(l._id)); }catch(_){ } }
+        if (l && l.userId) { try { row.setAttribute('data-user-id', String(l.userId)); }catch(_){ } }
+        if (l && l.type) { try { row.setAttribute('data-type', String(l.type)); }catch(_){ } }
+        row.innerHTML = makeRow(l);
+        try{ window.i18n && window.i18n.apply && window.i18n.apply(row);}catch(_){}
+        frag.appendChild(row);
+      });
       body.innerHTML=''; body.appendChild(frag);
       try { body.scrollTop = 0; } catch(_){ }
+      // 渲染（或恢复）预览行到列表顶部
+      try { updateFormatPreview(); } catch(_){ }
+
+      // 删除：不再进行“申请人昵称异步补全”，避免产生多余的 /api/user/:id 请求与 404 噪声
     }catch(_){ }
   }
 
@@ -418,6 +554,8 @@
       // 语言变化时同步更新日期输入的地区
       try{ const panel=document.getElementById('perms-log-panel'); const filters = panel ? panel.querySelector('.tokens-log__filters') : null; setDateInputLang(filters||panel); }catch(_){ }
       try{ document.querySelectorAll('#perms-log .log-time[data-ts]')?.forEach(el=>{ const ts=Number(el.getAttribute('data-ts'))||Date.now(); const rel=formatRel(ts); const abs=formatAbsForLang(ts); el.setAttribute('data-rel', rel); el.setAttribute('data-abs', abs); el.setAttribute('title', abs); el.textContent = el.matches(':hover')? abs : rel; }); }catch(_){ }
+      // 语言变化时更新类型格式预览
+      try{ updateFormatPreview(); }catch(_){ }
     };
     try{ document.addEventListener('i18n:changed', onLang);}catch(_){}
     try{ window.addEventListener && window.addEventListener('i18n:changed', onLang);}catch(_){}

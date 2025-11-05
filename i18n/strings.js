@@ -171,6 +171,11 @@
   'permissions.log.revoked': '撤销权限',
   'permissions.log.replaced': '替换权限集',
 
+  // Permissions log format preview labels
+  'permissions.log.format.template': '模板：',
+  'permissions.log.format.params': '参数：',
+  'permissions.log.format.example': '示例：',
+
   // Permissions log messages (body)
   'permissions.msg.userRegistered': '申请人：{applicantName}',
   'permissions.msg.userApproved': '申请人：{applicantName}',
@@ -472,6 +477,11 @@
   'permissions.log.granted': 'Permission granted',
   'permissions.log.revoked': 'Permission revoked',
   'permissions.log.replaced': 'Permissions replaced',
+
+  // Permissions log format preview labels
+  'permissions.log.format.template': 'Template:',
+  'permissions.log.format.params': 'Params:',
+  'permissions.log.format.example': 'Example:',
 
   // Permissions log messages (body)
   'permissions.msg.userRegistered': 'Applicant: {applicantName}',

@@ -20,9 +20,17 @@
       var oldPwd = modal.querySelector('#oldPassword');
       var newPwd = modal.querySelector('#newPassword');
       var confirmPwd = modal.querySelector('#confirmPassword');
+      var usernameInput = modal.querySelector('#pwdUsername');
       if (oldPwd) oldPwd.value = '';
       if (newPwd) newPwd.value = '';
       if (confirmPwd) confirmPwd.value = '';
+      // 为隐藏用户名字段赋值（若可用），以满足浏览器对密码表单的启发式要求
+      try {
+        if (usernameInput) {
+          var storedName = (localStorage && (localStorage.getItem('username') || localStorage.getItem('user') || '')) || '';
+          usernameInput.value = storedName;
+        }
+      } catch(_){ }
       if (oldPwd) oldPwd.focus();
     } else if (modalId === 'approve-user-modal') {
       try { if (typeof w.renderApprovals === 'function') w.renderApprovals(); } catch(_){ }

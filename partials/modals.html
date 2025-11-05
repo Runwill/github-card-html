@@ -57,6 +57,10 @@
     <h2 data-i18n="modal.password.title">密码</h2>
   </div>
   <form id="updateForm" class="modal-form">
+    <!-- 隐藏的用户名字段：满足浏览器对密码表单可用性的要求（不会影响样式与提交） -->
+    <input type="text" id="pwdUsername" name="username" autocomplete="username"
+           aria-hidden="true" tabindex="-1"
+           style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;pointer-events:none;" />
     <!-- 旧密码用于验证当前身份，autocomplete 使用 current-password -->
     <input type="password" id="oldPassword" name="oldPassword" data-i18n-attr="placeholder" data-i18n-placeholder="modal.password.old" placeholder="旧密码" required autocomplete="current-password">
     <!-- 新密码与确认新密码，autocomplete 使用 new-password -->

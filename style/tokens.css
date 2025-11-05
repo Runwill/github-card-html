@@ -407,7 +407,8 @@ html { scrollbar-gutter: stable both-edges; }
   transition: opacity .2s ease;
   pointer-events: none;        /* 默认不挡交互，内部按钮开启 */
 }
-.tokens-log .log-row:hover .log-actions { opacity: 1; }
+.tokens-log .log-row:hover .log-actions,
+.tokens-log .log-row:focus-within .log-actions { opacity: 1; pointer-events: auto; }
 .tokens-log .log-actions .btn-del {
   pointer-events: auto;
   border: none;
@@ -426,6 +427,11 @@ html { scrollbar-gutter: stable both-edges; }
   transform: scale(1.05);
 }
 .tokens-log .log-actions .btn-del:active { transform: scale(0.97); }
+
+/* 触屏/无悬浮设备：始终显示操作区，避免“悬浮才出现”的交互缺失 */
+@media (hover: none) {
+  .tokens-log .log-actions { opacity: 1; pointer-events: auto; }
+}
 
 #tokens-content .kv-row {
   display: grid;

@@ -174,3 +174,67 @@
     opacity: 1 !important;
   }
 }
+
+/* ===== 权限页：日志类型格式预览样式 ===== */
+#panel_permissions .tokens-log__format {
+  /* 使预览行与真实日志行背景/间距一致：去掉卡片外观，仅保留左右对齐 */
+  margin: 0 12px;                    /* 与 .tokens-log__body 的左右 padding 对齐 */
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+#panel_permissions .tokens-log__format .fmt-one { display: inline; }
+#panel_permissions .tokens-log__format .fmt-line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 4px 0;
+}
+#panel_permissions .tokens-log__format .fmt-line > strong {
+  flex: 0 0 auto;
+  min-width: 54px;                    /* 标签对齐：模板/参数/示例 */
+  font-weight: 600;
+  color: #4A5568;                     /* 次级标题色 */
+}
+#panel_permissions .tokens-log__format code { /* 不再使用 code 容器，这里保留兜底 */
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+#panel_permissions .tokens-log__format .fmt-template,
+#panel_permissions .tokens-log__format .fmt-params,
+#panel_permissions .tokens-log__format .fmt-example { flex: 1 1 auto; }
+
+/* 单行预览内的参数高亮样式（预览行已插入 #perms-log 内） */
+#panel_permissions #perms-log .fmt-param {
+  color: #1E3A8A;                      /* 蓝色文本（与 is-blue 语义接近） */
+  background: rgba(191, 219, 254, 0.28); /* 浅蓝底 */
+  border: 1px dashed #93C5FD;           /* 虚线边框暗示“占位符” */
+  border-radius: 4px;
+  padding: 0 3px;
+}
+
+/* 窄屏优化：标签换行到上方，避免拥挤 */
+@media (max-width: 520px) {
+  #panel_permissions .tokens-log__format .fmt-line {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  #panel_permissions .tokens-log__format .fmt-line > strong { min-width: 0; }
+}
+
+/* 深色模式适配 */
+[data-theme="dark"] #panel_permissions .tokens-log__format {
+  background: #1F2937;                 /* gray-800 */
+  border-color: #374151;                /* gray-700 */
+  color: #E5E7EB;                       /* gray-200 */
+}
+[data-theme="dark"] #panel_permissions .tokens-log__format .fmt-line > strong { color: #D1D5DB; }
+[data-theme="dark"] #panel_permissions .tokens-log__format code { background: transparent; border-color: transparent; }
+[data-theme="dark"] #panel_permissions #perms-log .fmt-param {
+  color: #93C5FD;                       /* blue-300 */
+  background: rgba(59, 130, 246, 0.16); /* 蓝色半透明底 */
+  border-color: #3B82F6;                /* blue-500 */
+}
