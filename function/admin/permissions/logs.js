@@ -6,7 +6,17 @@
   async function apiJson(path, options){
     const r = await fetch(`${API}${path}`, { headers: { 'Content-Type':'application/json', ...authHeader() }, ...(options||{}) });
     const out = await r.json().catch(()=>({}));
-    if (!r.ok) throw new Error(out && out.message || `HTTP ${r.status}`);
+    if (!r.ok) {
+      if (r.status === 401) {
+        try { console.warn('[perms-log] 401 未授权（可能登录已过期）'); } catch(_){ }
+        try {
+          if (window.CardUI && window.CardUI.Manager && window.CardUI.Manager.Controllers && typeof window.CardUI.Manager.Controllers.session?.handleLogout === 'function') {
+            window.CardUI.Manager.Controllers.session.handleLogout();
+          }
+        } catch(_){ }
+      }
+      throw new Error((out && out.message) || `HTTP ${r.status}`);
+    }
     return out;
   }
 
@@ -455,6 +465,8 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     const ready = (window.partialsReady instanceof Promise) ? window.partialsReady : Promise.resolve();
+    const isAdmin = ()=>{ try{ return localStorage.getItem('role') === 'admin'; } catch(_){ return false; } };
+    const hasToken = ()=>{ try{ return !!localStorage.getItem('token'); } catch(_){ return false; } };
     // 封装一次性绑定：在 #perms-log 出现后再绑定事件委托，避免绑定时机早于 DOM 创建
     function bindDeleteDelegation(){
       try{
@@ -478,8 +490,8 @@
       }catch(_){ }
     }
 
-    // 首次分片就绪后渲染日志，并在渲染后绑定删除委托
-    ready.then(()=>{ try{ hydrateUserLogs(); }catch(_){ } }).then(()=>{
+    // 首次分片就绪后渲染日志，并在渲染后绑定删除委托（仅管理员且已登录）
+    ready.then(()=>{ try{ if (hasToken() && isAdmin()) hydrateUserLogs(); }catch(_){ } }).then(()=>{
       try { bindDeleteDelegation(); } catch(_){ }
       // 进入权限页时自动刷新：监听面板可见性变化
       try{
@@ -499,7 +511,7 @@
           const check = ()=>{
             try{
               const vis = isVisible(panel);
-              if (vis && !wasVisible) { wasVisible = true; try{ hydrateUserLogs(); }catch(_){ } try { bindDeleteDelegation(); } catch(_){ } }
+              if (vis && !wasVisible) { wasVisible = true; if (hasToken() && isAdmin()) { try{ hydrateUserLogs(); }catch(_){ } try { bindDeleteDelegation(); } catch(_){ } } }
               else if (!vis && wasVisible) { wasVisible = false; }
             }catch(_){ }
           };
