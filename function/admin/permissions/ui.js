@@ -26,8 +26,6 @@
     try { alert(message); } catch(_){ }
   }
 
-  function badge(text, cls){ const s=document.createElement('span'); s.className='badge '+(cls||''); s.textContent=text; return s; }
-
   function bindPermTooltip(el, permName){
     try {
       if (!el) return;
@@ -146,5 +144,5 @@
     }
   }
 
-  ns.UI = { showToast, badge, bindPermTooltip, makeEl, tag, spinnerBtn, toggleSection };
+  ns.UI = { showToast, bindPermTooltip, makeEl, tag, spinnerBtn, toggleSection };
 })(window);

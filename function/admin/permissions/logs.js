@@ -131,15 +131,7 @@
         body.className = 'tokens-log__body';
         body.setAttribute('aria-live','polite');
         wrap.appendChild(filters);
-        // 日志类型格式预览容器：用于在选择具体类型时展示该类型的消息模板与参数
-        const fmtBox = document.createElement('div');
-        fmtBox.id = 'perms-log-format';
-        fmtBox.className = 'tokens-log__format';
-        fmtBox.style.display = 'none';
-        // 预览已插入日志体内，此处不再渲染内容
-        fmtBox.innerHTML = '';
-        wrap.appendChild(fmtBox);
-        try { window.i18n && window.i18n.apply && window.i18n.apply(fmtBox); } catch(_){ }
+  // 预览行直接插入到日志体内的首个条目位置，无需单独容器
         wrap.appendChild(body);
         panel.appendChild(header);
         panel.appendChild(wrap);
