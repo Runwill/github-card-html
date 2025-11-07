@@ -21,8 +21,17 @@
   }
 
   const MAX_LOGS = 200;
-  // 动态类型缓存（用于类型下拉与“结果”过滤映射）
-  let KNOWN_TYPES = new Set();
+  // 预置全部已定义的日志类型（即使尚未产生，也可在下拉中选择并查看格式预览）
+  const PRESET_LOG_TYPES = [
+    'user-registered','user-approved','user-rejected',
+    'password-change','role-changed',
+    'avatar-submitted','avatar-approved','avatar-rejected',
+    'username-submitted','username-approved','username-rejected','username-cancelled',
+    'intro-submitted','intro-approved','intro-rejected','intro-cancelled',
+    'permissions-granted','permissions-revoked','permissions-replaced'
+  ];
+  // 动态类型缓存（用于类型下拉与“结果”过滤映射），初始即包含全部预置类型
+  let KNOWN_TYPES = new Set(PRESET_LOG_TYPES);
 
   function isAnimating(el){ return !!(el && (el.classList.contains('is-opening') || el.classList.contains('is-closing'))); }
   function isOpen(el){ return !!(el && el.classList.contains('is-open')); }
@@ -77,6 +86,22 @@
         const v = out[key];
         if (v===undefined || v===null || v==='') out[key] = paramFallback(key, d, log);
       });
+      // 细化：角色变更日志中将 oldRole/newRole 从代码映射为本地化名称
+      try {
+        if (String(log && log.type) === 'role-changed') {
+          const mapRole = (val)=>{
+            try {
+              const code = String(val || '');
+              if (!code) return code;
+              const key = 'role.' + code;
+              const tr = (window.t && window.t(key)) || null;
+              return tr || code;
+            } catch(_) { return String(val||''); }
+          };
+          if (out.oldRole != null) out.oldRole = mapRole(out.oldRole);
+          if (out.newRole != null) out.newRole = mapRole(out.newRole);
+        }
+      } catch(_){ }
       return JSON.stringify(out);
     }catch(_){ return JSON.stringify((log&&log.data)||{}); }
   }
@@ -122,9 +147,11 @@
           '<button id="perms-log-reset" class="btn btn--secondary tokens-btn" data-i18n="permissions.log.filter.reset">重置</button>'
         ].join('');
         try { window.i18n && window.i18n.apply && window.i18n.apply(filters); } catch(_){ }
-        // 根据语言为日期输入设置地区
+  // 根据语言为日期输入设置地区
         try { setDateInputLang(filters); } catch(_){ }
         // 对齐/圆角等外观统一由 permissions.css 控制
+  // 初始渲染类型下拉（预置类型）
+  try { renderTypeOptions(Array.from(KNOWN_TYPES.values())); } catch(_){ }
 
         body = document.createElement('div');
         body.id = 'perms-log';
@@ -273,7 +300,25 @@
   const data = (log && log.data) || {};
   const msgK = msgKey(log && log.type);
   const msgParams = buildMsgParamsForLog(log);
-  const msg = msgK ? `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'></span>` : (log && log.message ? `<span>${String(log.message)}</span>` : '');
+  let msg = '';
+  if (msgK) {
+    // 若是角色变更，保留原始角色代码，便于语言切换时重新本地化
+    if (String(log && log.type) === 'role-changed') {
+      try {
+        const rawParams = (log && log.data) ? { ...log.data } : {};
+        const oldCode = rawParams.oldRole != null ? String(rawParams.oldRole) : '';
+        const newCode = rawParams.newRole != null ? String(rawParams.newRole) : '';
+        // msgParams 当前已是本地化版本，但我们仍保留代码以便后续重算
+        msg = `<span data-i18n="${msgK}" data-i18n-params='${msgParams}' data-old-role-code='${oldCode}' data-new-role-code='${newCode}'></span>`;
+      } catch(_) {
+        msg = `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'></span>`;
+      }
+    } else {
+      msg = `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'></span>`;
+    }
+  } else if (log && log.message) {
+    msg = `<span>${String(log.message)}</span>`;
+  }
   const detail = '';
       // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
   return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
@@ -337,7 +382,8 @@
       optAll.textContent = '全部类型';
       select.appendChild(optAll);
       // 按字母序插入所有类型
-      const sorted = Array.isArray(types) ? types.slice().sort() : [];
+  const base = (Array.isArray(types) ? types.slice() : []).concat(Array.from(KNOWN_TYPES.values()));
+  const sorted = Array.from(new Set(base)).sort();
       sorted.forEach(t => {
         const opt = document.createElement('option');
         opt.value = String(t);
@@ -554,6 +600,28 @@
       try{ document.querySelectorAll('#perms-log .log-time[data-ts]')?.forEach(el=>{ const ts=Number(el.getAttribute('data-ts'))||Date.now(); const rel=formatRel(ts); const abs=formatAbsForLang(ts); el.setAttribute('data-rel', rel); el.setAttribute('data-abs', abs); el.setAttribute('title', abs); el.textContent = el.matches(':hover')? abs : rel; }); }catch(_){ }
       // 语言变化时更新类型格式预览
       try{ updateFormatPreview(); }catch(_){ }
+      // 语言变化时重新本地化角色变更消息中的角色名
+      try{
+        const mapRole = (code)=>{
+          try{ const key='role.'+String(code||''); const tr=(window.t && window.t(key))||null; return tr || String(code||''); }catch(_){ return String(code||''); }
+        };
+        const rows = document.querySelectorAll('#perms-log .tokens-log__entry[data-type="role-changed"] .log-msg span[data-old-role-code]');
+        rows.forEach(span=>{
+          try{
+            const oldCode = span.getAttribute('data-old-role-code')||'';
+            const newCode = span.getAttribute('data-new-role-code')||'';
+            // 读取当前模板参数，替换 oldRole/newRole 为当前语言，并回写
+            const raw = span.getAttribute('data-i18n-params');
+            let params = {};
+            try { params = raw ? JSON.parse(raw) : {}; } catch(_) { params = {}; }
+            params.oldRole = mapRole(oldCode);
+            params.newRole = mapRole(newCode);
+            span.setAttribute('data-i18n-params', JSON.stringify(params));
+          }catch(_){ }
+        });
+        // 重新应用 i18n 以让文本刷新
+        try{ const panel=document.getElementById('perms-log-panel'); if(panel && window.i18n && window.i18n.apply) window.i18n.apply(panel);}catch(_){ }
+      }catch(_){ }
     };
     try{ document.addEventListener('i18n:changed', onLang);}catch(_){}
     try{ window.addEventListener && window.addEventListener('i18n:changed', onLang);}catch(_){}

@@ -246,7 +246,16 @@
     const sub = makeEl('div', 'approval-sub');
     const subLabel = makeEl('span', 'approval-sub__label');
     setI18nAttr(subLabel, 'permissions.user.roleLabel', t('permissions.user.roleLabel', 'role'));
-    const roleValue = makeEl('span', 'approval-role', u.role || '-');
+    // 初始化角色显示时使用 i18n 名称，而不是原始英文代码
+    const roleValue = makeEl('span', 'approval-role');
+    try {
+      const code = (u && u.role) ? String(u.role) : '';
+      if (code) {
+        setI18nAttr(roleValue, 'role.' + code, code);
+      } else {
+        roleValue.textContent = '-';
+      }
+    } catch(_) { roleValue.textContent = (u && u.role) || '-'; }
   try { roleValue.classList.add('is-editable'); roleValue.setAttribute('tabindex', '0'); roleValue.setAttribute('role', 'button'); roleValue.setAttribute('data-perm-trigger',''); } catch {}
     sub.appendChild(subLabel); sub.appendChild(roleValue);
     meta.appendChild(title); meta.appendChild(sub);
