@@ -171,10 +171,7 @@
   'permissions.log.revoked': '撤销权限',
   'permissions.log.replaced': '替换权限集',
 
-  // Permissions log format preview labels
-  'permissions.log.format.template': '模板：',
-  'permissions.log.format.params': '参数：',
-  'permissions.log.format.example': '示例：',
+  
 
   // Permissions log messages (body)
   'permissions.msg.userRegistered': '申请人：{applicantName}',
@@ -188,7 +185,7 @@
   'permissions.msg.usernameSubmitted': '新用户名：{newUsername}',
   'permissions.msg.usernameApproved': '用户名：{username}',
   'permissions.msg.usernameRejected': '申请人：{applicantName}，新用户名：{newUsername}',
-  'permissions.msg.usernameCancelled': '申请人：{applicantName}',
+  'permissions.msg.usernameCancelled': '已撤回用户名修改',
   'permissions.msg.introSubmitted': '新简介：{newIntro}',
   'permissions.msg.introApproved': '申请人：{applicantName}，简介：{intro}',
   'permissions.msg.introRejected': '申请人：{applicantName}，新简介：{newIntro}',
@@ -478,10 +475,7 @@
   'permissions.log.revoked': 'Permission revoked',
   'permissions.log.replaced': 'Permissions replaced',
 
-  // Permissions log format preview labels
-  'permissions.log.format.template': 'Template:',
-  'permissions.log.format.params': 'Params:',
-  'permissions.log.format.example': 'Example:',
+  
 
   // Permissions log messages (body)
   'permissions.msg.userRegistered': 'Applicant: {applicantName}',
@@ -495,7 +489,7 @@
   'permissions.msg.usernameSubmitted': 'New username: {newUsername}',
   'permissions.msg.usernameApproved': 'Username: {username}',
   'permissions.msg.usernameRejected': 'Applicant: {applicantName}, New username: {newUsername}',
-  'permissions.msg.usernameCancelled': 'Applicant: {applicantName}',
+  'permissions.msg.usernameCancelled': 'Username change revoked',
   'permissions.msg.introSubmitted': 'New intro: {newIntro}',
   'permissions.msg.introApproved': 'Applicant: {applicantName}, Intro: {intro}',
   'permissions.msg.introRejected': 'Applicant: {applicantName}, New intro: {newIntro}',
