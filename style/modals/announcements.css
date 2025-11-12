@@ -26,22 +26,13 @@
 
 /* Dark theme adjustments */
 html[data-theme="dark"] .ann-card {
-  /* 使用主题变量，改为更柔和的暗色平面底，避免强对比渐变 */
-  border-color: var(--border);
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  border-color: #2a2f3a; background: linear-gradient(180deg, #0b1220 0%, #0e1729 100%);
 }
-html[data-theme="dark"] .ann-card:hover {
-  box-shadow: 0 6px 12px var(--shadow-2);
-  border-color: color-mix(in srgb, var(--text-subtle) 40%, var(--border));
-}
-html[data-theme="dark"] .ann-card-title { color: var(--text); }
-html[data-theme="dark"] .ann-card-meta { color: var(--text-subtle); }
-html[data-theme="dark"] .ann-card-body { color: var(--text); }
-html[data-theme="dark"] .ann-empty, html[data-theme="dark"] .ann-loading {
-  border-color: var(--border);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  color: var(--text-subtle);
-}
+html[data-theme="dark"] .ann-card:hover { box-shadow: 0 6px 12px rgba(0,0,0,0.35); border-color: #334155; }
+html[data-theme="dark"] .ann-card-title { color: #e2e8f0; }
+html[data-theme="dark"] .ann-card-meta { color: #94a3b8; }
+html[data-theme="dark"] .ann-card-body { color: #cbd5e1; }
+html[data-theme="dark"] .ann-empty, html[data-theme="dark"] .ann-loading { border-color: #334155; background: #0f172a; color: #94a3b8; }
 
 /* Responsive tweaks */
 @media (max-width: 480px){
