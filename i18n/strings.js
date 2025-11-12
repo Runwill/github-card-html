@@ -13,6 +13,7 @@
     'sidebar.permissions': '权限',
     'sidebar.theme': '主题',
     'sidebar.logout': '退出',
+  'sidebar.announcements': '更新公告',
 
     'account.menu.back': '返回',
     'account.menu.info': '名片',
@@ -26,6 +27,7 @@
     'modal.password.update': '更新',
 
     'modal.approvals.title': '审核',
+  'modal.announcements.title': '更新公告',
 
     'modal.avatar.title': '头像',
     'modal.avatar.upload': '上传头像',
@@ -244,6 +246,9 @@
     'error.networkRevokeFailed': '网络异常，撤回失败',
     'error.parse.json': '服务器返回非 JSON 响应',
     'error.parse.unknown': '无法解析服务器响应',
+  // Announcements
+  'announcements.empty': '暂无公告',
+  'announcements.error.loadFailed': '公告加载失败',
 
     // Error prefixes for developer console messages
     'error.updateIntroFailedPrefix': '更新简介失败：',
@@ -317,6 +322,7 @@
     'sidebar.permissions': 'Permissions',
     'sidebar.theme': 'Theme',
     'sidebar.logout': 'Log out',
+  'sidebar.announcements': 'Updates',
 
     'account.menu.back': 'Back',
     'account.menu.info': 'Profile',
@@ -330,6 +336,7 @@
     'modal.password.update': 'Update',
 
     'modal.approvals.title': 'Approvals',
+  'modal.announcements.title': 'Updates',
 
     'modal.avatar.title': 'Avatar',
     'modal.avatar.upload': 'Upload avatar',
@@ -548,6 +555,9 @@
     'error.networkRevokeFailed': 'Network error, revoke failed',
     'error.parse.json': 'Server returned non-JSON response',
     'error.parse.unknown': 'Unable to parse server response',
+  // Announcements
+  'announcements.empty': 'No announcements yet',
+  'announcements.error.loadFailed': 'Failed to load announcements',
 
     // Error prefixes for developer console messages
     'error.updateIntroFailedPrefix': 'Update intro failed:',

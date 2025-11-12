@@ -27,7 +27,7 @@
     });
     $('sidebar-menu')?.addEventListener('click', (e) => e.stopPropagation());
     $('account-menu')?.addEventListener('click', (e) => e.stopPropagation());
-    ;['update-account-modal','approve-user-modal','avatar-modal','avatar-crop-modal','account-info-modal'].forEach(id => $(id)?.addEventListener('click', (e)=>e.stopPropagation()));
+  ;['update-account-modal','approve-user-modal','avatar-modal','avatar-crop-modal','account-info-modal','announcements-modal'].forEach(id => $(id)?.addEventListener('click', (e)=>e.stopPropagation()));
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         const st = (Core.state && Core.state.get && Core.state.get()) || {};
@@ -45,6 +45,10 @@
     $('account-info-button')?.addEventListener('click', () => C.accountInfo?.openAccountInfo?.());
 
     $('approve-request-button')?.addEventListener('click', () => C.approvals?.onApproveClick?.());
+    $('announcements-button')?.addEventListener('click', () => {
+      try { window.loadAnnouncements?.(); } catch(_){}
+      C.modal?.showModal?.('announcements-modal');
+    });
   $('logout-button')?.addEventListener('click', () => C.session?.handleLogout?.());
 
     const fileInput = $('upload-avatar-input');
