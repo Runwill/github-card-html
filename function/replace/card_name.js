@@ -1,5 +1,6 @@
 function replace_card_name(path, paragraphs = document){
-  fetchJsonCached(path).then(card => {
+  // 返回 Promise，供进度条与启动流程感知完成时机
+  return fetchJsonCached(path).then(card => {
     for (let i = 0; i < card.length; i++){
       const info = card[i]
       const $elements = $(paragraphs).find(info.en)

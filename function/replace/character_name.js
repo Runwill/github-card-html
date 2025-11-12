@@ -1,5 +1,6 @@
 function replace_character_name(path, paragraphs = document){
-    fetchJsonCached(path).then(character => {
+    // 返回 Promise，供进度条与启动流程感知完成时机
+    return fetchJsonCached(path).then(character => {
         const characterID = character.map(c => c.id).sort((a, b) => a - b)
         const idToName = new Map(character.map(c => [c.id, c.name]))
         for (let i = 0; i < characterID.length; i++){

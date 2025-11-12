@@ -12,7 +12,8 @@ if (typeof jQuery !== 'undefined') {
 }
 
 function replace_skill_name(path, paragraphs = document){
-  fetchJsonCached(path).then(skill => {
+  // 返回 Promise，供进度条与启动流程感知完成时机
+  return fetchJsonCached(path).then(skill => {
         // 获取技能名并排序
         const skillNames = skill.filter(s => s && s.role).map(s => s.name).sort()
         // name -> skill 的映射（若有重名以首个为准，保持现有行为语义）
@@ -124,5 +125,5 @@ function replace_skill_name(path, paragraphs = document){
                 })
             }
         }
-    })
+  })
 }

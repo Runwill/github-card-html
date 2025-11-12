@@ -55,8 +55,28 @@ window.addEventListener('load', ()=>{ resourcesReady=true; attemptCompletion() }
 // 名称 / 术语等替换完成（由 app_bootstrap.js 暴露）
 ;(function(){
     try{
-        const p = window.replacementsReady?.then ? window.replacementsReady : Promise.resolve()
-        p.then(()=>{ replacementsReady=true; attemptCompletion() }).catch(()=>{ replacementsReady=true; attemptCompletion() })
+        // 支持“迟到”的赋值：若此时尚未设置 window.replacementsReady，则拦截其后续 set
+        const hook = (p)=>{
+            if(p && typeof p.then === 'function'){
+                p.then(()=>{ replacementsReady=true; attemptCompletion() })
+                 .catch(()=>{ replacementsReady=true; attemptCompletion() })
+            }else{
+                // 未提供 Promise，视作不阻塞
+                replacementsReady=true; attemptCompletion()
+            }
+        }
+
+        if(Object.prototype.hasOwnProperty.call(window,'replacementsReady')){
+            hook(window.replacementsReady)
+        }else{
+            let _val
+            Object.defineProperty(window,'replacementsReady',{
+                configurable: true,
+                enumerable: true,
+                get(){ return _val },
+                set(v){ _val = v; hook(v) }
+            })
+        }
     }catch(_){ replacementsReady=true; attemptCompletion() }
 })()
 
