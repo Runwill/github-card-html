@@ -26,8 +26,8 @@ function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 })()
 
 // 加载状态跟踪
-// domReady/resourcesReady/fontsReady：三条件满足且 canComplete=true 时触发完成
-let domReady=false, resourcesReady=false, fontsReady=false, canComplete=false, completionStarted=false
+// domReady/resourcesReady/fontsReady/replacementsReady：四条件满足且 canComplete=true 时触发完成
+let domReady=false, resourcesReady=false, fontsReady=false, replacementsReady=false, canComplete=false, completionStarted=false
 
 // 检查是否可以完成进度条
 
@@ -44,13 +44,21 @@ function completeProgressBar(){
 // 开始检查完成条件的循环
 function startCompletionCheck(){ canComplete=true; attemptCompletion() }
 
-function attemptCompletion(){ if(!canComplete || completionStarted) return; if(domReady && resourcesReady && fontsReady) completeProgressBar() }
+function attemptCompletion(){ if(!canComplete || completionStarted) return; if(domReady && resourcesReady && fontsReady && replacementsReady) completeProgressBar() }
 
 // DOM加载完成
 document.addEventListener('DOMContentLoaded', ()=>{ domReady=true; attemptCompletion() })
 
 // 所有资源加载完成
 window.addEventListener('load', ()=>{ resourcesReady=true; attemptCompletion() })
+
+// 名称 / 术语等替换完成（由 app_bootstrap.js 暴露）
+;(function(){
+    try{
+        const p = window.replacementsReady?.then ? window.replacementsReady : Promise.resolve()
+        p.then(()=>{ replacementsReady=true; attemptCompletion() }).catch(()=>{ replacementsReady=true; attemptCompletion() })
+    }catch(_){ replacementsReady=true; attemptCompletion() }
+})()
 
 // 字体加载完成（使用 FontFaceSet API；若不支持则回退为已就绪）
 ;(function(){

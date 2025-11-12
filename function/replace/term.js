@@ -1,4 +1,6 @@
 function replace_term(path, mode, paragraphs = document) {
+    // 返回一个 Promise，便于上层加载进度等待替换完成
+    return new Promise((resolve, reject) => {
     fetchJsonCached(path).then(term => {
         for (var i in term) {
             if (!term[i].part) {//不分段术语
@@ -71,5 +73,8 @@ function replace_term(path, mode, paragraphs = document) {
                 }
             }
         }
+        // 所有替换与事件绑定完成
+        resolve()
+    }).catch(reject)
     })
 }
