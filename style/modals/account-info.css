@@ -1,170 +1,213 @@
 /* Account info modal - modern card layout with avatar, title and detail list */
-.account-info-modal { padding: 16px 16px 14px; }
-.account-info__header { display: flex; align-items: center; gap: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-.account-info__avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); background: var(--surface); box-shadow: 0 2px 6px var(--shadow-1); }
-.account-info__title { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.account-info-modal { padding: 24px; }
+
+/* Header Section */
+.account-info__header { 
+  display: flex; 
+  align-items: center; 
+  gap: 20px; 
+  padding-bottom: 20px; 
+  border-bottom: 1px solid var(--border, #e2e8f0); 
+}
+
+.account-info__avatar { 
+  width: 72px; height: 72px; 
+  border-radius: 50%; 
+  object-fit: cover; 
+  border: 2px solid var(--surface, #fff); 
+  background: var(--surface, #fff); 
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+}
+
+.account-info__title { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 4px; 
+  min-width: 0; 
+  flex: 1;
+}
+
 .account-info__name {
-  font-size: 18px;
-  color: var(--text);
+  font-size: 20px;
+  color: var(--text, #2d3748);
   line-height: 1.2;
-  /* 改为弹性布局：用户名本体可省略号，右侧“审核中/撤回”不再影响主文本宽度测量 */
-  display: flex; align-items: center; gap: 8px;
-  /* 保留整体字重在子元素上分别控制 */
-  font-weight: 700;
-  /* 强制单行，防止右侧状态出现时换行导致高度增加 */
+  display: flex; 
+  align-items: center; 
+  gap: 8px;
+  font-weight: 500;
   white-space: nowrap;
 }
+
 .account-info__name.is-editable { cursor: text; }
-.account-info__name.is-editable:hover { box-shadow: inset 0 -1px 0 0 var(--border); }
-.account-info__name.is-editing { outline: none; box-shadow: inset 0 -1px 0 0 var(--border); }
+.account-info__name.is-editable:hover { color: var(--primary-2, #7084ff); }
+.account-info__name.is-editing { outline: none; }
+
 .account-info__name-input {
-  /* 外观尽量贴近原文字，避免撑大布局 */
   font: inherit; color: inherit; line-height: 1.2; height: 1.2em;
   border: none; outline: none; background: transparent; padding: 0; margin: 0;
   display: inline-block; vertical-align: baseline;
-  width: auto; min-width: 2ch; /* 起始宽度，后续用 JS 自适应 */
+  width: auto; min-width: 2ch;
   box-sizing: content-box; appearance: none; -webkit-appearance: none; border-radius: 0; min-height: 0;
+  border-bottom: 2px solid var(--primary-1, #8698ff);
 }
-.account-info__name-input:focus {
-  /* 使用内阴影作为“下划线”，不改变高度 */
-  box-shadow: inset 0 -1px 0 0 var(--border);
-}
-.account-info__role .badge { font-size: 12px; }
 
-/* 主用户名文本：保持粗体、单行省略，不受右侧元素影响 */
+.account-info__role { display: flex; gap: 6px; flex-wrap: wrap; }
+.account-info__role .badge { 
+  font-size: 11px; 
+  padding: 2px 8px; 
+  border-radius: 6px; 
+  text-transform: uppercase; 
+  letter-spacing: 0.05em;
+}
+
+/* Username Text */
 #account-info-username-main {
-  font-weight: 700;
-  flex: 1 1 auto; min-width: 0; /* 允许缩小并触发省略 */
+  font-weight: 500;
+  flex: 0 1 auto; 
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;
+  max-width: 100%;
 }
 
-/* 审核中文本：不加粗、颜色更淡，尽量不抢视觉，并尽可能不撑开布局 */
+/* Pending / Cancel Inline Actions */
 #account-info-username-pending-inline,
 #account-info-intro-pending-inline {
-  font-weight: 400 !important;
-  /* 先提供兼容性回退色，再用更浅的混合色 */
-  color: var(--text-subtle);
-  color: color-mix(in srgb, var(--text-subtle) 30%, transparent);
-  /* 再缩小字号，进一步弱化视觉占比 */
-  font-size: 0.7em;
-  white-space: nowrap; /* 避免自身换行造成跳动 */
-  line-height: 1; /* 与按钮统一行高，避免撑高行盒 */
+  font-weight: 500 !important;
+  color: var(--text-subtle, #a0aec0);
+  font-size: 0.75em;
+  white-space: nowrap;
+  line-height: 1;
   vertical-align: baseline;
+  background: var(--bg-start, #f7fafc);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
-/* 撤回：轻量化为链接风格，减少占位影响 */
 #account-info-username-cancel-inline,
 #account-info-intro-cancel-inline {
-  /* 彻底压制通用 .btn 样式，避免高度被内边距/行高撑大 */
   all: unset;
-  display: inline;
-  /* 与“审核中”一致：更浅的中性灰，避免喧宾夺主 */
-  color: var(--text-subtle);
-  color: color-mix(in srgb, var(--text-subtle) 30%, transparent);
-  /* 与“审核中”一样大：去掉左右内边距，靠容器 gap 控制间距 */
-  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  color: var(--danger, #f56565);
+  padding: 2px 6px !important;
   line-height: 1 !important;
-  /* 与“审核中”一致的相对字号 */
-  font-size: 0.7em !important;
-  font-weight: 400 !important;
-  text-decoration: none;
+  font-size: 0.75em !important;
+  font-weight: 600 !important;
   cursor: pointer;
   vertical-align: baseline;
+  border-radius: 4px;
+  transition: background 0.2s;
 }
 
 #account-info-username-cancel-inline:hover,
-#account-info-username-cancel-inline:focus-visible,
-#account-info-intro-cancel-inline:hover,
-#account-info-intro-cancel-inline:focus-visible {
-  /* 悬停/聚焦保持同色，不加深 */
-  color: var(--text-subtle);
-  color: color-mix(in srgb, var(--text-subtle) 80%, transparent);
-  text-decoration: none;
+#account-info-intro-cancel-inline:hover {
+  background: rgba(245, 101, 101, 0.1);
 }
 
-/* 简介待审行内提示与撤回：对齐用户名的视觉权重 */
+/* Intro Pending Wrapper */
 #account-info-intro-pending {
-  display: flex; /* 占满行宽，便于内部文字根据容器宽度省略 */
+  display: flex; 
   align-items: center;
   gap: 8px;
-  color: var(--text-subtle);
-  color: color-mix(in srgb, var(--text-subtle) 30%, transparent);
+  color: var(--text-subtle, #a0aec0);
   line-height: 1;
   width: 100%;
-  flex-wrap: nowrap; /* 强制同一行，不允许换行 */
+  flex-wrap: nowrap;
+  margin-top: 4px;
 }
 
-/* 审核中的简介文本：启用基于容器宽度的省略号 */
 #account-info-intro-pending-inline {
-  /* 不再拉伸占位，确保撤回按钮紧跟在简短文本后 */
   flex: 0 1 auto;
-  min-width: 0;             /* 允许在 flex 布局下收缩 */
+  min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;   /* 关键：过长用省略号 */
-  white-space: nowrap;       /* 单行显示 */
-  /* 将可见宽度进一步收紧，确保文本更早使用省略号，避免挤占按钮空间 */
+  text-overflow: ellipsis;
+  white-space: nowrap;
   max-width: min(70%, 40ch);
 }
 
-/* 确保撤回按钮不被挤压到下一行 */
-#account-info-intro-cancel-inline { flex-shrink: 0; }
+/* Body Section */
+.account-info__body { padding-top: 20px; display: flex; flex-direction: column; gap: 16px; }
 
-.account-info__body { padding-top: 10px; }
-.account-info__body .info-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 2px; border-bottom: 1px dashed var(--border); }
-.account-info__body .info-row:last-child { border-bottom: none; }
-.account-info__body .info-label { color: var(--text-subtle); font-size: 13px; }
-.account-info__body .info-value { color: var(--text); font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-info__body .info-row { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 16px; 
+  padding: 8px 0; 
+  border-bottom: 1px dashed var(--border, #e2e8f0); 
+}
+.account-info__body .info-row:last-of-type { border-bottom: none; }
 
-/* 简介（多行）在可编辑/编辑中时的微样式 */
-/* 新版简介区域：显式文本框与提示 */
-.account-info__intro { padding: 10px 2px 0; display: flex; flex-direction: column; gap: 6px; }
+.account-info__body .info-label { 
+  color: var(--text-muted, #718096); 
+  font-size: 14px; 
+  font-weight: 400;
+}
+.account-info__body .info-value { 
+  color: var(--text, #2d3748); 
+  font-weight: 400; 
+  font-size: 14px; 
+  overflow: hidden; 
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+  font-family: monospace; /* Better for IDs */
+}
+
+/* Intro Textarea */
+.account-info__intro { 
+  padding-top: 8px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+}
+
 .intro-textarea {
-  width: 100%; min-height: 96px; resize: vertical; padding: 8px 10px;
-  border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
-  color: var(--text); font-size: 14px; line-height: 1.5; box-shadow: 0 1px 2px var(--shadow-0) inset;
-}
-.intro-textarea::placeholder { color: var(--text-subtle); }
-.intro-textarea:focus { outline: none; border-color: var(--primary-2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-2) 20%, transparent); }
-
-/* 夜间模式：确保文本域背景不变白，随主题颜色 */
-html[data-theme="dark"] .intro-textarea {
-  background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
-  border-color: var(--border) !important;
-  color: var(--text) !important;
-}
-html[data-theme="dark"] .intro-textarea::placeholder { color: var(--text-subtle) !important; }
-html[data-theme="dark"] .intro-textarea:focus {
-  background: var(--surface) !important;
-  border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important;
-  box-shadow: 0 0 0 3px var(--primary-ring) !important;
+  width: 100%; 
+  min-height: 100px; 
+  resize: vertical; 
+  padding: 12px;
+  border: 1px solid var(--border, #e2e8f0); 
+  border-radius: 10px; 
+  background: var(--bg-start, #f8fafc);
+  color: var(--text, #2d3748); 
+  font-size: 14px; 
+  line-height: 1.6; 
+  transition: all 0.2s ease;
 }
 
-/* 提示区域为空时不占空间 */
-#account-info-message:empty { margin: 0; padding: 0; border: 0; }
-/* 提示更新动画：使用轻微高亮的覆盖层而非位移，观感更柔和 */
+.intro-textarea::placeholder { color: var(--text-subtle, #a0aec0); }
+.intro-textarea:focus { 
+  outline: none; 
+  border-color: var(--primary-2, #7084ff); 
+  background: var(--surface, #fff);
+  box-shadow: 0 0 0 3px var(--primary-ring, rgba(134,152,255,.15)); 
+}
+
+/* Messages */
+/* Base styles handled by base.css (animation/layout) */
 #account-info-message { position: relative; }
-@keyframes account-info-msg-overlay {
+
+@keyframes account-info-msg-flash-anim {
   0% { opacity: 0; }
-  25% { opacity: .55; }
+  25% { opacity: 0.4; }
   100% { opacity: 0; }
 }
+
 #account-info-message.msg-flash::after {
   content: "";
-  position: absolute; inset: 0; border-radius: 8px;
+  position: absolute; 
+  inset: 0; 
+  border-radius: 8px;
   pointer-events: none;
-  animation: account-info-msg-overlay 500ms ease-out;
+  /* Flash color based on state */
+  background: currentColor; 
+  animation: account-info-msg-flash-anim 0.5s ease-out;
 }
-/* 按状态使用不同的高亮色 */
-#account-info-message.success.msg-flash::after { background: color-mix(in srgb, var(--success) 28%, transparent); }
-#account-info-message.error.msg-flash::after { background: color-mix(in srgb, var(--danger) 28%, transparent); }
-#account-info-message.msg-flash::after { background: color-mix(in srgb, var(--primary-1) 22%, transparent); }
 
-/* 无障碍：尊重减少动态偏好 */
-@media (prefers-reduced-motion: reduce) {
-  #account-info-message.msg-flash::after { animation: none !important; display: none !important; }
-}
+#account-info-message.success.msg-flash::after { background: var(--success, #48bb78); }
+#account-info-message.error.msg-flash::after { background: var(--danger, #f56565); }
 
 @media (max-width: 480px) {
-  .account-info__avatar { width: 48px; height: 48px; }
-  .account-info__name { font-size: 16px; }
+  .account-info-modal { padding: 20px; }
+  .account-info__avatar { width: 60px; height: 60px; }
+  .account-info__name { font-size: 18px; }
 }

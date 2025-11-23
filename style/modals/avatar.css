@@ -1,4 +1,6 @@
 /* Avatar modal/cropper split from modal.css */
+
+/* Cropper Overrides */
 #avatar-crop-modal .cropper-face,
 #avatar-crop-modal .cropper-move {
   display: block !important;
@@ -13,13 +15,83 @@
 #avatar-crop-modal .cropper-center::before,
 #avatar-crop-modal .cropper-center::after { display: none !important; }
 
-/* Fine-tune button position in avatar modal */
-#avatar-modal #avatar-modal-upload { margin-top: 16px; }
+/* Avatar Modal Layout */
+#avatar-modal .modal-form { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 20px; 
+}
 
-/* Reduce vertical gaps under the upload button inside avatar modal */
-#avatar-modal .modal-form { gap: 10px; }
-#avatar-modal #avatar-pending-wrap { margin-top: 6px !important; }
-#avatar-modal .modal-message { margin-top: 8px; }
+#avatar-modal-preview {
+  width: 180px; height: 180px; 
+  border-radius: 50%; 
+  object-fit: cover; 
+  border: 4px solid var(--surface, #fff); 
+  background: var(--bg-start, #f8fafc);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+#avatar-modal #avatar-modal-upload { 
+  width: 100%; 
+  margin-top: 0; /* Handled by gap */
+}
+
+/* Pending Avatar Section */
+#avatar-pending-wrap { 
+  margin-top: 12px !important; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg-start, #f8fafc);
+  border-radius: 12px;
+  border: 1px dashed var(--border, #e2e8f0);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#avatar-pending-wrap div[data-i18n="modal.avatar.pending"] {
+  font-size: 13px; 
+  color: var(--text-subtle, #718096); 
+  font-weight: 500;
+}
+
+#avatar-pending-preview {
+  width: 80px; height: 80px; 
+  border-radius: 50%; 
+  object-fit: cover; 
+  border: 2px solid var(--surface, #fff); 
+  background: var(--surface, #fff);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+#avatar-modal .modal-message { margin-top: 0; width: 100%; }
+
+/* Cropper Modal Content */
+#avatar-crop-modal .modal-header { margin-bottom: 16px; }
+
+#avatar-crop-image-container {
+  width: 100%; 
+  max-height: 60vh; 
+  border: 1px solid var(--border, #e2e8f0); 
+  border-radius: 12px; 
+  overflow: hidden; 
+  background: #000; /* Cropper usually needs dark bg */
+}
+
+#avatar-crop-image {
+  max-width: 100%; 
+  display: block;
+}
+
+#avatar-crop-actions {
+  display: flex; 
+  gap: 12px; 
+  justify-content: flex-end; 
+  margin-top: 20px;
+}
 
 @media (max-width: 480px) {
   /* Disable cropper animations on small screens */
@@ -27,9 +99,11 @@
   #avatar-crop-modal .cropper-dashed,
   #avatar-crop-modal .cropper-line { animation: none !important; background-image: none !important; }
   #avatar-crop-modal .cropper-line,
-  #avatar-crop-modal .cropper-point { background-color: #22c55e !important; }
+  #avatar-crop-modal .cropper-point { background-color: var(--success, #22c55e) !important; }
   #avatar-crop-modal .cropper-point { display: none !important; }
   #avatar-crop-modal .cropper-center,
   #avatar-crop-modal .cropper-face::before,
   #avatar-crop-modal .cropper-face::after { display: none !important; }
+  
+  #avatar-modal-preview { width: 140px; height: 140px; }
 }
