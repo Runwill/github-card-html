@@ -163,6 +163,21 @@
         var newName = (nameEl.textContent || '').trim(); var msgEl = $('account-info-message');
         if (_usernameSaveFailed && newName === _usernameLastTried) { try { nameEl.focus(); } catch(_){ } return; }
         if (!newName || newName === oldName) { cleanup(); return; }
+        
+        // Check if new name matches pending name
+        var pendingTag = $('account-info-username-pending-inline');
+        if (pendingTag && pendingTag.dataset.pendingName === newName) {
+          if (msgEl) {
+            // Mimic success message to provide consistent feedback without network request
+            msgEl.textContent = t('success.usernameSubmitted');
+            msgEl.className = 'modal-message success';
+            msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash');
+            var onAnimEndSame = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEndSame); };
+            msgEl.addEventListener('animationend', onAnimEndSame);
+          }
+          cleanup(); return;
+        }
+
         if (newName.length > 12) {
           if (msgEl) {
             msgEl.textContent = t('error.usernameMax');
@@ -230,8 +245,10 @@
         var prefix = t('account.info.pending');
         if (show) {
           tag.textContent = prefix + data.newUsername;
+          tag.dataset.pendingName = data.newUsername;
           if (tag.style.display === 'none') animateShow(tag, 'inline');
         } else {
+          delete tag.dataset.pendingName;
           animateHide(tag, function(){ tag.textContent = ''; });
         }
       }
