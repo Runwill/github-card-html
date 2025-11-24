@@ -42,6 +42,17 @@
 .account-info__name.is-editable:hover { color: var(--primary-2, #7084ff); }
 .account-info__name.is-editing { outline: none; }
 
+/* Fix for editable username span */
+#account-info-username-main.is-editable { cursor: text; transition: color 0.2s; }
+#account-info-username-main.is-editable:hover { color: var(--primary-2, #7084ff); }
+#account-info-username-main.is-editing { 
+  outline: none; 
+  overflow: visible; 
+  text-overflow: clip;
+  border-bottom: 1px solid var(--primary-2, #7084ff);
+  padding-bottom: 2px;
+}
+
 .account-info__name-input {
   font: inherit; color: inherit; line-height: 1.2; height: 1.2em;
   border: none; outline: none; background: transparent; padding: 0; margin: 0;
@@ -125,31 +136,47 @@
 }
 
 /* Body Section */
-.account-info__body { padding-top: 20px; display: flex; flex-direction: column; gap: 16px; }
+.account-info__body { padding-top: 20px; display: flex; flex-direction: column; gap: 10px; }
 
 .account-info__body .info-row { 
   display: flex; 
   align-items: center; 
   justify-content: space-between; 
   gap: 16px; 
-  padding: 8px 0; 
-  border-bottom: 1px dashed var(--border, #e2e8f0); 
+  padding: 12px 16px; 
+  background: transparent;
+  border-radius: 10px;
+  border: 1px solid var(--border, #e2e8f0);
+  transition: all 0.2s ease;
 }
-.account-info__body .info-row:last-of-type { border-bottom: none; }
+
+.account-info__body .info-row:hover {
+  background: var(--bg-end, #f8fafc);
+  border-color: var(--primary-2, #7084ff);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
 
 .account-info__body .info-label { 
   color: var(--text-muted, #718096); 
-  font-size: 14px; 
-  font-weight: 400;
+  font-size: 13px; 
+  font-weight: 500;
 }
 .account-info__body .info-value { 
   color: var(--text, #2d3748); 
-  font-weight: 400; 
+  font-weight: 500; 
   font-size: 14px; 
   overflow: hidden; 
   text-overflow: ellipsis; 
   white-space: nowrap; 
-  font-family: monospace; /* Better for IDs */
+}
+
+#account-info-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  background: rgba(128, 128, 128, 0.1);
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
 }
 
 /* Intro Textarea */
@@ -164,17 +191,24 @@
   width: 100%; 
   min-height: 100px; 
   resize: vertical; 
-  padding: 12px;
+  padding: 12px 16px;
   border: 1px solid var(--border, #e2e8f0); 
   border-radius: 10px; 
-  background: var(--bg-start, #f8fafc);
+  background: transparent;
   color: var(--text, #2d3748); 
   font-size: 14px; 
   line-height: 1.6; 
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
-.intro-textarea::placeholder { color: var(--text-subtle, #a0aec0); }
+.intro-textarea::placeholder { color: var(--text-subtle, #a0aec0); opacity: 0.8; }
+
+.intro-textarea:hover {
+  border-color: var(--text-muted, #cbd5e1);
+  background: var(--bg-end, #f8fafc);
+}
+
 .intro-textarea:focus { 
   outline: none; 
   border-color: var(--primary-2, #7084ff); 
@@ -206,8 +240,52 @@
 #account-info-message.success.msg-flash::after { background: var(--success, #48bb78); }
 #account-info-message.error.msg-flash::after { background: var(--danger, #f56565); }
 
+/* JS Animation Helpers */
+.anim-fade-enter {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.2s ease, transform 0.2s ease !important;
+}
+.anim-fade-enter-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.anim-fade-leave {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.2s ease, transform 0.2s ease !important;
+}
+.anim-fade-leave-active {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
 @media (max-width: 480px) {
   .account-info-modal { padding: 20px; }
   .account-info__avatar { width: 60px; height: 60px; }
   .account-info__name { font-size: 18px; }
+}
+
+/* Animation Fixes for Inline Edit - Smooth Collapse */
+#account-info-username-pending-inline,
+#account-info-username-cancel-inline {
+  display: inline-flex;
+  max-width: 300px;
+  overflow: hidden;
+}
+
+#account-info-username-pending-inline.anim-fade-leave,
+#account-info-username-cancel-inline.anim-fade-leave {
+  transition: opacity 0.2s ease, transform 0.2s ease, max-width 0.2s ease, padding 0.2s ease, margin 0.2s ease !important;
+}
+
+#account-info-username-pending-inline.anim-fade-leave-active,
+#account-info-username-cancel-inline.anim-fade-leave-active {
+  max-width: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  opacity: 0 !important;
 }

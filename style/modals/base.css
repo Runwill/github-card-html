@@ -82,15 +82,20 @@
   font-size: 15px; 
   line-height: 1.5;
   transition: all 0.2s ease; 
-  background: var(--bg-start, #f8fafc); /* Subtle background */
+  background: transparent;
   color: var(--text, #2d3748);
+}
+
+.modal-form input:hover {
+  border-color: var(--text-muted, #cbd5e1);
+  background: var(--bg-end, #f8fafc);
 }
 
 .modal-form input:focus { 
   outline: none; 
-  border-color: var(--primary-1, #8698ff); 
+  border-color: var(--primary-2, #7084ff); 
   background: var(--surface, #fff);
-  box-shadow: 0 0 0 4px var(--primary-ring, rgba(134,152,255,.15)); 
+  box-shadow: 0 0 0 3px var(--primary-ring, rgba(134,152,255,.15)); 
 }
 
 .modal-form input::placeholder { color: var(--text-subtle, #a0aec0); }

@@ -14,6 +14,37 @@
   var $ = dom.$ || function(id){ return document.getElementById(id); };
   var api = dom.api || function(u){ return u; };
 
+  // Animation helpers
+  function animateShow(el, displayType) {
+    if (!el) return;
+    el.classList.remove('anim-fade-leave', 'anim-fade-leave-active');
+    el.style.display = displayType || '';
+    el.classList.add('anim-fade-enter');
+    void el.offsetWidth; // reflow
+    el.classList.add('anim-fade-enter-active');
+    var onEnd = function() {
+      el.classList.remove('anim-fade-enter', 'anim-fade-enter-active');
+      el.removeEventListener('transitionend', onEnd);
+    };
+    el.addEventListener('transitionend', onEnd, { once: true });
+  }
+
+  function animateHide(el, callback) {
+    if (!el || el.style.display === 'none') { if(callback) callback(); return; }
+    el.classList.remove('anim-fade-enter', 'anim-fade-enter-active');
+    el.classList.add('anim-fade-leave');
+    void el.offsetWidth; // reflow
+    el.classList.add('anim-fade-leave-active');
+    var onEnd = function() {
+      el.style.display = 'none';
+      el.classList.remove('anim-fade-leave', 'anim-fade-leave-active');
+      if (callback) callback();
+    };
+    el.addEventListener('transitionend', onEnd, { once: true });
+    // Fallback if transition fails or element hidden
+    setTimeout(function(){ if(el.style.display !== 'none') { el.style.display = 'none'; if(callback) callback(); } }, 250);
+  }
+
   function refreshUsernameUI(newName){
     var nameMainEl = $('account-info-username-main');
     var nameTextEl = $('account-info-username-text');
@@ -61,7 +92,7 @@
           if (w.localStorage) w.localStorage.setItem('intro', newIntro);
           original = newIntro; introEl.value = newIntro;
           showFlash('success', t('success.introUpdatedImmediate'));
-          try { var wrap = document.getElementById('account-info-intro-pending'); if (wrap) { wrap.style.display = 'none'; wrap.innerHTML = ''; } } catch(_){ }
+          try { var wrap = document.getElementById('account-info-intro-pending'); if (wrap) animateHide(wrap, function(){ wrap.innerHTML = ''; }); } catch(_){ }
         } else {
           showFlash('success', t('success.introSubmitted'));
           introEl.value = original; // revert to old intro
@@ -90,16 +121,17 @@
       if (!id) return;
       var container = $('account-info-intro-pending'); if (!container) return;
       var resp = await fetch(api('/api/intro/pending/me?userId=' + encodeURIComponent(id)));
-      if (!resp.ok) { container.style.display = 'none'; return; }
+      if (!resp.ok) { animateHide(container); return; }
       var data = await resp.json();
       var show = !!(data && typeof data.newIntro === 'string');
-      if (!show) { container.style.display = 'none'; container.innerHTML = ''; return; }
+      if (!show) { animateHide(container, function(){ container.innerHTML = ''; }); return; }
       var full = (data.newIntro || '').replace(/\s+/g, ' ');
       container.innerHTML = '';
       var span = document.createElement('span'); span.id = 'account-info-intro-pending-inline'; span.textContent = t('account.info.pending') + full; span.title = full;
       var btn = document.createElement('button'); btn.id = 'account-info-intro-cancel-inline'; btn.textContent = t('account.info.cancel'); btn.addEventListener('click', function(){ cancelPendingIntroChange(); });
-      container.appendChild(span); container.appendChild(btn); container.style.display = '';
-    } catch(_){ var container2 = $('account-info-intro-pending'); if (container2) { container2.style.display = 'none'; container2.innerHTML = ''; } }
+      container.appendChild(span); container.appendChild(btn); 
+      if (container.style.display === 'none') animateShow(container, 'flex');
+    } catch(_){ var container2 = $('account-info-intro-pending'); if (container2) { animateHide(container2, function(){ container2.innerHTML = ''; }); } }
   }
 
   async function cancelPendingIntroChange(){
@@ -158,7 +190,7 @@
             if (w.localStorage) w.localStorage.setItem('username', newName);
             refreshUsernameUI(newName);
             if (msgEl) { msgEl.textContent = t('success.usernameUpdatedImmediate'); msgEl.className = 'modal-message success'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); var onAnimEnd3 = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd3); }; msgEl.addEventListener('animationend', onAnimEnd3); }
-            try { var tag = $('account-info-username-pending-inline'); if (tag) { tag.style.display = 'none'; tag.textContent = ''; } var btn = $('account-info-username-cancel-inline'); if (btn) btn.style.display = 'none'; } catch(_){ }
+            try { var tag = $('account-info-username-pending-inline'); if (tag) animateHide(tag, function(){ tag.textContent = ''; }); var btn = $('account-info-username-cancel-inline'); if (btn) animateHide(btn); } catch(_){ }
           } else {
             if (msgEl) { msgEl.textContent = t('success.usernameSubmitted'); msgEl.className = 'modal-message success'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); var onAnimEnd4 = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd4); }; msgEl.addEventListener('animationend', onAnimEnd4); }
             nameEl.textContent = oldName; // revert to old name
@@ -196,14 +228,25 @@
       var show = !!(data && data.newUsername);
       if (tag) {
         var prefix = t('account.info.pending');
-        tag.textContent = show ? (prefix + data.newUsername) : '';
-        tag.style.display = show ? '' : 'none';
+        if (show) {
+          tag.textContent = prefix + data.newUsername;
+          if (tag.style.display === 'none') animateShow(tag, 'inline');
+        } else {
+          animateHide(tag, function(){ tag.textContent = ''; });
+        }
       }
       if (cancelBtn) {
-        cancelBtn.style.display = show ? '' : 'none';
-        cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-        var freshBtn = $('account-info-username-cancel-inline');
-        if (freshBtn) freshBtn.addEventListener('click', function(){ cancelPendingUsernameChange(); });
+        var newBtn = cancelBtn.cloneNode(true);
+        // Preserve display state for animation continuity
+        newBtn.style.display = cancelBtn.style.display;
+        cancelBtn.replaceWith(newBtn);
+        newBtn.addEventListener('click', function(){ cancelPendingUsernameChange(); });
+        
+        if (show) {
+          if (newBtn.style.display === 'none') animateShow(newBtn, 'inline-flex');
+        } else {
+          animateHide(newBtn);
+        }
       }
     } catch(_){ }
   }

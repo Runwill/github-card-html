@@ -149,16 +149,27 @@ html.theme-switching body {
 #panel_tokens .tokens-input,
 #panel_permissions .tokens-input {
   border: 1px solid var(--border) !important;
-  background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
+  background: transparent !important;
   color: var(--text) !important;
+  transition: all 0.2s ease;
 }
+
+.modal-form input:hover,
+#login-form input:hover,
+#panel_tokens .tokens-input:hover,
+#panel_permissions .tokens-input:hover {
+  background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
+  border-color: var(--text-muted) !important;
+}
+
 .modal-form input::placeholder,
 #panel_tokens .tokens-input::placeholder,
-#panel_permissions .tokens-input::placeholder { color: var(--text-subtle) !important; }
+#panel_permissions .tokens-input::placeholder { color: var(--text-subtle) !important; opacity: 0.8; }
+
 .modal-form input:focus,
 #panel_tokens .tokens-input:focus,
 #panel_permissions .tokens-input:focus {
-  border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important;
+  border-color: var(--primary-2) !important;
   box-shadow: 0 0 0 3px var(--primary-ring) !important;
   background: var(--surface) !important;
 }
