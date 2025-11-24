@@ -117,6 +117,18 @@ html.theme-switching body {
   opacity: 0.96;
 }
 
+/* 
+   性能优化：在主题切换期间禁用所有元素的过渡动画。
+   这是为了配合 JavaScript 中的 View Transitions API（如果支持）或作为降级方案。
+   如果浏览器支持 View Transitions，屏幕会进行全页交叉淡入淡出，非常流畅且无需逐个元素计算。
+   如果不支持，则通过 body 透明度变化提供简单的视觉反馈，避免卡顿。
+*/
+html.theme-switching *,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+}
+
 /* 面板/模态通用覆盖（登录也使用 .panel） */
 .panel, #login-container {
   background: var(--surface-soft) !important;
