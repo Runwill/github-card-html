@@ -175,6 +175,44 @@
         }
       } catch (_) {}
 
+      // 日志内“复制”按钮事件委托
+      try {
+        if (body && !body.__copyDelegationBound) {
+          body.__copyDelegationBound = true;
+          body.addEventListener('click', (ev) => {
+            const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-copy') : null;
+            if (!btn) return;
+            const entry = btn.closest('.tokens-log__entry');
+            if (!entry) return;
+            
+            const clone = entry.cloneNode(true);
+            const actions = clone.querySelector('.log-actions');
+            if (actions) actions.remove();
+            
+            const timeEl = clone.querySelector('.log-time');
+            if (timeEl && timeEl.hasAttribute('data-abs')) {
+                timeEl.textContent = timeEl.getAttribute('data-abs') + ' ';
+            }
+            
+            const text = clone.innerText.replace(/\s+/g, ' ').trim();
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalI18n = btn.getAttribute('data-i18n');
+                    btn.setAttribute('data-i18n', 'common.copied');
+                    if (window.i18n && window.i18n.apply) window.i18n.apply(btn);
+                    setTimeout(() => {
+                        btn.setAttribute('data-i18n', originalI18n || 'common.copy');
+                        if (window.i18n && window.i18n.apply) window.i18n.apply(btn);
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Copy failed', err);
+                });
+            }
+          });
+        }
+      } catch (_) {}
+
       if (body) body.__ready = true;
       return body || null;
     } catch (_) { return null; }
@@ -310,13 +348,14 @@
     const iso = new Date(ts).toISOString();
   const timeAbs = formatAbsForLang(ts);
     const timeRel = formatRel(ts);
-    const timeHtml = `<time class="log-time" datetime="${html(iso)}" title="${html(timeAbs)}" data-ts="${html(String(ts))}" data-rel="${html(timeRel)}" data-abs="${html(timeAbs)}">${html(timeRel)}</time>`;
+    const timeHtml = `<time class="log-time" datetime="${html(iso)}" data-ts="${html(String(ts))}" data-rel="${html(timeRel)}" data-abs="${html(timeAbs)}">${html(timeRel)}</time>`;
   const cKey = payload && payload.collection ? mapCollectionKey(payload.collection) : '';
     const tag = (payload && payload.collection) ? resolveLabel(payload.collection, payload && payload.id, payload && payload.label) : '';
   const pill = (key, cls='')=> `<i class="log-pill ${cls}" data-i18n="${key}"></i>`;
     const code = (txt)=> `<code class="log-code">${html(txt||'')}</code>`;
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
-  if (type === 'create') {
+    const actions = `<div class="log-actions"><button class="btn-copy" data-i18n="common.copy" data-i18n-attr="aria-label" data-i18n-aria-label="common.copy"></button><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div>`;
+    if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
       const msg = (function(){
         try{
@@ -329,31 +368,31 @@
           return '';
         }catch(_){ return ''; }
       })();
-  return `<div class="log-row is-create">${timeHtml}${pill('tokens.log.create','is-green')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(label)}]</i><i class="log-msg">${code(msg)}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
+  return `<div class="log-row is-create">${timeHtml}${pill('tokens.log.create','is-green')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(label)}]</i><i class="log-msg">${code(msg)}</i>${actions}</div>`;
     }
     if (type === 'delete-doc') {
-  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteDoc','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
+  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteDoc','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i>${actions}</div>`;
     }
     if (type === 'delete-field') {
       const from = pickOld(payload);
-  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteField','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val"><span data-i18n="tokens.log.prev"></span>${code(json(from))}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
+  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteField','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val"><span data-i18n="tokens.log.prev"></span>${code(json(from))}</i>`:''}${actions}</div>`;
     }
     if (type === 'update') {
       const v = pickNew(payload);
       const from = pickOld(payload);
-  return `<div class="log-row is-update">${timeHtml}${pill('tokens.log.update','is-blue')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
+  return `<div class="log-row is-update">${timeHtml}${pill('tokens.log.update','is-blue')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i>${actions}</div>`;
     }
     if (type === 'save-edits') {
       const sets = (payload && payload.sets) || [];
       const dels = (payload && payload.dels) || [];
-  const head = `<div class="log-row is-save">${timeHtml}${pill('tokens.edit.submit','is-indigo')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-head" data-i18n="tokens.log.saveSummary" data-i18n-params='${html(JSON.stringify({ sets: sets.length, dels: dels.length }))}'></i><div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
+  const head = `<div class="log-row is-save">${timeHtml}${pill('tokens.edit.submit','is-indigo')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-head" data-i18n="tokens.log.saveSummary" data-i18n-params='${html(JSON.stringify({ sets: sets.length, dels: dels.length }))}'></i>${actions}</div>`;
       const pick = (val) => (val && typeof val === 'object') ? JSON.stringify(val) : val;
       const detail = [];
       sets.slice(0, 10).forEach(s => { detail.push(`<div class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(pick(s.from))} → `:''}${code(pick(s.to))}</div>`); });
   dels.slice(0, 10).forEach(d => { detail.push(`<div class="log-sub is-del"><span data-i18n="common.delete"></span> ${code(d.path)}${d.from!==undefined? ` (<span data-i18n="tokens.log.prev"></span>${code(pick(d.from))})`:''}</div>`); });
       return head + detail.join('');
     }
-  return `<div class=\"log-row\">${timeHtml}${pill(type)}<div class=\"log-actions\"><button class=\"btn-del\" data-i18n=\"common.delete\" data-i18n-attr=\"aria-label\" data-i18n-aria-label=\"common.delete\"></button></div></div>`;
+  return `<div class=\"log-row\">${timeHtml}${pill(type)}${actions}</div>`;
   }
 
   /**
@@ -519,7 +558,6 @@
           const abs = formatAbsForLang(ts);
           el.setAttribute('data-rel', rel);
           el.setAttribute('data-abs', abs);
-          el.setAttribute('title', abs);
           // 悬浮显示绝对时间；非悬浮显示相对时间
           el.textContent = el.matches(':hover') ? abs : rel;
         });

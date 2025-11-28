@@ -428,6 +428,25 @@ html { scrollbar-gutter: stable both-edges; }
 }
 .tokens-log .log-actions .btn-del:active { transform: scale(0.97); }
 
+.tokens-log .log-actions .btn-copy {
+  pointer-events: auto;
+  border: none;
+  background: transparent;
+  color: #A0AEC0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  transition: transform 140ms ease, color 140ms ease, background 140ms ease;
+}
+.tokens-log .log-actions .btn-copy:hover {
+  color: #3182CE;
+  background: rgba(49, 130, 206, 0.08);
+  transform: scale(1.05);
+}
+.tokens-log .log-actions .btn-copy:active { transform: scale(0.97); }
+
 /* 触屏/无悬浮设备：始终显示操作区，避免“悬浮才出现”的交互缺失 */
 @media (hover: none) {
   .tokens-log .log-actions { opacity: 1; pointer-events: auto; }

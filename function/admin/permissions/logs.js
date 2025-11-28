@@ -293,7 +293,7 @@
       const iso = new Date(t).toISOString();
       const abs = formatAbsForLang(t);
       const rel = formatRel(t);
-      const timeHtml = `<time class="log-time" datetime="${iso}" title="${abs}" data-ts="${t}" data-rel="${rel}" data-abs="${abs}">${rel}</time>`;
+      const timeHtml = `<time class="log-time" datetime="${iso}" data-ts="${t}" data-rel="${rel}" data-abs="${abs}">${rel}</time>`;
       const k = typeKey(log && log.type);
       const cls = typeCls(log && log.type);
       const who = (log && log.actorName) ? log.actorName : '';
@@ -320,8 +320,9 @@
     msg = `<span>${String(log.message)}</span>`;
   }
   const detail = '';
-      // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
-  return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}<div class="log-actions"><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div></div>`;
+    // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
+    const actions = `<div class="log-actions"><button class="btn-copy" data-i18n="common.copy" data-i18n-attr="aria-label" data-i18n-aria-label="common.copy"></button><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div>`;
+    return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}${actions}</div>`;
     }catch(_){ return ''; }
   }
 
@@ -511,6 +512,40 @@
         const root = document.getElementById('perms-log');
         if (root && !root.__delDelegationBound) {
           root.__delDelegationBound = true;
+          
+          // Copy delegation
+          root.addEventListener('click', (ev) => {
+            const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-copy') : null;
+            if (!btn) return;
+            const entry = btn.closest('.tokens-log__entry');
+            if (!entry) return;
+            
+            const clone = entry.cloneNode(true);
+            const actions = clone.querySelector('.log-actions');
+            if (actions) actions.remove();
+            
+            const timeEl = clone.querySelector('.log-time');
+            if (timeEl && timeEl.hasAttribute('data-abs')) {
+                timeEl.textContent = timeEl.getAttribute('data-abs') + ' ';
+            }
+            
+            const text = clone.innerText.replace(/\s+/g, ' ').trim();
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalI18n = btn.getAttribute('data-i18n');
+                    btn.setAttribute('data-i18n', 'common.copied');
+                    if (window.i18n && window.i18n.apply) window.i18n.apply(btn);
+                    setTimeout(() => {
+                        btn.setAttribute('data-i18n', originalI18n || 'common.copy');
+                        if (window.i18n && window.i18n.apply) window.i18n.apply(btn);
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Copy failed', err);
+                });
+            }
+          });
+
           root.addEventListener('click', (ev)=>{
             const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
             if (!btn) return;
@@ -597,7 +632,7 @@
       try{ const panel=document.getElementById('perms-log-panel'); if(panel && window.i18n && window.i18n.apply) window.i18n.apply(panel);}catch(_){ }
       // 语言变化时同步更新日期输入的地区
       try{ const panel=document.getElementById('perms-log-panel'); const filters = panel ? panel.querySelector('.tokens-log__filters') : null; setDateInputLang(filters||panel); }catch(_){ }
-      try{ document.querySelectorAll('#perms-log .log-time[data-ts]')?.forEach(el=>{ const ts=Number(el.getAttribute('data-ts'))||Date.now(); const rel=formatRel(ts); const abs=formatAbsForLang(ts); el.setAttribute('data-rel', rel); el.setAttribute('data-abs', abs); el.setAttribute('title', abs); el.textContent = el.matches(':hover')? abs : rel; }); }catch(_){ }
+      try{ document.querySelectorAll('#perms-log .log-time[data-ts]')?.forEach(el=>{ const ts=Number(el.getAttribute('data-ts'))||Date.now(); const rel=formatRel(ts); const abs=formatAbsForLang(ts); el.setAttribute('data-rel', rel); el.setAttribute('data-abs', abs); el.textContent = el.matches(':hover')? abs : rel; }); }catch(_){ }
       // 语言变化时更新类型格式预览
       try{ updateFormatPreview(); }catch(_){ }
       // 语言变化时重新本地化角色变更消息中的角色名

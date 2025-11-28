@@ -231,6 +231,8 @@
   'common.expand': '展开',
   'common.collapse': '收起',
   'common.delete': '删除',
+  'common.copy': '复制',
+  'common.copied': '已复制',
   'common.noPermission': '无权限',
 
     // UI messages / alerts / statuses
@@ -547,6 +549,8 @@
   'common.expand': 'Expand',
   'common.collapse': 'Collapse',
   'common.delete': 'Delete',
+  'common.copy': 'Copy',
+  'common.copied': 'Copied',
   'common.noPermission': 'No permission',
 
     // UI messages / alerts / statuses
