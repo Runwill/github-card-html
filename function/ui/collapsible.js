@@ -67,7 +67,7 @@
     return false;
   }
 
-  function ensureButton(h, content) {
+  function ensureButton(h, content, index) {
     // 避免重复创建按钮
     if (h.querySelector('.collapsible__toggle')) return h.querySelector('.collapsible__toggle');
 
@@ -81,14 +81,35 @@
     icon.textContent = '▾';
     btn.appendChild(icon);
 
+    // 生成唯一ID用于存储状态
+    // 优先使用标题文本，如果文本为空(可能尚未渲染)，则使用索引
+    let titleText = h.textContent.trim();
+    // 移除可能已存在的按钮文本对 textContent 的影响(虽然 insertBefore 在后，但防万一)
+    // 这里简单处理：如果文本为空，使用索引
+    const storageKey = titleText ? ('term_panel_collapse_' + titleText) : ('term_panel_collapse_idx_' + index);
+
   // 插入到标题内容最前面
     h.insertBefore(btn, h.firstChild);
+
+    // 恢复保存的状态
+    const savedState = localStorage.getItem(storageKey);
+    if (savedState === 'collapsed') {
+      // 无动画直接收起
+      content.style.height = '0px';
+      content.style.overflow = 'hidden';
+      content.classList.add('is-collapsed');
+      content.setAttribute('aria-hidden', 'true');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.classList.add('is-collapsed');
+    }
 
     btn.addEventListener('click', () => {
       if (content.classList.contains('is-collapsed')) {
         expandSection(content, btn);
+        localStorage.setItem(storageKey, 'expanded');
       } else {
         collapseSection(content, btn);
+        localStorage.setItem(storageKey, 'collapsed');
       }
     });
 
@@ -117,7 +138,7 @@
     if (!headings.length) return false;
 
     // 按 DOM 顺序处理
-    headings.forEach(h => {
+    headings.forEach((h, index) => {
       // 收集当前标题后属于该段落的兄弟节点
       const sectionNodesAll = collectSectionSiblings(h);
       // 过滤仅保留 panel_term 的“段落内容”节点，避免误包裹到其他页面的按钮/容器，造成遮挡
@@ -129,7 +150,7 @@
   if (!hasLowerOrSameHeading(sectionNodes, lvl)) return;
 
       const wrapper = wrapContent(sectionNodes);
-      const btn = ensureButton(h, wrapper);
+      const btn = ensureButton(h, wrapper, index);
 
       // 默认：全部展开（不加 'is-collapsed'）
     });

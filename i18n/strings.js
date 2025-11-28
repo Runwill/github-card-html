@@ -14,6 +14,7 @@
     'sidebar.theme': '主题',
     'sidebar.logout': '退出',
   'sidebar.announcements': '更新公告',
+  'sidebar.keySettings': '按键设置',
 
     'account.menu.back': '返回',
     'account.menu.info': '名片',
@@ -28,6 +29,7 @@
 
     'modal.approvals.title': '审核',
   'modal.announcements.title': '更新公告',
+  'modal.keySettings.title': '按键设置',
 
     'modal.avatar.title': '头像',
     'modal.avatar.upload': '上传头像',
@@ -43,6 +45,11 @@
   'account.info.editUsername': '编辑用户名',
     'account.info.pending': '审核中：',
     'account.info.cancel': '撤回',
+
+    'keySettings.expandAll': '展开所有术语',
+    'keySettings.notSet': '未设置',
+    'keySettings.pressKey': '请按下按键...',
+    'keySettings.hint': '按下 Esc 或 Backspace 可清除设置。',
 
     'theme.toggle.toLight': '切换为浅色',
     'theme.toggle.toDark': '切换为深色',
@@ -323,6 +330,7 @@
     'sidebar.theme': 'Theme',
     'sidebar.logout': 'Log out',
   'sidebar.announcements': 'Updates',
+  'sidebar.keySettings': 'Key Settings',
 
     'account.menu.back': 'Back',
     'account.menu.info': 'Profile',
@@ -337,6 +345,7 @@
 
     'modal.approvals.title': 'Approvals',
   'modal.announcements.title': 'Updates',
+  'modal.keySettings.title': 'Key Settings',
 
     'modal.avatar.title': 'Avatar',
     'modal.avatar.upload': 'Upload avatar',
@@ -352,6 +361,11 @@
   'account.info.editUsername': 'Edit username',
     'account.info.pending': 'Pending: ',
     'account.info.cancel': 'Revoke',
+
+    'keySettings.expandAll': 'Expand all terms',
+    'keySettings.notSet': 'Not set',
+    'keySettings.pressKey': 'Press a key...',
+    'keySettings.hint': 'Press Esc or Backspace to clear settings.',
 
     'theme.toggle.toLight': 'Switch to light',
     'theme.toggle.toDark': 'Switch to dark',
