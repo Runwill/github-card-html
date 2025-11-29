@@ -8,12 +8,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 3s;
+    /* 优化退出：增加模糊过渡，实现“对焦”般的清晰过程 */
+    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
 }
 
 #loading-overlay.fade-out {
     opacity: 0;
+    backdrop-filter: blur(0px); /* 模糊逐渐消失，页面逐渐清晰 */
     pointer-events: none;
+}
+
+/* 让内容元素比背景更快隐退，营造层次感，避免背景透明时内容显得突兀 */
+#loading-overlay.fade-out .loading-bar-container,
+#loading-overlay.fade-out .loading-title {
+    opacity: 0;
+    transform: scale(0.98); /* 极微小的退后感，保持稳重 */
+    transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
 .loading-bar-container {
