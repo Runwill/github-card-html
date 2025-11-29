@@ -60,10 +60,26 @@
       if (!input || input.__bound) return;
       input.__bound = true;
 
+      // 恢复上次搜索内容
+      try {
+        const saved = localStorage.getItem('tokens_search_q');
+        if (saved) {
+          input.value = saved;
+          state.q = saved;
+          // 恢复时若有内容，自动展开所有类型以便搜索
+          if (saved.trim()) {
+             state.openTypes = new Set(['term-fixed', 'term-dynamic', 'card', 'character', 'skill']);
+          }
+          // 恢复后立即触发一次重绘以应用过滤
+          if (window.renderTokensDashboard) window.renderTokensDashboard(false);
+        }
+      } catch (_) {}
+
       const onChange = () => {
         clearTimeout(state.timer);
         state.timer = setTimeout(() => {
           const text = (input.value || '');
+          try { localStorage.setItem('tokens_search_q', text); } catch (_) {}
           if (text === state.q) return;
           const trimmed = (text || '').trim();
           try {
