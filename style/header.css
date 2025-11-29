@@ -55,7 +55,18 @@
     transform: translateY(-1px);
 }
 
+#title-a:active {
+    transform: translateY(0);
+    transition-duration: 0.05s;
+}
+
 #title-a:hover::after { width: 100%; }
+
+#title-a:active::after {
+    width: 85%;
+    opacity: 0.8;
+    transition-duration: 0.05s;
+}
 
 #sidebar { background: #fff; padding: 0; z-index: 11; }
 
@@ -123,7 +134,8 @@
 
 .tabs-title.is-active > a,
 .tabs-title > a[aria-selected="true"] {
-    font-weight: 600;
+    /* font-weight: 600; */
+    text-shadow: 0 0 1px currentColor, 0 0 1px currentColor;
 }
 
 
