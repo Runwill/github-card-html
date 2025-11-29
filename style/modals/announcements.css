@@ -87,15 +87,46 @@
   position: relative;
 }
 
+/* Important state */
+.ann-card.is-important:hover {
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+  border-color: #f59e0b;
+  background: linear-gradient(to right bottom, #fffbeb, #fff);
+}
+.ann-card.is-important::before {
+  background: linear-gradient(to bottom, #f59e0b, #fbbf24);
+  width: 6px;
+  opacity: 0;
+}
+.ann-card.is-important:hover::before {
+  opacity: 1;
+}
+.ann-badge-important {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 1;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  margin-right: 8px;
+  vertical-align: middle;
+  font-weight: 600;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+  letter-spacing: 0.5px;
+}
+
 /* Dark theme adjustments */
 html[data-theme="dark"] .ann-card {
   background: var(--surface, #0b1220);
   border-color: var(--border, #2a2f3a);
 }
-
-html[data-theme="dark"] .ann-card:hover { 
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); 
-  border-color: var(--primary-3, #4338ca); 
+html[data-theme="dark"] .ann-card.is-important:hover {
+  background: linear-gradient(to right bottom, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15);
+  border-color: rgba(245, 158, 11, 0.5);
 }
 
 /* Responsive tweaks */

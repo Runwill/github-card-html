@@ -30,9 +30,19 @@
     list.forEach((it)=>{
       const card = document.createElement('div');
       card.className = 'ann-card';
+      if (it.important) card.classList.add('is-important');
+      
       const title = document.createElement('div');
       title.className = 'ann-card-title';
       title.textContent = (it.title || '');
+      if (it.important) {
+        const badge = document.createElement('span');
+        badge.className = 'ann-badge-important';
+        // Add a star icon for visual emphasis
+        badge.textContent = '★ ' + t('announcements.important', '重要');
+        title.prepend(badge);
+      }
+
       const meta = document.createElement('div');
       meta.className = 'ann-card-meta';
       meta.textContent = it.date ? String(it.date) : '';

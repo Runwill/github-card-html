@@ -27,6 +27,58 @@
     document.getElementById('tokens-refresh-btn')?.addEventListener('click',()=>{
       (window.tokensRefresh?.() || window.renderTokensDashboard?.());
     });
+
+    const header = document.getElementById('header');
+    if(header){
+      let lastSwitch = 0;
+      header.addEventListener('wheel', e => {
+        const now = Date.now();
+        if(now - lastSwitch < 150) return; 
+
+        if(Math.abs(e.deltaY) < 10) return;
+
+        e.preventDefault();
+
+        const tabs = Array.from(document.querySelectorAll('#example-tabs .tabs-title'));
+        const activeIndex = tabs.findIndex(tab => tab.classList.contains('is-active'));
+        if(activeIndex === -1) return;
+
+        const isTabAccessible = (tab) => {
+          const link = tab.querySelector('a');
+          if(!link) return false;
+          // 简单的可见性检查，如果被display:none隐藏则跳过
+          if(getComputedStyle(tab).display === 'none') return false;
+
+          const href = link.getAttribute('href');
+          if(href === '#panel_tokens' || href === '#panel_permissions') {
+              return isAdmin();
+          }
+          return true;
+        };
+
+        const direction = e.deltaY > 0 ? 1 : -1;
+        let nextIndex = activeIndex;
+        
+        // 查找下一个可用的 tab
+        for(let i = 0; i < tabs.length; i++) {
+            nextIndex = nextIndex + direction;
+            if(nextIndex < 0) nextIndex = tabs.length - 1;
+            if(nextIndex >= tabs.length) nextIndex = 0;
+            
+            if(isTabAccessible(tabs[nextIndex])) {
+                break;
+            }
+        }
+
+        if(nextIndex !== activeIndex) {
+            const link = tabs[nextIndex].querySelector('a');
+            if(link) {
+                lastSwitch = now;
+                link.click();
+            }
+        }
+      }, { passive: false });
+    }
   });
   window.changeTitle=changeTitle;
 })()

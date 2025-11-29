@@ -257,6 +257,7 @@
     'error.parse.unknown': '无法解析服务器响应',
   // Announcements
   'announcements.empty': '暂无公告',
+  'announcements.important': '重要',
   'announcements.error.loadFailed': '公告加载失败',
 
     // Error prefixes for developer console messages
@@ -575,6 +576,7 @@
     'error.parse.unknown': 'Unable to parse server response',
   // Announcements
   'announcements.empty': 'No announcements yet',
+  'announcements.important': 'Important',
   'announcements.error.loadFailed': 'Failed to load announcements',
 
     // Error prefixes for developer console messages

@@ -41,6 +41,9 @@
   }
 
   function updateVisibilityByRole(role){
+    var approveBtn = $('approve-request-button');
+    if (approveBtn) approveBtn.style.display = (role === 'admin' || role === 'moderator') ? '' : 'none';
+
     var tokensTab = (qs('a[href="#panel_tokens"]').parentElement) || null;
     var tokensPanel = $('panel_tokens');
     var canViewTokens = (role === 'admin' || role === 'moderator');
