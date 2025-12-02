@@ -43,7 +43,7 @@
   async function copyText(text){
     try{
       await navigator.clipboard.writeText(text);
-      toast('已复制');
+      toast(window.t('common.copied'));
     }catch{
       const ta = document.createElement('textarea');
       ta.value = text;
@@ -53,17 +53,18 @@
       ta.select();
       document.execCommand('copy');
       document.body.removeChild(ta);
-      toast('已复制');
+      toast(window.t('common.copied'));
     }
   }
 
   function toast(msg){
+    const defaultMsg = window.t('common.copied');
     if (window.tokensAdmin && typeof window.tokensAdmin.showToast === 'function') {
-      return window.tokensAdmin.showToast(msg || '已复制'); // 复用词元页 Toast 风格
+      return window.tokensAdmin.showToast(msg || defaultMsg); // 复用词元页 Toast 风格
     }
-    if (window.showToast) return window.showToast(msg || '已复制'); // 其它全局实现（若存在）
+    if (window.showToast) return window.showToast(msg || defaultMsg); // 其它全局实现（若存在）
     // 简易回退
-    console.log(msg || '已复制');
+    console.log(msg || defaultMsg);
   }
 
   function collectTextFrom(el){

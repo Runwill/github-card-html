@@ -25,21 +25,28 @@
   min-height: 0 !important;
   /* 配色：对齐 btn--secondary */
   background: transparent !important;
-  color: #4a5568 !important; /* gray-700 */
-  border: 1px solid #e2e8f0 !important; /* gray-200 */
+  color: var(--text-muted) !important; /* gray-700 */
+  border: 1px solid var(--border) !important; /* gray-200 */
   /* 过渡：对齐全局按钮 */
   transition: opacity .15s ease, background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .08s ease !important;
 }
 
 /* 悬浮态：对齐 btn--secondary:hover */
 .skill-copy-btn:hover {
-  background-color: #f7fafc !important; /* gray-50 */
-  border-color: #cbd5e0 !important;     /* gray-300 */
-  color: #2563eb !important;            /* blue-600 */
+  background-color: color-mix(in srgb, var(--surface) 92%, transparent) !important; /* gray-50 */
+  border-color: color-mix(in srgb, var(--border) 80%, transparent) !important;     /* gray-300 */
+  color: var(--text) !important;            /* 改为普通文本色，去掉变蓝 */
+}
+
+/* 去掉点击后的选中效果（Focus Ring） */
+.skill-copy-btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 /* 激活态微动效（与全局按钮一致） */
-.skill-copy-btn:active { transform: translateY(0.5px); }
+/* 修正：需保留垂直居中的 -50% 基准，否则会跳动 */
+.skill-copy-btn:active { transform: translateY(calc(-50% + 1px)); }
 
 /* 仅在“按下 Ctrl 且 hover 行/按钮”时显示 */
 /* 按下 Ctrl 时先允许按钮捕获指针（避免从行移到偏左按钮时闪烁）*/
@@ -71,4 +78,7 @@ html.ctrl-pressed .skill-copy-btn:focus {
   html.ctrl-pressed .skill-copy-btn:focus {
     display: inline-flex;
   }
+
+  /* 小屏下无默认 transform，active 时只需微移 */
+  .skill-copy-btn:active { transform: translateY(1px); }
 }
