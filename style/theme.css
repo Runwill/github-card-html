@@ -1,5 +1,7 @@
-.tabs-content {
+.tabs-content,
+.tabs-content .tabs-panel {
   border-color: var(--border) !important;
+  background: var(--surface) !important;
 }
 /* 主题变量与覆盖（轻量接管现有硬编码颜色）
    使用方法：在 <html> 上设置 data-theme="dark" 以启用深色；不设置为浅色默认。
@@ -107,6 +109,13 @@ html[data-theme="dark"] {
 html, body { color: var(--text); }
 /* 让 html/body 覆盖满屏，避免短页面时出现“页面下方另一块底色” */
 html, body { min-height: 100vh; }
+/* 使用 Flex 布局确保内容区域撑满剩余高度 */
+body { display: flex; flex-direction: column; }
+#main-content-row { flex: 1; display: flex; flex-direction: column; }
+#main-content-row > .columns { flex: 1; display: flex; flex-direction: column; }
+.tabs-content { flex: 1; display: flex; flex-direction: column; }
+.tabs-panel.is-active { flex: 1; }
+
 /* 同步 html 与 body 的背景，避免某些浏览器在 body 不满屏时显示不同底色 */
 html { background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%) !important; }
 body { background: inherit !important; }
