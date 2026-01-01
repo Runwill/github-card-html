@@ -660,5 +660,11 @@
     };
     try{ document.addEventListener('i18n:changed', onLang);}catch(_){}
     try{ window.addEventListener && window.addEventListener('i18n:changed', onLang);}catch(_){}
+
+    // 暴露刷新方法供外部调用（如权限变更后自动刷新日志）
+    try {
+      window.TokensPerm = window.TokensPerm || {};
+      window.TokensPerm.refreshLogs = () => hydrateUserLogs(false);
+    } catch(_){ }
   });
 })();

@@ -78,6 +78,13 @@
       row && row.querySelectorAll('button').forEach(b=>b.disabled=true);
       await jsonPost('/approve', { userId, action });
       removeApprovalRowFromTrigger(trigger);
+      // 审批通过后，强制刷新权限页的用户列表，以便管理员能立即在权限页看到新用户
+      try {
+        if (window.TokensPerm) {
+          if (window.TokensPerm.refreshUsers) window.TokensPerm.refreshUsers(true);
+          if (window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs();
+        }
+      } catch(_){ }
     } catch(e){
       alert(e.message || '操作失败');
       const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
@@ -91,6 +98,8 @@
       await jsonPost('/avatar/approve', { recordId, action });
       removeApprovalRowFromTrigger(trigger);
       try { window.MenuModalManager && window.MenuModalManager.refreshCurrentUserFromServer && window.MenuModalManager.refreshCurrentUserFromServer(); } catch(_){ }
+      // 自动刷新日志
+      try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
     } catch(e){
       alert(e.message || '操作失败');
       const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
@@ -106,6 +115,8 @@
       await jsonPost('/username/approve', { recordId, action });
       removeApprovalRowFromTrigger(trigger);
       try { window.MenuModalManager && window.MenuModalManager.refreshCurrentUserFromServer && window.MenuModalManager.refreshCurrentUserFromServer(); } catch(_){ }
+      // 自动刷新日志
+      try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
     } catch(e){
       alert(e.message || '操作失败');
       const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
@@ -119,6 +130,8 @@
       const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
       row && row.querySelectorAll('button').forEach(b=>b.disabled=true);
       await jsonPost('/intro/approve', { recordId, action });
+      // 自动刷新日志
+      try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
       removeApprovalRowFromTrigger(trigger);
       try { window.MenuModalManager && window.MenuModalManager.refreshCurrentUserFromServer && window.MenuModalManager.refreshCurrentUserFromServer(); } catch(_){ }
     } catch(e){

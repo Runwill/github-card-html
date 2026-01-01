@@ -89,6 +89,9 @@
     }
   };
 
+  // 暴露刷新用户列表的方法（供审批通过后调用）
+  ns.refreshUsers = (force) => getUsersData(DEFAULT_SEARCH_KEY, force !== false);
+
   // 提前启动默认查询的预加载
   try { getUsersData(DEFAULT_SEARCH_KEY, false); } catch {}
   try { getMasterData(false); } catch {}
@@ -369,6 +372,8 @@
         for (const p of toRevoke) { await API.revoke(userId, p); if (curSet.has(p)) { curSet.delete(p); const idx = current.indexOf(p); if (idx>-1) current.splice(idx,1); } }
         // 局部更新标签展示，不刷新整页
         refreshTags();
+        // 自动刷新日志
+        if (ns.refreshLogs) ns.refreshLogs();
       } catch(e) { toast((e && e.message) ? e.message : 'permissions.saveFailed', 'error'); }
       finally { spinnerBtn(btnSave, false); toggleSection(editor, false); }
     });
@@ -388,6 +393,8 @@
       try {
         await API.setPassword(userId, p1);
         toast('status.updated'); inputNew.value=''; inputConfirm.value=''; toggleSection(pwdEditor, false);
+        // 自动刷新日志
+        if (ns.refreshLogs) ns.refreshLogs();
       } catch(e) { toast(e && e.message ? e.message : 'error.updateFailed', 'error'); }
       finally { spinnerBtn(btnPwdSave, false); }
     });
@@ -406,6 +413,8 @@
       spinnerBtn(btnRoleSave, true);
       try {
         await API.setRole(userId, newRole); toast('status.updated');
+        // 自动刷新日志
+        if (ns.refreshLogs) ns.refreshLogs();
         // 局部更新角色文本，不刷新整页
         try { roleValue.textContent = select.options[select.selectedIndex]?.textContent || newRole; } catch { roleValue.textContent = newRole; }
       } catch(e) { toast(e && e.message ? e.message : 'error.updateFailed', 'error'); }
