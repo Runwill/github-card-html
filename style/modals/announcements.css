@@ -34,8 +34,10 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
+  z-index: 0; /* Establish stacking context */
 }
 
+/* Left strip */
 .ann-card::before {
   content: '';
   position: absolute;
@@ -44,15 +46,34 @@
   background: var(--primary-2, #7084ff);
   opacity: 0;
   transition: opacity 0.2s ease;
+  z-index: 2; /* Above background */
 }
 
-.ann-card:hover { 
+/* Hover background gradient (using ::after to avoid transition flash) */
+.ann-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 0; /* Behind content but above base background */
+  pointer-events: none;
+}
+
+.ann-card:hover,
+.ann-card.is-hovered { 
   transform: translateY(-2px); 
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
   border-color: var(--primary-ring, #dbe6fd); 
 }
 
-.ann-card:hover::before { opacity: 1; }
+.ann-card:hover::before,
+.ann-card.is-hovered::before { opacity: 1; }
+
+.ann-card-title, .ann-card-meta, .ann-card-body {
+  position: relative;
+  z-index: 1; /* Above ::after background */
+}
 
 .ann-card-title { 
   font-weight: 700; 
@@ -88,17 +109,28 @@
 }
 
 /* Important state */
-.ann-card.is-important:hover {
-  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
-  border-color: #f59e0b;
+.ann-card.is-important::after {
   background: linear-gradient(to right bottom, #fffbeb, #fff);
 }
+
+.ann-card.is-important:hover,
+.ann-card.is-important.is-hovered {
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+  border-color: #f59e0b;
+}
+
+.ann-card.is-important:hover::after,
+.ann-card.is-important.is-hovered::after {
+  opacity: 1;
+}
+
 .ann-card.is-important::before {
   background: linear-gradient(to bottom, #f59e0b, #fbbf24);
   width: 6px;
   opacity: 0;
 }
-.ann-card.is-important:hover::before {
+.ann-card.is-important:hover::before,
+.ann-card.is-important.is-hovered::before {
   opacity: 1;
 }
 .ann-badge-important {
@@ -116,6 +148,8 @@
   transform: translateY(-2px);
   box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
   letter-spacing: 0.5px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Dark theme adjustments */
@@ -123,8 +157,11 @@ html[data-theme="dark"] .ann-card {
   background: var(--surface, #0b1220);
   border-color: var(--border, #2a2f3a);
 }
-html[data-theme="dark"] .ann-card.is-important:hover {
+html[data-theme="dark"] .ann-card.is-important::after {
   background: linear-gradient(to right bottom, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.05));
+}
+html[data-theme="dark"] .ann-card.is-important:hover,
+html[data-theme="dark"] .ann-card.is-important.is-hovered {
   box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15);
   border-color: rgba(245, 158, 11, 0.5);
 }

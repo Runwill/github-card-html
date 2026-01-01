@@ -68,38 +68,52 @@
       const bp=esc(basePath);
       return `<div class="kv-row" data-path="${bp}"><div class="kv-key">value</div><div class="kv-val" data-path="${bp}" data-type="${typeof obj}" title="单击编辑">${esc(obj)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
     }
+    
+    // 缩略模式新规则：
+    // 1. 默认全部展开（不再折叠数组/对象）
+    // 2. 若当前层级包含 cn 或 epithet，则隐藏 en
+    // 3. 始终隐藏 color
+    // 4. 隐藏数组索引标识 (#n, [n])
+    const hideEn = state.compactMode && (Object.prototype.hasOwnProperty.call(obj, 'cn') || Object.prototype.hasOwnProperty.call(obj, 'epithet'));
+
     const parts=[];
     for(const k of Object.keys(obj)){
       if(HIDE_KEYS.has(k)) continue;
+      
+      if(state.compactMode){
+        if(k === 'color') continue;
+        if(hideEn && k === 'en') continue;
+      }
+
       const v=obj[k];
       const curPath = basePath? `${basePath}.${k}`: k;
+      
+      // 缩略模式下隐藏特定键的标签/标题
+      const hideLabel = state.compactMode && (k === 'epithet' || k === 'part' || k === 'parts');
+
       if(Array.isArray(v)){
-        if(state.compactMode){
-          const summary = `Array(${v.length})`;
-          parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="array" title="数组">${esc(summary)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
-        } else {
-          const items = v.map((it, idx)=>{
-            if(isObj(it) || Array.isArray(it)){
-              const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
-              return `<div class="arr-item"><div class="arr-index">#${idx}</div><div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
-            }
-            return `<div class="kv-row" data-path="${esc(curPath)}.${idx}"><div class="kv-key">[${idx}]</div><div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
-          }).join('');
-          const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
-          const emptyHtml = '<div class="kv-row"><div class="kv-key">(空)</div><div class="kv-val"></div></div>';
-          parts.push(`<div class="nest-block"${style}><div class="nest-title">${esc(k)} [${v.length}]</div><div class="nest-body">${items || emptyHtml}</div></div>`);
-        }
+        // 缩略模式下也展开
+        const items = v.map((it, idx)=>{
+          if(isObj(it) || Array.isArray(it)){
+            const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
+            const idxHtml = state.compactMode ? '' : `<div class="arr-index">#${idx}</div>`;
+            return `<div class="arr-item">${idxHtml}<div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
+          }
+          const keyHtml = state.compactMode ? '' : `<div class="kv-key">[${idx}]</div>`;
+          return `<div class="kv-row" data-path="${esc(curPath)}.${idx}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+        }).join('');
+        const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
+        const emptyHtml = '<div class="kv-row"><div class="kv-key">(空)</div><div class="kv-val"></div></div>';
+        const titleHtml = hideLabel ? '' : `<div class="nest-title">${esc(k)} [${v.length}]</div>`;
+        parts.push(`<div class="nest-block"${style}>${titleHtml}<div class="nest-body">${items || emptyHtml}</div></div>`);
       } else if (isObj(v)){
-        if(state.compactMode){
-          const keysCount = Object.keys(v||{}).filter(x=> !HIDE_KEYS.has(x)).length;
-          const summary = `Object(${keysCount})`;
-          parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="object" title="对象">${esc(summary)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
-        } else {
-          const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
-          parts.push(`<div class="nest-block"${style}><div class="nest-title">${esc(k)}</div><div class="nest-body">${renderKV(v, level+1, accent, curPath)}</div></div>`);
-        }
+        // 缩略模式下也展开
+        const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
+        const titleHtml = hideLabel ? '' : `<div class="nest-title">${esc(k)}</div>`;
+        parts.push(`<div class="nest-block"${style}>${titleHtml}<div class="nest-body">${renderKV(v, level+1, accent, curPath)}</div></div>`);
       } else {
-        parts.push(`<div class="kv-row" data-path="${esc(curPath)}"><div class="kv-key">${esc(k)}</div><div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="单击编辑">${esc(v)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
+        const keyHtml = hideLabel ? '' : `<div class="kv-key">${esc(k)}</div>`;
+        parts.push(`<div class="kv-row" data-path="${esc(curPath)}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="单击编辑">${esc(v)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
       }
     }
     return parts.join('');

@@ -6,6 +6,41 @@
 
   let cached = null; let loading = false; let lastError = null;
 
+  // 鼠标位置追踪（用于滚动时计算悬浮态）
+  let gMx = 0, gMy = 0;
+  try { document.addEventListener('mousemove', (e)=>{ gMx=e.clientX; gMy=e.clientY; }, {passive:true}); } catch(_){}
+
+  function attachScrollHover(container){
+    if (!container || container.__scrollHoverBound) return;
+    container.__scrollHoverBound = true;
+
+    const clear = ()=> {
+      const els = container.querySelectorAll('.ann-card.is-hovered');
+      els.forEach(el => el.classList.remove('is-hovered'));
+    };
+
+    // 滚动时手动计算 hover
+    container.addEventListener('scroll', ()=>{
+      if (container._ticking) return;
+      container._ticking = true;
+      requestAnimationFrame(()=>{
+        clear();
+        try {
+          const el = document.elementFromPoint(gMx, gMy);
+          if (el) {
+            const card = el.closest('.ann-card');
+            if (card && container.contains(card)) card.classList.add('is-hovered');
+          }
+        } catch(_){}
+        container._ticking = false;
+      });
+    }, {passive:true});
+
+    // 鼠标移动时清除手动状态，交还给 CSS :hover
+    container.addEventListener('mousemove', clear, {passive:true});
+    container.addEventListener('mouseleave', clear, {passive:true});
+  }
+
   async function fetchAnnouncements(){
     const url = 'base/announcements.json';
     const res = await fetch(url, { cache: 'no-cache' });
@@ -74,6 +109,7 @@
   async function load(){
     const container = $('announcements-content');
     if (!container) return;
+    attachScrollHover(container);
   container.textContent = '';
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'ann-loading';
