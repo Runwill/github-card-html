@@ -133,11 +133,19 @@
     </div>
     <div class="account-info__body">
       <div class="info-row"><span class="info-label" data-i18n="account.info.username">用户名</span><span class="info-value" id="account-info-username-text"></span></div>
-      <div class="info-row"><span class="info-label" data-i18n="account.info.userId">用户ID</span><span class="info-value" id="account-info-id"></span></div>
-      <div class="info-row"><span class="info-label" data-i18n="account.info.createdAt">注册时间</span><span class="info-value" id="account-info-createdAt"></span></div>
       <div class="account-info__intro">
         <textarea id="account-info-intro" class="intro-textarea" rows="4" maxlength="500" data-i18n-attr="placeholder" data-i18n-placeholder="account.info.placeholder.intro" placeholder="（暂无简介）"></textarea>
         <div id="account-info-intro-pending" class="info-hint" style="display:none;"></div>
+      </div>
+      <div class="account-info__meta">
+        <div class="meta-item">
+          <span class="meta-label" data-i18n="account.info.userId">用户ID</span>
+          <span class="meta-value" id="account-info-id"></span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label" data-i18n="account.info.createdAt">注册时间</span>
+          <span class="meta-value" id="account-info-createdAt"></span>
+        </div>
       </div>
     </div>
     <div id="account-info-message" class="modal-message"></div>
