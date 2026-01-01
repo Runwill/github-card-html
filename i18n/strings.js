@@ -41,6 +41,7 @@
 
     'account.info.username': '用户名',
     'account.info.userId': '用户ID',
+    'account.info.createdAt': '注册时间',
     'account.info.placeholder.intro': '（暂无简介）',
   'account.info.editUsername': '编辑用户名',
     'account.info.pending': '审核中：',

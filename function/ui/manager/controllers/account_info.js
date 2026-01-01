@@ -24,7 +24,22 @@
       const roleClsMap = { admin: 'badge-admin', moderator: 'badge-moderator', user: 'badge-user', guest: 'badge-guest' };
       const roleCls = roleClsMap[role] || 'badge-user';
       const nameMainEl = $('account-info-username-main'); const nameTextEl = $('account-info-username-text'); const roleEl = $('account-info-role'); const idEl = $('account-info-id'); const introEl = $('account-info-intro'); const avatarEl = $('account-info-avatar');
+      const createdAtEl = $('account-info-createdAt');
       if (nameMainEl) nameMainEl.textContent = name; if (nameTextEl) nameTextEl.textContent = name; if (idEl) idEl.textContent = id;
+      if (createdAtEl) {
+        const ca = localStorage.getItem('createdAt');
+        if (ca) { try { createdAtEl.textContent = new Date(ca).toLocaleString(); } catch { createdAtEl.textContent = ca; } }
+        else {
+          createdAtEl.textContent = '-';
+          // 尝试异步获取
+          if (M.Core.userService && M.Core.userService.refreshCurrentUserFromServer) {
+            M.Core.userService.refreshCurrentUserFromServer().then(()=>{
+              const n = localStorage.getItem('createdAt');
+              if (n) { try { createdAtEl.textContent = new Date(n).toLocaleString(); } catch {} }
+            });
+          }
+        }
+      }
       if (introEl) {
         const ph = t('account.info.placeholder.intro');
         if (introEl.tagName === 'TEXTAREA') introEl.value = intro || '';

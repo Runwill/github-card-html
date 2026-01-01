@@ -73,6 +73,7 @@ if (loginForm) {
         localStorage.setItem('id', data.user.id);
         localStorage.setItem('username', data.user.username);
   localStorage.setItem('role', data.user.role);
+  if (data.user.createdAt) { localStorage.setItem('createdAt', data.user.createdAt); }
   if (data.user.intro !== undefined) { localStorage.setItem('intro', data.user.intro || ''); }
         if (data.user.avatar !== undefined) { localStorage.setItem('avatar', data.user.avatar || ''); }
   setMessageKey('login.success', null, 'success');

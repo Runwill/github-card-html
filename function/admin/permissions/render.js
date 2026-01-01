@@ -261,6 +261,17 @@
     } catch(_) { roleValue.textContent = (u && u.role) || '-'; }
   try { roleValue.classList.add('is-editable'); roleValue.setAttribute('tabindex', '0'); roleValue.setAttribute('role', 'button'); roleValue.setAttribute('data-perm-trigger',''); } catch {}
     sub.appendChild(subLabel); sub.appendChild(roleValue);
+    
+    // 注册时间
+    if (u.createdAt) {
+      const dateSpan = makeEl('span', 'approval-sub__date');
+      dateSpan.style.marginLeft = '10px';
+      dateSpan.style.fontSize = '12px';
+      dateSpan.style.color = '#a0aec0';
+      try { dateSpan.textContent = new Date(u.createdAt).toLocaleString(); } catch { dateSpan.textContent = u.createdAt; }
+      sub.appendChild(dateSpan);
+    }
+
     meta.appendChild(title); meta.appendChild(sub);
 
     const tagsWrap = makeEl('div', 'perm-tags');

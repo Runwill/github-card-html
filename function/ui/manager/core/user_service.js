@@ -35,6 +35,7 @@
       if (!data) return;
 
       if (typeof data.intro === 'string' && w.localStorage) w.localStorage.setItem('intro', data.intro || '');
+      if (data.createdAt && w.localStorage) w.localStorage.setItem('createdAt', data.createdAt);
       if (Array.isArray(data.permissions) && w.localStorage) {
         try { w.localStorage.setItem('permissions', JSON.stringify(data.permissions)); } catch(_){}
       }
