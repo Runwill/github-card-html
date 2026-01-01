@@ -30,6 +30,8 @@
       // 本地 / file 协议，默认连本机后端
       if (loc.protocol === 'file:' || !host) return 'http://localhost:3000';
       if (host === 'localhost' || host === '127.0.0.1') return 'http://localhost:3000';
+      // 特殊处理 120.55.7.7，后端在 3000 端口
+      if (host === '120.55.7.7') return 'http://120.55.7.7:3000';
       // 线上默认走同源（前后端同域部署）
       return String(loc.origin || '').replace(/\/$/, '');
     } catch(e) {
