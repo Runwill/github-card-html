@@ -6,7 +6,15 @@ const loadingTexts=["多少事 从来急","雖萬被戮 豈有悔哉","書不能
 function calculateLetterSpacing(text){ const n=text.replace(/\s/g,'').length, base=1, len=6; return n<=len?base:Math.max(0.3, base*(len/n)) }
 
 // 计算动态进度条时间的函数
-function calculateProgressBarDuration(text){ const n=text.replace(/\s/g,'').length, base=1.2, len=6; return n<=len?base:Math.min(3, base*(n/len)) }
+function calculateProgressBarDuration(text){
+    const last=sessionStorage.getItem('loading_last_shown'), now=Date.now();
+    const isSpeed = last && (now - last < 180000);
+    // 极速模式：基准0.8s，上限1.2s；普通模式：基准1.2s，上限3s
+    const base = isSpeed ? 0.8 : 1.2;
+    const cap = isSpeed ? 1.2 : 3.0;
+    const n=text.replace(/\s/g,'').length, len=6;
+    return n<=len ? base : Math.min(cap, base*(n/len));
+}
 
 // 等待 DOM 与 partials 注入完毕后再设置加载文本与进度条时间
 function whenDOMReady(){ return new Promise(r=> document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', r, {once:true}) : r()) }
@@ -34,6 +42,7 @@ let domReady=false, resourcesReady=false, fontsReady=false, replacementsReady=fa
 // 平滑完成进度条
 function completeProgressBar(){
     if(completionStarted) return; completionStarted=true
+    sessionStorage.setItem('loading_last_shown', Date.now())
     const bar=document.querySelector('.loading-bar'), overlay=document.getElementById('loading-overlay')
     requestAnimationFrame(()=>{
         bar?.classList.add('accelerate')
