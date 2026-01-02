@@ -247,8 +247,8 @@
     const meta = makeEl('div');
     const title = makeEl('div', 'approval-title', u.username || '');
     const sub = makeEl('div', 'approval-sub');
-    const subLabel = makeEl('span', 'approval-sub__label');
-    setI18nAttr(subLabel, 'permissions.user.roleLabel', t('permissions.user.roleLabel', 'role'));
+    // const subLabel = makeEl('span', 'approval-sub__label');
+    // setI18nAttr(subLabel, 'permissions.user.roleLabel', t('permissions.user.roleLabel', 'role'));
     // 初始化角色显示时使用 i18n 名称，而不是原始英文代码
     const roleValue = makeEl('span', 'approval-role');
     try {
@@ -259,8 +259,8 @@
         roleValue.textContent = '-';
       }
     } catch(_) { roleValue.textContent = (u && u.role) || '-'; }
-  try { roleValue.classList.add('is-editable'); roleValue.setAttribute('tabindex', '0'); roleValue.setAttribute('role', 'button'); roleValue.setAttribute('data-perm-trigger',''); } catch {}
-    sub.appendChild(subLabel); sub.appendChild(roleValue);
+  try { meta.classList.add('is-editable'); meta.setAttribute('tabindex', '0'); meta.setAttribute('role', 'button'); meta.setAttribute('data-perm-trigger',''); meta.style.cursor='pointer'; } catch {}
+    /* sub.appendChild(subLabel); */ sub.appendChild(roleValue);
     
     // 注册时间
     if (u.createdAt) {
@@ -411,12 +411,13 @@
     });
 
     // 交互绑定 —— 角色
-    const openRoleEditor = ()=>{
+    const toggleRoleEditor = ()=>{
       const visible = roleEditor.style.display !== 'none' && !roleEditor.classList.contains('is-collapsed');
-      if (!visible) { toggleSection(roleEditor, true); try { select.focus(); } catch{} }
+      toggleSection(roleEditor, !visible);
+      if (!visible) { try { select.focus(); } catch{} }
     };
-    roleValue.addEventListener('click', openRoleEditor);
-    roleValue.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' ') { e.preventDefault(); openRoleEditor(); }});
+    meta.addEventListener('click', toggleRoleEditor);
+    meta.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' ') { e.preventDefault(); toggleRoleEditor(); }});
     select.addEventListener('keydown', (e)=>{ if (e.key==='Enter') { e.preventDefault(); btnRoleSave.click(); } else if (e.key==='Escape') { e.preventDefault(); btnRoleCancel.click(); }});
     btnRoleCancel.addEventListener('click', ()=> toggleSection(roleEditor, false));
     btnRoleSave.addEventListener('click', async ()=>{
