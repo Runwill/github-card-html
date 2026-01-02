@@ -87,8 +87,56 @@
       if (Array.isArray(it.changes) && it.changes.length) {
         const ul = document.createElement('ul');
         ul.className = 'ann-changes';
-        it.changes.forEach((ch)=>{
+
+        const buckets = new Map();
+        const order = ['新增', '优化', '修复'];
+        const alias = {
+          '添加': '新增',
+          '样式': '优化', '交互': '优化', '动画': '优化', '名片': '优化',
+          '逻辑': '优化', '性能': '优化', '体验': '优化',
+          '结构': '优化', '修改': '优化'
+        };
+        const others = [];
+
+        it.changes.forEach((ch) => {
+          if (typeof ch !== 'string') { others.push({ content: ch }); return; }
+          const match = ch.match(/^(.+?)：(.*)$/);
+          if (match) {
+            let key = match[1];
+            if (alias[key]) key = alias[key];
+            if (order.includes(key)) {
+              if (!buckets.has(key)) buckets.set(key, []);
+              buckets.get(key).push(match[2]);
+            } else { others.push({ content: ch }); }
+          } else { others.push({ content: ch }); }
+        });
+
+        order.forEach(key => {
+          if (buckets.has(key)) {
+            const list = buckets.get(key);
+            if (list.length > 0) {
+              const liGroup = document.createElement('li');
+              liGroup.className = 'ann-group';
+              const label = document.createElement('span');
+              label.className = `ann-group-label ann-label-${key}`;
+              label.textContent = key;
+              liGroup.appendChild(label);
+              const subUl = document.createElement('ul');
+              subUl.className = 'ann-sub-list';
+              list.forEach(text => {
+                const subLi = document.createElement('li');
+                subLi.innerHTML = text;
+                subUl.appendChild(subLi);
+              });
+              liGroup.appendChild(subUl);
+              ul.appendChild(liGroup);
+            }
+          }
+        });
+
+        others.forEach(item => {
           const li = document.createElement('li');
+          const ch = item.content;
           if (typeof ch === 'string') { li.textContent = ch; }
           else if (ch && typeof ch === 'object') {
             if (ch.html) li.innerHTML = String(ch.html);

@@ -172,3 +172,51 @@ html[data-theme="dark"] .ann-card.is-important.is-hovered {
   .ann-card-title { font-size: 16px; }
   .ann-card-body { font-size: 14px; }
 }
+
+/* Grouping styles */
+.ann-group {
+  margin-bottom: 12px;
+  list-style: none;
+}
+.ann-group:last-child { margin-bottom: 0; }
+
+.ann-group-label {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 999px;
+  margin-bottom: 4px;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.ann-label-新增 { background-color: #d1fae5; color: #047857; } /* Emerald-100 bg, Emerald-700 text */
+.ann-label-优化 { background-color: #dbeafe; color: #1d4ed8; } /* Blue-100 bg, Blue-700 text */
+.ann-label-修复 { background-color: #fef3c7; color: #b45309; } /* Amber-100 bg, Amber-700 text */
+.ann-label-其他 { background-color: #f1f5f9; color: #334155; } /* Slate-100 bg, Slate-700 text */
+
+/* Dark mode support for labels */
+[data-theme="dark"] .ann-label-新增 { background-color: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+[data-theme="dark"] .ann-label-优化 { background-color: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+[data-theme="dark"] .ann-label-修复 { background-color: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+[data-theme="dark"] .ann-label-其他 { background-color: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+
+.ann-sub-list {
+  margin: 0;
+  padding-left: 6px; /* Indent slightly */
+  list-style-type: none;
+}
+
+.ann-sub-list li {
+  margin-bottom: 4px;
+  position: relative;
+  padding-left: 14px;
+}
+
+.ann-sub-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--text-subtle, #94a3b8);
+}
