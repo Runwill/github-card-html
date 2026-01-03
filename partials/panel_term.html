@@ -278,7 +278,7 @@
             <padding>
               <div class="h">
                 <div class="indent">
-                  <advance></advance><tick></tick>“<atGameStart class="scroll bold"></atGameStart>”。
+                  <advance></advance><tick></tick>“<whenGameStart class="scroll bold"></whenGameStart>”。
                 </div>
                 <div class="indent">
                   循环<advance></advance><round></round>。
@@ -295,13 +295,13 @@
             <padding>
               <div class="h">
                 <div class="indent">
-                  <advance></advance><tick></tick>“<atRoundStart class="scroll bold"></atRoundStart>”。
+                  <advance></advance><tick></tick>“<whenRoundStart class="scroll bold"></whenRoundStart>”。
                 </div>
                 <div class="indent">
                   <makeC>所有<roleDefault></roleDefault><advance></advance><turnProcess epithet="1"></turnProcess></makeC>。
                 </div>
                 <div class="indent">
-                  <advance></advance><tick></tick>“<atRoundFinish class="scroll bold"> </atRoundFinish>”。
+                  <advance></advance><tick></tick>“<whenRoundFinish class="scroll bold"> </whenRoundFinish>”。
                 </div>
               </div>
             </padding>
@@ -350,7 +350,25 @@
                 <advance></advance><tick></tick>“<afterPreparingStageFinish class="scroll bold"></afterPreparingStageFinish>”。
               </div>
               <h3><dealingStageProcess class="scroll" /></h3>
+              <div class="indent">
+                <advance></advance><tick></tick>“<beforeDealingStageStart class="scroll bold"></beforeDealingStageStart>”。
+              </div>
+              <div class="indent">
+                <advance></advance><dealingStage></dealingStage>。
+              </div>
+              <div class="indent">
+                <advance></advance><tick></tick>“<afterDealingStageFinish class="scroll bold"></afterDealingStageFinish>”。
+              </div>
               <h3><gettingStageProcess class="scroll" /></h3>
+              <div class="indent">
+                <advance></advance><tick></tick>“<beforeGettingStageStart class="scroll bold"></beforeGettingStageStart>”。
+              </div>
+              <div class="indent">
+                <advance></advance><gettingStage></gettingStage>。
+              </div>
+              <div class="indent">
+                <advance></advance><tick></tick>“<afterGettingStageFinish class="scroll bold"></afterGettingStageFinish>”。
+              </div>
               <h3><actingStageProcess class="scroll" /></h3>
               <div class="indent">
                 <advance></advance><tick></tick>“<beforeActingStageStart class="scroll bold"></beforeActingStageStart>”。
@@ -362,7 +380,25 @@
                 <advance></advance><tick></tick>“<afterActingStageFinish class="scroll bold"></afterActingStageFinish>”。
               </div>
               <h3><throwingStageProcess class="scroll" /></h3>
+              <div class="indent">
+                <advance></advance><tick></tick>“<beforeThrowingStageStart class="scroll bold"></beforeThrowingStageStart>”。
+              </div>
+              <div class="indent">
+                <advance></advance><throwingStage></throwingStage>。
+              </div>
+              <div class="indent">
+                <advance></advance><tick></tick>“<afterThrowingStageFinish class="scroll bold"></afterThrowingStageFinish>”。
+              </div>
               <h3><concludingStageProcess class="scroll" /></h3>
+              <div class="indent">
+                <advance></advance><tick></tick>“<beforeConcludingStageStart class="scroll bold"></beforeConcludingStageStart>”。
+              </div>
+              <div class="indent">
+                <advance></advance><concludingStage></concludingStage>。
+              </div>
+              <div class="indent">
+                <advance></advance><tick></tick>“<afterConcludingStageFinish class="scroll bold"></afterConcludingStageFinish>”。
+              </div>
             </padding>
             <h2><event class="scroll" /></h2>
             <div class="indent">
@@ -1397,7 +1433,7 @@
                 包含以下<tick></tick>：
               </div>
               <padding>
-                <h3><atTurnStart class="scroll" /></h3>
+                <h3><whenTurnStart class="scroll" /></h3>
                 <h3><inherentPreparingStage class="scroll" /></h3>
                 <div class="indent">
                   包含以下<procedure></procedure>：<advance></advance><preparingStageProcess></preparingStageProcess>。
@@ -1422,7 +1458,7 @@
                 <div class="indent">
                   包含以下<procedure></procedure>：<advance></advance><concludingStageProcess></concludingStageProcess>。
                 </div>
-                <h3><atTurnFinish class="scroll" /></h3>
+                <h3><whenTurnFinish class="scroll" /></h3>
               </padding>
               <h3><stage class="scroll" epithet="1"/></h3>
               <div class="indent">
@@ -1437,11 +1473,39 @@
                   包含以下<tick></tick>：
                 </div>
                 <padding>
-                  <h3><atPreparingStageStart class="scroll" /></h3>
+                  <h3><whenPreparingStageStart class="scroll" /></h3>
                   <h3><preparing class="scroll" /></h3>
                   <div class="indent">
                   </div>
-                  <h3><atPreparingStageFinish class="scroll" /></h3>
+                  <h3><whenPreparingStageFinish class="scroll" /></h3>
+                </padding>
+                <h3><dealingStage class="scroll" /></h3>
+                <div class="indent">
+                  一种<stage></stage>。
+                </div>
+                <div class="indent">
+                  包含以下<tick></tick>：
+                </div>
+                <padding>
+                  <h3><whenDealingStageStart class="scroll" /></h3>
+                  <h3><dealing class="scroll" /></h3>
+                  <div class="indent">
+                  </div>
+                  <h3><whenDealingStageFinish class="scroll" /></h3>
+                </padding>
+                <h3><gettingStage class="scroll" /></h3>
+                <div class="indent">
+                  一种<stage></stage>。
+                </div>
+                <div class="indent">
+                  包含以下<tick></tick>：
+                </div>
+                <padding>
+                  <h3><whenGettingStageStart class="scroll" /></h3>
+                  <h3><getting class="scroll" /></h3>
+                  <div class="indent">
+                  </div>
+                  <h3><whenGettingStageFinish class="scroll" /></h3>
                 </padding>
                 <h3><actingStage class="scroll" /></h3>
                 <div class="indent">
@@ -1451,11 +1515,39 @@
                   包含以下<tick></tick>：
                 </div>
                 <padding>
-                  <h3><atActingStageStart class="scroll" /></h3>
+                  <h3><whenActingStageStart class="scroll" /></h3>
                   <h3><acting class="scroll" /></h3>
                   <div class="indent">
                   </div>
-                  <h3><atActingStageFinish class="scroll" /></h3>
+                  <h3><whenActingStageFinish class="scroll" /></h3>
+                </padding>
+                <h3><throwingStage class="scroll" /></h3>
+                <div class="indent">
+                  一种<stage></stage>。
+                </div>
+                <div class="indent">
+                  包含以下<tick></tick>：
+                </div>
+                <padding>
+                  <h3><whenThrowingStageStart class="scroll" /></h3>
+                  <h3><throwing class="scroll" /></h3>
+                  <div class="indent">
+                  </div>
+                  <h3><whenThrowingStageFinish class="scroll" /></h3>
+                </padding>
+                <h3><concludingStage class="scroll" /></h3>
+                <div class="indent">
+                  一种<stage></stage>。
+                </div>
+                <div class="indent">
+                  包含以下<tick></tick>：
+                </div>
+                <padding>
+                  <h3><whenConcludingStageStart class="scroll" /></h3>
+                  <h3><concluding class="scroll" /></h3>
+                  <div class="indent">
+                  </div>
+                  <h3><whenConcludingStageFinish class="scroll" /></h3>
                 </padding>
               </padding>
             </padding>

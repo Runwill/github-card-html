@@ -1,0 +1,40 @@
+<div class="tabs-panel" id="panel_game">
+    <div class="game-container">
+        <div class="game-header">
+            <h2 id="game-round-info" data-i18n="game.round" data-i18n-params='{"n":1}'>Round 1</h2>
+            <div id="game-controls">
+                <button class="button" id="btn-start-game" data-i18n="game.start">Start Game</button>
+                <button class="button alert hidden" id="btn-end-turn" data-i18n="game.endTurn">End Turn</button>
+            </div>
+        </div>
+        
+        <div class="game-main-area hidden" id="game-main-area">
+            <div class="current-character-panel">
+                <div class="character-info">
+                    <div class="char-avatar">
+                        <img id="char-img" src="" alt="Character Avatar">
+                    </div>
+                    <div class="char-details">
+                        <h3 id="char-name" data-i18n="game.characterName">Character Name</h3>
+                        <div class="char-stats">
+                            <span class="stat-hp" id="char-hp-display" data-i18n="game.hp" data-i18n-params='{"hp":4,"maxHp":4}'>体力: 4/4</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="player-hand">
+                    <h4 data-i18n="game.handCards">Hand Cards</h4>
+                    <div id="hand-cards-container" class="cards-container">
+                        <!-- Cards will be rendered here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="other-players-panel">
+                <h4 data-i18n="game.otherCharacters">Other Characters</h4>
+                <div id="other-players-container" class="other-players-list">
+                    <!-- Other players summaries -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
