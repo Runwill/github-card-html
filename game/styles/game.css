@@ -15,6 +15,131 @@
     margin: 0 auto;
 }
 
+/* Game Status Display */
+#game-round-info {
+    display: none !important;
+}
+
+.game-status-display {
+    display: flex;
+    flex-direction: row; /* Keep row to separate breadcrumbs and badge if needed, or column? User said column for breadcrumbs */
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-grow: 1;
+    margin: 0 20px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface); /* Adaptive background */
+    height: 160px; /* Fixed height to prevent jumping */
+    overflow-y: auto; /* Allow scrolling if content exceeds height */
+    box-shadow: 0 2px 4px var(--shadow-1);
+    transition: background-color 0.3s ease;
+}
+
+/* Custom Scrollbar for Webkit */
+.game-status-display::-webkit-scrollbar {
+    width: 6px;
+}
+.game-status-display::-webkit-scrollbar-track {
+    background: transparent;
+}
+.game-status-display::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 3px;
+}
+
+.breadcrumbs {
+    display: flex;
+    flex-direction: column; /* Vertical layout */
+    align-items: flex-start;
+    font-size: 1rem; /* Unified size */
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    gap: 4px;
+    flex: 1; /* Take remaining space */
+    min-width: 0; /* Allow shrinking if needed */
+    margin-right: 20px; /* Space between crumbs and actions */
+}
+
+.status-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+}
+
+#game-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.breadcrumbs .crumb {
+    display: inline-flex;
+    align-items: center;
+    opacity: 0;
+    animation: slideInUp 0.1s forwards; /* Faster animation */
+    font-size: 1rem; /* Ensure consistent size */
+    transition: all 0.3s ease; /* Smooth transition for color, shadow, opacity */
+}
+
+.breadcrumbs .crumb:last-child {
+    color: var(--primary);
+    /* font-weight: 700; Removed to prevent width jump */
+    /* font-size: 1rem; Removed to prevent shrinking of others */
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(5px); /* Subtle movement */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.timing-badge {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--text);
+    padding: 4px 12px;
+    background: var(--bg-panel);
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.breadcrumbs .crumb:not(:last-child)::after {
+    content: none;
+}
+
+.breadcrumbs .crumb:last-child {
+    opacity: 1;
+    color: var(--primary);
+}
+
+.timing-badge {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    padding: 6px 16px;
+    background: var(--bg-panel);
+    border-radius: 20px; /* Pill shape */
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.02em;
+    white-space: nowrap; /* Prevent text wrapping */
+    flex-shrink: 0; /* Prevent badge from shrinking */
+}
+
 /* Header Section */
 .game-header {
     display: flex;
