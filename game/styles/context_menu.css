@@ -1,0 +1,84 @@
+/* Context Menu Styles */
+.custom-context-menu {
+    position: fixed;
+    z-index: 10000;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #ccc);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    padding: 4px 0;
+    min-width: 180px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    color: var(--text-color, #333);
+    display: none; /* Hidden by default */
+    animation: fadeIn 0.1s ease-out;
+}
+
+.custom-context-menu.visible {
+    display: block;
+}
+
+.context-menu-header {
+    padding: 8px 12px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color, #eee);
+    background: var(--bg-secondary, #f9f9f9);
+    color: var(--text-secondary, #666);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.context-menu-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background 0.1s;
+}
+
+.context-menu-item:hover {
+    background: var(--primary-color-light, #e6f7ff);
+    color: var(--primary-color, #1890ff);
+}
+
+.context-menu-item .icon {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+    opacity: 0.7;
+}
+
+.context-menu-separator {
+    height: 1px;
+    background: var(--border-color, #eee);
+    margin: 4px 0;
+}
+
+/* Dark Mode Support */
+[data-theme='dark'] .custom-context-menu {
+    background: #2d2d2d;
+    border-color: #444;
+    color: #e0e0e0;
+}
+
+[data-theme='dark'] .context-menu-header {
+    background: #333;
+    border-bottom-color: #444;
+    color: #aaa;
+}
+
+[data-theme='dark'] .context-menu-item:hover {
+    background: #3d3d3d;
+    color: #40a9ff;
+}
+
+[data-theme='dark'] .context-menu-separator {
+    background: #444;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+}

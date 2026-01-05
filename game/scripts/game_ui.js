@@ -10,14 +10,50 @@
             window.fetchJsonCached(url).then(data => {
                 for (let key in data) {
                     const item = data[key];
+                    // 1. Load Colors
                     if (item.en && item.color) {
                         termColors.set(item.en, item.color);
                     }
+                    // 2. Load Translations (Backend Driven)
+                    if (item.en && (item.cn || item.replace) && window.I18N_STRINGS && window.I18N_STRINGS.zh) {
+                        // Inject into I18N system (Prefer 'replace' over 'cn' to match panel_term behavior)
+                        const val = item.replace || item.cn;
+                        
+                        // 2.1 Process/Event Names (game.process.X)
+                        window.I18N_STRINGS.zh[`game.process.${item.en}`] = val;
+                        
+                        // Also inject PascalCase version if key is lowercase (e.g. 'damage' -> 'Damage')
+                        const pascalKey = item.en.charAt(0).toUpperCase() + item.en.slice(1);
+                        if (pascalKey !== item.en) {
+                            window.I18N_STRINGS.zh[`game.process.${pascalKey}`] = val;
+                        }
+
+                        // 2.2 Timings (game.timing.X) - Detect if it looks like a timing
+                        if (/^(before|when|after)/.test(item.en)) {
+                            window.I18N_STRINGS.zh[`game.timing.${item.en}`] = val;
+                        }
+                    }
+
                     if (item.part) {
                         for (let pKey in item.part) {
                             const part = item.part[pKey];
                             if (part.en && (part.color || item.color)) {
                                 termColors.set(part.en, part.color || item.color);
+                            }
+                            // Load Part Translations
+                            if (part.en && (part.cn || part.replace) && window.I18N_STRINGS && window.I18N_STRINGS.zh) {
+                                const val = part.replace || part.cn;
+                                window.I18N_STRINGS.zh[`game.process.${part.en}`] = val;
+                                
+                                const pascalKey = part.en.charAt(0).toUpperCase() + part.en.slice(1);
+                                if (pascalKey !== part.en) {
+                                    window.I18N_STRINGS.zh[`game.process.${pascalKey}`] = val;
+                                }
+
+                                // Timings for parts
+                                if (/^(before|when|after)/.test(part.en)) {
+                                    window.I18N_STRINGS.zh[`game.timing.${part.en}`] = val;
+                                }
                             }
                         }
                     }
@@ -25,7 +61,7 @@
                 if (window.Game.Core && window.Game.Core.GameState.isGameRunning) {
                     updateUI();
                 }
-            }).catch(e => console.error("Failed to load colors", e));
+            }).catch(e => console.error("Failed to load colors/terms", e));
         };
 
         load(window.endpoints.termDynamic());
@@ -61,15 +97,71 @@
     }
 
     function showCharacterInfo(player) {
-        const info = [
-            `Name: ${player.name}`,
-            `Seat: ${player.seat}`,
-            `HP: ${player.health}/${player.healthLimit}`,
-            `Hand Limit: ${player.handLimit}`,
-            `Reach: ${player.reach}`,
-            `Status: ${player.liveStatus ? 'Alive' : 'Dead'}`
-        ].join('\n');
-        alert(info);
+        // Deprecated: Use showContextMenu instead
+        console.log("Showing info for", player.name);
+    }
+
+    // Context Menu Logic
+    let contextMenuEl = null;
+
+    function createContextMenu() {
+        if (contextMenuEl) return contextMenuEl;
+        
+        contextMenuEl = document.createElement('div');
+        contextMenuEl.className = 'custom-context-menu';
+        document.body.appendChild(contextMenuEl);
+        
+        // Close on click outside
+        document.addEventListener('click', () => {
+            contextMenuEl.classList.remove('visible');
+        });
+        
+        return contextMenuEl;
+    }
+
+    function showContextMenu(x, y, player) {
+        const menu = createContextMenu();
+        menu.innerHTML = ''; // Clear previous content
+        
+        // Header
+        const header = document.createElement('div');
+        header.className = 'context-menu-header';
+        header.textContent = player.name;
+        menu.appendChild(header);
+        
+        // Actions
+        const actions = [
+            { label: 'Damage 1 HP', action: () => window.Game.Core.Events.damage(null, player, 1) },
+            { label: 'Cure 1 HP', action: () => window.Game.Core.Events.cure(null, player, 1) },
+            { label: 'Recover 1 HP', action: () => window.Game.Core.Events.recover(player, 1) },
+            { label: 'Loss 1 HP', action: () => window.Game.Core.Events.loss(player, 1) }
+        ];
+        
+        actions.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'context-menu-item';
+            el.textContent = item.label;
+            el.onclick = (e) => {
+                e.stopPropagation(); // Prevent document click from closing immediately (though we want it to close after action)
+                item.action();
+                menu.classList.remove('visible');
+            };
+            menu.appendChild(el);
+        });
+
+        // Position and Show
+        menu.style.left = `${x}px`;
+        menu.style.top = `${y}px`;
+        menu.classList.add('visible');
+        
+        // Adjust if out of bounds (simple check)
+        const rect = menu.getBoundingClientRect();
+        if (rect.right > window.innerWidth) {
+            menu.style.left = `${window.innerWidth - rect.width - 10}px`;
+        }
+        if (rect.bottom > window.innerHeight) {
+            menu.style.top = `${window.innerHeight - rect.height - 10}px`;
+        }
     }
 
     function updateUI() {
@@ -101,6 +193,10 @@
                         // Format: "1 曹操 回合"
                         const seatStr = `${currentPlayer.id + 1}`;
                         text = `${seatStr} ${currentPlayer.name} ${text}`;
+                    }
+                    // Special handling for Event Steps to make them distinct
+                    if (currentNode && currentNode.type === 'event-step' && name === currentNode.name) {
+                         // Keep original name for step
                     }
                     return {
                         id: name,
@@ -229,14 +325,14 @@
         if (currentPlayer) {
             document.getElementById('char-name').textContent = currentPlayer.name;
             // document.getElementById('char-img').src = currentPlayer.avatar; // Uncomment when images are real
-            document.getElementById('char-hp-display').textContent = i18n.t('game.hp', { hp: currentPlayer.hp, maxHp: currentPlayer.maxHp });
+            document.getElementById('char-hp-display').textContent = i18n.t('game.hp', { hp: currentPlayer.health, maxHp: currentPlayer.healthLimit });
             
             // Add Context Menu
             const charInfoPanel = document.querySelector('.character-info');
             if (charInfoPanel) {
                 charInfoPanel.oncontextmenu = (e) => {
                     e.preventDefault();
-                    showCharacterInfo(currentPlayer);
+                    showContextMenu(e.clientX, e.clientY, currentPlayer);
                 };
             }
 

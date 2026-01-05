@@ -72,6 +72,10 @@
         'game.handCards': '手牌',
         'game.otherCharacters': '其他角色',
         'game.characterName': '角色名',
+
+        // Game Events (Backend Driven)
+        
+        // Event Timings (Backend Driven)
     };
 
     const en = {
@@ -147,6 +151,10 @@
         'game.handCards': 'Hand Cards',
         'game.otherCharacters': 'Other Characters',
         'game.characterName': 'Character Name',
+
+        // Game Events (Backend Driven)
+        
+        // Event Timings (Backend Driven)
     };
 
     if (window.I18N_STRINGS) {
