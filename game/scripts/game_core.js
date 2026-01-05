@@ -219,7 +219,7 @@
             
             // Slower for Event Steps to be visible
             if (currentNode.type === 'event-step') {
-                delay = 800; // 0.8s per step to see the timing
+                delay = 0; // Instant execution
             }
             // If we are at the start of a stage, pause longer (80ms) to match animation
             else if (currentNode.name.startsWith('when') && currentNode.name.includes('StageStart')) {

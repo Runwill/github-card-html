@@ -20,31 +20,38 @@
     display: none !important;
 }
 
-.game-status-display {
-    display: flex;
-    flex-direction: row; /* Keep row to separate breadcrumbs and badge if needed, or column? User said column for breadcrumbs */
-    align-items: flex-start;
-    justify-content: space-between;
-    flex-grow: 1;
-    margin: 0 20px;
-    padding: 10px;
+/* New Independent Panels */
+.game-panel {
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
-    background: var(--surface); /* Adaptive background */
-    height: 160px; /* Fixed height to prevent jumping */
-    overflow-y: auto; /* Allow scrolling if content exceeds height */
+    padding: 15px;
     box-shadow: 0 2px 4px var(--shadow-1);
     transition: background-color 0.3s ease;
 }
 
+.game-log-panel {
+    height: 160px;
+    overflow-y: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.game-action-panel {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+}
+
 /* Custom Scrollbar for Webkit */
-.game-status-display::-webkit-scrollbar {
+.game-log-panel::-webkit-scrollbar {
     width: 6px;
 }
-.game-status-display::-webkit-scrollbar-track {
+.game-log-panel::-webkit-scrollbar-track {
     background: transparent;
 }
-.game-status-display::-webkit-scrollbar-thumb {
+.game-log-panel::-webkit-scrollbar-thumb {
     background-color: var(--border);
     border-radius: 3px;
 }
@@ -61,28 +68,37 @@
     gap: 4px;
     flex: 1; /* Take remaining space */
     min-width: 0; /* Allow shrinking if needed */
-    margin-right: 20px; /* Space between crumbs and actions */
-}
-
-.status-actions {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 15px;
-    flex-shrink: 0;
-    flex-wrap: nowrap;
+    /* margin-right: 20px; Removed as it's now in a flex container with space-between */
 }
 
 #game-controls {
     display: flex;
-    gap: 10px;
+    flex-direction: row; /* Horizontal buttons in the new panel */
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+}
+
+#game-controls .button {
+    min-width: 140px; /* Slightly wider */
+    text-align: center;
+    padding: 12px 24px;
+    font-weight: 600;
+    box-shadow: 0 4px 6px var(--shadow-1);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    margin: 0; /* Reset margin */
+}
+
+#game-controls .button:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 2px var(--shadow-1);
 }
 
 .breadcrumbs .crumb {
     display: inline-flex;
     align-items: center;
     opacity: 0;
-    animation: slideInUp 0.1s forwards; /* Faster animation */
+    animation: slideInUp 0.03s forwards; /* Even faster */
     font-size: 1rem; /* Ensure consistent size */
     transition: all 0.3s ease; /* Smooth transition for color, shadow, opacity */
 }
@@ -96,32 +112,12 @@
 @keyframes slideInUp {
     from {
         opacity: 0;
-        transform: translateY(5px); /* Subtle movement */
+        transform: translateY(1px); /* Minimal movement */
     }
     to {
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.timing-badge {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: var(--text);
-    padding: 4px 12px;
-    background: var(--bg-panel);
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-}
-
-.breadcrumbs .crumb:not(:last-child)::after {
-    content: none;
-}
-
-.breadcrumbs .crumb:last-child {
-    opacity: 1;
-    color: var(--primary);
 }
 
 .timing-badge {
@@ -138,6 +134,7 @@
     letter-spacing: 0.02em;
     white-space: nowrap; /* Prevent text wrapping */
     flex-shrink: 0; /* Prevent badge from shrinking */
+    margin-left: 20px;
 }
 
 /* Header Section */
@@ -245,10 +242,20 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    transition: color 0.3s ease, background-color 0.3s ease;
 }
 
-.stat-hp::before {
-    content: '♥';
+/* Removed heart icon as per request */
+/* .stat-hp::before { content: '♥'; } */
+
+@keyframes hp-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); background-color: rgba(245, 101, 101, 0.3); box-shadow: 0 0 15px rgba(245, 101, 101, 0.4); }
+    100% { transform: scale(1); }
+}
+
+.stat-hp.hp-changed {
+    animation: hp-pulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Hand Cards Area */
@@ -347,7 +354,7 @@
 .other-player-summary.active {
     background-color: var(--token-accent-blue);
     border-color: var(--primary-2);
-    color: var(--primary-3);
+    color: var(--text-active);
     font-weight: 600;
     box-shadow: 0 2px 4px var(--primary-ring);
 }

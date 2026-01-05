@@ -68,14 +68,10 @@
         'game.timing.whenConcludingStageFinish': '结束阶段结束时',
         'game.timing.afterConcludingStageFinish': '结束阶段结束后',
 
-        'game.hp': '体力: {hp}/{maxHp}',
+        'game.hp': '{hp}/{maxHp}',
         'game.handCards': '手牌',
         'game.otherCharacters': '其他角色',
-        'game.characterName': '角色名',
-
-        // Game Events (Backend Driven)
-        
-        // Event Timings (Backend Driven)
+        'game.characterName': '角色名'
     };
 
     const en = {
@@ -150,11 +146,7 @@
         'game.hp': 'HP: {hp}/{maxHp}',
         'game.handCards': 'Hand Cards',
         'game.otherCharacters': 'Other Characters',
-        'game.characterName': 'Character Name',
-
-        // Game Events (Backend Driven)
-        
-        // Event Timings (Backend Driven)
+        'game.characterName': 'Character Name'
     };
 
     if (window.I18N_STRINGS) {

@@ -52,6 +52,9 @@
   
   /* 自定义：代词颜色（浅色主题下稍暗的红） */
   --pronoun-color: #d60000bb;
+
+  /* Active State Text Color (Light Mode) */
+  --text-active: var(--primary-3);
 }
 
 /* 深色主题变量 */
@@ -82,8 +85,8 @@ html[data-theme="dark"] {
 
   --token-odd-bg:  rgba(148,163,184,0.08); /* 淡石板 */
   --token-even-bg: rgba(148,163,184,0.04);
-  --token-accent-blue: rgba(56,189,248,0.55);
-  --token-accent-green:rgba(74,222,128,0.55);
+  --token-accent-blue: rgba(56,189,248,0.15); /* Reduced opacity from 0.55 to 0.15 for better dark mode contrast */
+  --token-accent-green:rgba(74,222,128,0.15);
 
   --panel-header-bg: rgba(148,163,184,0.08);
   --log-bg: #0f172a;
@@ -97,6 +100,9 @@ html[data-theme="dark"] {
   --toast-err-border:rgba(239,68,68,0.35);
   --toast-err-text: #fecaca;
   --toast-err-icon: #fca5a5;
+  
+  /* Active State Text Color for Dark Mode */
+  --text-active: var(--primary-1);
 
   /* 自定义：代词颜色（深色主题下提升亮度与对比） */
   --pronoun-color: #ff6b6b; /* 可视性更好，亦可根据需要调整为 #ff4d4f 等 */

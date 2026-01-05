@@ -3,61 +3,181 @@
 
     const termColors = new Map();
 
+    // Mapping of Event Name to its display parts (based on panel_term.html structure)
+    const termStructure = {
+        // Basic Events
+        'recover': ['recoverBody'],
+        'loss': ['lossBody'],
+        'cure': ['cureEnd'],
+        'damage': ['damageEnd'],
+        'dying': ['dyingEnd'],
+        'die': ['dieEnd'],
+        'use': ['useBody'],
+        'play': ['playBody'],
+        'discard': ['discardBody'],
+        'face': ['faceBody'],
+        'back': ['backBody'],
+        'draw': ['drawHead', 'drawEnd'],
+        'move': ['moveBody0'],
+
+        // Timings - Recover
+        'beforeRecover': ['recoverBody', 'beforeEnd'],
+        'whenRecover': ['recoverBody', 'whenEnd'],
+        'afterRecover': ['recoverBody', 'afterEnd'],
+
+        // Timings - Damage
+        'beforeDamage': ['dealtBody', 'damageEnd', 'beforeEnd'],
+        'beforeDamaged': ['takeBody', 'damageEnd', 'beforeEnd'],
+        'whenDamage': ['dealtBody', 'damageEnd', 'whenEnd'],
+        'whenDamaged': ['takeBody', 'damageEnd', 'whenEnd'],
+        'afterDamage': ['dealtBody', 'damageEnd', 'afterEnd'],
+        'afterDamaged': ['takeBody', 'damageEnd', 'afterEnd'],
+
+        // Timings - Use
+        'beforeUse': ['useBody', 'beforeEnd'],
+        'beforeUsed': ['passive', 'useBody', 'beforeEnd'],
+        'whenUse': ['useBody', 'whenEnd'],
+        'whenUsed': ['passive', 'useBody', 'whenEnd'],
+        'afterUse': ['useBody', 'afterEnd'],
+        'afterUsed': ['passive', 'useBody', 'afterEnd'],
+
+        // Timings - Play
+        'beforePlay': ['playBody', 'beforeEnd'],
+        'beforePlayed': ['passive', 'playBody', 'beforeEnd'],
+        'whenPlay': ['playBody', 'whenEnd'],
+        'whenPlayed': ['passive', 'playBody', 'whenEnd'],
+        'afterPlay': ['playBody', 'afterEnd'],
+        'afterPlayed': ['passive', 'playBody', 'afterEnd'],
+
+        // Timings - Discard
+        'beforeDiscard': ['discardBody', 'beforeEnd'],
+        'whenDiscard': ['discardBody', 'whenEnd'],
+        'afterDiscard': ['discardBody', 'afterEnd'],
+
+        // Timings - Dying
+        'beforeDying': ['dyingEnd', 'beforeEnd'],
+        'whenDying': ['dyingEnd', 'whenEnd'],
+        'afterDying': ['dyingEnd', 'afterEnd'],
+
+        // Timings - Die
+        'beforeDie': ['dieEnd', 'beforeEnd'],
+        'whenDie': ['dieEnd', 'whenEnd'],
+        'afterDie': ['dieEnd', 'afterEnd'],
+
+        // Timings - Draw
+        'beforeDraw': ['drawHead', 'drawEnd', 'beforeEnd'],
+        'whenDraw': ['drawHead', 'drawEnd', 'whenEnd'],
+        'afterDraw': ['drawHead', 'drawEnd', 'afterEnd'],
+
+        // Timings - Move
+        'beforeMove': ['moveBody0', 'beforeEnd'],
+        'whenMove': ['moveBody0', 'whenEnd'],
+        'afterMove': ['moveBody0', 'afterEnd'],
+
+        // Timings - Cure
+        'beforeCure': ['dealtBody', 'cureEnd', 'beforeEnd'],
+        'beforeCured': ['takeBody', 'cureEnd', 'beforeEnd'],
+        'whenCure': ['dealtBody', 'cureEnd', 'whenEnd'],
+        'whenCured': ['takeBody', 'cureEnd', 'whenEnd'],
+        'afterCure': ['dealtBody', 'cureEnd', 'afterEnd'],
+        'afterCured': ['takeBody', 'cureEnd', 'afterEnd'],
+
+        // Timings - Loss
+        'beforeLoss': ['lossBody', 'beforeEnd'],
+        'whenLoss': ['lossBody', 'whenEnd'],
+        'afterLoss': ['lossBody', 'afterEnd']
+    };
+
     function loadTermColors() {
         if (!window.endpoints || !window.fetchJsonCached) return;
         
         const load = (url) => {
             window.fetchJsonCached(url).then(data => {
+                // Store all available parts for cross-referencing
+                const globalParts = new Map();
+
+                // First pass: Process raw data and populate globalParts
                 for (let key in data) {
                     const item = data[key];
+                    if (item.part && Array.isArray(item.part)) {
+                        item.partMap = {};
+                        item.part.forEach(p => {
+                            if (p.en) {
+                                item.partMap[p.en] = p;
+                                globalParts.set(p.en, p);
+                            }
+                        });
+                    } else if (item.part) {
+                        // Handle case where part might be an object (legacy/different format)
+                        item.partMap = item.part;
+                        for (let pKey in item.part) {
+                            const p = item.part[pKey];
+                            if (p.en) globalParts.set(p.en, p);
+                        }
+                    }
+                }
+
+                // Second pass: Generate translations
+                // We iterate termStructure to ensure we cover all defined complex terms
+                // AND we iterate data to cover simple terms not in structure
+                
+                const processedKeys = new Set();
+
+                // 1. Process explicit structure definitions (Priority)
+                for (let key in termStructure) {
+                    const partsList = termStructure[key];
+                    
+                    // Try to construct from global parts
+                    const partTexts = partsList.map(pKey => {
+                        const p = globalParts.get(pKey);
+                        return p ? (p.replace || p.cn || '') : '';
+                    });
+
+                    if (partTexts.some(t => t)) {
+                        const val = partTexts.join('');
+                        injectTerm(key, val);
+                        processedKeys.add(key);
+                    } else {
+                        // Debug: Log missing parts for 'recover' or other keys we expect
+                        if (key === 'recover') {
+                            console.log('Failed to construct recover. Missing parts:', partsList.filter(pKey => !globalParts.get(pKey)));
+                        }
+                    }
+                }
+
+                // 2. Process remaining items from data
+                for (let key in data) {
+                    const item = data[key];
+                    
                     // 1. Load Colors
                     if (item.en && item.color) {
                         termColors.set(item.en, item.color);
                     }
-                    // 2. Load Translations (Backend Driven)
-                    if (item.en && (item.cn || item.replace) && window.I18N_STRINGS && window.I18N_STRINGS.zh) {
-                        // Inject into I18N system (Prefer 'replace' over 'cn' to match panel_term behavior)
-                        const val = item.replace || item.cn;
-                        
-                        // 2.1 Process/Event Names (game.process.X)
-                        window.I18N_STRINGS.zh[`game.process.${item.en}`] = val;
-                        
-                        // Also inject PascalCase version if key is lowercase (e.g. 'damage' -> 'Damage')
-                        const pascalKey = item.en.charAt(0).toUpperCase() + item.en.slice(1);
-                        if (pascalKey !== item.en) {
-                            window.I18N_STRINGS.zh[`game.process.${pascalKey}`] = val;
-                        }
-
-                        // 2.2 Timings (game.timing.X) - Detect if it looks like a timing
-                        if (/^(before|when|after)/.test(item.en)) {
-                            window.I18N_STRINGS.zh[`game.timing.${item.en}`] = val;
+                    
+                    // 2. Load Translations
+                    if (!processedKeys.has(item.en) && window.I18N_STRINGS && window.I18N_STRINGS.zh) {
+                        let val = item.replace || item.cn;
+                        if (item.en && val) {
+                            injectTerm(item.en, val);
                         }
                     }
 
-                    if (item.part) {
-                        for (let pKey in item.part) {
-                            const part = item.part[pKey];
+                    // 3. Load Part Colors & Simple Translations
+                    if (item.partMap) {
+                        for (let pKey in item.partMap) {
+                            const part = item.partMap[pKey];
                             if (part.en && (part.color || item.color)) {
                                 termColors.set(part.en, part.color || item.color);
                             }
-                            // Load Part Translations
-                            if (part.en && (part.cn || part.replace) && window.I18N_STRINGS && window.I18N_STRINGS.zh) {
-                                const val = part.replace || part.cn;
-                                window.I18N_STRINGS.zh[`game.process.${part.en}`] = val;
-                                
-                                const pascalKey = part.en.charAt(0).toUpperCase() + part.en.slice(1);
-                                if (pascalKey !== part.en) {
-                                    window.I18N_STRINGS.zh[`game.process.${pascalKey}`] = val;
-                                }
-
-                                // Timings for parts
-                                if (/^(before|when|after)/.test(part.en)) {
-                                    window.I18N_STRINGS.zh[`game.timing.${part.en}`] = val;
-                                }
+                            // Inject part translation if available and not complex
+                            if (part.en && (part.cn || part.replace)) {
+                                const pVal = part.replace || part.cn;
+                                injectTerm(part.en, pVal);
                             }
                         }
                     }
                 }
+                
                 if (window.Game.Core && window.Game.Core.GameState.isGameRunning) {
                     updateUI();
                 }
@@ -66,6 +186,24 @@
 
         load(window.endpoints.termDynamic());
         load(window.endpoints.termFixed());
+    }
+
+    function injectTerm(key, val) {
+        if (!window.I18N_STRINGS || !window.I18N_STRINGS.zh) return;
+        
+        // 1. Process/Event Names
+        window.I18N_STRINGS.zh[`game.process.${key}`] = val;
+        
+        // PascalCase
+        const pascalKey = key.charAt(0).toUpperCase() + key.slice(1);
+        if (pascalKey !== key) {
+            window.I18N_STRINGS.zh[`game.process.${pascalKey}`] = val;
+        }
+
+        // 2. Timings
+        if (/^(before|when|after)/.test(key)) {
+            window.I18N_STRINGS.zh[`game.timing.${key}`] = val;
+        }
     }
 
     // Helper: Hex to RGBA
@@ -325,7 +463,17 @@
         if (currentPlayer) {
             document.getElementById('char-name').textContent = currentPlayer.name;
             // document.getElementById('char-img').src = currentPlayer.avatar; // Uncomment when images are real
-            document.getElementById('char-hp-display').textContent = i18n.t('game.hp', { hp: currentPlayer.health, maxHp: currentPlayer.healthLimit });
+            
+            const hpEl = document.getElementById('char-hp-display');
+            const newHpText = i18n.t('game.hp', { hp: currentPlayer.health, maxHp: currentPlayer.healthLimit });
+            
+            // Trigger animation if value changed (and not first render)
+            if (hpEl.textContent && hpEl.textContent !== newHpText) {
+                hpEl.classList.remove('hp-changed');
+                void hpEl.offsetWidth; // Force reflow
+                hpEl.classList.add('hp-changed');
+            }
+            hpEl.textContent = newHpText;
             
             // Add Context Menu
             const charInfoPanel = document.querySelector('.character-info');
@@ -349,31 +497,63 @@
 
         // Render Other Players
         const otherPlayersContainer = document.getElementById('other-players-container');
-        otherPlayersContainer.innerHTML = '';
+        // Sync players instead of rebuilding to preserve animations
+        
         GameState.players.forEach((player, index) => {
-            const pEl = document.createElement('div');
-            pEl.className = 'other-player-summary';
-            if (index === GameState.currentPlayerIndex) {
-                pEl.classList.add('active');
+            let pEl = document.getElementById(`player-summary-${player.id}`);
+            
+            if (!pEl) {
+                pEl = document.createElement('div');
+                pEl.id = `player-summary-${player.id}`;
+                pEl.className = 'other-player-summary';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'player-name';
+                pEl.appendChild(nameSpan);
+                
+                const hpSpan = document.createElement('span');
+                hpSpan.className = 'player-hp stat-hp'; // Added stat-hp for shared styling/animation
+                pEl.appendChild(hpSpan);
+                
+                otherPlayersContainer.appendChild(pEl);
             }
             
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'player-name';
-            nameSpan.textContent = player.name;
+            // Update Active Status
+            if (index === GameState.currentPlayerIndex) {
+                pEl.classList.add('active');
+            } else {
+                pEl.classList.remove('active');
+            }
             
-            const hpSpan = document.createElement('span');
-            hpSpan.className = 'player-hp';
-            hpSpan.textContent = i18n.t('game.hp', { hp: player.hp, maxHp: player.maxHp });
+            // Update Name
+            const nameSpan = pEl.querySelector('.player-name');
+            if (nameSpan.textContent !== player.name) nameSpan.textContent = player.name;
             
-            pEl.appendChild(nameSpan);
-            pEl.appendChild(hpSpan);
+            // Update HP with Animation
+            const hpSpan = pEl.querySelector('.player-hp');
+            // Use health/healthLimit to match GameState structure
+            const newHpText = i18n.t('game.hp', { hp: player.health, maxHp: player.healthLimit });
             
+            if (hpSpan.textContent && hpSpan.textContent !== newHpText) {
+                hpSpan.classList.remove('hp-changed');
+                void hpSpan.offsetWidth; // Force reflow
+                hpSpan.classList.add('hp-changed');
+            }
+            hpSpan.textContent = newHpText;
+            
+            // Context Menu (Now supports modifying any player)
             pEl.oncontextmenu = (e) => {
                 e.preventDefault();
-                showCharacterInfo(player);
+                showContextMenu(e.clientX, e.clientY, player);
             };
-            
-            otherPlayersContainer.appendChild(pEl);
+        });
+        
+        // Cleanup removed players (if any)
+        Array.from(otherPlayersContainer.children).forEach(child => {
+            const id = parseInt(child.id.replace('player-summary-', ''));
+            if (!GameState.players.find(p => p.id === id)) {
+                otherPlayersContainer.removeChild(child);
+            }
         });
     }
 
