@@ -78,9 +78,9 @@
                         crumb.style.opacity = isLast ? '1' : '0.6';
                     }
                     
-                    if (crumb.textContent !== item.text) {
+                    if (crumb.innerHTML !== item.text) {
                         // Content changed (e.g. sibling transition), update text and re-trigger animation
-                        crumb.textContent = item.text;
+                        crumb.innerHTML = item.text;
                         // Reset animation
                         crumb.style.animation = 'none';
                         crumb.offsetHeight; /* trigger reflow */
@@ -90,7 +90,7 @@
                     // New element
                     const crumb = document.createElement('span');
                     crumb.className = 'crumb';
-                    crumb.textContent = item.text;
+                    crumb.innerHTML = item.text;
                     
                     if (color) {
                         crumb.style.color = color;
@@ -119,7 +119,7 @@
         
         // Render Timing Badge
         if (timingBadgeEl && currentNode) {
-            timingBadgeEl.textContent = i18n.t(`game.timing.${currentNode.name}`);
+            timingBadgeEl.innerHTML = i18n.t(`game.timing.${currentNode.name}`);
             
             const rawColor = window.Game.UI.termColors.get(currentNode.name);
             const color = window.Game.UI.getAdaptiveColor(rawColor);
@@ -143,7 +143,26 @@
         // Update Buttons based on state
         const endTurnBtn = document.getElementById('btn-end-turn');
         const playCardBtn = document.getElementById('btn-play-card');
+        const pauseBtn = document.getElementById('btn-pause-game');
         
+        // Pause Button Logic
+        if (pauseBtn) {
+            if (GameState.isGameRunning) {
+                pauseBtn.classList.remove('hidden');
+                if (GameState.isPaused) {
+                    pauseBtn.textContent = i18n.t('game.resume', { defaultValue: 'Resume' });
+                    pauseBtn.classList.remove('secondary');
+                    pauseBtn.classList.add('warning'); // Visual cue for paused state
+                } else {
+                    pauseBtn.textContent = i18n.t('game.pause', { defaultValue: 'Pause' });
+                    pauseBtn.classList.add('secondary');
+                    pauseBtn.classList.remove('warning');
+                }
+            } else {
+                pauseBtn.classList.add('hidden');
+            }
+        }
+
         if (isWaiting) {
             if (playCardBtn) playCardBtn.classList.remove('hidden');
             if (endTurnBtn) {

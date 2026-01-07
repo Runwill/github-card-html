@@ -10,9 +10,15 @@
         const startBtn = document.getElementById('btn-start-game');
         const endTurnBtn = document.getElementById('btn-end-turn');
         const playCardBtn = document.getElementById('btn-play-card');
+        const pauseBtn = document.getElementById('btn-pause-game');
 
         if (startBtn) {
             startBtn.addEventListener('click', window.Game.Core.startGame);
+        }
+        if (pauseBtn) {
+            pauseBtn.addEventListener('click', () => {
+                window.Game.Core.togglePause();
+            });
         }
         if (endTurnBtn) {
             endTurnBtn.addEventListener('click', window.Game.Core.advanceState);

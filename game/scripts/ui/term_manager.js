@@ -105,6 +105,11 @@
         }
     }
 
+    function createTermHtml(text, key, color) {
+        const style = color ? ` style="color:${color}"` : '';
+        return `<span class="term-click" data-term="${key}"${style}>${text}</span>`;
+    }
+
     function loadTermColors() {
         if (!window.endpoints || !window.fetchJsonCached) return;
         
@@ -113,15 +118,25 @@
                 // Store all available parts for cross-referencing
                 const globalParts = new Map();
 
-                // First pass: Process raw data and populate globalParts
+                // First pass: Process raw data and populate globalParts AND Colors (moved up)
                 for (let key in data) {
                     const item = data[key];
+                    
+                    // 1. Load Colors (Immediate)
+                    if (item.en && item.color) {
+                        window.Game.UI.termColors.set(item.en, item.color);
+                    }
+
                     if (item.part && Array.isArray(item.part)) {
                         item.partMap = {};
                         item.part.forEach(p => {
                             if (p.en) {
                                 item.partMap[p.en] = p;
                                 globalParts.set(p.en, p);
+                                // Load Part Colors
+                                if (p.color || item.color) {
+                                    window.Game.UI.termColors.set(p.en, p.color || item.color);
+                                }
                             }
                         });
                     } else if (item.part) {
@@ -129,7 +144,13 @@
                         item.partMap = item.part;
                         for (let pKey in item.part) {
                             const p = item.part[pKey];
-                            if (p.en) globalParts.set(p.en, p);
+                            if (p.en) {
+                                globalParts.set(p.en, p);
+                                // Load Part Colors
+                                if (p.color || item.color) {
+                                    window.Game.UI.termColors.set(p.en, p.color || item.color);
+                                }
+                            }
                         }
                     }
                 }
@@ -142,13 +163,17 @@
                     const partsList = termStructure[key];
                     
                     // Try to construct from global parts
-                    const partTexts = partsList.map(pKey => {
+                    const partHtmls = partsList.map(pKey => {
                         const p = globalParts.get(pKey);
-                        return p ? (p.replace || p.cn || '') : '';
+                        if (!p) return '';
+                        const val = p.replace || p.cn || '';
+                        const color = window.Game.UI.termColors.get(pKey);
+                        return createTermHtml(val, pKey, color);
                     });
 
-                    if (partTexts.some(t => t)) {
-                        const val = partTexts.join('');
+                    // Check if we have valid parts (at least one non-empty)
+                    if (partHtmls.some(t => t)) {
+                        const val = partHtmls.join('');
                         injectTerm(key, val);
                         processedKeys.add(key);
                     } else {
@@ -163,30 +188,24 @@
                 for (let key in data) {
                     const item = data[key];
                     
-                    // 1. Load Colors
-                    if (item.en && item.color) {
-                        window.Game.UI.termColors.set(item.en, item.color);
-                    }
-                    
                     // 2. Load Translations
                     if (!processedKeys.has(item.en) && window.I18N_STRINGS && window.I18N_STRINGS.zh) {
                         let val = item.replace || item.cn;
                         if (item.en && val) {
-                            injectTerm(item.en, val);
+                            const color = window.Game.UI.termColors.get(item.en);
+                            injectTerm(item.en, createTermHtml(val, item.en, color));
                         }
                     }
 
-                    // 3. Load Part Colors & Simple Translations
+                    // 3. Load Part Translations
                     if (item.partMap) {
                         for (let pKey in item.partMap) {
                             const part = item.partMap[pKey];
-                            if (part.en && (part.color || item.color)) {
-                                window.Game.UI.termColors.set(part.en, part.color || item.color);
-                            }
                             // Inject part translation if available and not complex
                             if (part.en && (part.cn || part.replace)) {
                                 const pVal = part.replace || part.cn;
-                                injectTerm(part.en, pVal);
+                                const color = window.Game.UI.termColors.get(part.en);
+                                injectTerm(part.en, createTermHtml(pVal, part.en, color));
                             }
                         }
                     }
@@ -201,6 +220,19 @@
         load(window.endpoints.termDynamic());
         load(window.endpoints.termFixed());
     }
+
+    // Add Global Click Listener for terms
+    document.addEventListener('dblclick', (e) => {
+        const target = e.target.closest('.term-click');
+        if (target && window.scrollActions && typeof window.scrollActions.scrollToTagAndFlash === 'function') {
+            e.preventDefault();
+            e.stopPropagation();
+            const tag = target.dataset.term;
+            if (tag) {
+                window.scrollActions.scrollToTagAndFlash('panel_term', tag, { behavior: 'smooth', stop: true });
+            }
+        }
+    });
 
     window.Game.UI.loadTermColors = loadTermColors;
     window.Game.UI.injectTerm = injectTerm;

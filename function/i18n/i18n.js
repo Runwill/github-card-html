@@ -139,7 +139,14 @@
         const key = el.getAttribute('data-i18n');
         const paramsRaw = el.getAttribute('data-i18n-params');
         let params = null; if (paramsRaw) { try { params = JSON.parse(paramsRaw); } catch(_){} }
-        el.textContent = t(key, params);
+        // Detect HTML-like content (simple heuristic: starts with <span) to use innerHTML
+        // Or if the key starts with 'game.timing.' or 'game.process.' which we know contain HTML
+        const val = t(key, params);
+        if (key && (key.startsWith('game.timing.') || key.startsWith('game.process.') || val.trim().startsWith('<span'))) {
+            el.innerHTML = val;
+        } else {
+            el.textContent = val;
+        }
       }
       if (el.hasAttribute('data-i18n-attr')) {
         const attrs = (el.getAttribute('data-i18n-attr')||'').split(',').map(s=>s.trim()).filter(Boolean);

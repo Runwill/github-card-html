@@ -25,6 +25,7 @@
         currentPlayerIndex: 0,
         round: 1,
         isGameRunning: false,
+        isPaused: false,
         
         // Stack of active nodes (indices in their parent's children array)
         flowStack: [],
@@ -210,7 +211,7 @@
     }
 
     function checkAutoAdvance() {
-        if (!GameState.isGameRunning) return;
+        if (!GameState.isGameRunning || GameState.isPaused) return;
         
         const currentNode = getCurrentNode();
         if (currentNode && !isInteractive(currentNode)) {
@@ -228,6 +229,18 @@
             
             setTimeout(advanceState, delay);
         }
+    }
+
+    function togglePause() {
+        GameState.isPaused = !GameState.isPaused;
+        console.log(`[Game] Paused: ${GameState.isPaused}`);
+        if (!GameState.isPaused) {
+            checkAutoAdvance();
+        }
+        if (window.Game.UI && window.Game.UI.updateUI) {
+            window.Game.UI.updateUI();
+        }
+        return GameState.isPaused;
     }
 
     // Event Logic Implementation
@@ -315,6 +328,7 @@
         getActiveProcesses,
         isInteractive,
         checkAutoAdvance,
+        togglePause,
         Events
     };
 
