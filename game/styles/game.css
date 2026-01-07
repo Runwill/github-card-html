@@ -15,11 +15,6 @@
     margin: 0 auto;
 }
 
-/* Game Status Display */
-#game-round-info {
-    display: none !important;
-}
-
 /* New Independent Panels */
 .game-panel {
     background: var(--surface);
@@ -68,7 +63,6 @@
     gap: 4px;
     flex: 1; /* Take remaining space */
     min-width: 0; /* Allow shrinking if needed */
-    /* margin-right: 20px; Removed as it's now in a flex container with space-between */
 }
 
 #game-controls {
@@ -94,6 +88,15 @@
     box-shadow: 0 1px 2px var(--shadow-1);
 }
 
+#game-controls .button.alert {
+    background-color: var(--danger);
+    color: white;
+}
+
+#game-controls .button.alert:hover {
+    background-color: var(--danger-hover);
+}
+
 .breadcrumbs .crumb {
     display: inline-flex;
     align-items: center;
@@ -105,8 +108,6 @@
 
 .breadcrumbs .crumb:last-child {
     color: var(--primary);
-    /* font-weight: 700; Removed to prevent width jump */
-    /* font-size: 1rem; Removed to prevent shrinking of others */
 }
 
 @keyframes slideInUp {
@@ -135,42 +136,6 @@
     white-space: nowrap; /* Prevent text wrapping */
     flex-shrink: 0; /* Prevent badge from shrinking */
     margin-left: 20px;
-}
-
-/* Header Section */
-.game-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--surface);
-    padding: 15px 25px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px var(--shadow-1);
-    border: 1px solid var(--border);
-}
-
-.game-header h2 {
-    margin: 0;
-    color: var(--text);
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-#game-controls .button {
-    margin: 0;
-    padding: 0.8em 1.5em;
-    border-radius: 6px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-#game-controls .button.alert {
-    background-color: var(--danger);
-    color: white;
-}
-
-#game-controls .button.alert:hover {
-    background-color: var(--danger-hover);
 }
 
 /* Main Game Area */
