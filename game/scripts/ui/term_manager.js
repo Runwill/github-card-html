@@ -103,10 +103,30 @@
         if (/^(before|when|after)/.test(key)) {
             window.I18N_STRINGS.zh[`game.timing.${key}`] = val;
         }
+
+        // 3. Areas (Special case for known areas)
+        if (['treatmentArea', 'hand', 'equipArea', 'judgeArea', 'discardPile', 'drawPile'].includes(key)) {
+            window.I18N_STRINGS.zh[`game.area.${key}`] = val;
+        }
+
+        // 4. Cards (Basic & Scrolls & Equips)
+        // Add known card keys here to categorize them correctly
+        const knownCards = [
+            'Slash', 'Dodge', 'Peach', 'Wine', 'Duel', 
+            'FireSlash', 'ThunderSlash', 'Analeptic', // Variants
+            'SavageAssault', 'ArcheryAttack', 'AmazingGrace', 'Godsalvation', // Scrolls
+            'Lightning', 'Indulgence', 'SupplyShortage', // Delayed Scrolls
+            'QingLongBlade', 'SerpentSpear', 'EightTrigrams', 'RenWangShield' // Equips
+        ];
+        if (knownCards.includes(key) || knownCards.includes(pascalKey)) {
+            window.I18N_STRINGS.zh[`game.card.${key}`] = val;
+            window.I18N_STRINGS.zh[`game.card.${pascalKey}`] = val; // Support both cases
+        }
     }
 
     function createTermHtml(text, key, color) {
-        const style = color ? ` style="color:${color}"` : '';
+        // Use CSS variable to store color, apply it only in specific contexts via CSS
+        const style = color ? ` style="--term-color:${color}"` : '';
         return `<span class="term-click" data-term="${key}"${style}>${text}</span>`;
     }
 

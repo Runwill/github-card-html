@@ -200,14 +200,77 @@
                 };
             }
 
-            // Render Hand
-            const handContainer = document.getElementById('hand-cards-container');
-            if (handContainer) {
-                handContainer.innerHTML = '';
-                currentPlayer.hand.forEach(card => {
+            // Render Treatment Area
+            const treatmentHeader = document.getElementById('header-treatment-area');
+            if (treatmentHeader && GameState.treatmentArea) {
+                // Update header text based on backend area name
+                // If term_manager is loaded, this returns HTML with interactions enabled
+                treatmentHeader.innerHTML = i18n.t(`game.area.${GameState.treatmentArea.name}`);
+            }
+
+            const treatmentContainer = document.getElementById('treatment-area-container');
+            if (treatmentContainer) {
+                treatmentContainer.setAttribute('data-drop-zone', 'treatmentArea');
+                treatmentContainer.innerHTML = '';
+                const treatmentCards = GameState.treatmentArea ? GameState.treatmentArea.cards : [];
+                
+                treatmentCards.forEach((card, index) => {
                     const cardEl = document.createElement('div');
                     cardEl.className = 'card-placeholder';
-                    cardEl.textContent = card;
+                    
+                    const cardName = typeof card === 'string' ? card : card.name;
+                    // Check if translation exists in the underlying data (polyfill for i18n.has)
+                    const key = `game.card.${cardName}`;
+                    const hasTranslation = window.I18N_STRINGS && window.I18N_STRINGS.zh && window.I18N_STRINGS.zh[key];
+
+                    if (hasTranslation) {
+                        cardEl.innerHTML = i18n.t(key);
+                    } else {
+                        // Fallback to text content
+                        cardEl.textContent = cardName;
+                    }
+                    
+                    if (window.Game.UI.Interactions) {
+                        window.Game.UI.Interactions.initDrag(cardEl, card, 'treatmentArea', index);
+                    }
+                    treatmentContainer.appendChild(cardEl);
+                });
+            }
+
+            // Render Hand
+            const handHeader = document.getElementById('header-hand-area');
+            if (handHeader && currentPlayer.hand) {
+                 // Check if it's an Area object to get name, otherwise default to 'hand'
+                 const areaName = currentPlayer.hand.name || 'hand';
+                 // If term_manager is loaded, this returns HTML with interactions enabled
+                 handHeader.innerHTML = i18n.t(`game.area.${areaName}`);
+            }
+
+            const handContainer = document.getElementById('hand-cards-container');
+            if (handContainer) {
+                handContainer.setAttribute('data-drop-zone', 'hand');
+                handContainer.innerHTML = '';
+                // Handle hand if it is an Area object (has .cards) or legacy array
+                const handCards = currentPlayer.hand.cards ? currentPlayer.hand.cards : currentPlayer.hand;
+                
+                handCards.forEach((card, index) => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'card-placeholder';
+                    
+                    const cardName = typeof card === 'string' ? card : card.name;
+                    // Check if translation exists in the underlying data (polyfill for i18n.has)
+                    const key = `game.card.${cardName}`;
+                    const hasTranslation = window.I18N_STRINGS && window.I18N_STRINGS.zh && window.I18N_STRINGS.zh[key];
+                    
+                    if (hasTranslation) {
+                        cardEl.innerHTML = i18n.t(key);
+                    } else {
+                        cardEl.textContent = cardName;
+                    }
+
+                    if (window.Game.UI.Interactions) {
+                        window.Game.UI.Interactions.initDrag(cardEl, card, 'hand', index);
+                    }
                     handContainer.appendChild(cardEl);
                 });
             }
@@ -234,6 +297,13 @@
                     hpSpan.className = 'player-hp stat-hp'; // Added stat-hp for shared styling/animation
                     pEl.appendChild(hpSpan);
                     
+                    // Optional: Equip Area Display (Placeholder)
+                    const equipDiv = document.createElement('div');
+                    equipDiv.className = 'player-equips';
+                    equipDiv.style.fontSize = '0.8em';
+                    equipDiv.style.color = '#aaa';
+                    pEl.appendChild(equipDiv);
+
                     otherPlayersContainer.appendChild(pEl);
                 }
                 
@@ -260,6 +330,14 @@
                 }
                 hpSpan.textContent = newHpText;
                 
+                // Update Equips
+                const equipDiv = pEl.querySelector('.player-equips');
+                if (equipDiv && player.equipArea && player.equipArea.cards.length > 0) {
+                   equipDiv.textContent = `[${player.equipArea.cards.join(',')}]`;
+                } else if (equipDiv) {
+                   equipDiv.textContent = '';
+                }
+
                 // Context Menu (Now supports modifying any player)
                 pEl.oncontextmenu = (e) => {
                     e.preventDefault();
@@ -278,4 +356,47 @@
     }
 
     window.Game.UI.updateUI = updateUI;
+
+    window.Game.UI.onCardDrop = function(cardData, sourceZone, targetZone, targetIndex = -1, sourceIndex = -1) {
+        console.log(`[Game UI] Card Dropped:`, { card: cardData, from: sourceZone, to: targetZone, index: targetIndex, srcIndex: sourceIndex });
+
+        const GameState = window.Game.Core.GameState;
+        const currentPlayer = GameState.players[GameState.currentPlayerIndex];
+
+        // Helper to get Area object from string
+        const getArea = (zoneName) => {
+            if (zoneName === 'hand') return currentPlayer.hand;
+            if (zoneName === 'treatmentArea') return GameState.treatmentArea;
+            return null;
+        };
+
+        const srcArea = getArea(sourceZone);
+        const tgtArea = getArea(targetZone);
+
+        if (srcArea && tgtArea) {
+            const srcIdx = sourceIndex !== -1 ? sourceIndex : srcArea.cards.indexOf(cardData);
+            if (srcIdx === -1) return;
+
+            if (sourceZone === targetZone) {
+                // Internal Reordering
+                if (targetIndex !== -1 && targetIndex !== srcIdx) {
+                    
+                    // Move
+                    srcArea.cards.splice(srcIdx, 1);
+                    srcArea.cards.splice(targetIndex, 0, cardData);
+                }
+                // Always update UI to restore DOM state (remove placeholders etc)
+                updateUI();
+            } else {
+                // Cross Zone Move
+                srcArea.cards.splice(srcIdx, 1);
+                if (targetIndex !== -1) {
+                    tgtArea.cards.splice(targetIndex, 0, cardData);
+                } else {
+                    tgtArea.cards.push(cardData);
+                }
+                updateUI();
+            }
+        }
+    };
 })();

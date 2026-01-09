@@ -9,10 +9,20 @@
         <!-- Independent Control Panel -->
         <div class="game-panel game-action-panel">
             <div id="game-controls">
-                <button class="button" id="btn-start-game" data-i18n="game.start">Start Game</button>
-                <button class="button secondary hidden" id="btn-pause-game" data-i18n="game.pause">Pause</button>
-                <button class="button success hidden" id="btn-play-card" data-i18n="game.playCard">Play Card</button>
-                <button class="button alert hidden" id="btn-end-turn" data-i18n="game.endTurn">End Turn</button>
+                <button class="btn btn--primary" id="btn-start-game" data-i18n="game.start">Start Game</button>
+                <button class="btn btn--secondary hidden" id="btn-pause-game" data-i18n="game.pause">Pause</button>
+                <button class="btn btn--success hidden" id="btn-play-card" data-i18n="game.playCard">Play Card</button>
+                <button class="btn btn--danger hidden" id="btn-end-turn" data-i18n="game.endTurn">End Turn</button>
+            </div>
+        </div>
+
+        <!-- Public Board Area -->
+        <div class="game-panel game-board-panel hidden" id="game-board-panel">
+            <div class="treatment-area-wrappper">
+                <h4 id="header-treatment-area">Treatment Area</h4>
+                <div id="treatment-area-container" class="cards-container treatment-container">
+                    <!-- Cards will be rendered here -->
+                </div>
             </div>
         </div>
         
@@ -29,8 +39,9 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="player-hand">
-                    <h4 data-i18n="game.handCards">Hand Cards</h4>
+                    <h4 id="header-hand-area">Hand Cards</h4>
                     <div id="hand-cards-container" class="cards-container">
                         <!-- Cards will be rendered here -->
                     </div>

@@ -58,7 +58,7 @@ class TextAnimationController {
     }
 
     setupInteractiveAnimations() {
-        document.querySelectorAll('.button').forEach(button => {
+        document.querySelectorAll('.button, .btn').forEach(button => {
             button.addEventListener('click', this.createRippleEffect);
         });
     }

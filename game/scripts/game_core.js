@@ -19,6 +19,31 @@
         return hand;
     }
 
+    // Area Class
+    class Area {
+        constructor(name, options = {}) {
+            this.name = name;
+            this.cards = []; // objectInArea
+            
+            // Default options
+            this.visible = options.visible || new Set(); // Roles who can see cards
+            this.forOrAgainst = options.forOrAgainst !== undefined ? options.forOrAgainst : 0; // 0: for, 1: against
+            this.verticalOrHorizontal = options.verticalOrHorizontal !== undefined ? options.verticalOrHorizontal : 0; // 0: vertical, 1: horizontal
+            this.apartOrTogether = options.apartOrTogether !== undefined ? options.apartOrTogether : 0; // 0: apart, 1: together
+        }
+
+        add(card) {
+            this.cards.push(card);
+        }
+
+        remove(card) {
+            const index = this.cards.indexOf(card);
+            if (index > -1) {
+                this.cards.splice(index, 1);
+            }
+        }
+    }
+
     // Game State
     const GameState = {
         players: [],
@@ -27,6 +52,11 @@
         isGameRunning: false,
         isPaused: false,
         
+        // Areas
+        pile: new Area('pile', { apartOrTogether: 1, forOrAgainst: 1 }), // Together, Against
+        discardPile: new Area('discardPile', { apartOrTogether: 1, forOrAgainst: 0 }), // Together, For
+        treatmentArea: new Area('treatmentArea', { apartOrTogether: 0, forOrAgainst: 0 }), // Apart, For
+
         // Stack of active nodes (indices in their parent's children array)
         flowStack: [],
         
@@ -101,17 +131,31 @@
     }
 
     function startGame() {
-        GameState.players = mockCharacters.map((char, index) => ({
-            ...char,
-            id: index,
-            seat: index + 1,
-            liveStatus: true,
-            health: char.hp,
-            healthLimit: char.maxHp,
-            handLimit: char.hp, // Initial hand limit equals health
-            reach: 1,
-            hand: generateMockHand()
-        }));
+        GameState.players = mockCharacters.map((char, index) => {
+            const player = {
+                ...char,
+                id: index,
+                seat: index + 1,
+                liveStatus: true,
+                health: char.hp,
+                healthLimit: char.maxHp,
+                handLimit: char.hp, // Initial hand limit equals health
+                reach: 1,
+                hand: new Area('hand', { apartOrTogether: 0, forOrAgainst: 1 }),
+                equipArea: new Area('equipArea', { apartOrTogether: 0, forOrAgainst: 0 }) // Apart, For
+            };
+            
+            // Populate Hand Area
+            const cards = generateMockHand();
+            cards.forEach(c => player.hand.add(c));
+            
+            // Set visibility: Hand is visible to its owner
+            player.hand.visible.add(player);
+            // Equip area is visible to all (implied empty set could mean public if we handle it that way, or we add all players)
+            // For now, we assume 'equipArea' is public information.
+
+            return player;
+        });
         GameState.currentPlayerIndex = 0;
         GameState.round = 1;
         GameState.isGameRunning = true;
@@ -121,6 +165,7 @@
 
         document.getElementById('btn-start-game').classList.add('hidden');
         document.getElementById('game-main-area').classList.remove('hidden');
+        document.getElementById('game-board-panel').classList.remove('hidden');
 
         if (window.Game.UI && window.Game.UI.updateUI) {
             window.Game.UI.updateUI();

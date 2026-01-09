@@ -2,6 +2,8 @@
     const zh = {
         'game.round': '第 {n} 轮',
         'game.start': '开始游戏',
+        'game.pause': '暂停游戏',
+        'game.resume': '恢复游戏',
         'game.endTurn': '结束回合',
         'game.nextStep': '下一步',
         'game.playCard': '使用/打出牌',
@@ -20,6 +22,12 @@
         'game.process.throwingStage': '弃牌阶段',
         'game.process.concludingStageProcess': '结束阶段流程',
         'game.process.concludingStage': '结束阶段',
+
+        // Areas
+        'game.area.treatmentArea': '处理区',
+        'game.area.hand': '手牌',
+        'game.area.equipArea': '装备区',
+        'game.area.judgeArea': '判定区',
 
         'game.timing.beforeTurnStart': '回合开始前',
         'game.timing.whenTurnStart': '回合开始时',
@@ -69,7 +77,6 @@
         'game.timing.afterConcludingStageFinish': '结束阶段结束后',
 
         'game.hp': '{hp}/{maxHp}',
-        'game.handCards': '手牌',
         'game.otherCharacters': '其他角色',
         'game.characterName': '角色名'
     };
@@ -144,7 +151,6 @@
         'game.timing.afterConcludingStageFinish': 'After Concluding Stage Finish',
 
         'game.hp': 'HP: {hp}/{maxHp}',
-        'game.handCards': 'Hand Cards',
         'game.otherCharacters': 'Other Characters',
         'game.characterName': 'Character Name'
     };
