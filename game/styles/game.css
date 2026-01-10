@@ -256,7 +256,10 @@
     background-color: var(--bg-start);
     border-radius: 8px;
     border: 2px dashed var(--border);
-    transition: background-color 0.2s, border-color 0.2s;
+    /* Update transition to include properties modified by drag-over state */
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    /* Ensure transform-origin is stable */
+    transform-origin: center center;
 }
 
 .card-placeholder {
@@ -342,7 +345,7 @@
 }
 
 .card-placeholder:hover {
-    transform: translateY(-5px);
+    /* transform: translateY(-5px); Removed hover lift animation */
     box-shadow: 0 8px 15px var(--shadow-2);
     z-index: 1;
     border-color: var(--primary-1);
@@ -470,7 +473,8 @@
     visibility: hidden;
     box-shadow: none !important;
     background: transparent !important;
-    border: 2px dashed rgba(0,0,0,0.1);
+    /* border: 2px dashed rgba(0,0,0,0.1);  Width mismatch fix: Border was adding width/height causing jump on drop */
+    border: none;
 }
 
 .drop-pulse {
