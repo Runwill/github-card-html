@@ -128,14 +128,22 @@
     padding: 6px 16px;
     background: var(--bg-panel);
     border-radius: 20px; /* Pill shape */
+    border: 1px solid transparent; /* Ensure consistent box model */
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     letter-spacing: 0.02em;
+    line-height: 1.4;
+    min-height: 42px; /* Enforce consistent height */
     white-space: nowrap; /* Prevent text wrapping */
     flex-shrink: 0; /* Prevent badge from shrinking */
     margin-left: 20px;
+    box-sizing: border-box;
+}
+
+.timing-badge .term-click {
+    border-bottom: none; /* Remove underline inside badge to keep height consistent */
 }
 
 /* Main Game Area */

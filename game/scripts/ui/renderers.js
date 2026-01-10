@@ -128,13 +128,14 @@
                 // Modern "Tag" Style: Transparent BG with tint, solid text
                 timingBadgeEl.style.backgroundColor = window.Game.UI.hexToRgba(color, 0.15);
                 timingBadgeEl.style.color = color;
-                timingBadgeEl.style.border = `1px solid ${window.Game.UI.hexToRgba(color, 0.3)}`;
+                // Only change Border Color, rely on CSS for width/style
+                timingBadgeEl.style.borderColor = window.Game.UI.hexToRgba(color, 0.3);
                 timingBadgeEl.style.textShadow = 'none';
                 timingBadgeEl.style.boxShadow = `0 2px 8px ${window.Game.UI.hexToRgba(color, 0.1)}`;
             } else {
                 timingBadgeEl.style.backgroundColor = '';
                 timingBadgeEl.style.color = '';
-                timingBadgeEl.style.border = '';
+                timingBadgeEl.style.borderColor = ''; // Revert to transparent
                 timingBadgeEl.style.textShadow = '';
                 timingBadgeEl.style.boxShadow = '';
             }
@@ -358,42 +359,60 @@
     window.Game.UI.updateUI = updateUI;
 
     window.Game.UI.onCardDrop = function(cardData, sourceZone, targetZone, targetIndex = -1, sourceIndex = -1) {
-        console.log(`[Game UI] Card Dropped:`, { card: cardData, from: sourceZone, to: targetZone, index: targetIndex, srcIndex: sourceIndex });
-
         const GameState = window.Game.Core.GameState;
         const currentPlayer = GameState.players[GameState.currentPlayerIndex];
 
-        // Helper to get Area object from string
+        // Helper to get Area object or Array
         const getArea = (zoneName) => {
             if (zoneName === 'hand') return currentPlayer.hand;
             if (zoneName === 'treatmentArea') return GameState.treatmentArea;
             return null;
         };
 
-        const srcArea = getArea(sourceZone);
-        const tgtArea = getArea(targetZone);
+        const srcAreaRaw = getArea(sourceZone);
+        const tgtAreaRaw = getArea(targetZone);
 
-        if (srcArea && tgtArea) {
-            const srcIdx = sourceIndex !== -1 ? sourceIndex : srcArea.cards.indexOf(cardData);
-            if (srcIdx === -1) return;
+        // Normalize to array manipulation
+        // Some areas are arrays (legacy), others are objects with .cards
+        const getCards = (area) => area.cards || area;
+
+        if (srcAreaRaw && tgtAreaRaw) {
+            const srcCards = getCards(srcAreaRaw);
+            const tgtCards = getCards(tgtAreaRaw);
+
+            // Robust index finding: Use sourceIndex if available, else fallback to indexOf (but avoid -1 splice issue)
+            const srcIdx = (sourceIndex !== -1 && sourceIndex < srcCards.length) 
+                ? sourceIndex 
+                : srcCards.indexOf(cardData);
+            
+            if (srcIdx === -1) {
+                console.error("Card drop failed: Source card not found in area", cardData);
+                updateUI(); // Restore matching local state
+                return;
+            }
 
             if (sourceZone === targetZone) {
                 // Internal Reordering
                 if (targetIndex !== -1 && targetIndex !== srcIdx) {
                     
-                    // Move
-                    srcArea.cards.splice(srcIdx, 1);
-                    srcArea.cards.splice(targetIndex, 0, cardData);
+                    const itemToMove = srcCards[srcIdx];
+                    
+                    // Remove 1 element
+                    srcCards.splice(srcIdx, 1);
+                    
+                    // Insert at targetIndex
+                    srcCards.splice(targetIndex, 0, itemToMove);
                 }
-                // Always update UI to restore DOM state (remove placeholders etc)
                 updateUI();
             } else {
                 // Cross Zone Move
-                srcArea.cards.splice(srcIdx, 1);
+                const itemToMove = srcCards[srcIdx];
+                srcCards.splice(srcIdx, 1); // remove 1
+                
                 if (targetIndex !== -1) {
-                    tgtArea.cards.splice(targetIndex, 0, cardData);
+                    tgtCards.splice(targetIndex, 0, itemToMove);
                 } else {
-                    tgtArea.cards.push(cardData);
+                    tgtCards.push(itemToMove);
                 }
                 updateUI();
             }

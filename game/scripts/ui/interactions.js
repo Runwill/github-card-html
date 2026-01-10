@@ -98,16 +98,7 @@
         el.style.margin = '0';
         
         // --- FIX: Copy essential computed styles to preserve look in body ---
-        const computed = window.getComputedStyle(placeholder);
-        el.style.fontFamily = computed.fontFamily;
-        el.style.fontSize = computed.fontSize;
-        el.style.fontWeight = computed.fontWeight;
-        el.style.lineHeight = computed.lineHeight;
-        el.style.color = computed.color;
-        el.style.textAlign = computed.textAlign;
-        el.style.letterSpacing = computed.letterSpacing;
-        el.style.textShadow = computed.textShadow;
-        el.style.boxSizing = 'border-box'; // Ensure strict sizing
+        copyComputedStyles(placeholder, el);
         // ------------------------------------------------------------------
 
         el.classList.add('dragging-real'); 
@@ -121,7 +112,6 @@
         DragState.targetY = 0;
         
         startAnimationLoop();
-        console.log("Real Drag Started");
     }
 
     function startAnimationLoop() {
@@ -284,27 +274,7 @@
             // Revert logic
             if (el.parentNode === document.body && DragState.placeholderElement && DragState.placeholderElement.parentNode) {
                  // Snap back visually could happen here, but for now instant revert
-                 el.style.position = '';
-                 el.style.left = '';
-                 el.style.top = '';
-                 el.style.width = '';
-                 el.style.height = '';
-                 el.style.zIndex = '';
-                 el.style.transform = '';
-                 el.style.margin = '';
-                 // --- Fix: Reset injected Inline Styles ---
-                 el.style.fontFamily = '';
-                 el.style.fontSize = '';
-                 el.style.fontWeight = '';
-                 el.style.lineHeight = '';
-                 el.style.color = '';
-                 el.style.textAlign = '';
-                 el.style.letterSpacing = '';
-                 el.style.textShadow = '';
-                 el.style.boxSizing = '';
-                 // -----------------------------------------
-                 el.classList.remove('dragging-real');
-                 el.style.pointerEvents = '';
+                 resetStyles(el);
                  
                  // Put back in place
                  DragState.placeholderElement.parentNode.insertBefore(el, DragState.placeholderElement);
@@ -361,13 +331,19 @@
             
             if (nextSibling) {
                 // Find index of nextSibling in the filtered list
+                // Note: siblings contains only .card-placeholder elements
+                // nextSibling should be one of them.
                 const idx = siblings.indexOf(nextSibling);
                 if (idx !== -1) {
                     targetIndex = idx;
+                } else {
+                    // Fallback: If nextSibling is not in siblings (e.g. unclassed div), 
+                    // we might need to look further or assume end.
+                    // But for now, let's log if this weird case happens
+                    console.warn("Placeholder nextSibling not found in siblings list", nextSibling);
                 }
             }
             
-            console.log(`Drop Real: ${targetZoneId}, idx: ${targetIndex}`);
             
             animateDropToPlaceholder(el, placeholder, () => {
                  // NOW call the backend/data update
@@ -417,30 +393,20 @@
         el.style.height = targetRect.height + 'px';
 
             // 5. Completion Callback
-        const onAnimationComplete = () => {
+        let isCompleted = false;
+        const onAnimationComplete = (e) => {
+            // Prevent multiple calls (property transitions or timeout + event)
+            if (isCompleted) return;
+            // Only fire for the main property if it's an event, or ignore property checking to be simple with flag
+            if (e && e.propertyName && e.propertyName !== 'left' && e.propertyName !== 'top') return; 
+
+            isCompleted = true;
+            el.ontransitionend = null;
+
             if (placeholder.parentNode) {
                 // Visually replace placeholder with the dragged element (temporarily)
                 if (el.parentNode === document.body) {
-                    el.style.position = '';
-                    el.style.left = '';
-                    el.style.top = '';
-                    el.style.zIndex = '';
-                    el.style.margin = '';
-                    el.style.width = '';
-                    el.style.height = '';
-                    // --- Fix: Reset injected Inline Styles ---
-                    el.style.fontFamily = '';
-                    el.style.fontSize = '';
-                    el.style.fontWeight = '';
-                    el.style.lineHeight = '';
-                    el.style.color = '';
-                    el.style.textAlign = '';
-                    el.style.letterSpacing = '';
-                    el.style.textShadow = '';
-                    el.style.boxSizing = '';
-                    // -----------------------------------------
-                    el.classList.remove('dragging-real');
-                    el.style.pointerEvents = '';
+                    resetStyles(el);
                     
                     placeholder.parentNode.insertBefore(el, placeholder);
                     placeholder.remove(); 
@@ -450,19 +416,34 @@
         };
 
         el.ontransitionend = onAnimationComplete;
-        setTimeout(onAnimationComplete, 220); // Safety fallback
+        setTimeout(() => onAnimationComplete(), 220); // Safety fallback
     }
 
-    // Temporary Helper to move card in UI (since backend logic is pending)
-    function moveCardUI(cardElement, newContainer) {
-        if (newContainer && cardElement) {
-            cardElement.classList.remove('dragging-source');
-            newContainer.appendChild(cardElement);
-        }
+    // --- Style Helpers ---
+    function copyComputedStyles(source, target) {
+        const computed = window.getComputedStyle(source);
+        const properties = [
+            'fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 
+            'color', 'textAlign', 'letterSpacing', 'textShadow'
+        ];
+        properties.forEach(prop => target.style[prop] = computed[prop]);
+        target.style.boxSizing = 'border-box';
+    }
+
+    function resetStyles(target) {
+        if (!target) return;
+        const properties = [
+            'position', 'left', 'top', 'width', 'height', 'zIndex', 'margin', 'transform',
+            'fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 
+            'color', 'textAlign', 'letterSpacing', 'textShadow', 'boxSizing'
+        ];
+        properties.forEach(prop => target.style[prop] = '');
+        target.classList.remove('dragging-real');
+        target.style.pointerEvents = '';
+        target.style.transition = '';
     }
 
     window.Game.UI.Interactions = {
-        initDrag,
-        moveCardUI
+        initDrag
     };
 })();

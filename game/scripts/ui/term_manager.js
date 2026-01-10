@@ -196,11 +196,6 @@
                         const val = partHtmls.join('');
                         injectTerm(key, val);
                         processedKeys.add(key);
-                    } else {
-                        // Debug: Log missing parts for 'recover' or other keys we expect
-                        if (key === 'recover') {
-                            console.log('Failed to construct recover. Missing parts:', partsList.filter(pKey => !globalParts.get(pKey)));
-                        }
                     }
                 }
 
