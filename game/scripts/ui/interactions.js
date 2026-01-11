@@ -259,11 +259,21 @@
         const hoverCard = targetEl ? targetEl.closest('.card-placeholder:not(.drag-placeholder)') : null;
         
         // --- FLIP Animation: Pre-calculation ---
-        // Snapshot positions of all siblings in the dropZone BEFORE move
-        const siblings = Array.from(dropZone.children).filter(c => 
+        // Snapshot positions of all siblings in the dropZone BEFORE move. 
+        // We also need to include siblings from the OLD zone if we are moving the placeholder out of it.
+        let siblings = Array.from(dropZone.children).filter(c => 
             c !== DragState.placeholderElement && 
             c.classList.contains('card-placeholder')
         );
+        
+        const currentParent = DragState.placeholderElement.parentNode;
+        if (currentParent && currentParent !== dropZone && currentParent.nodeType === 1) {
+             const oldSiblings = Array.from(currentParent.children).filter(c => 
+                c !== DragState.placeholderElement && 
+                c.classList.contains('card-placeholder')
+             );
+             siblings = siblings.concat(oldSiblings);
+        }
         
         // Snapshot only if we haven't for this frame/action? 
         // No, we need to snapshot right before DOM change.
