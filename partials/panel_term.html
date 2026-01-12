@@ -281,13 +281,13 @@
                   <advance></advance><tick></tick>“<whenGameStart class="scroll bold"></whenGameStart>”。
                 </div>
                 <div class="indent">
-                  循环<advance></advance><round></round>。
+                  循环<advance></advance><roundProcess></roundProcess>。
                 </div>
               </div>
             </padding>
-            <h2><round class="scroll" /></h2>
+            <h2><roundProcess class="scroll" /></h2>
             <div class="indent">
-              一种<process></process>。可简称为<round epithet="1"></round>。
+              一种<process></process>。可简称为<roundProcess epithet="1"></round>。
             </div>
             <div class="indent">
               包含以下<procedure></procedure>：
@@ -295,25 +295,25 @@
             <padding>
               <div class="h">
                 <div class="indent">
-                  <advance></advance><tick></tick>“<whenRoundStart class="scroll bold"></whenRoundStart>”。
+                  <advance></advance><tick></tick>“<beforeRoundStart class="scroll bold"></beforeRoundStart>”。
                 </div>
                 <div class="indent">
-                  <makeC>所有<roleDefault></roleDefault><advance></advance><turnProcess epithet="1"></turnProcess></makeC>。
+                  <advance></advance><round epithet="1"></round>。
                 </div>
                 <div class="indent">
-                  <advance></advance><tick></tick>“<whenRoundFinish class="scroll bold"> </whenRoundFinish>”。
+                  <advance></advance><tick></tick>“<afterRoundFinish class="scroll bold"> </afterRoundFinish>”。
                 </div>
               </div>
             </padding>
             <padding>
               <h3><rounds class="scroll" /></h3>
               <div class="indent">
-                <round></round>的循环次数。
+                <round></round>的<advance></advance>次数。
               </div>
             </padding>
-            <h2><turnProcess epithet="1" class="scroll" /></h2>
+            <h2><turnProcess class="scroll" /></h2>
             <div class="indent">
-              一种<process></process>。可简称为<turnProcess></turnProcess>。
+              一种<process></process>。可简称为<turnProcess epithet="1"></turnProcess>。
             </div>
             <div class="indent">
               包含以下<procedure></procedure>：
@@ -1425,6 +1425,19 @@
               <div class="indent">
                 引用<ticking></ticking>。
               </div>
+              <h3><round class="scroll" epithet="1"></round></h3>
+              <div class="indent">
+                一种<ticking></ticking>。可简称为<round></round>。
+              </div>
+              <div class="indent">
+                包含以下<tick></tick>：
+              </div>
+              <padding>
+                <h3><whenRoundStart class="scroll" /></h3>
+                <div class="indent">
+                  所有<roledefault></roledefault><advance></advance><turnprocess></turnprocess>。
+                <h3><whenRoundFinish class="scroll" /></h3>
+              </padding>
               <h3><turn class="scroll" epithet="1"></turn></h3>
               <div class="indent">
                 一种<ticking></ticking>。可简称为<turn></turn>。
