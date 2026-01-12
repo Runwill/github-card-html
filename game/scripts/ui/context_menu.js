@@ -2,7 +2,7 @@
     window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
-    // Context Menu Logic
+    // 上下文菜单逻辑
     let contextMenuEl = null;
 
     function createContextMenu() {
@@ -12,7 +12,7 @@
         contextMenuEl.className = 'custom-context-menu';
         document.body.appendChild(contextMenuEl);
         
-        // Close on click outside
+        // 点击外部关闭
         document.addEventListener('click', () => {
             contextMenuEl.classList.remove('visible');
         });
@@ -22,20 +22,20 @@
 
     function showContextMenu(x, y, player) {
         const menu = createContextMenu();
-        menu.innerHTML = ''; // Clear previous content
+        menu.innerHTML = ''; // 清除之前的内容
         
-        // Header
+        // 标题
         const header = document.createElement('div');
         header.className = 'context-menu-header';
         header.textContent = player.name;
         menu.appendChild(header);
         
-        // Actions
+        // 操作
         const actions = [
-            { label: 'Damage 1 HP', action: () => window.Game.Core.Events.damage(null, player, 1) },
-            { label: 'Cure 1 HP', action: () => window.Game.Core.Events.cure(null, player, 1) },
-            { label: 'Recover 1 HP', action: () => window.Game.Core.Events.recover(player, 1) },
-            { label: 'Loss 1 HP', action: () => window.Game.Core.Events.loss(player, 1) }
+            { label: '造成 1 点伤害', action: () => window.Game.Core.Events.damage(null, player, 1) },
+            { label: '治疗 1 点体力', action: () => window.Game.Core.Events.cure(null, player, 1) },
+            { label: '回复 1 点体力', action: () => window.Game.Core.Events.recover(player, 1) },
+            { label: '流失 1 点体力', action: () => window.Game.Core.Events.loss(player, 1) }
         ];
         
         actions.forEach(item => {
@@ -43,19 +43,19 @@
             el.className = 'context-menu-item';
             el.textContent = item.label;
             el.onclick = (e) => {
-                e.stopPropagation(); // Prevent document click from closing immediately (though we want it to close after action)
+                e.stopPropagation(); // 防止文档点击立即关闭（虽然我们希望在操作后关闭）
                 item.action();
                 menu.classList.remove('visible');
             };
             menu.appendChild(el);
         });
 
-        // Position and Show
+        // 定位并显示
         menu.style.left = `${x}px`;
         menu.style.top = `${y}px`;
         menu.classList.add('visible');
         
-        // Adjust if out of bounds (simple check)
+        // 如果超出边界则调整（简单检查）
         const rect = menu.getBoundingClientRect();
         if (rect.right > window.innerWidth) {
             menu.style.left = `${window.innerWidth - rect.width - 10}px`;

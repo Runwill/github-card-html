@@ -65,6 +65,15 @@
         eventStack: []
     };
 
+    const Settings = {
+        autoRunDelay: 50 // Default 50ms
+    };
+
+    function setSpeed(ms) {
+        Settings.autoRunDelay = ms;
+        // console.log(`[Game] Speed set to ${ms}ms`);
+    }
+
     // Helper to get current node from stack
     function getCurrentNode() {
         // Priority 1: Event Stack
@@ -93,28 +102,37 @@
 
     // Helper to get all active process names (for UI)
     function getActiveProcesses() {
-        const processes = [];
+        // Renamed to return full node info: [{name, type, ...}]
+        const path = [];
         
-        // Add Flow Stack processes
+        // 1. Traverse Flow Stack
         let node = window.Game.Def.GAME_FLOW;
-        processes.push(node.name); 
+        // Check root
+        if (node) {
+            path.push({ name: node.name, type: node.type });
+        }
+
         for (let i = 0; i < GameState.flowStack.length; i++) {
             if (node.children && node.children[GameState.flowStack[i]]) {
                 node = node.children[GameState.flowStack[i]];
-                if (node.type === 'process') {
-                    processes.push(node.name);
-                }
+                path.push({ name: node.name, type: node.type });
             } else {
                 break;
             }
         }
 
-        // Add Event Stack processes
+        // 2. Traverse Event Stack
         GameState.eventStack.forEach(evt => {
-            processes.push(evt.name); // e.g., 'Damage'
+            // Push the Event itself
+            path.push({ name: evt.name, type: 'event', context: evt.context });
+            
+            // Push the current step (Tick) of the event
+            if (evt.steps && evt.steps[evt.currentStepIndex]) {
+                 path.push({ name: evt.steps[evt.currentStepIndex], type: 'tick' });
+            }
         });
 
-        return processes;
+        return path;
     }
 
     function getNodeByStack(stack) {
@@ -130,8 +148,18 @@
         return node.name === 'acting';
     }
 
-    function startGame() {
-        GameState.players = mockCharacters.map((char, index) => {
+    function startGame(customConfig) {
+        let playersData;
+        
+        if (customConfig && Array.isArray(customConfig.players)) {
+             // 使用自定义配置（来自 Setup 环节）
+             playersData = customConfig.players;
+        } else {
+             // 使用默认 Mock 数据
+             playersData = mockCharacters;
+        }
+
+        GameState.players = playersData.map((char, index) => {
             const player = {
                 ...char,
                 id: index,
@@ -145,11 +173,12 @@
                 equipArea: new Area('equipArea', { apartOrTogether: 0, forOrAgainst: 0 }) // Apart, For
             };
             
-            // Populate Hand Area
+            // Populate Hand Area (Mock or Empty)
+             // 暂时仍然生成 Mock 手牌，或者如果 customConfig 提供初始手牌则使用
             const cards = generateMockHand();
             cards.forEach(c => player.hand.add(c));
             
-            // Set visibility: Hand is visible to its owner
+            // Set visibility: Hand is visible to its owner 
             player.hand.visible.add(player);
             // Equip area is visible to all (implied empty set could mean public if we handle it that way, or we add all players)
             // For now, we assume 'equipArea' is public information.
@@ -219,7 +248,7 @@
                 
                 // Drill down to first leaf
                 let node = getNodeByStack(GameState.flowStack);
-                while (node.type === 'process') {
+                while (node.type === 'process' || node.type === 'ticking') {
                     GameState.flowStack.push(0); // Enter first child
                     node = node.children[0];
                 }
@@ -260,16 +289,22 @@
         
         const currentNode = getCurrentNode();
         if (currentNode && !isInteractive(currentNode)) {
-            // Default fast tick speed (50ms)
-            let delay = 50; 
+            // Use configurable speed
+            let delay = Settings.autoRunDelay; 
             
-            // Slower for Event Steps to be visible
+            // Slower for Event Steps to be visible if needed, or faster
+            // For now, let's respect the slider globally, or maybe half speed for ticks?
+            // Let's stick to the slider value as the baseline beat.
+            
             if (currentNode.type === 'event-step') {
-                delay = 0; // Instant execution
+                delay = 0; // Steps inside event might still be instant logic, but maybe we want to see them?
+                // If user wants to see "WhenDamage", "AfterDamage" etc, we should wait.
+                // Let's make it consistent:
+                delay = Settings.autoRunDelay;
             }
-            // If we are at the start of a stage, pause longer (80ms) to match animation
+            // Start of stage might need extra pause?
             else if (currentNode.name.startsWith('when') && currentNode.name.includes('StageStart')) {
-                delay = 80;
+                // delay = delay * 1.5; // Optional: pause longer at start
             }
             
             setTimeout(advanceState, delay);
@@ -374,6 +409,7 @@
         isInteractive,
         checkAutoAdvance,
         togglePause,
+        setSpeed,
         Events
     };
 

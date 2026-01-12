@@ -15,11 +15,35 @@
         if (startBtn) {
             startBtn.addEventListener('click', window.Game.Core.startGame);
         }
+        
+        // Initialize Setup Manager if available
+        if (window.Game.Setup && window.Game.Setup.init) {
+            window.Game.Setup.init();
+        }
+
         if (pauseBtn) {
             pauseBtn.addEventListener('click', () => {
                 window.Game.Core.togglePause();
             });
         }
+        
+        // Speed Control
+        const speedRange = document.getElementById('game-speed-range');
+        const speedVal = document.getElementById('game-speed-val');
+        if (speedRange && speedVal) {
+            speedRange.addEventListener('input', (e) => {
+                const val = parseInt(e.target.value, 10);
+                speedVal.textContent = `${val}ms`;
+                if (window.Game.Core && window.Game.Core.setSpeed) {
+                    window.Game.Core.setSpeed(val);
+                }
+            });
+            // Init default
+            if (window.Game.Core && window.Game.Core.setSpeed) {
+                window.Game.Core.setSpeed(parseInt(speedRange.value, 10));
+            }
+        }
+
         if (endTurnBtn) {
             endTurnBtn.addEventListener('click', window.Game.Core.advanceState);
             // Update button text to "Next Step"

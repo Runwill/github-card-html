@@ -2,7 +2,7 @@
     window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
-    // Helper: Hex to RGBA
+    // 辅助函数：Hex 转 RGBA
     function hexToRgba(hex, alpha) {
         let c;
         if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
@@ -16,7 +16,7 @@
         return hex;
     }
 
-    // Helper: Get Adaptive Color
+    // 辅助函数：获取自适应颜色
     function getAdaptiveColor(color) {
         if (!color) return null;
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';

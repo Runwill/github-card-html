@@ -62,7 +62,6 @@
     <script src="function/animation/text_animation.js?v=202512070129"></script>
 
     <script src="function/button/utils.js?v=202512070129"></script>
-    <script src="function/button/pronoun.js?v=202512070129"></script>
     <script src="function/button/hide.js?v=202512070129"></script>
     <script src="function/button/replace.js?v=202512070129"></script>
     <script src="function/button/strength.js?v=202512070129"></script>
@@ -108,9 +107,16 @@
     <script src="game/scripts/ui/state.js"></script>
     <script src="game/scripts/ui/utils.js"></script>
     <script src="game/scripts/ui/term_manager.js"></script>
+    <script src="game/scripts/ui/text_renderer.js"></script>
+    <script src="game/data/text_templates.js"></script>
     <script src="game/scripts/ui/context_menu.js"></script>
-    <script src="game/scripts/ui/renderers.js"></script>
+    <!-- Renderers split modules -->
+    <script src="game/scripts/ui/renderers/card_renderer.js"></script>
+    <script src="game/scripts/ui/renderers/player_renderer.js"></script>
+    <script src="game/scripts/ui/renderers/control_renderer.js"></script>
+    <script src="game/scripts/ui/renderers/main_renderer.js"></script>
     <script src="game/scripts/ui/interactions.js"></script>
+    <script src="game/scripts/ui/setup_manager.js"></script>
     <script src="game/scripts/ui/main.js"></script>
     <script src="game/scripts/game_main.js"></script>
     <script src="function/ui/tooltip.js?v=202512070129"></script>

@@ -5,10 +5,10 @@
     const DragState = {
         isDragging: false,
         dragSource: null, // { data, sourceArea }
-        dragElement: null, // The actual card element being moved
-        placeholderElement: null, // Keeps the flow in the original list
+        dragElement: null, // 被移动的实际卡牌元素（克隆体）
+        placeholderElement: null, // 在原始列表中保持流动的元素（原始元素）
         
-        // Physics / Animation State
+        // 物理 / 动画状态
         currentX: 0,
         currentY: 0,
         targetX: 0,
@@ -16,7 +16,7 @@
         velocityX: 0,
         rafId: null,
 
-        // Offset to keep mouse relative position constant
+        // 保持鼠标相对位置恒定的偏移量
         initialX: 0,
         initialY: 0,
         offsetX: 0,
@@ -24,19 +24,19 @@
         
         currentDropZone: null,
         
-        // --- State Restoration ---
+        // --- 状态恢复 ---
         originalCssText: '',
-        originalClasses: '' // Optional, but good for safety
+        originalClasses: '' // 可选，但为了安全起见
     };
 
     const DRAG_CONFIG = {
-        lerpFactor: 0.25, // Higher = More responsive
+        lerpFactor: 0.25, // 越高 = 响应越快
         maxTilt: 12,      
         tiltFactor: 0.4,
-        swapAnimationDuration: 200 // ms
+        swapAnimationDuration: 200 // 毫秒
     };
 
-    // Store positions for FLIP animation
+    // 为 FLIP 动画存储位置
     const flipSnapshot = new Map();
 
     function initDrag(cardElement, cardData, sourceAreaName, sourceIndex = -1) {
@@ -53,54 +53,54 @@
         if (e.button !== 0 && e.pointerType === 'mouse') return;
 
         DragState.dragSource = { data, sourceArea, sourceIndex };
-        DragState.dragElement = el;
+        DragState.dragElement = el; // 暂存，startDrag 会处理克隆逻辑
         DragState.startX = e.clientX;
         DragState.startY = e.clientY;
         DragState.isDragging = false; 
 
-        // Initial capture to handle the very start, but we will delegate to document for the dragging
-        // This is important because once we move the element to Body, it might lose capture context in some browsers,
-        // or if pointer-events becomes none, it might stop firing.
+        // 初始捕获以处理刚开始的情况，但我们将委托 document 进行拖动
+        // 这一点很重要，因为一旦我们将元素移动到 Body，它可能会在某些浏览器中丢失捕获上下文，
+        // 或者如果 pointer-events 变为 none，它可能会停止触发。
         el.setPointerCapture(e.pointerId);
 
-        // Attach global listeners for robustness
+        // 附加全局监听器以增强鲁棒性
         document.addEventListener('pointermove', handlePointerMove);
         document.addEventListener('pointerup', handlePointerUp);
         document.addEventListener('pointercancel', handlePointerUp);
     }
 
     function startDrag(e) {
-        if (!DragState.dragElement) return; // Guard against null element
+        if (!DragState.dragElement) return; // 防止空元素
         DragState.isDragging = true;
         
-        // --- SAFE ELEMENT CAPTURE ---
-        // We clone the element for dragging instead of moving the original.
-        // This keeps the original DOM structure perfectly intact until the very moment of drop.
-        // It greatly simplifies style restoration (because we just delete the clone).
+        // --- 安全的元素捕获 ---
+        // 我们克隆元素进行拖动，而不是移动原始元素。
+        // 这可以在掉落的一刻之前完美保持原始 DOM 结构。
+        // 这极大地简化了样式恢复（因为我们要做的只是删除克隆体）。
         
         const originalEl = DragState.dragElement;
         const rect = originalEl.getBoundingClientRect();
         
-        // 1. Create Placeholder (Invisible) to maintain layout flow if we were to hide original
-        // But since we are Cloning, we can just style the original to be invisible?
-        // Let's stick to the pattern: Clone becomes the "Visual Drag", Original stays as "Placeholder".
+        // 1. 创建占位符（不可见）以维持布局流（如果我们隐藏原始元素）
+        // 但由于我们正在克隆，我们可以只是将原始元素样式设为不可见？
+        // 让我们坚持模式：克隆体变成“视觉拖拽对象”，原始体保留为“占位符”。
         
-        // Wait, Existing logic:
-        // 1. Create Placeholder -> Insert Before El
-        // 2. Move El to Body
+        // 等等，现有逻辑：
+        // 1. 创建占位符 -> 插入到 El 之前
+        // 2. 将 El 移动到 Body
         
-        // Proposed Logic:
-        // 1. Leave Original El exactly where it is. Just set visibility:hidden.
-        // 2. Create a "Drag Clone" and append to Body.
+        // 提议的逻辑：
+        // 1. 让原始元素完全保留在原位。只需设置 visibility:hidden。
+        // 2. 创建一个“拖拽克隆体”并追加到 Body。
         
-        // This solves "Start Position Mismatch" because we never mess with the DOM flow until the end.
-        // This solves "Restoration" because we just remove the clone and unhide the original.
+        // 这解决了“起始位置错配”，因为直到最后我们都不会弄乱 DOM 流。
+        // 这解决了“恢复”，因为我们只需删除克隆体并取消隐藏原始体。
         
         const dragClone = originalEl.cloneNode(true);
-        dragClone.id = ''; // Remove ID
+        dragClone.id = ''; // 移除 ID
         dragClone.classList.add('dragging-real'); 
         
-        // Copy computed styles to ensure clone looks identical
+        // 复制计算样式以确保克隆体看起来完全相同
         copyComputedStyles(originalEl, dragClone);
         
         dragClone.style.position = 'fixed';
@@ -109,7 +109,7 @@
         dragClone.style.height = rect.height + 'px';
         dragClone.style.margin = '0';
         
-        // Initial Position
+        // 初始位置
         DragState.initialX = rect.left;
         DragState.initialY = rect.top;
         DragState.offsetX = e.clientX - rect.left;
@@ -120,31 +120,31 @@
         
         document.body.appendChild(dragClone);
         
-        // Hide Original
+        // 隐藏原始体
         originalEl.style.visibility = 'hidden';
         
-        // Update State to track Clone
-        DragState.dragClone = dragClone; // New property
-        DragState.originalEl = originalEl;   // Keep track of real one
-        // DragState.dragElement is now ambiguous in old code. 
-        // Let's refactor DragState to distinguish.
-        // BUT to minimize code changes, let's swap them?
-        // No, 'dragElement' is used everywhere. Let's make 'dragElement' point to the CLONE.
-        // And 'placeholderElement' point to the ORIGINAL.
+        // 更新状态以追踪克隆体
+        DragState.dragClone = dragClone; // 新属性
+        DragState.originalEl = originalEl;   // 追踪真实的那个
+        // DragState.dragElement 在旧代码中是模棱两可的。
+        // 让我们重构 DragState 以进行区分。
+        // 但是为了最小化代码更改，还是交换它们？
+        // 不，'dragElement' 到处都在用。让 'dragElement' 指向克隆体。
+        // 并且 'placeholderElement' 指向原始体。
         
-        DragState.placeholderElement = originalEl; // The original acts as placeholder!
-        DragState.dragElement = dragClone;         // The clone acts as the moving part
+        DragState.placeholderElement = originalEl; // 原始体充当占位符！
+        DragState.dragElement = dragClone;         // 克隆体充当移动部件
         
-        // Note: Old 'placeholderElement' was a newly created div. 
-        // Now 'placeholderElement' is the actual original DOM node.
-        // But wait, the old logic MOVED the placeholder around for reordering.
-        // If we move 'originalEl' around, we are reordering the DOM live. That's fine.
-        // Just need to ensure 'originalEl' has the 'drag-placeholder' class?
+        // 注意：旧的 'placeholderElement' 是一个新创建的 div。
+        // 现在 'placeholderElement' 是实际的原始 DOM 节点。
+        // 但是等等，旧逻辑移动了占位符以进行重新排序。
+        // 如果这里移动 'originalEl'，我们就是在实时重新排序 DOM。这没问题。
+        // 只需要确保 'originalEl' 拥有 'drag-placeholder' 类？
         
-        DragState.placeholderElement.classList.add('drag-placeholder'); // Add placeholder style
+        DragState.placeholderElement.classList.add('drag-placeholder'); // 添加占位符样式
         
-        // --- CALIBRATION FIX ---
-        // Check if clone landed correctly
+        // --- 较准修复 ---
+        // 检查克隆体是否正确着陆
         const calibrationRect = dragClone.getBoundingClientRect();
         const driftX = calibrationRect.left - rect.left;
         const driftY = calibrationRect.top - rect.top;
@@ -156,9 +156,9 @@
         
         // ------------------------------------
         
-        // 3. Initialize Physics State
-        DragState.currentX = 0; // Translation X
-        DragState.currentY = 0; // Translation Y
+        // 3. 初始化物理状态
+        DragState.currentX = 0; // 平移 X
+        DragState.currentY = 0; // 平移 Y
 
         DragState.targetX = 0;
         DragState.targetY = 0;
@@ -172,24 +172,24 @@
         const render = () => {
             if (!DragState.isDragging || !DragState.dragElement) return;
 
-            // Lerp current translation to target translation
+            // 插值当前平移到目标平移
             const dx = DragState.targetX - DragState.currentX;
             const dy = DragState.targetY - DragState.currentY;
             
-            // Apply easing
+            // 应用缓动
             DragState.currentX += dx * DRAG_CONFIG.lerpFactor;
             DragState.currentY += dy * DRAG_CONFIG.lerpFactor;
             
-            // Calculate velocity for tilt effect
+            // 计算速度以用于倾斜效果
             DragState.velocityX = dx * DRAG_CONFIG.lerpFactor;
-            // DragState.velocityX could be non-zero at end, ensure we don't have residual tilt when "dropping"?
-            // Actually in animateDropToPlaceholder we decay rotation to 0.
+            // DragState.velocityX 在结束时可能非零，确保我们在“放下”时没有残留倾斜？
+            // 实际上在 animateDropToPlaceholder 中我们将旋转衰减为 0。
             
             const tilt = Math.max(Math.min(DragState.velocityX * DRAG_CONFIG.tiltFactor, DRAG_CONFIG.maxTilt), -DRAG_CONFIG.maxTilt);
             
             if (DragState.dragElement) {
-                // Ensure we use translate3d or consistent pixel snapping? 
-                // Browser subpixel rendering might be factor.
+                // 确保我们使用 translate3d 或一致的像素捕捉？
+                // 浏览器亚像素渲染可能是一个因素。
                 DragState.dragElement.style.transform = `translate(${DragState.currentX}px, ${DragState.currentY}px) rotate(${tilt}deg)`;
             }
 
@@ -198,9 +198,9 @@
         DragState.rafId = requestAnimationFrame(render);
     }
     
-    // Helper to get true offset of body 
+    // 获取 body 真实偏移的辅助函数
     function getBodyOffset() {
-         // If body has margin/padding that affects fixed elements (unlikely but possible in some frameworks)
+         // 如果 body 有影响固定元素的 margin/padding（不太可能但在某些框架中可能）
          const style = window.getComputedStyle(document.body);
          return {
              marginLeft: parseFloat(style.marginLeft) || 0,
@@ -219,11 +219,11 @@
 
         e.preventDefault();
         
-        // ... (existing physics code) ...
+        // ... (现有物理代码) ...
         
-        // Target Position
-        const targetRect = DragState.placeholderElement.getBoundingClientRect(); // Using placeholder NOT dragElement
-        // Actually targetX/Y logic is for 'dragElement' visual
+        // 目标位置
+        // 使用占位符而不是 dragElement
+        // 实际上 targetX/Y 逻辑是用于 'dragElement' 视觉效果的
         
         const outcomeX = e.clientX - DragState.offsetX;
         const outcomeY = e.clientY - DragState.offsetY;
@@ -233,12 +233,12 @@
         
         // ...
         
-        // Ensure pointer events pass through
+        // 确保指针事件穿透
         if (DragState.dragElement && DragState.dragElement.style.pointerEvents !== 'none') {
             DragState.dragElement.style.pointerEvents = 'none';
         }
 
-        // Detection of Drop Zone
+        // 检测放置区
         const targetEl = document.elementFromPoint(e.clientX, e.clientY);
         const dropZone = targetEl ? targetEl.closest('[data-drop-zone]') : null;
              
@@ -248,19 +248,19 @@
             DragState.currentDropZone = dropZone;
         }
 
-        // Live Reordering Logic
-        if (dropZone) { // Even if no placeholderElement yet? Oh it exists from startDrag.
+        // 实时重新排序逻辑
+        if (dropZone) { // 即使没有 placeholderElement？噢，它从 startDrag 就存在。
              updatePlaceholderPosition(dropZone, targetEl, e.clientX, e.clientY);
         }
     }
 
     function updatePlaceholderPosition(dropZone, targetEl, mouseX, mouseY) {
-        // Find the card we are hovering over
+        // 找到我们悬停其上的卡牌
         const hoverCard = targetEl ? targetEl.closest('.card-placeholder:not(.drag-placeholder)') : null;
         
-        // --- FLIP Animation: Pre-calculation ---
-        // Snapshot positions of all siblings in the dropZone BEFORE move. 
-        // We also need to include siblings from the OLD zone if we are moving the placeholder out of it.
+        // --- FLIP 动画：预计算 ---
+        // 在移动之前快照 dropZone 中所有兄弟节点的位置。
+        // 如果我们要将占位符移出旧区域，我们还需要包含旧区域的兄弟节点。
         let siblings = Array.from(dropZone.children).filter(c => 
             c !== DragState.placeholderElement && 
             c.classList.contains('card-placeholder')
@@ -275,50 +275,50 @@
              siblings = siblings.concat(oldSiblings);
         }
         
-        // Snapshot only if we haven't for this frame/action? 
-        // No, we need to snapshot right before DOM change.
-        // But doing this every mousemove is expensive.
-        // We should only do it IF we are about to move.
+        // 仅在这一帧/动作未快照时快照？
+        // 不，我们需要在 DOM 更改前快照。
+        // 但每次 mousemove 都这样做很昂贵。
+        // 我们应该只在我们将要移动时才这样做。
         
         let shouldMove = false;
         let moveTarget = null;
-        let movePosition = ''; // 'before' or 'after' or 'append'
+        let movePosition = ''; // 'before' 或 'after' 或 'append'
 
         if (hoverCard && hoverCard.parentNode === dropZone) {
             const rect = hoverCard.getBoundingClientRect();
-            // Directional logic (Grid support?)
-            // Simple X-axis for now, or X+Y if flex-wrap
-            // If rows differ, Y matters.
+            // 方向逻辑（支持网格？）
+            // 暂时简单的 X 轴，如果 flex-wrap 则 X+Y
+            // 如果行不同，Y 很重要。
             
-            // Check if same row
+            // 检查是否同一行
             // const placeholderRect = DragState.placeholderElement.getBoundingClientRect();
-            // But placeholder is visibility hidden in 'Clone Mode', but it TAKES SPACE.
-            // So we can use its rect usually.
+            // 但占位符在“克隆模式”下是 visibility hidden，但它占据空间。
+            // 所以我们可以通过使用它的 rect。
             
-            // Revert to simple mid-point logic
+            // 回退到简单的中点逻辑
             const midX = rect.left + rect.width / 2;
             const midY = rect.top + rect.height / 2;
             
-            // Very simple grid logic:
-            // If we are overlapping significantly?
+            // 非常简单的网格逻辑：
+            // 如果我们重叠显著？
             
-            // Use insertion sort style:
-            // If before midX/midY -> insertBefore
-            // If after -> insertAfter
+            // 使用插入排序样式：
+            // 如果在 midX/midY 之前 -> insertBefore
+            // 如果之后 -> insertAfter
             
-            // Let's stick to X for simple lists, check Y for multiline?
-            // Assuming flex-wrap:
-            // If mouseY is clearly in a different row?
+            // 对于简单列表坚持 X，对于多行检查 Y？
+            // 假设 flex-wrap：
+            // 如果 mouseY 明显在不同行？
             
-            // Simplified: Just use simple index check relative to hoverCard
+            // 简化：仅使用相对于 hoverCard 的简单索引检查
             const isAfter = (mouseX > midX) && (Math.abs(mouseY - midY) < rect.height/2);
-            // Or just 'isAfter' based on document order flow? 
-            // In a wrapped flex, 'after' visually means right (or next row).
+            // 或者仅仅基于文档流顺序的 'isAfter'？
+            // 在换行 flex 中，'after' 视觉上意味着右边（或下一行）。
             
             if (isAfter || (mouseY > rect.bottom)) {
                  if (DragState.placeholderElement.previousElementSibling !== hoverCard) {
                      shouldMove = true;
-                     moveTarget = hoverCard.nextSibling; // Insert before next sibling (i.e. after hover)
+                     moveTarget = hoverCard.nextSibling; // 插入到下一个兄弟之前（即 hover 之后）
                      movePosition = 'insertBefore';
                  }
             } else {
@@ -330,17 +330,17 @@
             }
         } 
         else if (targetEl === dropZone) {
-            // Container hover
+            // 容器悬停
              const lastChild = dropZone.lastElementChild;
-             // If last child is not placeholder, and we are past it?
+             // 如果最后一个子项不是占位符，且我们超过了它？
              if (!lastChild || (lastChild === DragState.placeholderElement && dropZone.children.length === 1)) {
-                 // Empty or just self
+                 // 空或只有自己
                  if (DragState.placeholderElement.parentNode !== dropZone) {
                      shouldMove = true;
                      movePosition = 'append';
                  }
              } else {
-                 // Check if we should append to end
+                 // 检查是否应该追加到末尾
                  const lastRect = lastChild.getBoundingClientRect();
                  if (mouseX > lastRect.right || mouseY > lastRect.bottom) {
                      if (lastChild !== DragState.placeholderElement) {
@@ -352,29 +352,29 @@
         }
 
         if (shouldMove) {
-            // --- FLIP: First (Snapshot) ---
+            // --- FLIP: 第一步 (快照) ---
             siblings.forEach(el => {
                 const r = el.getBoundingClientRect();
                 flipSnapshot.set(el, { left: r.left, top: r.top });
             });
 
-            // --- Action ---
-            // If we move placeholder, we must ensure drag-over class persists on the correct dropZone
+            // --- 动作 ---
+            // 如果我们移动占位符，必须确保 drag-over 类保留在正确的 dropZone 上
             if (DragState.placeholderElement.parentNode !== dropZone) {
-                // Moving between zones
+                // 在区域间移动
                 if (movePosition === 'append') dropZone.appendChild(DragState.placeholderElement);
                 else dropZone.insertBefore(DragState.placeholderElement, moveTarget);
                 
-                // Update drag-over state logic
-                // Previous zone cleanup? handlePointerMove does it by checking currentDropZone.
+                // 更新 drag-over 状态逻辑
+                // 上一个区域清理？handlePointerMove 通过检查 currentDropZone 来做。
             } else {
-                // Same zone reorder
+                // 同区域重新排序
                 if (movePosition === 'append') dropZone.appendChild(DragState.placeholderElement);
                 else dropZone.insertBefore(DragState.placeholderElement, moveTarget);
             }
 
-            // --- FLIP: Last (Invert & Play) ---
-            // Force layout update implicitly by reading rects
+            // --- FLIP: 最后一步 (反转 & 播放) ---
+            // 通过读取 rects 隐式强制布局更新
             requestAnimationFrame(() => {
                 siblings.forEach(el => {
                     const oldPos = flipSnapshot.get(el);
@@ -385,16 +385,16 @@
                     const dy = oldPos.top - newRect.top;
                     
                     if (dx !== 0 || dy !== 0) {
-                        // Invert
+                        // 反转
                         el.style.transform = `translate(${dx}px, ${dy}px)`;
                         el.style.transition = 'none';
                         
-                        // Play
+                        // 播放
                         requestAnimationFrame(() => {
                             el.style.transform = '';
                             el.style.transition = `transform ${DRAG_CONFIG.swapAnimationDuration}ms cubic-bezier(0.2, 0, 0, 1)`;
                             
-                            // Clean up transition after done
+                            // 完成后清理 transition
                             const handler = () => {
                                 el.style.transition = '';
                                 el.removeEventListener('transitionend', handler);
@@ -403,7 +403,7 @@
                         });
                     }
                 });
-                flipSnapshot.clear(); // Clean up
+                flipSnapshot.clear(); // 清理
             });
         }
     }
@@ -422,7 +422,7 @@
             DragState.currentDropZone = null;
         }
 
-        // Clean up placeholder if orphan
+        // 清理占位符（如果孤立）
         if (DragState.placeholderElement) {
             if(DragState.placeholderElement.parentNode) {
                 DragState.placeholderElement.parentNode.removeChild(DragState.placeholderElement);
@@ -430,8 +430,8 @@
             DragState.placeholderElement = null;
         }
         
-        // Clean up real element if needed (usually handled by finish or cancel logic)
-        // If dragElement is still attached to body, it means we failed/cancelled poorly
+        // 如果需要，清理真实元素（通常由 finish 或 cancel 逻辑处理）
+        // 如果 dragElement 仍然附加在 body 上，说明我们失败/取消得很糟糕
         if (DragState.dragElement && DragState.dragElement.parentNode === document.body) {
              DragState.dragElement.remove();
         }
@@ -444,37 +444,37 @@
     function cancelDrag(e) {
         const el = DragState.dragElement;
         
-        // Remove global listeners
+        // 移除全局监听器
         document.removeEventListener('pointermove', handlePointerMove);
         document.removeEventListener('pointerup', handlePointerUp);
         document.removeEventListener('pointercancel', handlePointerUp);
 
         if (el) {
             try { el.releasePointerCapture(e.pointerId); } catch(err){}
-            // Cleanup local listeners just in case
+            // 清理本地监听器以防万一
             el.removeEventListener('pointermove', handlePointerMove);
             el.removeEventListener('pointerup', handlePointerUp);
             el.removeEventListener('pointercancel', handlePointerUp);
             
-            // Revert logic
+            // 恢复逻辑
             if (el.parentNode === document.body && DragState.placeholderElement && DragState.placeholderElement.parentNode) {
-                 // Snap back visually could happen here, but for now instant revert
+                 // 视觉回弹可能发生在这里，但暂时立即恢复
                  resetStyles(el);
                  
-                 // Put back in place
+                 // 放回原位
                  DragState.placeholderElement.parentNode.insertBefore(el, DragState.placeholderElement);
                  DragState.placeholderElement.remove();
                  DragState.placeholderElement = null;
             } else if (el.parentNode === document.body) {
-                // If placeholder is gone (weird), just kill it
+                // 如果占位符消失（奇怪），直接干掉它
                 el.remove();
             } else {
-                // Was never moved to body (click only)
+                // 从未移动到 body（仅点击）
                 el.classList.remove('draggable-item'); 
             }
         }
         
-        // Reset state
+        // 重置状态
         DragState.currentDropZone?.classList.remove('drag-over');
         DragState.currentDropZone = null;
         DragState.dragElement = null;
@@ -483,10 +483,10 @@
     }
 
     function finishDrag(e) {
-        const el = DragState.dragElement; // CLONE
-        const placeholder = DragState.placeholderElement; // ORIGINAL
+        const el = DragState.dragElement; // 克隆体
+        const placeholder = DragState.placeholderElement; // 原始体
         
-        // Remove global listeners
+        // 移除全局监听器
         document.removeEventListener('pointermove', handlePointerMove);
         document.removeEventListener('pointerup', handlePointerUp);
         document.removeEventListener('pointercancel', handlePointerUp);
@@ -504,12 +504,12 @@
         if (dropZone && dropZone.getAttribute('data-drop-zone')) {
             const targetZoneId = dropZone.getAttribute('data-drop-zone');
             
-            // Calculate Index based on Placeholder Position
-            // Filter siblings properly
+            // 基于占位符位置计算索引
+            // 正确过滤兄弟节点
             const siblings = Array.from(dropZone.children).filter(c => c.classList.contains('card-placeholder') && c !== placeholder);
              
             const nextSibling = placeholder.nextElementSibling;
-            let targetIndex = siblings.length; // Default to end
+            let targetIndex = siblings.length; // 默认到末尾
             
             if (nextSibling) {
                 const idx = siblings.indexOf(nextSibling);
@@ -540,32 +540,32 @@
     }
 
     function animateDropToPlaceholder(el, placeholder, onComplete) {
-        // ... (existing params)
-        // Adapt 'el' as Clone, 'placeholder' as Original.
-        // We animate Clone to Original.
-        // targetRect moved to loop for dynamic updates
+        // ... (现有参数)
+        // 适配 'el' 为克隆体，'placeholder' 为原始体。
+        // 我们将克隆体动画化到原始体。
+        // targetRect 移至循环以进行动态更新
         
-        // ... (existing vars)
-        // Current State (CSS values)
+        // ... (现有变量)
+        // 当前状态 (CSS 值)
         let cssX = DragState.currentX;
         let cssY = DragState.currentY;
         let cssW = parseFloat(el.style.width) || el.getBoundingClientRect().width;
         let cssH = parseFloat(el.style.height) || el.getBoundingClientRect().height;
         
-        // Extract current rotation
+        // 提取当前旋转
         let curRot = 0;
         const rotMatch = el.style.transform.match(/rotate\(([-\d.]+)deg\)/);
         if (rotMatch) curRot = parseFloat(rotMatch[1]);
 
-        // Ensure no CSS transition interferes
+        // 确保没有 CSS transition 干扰
         el.style.transformOrigin = 'center center'; 
         el.style.transition = 'none'; 
 
         const loop = () => {
-            if (!el.isConnected) return; // Dropped or removed externally
+            if (!el.isConnected) return; // 外部已丢弃或移除
 
-            // --- ROBUST VISUAL CONVERGENCE (Same as before) ---
-            // Recalculate target position each frame to handle layout shifts
+            // --- 鲁棒的视觉收敛 (同前) ---
+            // 每帧重新计算目标位置以处理布局偏移
             const targetRect = placeholder.getBoundingClientRect();
             const currentRect = el.getBoundingClientRect();
             
@@ -592,11 +592,11 @@
                 Math.abs(deltaH) < 1.0 &&
                 Math.abs(curRot) < 0.5
             ) {
-                // Finalize:
-                // 1. Remove Clone
+                // 完成:
+                // 1. 移除克隆体
                 el.remove();
                 
-                // 2. Show Original
+                // 2. 显示原始体
                 placeholder.style.visibility = '';
                 placeholder.classList.remove('drag-placeholder');
                 
@@ -608,12 +608,7 @@
         requestAnimationFrame(loop);
     }
     
-    // --- Compatibility Reset (No-Op usually) ---
-    function resetStyles(target) {
-        // Just empty to prevent crashes if called
-    }
-
-    // --- Style Helpers ---
+    // --- 样式辅助函数 ---
     function copyComputedStyles(source, target) {
         const computed = window.getComputedStyle(source);
         const properties = [
@@ -624,24 +619,25 @@
         target.style.boxSizing = 'border-box';
     }
 
+    // 重置样式的回退
     function resetStyles(target) {
         if (!target) return;
         
-        console.log("[DragDebug] Resetting Styles. Target same as DragEl?", target === DragState.dragElement);
-        console.log("[DragDebug] Restoring CSS:", DragState.originalCssText);
+        console.log("[DragDebug] 重置样式。目标与 DragEl 相同？", target === DragState.dragElement);
+        console.log("[DragDebug] 恢复 CSS:", DragState.originalCssText);
 
-        // --- RESTORE SNAPSHOT ---
+        // --- 恢复快照 ---
         if (target === DragState.dragElement && DragState.originalCssText !== undefined) {
              target.style.cssText = DragState.originalCssText;
         } else {
-             // Fallback for manual cleanup if confused
+             // 如果困惑，手动清理的回退
              target.style.cssText = ''; 
         }
         // ------------------------
 
         target.classList.remove('dragging-real');
-        // Ensure pointer events are restored if they weren't in inline style
-        // target.style.pointerEvents = ''; // cssText handles this if it was empty
+        // 确保 pointer events 被恢复（如果未在 inline style 中）
+        // target.style.pointerEvents = ''; // cssText 处理它（如果是空的）
     }
 
     window.Game.UI.Interactions = {

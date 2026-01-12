@@ -2,7 +2,7 @@
     window.Game = window.Game || {};
 
     // --- Game Flow Definitions ---
-    // Node Types: 'process' (container), 'tick' (leaf timing)
+    // Node Types: 'process' (container), 'ticking' (semantic duration), 'tick' (leaf timing)
     
     const createStageProcess = (stageName) => {
         const capName = stageName.charAt(0).toUpperCase() + stageName.slice(1);
@@ -12,7 +12,7 @@
             children: [
                 { type: 'tick', name: `before${capName}StageStart` },
                 {
-                    type: 'process',
+                    type: 'ticking', // Changed from 'process' to 'ticking'
                     name: `${stageName}Stage`,
                     children: [
                         { type: 'tick', name: `when${capName}StageStart` },
@@ -31,7 +31,7 @@
         children: [
             { type: 'tick', name: 'beforeTurnStart' },
             {
-                type: 'process',
+                type: 'ticking', // Changed from 'process' to 'ticking'
                 name: 'Turn',
                 children: [
                     { type: 'tick', name: 'whenTurnStart' },

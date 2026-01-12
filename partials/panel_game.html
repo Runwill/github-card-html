@@ -9,10 +9,40 @@
         <!-- Independent Control Panel -->
         <div class="game-panel game-action-panel">
             <div id="game-controls">
-                <button class="btn btn--primary" id="btn-start-game" data-i18n="game.start">Start Game</button>
+                <button class="btn btn--primary" id="btn-show-setup" data-i18n="game.setup">Game Setup</button>
+                <button class="btn btn--primary hidden" id="btn-start-game" data-i18n="game.start">Start Game</button>
                 <button class="btn btn--secondary hidden" id="btn-pause-game" data-i18n="game.pause">Pause</button>
+                
+                <div class="speed-control-group" id="speed-control-group" style="display: inline-flex; align-items: center; margin-left: 10px;">
+                    <input type="range" id="game-speed-range" min="10" max="1000" step="10" value="50" style="width: 100px; vertical-align: middle;">
+                    <span id="game-speed-val" style="margin-left: 5px; font-size: 0.8rem; width: 40px;">50ms</span>
+                </div>
+
                 <button class="btn btn--success hidden" id="btn-play-card" data-i18n="game.playCard">Play Card</button>
                 <button class="btn btn--danger hidden" id="btn-end-turn" data-i18n="game.endTurn">End Turn</button>
+            </div>
+        </div>
+
+        <!-- Setup Panel -->
+        <div id="game-setup-ui" class="game-panel hidden" style="border: 1px solid #444; padding: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.5);">
+            <div class="row">
+                 <div class="input-group">
+                    <span class="input-group-label" data-i18n="game.setup.playerCount">Player Count</span>
+                    <select id="setup-player-count-select" class="input-group-field" style="width: auto;">
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4" selected>4</option>
+                        <option value="5">5</option>
+                        <option value="8">8</option>
+                    </select>
+                 </div>
+            </div>
+            <div id="setup-players-list">
+                <!-- Dynamic Inputs -->
+            </div>
+            <div class="text-center" style="margin-top: 15px;">
+                <button id="btn-confirm-setup" class="btn btn--success" data-i18n="game.setup.start">Start Game</button>
+                <button id="btn-cancel-setup" class="btn btn--secondary" data-i18n="common.cancel">Cancel</button>
             </div>
         </div>
 

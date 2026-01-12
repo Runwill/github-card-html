@@ -2,253 +2,101 @@
     window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
-    // Mapping of Event Name to its display parts (based on panel_term.html structure)
-    const termStructure = {
-        // Basic Events
-        'recover': ['recoverBody'],
-        'loss': ['lossBody'],
-        'cure': ['cureEnd'],
-        'damage': ['damageEnd'],
-        'dying': ['dyingEnd'],
-        'die': ['dieEnd'],
-        'use': ['useBody'],
-        'play': ['playBody'],
-        'discard': ['discardBody'],
-        'face': ['faceBody'],
-        'back': ['backBody'],
-        'draw': ['drawHead', 'drawEnd'],
-        'move': ['moveBody0'],
+    let cachedData = null; // 存储用于重新着色的数据
 
-        // Timings - Recover
-        'beforeRecover': ['recoverBody', 'beforeEnd'],
-        'whenRecover': ['recoverBody', 'whenEnd'],
-        'afterRecover': ['recoverBody', 'afterEnd'],
+    // 撤销 term manager 中的 HTML 生成。
+    // 相反，我们提供数据访问助手，以便渲染器可以直接构建 DOM 元素。
 
-        // Timings - Damage
-        'beforeDamage': ['dealtBody', 'damageEnd', 'beforeEnd'],
-        'beforeDamaged': ['takeBody', 'damageEnd', 'beforeEnd'],
-        'whenDamage': ['dealtBody', 'damageEnd', 'whenEnd'],
-        'whenDamaged': ['takeBody', 'damageEnd', 'whenEnd'],
-        'afterDamage': ['dealtBody', 'damageEnd', 'afterEnd'],
-        'afterDamaged': ['takeBody', 'damageEnd', 'afterEnd'],
-
-        // Timings - Use
-        'beforeUse': ['useBody', 'beforeEnd'],
-        'beforeUsed': ['passive', 'useBody', 'beforeEnd'],
-        'whenUse': ['useBody', 'whenEnd'],
-        'whenUsed': ['passive', 'useBody', 'whenEnd'],
-        'afterUse': ['useBody', 'afterEnd'],
-        'afterUsed': ['passive', 'useBody', 'afterEnd'],
-
-        // Timings - Play
-        'beforePlay': ['playBody', 'beforeEnd'],
-        'beforePlayed': ['passive', 'playBody', 'beforeEnd'],
-        'whenPlay': ['playBody', 'whenEnd'],
-        'whenPlayed': ['passive', 'playBody', 'whenEnd'],
-        'afterPlay': ['playBody', 'afterEnd'],
-        'afterPlayed': ['passive', 'playBody', 'afterEnd'],
-
-        // Timings - Discard
-        'beforeDiscard': ['discardBody', 'beforeEnd'],
-        'whenDiscard': ['discardBody', 'whenEnd'],
-        'afterDiscard': ['discardBody', 'afterEnd'],
-
-        // Timings - Dying
-        'beforeDying': ['dyingEnd', 'beforeEnd'],
-        'whenDying': ['dyingEnd', 'whenEnd'],
-        'afterDying': ['dyingEnd', 'afterEnd'],
-
-        // Timings - Die
-        'beforeDie': ['dieEnd', 'beforeEnd'],
-        'whenDie': ['dieEnd', 'whenEnd'],
-        'afterDie': ['dieEnd', 'afterEnd'],
-
-        // Timings - Draw
-        'beforeDraw': ['drawHead', 'drawEnd', 'beforeEnd'],
-        'whenDraw': ['drawHead', 'drawEnd', 'whenEnd'],
-        'afterDraw': ['drawHead', 'drawEnd', 'afterEnd'],
-
-        // Timings - Move
-        'beforeMove': ['moveBody0', 'beforeEnd'],
-        'whenMove': ['moveBody0', 'whenEnd'],
-        'afterMove': ['moveBody0', 'afterEnd'],
-
-        // Timings - Cure
-        'beforeCure': ['dealtBody', 'cureEnd', 'beforeEnd'],
-        'beforeCured': ['takeBody', 'cureEnd', 'beforeEnd'],
-        'whenCure': ['dealtBody', 'cureEnd', 'whenEnd'],
-        'whenCured': ['takeBody', 'cureEnd', 'whenEnd'],
-        'afterCure': ['dealtBody', 'cureEnd', 'afterEnd'],
-        'afterCured': ['takeBody', 'cureEnd', 'afterEnd'],
-
-        // Timings - Loss
-        'beforeLoss': ['lossBody', 'beforeEnd'],
-        'whenLoss': ['lossBody', 'whenEnd'],
-        'afterLoss': ['lossBody', 'afterEnd']
-    };
-
-    function injectTerm(key, val) {
-        if (!window.I18N_STRINGS || !window.I18N_STRINGS.zh) return;
+    function getTermData(key) {
+        if (!cachedData) return null;
         
-        // 1. Process/Event Names
-        window.I18N_STRINGS.zh[`game.process.${key}`] = val;
+        // 1. 直接匹配
+        if (cachedData[key]) return cachedData[key];
         
-        // PascalCase
-        const pascalKey = key.charAt(0).toUpperCase() + key.slice(1);
-        if (pascalKey !== key) {
-            window.I18N_STRINGS.zh[`game.process.${pascalKey}`] = val;
+        // 2. 不区分大小写的搜索
+        const lowerKey = key.toLowerCase();
+        for (let k in cachedData) {
+            if (k.toLowerCase() === lowerKey) return cachedData[k];
         }
 
-        // 2. Timings
-        if (/^(before|when|after)/.test(key)) {
-            window.I18N_STRINGS.zh[`game.timing.${key}`] = val;
+        // 3. 在部件内部搜索（如果有）
+        for (let k in cachedData) {
+            const item = cachedData[k];
+            if (item.partMap) {
+               if (item.partMap[key]) return item.partMap[key];
+               // 部件小写检查
+               for(let pKey in item.partMap) {
+                   if(pKey.toLowerCase() === lowerKey) return item.partMap[pKey];
+               }
+            }
         }
+        return null;
+    }
 
-        // 3. Areas (Special case for known areas)
-        if (['treatmentArea', 'hand', 'equipArea', 'judgeArea', 'discardPile', 'drawPile'].includes(key)) {
-            window.I18N_STRINGS.zh[`game.area.${key}`] = val;
-        }
-
-        // 4. Cards (Basic & Scrolls & Equips)
-        // Add known card keys here to categorize them correctly
-        const knownCards = [
-            'Slash', 'Dodge', 'Peach', 'Wine', 'Duel', 
-            'FireSlash', 'ThunderSlash', 'Analeptic', // Variants
-            'SavageAssault', 'ArcheryAttack', 'AmazingGrace', 'Godsalvation', // Scrolls
-            'Lightning', 'Indulgence', 'SupplyShortage', // Delayed Scrolls
-            'QingLongBlade', 'SerpentSpear', 'EightTrigrams', 'RenWangShield' // Equips
-        ];
-        if (knownCards.includes(key) || knownCards.includes(pascalKey)) {
-            window.I18N_STRINGS.zh[`game.card.${key}`] = val;
-            window.I18N_STRINGS.zh[`game.card.${pascalKey}`] = val; // Support both cases
+    // 只保留颜色加载和数据缓存功能
+    function populateTerms(data) {
+        window.Game.UI.termColors = window.Game.UI.termColors || new Map();
+        
+        // 1. 加载颜色
+        for (let key in data) {
+            const item = data[key];
+            if (item.en && item.color) window.Game.UI.termColors.set(item.en, item.color);
+            if (item.part && Array.isArray(item.part)) {
+                item.partMap = {};
+                item.part.forEach(p => {
+                    if (p.en) {
+                        item.partMap[p.en] = p;
+                        if (p.color || item.color) window.Game.UI.termColors.set(p.en, p.color || item.color);
+                    }
+                });
+            } else if (item.part) { // 遗留对象支持
+                 item.partMap = item.part;
+                 for(let pKey in item.part){
+                     const p = item.part[pKey];
+                     if(p.en) {
+                         if (p.color || item.color) window.Game.UI.termColors.set(p.en, p.color || item.color);
+                     }
+                 }
+            }
         }
     }
 
-    function createTermHtml(text, key, color) {
-        // Use CSS variable to store color, apply it only in specific contexts via CSS
-        const style = color ? ` style="--term-color:${color}"` : '';
-        return `<span class="term-click" data-term="${key}"${style}>${text}</span>`;
+    function refreshTerms() {
+         if (!cachedData) return;
+         populateTerms(cachedData);
+         if (window.Game.UI.updateUI) window.Game.UI.updateUI();
     }
 
     function loadTermColors() {
         if (!window.endpoints || !window.fetchJsonCached) return;
         
-        const load = (url) => {
-            window.fetchJsonCached(url).then(data => {
-                // Store all available parts for cross-referencing
-                const globalParts = new Map();
+        Promise.all([
+            window.fetchJsonCached(window.endpoints.termDynamic()),
+            window.fetchJsonCached(window.endpoints.termFixed())
+        ]).then(([dyn, fixed]) => {
+            cachedData = { ...dyn, ...fixed };
+            populateTerms(cachedData);
+            
+            // 暴露数据供其他模块使用 (例如 GameText 可能需要查询)
+            window.Game.UI.termData = cachedData;
 
-                // First pass: Process raw data and populate globalParts AND Colors (moved up)
-                for (let key in data) {
-                    const item = data[key];
-                    
-                    // 1. Load Colors (Immediate)
-                    if (item.en && item.color) {
-                        window.Game.UI.termColors.set(item.en, item.color);
-                    }
-
-                    if (item.part && Array.isArray(item.part)) {
-                        item.partMap = {};
-                        item.part.forEach(p => {
-                            if (p.en) {
-                                item.partMap[p.en] = p;
-                                globalParts.set(p.en, p);
-                                // Load Part Colors
-                                if (p.color || item.color) {
-                                    window.Game.UI.termColors.set(p.en, p.color || item.color);
-                                }
-                            }
-                        });
-                    } else if (item.part) {
-                        // Handle case where part might be an object (legacy/different format)
-                        item.partMap = item.part;
-                        for (let pKey in item.part) {
-                            const p = item.part[pKey];
-                            if (p.en) {
-                                globalParts.set(p.en, p);
-                                // Load Part Colors
-                                if (p.color || item.color) {
-                                    window.Game.UI.termColors.set(p.en, p.color || item.color);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Second pass: Generate translations
-                const processedKeys = new Set();
-
-                // 1. Process explicit structure definitions (Priority)
-                for (let key in termStructure) {
-                    const partsList = termStructure[key];
-                    
-                    // Try to construct from global parts
-                    const partHtmls = partsList.map(pKey => {
-                        const p = globalParts.get(pKey);
-                        if (!p) return '';
-                        const val = p.replace || p.cn || '';
-                        const color = window.Game.UI.termColors.get(pKey);
-                        return createTermHtml(val, pKey, color);
-                    });
-
-                    // Check if we have valid parts (at least one non-empty)
-                    if (partHtmls.some(t => t)) {
-                        const val = partHtmls.join('');
-                        injectTerm(key, val);
-                        processedKeys.add(key);
-                    }
-                }
-
-                // 2. Process remaining items from data
-                for (let key in data) {
-                    const item = data[key];
-                    
-                    // 2. Load Translations
-                    if (!processedKeys.has(item.en) && window.I18N_STRINGS && window.I18N_STRINGS.zh) {
-                        let val = item.replace || item.cn;
-                        if (item.en && val) {
-                            const color = window.Game.UI.termColors.get(item.en);
-                            injectTerm(item.en, createTermHtml(val, item.en, color));
-                        }
-                    }
-
-                    // 3. Load Part Translations
-                    if (item.partMap) {
-                        for (let pKey in item.partMap) {
-                            const part = item.partMap[pKey];
-                            // Inject part translation if available and not complex
-                            if (part.en && (part.cn || part.replace)) {
-                                const pVal = part.replace || part.cn;
-                                const color = window.Game.UI.termColors.get(part.en);
-                                injectTerm(part.en, createTermHtml(pVal, part.en, color));
-                            }
-                        }
-                    }
-                }
-                
-                if (window.Game.Core && window.Game.Core.GameState.isGameRunning && window.Game.UI.updateUI) {
-                    window.Game.UI.updateUI();
-                }
-            }).catch(e => console.error("Failed to load colors/terms", e));
-        };
-
-        load(window.endpoints.termDynamic());
-        load(window.endpoints.termFixed());
+            if (window.Game.Core && window.Game.Core.GameState.isGameRunning && window.Game.UI.updateUI) {
+                window.Game.UI.updateUI();
+            }
+        }).catch(e => console.error("Failed to load terms", e));
     }
 
-    // Add Global Click Listener for terms
-    document.addEventListener('dblclick', (e) => {
-        const target = e.target.closest('.term-click');
-        if (target && window.scrollActions && typeof window.scrollActions.scrollToTagAndFlash === 'function') {
-            e.preventDefault();
-            e.stopPropagation();
-            const tag = target.dataset.term;
-            if (tag) {
-                window.scrollActions.scrollToTagAndFlash('panel_term', tag, { behavior: 'smooth', stop: true });
+    // Theme Observer
+    const observer = new MutationObserver((mutations) => {
+        for(let m of mutations) {
+            if (m.type === 'attributes' && m.attributeName === 'data-theme') {
+                refreshTerms();
             }
         }
     });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     window.Game.UI.loadTermColors = loadTermColors;
-    window.Game.UI.injectTerm = injectTerm;
+    window.Game.UI.getTermData = getTermData;
+
 })();

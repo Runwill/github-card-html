@@ -1,21 +1,19 @@
-/* Term Colors Context */
-.term-click {
+/* Term Click Styling */
+.term-click,
+.crumb span[data-term] {
     cursor: pointer;
     font-weight: 600;
-    color: inherit; /* Default: inherit parent text color */
-    border-bottom: 2px solid transparent; 
-    transition: all 0.2s;
+    transition: color 0.2s ease;
+    /* 
+       Global Default: Inherit color from container.
+       This ensures terms in logs/card descriptions match the text color 
+       (e.g., black/white) unless overridden by a specific parent like Breadcrumbs.
+    */
+    color: inherit; 
+    position: relative;
+    padding: 0 1px;
+    border-radius: 3px;
     display: inline-block;
-}
-
-.term-click:hover {
-    background-color: rgba(var(--primary-rgb), 0.1);
-    transform: translateY(-1px);
-}
-
-/* Only apply backend color in log panels */
-.game-log-panel .term-click {
-    color: var(--term-color, inherit) !important;
 }
 
 /* Game Panel Container */
@@ -101,7 +99,7 @@
     display: inline-flex;
     align-items: center;
     opacity: 0;
-    animation: slideInUp 0.03s forwards; /* Even faster */
+    animation: slideInUp 0.3s forwards; /* Slower animation for visibility */
     font-size: 1rem; /* Ensure consistent size */
     transition: all 0.3s ease; /* Smooth transition for color, shadow, opacity */
 }
@@ -217,9 +215,6 @@
     gap: 5px;
     transition: color 0.3s ease, background-color 0.3s ease;
 }
-
-/* Removed heart icon as per request */
-/* .stat-hp::before { content: '♥'; } */
 
 @keyframes hp-pulse {
     0% { transform: scale(1); }
