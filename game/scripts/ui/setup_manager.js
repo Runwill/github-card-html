@@ -138,6 +138,7 @@
             // Game: { hp, maxHp, ... }
             playersConfig.push({
                 name: charData.name || `Player ${index+1}`,
+                characterId: charData.id, // 保存后端 ID
                 character: [charData.name], // GameText 需要
                 hp: charData.health || 4,
                 maxHp: charData.health || 4, // 默认当前血量即上限

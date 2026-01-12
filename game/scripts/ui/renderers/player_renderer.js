@@ -16,7 +16,15 @@
              if (Array.isArray(key) && key.length > 0) key = key[0];
              if (!key) key = currentPlayer.name;
 
-             const html = GameText.render(key);
+             // 使用新的 GameText 系统渲染为武将术语
+             // 传入 id 以匹配 <characterName class="characterID{id}"> 模板
+             let html;
+             if (currentPlayer.characterId) {
+                 html = GameText.render('Character', { id: currentPlayer.characterId, name: key });
+             } else {
+                 html = GameText.render(key);
+             }
+
              if (nameEl.innerHTML !== html) nameEl.innerHTML = html;
         }
         
@@ -125,7 +133,14 @@
             if (Array.isArray(key) && key.length > 0) key = key[0];
             if (!key) key = player.name;
 
-            const newNameHtml = GameText ? GameText.render(key) : key;
+            // 使用 GameText 渲染武将术语
+            let newNameHtml;
+            if (player.characterId && GameText) {
+                 newNameHtml = GameText.render('Character', { id: player.characterId, name: key });
+            } else {
+                 newNameHtml = GameText ? GameText.render(key) : key;
+            }
+
             if (nameSpan.innerHTML !== newNameHtml) nameSpan.innerHTML = newNameHtml;
             
             // 血量

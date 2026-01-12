@@ -90,9 +90,10 @@
     // 这些使用术语数据中定义的语义标签
     GameText.registerTemplates({
         'Round': '第 {n} <round></round>',
-        'Turn': '<turn></turn>', // 可能需要特殊样式
-        // 时机逻辑
-        // 'preparing': '<preparing></preparing>' // 由回退自动处理
+        'Turn': '<turn></turn>', 
+        // 注册武将术语模板
+        // 前端生成方式参考: <characterName class="characterID{id}"></characterName>
+        'Character': '<characterName class="characterID{id}">{name}</characterName>'
     });
 
     // 暴露

@@ -163,6 +163,7 @@
             const player = {
                 ...char,
                 id: index,
+                characterId: char.characterId || char.id, // Ensure characterId is available
                 seat: index + 1,
                 liveStatus: true,
                 health: char.hp,
