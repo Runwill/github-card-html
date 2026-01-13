@@ -35,7 +35,39 @@
         'judgeArea': '<judgeArea></judgeArea>',
         'treatmentArea': '<treatmentArea></treatmentArea>',
         'discardPile': '<discardPile></discardPile>',
-        'drawPile': '<drawPile></drawPile>'
+        'drawPile': '<drawPile></drawPile>',
+
+        // 体力事件
+        'Recover': '<recover></recover>',
+        'Loss': '<loss></loss>',
+        'Cure': '<cure></cure>',
+        'Damage': '<damage></damage>',
+
+        // Recover 时机
+        'beforeRecover': '<beforeRecover></beforeRecover>',
+        'whenRecover': '<whenRecover></whenRecover>',
+        'afterRecover': '<afterRecover></afterRecover>',
+
+        // Loss 时机
+        'beforeLoss': '<beforeLoss></beforeLoss>',
+        'whenLoss': '<whenLoss></whenLoss>',
+        'afterLoss': '<afterLoss></afterLoss>',
+
+        // Cure 时机
+        'beforeCure': '<beforeCure></beforeCure>',
+        'beforeCured': '<beforeCured></beforeCured>',
+        'whenCure': '<whenCure></whenCure>',
+        'whenCured': '<whenCured></whenCured>',
+        'afterCure': '<afterCure></afterCure>',
+        'afterCured': '<afterCured></afterCured>',
+
+        // Damage 时机
+        'beforeDamage': '<beforeDamage></beforeDamage>',
+        'beforeDamaged': '<beforeDamaged></beforeDamaged>',
+        'whenDamage': '<whenDamage></whenDamage>',
+        'whenDamaged': '<whenDamaged></whenDamaged>',
+        'afterDamage': '<afterDamage></afterDamage>',
+        'afterDamaged': '<afterDamaged></afterDamaged>'
     };
 
     // 如果可用，注入 GameText
