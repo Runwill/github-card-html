@@ -15,6 +15,9 @@ function replace_term(path, mode, paragraphs = document) {
 
         // 定义处理单个节点的函数 (核心逻辑抽取)
         const processNode = (node, termData, index) => {
+            // 防止重复处理
+            if (node.dataset.termProcessed) return;
+
             const $node = $(node);
             const t = termData;
 
@@ -121,14 +124,22 @@ function replace_term(path, mode, paragraphs = document) {
             node.dataset.termProcessed = "true";
         };
 
-        // --- 批量初始化 (初始执行) ---
-        for (var i in term) {
-            const selector = term[i].en;
-            if(!selector) continue;
-            
-            $(paragraphs).find(selector).each(function() {
-                processNode(this, term[i], i);
-            });
+        // --- 批量初始化 (初始执行 - 优化版) ---
+        // 遍历 DOM 节点匹配术语表 (O(N))，替代遍历术语表查找 DOM (O(M*N))
+        const root = (paragraphs === document) ? document.body : paragraphs;
+        if (root) {
+            const allElements = root.getElementsByTagName('*');
+            for (let j = 0; j < allElements.length; j++) {
+                const el = allElements[j];
+                const tag = el.tagName; // Browser guarantees uppercase for HTML elements
+                if (termMap.has(tag)) {
+                    const { index, data } = termMap.get(tag);
+                    // 避免重复处理
+                    if (!el.dataset.termProcessed) {
+                        processNode(el, data, index);
+                    }
+                }
+            }
         }
         
         // --- 动态监听 (MutationObserver) ---
@@ -147,29 +158,19 @@ function replace_term(path, mode, paragraphs = document) {
                                     processNode(node, data, index);
                                 }
                                 
-                                // 2. 检查节点内部是否包含术语标签 (深度查找)
-                                // 遍历 termMap 中所有可能的选择器 (性能优化: 仅查找存在的自定义标签)
-                                // 由于 querySelectorAll 性能开销，这里可以用 TreeWalker 或者 简单 find
-                                // 为了简单可靠，我们再次遍历 termMap 的 keys
-                                // 优化：仅当 addedNode 可能是容器时才查。
-                                
-                                // 这里使用 jQuery 的 find，配合 Map 的 keys
-                                // 但遍历 Map keys 太多可能慢。
-                                // 反向思路：查找 node 下的所有自定义标签元素? 
-                                // 现在的术语标签形如 <PRONOUN1>, <TICK> 等。
-                                // 我们可以查找所有非标准 HTML 标签，或者直接全量匹配。
-                                // 鉴于 term 数量有限，循环匹配是可接受的。
-                                
-                                termMap.forEach(({ index, data }, tagKey) => {
-                                    // 查找新插入节点内部的术语
-                                    const $found = $(node).find(data.en);
-                                    $found.each(function() {
-                                        // 避免重复处理
-                                        if (!this.dataset.termProcessed) {
-                                            processNode(this, data, index);
+                                // 2. 检查节点内部是否包含术语标签 (深度查找 - 优化版)
+                                // 遍历子节点匹配 Map (O(Subtree))，替代遍历 Map 查找子节点 (O(M*Subtree))
+                                const descendants = node.getElementsByTagName('*');
+                                for (let j = 0; j < descendants.length; j++) {
+                                    const el = descendants[j];
+                                    const tag = el.tagName;
+                                    if (termMap.has(tag)) {
+                                        const { index, data } = termMap.get(tag);
+                                        if (!el.dataset.termProcessed) {
+                                            processNode(el, data, index);
                                         }
-                                    });
-                                });
+                                    }
+                                }
                             }
                         });
                     }

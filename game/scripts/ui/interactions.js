@@ -58,10 +58,9 @@
         DragState.startY = e.clientY;
         DragState.isDragging = false; 
 
-        // 初始捕获以处理刚开始的情况，但我们将委托 document 进行拖动
-        // 这一点很重要，因为一旦我们将元素移动到 Body，它可能会在某些浏览器中丢失捕获上下文，
-        // 或者如果 pointer-events 变为 none，它可能会停止触发。
-        el.setPointerCapture(e.pointerId);
+        // 移除 setPointerCapture 以修复双击 (dblclick) 冲突
+        // 通过 document 监听 pointermove 也就足够处理拖拽
+        // el.setPointerCapture(e.pointerId);
 
         // 附加全局监听器以增强鲁棒性
         document.addEventListener('pointermove', handlePointerMove);
@@ -450,7 +449,9 @@
         document.removeEventListener('pointercancel', handlePointerUp);
 
         if (el) {
-            try { el.releasePointerCapture(e.pointerId); } catch(err){}
+            // 对应移除 setPointerCapture
+            // try { el.releasePointerCapture(e.pointerId); } catch(err){}
+            
             // 清理本地监听器以防万一
             el.removeEventListener('pointermove', handlePointerMove);
             el.removeEventListener('pointerup', handlePointerUp);

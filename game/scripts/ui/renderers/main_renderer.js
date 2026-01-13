@@ -140,14 +140,19 @@
             }
         }
 
-        // 3. 渲染角色信息
-        if (window.Game.UI.updateCharacterInfo) {
-            window.Game.UI.updateCharacterInfo(GameState, GameText);
+        // 3. 渲染角色信息 (Self Role)
+        if (window.Game.UI.updateSelfRoleInfo) {
+            window.Game.UI.updateSelfRoleInfo(GameState, GameText);
+        } else if (window.Game.UI.updateCharacterInfo) {
+             // Fallback
+             window.Game.UI.updateCharacterInfo(GameState, GameText);
         }
 
-        // 4. 渲染其他玩家
-        if (window.Game.UI.renderOtherPlayers) {
-            window.Game.UI.renderOtherPlayers(GameState, GameText);
+        // 4. 渲染其他角色 (Other Roles)
+        if (window.Game.UI.renderOtherRoles) {
+            window.Game.UI.renderOtherRoles(GameState, GameText);
+        } else if (window.Game.UI.renderOtherPlayers) {
+             window.Game.UI.renderOtherPlayers(GameState, GameText);
         }
 
         // 5. 更新控件

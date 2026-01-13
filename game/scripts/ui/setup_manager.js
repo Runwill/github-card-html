@@ -85,7 +85,8 @@
 
             const colLabel = document.createElement('div');
             colLabel.className = 'small-4 columns';
-            colLabel.innerHTML = `<span class="prefix">Player ${i + 1}</span>`;
+            // User requested terminology change: Player -> Role
+            colLabel.innerHTML = `<span class="prefix">Role ${i + 1}</span>`;
             
             const colSelect = document.createElement('div');
             colSelect.className = 'small-8 columns';
@@ -122,6 +123,25 @@
         }
     }
 
+    function generateDeck(preset) {
+        let deck = [];
+        if (preset === '80sha80shan') {
+            // Align with backend card data keys (see console logs: ATTACK, DODGE)
+            for(let i=0; i<80; i++) deck.push('Attack');
+            for(let i=0; i<80; i++) deck.push('Dodge');
+        } else {
+            // Standard fallback (mock standard deck)
+            // Align keys with card data: Attack(Sha), Dodge(Shan), Peach(Tao), Wine(Jiu)
+            // If keys don't match data, they will render as English tags <Key>
+            const basic = ['Attack', 'Dodge', 'Peach', 'Wine'];
+            // 简单的每种20张用于测试
+            basic.forEach(card => {
+                for(let i=0; i<20; i++) deck.push(card);
+            });
+        }
+        return deck;
+    }
+
     function confirmSetup() {
         const selects = document.querySelectorAll('.setup-char-select');
         const playersConfig = [];
@@ -147,6 +167,11 @@
             });
         });
 
+        // 获取牌堆预设
+        const presetSelect = document.getElementById('setup-card-preset-select');
+        const preset = presetSelect ? presetSelect.value : 'standard';
+        const deck = generateDeck(preset);
+
         // 隐藏设置面板
         hideSetupPanel();
 
@@ -158,7 +183,7 @@
 
         // 开始游戏
         if (window.Game.Core && window.Game.Core.startGame) {
-            window.Game.Core.startGame({ players: playersConfig });
+            window.Game.Core.startGame({ players: playersConfig, deck: deck });
         }
     }
 

@@ -2,40 +2,48 @@
     window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
-    function updateCharacterInfo(GameState, GameText) {
+    /**
+     * 渲染自身角色信息 (Self Role Info)
+     * 对应用户操作的当前角色 (UI底部面板)
+     */
+    function updateSelfRoleInfo(GameState, GameText) {
         if (!GameText) return;
-        const currentPlayer = GameState.players[GameState.currentPlayerIndex];
-        if (!currentPlayer) return;
+        // selfRole: 当前用户操作的角色实体
+        const selfRole = GameState.players[GameState.currentPlayerIndex];
+        if (!selfRole) return;
 
-        // 名字
+        // 名字 (角色/武将)
         const nameEl = document.getElementById('char-name');
         if (nameEl) {
-             // "角色名全部重构为后端第一个武将的名称"
-             // 优先使用 character 字段 (可能是数组，取第一个)，回退使用 name
-             let key = currentPlayer.character;
+             // 优先使用 character 字段 (武将名)，回退使用 role.name
+             let key = selfRole.character;
              if (Array.isArray(key) && key.length > 0) key = key[0];
-             if (!key) key = currentPlayer.name;
+             if (!key) key = selfRole.name;
 
-             // 使用新的 GameText 系统渲染为武将术语
-             // 传入 id 以匹配 <characterName class="characterID{id}"> 模板
+             // 使用 GameText 渲染 Character (武将)
              let html;
-             if (currentPlayer.characterId) {
-                 html = GameText.render('Character', { id: currentPlayer.characterId, name: key });
+             // 构造一个唯一标识，用于检查数据是否真正改变
+             const renderKey = selfRole.characterId ? `char:${selfRole.characterId}:${key}` : `char:default:${key}`;
+
+             if (selfRole.characterId) {
+                 html = GameText.render('Character', { id: selfRole.characterId, name: key });
              } else {
                  html = GameText.render(key);
              }
 
-             if (nameEl.innerHTML !== html) nameEl.innerHTML = html;
+             // 使用 data-render-key 进行脏检查
+             if (nameEl.getAttribute('data-render-key') !== renderKey) {
+                 nameEl.innerHTML = html;
+                 nameEl.setAttribute('data-render-key', renderKey);
+             }
         }
         
         // 血量
         const hpEl = document.getElementById('char-hp-display');
         if (hpEl) {
-            const newHpText = `${currentPlayer.health}/${currentPlayer.healthLimit}`; // 简单格式，或使用 i18n
-            // 如果使用了 i18n: i18n.t('game.hp', { hp: ..., maxHp: ... })
-            // 为了保持一致性，如果有 i18n 则使用
+            const newHpText = `${selfRole.health}/${selfRole.healthLimit}`; 
             const finalHpText = (typeof i18n !== 'undefined' && i18n.t) 
-                ? i18n.t('game.hp', { hp: currentPlayer.health, maxHp: currentPlayer.healthLimit })
+                ? i18n.t('game.hp', { hp: selfRole.health, maxHp: selfRole.healthLimit })
                 : newHpText;
 
             if (hpEl.textContent !== finalHpText) {
@@ -52,7 +60,7 @@
             charInfoPanel.oncontextmenu = (e) => {
                 e.preventDefault();
                 if (window.Game.UI.showContextMenu) {
-                    window.Game.UI.showContextMenu(e.clientX, e.clientY, currentPlayer);
+                    window.Game.UI.showContextMenu(e.clientX, e.clientY, selfRole);
                 }
             };
         }
@@ -73,32 +81,37 @@
         }
         
         // 手牌
-        if (currentPlayer.hand) {
+        if (selfRole.hand) {
             const el = document.getElementById('header-hand-area');
             if (el) {
-                const key = currentPlayer.hand.name || 'hand';
+                const key = selfRole.hand.name || 'hand';
                 const html = GameText.render(key);
                 if (el.innerHTML !== html) el.innerHTML = html;
             }
             // 渲染卡牌
-            const handCards = currentPlayer.hand.cards ? currentPlayer.hand.cards : currentPlayer.hand;
+            const handCards = selfRole.hand.cards ? selfRole.hand.cards : selfRole.hand;
             if (window.Game.UI.renderCardList) {
                 window.Game.UI.renderCardList('hand-cards-container', handCards, 'hand');
             }
         }
     }
     
-    function renderOtherPlayers(GameState, GameText) {
-        const otherPlayersContainer = document.getElementById('other-players-container');
-        if (!otherPlayersContainer) return;
+    /**
+     * 渲染其他角色 (Other Roles)
+     * 场上其他被操作的单位
+     */
+    function renderOtherRoles(GameState, GameText) {
+        const otherRolesContainer = document.getElementById('other-players-container');
+        if (!otherRolesContainer) return;
         
-        // 同步玩家列表
-        GameState.players.forEach((player, index) => {
-            let pEl = document.getElementById(`player-summary-${player.id}`);
+        // 同步角色列表
+        GameState.players.forEach((role, index) => {
+            // 虽然HTML ID 仍沿用 player-summary- 以匹配旧 CSS，但逻辑上这是 Role
+            let pEl = document.getElementById(`player-summary-${role.id}`);
             
             if (!pEl) {
                 pEl = document.createElement('div');
-                pEl.id = `player-summary-${player.id}`;
+                pEl.id = `player-summary-${role.id}`;
                 pEl.className = 'other-player-summary';
                 
                 const nameSpan = document.createElement('span');
@@ -115,28 +128,27 @@
                 equipDiv.style.color = '#aaa';
                 pEl.appendChild(equipDiv);
 
-                otherPlayersContainer.appendChild(pEl);
+                otherRolesContainer.appendChild(pEl);
             }
             
-            // 激活状态
+            // 激活状态 (当前回合角色)
             if (index === GameState.currentPlayerIndex) {
                 pEl.classList.add('active');
             } else {
                 pEl.classList.remove('active');
             }
             
-            // 名字
+            // 名字 (角色/武将)
             const nameSpan = pEl.querySelector('.player-name');
             
-            // "角色名全部重构为后端第一个武将的名称"
-            let key = player.character;
+            let key = role.character;
             if (Array.isArray(key) && key.length > 0) key = key[0];
-            if (!key) key = player.name;
+            if (!key) key = role.name;
 
-            // 使用 GameText 渲染武将术语
+            // 使用 GameText 渲染 Character (武将)
             let newNameHtml;
-            if (player.characterId && GameText) {
-                 newNameHtml = GameText.render('Character', { id: player.characterId, name: key });
+            if (role.characterId && GameText) {
+                 newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
             } else {
                  newNameHtml = GameText ? GameText.render(key) : key;
             }
@@ -146,8 +158,8 @@
             // 血量
             const hpSpan = pEl.querySelector('.player-hp');
             const finalHpText = (typeof i18n !== 'undefined' && i18n.t) 
-                ? i18n.t('game.hp', { hp: player.health, maxHp: player.healthLimit })
-                : `${player.health}/${player.healthLimit}`;
+                ? i18n.t('game.hp', { hp: role.health, maxHp: role.healthLimit })
+                : `${role.health}/${role.healthLimit}`;
             
             if (hpSpan.textContent !== finalHpText) {
                 hpSpan.classList.remove('hp-changed');
@@ -156,12 +168,11 @@
                 hpSpan.textContent = finalHpText;
             }
             
-            // 装备区 (简易显示)
+            // 装备区
             const equipDiv = pEl.querySelector('.player-equips');
             if (equipDiv) {
-                if (player.equipArea && player.equipArea.cards && player.equipArea.cards.length > 0) {
-                     // 也尝试翻译卡牌名
-                     const equipNames = player.equipArea.cards.map(c => {
+                if (role.equipArea && role.equipArea.cards && role.equipArea.cards.length > 0) {
+                     const equipNames = role.equipArea.cards.map(c => {
                          const cName = typeof c === 'string' ? c : c.name;
                          return (typeof i18n !== 'undefined' && i18n.t) ? i18n.t(`game.card.${cName}`, {defaultValue: cName}) : cName;
                      });
@@ -175,21 +186,25 @@
             pEl.oncontextmenu = (e) => {
                 e.preventDefault();
                 if (window.Game.UI.showContextMenu) {
-                    window.Game.UI.showContextMenu(e.clientX, e.clientY, player);
+                    window.Game.UI.showContextMenu(e.clientX, e.clientY, role);
                 }
             };
         });
         
-        // 清理移除的玩家
-        Array.from(otherPlayersContainer.children).forEach(child => {
+        // 清理移除的角色
+        Array.from(otherRolesContainer.children).forEach(child => {
             const id = parseInt(child.id.replace('player-summary-', ''));
             if (!GameState.players.find(p => p.id === id)) {
-                otherPlayersContainer.removeChild(child);
+                otherRolesContainer.removeChild(child);
             }
         });
     }
 
-    // 导出
-    window.Game.UI.updateCharacterInfo = updateCharacterInfo;
-    window.Game.UI.renderOtherPlayers = renderOtherPlayers;
+    // 导出 (使用 Role 术语)
+    window.Game.UI.updateSelfRoleInfo = updateSelfRoleInfo;
+    window.Game.UI.renderOtherRoles = renderOtherRoles;
+    
+    // (保留旧名以防其他地方调用遗漏，尽管我们即将更新 main_renderer)
+    window.Game.UI.updateCharacterInfo = updateSelfRoleInfo; 
+    window.Game.UI.renderOtherPlayers = renderOtherRoles;
 })();

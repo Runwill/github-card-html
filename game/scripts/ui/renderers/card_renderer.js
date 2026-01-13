@@ -8,38 +8,58 @@
         if (!container) return;
 
         container.setAttribute('data-drop-zone', dropZoneId);
-        container.innerHTML = '';
         
         const GameText = window.Game.UI.GameText;
+        const currentChildren = Array.from(container.children);
 
+        // 差量更新 (Diffing) 策略：复用现有 DOM 节点，避免暴力清空导致的闪烁和 Hover 状态丢失
         cards.forEach((card, index) => {
-            const cardEl = document.createElement('div');
-            cardEl.className = 'card-placeholder';
-            
-            // "卡牌名全部重构为第一张卡牌的名称"
-            // 这里理解为：使用 GameText 系统渲染卡牌
-            // 假设 card 对象或字符串就是卡牌的 Key (如 'Sha')
             const cardName = typeof card === 'string' ? card : (card.name || card.key);
             
-            if (GameText) {
-                // 使用新的 GameText 系统渲染
-                cardEl.innerHTML = GameText.render(cardName);
-            } else {
-                // 回退逻辑
-                if (typeof i18n !== 'undefined' && i18n.t) {
-                    const key = `game.card.${cardName}`;
-                    const text = i18n.t(key, { defaultValue: cardName });
-                    cardEl.innerHTML = text; 
-                } else {
-                    cardEl.textContent = cardName;
-                }
+            // 尝试复用现有位置的节点
+            let cardEl = currentChildren[index];
+            let isNewNode = false;
+
+            if (!cardEl) {
+                cardEl = document.createElement('div');
+                cardEl.className = 'card-placeholder';
+                container.appendChild(cardEl);
+                isNewNode = true;
             }
-            
+
+            // 检查内容是否需要更新 (Dirty Checking)
+            // 使用 data-card-key 记录上次渲染的内容
+            if (isNewNode || cardEl.getAttribute('data-card-key') !== cardName) {
+                if (GameText) {
+                    // 重要：这里是关键连接点。
+                    // 1. 我们传入 cardName (例如 "Sha")
+                    // 2. GameText.render 返回 "<Sha></Sha>"
+                    // 3. 浏览器将其渲染为自定义标签
+                    // 4. card_name.js 的 MutationObserver 捕获到 <SHA> 并将其替换为中文
+                    cardEl.innerHTML = GameText.render(cardName);
+                } else {
+                    if (typeof i18n !== 'undefined' && i18n.t) {
+                        const key = `game.card.${cardName}`;
+                        const text = i18n.t(key, { defaultValue: cardName });
+                        cardEl.innerHTML = text; 
+                    } else {
+                        cardEl.textContent = cardName;
+                    }
+                }
+                cardEl.setAttribute('data-card-key', cardName);
+            }
+
+            // 总是更新交互元数据 (例如 index 可能变化)
+            // 注意：依赖 initDrag 的实现能够处理重复调用 (例如覆盖 ondragstart 属性而非不断 addEventListener)
             if (window.Game.UI.Interactions && window.Game.UI.Interactions.initDrag) {
                 window.Game.UI.Interactions.initDrag(cardEl, card, dropZoneId, index);
             }
-            container.appendChild(cardEl);
         });
+
+        // 移除多余的节点
+        while (container.children.length > cards.length) {
+            container.removeChild(container.lastChild);
+        }
     }
 
     // 导出到全局命名空间供其他模块使用

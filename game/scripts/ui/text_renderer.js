@@ -93,7 +93,11 @@
         'Turn': '<turn></turn>', 
         // 注册武将术语模板
         // 前端生成方式参考: <characterName class="characterID{id}"></characterName>
-        'Character': '<characterName class="characterID{id}">{name}</characterName>'
+        'Character': '<characterName class="characterID{id}">{name}</characterName>',
+        // 注册卡牌术语模板
+        // 卡牌渲染直接使用卡牌名称标签，例如 <SHA>，text_renderer 默认 fallback 到 <Key> 已经覆盖了大部分情况
+        // 但为了明确语义或特殊处理，我们可以显式声明
+        // 'Card': '<{name}></{name}>' // 动态生成
     });
 
     // 暴露

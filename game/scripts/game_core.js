@@ -53,7 +53,7 @@
         isPaused: false,
         
         // Areas
-        pile: new Area('pile', { apartOrTogether: 1, forOrAgainst: 1 }), // Together, Against
+        pile: new Area('pile', { apartOrTogether: 1, forOrAgainst: 1 }), // Together, Against (Draw Pile)
         discardPile: new Area('discardPile', { apartOrTogether: 1, forOrAgainst: 0 }), // Together, For
         treatmentArea: new Area('treatmentArea', { apartOrTogether: 0, forOrAgainst: 0 }), // Apart, For
 
@@ -64,6 +64,44 @@
         // Each item is an object: { type: 'event', name: 'damage', steps: [], currentStepIndex: 0, context: {} }
         eventStack: []
     };
+
+    function shuffle(array) {
+        let currentIndex = array.length;
+        while (currentIndex != 0) {
+            let randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+    }
+
+    // Helper: Distribute initial cards (4 cards per role)
+    // Remaining cards stay in the pile
+    function distributeInitialCards() {
+        // Shuffle the pile first
+        if (GameState.pile.cards.length > 0) {
+            shuffle(GameState.pile.cards);
+        }
+
+        GameState.players.forEach(player => {
+            // Ensure player has a hand area
+            if (!player.hand) {
+                player.hand = new Area('hand');
+            }
+            
+            // Draw 4 cards
+            for (let i = 0; i < 4; i++) {
+                if (GameState.pile.cards.length > 0) {
+                    const card = GameState.pile.cards.pop();
+                    player.hand.add(card);
+                } else {
+                    console.warn('[Game] Deck is empty during initial distribution!');
+                    break;
+                }
+            }
+        });
+        
+        console.log('[Game] Initial cards distributed (4 per role).');
+    }
 
     const Settings = {
         autoRunDelay: 50 // Default 50ms
@@ -148,6 +186,15 @@
         return node.name === 'acting';
     }
 
+    function shuffle(array) {
+        let currentIndex = array.length;
+        while (currentIndex != 0) {
+            let randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+    }
+
     function startGame(customConfig) {
         let playersData;
         
@@ -158,6 +205,22 @@
              // 使用默认 Mock 数据
              playersData = mockCharacters;
         }
+
+        // Initialize Deck (Pile)
+        // Check if custom deck is provided
+        GameState.pile.cards = [];
+        if (customConfig && Array.isArray(customConfig.deck)) {
+            GameState.pile.cards = [...customConfig.deck];
+        } else {
+            // Default Fallback
+            const basic = ['Sha', 'Shan', 'Tao', 'Jiu'];
+            for(let i=0; i<80; i++) GameState.pile.cards.push(basic[i%basic.length]);
+        }
+        
+        // Shuffle the pile before distribution
+        shuffle(GameState.pile.cards);
+
+        console.log(`[Game Core] Deck initialized with ${GameState.pile.cards.length} cards.`);
 
         GameState.players = playersData.map((char, index) => {
             const player = {
@@ -174,10 +237,13 @@
                 equipArea: new Area('equipArea', { apartOrTogether: 0, forOrAgainst: 0 }) // Apart, For
             };
             
-            // Populate Hand Area (Mock or Empty)
-             // 暂时仍然生成 Mock 手牌，或者如果 customConfig 提供初始手牌则使用
-            const cards = generateMockHand();
-            cards.forEach(c => player.hand.add(c));
+            // Distribute 4 cards from the Top of the Pile
+            for (let i = 0; i < 4; i++) {
+                if (GameState.pile.cards.length > 0) {
+                    const card = GameState.pile.cards.pop();
+                    player.hand.add(card);
+                }
+            }
             
             // Set visibility: Hand is visible to its owner 
             player.hand.visible.add(player);
@@ -193,9 +259,14 @@
         // Initialize Flow Stack to point to the first leaf node
         GameState.flowStack = [0]; 
 
-        document.getElementById('btn-start-game').classList.add('hidden');
-        document.getElementById('game-main-area').classList.remove('hidden');
-        document.getElementById('game-board-panel').classList.remove('hidden');
+        const btn = document.getElementById('btn-start-game');
+        if (btn) btn.classList.add('hidden');
+        
+        const main = document.getElementById('game-main-area');
+        if (main) main.classList.remove('hidden');
+        
+        const board = document.getElementById('game-board-panel');
+        if (board) board.classList.remove('hidden');
 
         if (window.Game.UI && window.Game.UI.updateUI) {
             window.Game.UI.updateUI();

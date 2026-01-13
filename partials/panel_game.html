@@ -27,13 +27,20 @@
         <div id="game-setup-ui" class="game-panel hidden" style="border: 1px solid #444; padding: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.5);">
             <div class="row">
                  <div class="input-group">
-                    <span class="input-group-label" data-i18n="game.setup.playerCount">Player Count</span>
+                    <span class="input-group-label" data-i18n="game.setup.playerCount">Role Count</span>
                     <select id="setup-player-count-select" class="input-group-field" style="width: auto;">
                         <option value="2">2</option>
                         <option value="3">3</option>
                         <option value="4" selected>4</option>
                         <option value="5">5</option>
                         <option value="8">8</option>
+                    </select>
+                 </div>
+                 <div class="input-group" style="margin-left: 20px;">
+                    <span class="input-group-label" data-i18n="game.setup.cardPreset">Card Preset</span>
+                    <select id="setup-card-preset-select" class="input-group-field" style="width: auto;">
+                        <option value="standard">Standard</option>
+                        <option value="80sha80shan">80 Sha 80 Shan</option>
                     </select>
                  </div>
             </div>
