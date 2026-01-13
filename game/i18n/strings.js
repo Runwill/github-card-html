@@ -66,7 +66,6 @@
         'game.timing.whenConcludingStageFinish': '结束阶段结束时',
         'game.timing.afterConcludingStageFinish': '结束阶段结束后',
 
-        'game.otherCharacters': '其他角色',
         'game.characterName': '角色名'
     };
 
@@ -131,7 +130,6 @@
         'game.timing.whenConcludingStageFinish': 'When Concluding Stage Finish',
         'game.timing.afterConcludingStageFinish': 'After Concluding Stage Finish',
 
-        'game.otherCharacters': 'Other Characters',
         'game.characterName': 'Character Name'
     };
 

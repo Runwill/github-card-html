@@ -459,13 +459,21 @@
             
             // 恢复逻辑
             if (el.parentNode === document.body && DragState.placeholderElement && DragState.placeholderElement.parentNode) {
-                 // 视觉回弹可能发生在这里，但暂时立即恢复
-                 resetStyles(el);
+                 // 使用动画平滑归位，而不是瞬间重置
+                 // 这可以解决“放下时阴影直接消失”的突兀感，并提供视觉反馈
+                 const placeholder = DragState.placeholderElement;
                  
-                 // 放回原位
-                 DragState.placeholderElement.parentNode.insertBefore(el, DragState.placeholderElement);
-                 DragState.placeholderElement.remove();
-                 DragState.placeholderElement = null;
+                 animateDropToPlaceholder(el, placeholder, () => {
+                     // 动画结束后的清理
+                     // animateDropToPlaceholder 会负责显示 placeholder 并移除 el
+                     
+                     // 我们还依然需要清理 DragState 的引用吗？
+                     // 由于是异步回调，此时 DragState.placeholderElement 可能已经被置空了，这没关系。
+                 });
+                 
+                 // 重要：不要在这里立即移除 placeholder 或 el
+                 // 防止下面的逻辑进行破坏性清理
+                 DragState.placeholderElement = null; // 断开引用，交给动画闭包
             } else if (el.parentNode === document.body) {
                 // 如果占位符消失（奇怪），直接干掉它
                 el.remove();
@@ -586,12 +594,13 @@
             el.style.width = cssW + 'px';
             el.style.height = cssH + 'px';
 
+            // 放宽判定阈值，避免视觉上已停止但数值上还在微调导致的“停顿感”
             if (
-                Math.abs(deltaX) < 1.0 && 
-                Math.abs(deltaY) < 1.0 && 
-                Math.abs(deltaW) < 1.0 &&
-                Math.abs(deltaH) < 1.0 &&
-                Math.abs(curRot) < 0.5
+                Math.abs(deltaX) < 2.0 && 
+                Math.abs(deltaY) < 2.0 && 
+                Math.abs(deltaW) < 2.0 &&
+                Math.abs(deltaH) < 2.0 &&
+                Math.abs(curRot) < 2.0
             ) {
                 // 完成:
                 // 1. 移除克隆体
@@ -600,7 +609,23 @@
                 // 2. 显示原始体
                 placeholder.style.visibility = '';
                 placeholder.classList.remove('drag-placeholder');
-                
+                // --- 视觉平滑处理 ---
+                // 使阴影平滑过渡而不是突兀消失
+                // 手动应用 .dragging-real 的阴影作为起始状态
+                if (window.getComputedStyle(placeholder).transitionProperty !== 'none') {
+                    placeholder.style.transition = 'none';
+                    placeholder.style.boxShadow = '0 15px 30px rgba(0,0,0,0.3)';
+                    // 强制 Reflow
+                    void placeholder.offsetWidth;
+                    // 使用快速过渡 (0.1s) 让阴影消失更利落
+                    placeholder.style.transition = 'box-shadow 0.1s ease-out';
+                    placeholder.style.boxShadow = '';
+                    
+                    // 恢复默认 CSS Transition
+                    setTimeout(() => {
+                         if (placeholder) placeholder.style.transition = '';
+                    }, 100);
+                }                
                 if (onComplete) onComplete();
             } else {
                 requestAnimationFrame(loop);

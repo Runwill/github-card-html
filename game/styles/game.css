@@ -248,7 +248,7 @@
     width: 100%;
     box-sizing: border-box;
     padding: 15px;
-    background-color: var(--bg-start);
+    background-color: rgba(128, 128, 128, 0.05); /* Subtle variable-neutral tint */
     border-radius: 8px;
     border: 2px dashed var(--border);
     /* Update transition to include properties modified by drag-over state */
@@ -346,8 +346,8 @@
     border-color: var(--primary-1);
 }
 
-/* Other Players Panel */
-.other-players-panel {
+/* Role List Panel */
+.role-list-panel {
     flex: 1;
     background: var(--surface);
     border-radius: 12px;
@@ -357,7 +357,7 @@
     min-width: 250px;
 }
 
-.other-players-panel h4 {
+.role-list-panel h4 {
     margin-top: 0;
     margin-bottom: 15px;
     color: var(--text-muted);
@@ -368,13 +368,13 @@
     padding-bottom: 10px;
 }
 
-.other-players-list {
+.role-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.other-player-summary {
+.role-summary {
     padding: 12px 15px;
     border-radius: 8px;
     background-color: var(--surface);
@@ -387,12 +387,12 @@
     color: var(--text);
 }
 
-.other-player-summary:hover {
+.role-summary:hover {
     background-color: var(--bg-start);
     border-color: var(--text-subtle);
 }
 
-.other-player-summary.active {
+.role-summary.active {
     background-color: var(--token-accent-blue);
     border-color: var(--primary-2);
     color: var(--text-active);
@@ -400,11 +400,11 @@
     box-shadow: 0 2px 4px var(--primary-ring);
 }
 
-.other-player-summary .player-name {
+.role-summary .player-name {
     font-size: 0.95rem;
 }
 
-.other-player-summary .player-hp {
+.role-summary .player-hp {
     font-size: 0.85rem;
     color: var(--danger);
     background: rgba(245, 101, 101, 0.1);
@@ -423,7 +423,7 @@
         flex-direction: column;
     }
     
-    .other-players-panel {
+    .role-list-panel {
         width: 100%;
     }
     

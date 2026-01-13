@@ -96,12 +96,12 @@
     }
     
     /**
-     * 渲染其他角色 (Other Roles)
-     * 场上其他被操作的单位
+     * 渲染角色列表 (Role List)
+     * 场上所有角色的列表
      */
-    function renderOtherRoles(GameState, GameText) {
-        const otherRolesContainer = document.getElementById('other-players-container');
-        if (!otherRolesContainer) return;
+    function renderRoleList(GameState, GameText) {
+        const roleListContainer = document.getElementById('role-list-container');
+        if (!roleListContainer) return;
         
         // 同步角色列表
         GameState.players.forEach((role, index) => {
@@ -111,7 +111,7 @@
             if (!pEl) {
                 pEl = document.createElement('div');
                 pEl.id = `player-summary-${role.id}`;
-                pEl.className = 'other-player-summary';
+                pEl.className = 'role-summary';
                 // Inspector Meta
                 pEl.setAttribute('data-inspector-type', 'role');
                 pEl.setAttribute('data-role-id', role.id);
@@ -130,7 +130,7 @@
                 equipDiv.style.color = '#aaa';
                 pEl.appendChild(equipDiv);
 
-                otherRolesContainer.appendChild(pEl);
+                roleListContainer.appendChild(pEl);
             }
             
             // 激活状态 (当前回合角色)
@@ -192,19 +192,20 @@
         });
         
         // 清理移除的角色
-        Array.from(otherRolesContainer.children).forEach(child => {
+        Array.from(roleListContainer.children).forEach(child => {
             const id = parseInt(child.id.replace('player-summary-', ''));
             if (!GameState.players.find(p => p.id === id)) {
-                otherRolesContainer.removeChild(child);
+                roleListContainer.removeChild(child);
             }
         });
     }
 
     // 导出 (使用 Role 术语)
     window.Game.UI.updateSelfRoleInfo = updateSelfRoleInfo;
-    window.Game.UI.renderOtherRoles = renderOtherRoles;
+    window.Game.UI.renderRoleList = renderRoleList;
     
     // (保留旧名以防其他地方调用遗漏，尽管我们即将更新 main_renderer)
     window.Game.UI.updateCharacterInfo = updateSelfRoleInfo; 
-    window.Game.UI.renderOtherPlayers = renderOtherRoles;
+    window.Game.UI.renderOtherRoles = renderRoleList;
+    window.Game.UI.renderOtherPlayers = renderRoleList;
 })();

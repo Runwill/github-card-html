@@ -148,11 +148,11 @@
              window.Game.UI.updateCharacterInfo(GameState, GameText);
         }
 
-        // 4. 渲染其他角色 (Other Roles)
-        if (window.Game.UI.renderOtherRoles) {
+        // 4. 渲染角色列表 (Role List)
+        if (window.Game.UI.renderRoleList) {
+            window.Game.UI.renderRoleList(GameState, GameText);
+        } else if (window.Game.UI.renderOtherRoles) {
             window.Game.UI.renderOtherRoles(GameState, GameText);
-        } else if (window.Game.UI.renderOtherPlayers) {
-             window.Game.UI.renderOtherPlayers(GameState, GameText);
         }
 
         // 5. 渲染公共区域 (Board)
