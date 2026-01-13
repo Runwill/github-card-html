@@ -64,6 +64,45 @@ function addStandardHighlight(element, color, scrollSelector) {
  * @param {HTMLElement} element - DOM元素
  * @param {string} mode - 模式：'', 'divided', 'part'
  */
+const HighlightSanityChecker = {
+    interval: null,
+    target: null,
+    cleanupCallback: null,
+
+    start(element, cleanup) {
+        if (this.target && this.target !== element) {
+            this.executeCleanup();
+        } else {
+            this.stop();
+        }
+
+        this.target = element;
+        this.cleanupCallback = cleanup;
+        
+        this.interval = setInterval(() => {
+            if (this.target && !document.body.contains(this.target)) {
+                this.executeCleanup();
+            }
+        }, 200);
+    },
+
+    stop() {
+        if (this.interval) {
+            clearInterval(this.interval);
+            this.interval = null;
+        }
+        this.target = null;
+        this.cleanupCallback = null;
+    },
+
+    executeCleanup() {
+        if (this.cleanupCallback) {
+            this.cleanupCallback();
+        }
+        this.stop();
+    }
+};
+
 function termHighlight(term, element, mode='') {
     const HIGHLIGHT_OPACITY = '60'
 
@@ -75,6 +114,33 @@ function termHighlight(term, element, mode='') {
         const target = event.currentTarget
         const currentTerm = term[target.i]
         
+        const performCleanup = () => {
+             if(mode=='divided'){
+                currentTerm.part.forEach((part) => {
+                    const enSelector = part.en
+                    removeHighlight($(element).children(enSelector))
+                    removeHighlight(`${currentTerm.en}.scroll ${enSelector}`)
+                })
+            }else if(mode=='part'){
+                const currentPart = currentTerm?.part[target.j]
+                removeHighlight(`${currentPart.en}.scroll`)
+            }else{
+                removeHighlight(target)
+                removeHighlight(`${currentTerm.en}.scroll`)
+                
+                if ($(target).hasClass('highlight') || currentTerm.highlight) {
+                    const containerType = $(target).closest('pronounScope').length > 0 
+                        ? 'pronounScope' 
+                        : 'padding'
+                    
+                    const specialHighlightElements = $(target).closest(containerType).find(currentTerm.en)
+                    removeHighlight(specialHighlightElements)
+                }
+            }
+        };
+
+        HighlightSanityChecker.start(target, performCleanup);
+
         if(mode=='divided'){
             currentTerm.part.forEach((part) => {
                 const enSelector = part.en
@@ -104,30 +170,8 @@ function termHighlight(term, element, mode='') {
             }
         }
     }).mouseout((event) => {
-        const target = event.currentTarget
-        const currentTerm = term[target.i]
-        
-        if(mode=='divided'){
-            currentTerm.part.forEach((part) => {
-                const enSelector = part.en
-                removeHighlight($(element).children(enSelector))
-                removeHighlight(`${currentTerm.en}.scroll ${enSelector}`)
-            })
-        }else if(mode=='part'){
-            const currentPart = currentTerm?.part[target.j]
-            removeHighlight(`${currentPart.en}.scroll`)
-        }else{
-            removeHighlight(target)
-            removeHighlight(`${currentTerm.en}.scroll`)
-            
-            if ($(target).hasClass('highlight') || currentTerm.highlight) {
-                const containerType = $(target).closest('pronounScope').length > 0 
-                    ? 'pronounScope' 
-                    : 'padding'
-                
-                const specialHighlightElements = $(target).closest(containerType).find(currentTerm.en)
-                removeHighlight(specialHighlightElements)
-            }
+        if (HighlightSanityChecker.target === event.currentTarget) {
+            HighlightSanityChecker.executeCleanup();
         }
     })
 }
