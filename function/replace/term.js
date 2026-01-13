@@ -120,73 +120,34 @@ function replace_term(path, mode, paragraphs = document) {
                 }
             }
             
-            // 标记已处理 (注意: 这里仅仅标记父容器; 内部子元素如 pronoun 如果是独立术语, 会在 MutationObserver 的深度扫描中被独立处理, 并获得自己的 termProcessed 标记)
+            // 标记已处理
             node.dataset.termProcessed = "true";
         };
 
-        // --- 批量初始化 (初始执行 - 优化版) ---
-        // 遍历 DOM 节点匹配术语表 (O(N))，替代遍历术语表查找 DOM (O(M*N))
-        const root = (paragraphs === document) ? document.body : paragraphs;
-        if (root) {
-            const allElements = root.getElementsByTagName('*');
-            for (let j = 0; j < allElements.length; j++) {
-                const el = allElements[j];
-                const tag = el.tagName; // Browser guarantees uppercase for HTML elements
-                if (termMap.has(tag)) {
-                    const { index, data } = termMap.get(tag);
-                    // 避免重复处理
-                    if (!el.dataset.termProcessed) {
-                        processNode(el, data, index);
-                    }
-                }
-            }
-        }
-        
-        // --- 动态监听 (MutationObserver) ---
-        // 允许后续动态插入的 HTML (如 AJAX 加载、动态生成的卡片) 自动应用术语效果
-        // 仅在 mode=true (通常是 dynamic term) 时开启，或者全局开启
-        if (window.MutationObserver) {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.addedNodes.length) {
-                        mutation.addedNodes.forEach((node) => {
-                            if (node.nodeType === 1) { // ELEMENT_NODE
-                                // 1. 检查节点本身是否是术语标签
-                                const tagName = node.tagName;
-                                if (termMap.has(tagName)) {
-                                    const { index, data } = termMap.get(tagName);
-                                    processNode(node, data, index);
-                                }
-                                
-                                // 2. 检查节点内部是否包含术语标签 (深度查找 - 优化版)
-                                // 遍历子节点匹配 Map (O(Subtree))，替代遍历 Map 查找子节点 (O(M*Subtree))
-                                const descendants = node.getElementsByTagName('*');
-                                for (let j = 0; j < descendants.length; j++) {
-                                    const el = descendants[j];
-                                    const tag = el.tagName;
-                                    if (termMap.has(tag)) {
-                                        const { index, data } = termMap.get(tag);
-                                        if (!el.dataset.termProcessed) {
-                                            processNode(el, data, index);
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    }
-                });
-            });
+        // 适配器：将 scanAndObserve 的 (node) 调用转换为 processNode(node, data, index)
+        const processLogic = (node) => {
+             const tag = node.tagName;
+             if (termMap.has(tag)) {
+                 const { index, data } = termMap.get(tag);
+                 processNode(node, data, index);
+             }
+        };
 
-            // 观察配置
-            const config = { childList: true, subtree: true };
-            // 观察目标：paragraphs (通常是 document 或 specific container)
-            // 注意：观察 document.body 可能性能消耗较大，最好限定范围
-            const targetNode = (paragraphs === document) ? document.body : paragraphs;
-            if(targetNode) observer.observe(targetNode, config);
-            
-            // 存储 observer 以便销毁 (如果需要)
-            if(!window.termObservers) window.termObservers = [];
-            window.termObservers.push(observer);
+        if (window.scanAndObserve) {
+            window.scanAndObserve({
+                root: paragraphs,
+                processor: processLogic,
+                dataKey: 'termProcessed', 
+                tagNameMap: termMap
+            });
+        } else {
+            console.warn('scanAndObserve missing in term.js');
+            // Fallback (Simplified)
+            const root = (paragraphs === document) ? document.body : paragraphs;
+            const allElements = root ? root.getElementsByTagName('*') : [];
+            for(let i=0; i<allElements.length; i++) {
+                processLogic(allElements[i]);
+            }
         }
 
         // 所有替换与事件绑定完成 (同步部分)

@@ -7,10 +7,7 @@ function replace_character_name(path, paragraphs = document){
         const dataKey = 'characterProcessed' // 处理标记
 
         // 定义处理单个节点的函数
-        const processNode = (node) => {
-            // 防止重复处理
-            if (node.dataset[dataKey]) return;
-
+        const processLogic = (node) => {
             const $node = $(node);
             // 提取 ID (如 characterID1001 -> 1001)
             let id = null;
@@ -36,48 +33,15 @@ function replace_character_name(path, paragraphs = document){
                 getScrollSelector: (el) => '.' + classPrefix + id + '.scroll',
                 highlightColor: '#9ca8ee'
             });
-
-            node.dataset[dataKey] = "true";
         };
 
-        // 批量处理现有节点
-        characterID.forEach(id => {
-            // 使用更精确的查找，遍历所有匹配前缀的元素
-            // 这里为了与 MutationObserver 统一，可以在循环中根据 ID 查找
-            // 或者直接查找所有包含该类名的元素
-            // 原逻辑是按 ID 分组处理，这里保持一致
-            const $elements = $(paragraphs).find('.' + classPrefix + id);
-            $elements.each(function() {
-                if (!this.dataset[dataKey]) processNode(this);
+        if (window.scanAndObserve) {
+            window.scanAndObserve({
+                root: paragraphs,
+                processor: processLogic,
+                dataKey: dataKey,
+                selector: `[class*="${classPrefix}"]`
             });
-        });
-
-        // 动态监听 (MutationObserver)
-        if (window.MutationObserver) {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.addedNodes.length) {
-                        mutation.addedNodes.forEach((node) => {
-                            if (node.nodeType === 1) { // ELEMENT_NODE
-                                // 1. 检查自身
-                                if (node.className && typeof node.className === 'string' && node.className.includes(classPrefix)) {
-                                     processNode(node);
-                                }
-                                // 2. 检查子节点
-                                const $found = $(node).find(`[class*="${classPrefix}"]`);
-                                $found.each(function() {
-                                    if (!this.dataset[dataKey]) processNode(this);
-                                });
-                            }
-                        });
-                    }
-                });
-            });
-            const targetNode = (paragraphs === document) ? document.body : paragraphs;
-            if(targetNode) observer.observe(targetNode, { childList: true, subtree: true });
-            
-            if(!window.characterObservers) window.characterObservers = [];
-            window.characterObservers.push(observer);
         }
     })
 }
