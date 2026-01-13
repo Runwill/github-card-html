@@ -38,36 +38,36 @@
         'drawPile': '<drawPile></drawPile>',
 
         // 体力事件
-        'Recover': '<recover></recover>',
-        'Loss': '<loss></loss>',
-        'Cure': '<cure></cure>',
-        'Damage': '<damage></damage>',
+        'Recover': '<recover><recoverBody></recoverBody></recover>',
+        'Loss': '<loss><lossBody></lossBody></loss>',
+        'Cure': '<cure><cureEnd></cureEnd></cure>',
+        'Damage': '<damage><damageEnd></damageEnd></damage>',
 
         // Recover 时机
-        'beforeRecover': '<beforeRecover></beforeRecover>',
-        'whenRecover': '<whenRecover></whenRecover>',
-        'afterRecover': '<afterRecover></afterRecover>',
+        'beforeRecover': '<beforeRecover><recoverBody></recoverBody><beforeEnd></beforeEnd></beforeRecover>',
+        'whenRecover': '<whenRecover><recoverBody></recoverBody><whenEnd></whenEnd></whenRecover>',
+        'afterRecover': '<afterRecover><recoverBody></recoverBody><afterEnd></afterEnd></afterRecover>',
 
         // Loss 时机
-        'beforeLoss': '<beforeLoss></beforeLoss>',
-        'whenLoss': '<whenLoss></whenLoss>',
-        'afterLoss': '<afterLoss></afterLoss>',
+        'beforeLoss': '<beforeLoss><lossBody></lossBody><beforeEnd></beforeEnd></beforeLoss>',
+        'whenLoss': '<whenLoss><lossBody></lossBody><whenEnd></whenEnd></whenLoss>',
+        'afterLoss': '<afterLoss><lossBody></lossBody><afterEnd></afterEnd></afterLoss>',
 
         // Cure 时机
-        'beforeCure': '<beforeCure></beforeCure>',
-        'beforeCured': '<beforeCured></beforeCured>',
-        'whenCure': '<whenCure></whenCure>',
-        'whenCured': '<whenCured></whenCured>',
-        'afterCure': '<afterCure></afterCure>',
-        'afterCured': '<afterCured></afterCured>',
+        'beforeCure': '<beforeCure><dealtBody></dealtBody><cureEnd></cureEnd><beforeEnd></beforeEnd></beforeCure>',
+        'beforeCured': '<beforeCured><takeBody></takeBody><cureEnd></cureEnd><beforeEnd></beforeEnd></beforeCured>',
+        'whenCure': '<whenCure><dealtBody></dealtBody><cureEnd></cureEnd><whenEnd></whenEnd></whenCure>',
+        'whenCured': '<whenCured><takeBody></takeBody><cureEnd></cureEnd><whenEnd></whenEnd></whenCured>',
+        'afterCure': '<afterCure><dealtBody></dealtBody><cureEnd></cureEnd><afterEnd></afterEnd></afterCure>',
+        'afterCured': '<afterCured><takeBody></takeBody><cureEnd></cureEnd><afterEnd></afterEnd></afterCured>',
 
         // Damage 时机
-        'beforeDamage': '<beforeDamage></beforeDamage>',
-        'beforeDamaged': '<beforeDamaged></beforeDamaged>',
-        'whenDamage': '<whenDamage></whenDamage>',
-        'whenDamaged': '<whenDamaged></whenDamaged>',
-        'afterDamage': '<afterDamage></afterDamage>',
-        'afterDamaged': '<afterDamaged></afterDamaged>'
+        'beforeDamage': '<beforeDamage><dealtBody></dealtBody><damageEnd></damageEnd><beforeEnd></beforeEnd></beforeDamage>',
+        'beforeDamaged': '<beforeDamaged><takeBody></takeBody><damageEnd></damageEnd><beforeEnd></beforeEnd></beforeDamaged>',
+        'whenDamage': '<whenDamage><dealtBody></dealtBody><damageEnd></damageEnd><whenEnd></whenEnd></whenDamage>',
+        'whenDamaged': '<whenDamaged><takeBody></takeBody><damageEnd></damageEnd><whenEnd></whenEnd></whenDamaged>',
+        'afterDamage': '<afterDamage><dealtBody></dealtBody><damageEnd></damageEnd><afterEnd></afterEnd></afterDamage>',
+        'afterDamaged': '<afterDamaged><takeBody></takeBody><damageEnd></damageEnd><afterEnd></afterEnd></afterDamaged>'
     };
 
     // 如果可用，注入 GameText
