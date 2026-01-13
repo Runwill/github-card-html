@@ -155,7 +155,12 @@
              window.Game.UI.renderOtherPlayers(GameState, GameText);
         }
 
-        // 5. 更新控件
+        // 5. 渲染公共区域 (Board)
+        if (window.Game.UI.renderBoard) {
+            window.Game.UI.renderBoard(GameState, GameText);
+        }
+
+        // 6. 更新控件
         if (window.Game.UI.updateControls) {
             window.Game.UI.updateControls(GameState);
         }

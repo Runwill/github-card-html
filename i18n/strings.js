@@ -49,6 +49,7 @@
     'account.info.cancel': '撤回',
 
     'keySettings.expandAll': '展开所有术语',
+    'keySettings.inspect': '显示属性',
     'keySettings.notSet': '未设置',
     'keySettings.pressKey': '请按下按键...',
     'keySettings.hint': '按下 Esc 或 Backspace 可清除设置。',
@@ -168,6 +169,7 @@
     'nav.draft': 'Drafts',
     'nav.tokens': 'Tokens',
     'nav.permissions': 'Permissions',
+    'nav.game': 'Game',
 
     'sidebar.account': 'Account',
     'sidebar.approvals': 'Approvals',
@@ -202,12 +204,14 @@
 
     'account.info.username': 'Username',
     'account.info.userId': 'User ID',
+    'account.info.createdAt': 'Joined',
     'account.info.placeholder.intro': '(No intro yet)',
   'account.info.editUsername': 'Edit username',
     'account.info.pending': 'Pending: ',
     'account.info.cancel': 'Revoke',
 
     'keySettings.expandAll': 'Expand all terms',
+    'keySettings.inspect': 'Show Attributes',
     'keySettings.notSet': 'Not set',
     'keySettings.pressKey': 'Press a key...',
     'keySettings.hint': 'Press Esc or Backspace to clear settings.',

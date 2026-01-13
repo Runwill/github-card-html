@@ -27,6 +27,11 @@
                 isNewNode = true;
             }
 
+            // 添加 Inspector 所需的元数据
+            cardEl.setAttribute('data-inspector-type', 'card');
+            cardEl.setAttribute('data-area-name', dropZoneId);
+            cardEl.setAttribute('data-card-index', index);
+
             // 检查内容是否需要更新 (Dirty Checking)
             // 使用 data-card-key 记录上次渲染的内容
             if (isNewNode || cardEl.getAttribute('data-card-key') !== cardName) {

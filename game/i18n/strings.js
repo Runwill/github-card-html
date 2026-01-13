@@ -66,7 +66,6 @@
         'game.timing.whenConcludingStageFinish': '结束阶段结束时',
         'game.timing.afterConcludingStageFinish': '结束阶段结束后',
 
-        'game.hp': '{hp}/{maxHp}',
         'game.otherCharacters': '其他角色',
         'game.characterName': '角色名'
     };
@@ -74,6 +73,12 @@
     const en = {
         'game.round': 'Round {n}',
         'game.start': 'Start Game',
+        'game.setup': 'Game Setup',
+        'game.setup.playerCount': 'Player Count',
+        'game.setup.cardPreset': 'Card Preset',
+        'game.setup.start': 'Confirm Start',
+        'game.pause': 'Pause Game',
+        'game.resume': 'Resume Game',
         'game.endTurn': 'End Turn',
         'game.nextStep': 'Next Step',
         'game.playCard': 'Use/Play Card',
@@ -126,7 +131,6 @@
         'game.timing.whenConcludingStageFinish': 'When Concluding Stage Finish',
         'game.timing.afterConcludingStageFinish': 'After Concluding Stage Finish',
 
-        'game.hp': 'HP: {hp}/{maxHp}',
         'game.otherCharacters': 'Other Characters',
         'game.characterName': 'Character Name'
     };

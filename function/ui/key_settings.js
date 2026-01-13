@@ -1,11 +1,17 @@
 (function () {
   const STORAGE_KEY = 'user_key_bindings';
   const BUTTON_ID = 'key-settings-button';
-  const BIND_BTN_ID = 'key-bind-expand-all';
-  const ACTION_EXPAND_ALL = 'expand_all_terms';
+  
+  // Actions Definition
+  const ACTIONS = {
+      'expand_all_terms': { label: 'Expand All Terms', default: null, btnId: 'key-bind-expand-all' },
+      // default: { key: 'Control' } means the key 'Control' itself.
+      'inspect_details': { label: 'Inspect Details (Hold)', default: { key: 'Control' }, btnId: 'key-bind-inspect' }
+  };
 
   let bindings = {};
   let isRecording = false;
+  let recordingAction = null;
 
   function loadBindings() {
     try {
@@ -20,173 +26,207 @@
 
   function saveBindings() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bindings));
+    // Dispatch event for other modules
+    try {
+        window.dispatchEvent(new CustomEvent('keybindings-changed'));
+    } catch(e) {}
+  }
+
+  function getBinding(action) {
+      if (bindings[action]) return bindings[action];
+      return ACTIONS[action] ? ACTIONS[action].default : null;
   }
 
   function getBindingText(action) {
-    const bind = bindings[action];
-    if (!bind) return window.i18n ? window.i18n.t('keySettings.notSet') : '未设置';
-    
-    // 仅显示按键名，不显示修饰键
+    const bind = getBinding(action);
+    if (!bind) return window.i18n ? window.i18n.t('keySettings.notSet') : 'Not Set';
     return bind.key.toUpperCase();
   }
 
   function updateUI() {
-    const btn = document.getElementById(BIND_BTN_ID);
-    if (btn) {
-      btn.textContent = getBindingText(ACTION_EXPAND_ALL);
-    }
+    Object.keys(ACTIONS).forEach(action => {
+        const conf = ACTIONS[action];
+        const btn = document.getElementById(conf.btnId);
+        if (btn) {
+            btn.textContent = getBindingText(action);
+            btn.classList.remove('btn--primary');
+        }
+    });
   }
 
   function handleRecord(e) {
     e.preventDefault();
     e.stopPropagation();
+    
+    if (!recordingAction) return;
 
-    // 如果按下 Escape 或 Backspace，则清除绑定
+    // Clear binding on Escape/Backspace
     if (e.key === 'Escape' || e.key === 'Backspace') {
-      delete bindings[ACTION_EXPAND_ALL];
+      delete bindings[recordingAction];
       saveBindings();
-      updateUI();
       stopRecording();
       return;
     }
 
-    // 忽略单独的修饰键
-    if (['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) return;
-
-    // 仅记录按键，不记录修饰键状态
+    // We allow modifier keys to be bound directly for 'inspect_details'.
+    // e.key for Alt is "Alt", for Control is "Control".
     const binding = {
-      key: e.key,
-      ctrlKey: false,
-      altKey: false,
-      shiftKey: false,
-      metaKey: false
+      key: e.key
+      // Note: We are not storing ctrlKey/altKey state flags, just the primary key pressed.
+      // This is a simplified "Single Key" binding system.
     };
 
-    bindings[ACTION_EXPAND_ALL] = binding;
+    bindings[recordingAction] = binding;
     saveBindings();
-    updateUI();
     stopRecording();
   }
 
-  function startRecording() {
+  function startRecording(action) {
     isRecording = true;
-    const btn = document.getElementById(BIND_BTN_ID);
+    recordingAction = action;
+    
+    const conf = ACTIONS[action];
+    const btn = document.getElementById(conf.btnId);
     if (btn) {
-      btn.textContent = window.i18n ? window.i18n.t('keySettings.pressKey') : '请按下按键...';
-      btn.classList.add('btn--primary'); // 高亮
+      btn.textContent = window.i18n ? window.i18n.t('keySettings.pressKey') : 'Press key...';
+      btn.classList.add('btn--primary');
     }
+    
     document.addEventListener('keydown', handleRecord, { capture: true, once: true });
-    // 点击其他地方取消录制
-    document.addEventListener('click', cancelRecording, { capture: true, once: true });
+    document.addEventListener('mousedown', cancelRecording, { capture: true, once: true });
   }
 
   function stopRecording() {
     isRecording = false;
-    const btn = document.getElementById(BIND_BTN_ID);
-    if (btn) {
-      btn.classList.remove('btn--primary');
-    }
+    recordingAction = null;
+    
     document.removeEventListener('keydown', handleRecord, { capture: true });
-    document.removeEventListener('click', cancelRecording, { capture: true });
-    updateUI(); // 恢复显示（如果取消了）
+    document.removeEventListener('mousedown', cancelRecording, { capture: true });
+    updateUI(); 
   }
 
   function cancelRecording(e) {
-    // 如果点击的是绑定按钮自己，不要取消（因为那是触发录制的事件）
-    if (e.target.id === BIND_BTN_ID) return;
+    // If clicking the button itself, let the click handler handle it (stop vs start)
+    if (recordingAction) {
+        const conf = ACTIONS[recordingAction];
+        if (e.target.id === conf.btnId) return;
+    }
     stopRecording();
   }
 
+  /**
+   * Check if the event matches the binding for the given action.
+   * Useful for 'trigger' actions (keydown).
+   */
   function checkBinding(e, action) {
-    const bind = bindings[action];
+    const bind = getBinding(action);
     if (!bind) return false;
     
-    // 严格检查：按键匹配，且所有修饰键都未按下
-    return e.key.toLowerCase() === bind.key.toLowerCase() &&
-           !e.ctrlKey &&
-           !e.altKey &&
-           !e.shiftKey &&
-           !e.metaKey;
+    if (!(e instanceof KeyboardEvent)) return false;
+
+    // Strict matching for trigger: The key pressed MUST be the bound key.
+    return e.key.toLowerCase() === bind.key.toLowerCase();
+  }
+  
+  /**
+   * Check if the action is currently "active" (held down).
+   * Useful for state checks (is specific key held?).
+   * Supports both KeyboardEvent (is this the key?) and MouseEvent (is the modifier held?).
+   */
+  function isActionActive(e, action) {
+      const bind = getBinding(action);
+      if (!bind) return false;
+
+      const targetKey = bind.key.toLowerCase();
+
+      // IF the bound key IS a modifier (Alt, Control, Shift, Meta),
+      // we can check the modifier flags on ANY event (Mouse or Keyboard).
+      if (targetKey === 'alt') return e.altKey;
+      if (targetKey === 'control') return e.ctrlKey;
+      if (targetKey === 'shift') return e.shiftKey;
+      if (targetKey === 'meta') return e.metaKey;
+
+      // If it's a regular key (e.g. "Space" or "A"), we can only check it if
+      // 1. This is a KeyboardEvent and e.key matches.
+      // 2. We don't really know if "A" is held during a MouseEvent without tracking global state.
+      //    For now, we only support modifier keys for MouseEvent checks.
+      if (e instanceof KeyboardEvent) {
+          return e.key.toLowerCase() === targetKey;
+      }
+
+      return false;
   }
 
   function expandAllTerms() {
     const panel = document.getElementById('panel_term');
     if (!panel) return;
-    
-    // 找到所有折叠的 toggle 按钮
-    // 注意：collapsible.js 给收起的元素加了 .is-collapsed 类
-    // 对应的按钮也有 .is-collapsed 类
     const toggles = panel.querySelectorAll('.collapsible__toggle.is-collapsed');
-    if (toggles.length === 0) return;
-
-    toggles.forEach(btn => {
-      btn.click();
-    });
-    
-    // 简单的提示
-    console.log('Expanded ' + toggles.length + ' terms.');
+    toggles.forEach(btn => btn.click());
+    if(toggles.length > 0) console.log(`Expanded ${toggles.length} terms.`);
   }
 
   function init() {
     loadBindings();
 
     const setupUI = () => {
-      // 绑定打开弹窗按钮
       const openBtn = document.getElementById(BUTTON_ID);
       if (openBtn) {
         openBtn.addEventListener('click', () => {
-          // 使用 CardUI 框架打开弹窗，以保证样式和行为一致
-          if (window.CardUI && window.CardUI.Manager && window.CardUI.Manager.Controllers && window.CardUI.Manager.Controllers.modal) {
+          if (window.CardUI?.Manager?.Controllers?.modal) {
             window.CardUI.Manager.Controllers.modal.showModal('key-settings-modal');
           } else {
-            // Fallback: 手动操作 DOM (仅当 CardUI 未加载时)
-            console.warn('CardUI framework not found, using fallback modal logic');
-            const sb = document.getElementById('sidebar-menu');
-            if(sb) {
-                sb.classList.remove('show');
-                sb.style.display = 'none';
-            }
-            const sbb = document.getElementById('sidebar-backdrop');
-            if(sbb) {
-                sbb.classList.remove('show');
-                sbb.style.display = 'none';
-            }
-            
-            const modal = document.getElementById('key-settings-modal');
-            const backdrop = document.getElementById('modal-backdrop');
-            
-            if(modal && backdrop) {
-                backdrop.style.display = 'block';
-                modal.style.display = 'block';
-                // 强制重绘
-                void backdrop.offsetWidth;
-                void modal.offsetWidth;
-                
-                backdrop.classList.add('show');
-                modal.classList.add('show');
-            }
+             // Fallback
+             const modal = document.getElementById('key-settings-modal');
+             const backdrop = document.getElementById('modal-backdrop');
+             if(modal && backdrop) {
+                 backdrop.classList.add('show');
+                 modal.classList.add('show');
+                 modal.style.display = 'block';
+                 backdrop.style.display = 'block';
+             }
           }
           updateUI();
         });
-      } else {
-        console.warn('Key settings button not found');
+      }
+      
+      // Close logic for fallback
+      const backdrop = document.getElementById('modal-backdrop');
+      if (backdrop) {
+            backdrop.addEventListener('click', () => {
+                const modal = document.getElementById('key-settings-modal');
+                if (modal && modal.style.display === 'block' && !window.CardUI?.Manager?.Controllers?.modal) {
+                    modal.classList.remove('show');
+                    backdrop.classList.remove('show');
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        backdrop.style.display = 'none';
+                    }, 300);
+                }
+            });
       }
 
-      // 绑定录制按钮
-      const bindBtn = document.getElementById(BIND_BTN_ID);
-      if (bindBtn) {
-        bindBtn.addEventListener('click', (e) => {
-          e.stopPropagation(); // 防止触发 document click 取消
-          if (isRecording) {
-              stopRecording();
-          } else {
-              startRecording();
+      // Bind record buttons
+      Object.keys(ACTIONS).forEach(action => {
+          const conf = ACTIONS[action];
+          const btn = document.getElementById(conf.btnId);
+          if (btn) {
+              // Clone to remove old listeners
+              const newBtn = btn.cloneNode(true);
+              btn.parentNode.replaceChild(newBtn, btn);
+              
+              newBtn.addEventListener('click', (e) => {
+                  e.stopPropagation();
+                  if (isRecording && recordingAction === action) {
+                      stopRecording();
+                  } else {
+                      if (isRecording) stopRecording();
+                      startRecording(action);
+                  }
+              });
           }
-        });
-      }
+      });
     };
 
-    // 等待 partials 加载完成
     if (window.partialsReady) {
       window.partialsReady.then(setupUI);
     } else if (document.readyState === 'loading') {
@@ -195,39 +235,24 @@
       setupUI();
     }
 
-    // 全局按键监听
+    // Global Key Listener
     document.addEventListener('keydown', (e) => {
-      if (isRecording) return; // 录制时由 handleRecord 处理
-      
-      // 如果在输入框中，不触发快捷键
+      if (isRecording) return; 
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
 
-      if (checkBinding(e, ACTION_EXPAND_ALL)) {
+      if (checkBinding(e, 'expand_all_terms')) {
         e.preventDefault();
         expandAllTerms();
       }
     });
-    
-    // 监听点击遮罩关闭弹窗 (如果是手动模式)
-    const backdrop = document.getElementById('modal-backdrop');
-    if (backdrop) {
-        backdrop.addEventListener('click', () => {
-            const modal = document.getElementById('key-settings-modal');
-            if (modal && modal.style.display === 'block') {
-                 if (window.CardUI && window.CardUI.Manager && window.CardUI.Manager.Controllers && window.CardUI.Manager.Controllers.modal) {
-                    window.CardUI.Manager.Controllers.modal.hideModal('key-settings-modal');
-                 } else {
-                    modal.classList.remove('show');
-                    backdrop.classList.remove('show');
-                    setTimeout(() => {
-                        modal.style.display = 'none';
-                        backdrop.style.display = 'none';
-                    }, 300);
-                 }
-            }
-        });
-    }
   }
+  
+  // Expose API
+  window.KeySettings = {
+      isActionActive,
+      checkBinding, // Expose for triggers
+      ACTIONS
+  };
 
   init();
 })();

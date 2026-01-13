@@ -11,6 +11,16 @@
         // selfRole: 当前用户操作的角色实体
         const selfRole = GameState.players[GameState.currentPlayerIndex];
         if (!selfRole) return;
+        
+        // 绑定自身面板的 Inspector
+        const currentPanel = document.querySelector('.current-character-panel');
+        if (currentPanel && !currentPanel.hasAttribute('data-inspector-type')) {
+            currentPanel.setAttribute('data-inspector-type', 'role');
+            currentPanel.setAttribute('data-role-id', selfRole.id);
+        } else if (currentPanel) {
+            // 确保 ID 正确 (如果是 hotseat 模式可能会变)
+            currentPanel.setAttribute('data-role-id', selfRole.id);
+        }
 
         // 名字 (角色/武将)
         const nameEl = document.getElementById('char-name');
@@ -41,10 +51,7 @@
         // 血量
         const hpEl = document.getElementById('char-hp-display');
         if (hpEl) {
-            const newHpText = `${selfRole.health}/${selfRole.healthLimit}`; 
-            const finalHpText = (typeof i18n !== 'undefined' && i18n.t) 
-                ? i18n.t('game.hp', { hp: selfRole.health, maxHp: selfRole.healthLimit })
-                : newHpText;
+            const finalHpText = `${selfRole.health}/${selfRole.healthLimit}`;
 
             if (hpEl.textContent !== finalHpText) {
                 hpEl.classList.remove('hp-changed');
@@ -65,25 +72,17 @@
             };
         }
 
-        // 区域（手牌、处理区）
-        // 处理区
-        if (GameState.treatmentArea) {
-            const el = document.getElementById('header-treatment-area');
-            if (el) {
-                const key = GameState.treatmentArea.name || 'treatmentArea';
-                const html = GameText.render(key);
-                if (el.innerHTML !== html) el.innerHTML = html;
-            }
-            // 渲染卡牌
-            if (window.Game.UI.renderCardList) {
-                window.Game.UI.renderCardList('treatment-area-container', GameState.treatmentArea.cards || [], 'treatmentArea');
-            }
-        }
+        // 区域（手牌）
+        // (处理区已移至 board_renderer.js)
         
         // 手牌
         if (selfRole.hand) {
             const el = document.getElementById('header-hand-area');
             if (el) {
+                // Add Inspector
+                el.setAttribute('data-inspector-type', 'area');
+                el.setAttribute('data-area-name', 'hand'); // 注意：这里的 hand 上下文依赖于当前角色
+
                 const key = selfRole.hand.name || 'hand';
                 const html = GameText.render(key);
                 if (el.innerHTML !== html) el.innerHTML = html;
@@ -113,6 +112,9 @@
                 pEl = document.createElement('div');
                 pEl.id = `player-summary-${role.id}`;
                 pEl.className = 'other-player-summary';
+                // Inspector Meta
+                pEl.setAttribute('data-inspector-type', 'role');
+                pEl.setAttribute('data-role-id', role.id);
                 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'player-name';
@@ -157,9 +159,7 @@
             
             // 血量
             const hpSpan = pEl.querySelector('.player-hp');
-            const finalHpText = (typeof i18n !== 'undefined' && i18n.t) 
-                ? i18n.t('game.hp', { hp: role.health, maxHp: role.healthLimit })
-                : `${role.health}/${role.healthLimit}`;
+            const finalHpText = `${role.health}/${role.healthLimit}`;
             
             if (hpSpan.textContent !== finalHpText) {
                 hpSpan.classList.remove('hp-changed');

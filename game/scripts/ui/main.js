@@ -15,6 +15,11 @@
         if (window.Game.UI.updateUI) {
             window.Game.UI.updateUI();
         }
+
+        // 初始化检查器 (Tooltip)
+        if (window.Game.UI.Inspector && window.Game.UI.Inspector.init) {
+            window.Game.UI.Inspector.init();
+        }
     }
 
     // 暴露 init
