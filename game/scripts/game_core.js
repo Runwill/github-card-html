@@ -268,6 +268,9 @@
         const board = document.getElementById('game-board-panel');
         if (board) board.classList.remove('hidden');
 
+        const table = document.getElementById('game-table-panel');
+        if (table) table.classList.remove('hidden');
+
         if (window.Game.UI && window.Game.UI.updateUI) {
             window.Game.UI.updateUI();
         }
@@ -486,3 +489,5 @@
     };
 
 })();
+
+

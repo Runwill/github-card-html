@@ -18,8 +18,13 @@
                 el.setAttribute('data-area-name', 'treatmentArea');
                 
                 const key = GameState.treatmentArea.name || 'treatmentArea';
-                const html = GameText.render(key);
-                if (el.innerHTML !== html) el.innerHTML = html;
+                const renderKey = `area:${key}`;
+
+                if (el.getAttribute('data-render-key') !== renderKey) {
+                    const html = GameText.render(key);
+                    el.innerHTML = html;
+                    el.setAttribute('data-render-key', renderKey);
+                }
             }
             // 渲染卡牌
             if (window.Game.UI.renderCardList) {

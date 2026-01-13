@@ -1,29 +1,41 @@
 <div class="tabs-panel" id="panel_game">
     <div class="game-container">
-        <!-- Independent Log Panel -->
-        <div class="game-panel game-log-panel">
-            <div id="game-breadcrumbs" class="breadcrumbs"></div>
-            <div id="game-timing-badge" class="timing-badge"></div>
-        </div>
+        <!-- Top Section: Board/Controls + Sidebar -->
+        <div class="game-top-section">
+            <div class="game-layout-main">
 
-        <!-- Independent Control Panel -->
-        <div class="game-panel game-action-panel">
-            <div id="game-controls">
-                <button class="btn btn--primary" id="btn-show-setup" data-i18n="game.setup">Game Setup</button>
-                <button class="btn btn--primary hidden" id="btn-start-game" data-i18n="game.start">Start Game</button>
-                <button class="btn btn--secondary hidden" id="btn-pause-game" data-i18n="game.pause">Pause</button>
-                
-                <div class="speed-control-group" id="speed-control-group" style="display: inline-flex; align-items: center; margin-left: 10px;">
-                    <input type="range" id="game-speed-range" min="10" max="1000" step="10" value="50" style="width: 100px; vertical-align: middle;">
-                    <span id="game-speed-val" style="margin-left: 5px; font-size: 0.8rem; width: 40px;">50ms</span>
+            <!-- NEW: Card Table Area (Encircling Layout) -->
+            <div class="game-panel game-table-panel hidden" id="game-table-panel" style="background: none; border: none; box-shadow: none; padding: 0;">
+                <div class="table-layout-grid">
+                    <!-- Left Side (Upstream) -->
+                    <div class="table-side-col left-col">
+                        <div id="role-list-left" class="role-column"></div>
+                    </div>
+
+                    <!-- Center (Top Opponents + Treatment Area) -->
+                    <div class="table-center-col">
+                        <!-- Top Row Opponents -->
+                        <div id="role-list-top" class="role-row"></div>
+                        
+                        <!-- Treatment Area (Center) -->
+                        <div class="game-panel game-board-panel hidden" id="game-board-panel" style="margin-top: 15px; width: 100%;">
+                            <div class="treatment-area-wrappper" style="position: relative;">
+                                <div id="header-treatment-area" class="area-watermark">Treatment Area</div>
+                                <div id="treatment-area-container" class="cards-container treatment-container">
+                                    <!-- Cards will be rendered here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side (Downstream) -->
+                    <div class="table-side-col right-col">
+                        <div id="role-list-right" class="role-column"></div>
+                    </div>
                 </div>
-
-                <button class="btn btn--success hidden" id="btn-play-card" data-i18n="game.playCard">Play Card</button>
-                <button class="btn btn--danger hidden" id="btn-end-turn" data-i18n="game.endTurn">End Turn</button>
             </div>
-        </div>
 
-        <!-- Setup Panel -->
+            <!-- Setup Panel (kept separate or overlay) -->
         <div id="game-setup-ui" class="game-panel hidden" style="border: 1px solid #444; padding: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.5);">
             <div class="row">
                  <div class="input-group">
@@ -53,43 +65,61 @@
             </div>
         </div>
 
-        <!-- Public Board Area -->
-        <div class="game-panel game-board-panel hidden" id="game-board-panel">
-            <div class="treatment-area-wrappper">
-                <h4 id="header-treatment-area">Treatment Area</h4>
-                <div id="treatment-area-container" class="cards-container treatment-container">
-                    <!-- Cards will be rendered here -->
+            </div> <!-- End of game-layout-main -->
+
+            <div class="game-layout-sidebar">
+                <div class="game-panel game-log-panel">
+                    <div id="game-timing-badge" class="timing-badge"></div>
+                    <div id="game-breadcrumbs" class="breadcrumbs"></div>
                 </div>
             </div>
-        </div>
+        </div> <!-- End of game-top-section -->
         
-        <div class="game-main-area hidden" id="game-main-area">
-            <div class="current-character-panel">
-                <div class="character-info">
-                    <div class="char-avatar">
-                        <img id="char-img" src="" alt="Character Avatar">
+        <!-- Bottom Section: Main Perspective -->
+        <div class="game-bottom-section">
+            <!-- Independent Control Panel -->
+            <div class="game-panel game-action-panel">
+                <div id="game-controls">
+                    <button class="btn btn--primary" id="btn-show-setup" data-i18n="game.setup">Game Setup</button>
+                    <button class="btn btn--primary hidden" id="btn-start-game" data-i18n="game.start">Start Game</button>
+                    <button class="btn btn--secondary hidden" id="btn-pause-game" data-i18n="game.pause">Pause</button>
+                    
+                    <div class="speed-control-group" id="speed-control-group" style="display: inline-flex; align-items: center; margin-left: 10px;">
+                        <input type="range" id="game-speed-range" min="10" max="1000" step="10" value="50" style="width: 100px; vertical-align: middle;">
+                        <span id="game-speed-val" style="margin-left: 5px; font-size: 0.8rem; width: 40px;">50ms</span>
                     </div>
-                    <div class="char-details">
-                        <h3 id="char-name" data-i18n="game.characterName">Character Name</h3>
-                        <div class="char-stats">
-                            <span class="stat-hp" id="char-hp-display">4/4</span>
+
+                    <button class="btn btn--success hidden" id="btn-play-card" data-i18n="game.playCard">Play Card</button>
+                    <button class="btn btn--danger hidden" id="btn-end-turn" data-i18n="game.endTurn">End Turn</button>
+                </div>
+            </div>
+
+            <div class="game-main-area hidden" id="game-main-area">
+                <div class="main-perspective-container">
+                <div class="current-character-panel" style="position: relative;">
+                    <div class="player-hand" style="position: relative;">
+                        <div id="header-hand-area" class="area-watermark">Hand Cards</div>
+                        <div id="hand-cards-container" class="cards-container">
+                            <!-- Cards will be rendered here -->
+                        </div>
+                    </div>
+
+                    <div class="character-info">
+                        <div class="char-avatar">
+                            <img id="char-img" src="" alt="Character Avatar">
+                        </div>
+                        <div class="char-details">
+                            <h3 id="char-name" data-i18n="game.characterName">Character Name</h3>
+                            <div class="char-stats">
+                                <span class="stat-hp" id="char-hp-display">4/4</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-                <div class="player-hand">
-                    <h4 id="header-hand-area">Hand Cards</h4>
-                    <div id="hand-cards-container" class="cards-container">
-                        <!-- Cards will be rendered here -->
-                    </div>
-                </div>
-            </div>
-            
-            <div class="role-list-panel">
-                <div id="role-list-container" class="role-list">
-                    <!-- Other players summaries -->
-                </div>
+                
+                <!-- Role List moved to Top Table Panel -->
             </div>
         </div>
+        </div> <!-- End of game-bottom-section -->
     </div>
 </div>

@@ -84,8 +84,13 @@
                 el.setAttribute('data-area-name', 'hand'); // 注意：这里的 hand 上下文依赖于当前角色
 
                 const key = selfRole.hand.name || 'hand';
-                const html = GameText.render(key);
-                if (el.innerHTML !== html) el.innerHTML = html;
+                const renderKey = `area:${key}`;
+                
+                if (el.getAttribute('data-render-key') !== renderKey) {
+                    const html = GameText.render(key);
+                    el.innerHTML = html;
+                    el.setAttribute('data-render-key', renderKey);
+                }
             }
             // 渲染卡牌
             const handCards = selfRole.hand.cards ? selfRole.hand.cards : selfRole.hand;
@@ -100,11 +105,36 @@
      * 场上所有角色的列表
      */
     function renderRoleList(GameState, GameText) {
-        const roleListContainer = document.getElementById('role-list-container');
-        if (!roleListContainer) return;
+        // Find split containers
+        const containerLeft = document.getElementById('role-list-left');
+        const containerTop = document.getElementById('role-list-top');
+        const containerRight = document.getElementById('role-list-right');
+
+        // Fallback for setups without new layout (if any)
+        const legacyContainer = document.getElementById('role-list-container');
         
-        // 同步角色列表
+        if (!containerLeft && !containerTop && !containerRight && !legacyContainer) return;
+
+        // "Main" player is now the Current Active Player (Center of attention)
+        const mainPlayerIndex = GameState.currentPlayerIndex; 
+        const playerCount = GameState.players.length;
+
         GameState.players.forEach((role, index) => {
+            // Calculate relative position based on Current Player
+            // diff = 0 (Main/Bottom), 1 (Right), N-1 (Left), Others (Top)
+            const diff = (index - mainPlayerIndex + playerCount) % playerCount;
+
+            // EXCLUDE MAIN PLAYER from Table (They are in Main/Bottom view)
+            if (diff === 0) return;
+
+            // Determine Target Container
+            let targetContainer = legacyContainer;
+            if (!targetContainer) {
+                if (diff === 1) targetContainer = containerRight;
+                else if (diff === playerCount - 1) targetContainer = containerLeft;
+                else targetContainer = containerTop;
+            }
+
             // 虽然HTML ID 仍沿用 player-summary- 以匹配旧 CSS，但逻辑上这是 Role
             let pEl = document.getElementById(`player-summary-${role.id}`);
             
@@ -129,9 +159,16 @@
                 equipDiv.style.fontSize = '0.8em';
                 equipDiv.style.color = '#aaa';
                 pEl.appendChild(equipDiv);
-
-                roleListContainer.appendChild(pEl);
+                
+                if (targetContainer) targetContainer.appendChild(pEl);
+            } else {
+                // Ensure it is in the correct container (in case players added dynamically or re-sorted)
+                if (targetContainer && pEl.parentElement !== targetContainer) {
+                    targetContainer.appendChild(pEl);
+                }
             }
+            
+            // 激活状态 (当前回合角色)
             
             // 激活状态 (当前回合角色)
             if (index === GameState.currentPlayerIndex) {
@@ -147,15 +184,22 @@
             if (Array.isArray(key) && key.length > 0) key = key[0];
             if (!key) key = role.name;
 
-            // 使用 GameText 渲染 Character (武将)
-            let newNameHtml;
-            if (role.characterId && GameText) {
-                 newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
-            } else {
-                 newNameHtml = GameText ? GameText.render(key) : key;
-            }
+            // FIX: Use dirty check key to prevent infinite replace loop
+            const renderKey = role.characterId ? `char:${role.characterId}:${key}` : `char:default:${key}`;
 
-            if (nameSpan.innerHTML !== newNameHtml) nameSpan.innerHTML = newNameHtml;
+            // Check using stable key instead of volatile innerHTML
+            if (nameSpan.getAttribute('data-render-key') !== renderKey) {
+                // 使用 GameText 渲染 Character (武将)
+                let newNameHtml;
+                if (role.characterId && GameText) {
+                     newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
+                } else {
+                     newNameHtml = GameText ? GameText.render(key) : key;
+                }
+
+                nameSpan.innerHTML = newNameHtml;
+                nameSpan.setAttribute('data-render-key', renderKey);
+            }
             
             // 血量
             const hpSpan = pEl.querySelector('.player-hp');
@@ -192,11 +236,21 @@
         });
         
         // 清理移除的角色
-        Array.from(roleListContainer.children).forEach(child => {
-            const id = parseInt(child.id.replace('player-summary-', ''));
-            if (!GameState.players.find(p => p.id === id)) {
-                roleListContainer.removeChild(child);
-            }
+        const allContainers = [containerLeft, containerTop, containerRight, legacyContainer];
+        allContainers.forEach(container => {
+            if (!container) return;
+            Array.from(container.children).forEach(child => {
+                const id = parseInt(child.id.replace('player-summary-', ''));
+                const playerExists = GameState.players.find(p => p.id === id);
+                
+                // Remove if player doesn't exist OR if this player is now the Main Player (Bottom View)
+                // The Main Player is GameState.players[GameState.currentPlayerIndex]
+                const isMainNow = (GameState.players[GameState.currentPlayerIndex] && GameState.players[GameState.currentPlayerIndex].id === id);
+
+                if (!playerExists || isMainNow) {
+                    container.removeChild(child);
+                }
+            });
         });
     }
 
@@ -209,3 +263,11 @@
     window.Game.UI.renderOtherRoles = renderRoleList;
     window.Game.UI.renderOtherPlayers = renderRoleList;
 })();
+
+
+
+
+
+
+
+

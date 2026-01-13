@@ -18,19 +18,65 @@
 
 /* Game Panel Container */
 #panel_game {
-    padding: 20px;
+    padding: 15px;
     background-color: var(--bg-start);
-    min-height: calc(100vh - 100px);
+    /* Further reduced height to ensure it clears the fixed footer completely */
+    /* 100vh - Header(~60) - Footer(~40) - Safety Buffer(~60) = ~160px */
+    height: calc(100vh - 160px) !important; 
+    box-sizing: border-box;
+    overflow: hidden !important; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: var(--text);
+    /* Note: Display is handled by tabs system, overridden below for active state */
+}
+
+/* Ensure flex layout is only applied when tab is active */
+#panel_game.is-active {
+    display: flex !important;
+    flex-direction: column;
 }
 
 .game-container {
     display: flex;
+    flex-direction: column; /* Vertical stack */
+    flex: 1; /* Turn into flex child filling parent */
+    gap: 15px;
+    width: 100%; /* Occupy full width */
+    max-width: none; /* Remove width restriction */
+    margin: 0; 
+    min-height: 0; /* Critical for scroll inside flex */
+}
+
+.game-top-section {
+    display: flex;
+    flex-direction: row;
+    /* Use stretch to ensure children (.game-layout-main) fill the full height */
+    align-items: stretch;
+    gap: 20px;
+    width: 100%;
+    /* Flex grow to push bottom section down */
+    flex: 1 1 auto; 
+    min-height: 0; /* Enable internal scrolling */
+    overflow-y: auto; /* Scrollbar appears here */
+    overflow-x: hidden;
+    padding-right: 5px; /* Scrollbar spacing */
+    padding-bottom: 10px;
+}
+
+.game-layout-main {
+    flex: 1;
+    display: flex;
     flex-direction: column;
     gap: 20px;
-    max-width: 1400px;
-    margin: 0 auto;
+    min-width: 0;
+}
+
+.game-layout-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 /* New Independent Panels */
@@ -44,17 +90,20 @@
 }
 
 .game-log-panel {
-    height: 160px;
-    overflow-y: auto;
+    min-height: 100px;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 15px;
 }
 
 .game-action-panel {
     display: flex;
     justify-content: center;
     padding: 15px;
+    /* Remove contrast borders for seamless look */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 /* Custom Scrollbar for Webkit */
@@ -128,24 +177,37 @@
     border-radius: 20px; /* Pill shape */
     border: 1px solid transparent; /* Ensure consistent box model */
     transition: all 0.3s ease;
-    display: inline-flex;
+    display: flex; /* Changed to flex to fill container in column layout */
     align-items: center;
     justify-content: center;
     letter-spacing: 0.02em;
     line-height: 1.4;
-    min-height: 42px; /* Enforce consistent height */
+    min-height: 44px; /* Slightly increased to account for borders */
     white-space: nowrap; /* Prevent text wrapping */
     flex-shrink: 0; /* Prevent badge from shrinking */
-    margin-left: 20px;
+    margin-left: 0; /* Removed margin-left as it is now stacked */
+    width: 100%; /* Take full width when stacked */
     box-sizing: border-box;
+}
+
+.timing-badge:empty::before {
+    content: "\00a0"; /* Non-breaking space to maintain height when empty */
+    visibility: hidden;
 }
 
 .timing-badge .term-click {
     border-bottom: none; /* Remove underline inside badge to keep height consistent */
 }
 
-/* Main Game Area */
+/* Main Game Area (Main Perspective) */
 .game-main-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.main-perspective-container {
     display: flex;
     gap: 20px;
     align-items: flex-start;
@@ -435,12 +497,14 @@
 
 /* Game Board Panel (Central/Public Area) */
 .game-board-panel {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 6px var(--shadow-1);
-    margin-bottom: 20px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    /* Ensure auto margin from previous fix is preserved if defined in inline style, 
+       but here we keep margin-bottom if needed for spacing, though inline style 'auto' takes precedence */
+    margin-bottom: 20px; 
 }
 
 .game-board-panel h3 {
@@ -453,6 +517,39 @@
     padding-bottom: 10px;
     margin-bottom: 15px;
 }
+
+/* Specific override for treatment container */
+.treatment-container {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    justify-content: center; /* Horizontally center the cards */
+    /* Critical: allow clicks to pass through the empty container space to the watermark below */
+    pointer-events: none; 
+}
+
+/* Ensure cards inside the treatment container are still interactive */
+.treatment-container > * {
+    pointer-events: auto;
+}
+
+/* Fix: Allow dropping cards into treatment container when dragging */
+body.is-global-dragging .treatment-container {
+    pointer-events: auto !important;
+}
+
+/* Hand Area Text Click-Through Fix */
+#hand-cards-container {
+    pointer-events: none; /* Allow clicks to pass through empty space to watermark */
+}
+#hand-cards-container > * {
+    pointer-events: auto; /* Cards remain interactive */
+}
+body.is-global-dragging #hand-cards-container {
+    pointer-events: auto !important; /* Allow dropping during drag */
+}
+
+
 
 /* Drag & Drop Real Movement Styles */
 .dragging-real {
@@ -613,3 +710,181 @@
     text-align: right;
     user-select: none;
 }
+@media (max-width: 1024px) {
+    .game-container {
+        flex-direction: column;
+    }
+    .game-layout-sidebar {
+        width: 100%;
+        order: -1;
+    }
+    .game-log-panel {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+@media (max-width: 1024px) {
+    .game-top-section {
+        flex-direction: column;
+    }
+    .game-layout-sidebar {
+        width: 100%;
+        order: -1;
+    }
+    .game-log-panel {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .main-perspective-container {
+        flex-direction: column;
+    }
+}
+.game-bottom-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    flex-shrink: 0; /* Prevent shrinking when top section expands */
+    padding-top: 5px; /* Optional visual separation */
+    /* Add padding to prevent overlap with footer */
+    padding-bottom: 20px; 
+    /* Force margin at bottom to push away from container edge */
+    margin-bottom: 20px;
+}
+.game-table-panel {
+    width: 100%;
+    min-height: 120px;
+    background: rgba(0, 0, 0, 0.2); 
+    border-bottom: 1px solid var(--border);
+    /* Make this panel fill the available vertical space in its parent (.game-layout-main) */
+    flex: 1;
+    display: flex; /* Activate flex to allow children (table-layout-grid) to fill height */
+    flex-direction: column;
+}
+.role-table-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 10px 0;
+    align-items: flex-start;
+}
+.role-summary {
+    min-width: 120px;
+    padding: 10px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+}
+.role-summary.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 8px var(--primary-shadow);
+}
+.role-table-layout {
+    flex-direction: row-reverse;
+    justify-content: space-around;
+}
+.table-layout-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    /* Use stretch to ensure all columns share the full height */
+    align-items: stretch; 
+    width: 100%;
+    min-height: 100%; 
+    flex: 1;
+    gap: 15px;
+}
+
+.table-side-col {
+    display: flex;
+    flex-direction: column;
+    /* Vertically center the role list within the full-height column */
+    justify-content: center; 
+    min-width: 140px;
+    padding-top: 0; 
+}
+
+.table-center-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+    /* Start from top to keep role-list-top at the top */
+    justify-content: flex-start;
+    min-height: 100%;
+}
+
+/* Ensure the treatment area centers itself in the remaining space below the top roles */
+#game-board-panel {
+    margin-top: auto !important;
+    margin-bottom: auto !important;
+}
+
+.role-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.role-row {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+}
+.current-character-panel {
+    flex-direction: row;
+    align-items: center;
+}
+
+.character-info {
+    width: 250px;
+    flex-shrink: 0;
+    border-bottom: none;
+    border-left: 1px solid var(--border);
+    padding-bottom: 0;
+    padding-left: 20px;
+    padding-right: 0;
+}
+
+.player-hand {
+    flex: 1;
+    padding-right: 20px;
+}
+.area-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--text);
+    opacity: 0.1; /* Slightly increased visibility */
+    /* Allow interaction with the watermark text */
+    pointer-events: auto;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    width: 100%;
+    text-align: center;
+    cursor: pointer; /* Show pointer to indicate clickability */
+}
+
+.cards-container {
+    position: relative;
+    z-index: 1;
+    min-height: 140px; /* Ensure height for watermark */
+}
+/* override removed to keep watermark behind cards */
+.drag-ghost {
+    background: var(--surface);
+

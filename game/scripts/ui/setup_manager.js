@@ -40,10 +40,12 @@
         const panel = document.getElementById('game-setup-ui');
         const board = document.getElementById('game-board-panel');
         const main = document.getElementById('game-main-area');
+        const table = document.getElementById('game-table-panel');
         
         if (panel) panel.classList.remove('hidden');
         if (board) board.classList.add('hidden');
         if (main) main.classList.add('hidden');
+        if (table) table.classList.add('hidden');
 
         // 加载武将数据
         if (!characterCache) {
@@ -190,3 +192,5 @@
     window.Game.Setup.init = init;
 
 })();
+
+

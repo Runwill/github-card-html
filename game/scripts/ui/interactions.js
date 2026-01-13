@@ -71,6 +71,7 @@
     function startDrag(e) {
         if (!DragState.dragElement) return; // 防止空元素
         DragState.isDragging = true;
+        document.body.classList.add('is-global-dragging');
         
         // --- 安全的元素捕获 ---
         // 我们克隆元素进行拖动，而不是移动原始元素。
@@ -416,6 +417,7 @@
     }
 
     function cleanupDrag() {
+        document.body.classList.remove('is-global-dragging');
         if (DragState.currentDropZone) {
             DragState.currentDropZone.classList.remove('drag-over');
             DragState.currentDropZone = null;
@@ -537,6 +539,7 @@
                         DragState.dragSource.sourceIndex
                     );
                 }
+                document.body.classList.remove('is-global-dragging');
                 DragState.dragElement = null; 
                 DragState.placeholderElement = null; 
             });

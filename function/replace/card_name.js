@@ -10,9 +10,9 @@ function replace_card_name(path, paragraphs = document){
     
     const dataKey = 'cardProcessed';
 
-    // 定义单节点处理逻辑 (无去重检查，�?scanAndObserve 负责)
+    // 定义单节点处理逻辑 (无去重检查，�?scanAndObserve 负责)
     const processLogic = (node) => {
-        const tagName = node.tagName; // 浏览器保证TagName为大�?
+        const tagName = node.tagName; // 浏览器保证TagName为大�?
         const info = cardMap.get(tagName);
         
         if (!info) return;
