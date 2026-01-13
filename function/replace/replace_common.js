@@ -1,29 +1,29 @@
-(function() {
+﻿(function() {
     /**
-     * ͨ�õ� DOM ɨ���� MutationObserver ��װ
-     * ���� card_name, term, character_name, skill_name ���滻�ű�
+     * 通用的 DOM 扫描与 MutationObserver 封装
+     * 用于 card_name, term, character_name, skill_name 等替换脚本
      */
 
     /**
-     * ����ȫ��ɨ�貢���� MutationObserver
+     * 启动全量扫描并挂载 MutationObserver
      * @param {object} config
-     * @param {HTMLElement} config.root - ɨ����ڵ�
-     * @param {Function} config.processor - ���Ĵ����߼�: (node) => void
-     * @param {string} config.dataKey - dataset key������ȥ�ؼ�� (�Զ�����: �� node.dataset[dataKey] ����������)
-     * @param {Map<string, any>} [config.tagNameMap] - �Ż�ģʽA: ������ tagName �� Map �е�Ԫ�� (�����д)
-     * @param {string} [config.selector] - �Ż�ģʽB: ʹ�� querySelectorAll ����Ŀ��Ԫ��
-     * @param {Function} [config.manualCheck] - �Ż�ģʽC: �ֶ���麯�� (node) => boolean�����ڼ��临�ӵ�ƥ��
-     * @param {Object} [config.context] - ���������ݣ����� processor �ĵڶ������� (optional)
+     * @param {HTMLElement} config.root - 扫描根节点
+     * @param {Function} config.processor - 核心处理逻辑: (node) => void
+     * @param {string} config.dataKey - dataset key，用于去重检查 (自动处理: 若 node.dataset[dataKey] 存在则跳过)
+     * @param {Map<string, any>} [config.tagNameMap] - 优化模式A: 仅处理 tagName 在 Map 中的元素 (必须大写)
+     * @param {string} [config.selector] - 优化模式B: 使用 querySelectorAll 查找目标元素
+     * @param {Function} [config.manualCheck] - 优化模式C: 手动检查函数 (node) => boolean，用于极其复杂的匹配
+     * @param {Object} [config.context] - 上下文数据，传给 processor 的第二个参数 (optional)
      */
     function scanAndObserve(config) {
         const { root, processor, dataKey, tagNameMap, selector, manualCheck, context } = config;
         
-        // �ڲ���װ��������������ȥ�ؼ��
+        // 内部封装处理函数：负责去重检查
         const processSafe = (node) => {
-            if (node.nodeType !== 1) return; // ������ Element
+            if (node.nodeType !== 1) return; // 仅处理 Element
             if (node.dataset[dataKey]) return;
             
-            // �������߼�
+            // 额外检查逻辑
             if (tagNameMap && !tagNameMap.has(node.tagName)) return;
             if (manualCheck && !manualCheck(node)) return;
 
@@ -34,9 +34,9 @@
         const targetRoot = root || document.body;
         if (!targetRoot) return;
 
-        // --- 1. ��ʼȫ��ɨ�� ---
+        // --- 1. 初始全量扫描 ---
         if (tagNameMap) {
-            // TagName �Ż�·��: getElementsByTagName('*') ������� Map
+            // TagName 优化路径: getElementsByTagName('*') 遍历检查 Map
             const all = targetRoot.getElementsByTagName('*');
             for (let i = 0; i < all.length; i++) {
                 if (tagNameMap.has(all[i].tagName)) {
@@ -44,20 +44,20 @@
                 }
             }
         } else if (selector) {
-            // Selector �Ż�·��
+            // Selector 优化路径
             const all = targetRoot.querySelectorAll(selector);
             for (let i = 0; i < all.length; i++) {
                 processSafe(all[i]);
             }
         } else {
-            // Fallback: ����ȫɨ
+            // Fallback: 暴力全扫
             const all = targetRoot.getElementsByTagName('*');
             for (let i = 0; i < all.length; i++) {
                 processSafe(all[i]);
             }
         }
 
-        // --- 2. ��̬���� ---
+        // --- 2. 动态监听 ---
         if (window.MutationObserver) {
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {

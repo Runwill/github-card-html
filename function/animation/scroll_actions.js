@@ -137,29 +137,8 @@
     }
   }
 
-  function commonFlow(panelId, $matches, opts){
-    // 每次新操作前取消旧操作
-    cancelCurrentOp('new-op')
-
-  // 仅在将要切换到非当前活动的 panel 时，认为是“跨页/跨面板跳转”
-  const switching = panelId ? !isPanelActive(panelId) : false
-  selectTab(panelId)
-
-    // 选择第一个可滚动的目标进行滚动（避免多次滚动抖动）
-    let scrollTarget = null
-    $matches.each(function(){
-      const el = this
-      if (!el.classList || !el.classList.contains('fadeOnly')) {
-        if (!scrollTarget) scrollTarget = el
-      }
-    })
-
-    // 若目标在 panel_term 内，先展开其路径上的所有折叠，再滚动
-    if (scrollTarget) {
-      try { expandCollapsibleAncestorsIfNeeded(scrollTarget) } catch(_) {}
-      performScroll(scrollTarget, opts)
-    }
-    // 滚动结束后，给目标位置打一条蓝色贯穿屏幕的高亮条
+  // 内部抽象：调度高亮条显示（管理延迟与生命周期）
+  function scheduleRowHighlight(scrollTarget, panelId, switching, opts) {
     const enableRowHighlight = !(opts && opts.highlightRow === false)
     if (scrollTarget && enableRowHighlight) {
       const behavior = (opts && opts.behavior) || 'smooth'
@@ -176,15 +155,53 @@
         }
       }
       if (behavior === 'smooth') {
-        // 仅在跨面板跳转时，默认延迟等于文本进场时长；否则使用 onScrollSettled 的默认值
         const sd = (opts && typeof opts.rowSettleDelay === 'number') ? opts.rowSettleDelay : (switching ? textEnterDurationMs() : undefined)
         const settleCtrl = onScrollSettled(fire, sd)
         __currentOp = { id: myOpId, panelId, settle: settleCtrl, removeOverlay: null }
       } else {
-        // 非平滑滚动基本为即时完成
         const remover = (isPanelActive(panelId)) ? (highlightRowAtElement(scrollTarget, opts) || null) : null
         __currentOp = { id: ++__opSeq, panelId, settle: { cancel: function(){} }, removeOverlay: remover }
       }
+    }
+  }
+
+  // 内部抽象：执行核心滚动动作序列
+  // 包括：状态重置、切换 Tab、展开折叠、滚动、高亮
+  function executeScrollAction(panelId, scrollTarget, opts) {
+    if (!scrollTarget) return
+
+    // 1. 每次新操作前取消旧操作
+    cancelCurrentOp('new-op')
+
+    // 2. 切换 Tab (并判断是否跨面板)
+    const switching = panelId ? !isPanelActive(panelId) : false
+    selectTab(panelId)
+
+    // 3. 展开路径上的折叠区域
+    try { expandCollapsibleAncestorsIfNeeded(scrollTarget) } catch(_) {}
+
+    // 4. 执行滚动
+    performScroll(scrollTarget, opts)
+
+    // 5. 调度高亮
+    scheduleRowHighlight(scrollTarget, panelId, switching, opts)
+  }
+
+  function commonFlow(panelId, $matches, opts){
+    // 选择第一个可滚动的目标
+    let scrollTarget = null
+    $matches.each(function(){
+      const el = this
+      // 忽略仅用于淡入淡出的辅助元素
+      if (!el.classList || !el.classList.contains('fadeOnly')) {
+        if (!scrollTarget) scrollTarget = el
+        // 找到第一个即停止
+        if (scrollTarget) return false 
+      }
+    })
+
+    if (scrollTarget) {
+      executeScrollAction(panelId, scrollTarget, opts)
     }
   }
 
@@ -242,10 +259,6 @@
     const $matches = $(`.scroll.${className}`)
     if (!$matches || !$matches.length) return
 
-  // 判断是否跨面板
-  const switching = panelId ? !isPanelActive(panelId) : false
-  selectTab(panelId)
-
     let scrollTarget = null
     $matches.each(function(){
       const el = this
@@ -254,24 +267,14 @@
           const container = centerSelector ? $(el).closest(centerSelector)[0] : el
           scrollTarget = container || el
         }
+        if (scrollTarget) return false
       }
     })
 
-  if (scrollTarget) {
-    try { expandCollapsibleAncestorsIfNeeded(scrollTarget) } catch(_) {}
-    performScroll(scrollTarget, Object.assign({}, opts, { center: true }))
-  }
-    // 滚动结束后行高亮
-    const enableRowHighlight = !(opts && opts.highlightRow === false)
-    if (scrollTarget && enableRowHighlight) {
-      const behavior = (opts && opts.behavior) || 'smooth'
-      const fire = () => { if (isPanelActive(panelId)) highlightRowAtElement(scrollTarget, opts) }
-      if (behavior === 'smooth') {
-        const sd = (opts && typeof opts.rowSettleDelay === 'number') ? opts.rowSettleDelay : (switching ? textEnterDurationMs() : undefined)
-        onScrollSettled(fire, sd)
-      } else {
-        if (isPanelActive(panelId)) fire()
-      }
+    if (scrollTarget) {
+      // 强制启用居中
+      const newOpts = Object.assign({}, opts, { center: true })
+      executeScrollAction(panelId, scrollTarget, newOpts)
     }
   }
 

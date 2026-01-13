@@ -1,4 +1,4 @@
-// 添加自定义缓动函数以增强tooltip动画效果
+﻿// 添加自定义缓动函数以增强tooltip动画效果
 if (typeof jQuery !== 'undefined') {
     jQuery.extend(jQuery.easing, {
         easeOutBack: function (x, t, b, c, d, s) {
@@ -35,18 +35,12 @@ function replace_skill_name(path, paragraphs = document){
         }
         const $tooltip = $('#lore-tooltip');
 
-        // 单节点处理函数
-        const processNode = (node) => {
-             // 避免重复处理
-             if (node.dataset[dataKey]) return;
-
+        // 核心处理函数（dom 操作与事件绑定）
+        const processor = (node) => {
              const $node = $(node);
              const classList = node.classList;
-             let processed = false;
-
+             
              // 遍历类名进行匹配
-             // 注意: 一个节点可能既是技能名也是 Lore 触发器 (理论上分离, 但防御性编程)
-             // 考虑到 classList 是类数组对象
              for (let i = 0; i < classList.length; i++) {
                  const cls = classList[i];
 
@@ -64,7 +58,6 @@ function replace_skill_name(path, paragraphs = document){
                         scrollSelector: '.' + name + '.scroll',
                         highlightColor: '#df90ff'
                      });
-                     processed = true;
                  }
                  
                  // CASE B: Lore Tooltip 绑定
@@ -156,77 +149,47 @@ function replace_skill_name(path, paragraphs = document){
                                 $node.on('mouseleave', function () {
                                     $tooltip.removeClass('show from-left from-right').attr('aria-hidden', 'true')
                                 });
-                                processed = true;
                              }
                          }
                      }
                  }
              }
-
-             if(processed) node.dataset[dataKey] = "true";
         };
 
-        // 初始查找与处理
-        // 查找所有可能的技能名类
-        validSkillNames.forEach(name => {
-             const $els = $(paragraphs).find('.' + name);
-             $els.each(function(){ processNode(this); });
-        });
-        // 查找所有可能的 Lore 类 (从 Maps 推导较慢, 不如直接用包含选择器)
-        // 使用属性选择器或模糊查询太慢，但我们知道它一定是类。
-        // 原逻辑是构建明确的选择器。
-        // 这里我们可以遍历所有带 LoreCharacterID 的类? 不, DOM query is hard.
-        // 反向: 遍历 nameToSkill -> role -> id, 构建 selector.
-        nameToSkill.forEach((skObj, name) => {
-             if(skObj.role) {
-                 skObj.role.forEach(r => {
-                      const rid = r.id;
-                      const selector = '.' + name + 'LoreCharacterID' + rid;
-                      $(paragraphs).find(selector).each(function(){ processNode(this); });
-                 });
-             }
-        });
+        // 手动检查函数：只筛选包含特定 class 的节点
+        // 这对于 replace_common.js 的 "Fallback 全扫" 模式至关重要
+        // 只对通过检查的节点设置 data-skillProcessed="true" 并调用 processor
+        const manualCheck = (node) => {
+            if (!node.classList || !node.classList.length) return false;
+            // 快速扫描
+            for (let i = 0; i < node.classList.length; i++) {
+                const cls = node.classList[i];
+                if (validSkillNames.has(cls)) return true;
+                if (cls.includes('LoreCharacterID')) {
+                     const match = cls.match(/^(.+)LoreCharacterID(\d+)$/);
+                     if(match) {
+                        const name = match[1];
+                        if (nameToSkill.has(name)) {
+                             const rid = parseInt(match[2], 10);
+                             const skObj = nameToSkill.get(name);
+                             if(skObj.role && skObj.role.some(r => r.id === rid)) {
+                                 return true;
+                             }
+                        }
+                     }
+                }
+            }
+            return false;
+        };
 
-        // 动态监听
-        if (window.MutationObserver) {
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.addedNodes.length) {
-                        mutation.addedNodes.forEach((node) => {
-                            if (node.nodeType === 1) { 
-                                 processNode(node); 
-                                 // 深度扫描子节点?
-                                 // 由于我们无法用通用选择器一次性选中所有 skill/lore classes,
-                                 // 这里需要一种高效方式。
-                                 // 1. 扫描所有技能名
-                                 validSkillNames.forEach(name => {
-                                     $(node).find('.' + name).each(function(){ processNode(this); });
-                                 });
-                                 // 2. 扫描 lore class?
-                                 // 如果 lore 类很多, 循环查找会很慢。
-                                 // 优化: 查找所有包含 "LoreCharacterID" 字符的类? jQuery 没有 regex selector.
-                                 // 保守策略: 重复上面的 "构建所有可能 selector" 太重了。
-                                 // 假设动态插入通常是整块 HTML。
-                                 // 我们可以依赖上面的 "构建选择器" 逻辑范围缩小到 node.
-                                 
-                                 nameToSkill.forEach((skObj, name) => {
-                                     if(skObj.role) {
-                                         skObj.role.forEach(r => {
-                                              const rid = r.id;
-                                              const selector = '.' + name + 'LoreCharacterID' + rid;
-                                              $(node).find(selector).each(function(){ processNode(this); });
-                                         });
-                                     }
-                                });
-                            }
-                        });
-                    }
-                });
-            });
-            const targetNode = (paragraphs === document) ? document.body : paragraphs;
-            if(targetNode) observer.observe(targetNode, { childList: true, subtree: true });
-            if(!window.skillObservers) window.skillObservers = [];
-            window.skillObservers.push(observer);
-        }
+        // 统一调用通用扫描器
+        // 自动处理了：初始扫描、MutationObserver、去重检测 (dataKey)
+        scanAndObserve({
+            root: paragraphs,
+            processor: processor,
+            dataKey: dataKey,
+            manualCheck: manualCheck,
+            // 技能名没有特定的 TagName 或简单的选择器，所以利用 manualCheck + fallback 遍历
+        });
   })
 }
