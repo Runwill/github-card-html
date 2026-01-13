@@ -11,6 +11,58 @@ const HIGHLIGHT_CONFIG = {
 }
 
 /**
+ * 全局高亮注册表
+ * 用于追踪当前活跃的高亮元素，并在元素被移除DOM时强制执行清理逻辑
+ */
+const ActiveHighlightRegistry = {
+    items: new Set(), // Set<{ element: HTMLElement, cleanup: Function }>
+    
+    add(element, cleanup) {
+        for (const item of this.items) {
+            if (item.element === element) return;
+        }
+        this.items.add({ element, cleanup });
+    },
+    
+    remove(element) {
+        for (const item of this.items) {
+            if (item.element === element) {
+                this.items.delete(item);
+                break;
+            }
+        }
+    }
+};
+
+// 全局 MutationObserver 监听节点移除
+if (window.MutationObserver) {
+    const observer = new MutationObserver((mutations) => {
+        if (ActiveHighlightRegistry.items.size === 0) return;
+
+        mutations.forEach((mutation) => {
+            if (mutation.removedNodes.length > 0) {
+                mutation.removedNodes.forEach((removedNode) => {
+                    if (removedNode.nodeType === 1) {
+                        for (const item of ActiveHighlightRegistry.items) {
+                            if (removedNode === item.element || (removedNode.contains && removedNode.contains(item.element))) {
+                                try {
+                                    item.cleanup(item.element);
+                                } catch (e) { 
+                                    console.error('Highlight cleanup failed for detached element', e); 
+                                }
+                                ActiveHighlightRegistry.items.delete(item);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    });
+    
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+}
+
+/**
  * 统一的高亮应用函数
  * 在暗色主题下会对高亮颜色进行亮度反转（保持色相/饱和度），以获得更好的对比度
  * @param {string|jQuery} selector - 选择器或jQuery对象
@@ -49,13 +101,27 @@ function removeHighlight(selector) {
  * @param {string} scrollSelector - 滚动区域对应的选择器
  */
 function addStandardHighlight(element, color, scrollSelector) {
-    element.mouseover(function(event) {
-        applyHighlight(this, color)
-        applyHighlight(scrollSelector, color)
-    }).mouseout(function(event) {
-        removeHighlight(this)
-        removeHighlight(scrollSelector)
-    })
+    $(element).each(function() {
+        const el = this;
+        
+        const performCleanup = () => {
+            removeHighlight(el);
+            removeHighlight(scrollSelector);
+        };
+
+        $(el).mouseover(function(event) {
+            applyHighlight(this, color);
+            applyHighlight(scrollSelector, color);
+            
+            ActiveHighlightRegistry.add(this, () => {
+                performCleanup();
+                ActiveHighlightRegistry.remove(this);
+            });
+        }).mouseout(function(event) {
+            performCleanup();
+            ActiveHighlightRegistry.remove(this);
+        });
+    });
 }
 
 /**
@@ -64,45 +130,6 @@ function addStandardHighlight(element, color, scrollSelector) {
  * @param {HTMLElement} element - DOM元素
  * @param {string} mode - 模式：'', 'divided', 'part'
  */
-const HighlightSanityChecker = {
-    interval: null,
-    target: null,
-    cleanupCallback: null,
-
-    start(element, cleanup) {
-        if (this.target && this.target !== element) {
-            this.executeCleanup();
-        } else {
-            this.stop();
-        }
-
-        this.target = element;
-        this.cleanupCallback = cleanup;
-        
-        this.interval = setInterval(() => {
-            if (this.target && !document.body.contains(this.target)) {
-                this.executeCleanup();
-            }
-        }, 200);
-    },
-
-    stop() {
-        if (this.interval) {
-            clearInterval(this.interval);
-            this.interval = null;
-        }
-        this.target = null;
-        this.cleanupCallback = null;
-    },
-
-    executeCleanup() {
-        if (this.cleanupCallback) {
-            this.cleanupCallback();
-        }
-        this.stop();
-    }
-};
-
 function termHighlight(term, element, mode='') {
     const HIGHLIGHT_OPACITY = '60'
 
@@ -110,37 +137,47 @@ function termHighlight(term, element, mode='') {
         return baseColor ? `${baseColor}${HIGHLIGHT_OPACITY}` : ''
     }
 
+    const performCleanup = (target) => {
+        const currentTerm = term[target.i]
+        if (!currentTerm) {
+             removeHighlight(target);
+             return;
+        }
+
+        if(mode=='divided'){
+            currentTerm.part.forEach((part) => {
+                const enSelector = part.en
+                removeHighlight($(element).children(enSelector))
+                removeHighlight(`${currentTerm.en}.scroll ${enSelector}`)
+            })
+        }else if(mode=='part'){
+            const currentPart = currentTerm?.part[target.j]
+            if (currentPart) {
+                removeHighlight(`${currentPart.en}.scroll`)
+            }
+        }else{
+            removeHighlight(target)
+            removeHighlight(`${currentTerm.en}.scroll`)
+            
+            if ($(target).hasClass('highlight') || currentTerm.highlight) {
+                const containerType = $(target).closest('pronounScope').length > 0 
+                    ? 'pronounScope' 
+                    : 'padding'
+                
+                const specialHighlightElements = $(target).closest(containerType).find(currentTerm.en)
+                removeHighlight(specialHighlightElements)
+            }
+        }
+    };
+
     $(element).mouseover((event) => {
         const target = event.currentTarget
+        
+        // 注册 Cleanup
+        ActiveHighlightRegistry.add(target, (el) => performCleanup(el));
+
         const currentTerm = term[target.i]
         
-        const performCleanup = () => {
-             if(mode=='divided'){
-                currentTerm.part.forEach((part) => {
-                    const enSelector = part.en
-                    removeHighlight($(element).children(enSelector))
-                    removeHighlight(`${currentTerm.en}.scroll ${enSelector}`)
-                })
-            }else if(mode=='part'){
-                const currentPart = currentTerm?.part[target.j]
-                removeHighlight(`${currentPart.en}.scroll`)
-            }else{
-                removeHighlight(target)
-                removeHighlight(`${currentTerm.en}.scroll`)
-                
-                if ($(target).hasClass('highlight') || currentTerm.highlight) {
-                    const containerType = $(target).closest('pronounScope').length > 0 
-                        ? 'pronounScope' 
-                        : 'padding'
-                    
-                    const specialHighlightElements = $(target).closest(containerType).find(currentTerm.en)
-                    removeHighlight(specialHighlightElements)
-                }
-            }
-        };
-
-        HighlightSanityChecker.start(target, performCleanup);
-
         if(mode=='divided'){
             currentTerm.part.forEach((part) => {
                 const enSelector = part.en
@@ -170,8 +207,8 @@ function termHighlight(term, element, mode='') {
             }
         }
     }).mouseout((event) => {
-        if (HighlightSanityChecker.target === event.currentTarget) {
-            HighlightSanityChecker.executeCleanup();
-        }
+        const target = event.currentTarget
+        performCleanup(target);
+        ActiveHighlightRegistry.remove(target);
     })
 }

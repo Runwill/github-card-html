@@ -119,9 +119,11 @@
             const currentNode = window.Game.Core.getCurrentNode();
             if (currentNode) {
                 // 渲染内容
-                const newHtml = GameText.render(currentNode.name);
-                if (timingBadgeEl.innerHTML !== newHtml) {
-                    timingBadgeEl.innerHTML = newHtml;
+                const renderKey = currentNode.name;
+                // 使用 data-render-key 避免因全局高亮修改 DOM 导致的循环重置
+                if (timingBadgeEl.getAttribute('data-render-key') !== renderKey) {
+                    timingBadgeEl.innerHTML = GameText.render(renderKey);
+                    timingBadgeEl.setAttribute('data-render-key', renderKey);
                 }
 
                 // 样式

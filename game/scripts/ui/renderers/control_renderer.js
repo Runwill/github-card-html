@@ -13,9 +13,13 @@
         if (pauseBtn) {
             if (GameState.isGameRunning) {
                 pauseBtn.classList.remove('hidden');
-                pauseBtn.textContent = GameState.isPaused ? 
+                const btnText = GameState.isPaused ? 
                     (i18n.t('game.resume') || 'resume') : 
                     (i18n.t('game.pause') || 'pause');
+                
+                if (pauseBtn.textContent !== btnText) {
+                    pauseBtn.textContent = btnText;
+                }
             } else {
                 pauseBtn.classList.add('hidden');
             }

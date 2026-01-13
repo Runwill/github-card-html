@@ -220,9 +220,16 @@
                          const cName = typeof c === 'string' ? c : c.name;
                          return (typeof i18n !== 'undefined' && i18n.t) ? i18n.t(`game.card.${cName}`, {defaultValue: cName}) : cName;
                      });
-                     equipDiv.textContent = `[${equipNames.join(',')}]`;
+                     const newEquipText = `[${equipNames.join(',')}]`;
+                     if (equipDiv.textContent !== newEquipText) {
+                         equipDiv.textContent = newEquipText;
+                         // Add a specialized render key if we want to support HTML rendering in future, 
+                         // but for textContent, the content check is usually sufficient unless formatting changes.
+                     }
                 } else {
-                     equipDiv.textContent = '';
+                     if (equipDiv.textContent !== '') {
+                        equipDiv.textContent = '';
+                     }
                 }
             }
 
