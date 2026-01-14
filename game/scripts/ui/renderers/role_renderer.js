@@ -3,12 +3,33 @@
     window.Game.UI = window.Game.UI || {};
 
     /**
+     * Helper to resolve avatar image path
+     */
+    function resolveAvatarUrl(role) {
+        if (role.avatar) return role.avatar;
+
+        let position = role.position;
+        // Fix: If position is not at root, check _originalData (based on debug info)
+        if (!position && role._originalData) {
+            position = role._originalData.position;
+        }
+
+        if (position) {
+            // Remove _君主 suffix if present to use the base image
+            const cleanName = position.replace(/_君主$/, '');
+            // Construct path assuming images are in source/ folder
+            return `source/${cleanName}.png`;
+        }
+        return '';
+    }
+
+    /**
      * 渲染自身角色信息 (Self Role Info)
      * 对应用户操作的当前角色 (UI底部面板)
      */
     function updateSelfRoleInfo(GameState, GameText) {
         if (!GameText) return;
-        // selfRole: 当前用户操作的角色实体
+        
         const selfRole = GameState.players[GameState.currentPlayerIndex];
         if (!selfRole) return;
         
@@ -29,7 +50,15 @@
              // Ensure ID is correct
             currentPanel.setAttribute('data-role-id', selfRole.id);
         }
-
+        // 头像 (Avatar) - Main View
+        const mainAvatarImg = document.getElementById('char-img');
+        if (mainAvatarImg) {
+            const avatarUrl = resolveAvatarUrl(selfRole);
+            // Only update if changed and valid
+            if (avatarUrl && mainAvatarImg.getAttribute('src') !== avatarUrl) {
+                mainAvatarImg.src = avatarUrl;
+            }
+        }
         // 名字 (角色/武将)
         const nameEl = document.getElementById('char-name');
         if (nameEl) {
@@ -56,9 +85,35 @@
              }
         }
         
-        // 血量
+        // 血量 (Main View)
         const hpEl = document.getElementById('char-hp-display');
         if (hpEl) {
+             // Main View Seat Number
+             // Insert before HP if not exists
+             let seatEl = document.getElementById('char-seat-display');
+             if (!seatEl) {
+                 seatEl = document.createElement('span');
+                 seatEl.id = 'char-seat-display';
+                 seatEl.className = 'player-seat'; // Reuse utility class
+                 if (hpEl.parentNode) {
+                     hpEl.parentNode.insertBefore(seatEl, hpEl);
+                 }
+             }
+
+             // Seat Temporarily Hidden
+             const realIndex = GameState.players.findIndex(p => p.id === selfRole.id);
+             // const seatText = `${realIndex >= 0 ? realIndex + 1 : '?'}`;
+             /*
+             if (seatEl.textContent !== seatText) {
+                 seatEl.textContent = seatText;
+             }
+             */
+             // Ensure hidden
+             if (seatEl) seatEl.style.display = 'none';
+
+             // Ensure correct style if class was different
+             if (seatEl.className !== 'player-seat') seatEl.className = 'player-seat';
+            
             const finalHpText = `${selfRole.health}/${selfRole.healthLimit}`;
 
             if (hpEl.textContent !== finalHpText) {
@@ -71,6 +126,48 @@
                     hpEl.classList.add('hp-changed');
                 }
                 hpEl.textContent = finalHpText;
+            }
+
+            // Main View Hand Count
+            // Check if element exists, create if not
+            let handCountEl = document.getElementById('char-hand-count');
+            if (!handCountEl) {
+                handCountEl = document.createElement('span');
+                handCountEl.id = 'char-hand-count';
+                handCountEl.className = 'player-hand-count'; // Reuse utility class
+                // Insert BEFORE hpEl (and after seatEl if exists)
+                if (hpEl.parentNode) {
+                    hpEl.parentNode.insertBefore(handCountEl, hpEl);
+                }
+            } else {
+                // Check order in DOM if needed, but usually creation only happens once.
+                // If reuse, ensure it is before header
+                if (handCountEl.nextSibling !== hpEl) {
+                     if (hpEl.parentNode) {
+                        hpEl.parentNode.insertBefore(handCountEl, hpEl);
+                     }
+                }
+                
+                // Update class if needed to match summary style
+                if (handCountEl.className !== 'player-hand-count') {
+                    handCountEl.className = 'player-hand-count';
+                }
+            }
+
+            // Calc count
+            let count = 0;
+            // Try multiple properties for hand count
+            if (typeof selfRole.handCount === 'number') {
+                count = selfRole.handCount;
+            } else if (selfRole.hand) {
+                if (Array.isArray(selfRole.hand)) count = selfRole.hand.length; // Array of cards
+                else if (typeof selfRole.hand === 'number') count = selfRole.hand;
+                else if (selfRole.hand.cards) count = selfRole.hand.cards.length; // Object with cards array
+            }
+
+            const handText = ` ${count}`; // format: space + count
+            if (handCountEl.textContent !== handText) {
+                handCountEl.textContent = handText;
             }
         }
         
@@ -159,13 +256,42 @@
                 pEl.setAttribute('data-inspector-type', 'role');
                 pEl.setAttribute('data-role-id', role.id);
                 
+                // Avatar
+                // Use .char-avatar container to reuse Main View styles from game.css
+                const avatarContainer = document.createElement('div');
+                avatarContainer.className = 'char-avatar role-list-avatar'; // role-list-avatar for size override
+                
+                const avatarImg = document.createElement('img');
+                // Removed .player-avatar class to avoid style conflicts, relying on .char-avatar img
+                avatarImg.src = ''; 
+                
+                avatarContainer.appendChild(avatarImg);
+                pEl.appendChild(avatarContainer);
+
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'player-name';
                 pEl.appendChild(nameSpan);
                 
+                // Container for stats (Seat, HP, Hand) to keep them inline
+                const statsDiv = document.createElement('div');
+                statsDiv.className = 'player-stats-row';
+                
+                // Seat / Index
+                const seatSpan = document.createElement('span');
+                seatSpan.className = 'player-seat';
+                statsDiv.appendChild(seatSpan);
+
+                // Hand Count (Now before HP)
+                const handResultSpan = document.createElement('span');
+                handResultSpan.className = 'player-hand-count';
+                statsDiv.appendChild(handResultSpan);
+
+                // HP
                 const hpSpan = document.createElement('span');
                 hpSpan.className = 'player-hp stat-hp';
-                pEl.appendChild(hpSpan);
+                statsDiv.appendChild(hpSpan);
+                
+                pEl.appendChild(statsDiv);
                 
                 const equipDiv = document.createElement('div');
                 equipDiv.className = 'player-equips';
@@ -173,11 +299,19 @@
                 equipDiv.style.color = '#aaa';
                 pEl.appendChild(equipDiv);
                 
+                // Add animation class for new elements (e.g. moving from Main View to Role View)
+                pEl.classList.add('role-moving');
+                
                 if (targetContainer) targetContainer.appendChild(pEl);
             } else {
                 // Ensure it is in the correct container (in case players added dynamically or re-sorted)
                 if (targetContainer && pEl.parentElement !== targetContainer) {
+                    pEl.classList.remove('role-moving');
                     targetContainer.appendChild(pEl);
+                    
+                    // Trigger reflow to play animation
+                    void pEl.offsetWidth;
+                    pEl.classList.add('role-moving');
                 }
             }
             
@@ -190,44 +324,86 @@
                 pEl.classList.remove('active');
             }
             
+            // 头像 (Avatar)
+            const avatarImg = pEl.querySelector('.char-avatar img');
+            if (avatarImg) {
+                const avatarUrl = resolveAvatarUrl(role);
+                
+                if (avatarUrl && avatarImg.getAttribute('src') !== avatarUrl) {
+                    avatarImg.src = avatarUrl;
+                }
+            }
+
             // 名字 (角色/武将)
             const nameSpan = pEl.querySelector('.player-name');
-            
+            // ... (name update logic) ...
             let key = role.character;
             if (Array.isArray(key) && key.length > 0) key = key[0];
             if (!key) key = role.name;
-
-            // FIX: Use dirty check key to prevent infinite replace loop
             const renderKey = role.characterId ? `char:${role.characterId}:${key}` : `char:default:${key}`;
-
-            // Check using stable key instead of volatile innerHTML
             if (nameSpan.getAttribute('data-render-key') !== renderKey) {
-                // 使用 GameText 渲染 Character (武将)
                 let newNameHtml;
                 if (role.characterId && GameText) {
                      newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
                 } else {
                      newNameHtml = GameText ? GameText.render(key) : key;
                 }
-
                 nameSpan.innerHTML = newNameHtml;
                 nameSpan.setAttribute('data-render-key', renderKey);
             }
             
+            // Stats Row Updates
+            
+            // 座次 (Seat)
+            const seatSpan = pEl.querySelector('.player-seat');
+            /* Seat Temporarily Hidden
+            // Display valid index (0-based or 1-based?). Usually 1-based for UI.
+            // Using the current 'index' from forEach which is the absolute player index.
+            const seatText = `${index + 1}`; 
+            if (seatSpan && seatSpan.textContent !== seatText) {
+                seatSpan.textContent = seatText;
+                seatSpan.style.display = 'none'; // Ensure hidden
+            }
+            */
+           if (seatSpan) seatSpan.style.display = 'none';
+
             // 血量
             const hpSpan = pEl.querySelector('.player-hp');
             const finalHpText = `${role.health}/${role.healthLimit}`;
             
             if (hpSpan.textContent !== finalHpText) {
+                // ... hp logic ...
                 hpSpan.classList.remove('hp-changed');
-                
-                // Animation check: only if not empty (initial creation)
                 if (hpSpan.textContent.trim() !== '') {
                     void hpSpan.offsetWidth;
                     hpSpan.classList.add('hp-changed');
                 }
-
                 hpSpan.textContent = finalHpText;
+            }
+
+            // 手牌数 (Hand Count) - 去掉图标
+            const handCountSpan = pEl.querySelector('.player-hand-count');
+            if (handCountSpan) {
+                let count = 0;
+                // Try multiple properties for hand count
+                if (typeof role.handCount === 'number') {
+                    count = role.handCount;
+                } else if (role.hand) {
+                    if (Array.isArray(role.hand)) count = role.hand.length;
+                    else if (typeof role.hand === 'number') count = role.hand;
+                    else if (role.hand.cards && Array.isArray(role.hand.cards)) count = role.hand.cards.length;
+                    else if (role.hand.length !== undefined) count = role.hand.length;
+                    else if (role.hand.count !== undefined) count = role.hand.count;
+                }
+                
+                // 仅显示数字，根据需求 "写在体力值之后"
+                // 格式: space + count
+                const handText = ` ${count}`;
+                if (handCountSpan.textContent !== handText) {
+                    handCountSpan.textContent = handText;
+                    // Remove dynamic opacity, keep style consistent
+                    handCountSpan.style.opacity = '1';
+                }
             }
             
             // 装备区

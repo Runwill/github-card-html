@@ -1,0 +1,72 @@
+
+/* Role Summary Avatar & Hand Count */
+.role-summary {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+}
+
+/* Override .char-avatar size for role list */
+.role-list-avatar {
+    width: 60px !important;
+    height: 60px !important;
+    margin-bottom: 4px;
+}
+
+/* Reuse game.css .char-avatar styles, just handle active state */
+.role-summary.active .char-avatar img {
+    border: 2px solid #ffd700; /* Add border only for active state */
+    box-shadow: 0 0 10px #ffd700;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.player-hand-count {
+    font-size: 0.85rem;
+    font-weight: 700;
+    
+    /* Modern Adaptive Colors */
+    color: var(--text, #e5e7eb); 
+    background-color: var(--surface-soft, rgba(0,0,0,0.6));
+    border: 1px solid var(--border, rgba(255,255,255,0.1));
+    
+    /* Shape & Box */
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin-right: 6px; /* Changed from margin-left to margin-right */
+    margin-left: 0;
+    min-width: 24px;
+    text-align: center;
+    
+    /* Modern Effects (Matched with .stat-hp) */
+    box-shadow: 0 2px 4px var(--shadow-1, rgba(0,0,0,0.1));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    
+    /* Typography */
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-seat {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #FFD700;
+    background: rgba(0,0,0,0.5);
+    padding: 0 4px;
+    border-radius: 4px;
+    margin-right: 4px;
+}
+
+.player-stats-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+}

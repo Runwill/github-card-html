@@ -1,0 +1,16 @@
+
+/* Role Layout Animation */
+.role-moving {
+    animation: roleMoveIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes roleMoveIn {
+    0% {
+        opacity: 0.9;
+        transform: scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
