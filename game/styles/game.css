@@ -239,6 +239,8 @@
     width: 100px;
     height: 100px;
     flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px var(--shadow-2);
 }
 
 .char-avatar img {
@@ -247,7 +249,10 @@
     object-fit: cover;
     border-radius: 50%;
     /* Removed border: 4px solid var(--surface); as per user request */
-    box-shadow: 0 2px 4px var(--shadow-2);
+}
+
+html[data-theme="dark"] .char-avatar img {
+    filter: invert(0.9);
 }
 
 .char-details {
@@ -306,11 +311,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.stat-hp.hp-changed {
-    transform: scale(1.1);
-    background-color: rgba(245, 101, 101, 0.4);
-    box-shadow: 0 0 10px rgba(245, 101, 101, 0.6);
-}
+
 
 @keyframes hp-pulse {
     0% { transform: scale(1); }
