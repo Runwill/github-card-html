@@ -257,7 +257,14 @@
         GameState.isGameRunning = true;
         
         // Initialize Flow Stack to point to the first leaf node
-        GameState.flowStack = [0]; 
+        // Root is RoundProcess -> beforeRoundStart
+        GameState.flowStack = [];
+        let node = window.Game.Def.GAME_FLOW;
+        while (node && (node.type === 'process' || node.type === 'ticking')) {
+             if (!node.children || node.children.length === 0) break;
+             GameState.flowStack.push(0);
+             node = node.children[0];
+        } 
 
         const btn = document.getElementById('btn-start-game');
         if (btn) btn.classList.add('hidden');
@@ -315,8 +322,55 @@
         
         while (!foundNext && GameState.flowStack.length > 0) {
             const currentIdx = GameState.flowStack.pop();
-            const parentNode = getNodeByStack(GameState.flowStack); // Get parent using remaining stack
+            const parentNode = getNodeByStack(GameState.flowStack); 
             
+            // Special handling for TurnProcess loop within Round
+            // parentNode is 'Round' (the ticking container), children[1] is TurnProcess
+            if (parentNode.children && parentNode.children[currentIdx] && parentNode.children[currentIdx].name === 'TurnProcess') {
+                // We just finished a TurnProcess
+                GameState.currentPlayerIndex++;
+                if (GameState.currentPlayerIndex < GameState.players.length) {
+                    // Next player, restart TurnProcess
+                    GameState.flowStack.push(currentIdx); // Push TurnProcess index back
+                    
+                    // Drill down to start of TurnProcess
+                    let node = parentNode.children[currentIdx];
+                    while (node.type === 'process' || node.type === 'ticking') {
+                        GameState.flowStack.push(0);
+                        node = node.children[0];
+                    }
+                    foundNext = true;
+                    // Trigger UI update to reflect player change
+                    if (window.Game.UI && window.Game.UI.updateUI) {
+                        window.Game.UI.updateUI();
+                    }
+                    break; 
+                } else {
+                    // Round finished (all players done)
+                    GameState.currentPlayerIndex = 0;
+                    // GameState.round++; // MOVED to GameProcess loop
+                    // Fall through to standard sibling logic (proceed to whenRoundFinish)
+                }
+            }
+
+            // Special handling for RoundProcess loop within GameProcess
+            if (parentNode && parentNode.name === 'GameProcess' && parentNode.children[currentIdx] && parentNode.children[currentIdx].name === 'RoundProcess') {
+                // RoundProcess finished. Loop back to start of RoundProcess
+                // Incremenet Round count here, so it applies to the NEW round
+                GameState.round++;
+                
+                GameState.flowStack.push(currentIdx); // Push RoundProcess index back
+                
+                // Drill down to start of RoundProcess
+                let node = parentNode.children[currentIdx];
+                while (node.type === 'process' || node.type === 'ticking') {
+                    GameState.flowStack.push(0);
+                    node = node.children[0];
+                }
+                foundNext = true;
+                break;
+            }
+
             if (currentIdx + 1 < parentNode.children.length) {
                 // Move to next sibling
                 GameState.flowStack.push(currentIdx + 1);
@@ -334,8 +388,27 @@
         }
 
         if (!foundNext) {
-            // End of TurnProcess, start next player turn
-            endTurn();
+            // End of entire GAME_FLOW (RoundProcess ends)
+            // Restart RoundProcess for next round? 
+            // Usually Game stops or loops indefinitely?
+            // "Cycle roundProcess" implies infinite loop.
+            // Reset to start of RoundProcess?
+            // Root is RoundProcess. 
+            // If we popped everything, flowStack is empty.
+            
+            // Restart game loop (RoundProcess)
+             GameState.flowStack = [0]; 
+             // Logic above handles drilling down
+             let node = window.Game.Def.GAME_FLOW;
+             while (node.type === 'process' || node.type === 'ticking') {
+                GameState.flowStack.push(0);
+                node = node.children[0];
+             }
+             
+             if (window.Game.UI && window.Game.UI.updateUI) {
+                window.Game.UI.updateUI();
+             }
+             checkAutoAdvance();
         } else {
             if (window.Game.UI && window.Game.UI.updateUI) {
                 window.Game.UI.updateUI();
@@ -345,18 +418,11 @@
     }
 
     function endTurn() {
-        GameState.currentPlayerIndex++;
-        if (GameState.currentPlayerIndex >= GameState.players.length) {
-            GameState.currentPlayerIndex = 0;
-            GameState.round++;
-        }
-        // Reset Flow to start
-        GameState.flowStack = [0];
-
-        if (window.Game.UI && window.Game.UI.updateUI) {
-            window.Game.UI.updateUI();
-        }
-        checkAutoAdvance();
+        // Deprecated/Modified logic
+        // This function was used when flow was just TurnProcess. 
+        // Now flow handles it naturally.
+        // We can force advance until TurnProcess ends if needed, but for now let's just use advanceState.
+        advanceState(); 
     }
 
     function checkAutoAdvance() {

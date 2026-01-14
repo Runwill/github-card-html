@@ -17,30 +17,36 @@
             const activeProcesses = window.Game.Core.getActiveProcesses();
 
             // 用于对比/渲染的结构数据
-            // 我们需要 [RoundItem, ...ProcessItems]
             const displayItems = [];
 
-            // 添加回合项
-            displayItems.push({
-                key: 'Round',
-                data: { n: GameState.round }
-            });
-
-            // 添加流程项
+            // 移除硬编码的 'Round' 插入，完全依赖 activeProcesses。
+            // 之前的代码：displayItems.push({ key: 'Round', data: { n: GameState.round } }); 
+            // 导致了 "Round Process"(来自 activeProcess) 和 "Hardcoded Round" 同时出现。
+            
+            // 遍历活跃堆栈
             activeProcesses.forEach(node => {
-                if (node.type === 'process' || node.type === 'tick') return;
+                // 过滤掉 tick (瞬时时机节点，通常显示在 Badges 而不是 Breadcrumbs)
+                // 面包屑主要用于显示持续性的 "Process/Ticking" 状态
+                if (node.type === 'tick') return;
                 
-                // 对带有玩家信息的 Turn 进行特殊处理？
-                // 用户需求：“角色名”是单独的文本。
-                // 但在面包屑中，目前显示“1 CaoCao Turn”。
-                // 如果我们希望 "Turn" 为 <turn></turn>，我们可以构建一个组合键吗？
-                // 或者只是推送通用的 'Process' 项。
-                
+                // 过滤掉 'TurnProcess', 'RoundProcess' 等容器节点，仅显示 'Round', 'Turn' 等语义节点
+                // 根据 GameDef，有 name="RoundProcess" (process) 和 name="Round" (ticking)
+                // 我们只想显示 name="Round"
+                if (node.name.endsWith('Process')) return;
+
+                const itemData = {};
+                // 如果是 "Round"，注入轮数
+                if (node.name === 'Round') {
+                    itemData.n = GameState.round;
+                }
+
                 displayItems.push({
                     key: node.name,
-                    data: {} // 标准阶段通常没有动态数据
+                    data: itemData
                 });
             });
+
+            // (Deleted per user request: breadcrumbs should be empty if not inside Round)
 
             // 协调 / 渲染
             // 目前简单的清空并填充，依赖 GameText 生成缓存的 HTML 字符串

@@ -25,7 +25,7 @@
         };
     };
 
-    const GAME_FLOW = {
+    const TurnProcess = {
         type: 'process',
         name: 'TurnProcess',
         children: [
@@ -48,8 +48,39 @@
         ]
     };
 
+    const RoundProcess = {
+        type: 'process',
+        name: 'RoundProcess',
+        children: [
+            { type: 'tick', name: 'beforeRoundStart' },
+            {
+                type: 'ticking',
+                name: 'Round', // round epithet=1
+                children: [
+                    { type: 'tick', name: 'whenRoundStart' },
+                    TurnProcess,
+                    { type: 'tick', name: 'whenRoundFinish' }
+                ]
+            },
+            { type: 'tick', name: 'afterRoundFinish' }
+        ]
+    };
+
+    const GameProcess = {
+        type: 'process',
+        name: 'GameProcess',
+        children: [
+            { type: 'tick', name: 'beforeGameStart' },
+            { type: 'tick', name: 'whenGameStart' },
+            RoundProcess
+        ]
+    };
+
     window.Game.Def = {
-        GAME_FLOW
+        GAME_FLOW: GameProcess,
+        GameProcess,
+        RoundProcess,
+        TurnProcess
     };
 
 })();

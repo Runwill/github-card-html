@@ -37,6 +37,16 @@
         'discardPile': '<discardPile></discardPile>',
         'drawPile': '<drawPile></drawPile>',
 
+        // Game 时机
+        'beforeGameStart': '<beforeGameStart></beforeGameStart>',
+        'whenGameStart': '<whenGameStart></whenGameStart>',
+
+        // 轮 (Round) 相关时机
+        'beforeRoundStart': '<beforeRoundStart></beforeRoundStart>',
+        'whenRoundStart': '<whenRoundStart></whenRoundStart>',
+        'whenRoundFinish': '<whenRoundFinish></whenRoundFinish>',
+        'afterRoundFinish': '<afterRoundFinish></afterRoundFinish>',
+
         // 体力事件
         'Recover': '<recover><recoverBody></recoverBody></recover>',
         'Loss': '<loss><lossBody></lossBody></loss>',
