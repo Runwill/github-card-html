@@ -24,6 +24,7 @@
         constructor(name, options = {}) {
             this.name = name;
             this.cards = []; // objectInArea
+            this.owner = options.owner || null; // Role who owns this area
             
             // Default options
             this.visible = options.visible || new Set(); // Roles who can see cards
@@ -91,7 +92,9 @@
         GameState.players.forEach(player => {
             // Ensure player has a hand area
             if (!player.hand) {
-                player.hand = new Area('hand');
+                player.hand = new Area('hand', { owner: player });
+            } else if (!player.hand.owner) {
+                player.hand.owner = player;
             }
             
             // Draw 4 cards
@@ -239,9 +242,13 @@
                 healthLimit: char.maxHp,
                 handLimit: char.hp, // Initial hand limit equals health
                 reach: 1,
+                // Assign owner later or use temporary object to ref?
+                // Use default and assign owner immediately after
                 hand: new Area('hand', { apartOrTogether: 0, forOrAgainst: 1 }),
                 equipArea: new Area('equipArea', { apartOrTogether: 0, forOrAgainst: 0 }) // Apart, For
             };
+            player.hand.owner = player;
+            player.equipArea.owner = player;
             
             // Distribute 4 cards from the Top of the Pile
             for (let i = 0; i < 4; i++) {
@@ -630,9 +637,9 @@
                      
                      console.log('[Game] Event: Move executed.', { 
                          cards: cards.length, 
-                         to: ctx.movedInArea.name, 
+                         to: ctx.movedInArea.name + (ctx.movedInArea.owner ? ` (${ctx.movedInArea.owner.name})` : ''), 
                          pos: ctx.movedAtPosition,
-                         from: ctx.fromArea ? ctx.fromArea.name : 'unknown'
+                         from: ctx.fromArea ? (ctx.fromArea.name + (ctx.fromArea.owner ? ` (${ctx.fromArea.owner.name})` : '')) : 'unknown'
                      });
 
                      // Trigger specific callback if provided

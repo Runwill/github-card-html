@@ -184,9 +184,9 @@
 
         let targetArea = null;
         let moveRole = null;
-        // 假设当前操作者总是 players[0] (对于单机/Mock)
-        // 在联机版中这里需要判断 sessionId
-        const currentPlayer = GameState.players[0];
+        // 修正：当前操作者应与 UI 显示的“主视角角色”一致
+        // 之前硬编码为 players[0]，会导致在 updateSelfRoleInfo 渲染 players[1] 时逻辑错乱
+        const currentPlayer = GameState.players[GameState.currentPlayerIndex] || GameState.players[0];
 
         // 1. 映射 targetZoneId 到 Area 对象
         if (targetZoneId === 'hand') {
