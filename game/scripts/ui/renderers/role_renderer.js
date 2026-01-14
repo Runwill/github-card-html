@@ -14,11 +14,19 @@
         
         // 绑定自身面板的 Inspector
         const currentPanel = document.querySelector('.current-character-panel');
-        if (currentPanel && !currentPanel.hasAttribute('data-inspector-type')) {
-            currentPanel.setAttribute('data-inspector-type', 'role');
-            currentPanel.setAttribute('data-role-id', selfRole.id);
-        } else if (currentPanel) {
-            // 确保 ID 正确 (如果是 hotseat 模式可能会变)
+        let isRoleChanged = false;
+        
+        if (currentPanel) {
+            const oldId = currentPanel.getAttribute('data-role-id');
+            // Check if ID changed
+            if (oldId !== String(selfRole.id)) {
+                isRoleChanged = true;
+            }
+
+            if (!currentPanel.hasAttribute('data-inspector-type')) {
+                currentPanel.setAttribute('data-inspector-type', 'role');
+            }
+             // Ensure ID is correct
             currentPanel.setAttribute('data-role-id', selfRole.id);
         }
 
@@ -55,8 +63,13 @@
 
             if (hpEl.textContent !== finalHpText) {
                 hpEl.classList.remove('hp-changed');
-                void hpEl.offsetWidth; 
-                hpEl.classList.add('hp-changed');
+                
+                // Only animate if NOT a role switch AND not empty initial state
+                const isInitial = hpEl.textContent.trim() === '';
+                if (!isRoleChanged && !isInitial) {
+                    void hpEl.offsetWidth; 
+                    hpEl.classList.add('hp-changed');
+                }
                 hpEl.textContent = finalHpText;
             }
         }
@@ -207,8 +220,13 @@
             
             if (hpSpan.textContent !== finalHpText) {
                 hpSpan.classList.remove('hp-changed');
-                void hpSpan.offsetWidth;
-                hpSpan.classList.add('hp-changed');
+                
+                // Animation check: only if not empty (initial creation)
+                if (hpSpan.textContent.trim() !== '') {
+                    void hpSpan.offsetWidth;
+                    hpSpan.classList.add('hp-changed');
+                }
+
                 hpSpan.textContent = finalHpText;
             }
             
