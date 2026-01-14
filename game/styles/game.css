@@ -251,8 +251,10 @@
     /* Removed border: 4px solid var(--surface); as per user request */
 }
 
-html[data-theme="dark"] .char-avatar img {
-    filter: invert(0.9);
+/* Invert colors and add transparency for position-based avatars (symbols) in dark mode */
+html[data-theme="dark"] .char-avatar img.position-avatar {
+    filter: invert(1);
+    opacity: 0.8;
 }
 
 .char-details {

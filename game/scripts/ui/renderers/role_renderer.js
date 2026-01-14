@@ -57,6 +57,12 @@
             // Only update if changed and valid
             if (avatarUrl && mainAvatarImg.getAttribute('src') !== avatarUrl) {
                 mainAvatarImg.src = avatarUrl;
+                // Mark as position symbol if from source/
+                if (avatarUrl.startsWith('source/')) {
+                    mainAvatarImg.classList.add('position-avatar');
+                } else {
+                    mainAvatarImg.classList.remove('position-avatar');
+                }
             }
         }
         // 名字 (角色/武将)
@@ -331,6 +337,12 @@
                 
                 if (avatarUrl && avatarImg.getAttribute('src') !== avatarUrl) {
                     avatarImg.src = avatarUrl;
+                    // Mark as position symbol if from source/
+                    if (avatarUrl.startsWith('source/')) {
+                        avatarImg.classList.add('position-avatar');
+                    } else {
+                        avatarImg.classList.remove('position-avatar');
+                    }
                 }
             }
 
