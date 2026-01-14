@@ -77,7 +77,16 @@
         'whenDamage': '<whenDamage><dealtBody></dealtBody><damageEnd></damageEnd><whenEnd></whenEnd></whenDamage>',
         'whenDamaged': '<whenDamaged><takeBody></takeBody><damageEnd></damageEnd><whenEnd></whenEnd></whenDamaged>',
         'afterDamage': '<afterDamage><dealtBody></dealtBody><damageEnd></damageEnd><afterEnd></afterEnd></afterDamage>',
-        'afterDamaged': '<afterDamaged><takeBody></takeBody><damageEnd></damageEnd><afterEnd></afterEnd></afterDamaged>'
+        'afterDamaged': '<afterDamaged><takeBody></takeBody><damageEnd></damageEnd><afterEnd></afterEnd></afterDamaged>',
+
+        // Move 时机
+        'Move': '<move><placeBody></placeBody></move>',
+        'beforePlace': '<beforePlace><placeBody></placeBody><beforeEnd></beforeEnd></beforePlace>',
+        'beforePlaced': '<beforePlaced><passive></passive><placeBody></placeBody><beforeEnd></beforeEnd></beforePlaced>',
+        'whenPlace': '<whenPlace><placeBody></placeBody><whenEnd></whenEnd></whenPlace>',
+        'whenPlaced': '<whenPlaced><passive></passive><placeBody></placeBody><whenEnd></whenEnd></whenPlaced>',
+        'afterPlace': '<afterPlace><placeBody></placeBody><afterEnd></afterEnd></afterPlace>',
+        'afterPlaced': '<afterPlaced><passive></passive><placeBody></placeBody><afterEnd></afterEnd></afterPlaced>'
     };
 
     // 如果可用，注入 GameText

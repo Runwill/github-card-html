@@ -42,6 +42,12 @@
                 this.cards.splice(index, 1);
             }
         }
+
+        removeAt(index) {
+            if (index > -1 && index < this.cards.length) {
+                this.cards.splice(index, 1);
+            }
+        }
     }
 
     // Game State
@@ -308,6 +314,9 @@
             // Check if event is finished
             if (activeEvent.currentStepIndex >= activeEvent.steps.length) {
                 GameState.eventStack.pop(); // Remove finished event
+                if (activeEvent.onFinish) {
+                    activeEvent.onFinish(activeEvent.context);
+                }
             }
 
             if (window.Game.UI && window.Game.UI.updateUI) {
@@ -467,14 +476,15 @@
     // Event Logic Implementation
     const Events = {
         // Helper to push event to stack
-        trigger: function(name, steps, context, onStep) {
+        trigger: function(name, steps, context, onStep, onFinish) {
             GameState.eventStack.push({
                 type: 'event',
                 name: name,
                 steps: steps,
                 currentStepIndex: 0,
                 context: context,
-                onStep: onStep
+                onStep: onStep,
+                onFinish: onFinish
             });
             // Trigger UI update immediately to show start of event
             if (window.Game.UI && window.Game.UI.updateUI) {
@@ -537,6 +547,100 @@
                     if (ctx.target.health <= 0) console.log(`[Event] ${ctx.target.name} is dying!`);
                 }
             });
+        },
+
+        // move: moveRole moves movedCard to movedInArea at movedAtPosition
+        move: function(moveRole, movedCard, movedInArea, movedAtPosition = 1, fromArea = null, fromIndex = -1, callbacks = null) {
+            // Polymorphism: handle if fromIndex is skipped and callbacks is passed as expected
+            // If the 6th arg is function or object, and 7th is null/undefined, shift args
+            if ((typeof fromIndex === 'function' || (typeof fromIndex === 'object' && fromIndex !== null)) && callbacks === null) {
+                callbacks = fromIndex;
+                fromIndex = -1;
+            }
+
+            let onComplete = null;
+            let onMoveExecuted = null;
+
+            if (typeof callbacks === 'function') {
+                onComplete = callbacks;
+            } else if (typeof callbacks === 'object' && callbacks !== null) {
+                onComplete = callbacks.onComplete;
+                onMoveExecuted = callbacks.onMoveExecuted;
+            }
+
+            // Inputs: moveRole (Role/null), movedCard (Array), movedInArea (Area), movedAtPosition (int), fromArea (Area/null)
+            const context = { moveRole, movedCard, movedInArea, movedAtPosition, fromArea, fromIndex };
+            
+            const steps = [];
+            if (moveRole) steps.push('beforePlace');
+            steps.push('beforePlaced');
+            if (moveRole) steps.push('whenPlace');
+            steps.push('whenPlaced');
+            if (moveRole) steps.push('afterPlace');
+            steps.push('afterPlaced');
+
+            this.trigger('Move', steps, context, (step, ctx) => {
+                 if (step === 'whenPlaced') {
+                     // Logic:
+                     // 1. Remove cards from source (if possible)
+                     // 2. Add to movedInArea
+                     
+                     if (!ctx.movedInArea) return;
+                     
+                     // Ensure movedCard is array
+                     const cards = Array.isArray(ctx.movedCard) ? ctx.movedCard : [ctx.movedCard];
+
+                     cards.forEach(card => {
+                         // Try to remove from old area
+                         let removed = false;
+
+                         // 1. Explicit fromArea
+                         if (ctx.fromArea) {
+                             if (ctx.fromIndex !== undefined && ctx.fromIndex > -1 && typeof ctx.fromArea.removeAt === 'function') {
+                                ctx.fromArea.removeAt(ctx.fromIndex);
+                                removed = true;
+                                // Reset index to avoid reusing for next card if multiple (though rare for drag)
+                                ctx.fromIndex = -1; 
+                             } else if (typeof ctx.fromArea.remove === 'function') {
+                                 ctx.fromArea.remove(card);
+                                 removed = true;
+                             }
+                         }
+                         
+                         // 2. Object property (Fallback)
+                         if (!removed && card && card.lyingArea && typeof card.lyingArea.remove === 'function') {
+                             card.lyingArea.remove(card);
+                         } 
+                     });
+
+                     // Insert into new area
+                     // Arrays are 0-indexed, movedAtPosition is 1-based default.
+                     if (ctx.movedInArea.cards && Array.isArray(ctx.movedInArea.cards)) {
+                         const insertIdx = Math.max(0, (ctx.movedAtPosition || 1) - 1);
+                         ctx.movedInArea.cards.splice(insertIdx, 0, ...cards);
+                     }
+                     
+                     // Update properties
+                     cards.forEach(card => {
+                         if (card && typeof card === 'object') {
+                             card.lyingArea = ctx.movedInArea;
+                             // We don't track 'position' property explicitly as it is array index
+                         }
+                     });
+                     
+                     console.log('[Game] Event: Move executed.', { 
+                         cards: cards.length, 
+                         to: ctx.movedInArea.name, 
+                         pos: ctx.movedAtPosition,
+                         from: ctx.fromArea ? ctx.fromArea.name : 'unknown'
+                     });
+
+                     // Trigger specific callback if provided
+                     if (onMoveExecuted) {
+                         onMoveExecuted(ctx);
+                     }
+                 }
+            }, onComplete);
         }
     };
 

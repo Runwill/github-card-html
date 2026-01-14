@@ -36,6 +36,30 @@
         swapAnimationDuration: 200 // 毫秒
     };
 
+    // 调试辅助函数：输出手牌和处理区状态
+    function logDragDebug(phase) {
+        if (!window.Game || !window.Game.Core || !window.Game.Core.GameState) return;
+        const gs = window.Game.Core.GameState;
+        
+        // 假设玩家0是当前玩家
+        const self = gs.players && gs.players[0];
+        const handCards = (self && self.hand && self.hand.cards) ? self.hand.cards : [];
+        const treatmentCards = (gs.treatmentArea && gs.treatmentArea.cards) ? gs.treatmentArea.cards : [];
+        
+        console.group(`[DragDebug] ${phase}`);
+        
+        if (DragState.dragSource) {
+             const cardName = typeof DragState.dragSource.data === 'string' ? DragState.dragSource.data : (DragState.dragSource.data.name || 'Unknown');
+             console.log(`Moving Card: "${cardName}" (Index: ${DragState.dragSource.sourceIndex}, From: ${DragState.dragSource.sourceArea})`);
+        }
+
+        // 简单打印数量和名称列表
+        const getName = (c, i) => `[${i}] ${typeof c === 'string' ? c : (c.name || 'Unknown')}`;
+        console.log(`Hand (${handCards.length}):`, handCards.map(getName));
+        console.log(`Treatment (${treatmentCards.length}):`, treatmentCards.map(getName));
+        console.groupEnd();
+    }
+
     // 为 FLIP 动画存储位置
     const flipSnapshot = new Map();
 
@@ -70,6 +94,7 @@
 
     function startDrag(e) {
         if (!DragState.dragElement) return; // 防止空元素
+        logDragDebug('Start Drag');
         DragState.isDragging = true;
         document.body.classList.add('is-global-dragging');
         
@@ -255,6 +280,9 @@
     }
 
     function updatePlaceholderPosition(dropZone, targetEl, mouseX, mouseY) {
+        // 安全检查：如果占位符元素丢失，中止更新以防止崩溃
+        if (!DragState.placeholderElement) return;
+
         // 找到我们悬停其上的卡牌
         const hoverCard = targetEl ? targetEl.closest('.card-placeholder:not(.drag-placeholder)') : null;
         
@@ -529,21 +557,64 @@
                 }
             }
             
-            animateDropToPlaceholder(el, placeholder, () => {
-                if (window.Game.UI.onCardDrop) {
-                    window.Game.UI.onCardDrop(
-                        DragState.dragSource.data, 
-                        DragState.dragSource.sourceArea, 
-                        targetZoneId, 
-                        targetIndex,
-                        DragState.dragSource.sourceIndex
-                    );
-                }
-                document.body.classList.remove('is-global-dragging');
-                DragState.dragElement = null; 
-                DragState.placeholderElement = null; 
-            });
+            logDragDebug(`Before Drop Action (Target: ${targetZoneId})`);
 
+            // 提前挂起渲染
+            window.Game.UI.isRenderingSuspended = true;
+
+            let isLogicFinished = false;
+            let isAnimationFinished = false;
+
+            // 统一的完成检查器
+            const checkFinish = () => {
+                if (isLogicFinished && isAnimationFinished) {
+                    // 当且仅当两者都完成时，恢复UI
+                    window.Game.UI.isRenderingSuspended = false;
+                    if (window.Game.UI.updateUI) window.Game.UI.updateUI();
+                    logDragDebug('After Drop Action (All Done)');
+                    
+                    document.body.classList.remove('is-global-dragging');
+                    DragState.dragElement = null; 
+                    DragState.placeholderElement = null; 
+                }
+            };
+
+            // 动画触发器
+            const playDropAnimation = () => {
+                animateDropToPlaceholder(el, placeholder, () => {
+                    isAnimationFinished = true;
+                    checkFinish();
+                });
+            };
+
+            // 执行业务逻辑
+            if (window.Game.UI.onCardDrop) {
+                window.Game.UI.onCardDrop(
+                    DragState.dragSource.data, 
+                    DragState.dragSource.sourceArea, 
+                    targetZoneId, 
+                    targetIndex,
+                    DragState.dragSource.sourceIndex,
+                    {
+                        // 1. 当 Move 事件实际执行数据变更时（whenPlaced），触发动画
+                        onMoveExecuted: () => {
+                            logDragDebug('Triggering Animation (Event Executed)');
+                            playDropAnimation();
+                        },
+                        // 2. 当 Move 事件完全结束后（afterPlaced...done）
+                        onComplete: () => {
+                            isLogicFinished = true;
+                            logDragDebug('Logic Finished');
+                            checkFinish();
+                        }
+                    }
+                );
+            } else {
+                // 无逻辑处理，直通
+                isLogicFinished = true;
+                playDropAnimation();
+            }
+            
             DragState.currentDropZone = null;
             return;
         }

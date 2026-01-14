@@ -177,8 +177,59 @@
     // 导出
     window.Game.UI.updateUI = updateUI;
     
-    // 如果仍然全局依赖 onCardDrop，则为拖放提供回退
-    // 如果新系统不需要，我们可以最小化实现或将其留空
-    window.Game.UI.onCardDrop = function() { console.log('Legacy drop'); };
+    // 拖放回调实现：触发核心 Move 事件
+    window.Game.UI.onCardDrop = function(cardData, sourceAreaName, targetZoneId, targetIndex, sourceIndex, callbacks) {
+        const GameState = window.Game.Core.GameState;
+        if (!GameState) return;
+
+        let targetArea = null;
+        let moveRole = null;
+        // 假设当前操作者总是 players[0] (对于单机/Mock)
+        // 在联机版中这里需要判断 sessionId
+        const currentPlayer = GameState.players[0];
+
+        // 1. 映射 targetZoneId 到 Area 对象
+        if (targetZoneId === 'hand') {
+            targetArea = currentPlayer.hand;
+            moveRole = currentPlayer;
+        } else if (targetZoneId === 'treatmentArea') {
+            targetArea = GameState.treatmentArea;
+            moveRole = currentPlayer; 
+        } else if (GameState[targetZoneId]) {
+            // 尝试全局区域
+            targetArea = GameState[targetZoneId];
+            moveRole = currentPlayer;
+        }
+
+        if (targetArea) {
+            // Game Core movedAtPosition 是 1-based index
+            const position = targetIndex + 1;
+            
+            // Resolve sourceArea based on sourceAreaName
+            let sourceArea = null;
+            if (sourceAreaName === 'hand') {
+                sourceArea = currentPlayer.hand;
+            } else if (sourceAreaName === 'treatmentArea') {
+                sourceArea = GameState.treatmentArea; 
+            } else if (GameState[sourceAreaName]) {
+                sourceArea = GameState[sourceAreaName];
+            } else {
+                 // Try to check if it's a role ID or similar (not implemented here yet)
+            }
+
+            // cardData 是 Card 对象 (or String)
+            window.Game.Core.Events.move(
+                moveRole, 
+                cardData, 
+                targetArea, 
+                position, 
+                sourceArea, 
+                sourceIndex, 
+                callbacks // Passing the callbacks structure (could be fn or object)
+            );
+        } else {
+             console.warn('[UI] Drop: Target area not found', targetZoneId);
+        }
+    };
 
 })();

@@ -4,6 +4,8 @@
 
     // 辅助：渲染卡牌列表
     function renderCardList(containerId, cards, dropZoneId) {
+        if (window.Game.UI.isRenderingSuspended) return;
+
         const container = document.getElementById(containerId);
         if (!container) return;
 
