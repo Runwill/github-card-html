@@ -116,6 +116,9 @@
         autoRunDelay: 50 // Default 50ms
     };
 
+    let recursionDepth = 0;
+    const MAX_RECURSION = 50; // Max synchronous steps for 0ms delay
+
     function setSpeed(ms) {
         Settings.autoRunDelay = ms;
         // console.log(`[Game] Speed set to ${ms}ms`);
@@ -449,14 +452,7 @@
             // Use configurable speed
             let delay = Settings.autoRunDelay; 
             
-            // Slower for Event Steps to be visible if needed, or faster
-            // For now, let's respect the slider globally, or maybe half speed for ticks?
-            // Let's stick to the slider value as the baseline beat.
-            
             if (currentNode.type === 'event-step') {
-                delay = 0; // Steps inside event might still be instant logic, but maybe we want to see them?
-                // If user wants to see "WhenDamage", "AfterDamage" etc, we should wait.
-                // Let's make it consistent:
                 delay = Settings.autoRunDelay;
             }
             // Start of stage might need extra pause?
@@ -464,6 +460,20 @@
                 // delay = delay * 1.5; // Optional: pause longer at start
             }
             
+            if (delay === 0) {
+                if (recursionDepth < MAX_RECURSION) {
+                    recursionDepth++;
+                    try {
+                        advanceState();
+                    } catch (e) {
+                         console.error("[Game] Error in auto-advance:", e);
+                    } finally {
+                        recursionDepth--;
+                    }
+                    return;
+                }
+            }
+
             setTimeout(advanceState, delay);
         }
     }
