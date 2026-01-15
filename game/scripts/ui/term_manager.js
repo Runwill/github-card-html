@@ -80,7 +80,9 @@
             // 暴露数据供其他模块使用 (例如 GameText 可能需要查询)
             window.Game.UI.termData = cachedData;
 
-            if (window.Game.Core && window.Game.Core.GameState.isGameRunning && window.Game.UI.updateUI) {
+            // Updated to check Game.GameState directly as per refactoring
+            const isGameRunning = window.Game.GameState && window.Game.GameState.isGameRunning;
+            if (isGameRunning && window.Game.UI.updateUI) {
                 window.Game.UI.updateUI();
             }
         }).catch(e => console.error("Failed to load terms", e));

@@ -13,7 +13,14 @@
         const pauseBtn = document.getElementById('btn-pause-game');
 
         if (startBtn) {
-            startBtn.addEventListener('click', window.Game.Core.startGame);
+            // startBtn.addEventListener('click', window.Game.Core.startGame);
+            // Modified to use Controller with default 'auto' mode for now
+            startBtn.addEventListener('click', () => {
+                // 读取用户可能在 Setup 面板中选择的模式，或者默认使用 auto
+                // 暂时默认 auto，后续可以改为读取配置
+                const mode = 'auto'; 
+                window.Game.Controller.initGame(mode);
+            });
         }
         
         // Initialize Setup Manager if available
@@ -23,7 +30,8 @@
 
         if (pauseBtn) {
             pauseBtn.addEventListener('click', () => {
-                window.Game.Core.togglePause();
+                // window.Game.Core.togglePause();
+                window.Game.Controller.togglePause();
             });
         }
         
@@ -34,13 +42,15 @@
             speedRange.addEventListener('input', (e) => {
                 const val = parseInt(e.target.value, 10);
                 speedVal.textContent = `${val}ms`;
-                if (window.Game.Core && window.Game.Core.setSpeed) {
-                    window.Game.Core.setSpeed(val);
-                }
+                // if (window.Game.Core && window.Game.Core.setSpeed) {
+                //    window.Game.Core.setSpeed(val);
+                // }
+                window.Game.Controller.setSpeed(val);
             });
             // Init default
             if (window.Game.Core && window.Game.Core.setSpeed) {
-                window.Game.Core.setSpeed(parseInt(speedRange.value, 10));
+                // window.Game.Core.setSpeed(parseInt(speedRange.value, 10));
+                window.Game.Controller.setSpeed(parseInt(speedRange.value, 10));
             }
         }
 

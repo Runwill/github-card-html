@@ -1,116 +1,13 @@
 (function() {
     window.Game = window.Game || {};
 
-    // Mock Data for Characters
-    const mockCharacters = [
-        { name: "Character A", hp: 4, maxHp: 4, avatar: "source/青龙.png.bak" },
-        { name: "Character B", hp: 3, maxHp: 3, avatar: "source/白虎_君主.png.bak" },
-        { name: "Character C", hp: 4, maxHp: 4, avatar: "source/朱雀.png.bak" },
-        { name: "Character D", hp: 3, maxHp: 3, avatar: "source/玄武_君主.png.bak" }
-    ];
+    // Dependencies
+    const GameState = window.Game.GameState;
+    const Area = window.Game.Models.Area;
+    const shuffle = window.Game.Utils.shuffle;
+    const Events = window.Game.Core.Events;
+    const MockData = window.Game.MockData; 
 
-    function generateMockHand() {
-        const count = Math.floor(Math.random() * 3) + 2;
-        const cards = ['Slash', 'Dodge', 'Peach', 'Wine', 'Duel'];
-        const hand = [];
-        for (let i = 0; i < count; i++) {
-            hand.push(cards[Math.floor(Math.random() * cards.length)]);
-        }
-        return hand;
-    }
-
-    // Area Class
-    class Area {
-        constructor(name, options = {}) {
-            this.name = name;
-            this.cards = []; // objectInArea
-            this.owner = options.owner || null; // Role who owns this area
-            
-            // Default options
-            this.visible = options.visible || new Set(); // Roles who can see cards
-            this.forOrAgainst = options.forOrAgainst !== undefined ? options.forOrAgainst : 0; // 0: for, 1: against
-            this.verticalOrHorizontal = options.verticalOrHorizontal !== undefined ? options.verticalOrHorizontal : 0; // 0: vertical, 1: horizontal
-            this.apartOrTogether = options.apartOrTogether !== undefined ? options.apartOrTogether : 0; // 0: apart, 1: together
-        }
-
-        add(card) {
-            this.cards.push(card);
-        }
-
-        remove(card) {
-            const index = this.cards.indexOf(card);
-            if (index > -1) {
-                this.cards.splice(index, 1);
-            }
-        }
-
-        removeAt(index) {
-            if (index > -1 && index < this.cards.length) {
-                this.cards.splice(index, 1);
-            }
-        }
-    }
-
-    // Game State
-    const GameState = {
-        players: [],
-        currentPlayerIndex: 0,
-        round: 1,
-        isGameRunning: false,
-        isPaused: false,
-        
-        // Areas
-        pile: new Area('pile', { apartOrTogether: 1, forOrAgainst: 1 }), // Together, Against (Draw Pile)
-        discardPile: new Area('discardPile', { apartOrTogether: 1, forOrAgainst: 0 }), // Together, For
-        treatmentArea: new Area('treatmentArea', { apartOrTogether: 0, forOrAgainst: 0 }), // Apart, For
-
-        // Stack of active nodes (indices in their parent's children array)
-        flowStack: [],
-        
-        // Dynamic Event Stack (for events like Damage, Recover, etc.)
-        // Each item is an object: { type: 'event', name: 'damage', steps: [], currentStepIndex: 0, context: {} }
-        eventStack: []
-    };
-
-    function shuffle(array) {
-        let currentIndex = array.length;
-        while (currentIndex != 0) {
-            let randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-        }
-    }
-
-    // Helper: Distribute initial cards (4 cards per role)
-    // Remaining cards stay in the pile
-    function distributeInitialCards() {
-        // Shuffle the pile first
-        if (GameState.pile.cards.length > 0) {
-            shuffle(GameState.pile.cards);
-        }
-
-        GameState.players.forEach(player => {
-            // Ensure player has a hand area
-            if (!player.hand) {
-                player.hand = new Area('hand', { owner: player });
-            } else if (!player.hand.owner) {
-                player.hand.owner = player;
-            }
-            
-            // Draw 4 cards
-            for (let i = 0; i < 4; i++) {
-                if (GameState.pile.cards.length > 0) {
-                    const card = GameState.pile.cards.pop();
-                    player.hand.add(card);
-                } else {
-                    console.warn('[Game] Deck is empty during initial distribution!');
-                    break;
-                }
-            }
-        });
-        
-        console.log('[Game] Initial cards distributed (4 per role).');
-    }
 
     const Settings = {
         autoRunDelay: 50 // Default 50ms
@@ -198,15 +95,6 @@
         return node.name === 'acting';
     }
 
-    function shuffle(array) {
-        let currentIndex = array.length;
-        while (currentIndex != 0) {
-            let randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-        }
-    }
-
     function startGame(customConfig) {
         let playersData;
         
@@ -215,7 +103,7 @@
              playersData = customConfig.players;
         } else {
              // 使用默认 Mock 数据
-             playersData = mockCharacters;
+             playersData = MockData.mockCharacters;
         }
 
         // Initialize Deck (Pile)
@@ -490,176 +378,7 @@
         return GameState.isPaused;
     }
 
-    // Event Logic Implementation
-    const Events = {
-        // Helper to push event to stack
-        trigger: function(name, steps, context, onStep, onFinish) {
-            GameState.eventStack.push({
-                type: 'event',
-                name: name,
-                steps: steps,
-                currentStepIndex: 0,
-                context: context,
-                onStep: onStep,
-                onFinish: onFinish
-            });
-            // Trigger UI update immediately to show start of event
-            if (window.Game.UI && window.Game.UI.updateUI) {
-                window.Game.UI.updateUI();
-            }
-            checkAutoAdvance(); // Start processing
-        },
 
-        // recover: Role recovers value health
-        recover: function(role, value) {
-            if (!role) return;
-            // Steps: beforeRecover -> whenRecover (Action) -> afterRecover
-            this.trigger('Recover', ['beforeRecover', 'whenRecover', 'afterRecover'], { role, value }, (step, ctx) => {
-                if (step === 'whenRecover') {
-                    const oldHealth = ctx.role.health;
-                    ctx.role.health = Math.min(ctx.role.health + ctx.value, ctx.role.healthLimit);
-                    console.log(`[Event] Recover: ${ctx.role.name} recovered ${ctx.value} health. (${oldHealth} -> ${ctx.role.health})`);
-                }
-            });
-        },
-
-        // loss: Role loses value health (direct loss, not damage)
-        loss: function(role, value) {
-            if (!role) return;
-            // Steps: beforeLoss -> whenLoss (Action) -> afterLoss
-            this.trigger('Loss', ['beforeLoss', 'whenLoss', 'afterLoss'], { role, value }, (step, ctx) => {
-                if (step === 'whenLoss') {
-                    const oldHealth = ctx.role.health;
-                    ctx.role.health = Math.max(ctx.role.health - ctx.value, 0);
-                    console.log(`[Event] Loss: ${ctx.role.name} lost ${ctx.value} health. (${oldHealth} -> ${ctx.role.health})`);
-                    if (ctx.role.health <= 0) console.log(`[Event] ${ctx.role.name} is dying!`);
-                }
-            });
-        },
-
-        // cure: Source cures Target for value
-        cure: function(source, target, value) {
-            if (!target) return;
-            // Steps: beforeCure -> beforeCured -> whenCure -> whenCured (Action) -> afterCure -> afterCured
-            const steps = ['beforeCure', 'beforeCured', 'whenCure', 'whenCured', 'afterCure', 'afterCured'];
-            this.trigger('Cure', steps, { source, target, value }, (step, ctx) => {
-                if (step === 'whenCured') {
-                    const oldHealth = ctx.target.health;
-                    ctx.target.health = Math.min(ctx.target.health + ctx.value, ctx.target.healthLimit);
-                    console.log(`[Event] Cure: ${ctx.source ? ctx.source.name : 'System'} cured ${ctx.target.name} for ${ctx.value}. (${oldHealth} -> ${ctx.target.health})`);
-                }
-            });
-        },
-
-        // damage: Source damages Target for value
-        damage: function(source, target, value) {
-            if (!target) return;
-            // Steps: beforeDamage -> beforeDamaged -> whenDamage -> whenDamaged (Action) -> afterDamage -> afterDamaged
-            const steps = ['beforeDamage', 'beforeDamaged', 'whenDamage', 'whenDamaged', 'afterDamage', 'afterDamaged'];
-            this.trigger('Damage', steps, { source, target, value }, (step, ctx) => {
-                if (step === 'whenDamaged') {
-                    const oldHealth = ctx.target.health;
-                    ctx.target.health = Math.max(ctx.target.health - ctx.value, 0);
-                    console.log(`[Event] Damage: ${ctx.source ? ctx.source.name : 'System'} damaged ${ctx.target.name} for ${ctx.value}. (${oldHealth} -> ${ctx.target.health})`);
-                    if (ctx.target.health <= 0) console.log(`[Event] ${ctx.target.name} is dying!`);
-                }
-            });
-        },
-
-        // move: moveRole moves movedCard to movedInArea at movedAtPosition
-        move: function(moveRole, movedCard, movedInArea, movedAtPosition = 1, fromArea = null, fromIndex = -1, callbacks = null) {
-            // Polymorphism: handle if fromIndex is skipped and callbacks is passed as expected
-            // If the 6th arg is function or object, and 7th is null/undefined, shift args
-            if ((typeof fromIndex === 'function' || (typeof fromIndex === 'object' && fromIndex !== null)) && callbacks === null) {
-                callbacks = fromIndex;
-                fromIndex = -1;
-            }
-
-            let onComplete = null;
-            let onMoveExecuted = null;
-
-            if (typeof callbacks === 'function') {
-                onComplete = callbacks;
-            } else if (typeof callbacks === 'object' && callbacks !== null) {
-                onComplete = callbacks.onComplete;
-                onMoveExecuted = callbacks.onMoveExecuted;
-            }
-
-            // Inputs: moveRole (Role/null), movedCard (Array), movedInArea (Area), movedAtPosition (int), fromArea (Area/null)
-            const context = { moveRole, movedCard, movedInArea, movedAtPosition, fromArea, fromIndex };
-            
-            const steps = [];
-            if (moveRole) steps.push('beforePlace');
-            steps.push('beforePlaced');
-            if (moveRole) steps.push('whenPlace');
-            steps.push('whenPlaced');
-            if (moveRole) steps.push('afterPlace');
-            steps.push('afterPlaced');
-
-            this.trigger('Move', steps, context, (step, ctx) => {
-                 if (step === 'whenPlaced') {
-                     // Logic:
-                     // 1. Remove cards from source (if possible)
-                     // 2. Add to movedInArea
-                     
-                     if (!ctx.movedInArea) return;
-                     
-                     // Ensure movedCard is array
-                     const cards = Array.isArray(ctx.movedCard) ? ctx.movedCard : [ctx.movedCard];
-
-                     cards.forEach(card => {
-                         // Try to remove from old area
-                         let removed = false;
-
-                         // 1. Explicit fromArea
-                         if (ctx.fromArea) {
-                             if (ctx.fromIndex !== undefined && ctx.fromIndex > -1 && typeof ctx.fromArea.removeAt === 'function') {
-                                ctx.fromArea.removeAt(ctx.fromIndex);
-                                removed = true;
-                                // Reset index to avoid reusing for next card if multiple (though rare for drag)
-                                ctx.fromIndex = -1; 
-                             } else if (typeof ctx.fromArea.remove === 'function') {
-                                 ctx.fromArea.remove(card);
-                                 removed = true;
-                             }
-                         }
-                         
-                         // 2. Object property (Fallback)
-                         if (!removed && card && card.lyingArea && typeof card.lyingArea.remove === 'function') {
-                             card.lyingArea.remove(card);
-                         } 
-                     });
-
-                     // Insert into new area
-                     // Arrays are 0-indexed, movedAtPosition is 1-based default.
-                     if (ctx.movedInArea.cards && Array.isArray(ctx.movedInArea.cards)) {
-                         const insertIdx = Math.max(0, (ctx.movedAtPosition || 1) - 1);
-                         ctx.movedInArea.cards.splice(insertIdx, 0, ...cards);
-                     }
-                     
-                     // Update properties
-                     cards.forEach(card => {
-                         if (card && typeof card === 'object') {
-                             card.lyingArea = ctx.movedInArea;
-                             // We don't track 'position' property explicitly as it is array index
-                         }
-                     });
-                     
-                     console.log('[Game] Event: Move executed.', { 
-                         cards: cards.length, 
-                         to: ctx.movedInArea.name + (ctx.movedInArea.owner ? ` (${ctx.movedInArea.owner.name})` : ''), 
-                         pos: ctx.movedAtPosition,
-                         from: ctx.fromArea ? (ctx.fromArea.name + (ctx.fromArea.owner ? ` (${ctx.fromArea.owner.name})` : '')) : 'unknown'
-                     });
-
-                     // Trigger specific callback if provided
-                     if (onMoveExecuted) {
-                         onMoveExecuted(ctx);
-                     }
-                 }
-            }, onComplete);
-        }
-    };
 
     window.Game.Core = {
         GameState,
