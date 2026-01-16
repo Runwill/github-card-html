@@ -69,7 +69,15 @@
         
         cardElement.ondragstart = () => false;
         cardElement.oncontextmenu = (e) => {
-             if(DragState.isDragging) e.preventDefault();
+             if(DragState.isDragging) {
+                 e.preventDefault();
+                 return;
+             }
+             // Show Card Context Menu
+             if (window.Game.UI.showCardContextMenu) {
+                 e.preventDefault();
+                 window.Game.UI.showCardContextMenu(e.clientX, e.clientY, cardData, sourceAreaName);
+             }
         };
     }
 

@@ -100,6 +100,32 @@
                 onMoveExecuted = callbacks.onMoveExecuted;
             }
 
+            // Auto-resolve fromArea if missing (Robustness Fix)
+            if (!fromArea && movedCard) {
+                const card = Array.isArray(movedCard) ? movedCard[0] : movedCard;
+                const gs = window.Game.GameState;
+                
+                // 1. Check card property (if object)
+                if (card && typeof card === 'object' && card.lyingArea) {
+                    fromArea = card.lyingArea;
+                }
+                
+                // 2. Search in GameState (Brute force safety net)
+                if (!fromArea && gs) {
+                    // Check players
+                    if (gs.players) {
+                        for (let p of gs.players) {
+                            if (p.hand && p.hand.cards.includes(card)) { fromArea = p.hand; break; }
+                            if (p.equipArea && p.equipArea.cards.includes(card)) { fromArea = p.equipArea; break; }
+                            if (p.judgeArea && p.judgeArea.cards.includes(card)) { fromArea = p.judgeArea; break; }
+                        }
+                    }
+                    // Check piles with extra checks for existence
+                    if (!fromArea && gs.pile && gs.pile.cards.includes(card)) fromArea = gs.pile;
+                    if (!fromArea && gs.discardPile && gs.discardPile.cards.includes(card)) fromArea = gs.discardPile;
+                }
+            }
+
             // Inputs: moveRole (Role/null), movedCard (Array), movedInArea (Area), movedAtPosition (int), fromArea (Area/null)
             const context = { moveRole, movedCard, movedInArea, movedAtPosition, fromArea, fromIndex };
             
