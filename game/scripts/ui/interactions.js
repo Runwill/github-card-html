@@ -643,12 +643,30 @@
         // ... (现有参数)
         // 适配 'el' 为克隆体，'placeholder' 为原始体。
         // 我们将克隆体动画化到原始体。
-        // targetRect 移至循环以进行动态更新
         
-        // ... (现有变量)
-        // 当前状态 (CSS 值)
-        let cssX = DragState.currentX;
-        let cssY = DragState.currentY;
+        let cssX, cssY;
+        
+        // 智能判断初始位置：
+        // 如果是正在拖动的中途 (DragState.isDragging 为 true 或刚结束)，从 DragState 读取以前的连续动量
+        // 如果是从外部调用 (Programmatic)，解析当前的 transform 或为 0
+        
+        const styleTransform = el.style.transform || '';
+        const translateMatch = styleTransform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+        
+        if (translateMatch) {
+             cssX = parseFloat(translateMatch[1]);
+             cssY = parseFloat(translateMatch[2]);
+        } else if (DragState.dragElement === el) {
+             // 仅当 el 确实是上一次拖动的元素时，信任 DragState
+             cssX = DragState.currentX;
+             cssY = DragState.currentY;
+        } else {
+             // 完全没有变换的新元素（如 Context Menu 克隆体），起始 transform 为 0
+             // 因为它的位置是由 left/top 决定的
+             cssX = 0;
+             cssY = 0;
+        }
+
         let cssW = parseFloat(el.style.width) || el.getBoundingClientRect().width;
         let cssH = parseFloat(el.style.height) || el.getBoundingClientRect().height;
         
@@ -758,6 +776,7 @@
     }
 
     window.Game.UI.Interactions = {
-        initDrag
+        initDrag,
+        animateDropToPlaceholder
     };
 })();

@@ -60,22 +60,31 @@
     const performFlipAnimation = (startRect, toArea, movedCard) => {
         if (!startRect || !window.Game.UI) return;
         
-        requestAnimationFrame(() => {
-            // 2. 在容器中找到卡牌元素
-            // 优化：直接通过 HTML 标准属性 data-area-name 查找容器
-            // 这要求 HTML 模板中必须给容器添加 data-area-name="areaName"
+        // 关键修复：移除 requestAnimationFrame 包装
+        // 因为调用者（dispatch）已经负责了时机控制 (requestAnimationFrame 或微任务)
+        // 双重 RAF 会导致逻辑推迟到下一帧，从而导致一帧的“闪烁”（即卡牌先在目标位置渲染了一次）
+        
+        // 2. 在容器中找到卡牌元素
+        // 优化：查找容器，同时兼容 HTML 静态属性 (data-area-name) 和 渲染器动态属性 (data-drop-zone)
+            // 关键：必须使用 :not(.card) 排除卡牌自身，因为 renderCardList 也会给卡牌元素标记相同的区域名
             
             const areaName = toArea.name || toArea;
-            container = document.querySelector(`[data-area-name="${areaName}"]`);
+            
+            // 核心修复：
+            // 1. 使用 let 声明变量，防止污染全局
+            // 2. 增加 .cards-container 类限制，防止选中 Header（例如 #header-hand-area）或 Card 自身
+            //    原因：Project 中 role_renderer 给 Header 加了 data-area-name，card_renderer 给 card 也加了。
+            //    querySelector 默认会选中 DOM 中靠前的 Header，导致动画目标错误。
+            let container = document.querySelector(`.cards-container[data-area-name="${areaName}"], .cards-container[data-drop-zone="${areaName}"]`);
 
-            // 如果没有找到，静默失败或回退（为了兼容旧代码，可选）
             if (!container) {
-                // 尝试旧的 ID 约定作为最后防线
-                // container = document.getElementById(`${areaName}-container`);
-                return; 
+                 // Fallback：如果没有 .cards-container 类，尝试 ID 规则（兼容旧布局）
+                 container = document.getElementById(`${areaName}-container`);
+                 // console.warn(`[Animation] Container not found for area: ${areaName}`);
+                 if (!container) return; 
             }
             
-            // 2. 在容器中找到卡牌元素
+            // 3. 在容器中找到目标卡牌 (通常是最后加入的那张)
             // 因为我们刚刚添加了它，通常 "Place To" 把它放在末尾或特定索引
             // 目前，如果没有索引跟踪，假设它是最后一个，或者尝试匹配
             let targetEl = null;
@@ -83,7 +92,11 @@
             // 简单的启发式更新：如果是新添加到末尾的
             if (container.lastElementChild) {
                 targetEl = container.lastElementChild;
-                if(targetEl.classList.contains('card-placeholder')) targetEl = null; // 跳过占位符（如果有）
+                // 注意：旧代码曾排除 'card-placeholder'，但现在的 CardRenderer 默认使用此 class 作为卡牌容器
+                // 因此我们只应该排除那些完全为空或明显不可见的元素
+                if (targetEl.className === 'card-placeholder' && !targetEl.hasChildNodes()) {
+                     targetEl = null; 
+                }
             }
             
             // 改进：如果可能，尝试通过 ID 匹配 (Sandbox)
@@ -92,6 +105,59 @@
             }
 
             if (targetEl) {
+                // -------------------------------------------------------------
+                // 统一动画体验：使用 Interactions.animateDropToPlaceholder
+                // -------------------------------------------------------------
+                if (window.Game.UI.Interactions && window.Game.UI.Interactions.animateDropToPlaceholder) {
+                    
+                    // 1. 克隆一个用于飞行的元素
+                    // 由于 targetEl 已经是渲染好的样子，我们直接克隆它，或者创建一个临时的 visually identical element
+                    // 为了简单起见，且为了包含 CardRenderer 的效果，我们克隆 targetEl
+                    const clone = targetEl.cloneNode(true);
+                    
+                    // 2. 设置克隆体的初始状态 (Match startRect)
+                    clone.style.position = 'fixed';
+                    clone.style.left = `${startRect.left}px`;
+                    clone.style.top = `${startRect.top}px`;
+                    clone.style.width = `${startRect.width}px`;
+                    clone.style.height = `${startRect.height}px`;
+                    clone.style.margin = '0';
+                    clone.style.zIndex = '9999';
+                    clone.style.pointerEvents = 'none'; // 防止干扰鼠标
+                    clone.style.transition = 'none';
+                    clone.style.transform = ''; // 确保没有 transform
+                    // clone.classList.remove('card-placeholder'); // 错误：不要移除，它是卡牌的基础样式！
+                    
+                    // 添加 "正在拖拽" 的视觉效果 (阴影/透明度)
+                    clone.classList.add('dragging-real'); 
+                    
+                    // 如果原元素有特定背景或颜色可能是由其他 class 控制的，保留它们
+                    clone.classList.add('draggable-item'); // 确保样式一致
+                    
+                    // 3. 将克隆体添加到 body
+                    document.body.appendChild(clone);
+                    
+                    // 4. 隐藏真实目标 (作为 placeholder)
+                    // 使用 visibility: hidden 占据空间但不显示
+                    targetEl.style.visibility = 'hidden';
+                    
+                    // 5. 执行动画
+                    // animateDropToPlaceholder(el, placeholder, onComplete)
+                    window.Game.UI.Interactions.animateDropToPlaceholder(clone, targetEl, () => {
+                        // 动画结束，animateDropToPlaceholder 会移除 clone 并恢复 targetEl 的 visibility
+                        // 但我们需要确保 CSS Timer 或其他清理也是正确的
+                        // interactions.js 内部已经处理了: element.remove(), placeholder.style.visibility = ''
+                        
+                        // 强制再确认一次，防止任何意外
+                        if (targetEl) targetEl.style.visibility = '';
+                    });
+                    
+                    return; // 动画交接完成，退出
+                }
+
+                // -------------------------------------------------------------
+                // Fallback: 旧的 CSS FLIP 实现
+                // -------------------------------------------------------------
                 const endRect = targetEl.getBoundingClientRect();
                 const dx = startRect.left - endRect.left;
                 const dy = startRect.top - endRect.top;
@@ -112,7 +178,6 @@
                     }, {once: true});
                 });
             }
-        });
     };
 
     // 辅助函数：查找卡牌当前区域
@@ -165,10 +230,14 @@
         let startRect = null;
         if (payload.element) {
             startRect = payload.element.getBoundingClientRect();
+            // console.log(`[Animation] Captured startRect for ${actionType}:`, startRect);
+        } else {
+            // console.warn(`[Animation] No start element provided for ${actionType}`);
         }
 
         // 包装执行以在之后触发动画
         const triggerAnimation = () => {
+             // console.log("[Animation] Triggering animation...", { startRect, toArea: payload.toArea, card: payload.card });
              if(startRect && payload.toArea) {
                  performFlipAnimation(startRect, payload.toArea, payload.card);
              }
@@ -222,12 +291,14 @@
                      if (originalOnMove) originalOnMove(ctx);
                      
                      // 强制 UI 更新以确保 DOM 为动画准备就绪
+                     // 注意：updateUI 通常包含同步 DOM 操作
                      if (window.Game.UI && window.Game.UI.updateUI) window.Game.UI.updateUI();
 
-                     // 等待 UI 更新（微任务或小超时）
-                     setTimeout(() => {
+                     // 优化：移除 setTimeout 以消除闪烁
+                     // 使用 requestAnimationFrame 确保在浏览器重绘之前执行动画逻辑 (隐藏 targetEl)
+                     requestAnimationFrame(() => {
                         triggerAnimation(); 
-                     }, 20); // 稍微增加缓冲
+                     });
                  };
                  
                  // 重构 payload.callbacks 逻辑处理如果它为空的情况
