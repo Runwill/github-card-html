@@ -218,15 +218,29 @@
             }
 
             // cardData 是 Card 对象 (or String)
-            window.Game.Core.Events.move(
-                moveRole, 
-                cardData, 
-                targetArea, 
-                position, 
-                sourceArea, 
-                sourceIndex, 
-                callbacks // Passing the callbacks structure (could be fn or object)
-            );
+            // Delegate to Controller to handle mode-specific logic
+            if (window.Game.Controller && window.Game.Controller.dispatch) {
+                window.Game.Controller.dispatch('move', {
+                    moveRole, 
+                    card: cardData, 
+                    toArea: targetArea, 
+                    position, 
+                    fromArea: sourceArea, 
+                    fromIndex: sourceIndex, 
+                    callbacks
+                });
+            } else {
+                // Fallback to direct event trigger (Legacy/Auto)
+                window.Game.Core.Events.move(
+                    moveRole, 
+                    cardData, 
+                    targetArea, 
+                    position, 
+                    sourceArea, 
+                    sourceIndex, 
+                    callbacks 
+                );
+            }
         } else {
              console.warn('[UI] Drop: Target area not found', targetZoneId);
         }

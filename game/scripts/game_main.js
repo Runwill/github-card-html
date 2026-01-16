@@ -16,10 +16,11 @@
             // startBtn.addEventListener('click', window.Game.Core.startGame);
             // Modified to use Controller with default 'auto' mode for now
             startBtn.addEventListener('click', () => {
-                // 读取用户可能在 Setup 面板中选择的模式，或者默认使用 auto
-                // 暂时默认 auto，后续可以改为读取配置
-                const mode = 'auto'; 
-                window.Game.Controller.initGame(mode);
+                 if (window.Game.Controller && window.Game.Controller.startGame) {
+                     window.Game.Controller.startGame();
+                 } else {
+                     window.Game.Core.startGame();
+                 }
             });
         }
         

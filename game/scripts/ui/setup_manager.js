@@ -174,6 +174,10 @@
         const preset = presetSelect ? presetSelect.value : 'standard';
         const deck = generateDeck(preset);
 
+        // 获取模式预设
+        const modeSelect = document.getElementById('setup-mode-select');
+        const mode = modeSelect ? modeSelect.value : 'auto';
+
         // 隐藏设置面板
         hideSetupPanel();
 
@@ -184,7 +188,9 @@
         // if (main) main.classList.remove('hidden');
 
         // 开始游戏
-        if (window.Game.Core && window.Game.Core.startGame) {
+        if (window.Game.Controller && window.Game.Controller.startGame) {
+            window.Game.Controller.startGame({ mode: mode, players: playersConfig, deck: deck });
+        } else if (window.Game.Core && window.Game.Core.startGame) {
             window.Game.Core.startGame({ players: playersConfig, deck: deck });
         }
     }
