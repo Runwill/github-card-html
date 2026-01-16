@@ -16,7 +16,8 @@
 
         // 差量更新 (Diffing) 策略：复用现有 DOM 节点，避免暴力清空导致的闪烁和 Hover 状态丢失
         cards.forEach((card, index) => {
-            const cardName = typeof card === 'string' ? card : (card.name || card.key);
+            // 模型层保证 card 是 Card 实例
+            const cardName = card.name || card.key; // 兼容可能不仅叫 name 的情况，但主要依据 Model 定义
             
             // 尝试复用现有位置的节点
             let cardEl = currentChildren[index];

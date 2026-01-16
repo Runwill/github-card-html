@@ -128,14 +128,13 @@
     function generateDeck(preset) {
         let deck = [];
         if (preset === '80sha80shan') {
-            // Align with backend card data keys (see console logs: ATTACK, DODGE)
-            for(let i=0; i<80; i++) deck.push('Attack');
-            for(let i=0; i<80; i++) deck.push('Dodge');
+            // Updated to lowercase to match panel_card definitions (attack, dodge)
+            for(let i=0; i<80; i++) deck.push('attack');
+            for(let i=0; i<80; i++) deck.push('dodge');
         } else {
             // Standard fallback (mock standard deck)
-            // Align keys with card data: Attack(Sha), Dodge(Shan), Peach(Tao), Wine(Jiu)
-            // If keys don't match data, they will render as English tags <Key>
-            const basic = ['Attack', 'Dodge', 'Peach', 'Wine'];
+            // Updated to lowercase to match panel_card definitions
+            const basic = ['attack', 'dodge', 'peach', 'wine'];
             // 简单的每种20张用于测试
             basic.forEach(card => {
                 for(let i=0; i<20; i++) deck.push(card);

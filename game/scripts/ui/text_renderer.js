@@ -16,7 +16,10 @@
         templates: {
             // 示例:
             'Round': '第 {n} <round></round>', 
-            // 未知键的默认回退仅为 <Key></Key>
+            
+            // 下方映射已移除，直接使用 attack/dodge 作为键值
+            // 'Sha': '<attack></attack>',
+            // 'Shan': '<dodge></dodge>',
         },
 
         config: {

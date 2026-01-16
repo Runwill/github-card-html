@@ -15,7 +15,7 @@
             this._setupPlayers(config);
             this._distributeCards();
             
-            // --- UI Visibility Handling ---
+            // --- UI 可见性处理 ---
             const btn = document.getElementById('btn-start-game');
             if (btn) btn.classList.add('hidden');
             
@@ -29,8 +29,8 @@
             if (table) table.classList.remove('hidden');
             // -------------------------------
             
-            // In Sandbox, all areas might be treated as open or managed by user
-            // We don't start any flow stack
+            // 在沙盒中，所有区域都可以视为开放或由此用户管理
+            // 不需要启动任何流程堆栈
             
             if (window.Game.UI && window.Game.UI.updateUI) {
                 window.Game.UI.updateUI();
@@ -43,70 +43,39 @@
              if (config && Array.isArray(config.players)) {
                   playersData = config.players;
              } else {
-                  playersData = window.Game.MockData.mockCharacters;
+                  // 如果未提供配置，回退到一个基本配置，或者空数组
+                  // playersData = window.Game.MockData.mockCharacters; // 已移除
+                  playersData = [];
+                  console.warn("[Sandbox] No players config provided and no MockData available.");
              }
      
              this.state.players = playersData.map((char, index) => {
-                 const Area = window.Game.Models.Area;
-                 const player = {
-                     ...char,
-                     id: index,
-                     characterId: char.characterId || char.id,
-                     seat: index + 1,
-                     liveStatus: true,
-                     health: char.hp,
-                     healthLimit: char.maxHp,
-                     handLimit: char.hp,
-                     reach: 1,
-                     
-                     // In sandbox, areas are just containers
-                     hand: new Area('hand', { apartOrTogether: 0, forOrAgainst: 1 }),
-                     equipArea: new Area('equipArea', { apartOrTogether: 0, forOrAgainst: 0 })
-                 };
-                 player.hand.owner = player;
-                 player.equipArea.owner = player;
-                 
-                 // Sandbox: Make hand visible to owner (or everyone if hotseat)
-                 player.hand.visible.add(player);
-                 
-                 return player;
+                 const Player = window.Game.Models.Player;
+                 return new Player(char, index);
              });
              
-             // Reset Indices
+             // 重置索引
              this.state.currentPlayerIndex = 0;
         }
 
         _distributeCards(config) {
              const Area = window.Game.Models.Area;
+             const Card = window.Game.Models.Card; // 使用 Card 类
              const shuffle = window.Game.Utils.shuffle;
              
-             // Reset Pile
-             this.state.pile = new Area('pile', { apartOrTogether: 1, forOrAgainst: 1 });
-             this.state.discardPile = new Area('discardPile', { apartOrTogether: 1, forOrAgainst: 0 });
+             // 重置牌组
+             this.state.pile = new Area('pile', Area.Configs.Pile);
+             this.state.discardPile = new Area('discardPile', Area.Configs.DiscardPile);
              
-             // Fill Pile
-             const basic = ['Sha', 'Shan', 'Tao', 'Jiu'];
-             for(let i=0; i<80; i++) {
-                 // Convert string to Object to support properties like 'lyingArea'
-                 this.state.pile.cards.push({
-                     name: basic[i%basic.length],
-                     type: 'basic', // Mock type
-                     id: `card_${i}`
-                 });
-             }
+             // 填充牌组 (统一使用 Card.generateStandardDeck)
+             this.state.pile.cards = Card.generateStandardDeck(80);
              
              shuffle(this.state.pile.cards);
              
-             // Initial Draw (Optional in Sandbox, maybe start empty?)
+             // 初始抽牌 (可选的沙盒设置，或许从空手牌开始?)
              // Let's give them 4 cards to start playing with
              this.state.players.forEach(player => {
-                 for (let i = 0; i < 4; i++) {
-                     if (this.state.pile.cards.length > 0) {
-                         const card = this.state.pile.cards.pop();
-                         card.lyingArea = player.hand; // Initialize location
-                         player.hand.add(card);
-                     }
-                 }
+                 player.drawCards(this.state.pile, 4);
              });
         }
 

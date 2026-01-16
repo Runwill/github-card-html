@@ -1,5 +1,5 @@
 (function() {
-    // Initialization
+    // 初始化
     function initGame() {
         if (!window.Game || !window.Game.UI || !window.Game.Core) {
             console.error("Game modules not loaded correctly.");
@@ -14,7 +14,7 @@
 
         if (startBtn) {
             // startBtn.addEventListener('click', window.Game.Core.startGame);
-            // Modified to use Controller with default 'auto' mode for now
+            // 修改为使用控制器，默认启用 'auto' 模式
             startBtn.addEventListener('click', () => {
                  if (window.Game.Controller && window.Game.Controller.startGame) {
                      window.Game.Controller.startGame();

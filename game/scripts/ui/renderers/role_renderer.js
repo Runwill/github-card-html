@@ -3,24 +3,13 @@
     window.Game.UI = window.Game.UI || {};
 
     /**
-     * Helper to resolve avatar image path
+     * 解析头像图片路径的辅助函数
+     * @deprecated 具体的路径推导逻辑已移至 Game.Models.Player 类中。
+     * 这里仅保留作为简单的访问器。
      */
     function resolveAvatarUrl(role) {
-        if (role.avatar) return role.avatar;
-
-        let position = role.position;
-        // Fix: If position is not at root, check _originalData (based on debug info)
-        if (!position && role._originalData) {
-            position = role._originalData.position;
-        }
-
-        if (position) {
-            // Remove _君主 suffix if present to use the base image
-            const cleanName = position.replace(/_君主$/, '');
-            // Construct path assuming images are in source/ folder
-            return `source/${cleanName}.png`;
-        }
-        return '';
+        // 模型层（Player Class）现在负责确保 avatar 属性总是存在的
+        return role.avatar || '';
     }
 
     /**
@@ -161,14 +150,10 @@
             }
 
             // Calc count
+            // 模型层保证 hand 是 Area 实例，cards 是数组
             let count = 0;
-            // Try multiple properties for hand count
-            if (typeof selfRole.handCount === 'number') {
-                count = selfRole.handCount;
-            } else if (selfRole.hand) {
-                if (Array.isArray(selfRole.hand)) count = selfRole.hand.length; // Array of cards
-                else if (typeof selfRole.hand === 'number') count = selfRole.hand;
-                else if (selfRole.hand.cards) count = selfRole.hand.cards.length; // Object with cards array
+            if (selfRole.hand && selfRole.hand.cards) {
+                count = selfRole.hand.cards.length;
             }
 
             const handText = ` ${count}`; // format: space + count
@@ -396,16 +381,10 @@
             // 手牌数 (Hand Count) - 去掉图标
             const handCountSpan = pEl.querySelector('.player-hand-count');
             if (handCountSpan) {
+                // 模型层保证 hand 是 Area 实例，cards 是数组
                 let count = 0;
-                // Try multiple properties for hand count
-                if (typeof role.handCount === 'number') {
-                    count = role.handCount;
-                } else if (role.hand) {
-                    if (Array.isArray(role.hand)) count = role.hand.length;
-                    else if (typeof role.hand === 'number') count = role.hand;
-                    else if (role.hand.cards && Array.isArray(role.hand.cards)) count = role.hand.cards.length;
-                    else if (role.hand.length !== undefined) count = role.hand.length;
-                    else if (role.hand.count !== undefined) count = role.hand.count;
+                if (role.hand && role.hand.cards) {
+                    count = role.hand.cards.length;
                 }
                 
                 // 仅显示数字，根据需求 "写在体力值之后"
@@ -423,7 +402,8 @@
             if (equipDiv) {
                 if (role.equipArea && role.equipArea.cards && role.equipArea.cards.length > 0) {
                      const equipNames = role.equipArea.cards.map(c => {
-                         const cName = typeof c === 'string' ? c : c.name;
+                         // 模型层保证 EquipArea 中的元素是 Card 实例
+                         const cName = c.name;
                          return (typeof i18n !== 'undefined' && i18n.t) ? i18n.t(`game.card.${cName}`, {defaultValue: cName}) : cName;
                      });
                      const newEquipText = `[${equipNames.join(',')}]`;

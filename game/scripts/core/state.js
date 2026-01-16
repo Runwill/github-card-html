@@ -1,18 +1,10 @@
 (function() {
     window.Game = window.Game || {};
     
-    // Ensure Models are loaded
+    // 确保模型已加载
     const Area = window.Game.Models && window.Game.Models.Area;
 
-     // Mock Data for Characters
-     const mockCharacters = [
-        { name: "Character A", hp: 4, maxHp: 4, avatar: "source/青龙.png.bak" },
-        { name: "Character B", hp: 3, maxHp: 3, avatar: "source/白虎_君主.png.bak" },
-        { name: "Character C", hp: 4, maxHp: 4, avatar: "source/朱雀.png.bak" },
-        { name: "Character D", hp: 3, maxHp: 3, avatar: "source/玄武_君主.png.bak" }
-    ];
-
-    // Game State
+    // 游戏状态
     window.Game.GameState = {
         players: [],
         currentPlayerIndex: 0,
@@ -34,16 +26,14 @@
     };
 
     if (Area) {
-        window.Game.GameState.pile = new Area('pile', { apartOrTogether: 1, forOrAgainst: 1 });
-        window.Game.GameState.discardPile = new Area('discardPile', { apartOrTogether: 1, forOrAgainst: 0 });
-        window.Game.GameState.treatmentArea = new Area('treatmentArea', { apartOrTogether: 0, forOrAgainst: 0 });
+        window.Game.GameState.pile = new Area('pile', Area.Configs.Pile);
+        window.Game.GameState.discardPile = new Area('discardPile', Area.Configs.DiscardPile);
+        window.Game.GameState.treatmentArea = new Area('treatmentArea', Area.Configs.TreatmentArea);
     } else {
         console.error("Game.Models.Area not found during State initialization. Make sure models.js is loaded before state.js");
     }
 
-    // Expose Mock Data
-    window.Game.MockData = {
-        mockCharacters
-    };
+    // 暴露模拟数据（如果需要可以添加其他数据）
+    window.Game.MockData = {};
 
 })();

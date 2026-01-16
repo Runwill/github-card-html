@@ -65,7 +65,15 @@
 
     function initDrag(cardElement, cardData, sourceAreaName, sourceIndex = -1) {
         cardElement.classList.add('draggable-item');
-        cardElement.addEventListener('pointerdown', (e) => handlePointerDown(e, cardElement, cardData, sourceAreaName, sourceIndex));
+        
+        // 如果存在旧的监听器则移除，以防止累积逻辑检查
+        // 虽然如果在引用相同的情况下多次使用 addEventListener 是相对安全的
+        // 但这里我们使用的是箭头函数，所以它们会叠加。这对 pointerdown 很不好。
+        // 我们应该解决这个问题。card_renderer 会重复调用 initDrag。
+        // 解决方案：检查监听器是否已附加或使用属性 (onpointerdown)
+        // 使用 onpointerdown 对于这种“单一拖动处理器”模型更整洁
+        
+        cardElement.onpointerdown = (e) => handlePointerDown(e, cardElement, cardData, sourceAreaName, sourceIndex);
         
         cardElement.ondragstart = () => false;
         cardElement.oncontextmenu = (e) => {
@@ -73,10 +81,10 @@
                  e.preventDefault();
                  return;
              }
-             // Show Card Context Menu
+             // 显示卡牌上下文菜单
              if (window.Game.UI.showCardContextMenu) {
                  e.preventDefault();
-                 window.Game.UI.showCardContextMenu(e.clientX, e.clientY, cardData, sourceAreaName);
+                 window.Game.UI.showCardContextMenu(e.clientX, e.clientY, cardData, sourceAreaName, cardElement);
              }
         };
     }
@@ -584,6 +592,7 @@
                     document.body.classList.remove('is-global-dragging');
                     DragState.dragElement = null; 
                     DragState.placeholderElement = null; 
+                    DragState.isDragging = false; // Reset dragging flag
                 }
             };
 

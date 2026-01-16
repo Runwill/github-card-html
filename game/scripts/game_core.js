@@ -1,7 +1,7 @@
 (function() {
     window.Game = window.Game || {};
 
-    // Dependencies
+    // 依赖项
     const GameState = window.Game.GameState;
     const Area = window.Game.Models.Area;
     const shuffle = window.Game.Utils.shuffle;
@@ -10,20 +10,20 @@
 
 
     const Settings = {
-        autoRunDelay: 50 // Default 50ms
+        autoRunDelay: 50 // 默认 50ms
     };
 
     let recursionDepth = 0;
-    const MAX_RECURSION = 50; // Max synchronous steps for 0ms delay
+    const MAX_RECURSION = 50; // 0ms 延迟下的最大同步步骤
 
     function setSpeed(ms) {
         Settings.autoRunDelay = ms;
         // console.log(`[Game] Speed set to ${ms}ms`);
     }
 
-    // Helper to get current node from stack
+    // 辅助函数：从堆栈获取当前节点
     function getCurrentNode() {
-        // Priority 1: Event Stack
+        // 优先级 1：事件堆栈
         if (GameState.eventStack.length > 0) {
             const activeEvent = GameState.eventStack[GameState.eventStack.length - 1];
             if (activeEvent.steps && activeEvent.steps.length > 0) {
@@ -35,7 +35,7 @@
             }
         }
 
-        // Priority 2: Flow Stack
+        // 优先级 2：流程堆栈
         let node = window.Game.Def.GAME_FLOW;
         for (let i = 0; i < GameState.flowStack.length; i++) {
             if (node.children && node.children[GameState.flowStack[i]]) {
@@ -47,7 +47,7 @@
         return node;
     }
 
-    // Helper to get all active process names (for UI)
+    // 辅助函数：获取所有活跃进程名称 (用于 UI)
     function getActiveProcesses() {
         // Renamed to return full node info: [{name, type, ...}]
         const path = [];
@@ -102,19 +102,33 @@
              // 使用自定义配置（来自 Setup 环节）
              playersData = customConfig.players;
         } else {
-             // 使用默认 Mock 数据
-             playersData = MockData.mockCharacters;
+             // 使用默认 Mock 数据 (已移除，设为空)
+             playersData = [];
+             // playersData = MockData.mockCharacters;
         }
 
-        // Initialize Deck (Pile)
-        // Check if custom deck is provided
-        GameState.pile.cards = [];
+        // Initialize Public Areas (Reset all to clean state)
+        const Area = window.Game.Models.Area;
+        GameState.pile = new Area('pile', Area.Configs.Pile);
+        GameState.discardPile = new Area('discardPile', Area.Configs.DiscardPile);
+        GameState.treatmentArea = new Area('treatmentArea', Area.Configs.TreatmentArea);
+
+        // Fill the Deck
+        const Card = window.Game.Models.Card; // 使用 Card 类
+
         if (customConfig && Array.isArray(customConfig.deck)) {
-            GameState.pile.cards = [...customConfig.deck];
+            // 确保即使传入的是字符串数组，也转换为 Card 对象
+            GameState.pile.cards = customConfig.deck.map((c, i) => {
+                if (typeof c === 'string') {
+                    return new Card(c, 'basic', 'none', 0, `card_${i}`);
+                }
+                // 已经是对象则不做处理（假设它是合法的 Card 或近似结构）
+                return c;
+            });
         } else {
             // Default Fallback
-            const basic = ['Sha', 'Shan', 'Tao', 'Jiu'];
-            for(let i=0; i<80; i++) GameState.pile.cards.push(basic[i%basic.length]);
+            // 统一使用 Card.generateStandardDeck
+            GameState.pile.cards = Card.generateStandardDeck(80);
         }
         
         // Shuffle the pile before distribution
@@ -123,37 +137,12 @@
         console.log(`[Game Core] Deck initialized with ${GameState.pile.cards.length} cards.`);
 
         GameState.players = playersData.map((char, index) => {
-            const player = {
-                ...char,
-                id: index,
-                characterId: char.characterId || char.id, // Ensure characterId is available
-                seat: index + 1,
-                liveStatus: true,
-                health: char.hp,
-                healthLimit: char.maxHp,
-                handLimit: char.hp, // Initial hand limit equals health
-                reach: 1,
-                // Assign owner later or use temporary object to ref?
-                // Use default and assign owner immediately after
-                hand: new Area('hand', { apartOrTogether: 0, forOrAgainst: 1 }),
-                equipArea: new Area('equipArea', { apartOrTogether: 0, forOrAgainst: 0 }) // Apart, For
-            };
-            player.hand.owner = player;
-            player.equipArea.owner = player;
+            const Player = window.Game.Models.Player;
+            const player = new Player(char, index);
             
             // Distribute 4 cards from the Top of the Pile
-            for (let i = 0; i < 4; i++) {
-                if (GameState.pile.cards.length > 0) {
-                    const card = GameState.pile.cards.pop();
-                    player.hand.add(card);
-                }
-            }
+            player.drawCards(GameState.pile, 4);
             
-            // Set visibility: Hand is visible to its owner 
-            player.hand.visible.add(player);
-            // Equip area is visible to all (implied empty set could mean public if we handle it that way, or we add all players)
-            // For now, we assume 'equipArea' is public information.
-
             return player;
         });
         GameState.currentPlayerIndex = 0;

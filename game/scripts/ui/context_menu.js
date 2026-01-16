@@ -78,60 +78,58 @@
         }
     }
 
-    function showCardContextMenu(x, y, card, currentAreaName) {
+    function showCardContextMenu(x, y, card, currentAreaName, cardElement = null) {
         const menu = createContextMenu();
         menu.innerHTML = '';
         
-        // Header
+        // 标题
         const header = document.createElement('div');
         header.className = 'context-menu-header';
         header.textContent = typeof card === 'string' ? card : (card.name || 'Card');
         menu.appendChild(header);
 
-        // Actions
+        // 动作列表
         const actions = [];
         const state = window.Game.GameState;
         
-        // Helpers
+        // 辅助函数
         const getPlayer = () => state.players[state.currentPlayerIndex] || state.players[0];
-        const moveAction = (toArea, label) => ({
-            label: label,
-            action: () => {
-                // Large index => Top/End
-                const position = 9999;
-                window.Game.Controller.dispatch('move', {
-                    moveRole: getPlayer(), // Pass current player as actor
-                    card: card,
-                    toArea: toArea,
-                    position: position,
-                    // If we know source, providing it helps, otherwise controller/engine tries to find it
-                    // fromArea: card.lyingArea
+
+        // 动作配置
+        const targetConfigs = [
+            { key: 'pile', label: '置入牌堆顶' },
+            { key: 'discardPile', label: '置入弃牌堆顶' },
+            { key: 'treatmentArea', label: '置入处理区' },
+            { roleKey: 'hand', label: '置入手牌' },
+            { roleKey: 'equipArea', label: '置入装备区' },
+        ];
+
+        targetConfigs.forEach(conf => {
+            let area = null;
+            if (conf.key) area = state[conf.key];
+            if (conf.roleKey) {
+                const p = getPlayer();
+                if (p) area = p[conf.roleKey];
+            }
+            
+            // 如果找到了目标区域，就生成一个菜单项
+            // 这里可以清楚看到：label 只是为了显示，action 才是逻辑，两者是并列关系
+            if (area) {
+                actions.push({
+                    label: conf.label, // 1. 这个只给按钮显示文字用
+                    action: () => {    // 2. 这个是点击后触发的逻辑，里面没有 label
+                        window.Game.Controller.dispatch('place', {
+                            moveRole: getPlayer(),
+                            card: card,
+                            toArea: area,
+                            element: cardElement
+                        });
+                    }
                 });
             }
         });
 
-        // 1. To Pile (Top)
-        if (state.pile) {
-            actions.push(moveAction(state.pile, '置入牌堆顶'));
-        }
-        
-        // 2. To Discard (Top)
-        if (state.discardPile) {
-            actions.push(moveAction(state.discardPile, '置入弃牌堆顶'));
-        }
-        
-        // 3. To Current Player Hand
-        const currentPlayer = getPlayer();
-        if (currentPlayer && currentPlayer.hand) {
-            actions.push(moveAction(currentPlayer.hand, '置入手牌'));
-        }
-
-        // 4. To Current Player Equip
-        if (currentPlayer && currentPlayer.equipArea) {
-             actions.push(moveAction(currentPlayer.equipArea, '置入装备区'));
-        }
-        
-        // Render
+        // 渲染
         actions.forEach(item => {
             const el = document.createElement('div');
             el.className = 'context-menu-item';
@@ -144,12 +142,12 @@
             menu.appendChild(el);
         });
 
-        // Position
+        // 定位并显示
         menu.style.left = `${x}px`;
         menu.style.top = `${y}px`;
         menu.classList.add('visible');
         
-        // Boundary check
+        // 边界检查
         const rect = menu.getBoundingClientRect();
         if (rect.right > window.innerWidth) menu.style.left = `${window.innerWidth - rect.width - 10}px`;
         if (rect.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - rect.height - 10}px`;
