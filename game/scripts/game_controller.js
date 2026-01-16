@@ -61,31 +61,17 @@
         if (!startRect || !window.Game.UI) return;
         
         requestAnimationFrame(() => {
-            // 1. 寻找目标容器
-            let container = null;
+            // 2. 在容器中找到卡牌元素
+            // 优化：直接通过 HTML 标准属性 data-area-name 查找容器
+            // 这要求 HTML 模板中必须给容器添加 data-area-name="areaName"
+            
+            const areaName = toArea.name || toArea;
+            container = document.querySelector(`[data-area-name="${areaName}"]`);
 
-            // 优先级 1：如果可用，使用集中式 UI 辅助函数（最适合扩展）
-            // (假设 window.Game.UI.getAreaContainer 已实现，用于处理当前玩家的 "hand", "judge", "equip" 等)
-            if (typeof window.Game.UI.getAreaContainer === 'function') {
-                 container = window.Game.UI.getAreaContainer(toArea);
-            }
-            
-            // 优先级 2：通用 data-attribute 查找（强大的后备方案）
-            // 适用于 "treatmentArea", "discardPile" 等，如果它们遵循约定
+            // 如果没有找到，静默失败或回退（为了兼容旧代码，可选）
             if (!container) {
-                // 对可能重名但归属不同的玩家区域进行特殊处理
-                // 理想情况下 getAreaContainer 处理这个问题。 
-                // 如果是简单的查找：
-                container = document.querySelector(`[data-drop-zone="${toArea.name}"]`);
-                
-                // 修正 'hand' -> 通常在单设备视图中暗示当前玩家的手牌
-                if (toArea.name === 'hand' && !container) {
-                     container = document.getElementById('hand-cards-container');
-                }
-            }
-            
-            if (!container) {
-                // console.warn(`[Animation] Container not found for area: ${toArea.name}`);
+                // 尝试旧的 ID 约定作为最后防线
+                // container = document.getElementById(`${areaName}-container`);
                 return; 
             }
             
