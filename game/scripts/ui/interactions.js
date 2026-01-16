@@ -35,6 +35,13 @@
         tiltFactor: 0.4,
         swapAnimationDuration: 200 // 毫秒
     };
+    
+    function setDragConfig(config) {
+        if (typeof config.lerpFactor === 'number') {
+            DRAG_CONFIG.lerpFactor = config.lerpFactor;
+        }
+        // Can add more configs here
+    }
 
     // 调试辅助函数：输出手牌和处理区状态
     function logDragDebug(phase) {
@@ -818,6 +825,7 @@
 
     window.Game.UI.Interactions = {
         initDrag,
-        animateDropToPlaceholder
+        animateDropToPlaceholder,
+        setDragConfig
     };
 })();
