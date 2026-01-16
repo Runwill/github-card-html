@@ -290,7 +290,10 @@
         }
 
         // 实时重新排序逻辑
-        if (dropZone) { // 即使没有 placeholderElement？噢，它从 startDrag 就存在。
+        // 仅当该区域接受占位符时才执行
+        const acceptPlaceholder = dropZone && dropZone.getAttribute('data-accept-placeholder') !== 'false';
+        
+        if (dropZone && acceptPlaceholder) { 
              updatePlaceholderPosition(dropZone, targetEl, e.clientX, e.clientY);
         }
     }
@@ -554,23 +557,34 @@
              el.removeEventListener('pointercancel', handlePointerUp);
         }
 
-        const dropZone = placeholder ? placeholder.parentNode : null;
+        // 确定放置区：优先使用鼠标当前的区域，回退到占位符所在的区域
+        let dropZone = DragState.currentDropZone;
+        if (!dropZone && placeholder) {
+            dropZone = placeholder.parentNode;
+        }
 
         if (dropZone && dropZone.getAttribute('data-drop-zone')) {
             const targetZoneId = dropZone.getAttribute('data-drop-zone');
+            const acceptPlaceholder = dropZone.getAttribute('data-accept-placeholder') !== 'false';
             
-            // 基于占位符位置计算索引
-            // 正确过滤兄弟节点
-            const siblings = Array.from(dropZone.children).filter(c => c.classList.contains('card-placeholder') && c !== placeholder);
-             
-            const nextSibling = placeholder.nextElementSibling;
-            let targetIndex = siblings.length; // 默认到末尾
-            
-            if (nextSibling) {
-                const idx = siblings.indexOf(nextSibling);
-                if (idx !== -1) {
-                    targetIndex = idx;
+            let targetIndex = -1;
+
+            if (acceptPlaceholder && placeholder && placeholder.parentNode === dropZone) {
+                // 标准模式：基于占位符位置计算索引
+                const siblings = Array.from(dropZone.children).filter(c => c.classList.contains('card-placeholder') && c !== placeholder);
+                
+                targetIndex = siblings.length; // 默认到末尾
+                
+                const nextSibling = placeholder.nextElementSibling;
+                if (nextSibling) {
+                    const idx = siblings.indexOf(nextSibling);
+                    if (idx !== -1) {
+                        targetIndex = idx;
+                    }
                 }
+            } else {
+                // 触发模式（或占位符不在目标内）：默认追加
+                targetIndex = -1;
             }
             
             logDragDebug(`Before Drop Action (Target: ${targetZoneId})`);
@@ -580,6 +594,23 @@
 
             let isLogicFinished = false;
             let isAnimationFinished = false;
+            
+            // 是否使用远程动画（即由 Controller 接管）
+            // 如果是触发模式 (acceptPlaceholder=false)，我们没有本地占位符目标，必须依赖 Controller 对新元素的定位
+            const useRemoteAnimation = !acceptPlaceholder;
+            let options = {};
+            
+            if (useRemoteAnimation && el) {
+                // 捕获当前拖拽元素的 rect 作为动画起点（备用）
+                options.startRect = el.getBoundingClientRect();
+                // 核心修改：直接移交 DOM 元素所有权给外部 (Controller)
+                // 这样可以保留所有视觉状态（旋转、阴影等），防止动画跳动
+                options.dragElement = el;
+                options.cardHTML = el.outerHTML; // 备用
+                
+                // 标记动画阶段对“本地交互”来说已完成（因为移交了）
+                isAnimationFinished = true;
+            }
 
             // 统一的完成检查器
             const checkFinish = () => {
@@ -596,7 +627,7 @@
                 }
             };
 
-            // 动画触发器
+            // 动画触发器 (本地)
             const playDropAnimation = () => {
                 animateDropToPlaceholder(el, placeholder, () => {
                     isAnimationFinished = true;
@@ -613,10 +644,19 @@
                     targetIndex,
                     DragState.dragSource.sourceIndex,
                     {
-                        // 1. 当 Move 事件实际执行数据变更时（whenPlaced），触发动画
+                        // 1. 当 Move 事件实际执行数据变更时（whenPlaced）
                         onMoveExecuted: () => {
                             logDragDebug('Triggering Animation (Event Executed)');
-                            playDropAnimation();
+                            if (useRemoteAnimation) {
+                                // 远程动画接管：本地无需播放飞回占位符的动画
+                                // 我们已经移交了 el 的引用 (options.dragElement)，所以不要在这里销毁它！
+                                if (placeholder) placeholder.remove(); // 移除可能的残留占位符(如果在原处)
+                                
+                                isAnimationFinished = true; // 视为本地动画阶段立即完成
+                                checkFinish();
+                            } else {
+                                playDropAnimation();
+                            }
                         },
                         // 2. 当 Move 事件完全结束后（afterPlaced...done）
                         onComplete: () => {
@@ -624,7 +664,8 @@
                             logDragDebug('Logic Finished');
                             checkFinish();
                         }
-                    }
+                    },
+                    options // 传递额外选项 (startRect)
                 );
             } else {
                 // 无逻辑处理，直通

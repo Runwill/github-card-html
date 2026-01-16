@@ -57,9 +57,100 @@
     }
 
     // 辅助函数：动画逻辑
-    const performFlipAnimation = (startRect, toArea, movedCard) => {
+    const performFlipAnimation = (startRect, toArea, movedCard, animationHint, cardHTML, passedEl) => {
         if (!startRect || !window.Game.UI) return;
         
+        // -------------------------------------------------------------
+        // 特殊路径：如果指定了动画目标提示（Role Summary）
+        // -------------------------------------------------------------
+        if (animationHint && animationHint.startsWith('role:')) {
+            const container = document.querySelector(`[data-drop-zone="${animationHint}"]`);
+            if (container) {
+                //重建飞行卡牌 (或直接使用传递的元素)
+                let flyer = passedEl;
+                let isReusedElement = !!flyer;
+
+                if (!flyer) {
+                     // Fallback: Create new
+                     if (cardHTML) {
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = cardHTML;
+                        flyer = tempDiv.firstElementChild;
+                        if (flyer) {
+                            flyer.style.transform = '';
+                            flyer.style.transition = '';
+                        }
+                    }
+                    if (!flyer) {
+                        flyer = document.createElement('div');
+                        flyer.className = 'card dragging-real';
+                        flyer.style.background = 'white'; 
+                        flyer.style.border = '1px solid #ccc';
+                    }
+                    // 如果是新建的，需要设置初始状态
+                    flyer.style.position = 'fixed';
+                    flyer.style.left = `${startRect.left}px`;
+                    flyer.style.top = `${startRect.top}px`;
+                    flyer.style.width = `${startRect.width}px`;
+                    flyer.style.height = `${startRect.height}px`;
+                    flyer.style.zIndex = '9999';
+                    flyer.style.pointerEvents = 'none';
+                    flyer.style.margin = '0';
+                    flyer.style.transform = '';
+                    if (!flyer.classList.contains('dragging-real')) flyer.classList.add('dragging-real');
+                    document.body.appendChild(flyer);
+                } else {
+                    // 如果是复用的，确保它还在 DOM 上（虽然 interactions.js 没移除它，但我们确认一下）
+                    if (!flyer.isConnected) document.body.appendChild(flyer);
+                    // 确保不会再响应鼠标
+                    flyer.style.pointerEvents = 'none';
+                    flyer.style.zIndex = '9999';
+                }
+                
+                // 目标：根据用户要求，定位到摘要角色的中心 (container 本身)，而不是头像
+                const targetRectBase = container.getBoundingClientRect();
+
+                // 目标大小：保持原大小（根据用户要求，不进行缩放）
+                // 此时 startRect 应该是准确的。
+                
+                const targetW = startRect.width;
+                const targetH = startRect.height;
+                // 计算居中位置
+                const targetLeft = targetRectBase.left + targetRectBase.width/2 - targetW/2;
+                const targetTop = targetRectBase.top + targetRectBase.height/2 - targetH/2;
+                
+                // --- 使用 CSS Transition ---
+                if (isReusedElement) {
+                    const initialX = parseFloat(flyer.style.left) || 0;
+                    const initialY = parseFloat(flyer.style.top) || 0;
+                    
+                    const finalTx = targetLeft - initialX;
+                    const finalTy = targetTop - initialY;
+                    
+                    requestAnimationFrame(() => {
+                        // ease-in 在开始时速度为0，会导致"先慢后快"的感觉
+                        // 改为 linear 并在较短时间内完成，以维持拖拽时的速度感
+                        flyer.style.transition = 'transform 0.15s linear'; 
+                        flyer.style.transform = `translate(${finalTx}px, ${finalTy}px)`;
+                    });
+                } else {
+                    const deltaX = targetLeft - startRect.left;
+                    const deltaY = targetTop - startRect.top;
+                    
+                    requestAnimationFrame(() => {
+                        flyer.style.transition = 'transform 0.15s linear';
+                        flyer.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                    });
+                }
+
+                flyer.addEventListener('transitionend', () => {
+                    flyer.remove();
+                }, {once: true});
+                
+                return; // 动画接管完成，退出
+            }
+        }
+
         // 关键修复：移除 requestAnimationFrame 包装
         // 因为调用者（dispatch）已经负责了时机控制 (requestAnimationFrame 或微任务)
         // 双重 RAF 会导致逻辑推迟到下一帧，从而导致一帧的“闪烁”（即卡牌先在目标位置渲染了一次）
@@ -227,19 +318,18 @@
         }
 
         // 捕获动画开始状态
-        let startRect = null;
-        if (payload.element) {
+        let startRect = payload.startRect; // 优先使用直接传递的 startRect (例如来自 interactions.js 的值传递)
+        
+        if (!startRect && payload.element) {
             startRect = payload.element.getBoundingClientRect();
-            // console.log(`[Animation] Captured startRect for ${actionType}:`, startRect);
-        } else {
-            // console.warn(`[Animation] No start element provided for ${actionType}`);
+            // console.log(`[Animation] Captured startRect from element for ${actionType}:`, startRect);
         }
 
         // 包装执行以在之后触发动画
         const triggerAnimation = () => {
              // console.log("[Animation] Triggering animation...", { startRect, toArea: payload.toArea, card: payload.card });
              if(startRect && payload.toArea) {
-                 performFlipAnimation(startRect, payload.toArea, payload.card);
+                 performFlipAnimation(startRect, payload.toArea, payload.card, payload.animationHint, payload.cardHTML, payload.dragElement);
              }
         };
 

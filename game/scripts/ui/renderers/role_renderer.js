@@ -247,6 +247,10 @@
                 pEl.setAttribute('data-inspector-type', 'role');
                 pEl.setAttribute('data-role-id', role.id);
                 
+                // Drop Zone Config (Trigger Mode)
+                pEl.setAttribute('data-drop-zone', `role:${role.id}`); 
+                pEl.setAttribute('data-accept-placeholder', 'false'); // Do not accept physical card insertion
+                
                 // Avatar
                 // Use .char-avatar container to reuse Main View styles from game.css
                 const avatarContainer = document.createElement('div');

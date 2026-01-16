@@ -178,12 +178,13 @@
     window.Game.UI.updateUI = updateUI;
     
     // 拖放回调实现：触发核心 Move 事件
-    window.Game.UI.onCardDrop = function(cardData, sourceAreaName, targetZoneId, targetIndex, sourceIndex, callbacks) {
+    window.Game.UI.onCardDrop = function(cardData, sourceAreaName, targetZoneId, targetIndex, sourceIndex, callbacks, options) {
         const GameState = window.Game.Core.GameState;
         if (!GameState) return;
 
         let targetArea = null;
         let moveRole = null;
+        let animationHint = null;
         // 修正：当前操作者应与 UI 显示的“主视角角色”一致
         // 之前硬编码为 players[0]，会导致在 updateSelfRoleInfo 渲染 players[1] 时逻辑错乱
         const currentPlayer = GameState.players[GameState.currentPlayerIndex] || GameState.players[0];
@@ -195,6 +196,15 @@
         } else if (targetZoneId === 'treatmentArea') {
             targetArea = GameState.treatmentArea;
             moveRole = currentPlayer; 
+        } else if (targetZoneId && targetZoneId.startsWith('role:')) {
+            // 特殊处理：拖拽到角色摘要 -> 置入该角色手牌
+            const roleId = parseInt(targetZoneId.split(':')[1]);
+            const targetPlayer = GameState.players.find(p => p.id === roleId);
+            if (targetPlayer) {
+                targetArea = targetPlayer.hand;
+                moveRole = currentPlayer; 
+                animationHint = targetZoneId; // 传递动画线索 (e.g. "role:1")
+            }
         } else if (GameState[targetZoneId]) {
             // 尝试全局区域
             targetArea = GameState[targetZoneId];
@@ -220,14 +230,23 @@
             // cardData 是 Card 对象 (or String)
             // Delegate to Controller to handle mode-specific logic
             if (window.Game.Controller && window.Game.Controller.dispatch) {
+                // 用于动画接管的起始位置
+                const startRect = (options && options.startRect) ? options.startRect : null;
+                const cardHTML = (options && options.cardHTML) ? options.cardHTML : null;
+                const dragElement = (options && options.dragElement) ? options.dragElement : null;
+
                 window.Game.Controller.dispatch('move', {
                     moveRole, 
                     card: cardData, 
                     toArea: targetArea, 
-                    position, 
+                    position: (targetIndex < 0) ? 9999 : position, // 负索引意味着追加到末尾
                     fromArea: sourceArea, 
                     fromIndex: sourceIndex, 
-                    callbacks
+                    callbacks,
+                    startRect,
+                    animationHint, // 显式传递动画目标线索
+                    cardHTML, // 显式传递卡牌外观
+                    dragElement // 显式传递拖拽元素本体
                 });
             } else {
                 // Fallback to direct event trigger (Legacy/Auto)
