@@ -67,8 +67,8 @@
         console.groupEnd();
     }
 
-    // 为 FLIP 动画存储位置
-    const flipSnapshot = new Map();
+    // 为 FLIP 动画存储位置 (已移至局部变量)
+    // const flipSnapshot = new Map();
 
     function initDrag(cardElement, cardData, sourceAreaName, sourceIndex = -1) {
         cardElement.classList.add('draggable-item');
@@ -297,168 +297,209 @@
         }
 
         // 实时重新排序逻辑
-        // 仅当该区域接受占位符时才执行
-        const acceptPlaceholder = dropZone && dropZone.getAttribute('data-accept-placeholder') !== 'false';
+        // 扩展逻辑：即使 acceptPlaceholder 为 false，我们也可能想把占位符“吸”过去（即使是隐藏的）
+        // 以便让原区域（如手牌）复原。
         
-        if (dropZone && acceptPlaceholder) { 
-             updatePlaceholderPosition(dropZone, targetEl, e.clientX, e.clientY);
+        if (dropZone) {
+             const acceptPlaceholder = dropZone.getAttribute('data-accept-placeholder') !== 'false';
+             
+             if (acceptPlaceholder) {
+                 // 标准排序逻辑：占位符可见并占据空间
+                 updatePlaceholderPosition(dropZone, targetEl, e.clientX, e.clientY);
+             } 
+             else if (DragState.placeholderElement) {
+                 // 非排序逻辑（如摘要角色）：占位符移过去但隐藏
+                 // 仅当它还没过去时触发
+                 if (DragState.placeholderElement.parentNode !== dropZone) {
+                     performPlaceholderMove(dropZone, null, true); // true = hide
+                 }
+             }
         }
     }
 
-    function updatePlaceholderPosition(dropZone, targetEl, mouseX, mouseY) {
-        // 安全检查：如果占位符元素丢失，中止更新以防止崩溃
-        if (!DragState.placeholderElement) return;
+    // --- 提取复用的移动逻辑 ---
+    function getSortableSelector(el) {
+        return el.getAttribute('data-item-selector') || '.card-placeholder';
+    }
 
-        // 找到我们悬停其上的卡牌
-        const hoverCard = targetEl ? targetEl.closest('.card-placeholder:not(.drag-placeholder)') : null;
+    // 获取元素真实的布局 Rect (忽略 Transform 动画的影响)
+    function getLayoutRect(el) {
+        const rect = el.getBoundingClientRect();
+        const style = window.getComputedStyle(el);
+        const transform = style.transform;
         
-        // --- FLIP 动画：预计算 ---
-        // 在移动之前快照 dropZone 中所有兄弟节点的位置。
-        // 如果我们要将占位符移出旧区域，我们还需要包含旧区域的兄弟节点。
-        let siblings = Array.from(dropZone.children).filter(c => 
-            c !== DragState.placeholderElement && 
-            c.classList.contains('card-placeholder')
-        );
+        if (transform && transform !== 'none') {
+            // 解析 matrix(a, b, c, d, tx, ty)
+            const match = transform.match(/matrix\((.+)\)/);
+            if (match) {
+                const values = match[1].split(',').map(parseFloat);
+                if (values.length >= 6) {
+                    const tx = values[4];
+                    const ty = values[5];
+                    // 视觉位置 = 布局位置 + transform
+                    // 布局位置 = 视觉位置 - transform
+                    return {
+                        left: rect.left - tx,
+                        top: rect.top - ty,
+                        right: rect.right - tx,
+                        bottom: rect.bottom - ty,
+                        width: rect.width,
+                        height: rect.height,
+                        // 兼容 x, y
+                        x: rect.left - tx,
+                        y: rect.top - ty
+                    };
+                }
+            }
+        }
+        return rect;
+    }
+
+    function performPlaceholderMove(targetContainer, targetSibling, hidePlaceholder = false) {
+        const placeholder = DragState.placeholderElement;
+        if (!placeholder) return;
+
+        // 如果需要显示（hidePlaceholder 为 false），则立即移除隐藏样式，以便正确计算布局（挤开效果）
+        // 如果需要隐藏，我们在移动后再添加样式，或者现在添加也行？
+        // 最好在移动前重置状态，以确保 getBoundingClientRect 是基于“可见/占据空间”的（对于 target sibling 来说）
+        // 但如果我们要隐藏它，它就不应该挤开 targetSibling。
         
-        const currentParent = DragState.placeholderElement.parentNode;
-        if (currentParent && currentParent !== dropZone && currentParent.nodeType === 1) {
-             const oldSiblings = Array.from(currentParent.children).filter(c => 
-                c !== DragState.placeholderElement && 
-                c.classList.contains('card-placeholder')
-             );
-             siblings = siblings.concat(oldSiblings);
+        if (!hidePlaceholder) {
+            placeholder.classList.remove('drag-placeholder-hidden');
+            placeholder.style.display = ''; 
+        }
+
+        const oldContainer = placeholder.parentNode;
+        
+        let affected = [];
+        const targetSelector = getSortableSelector(targetContainer);
+        
+        Array.from(targetContainer.children).forEach(c => {
+             if (c !== placeholder && c.matches(targetSelector)) affected.push(c);
+        });
+        
+        if (oldContainer && oldContainer !== targetContainer && oldContainer.nodeType === 1) {
+            const oldSelector = getSortableSelector(oldContainer);
+            Array.from(oldContainer.children).forEach(c => {
+                 if (c !== placeholder && c.matches(oldSelector)) affected.push(c);
+            });
         }
         
-        // 仅在这一帧/动作未快照时快照？
-        // 不，我们需要在 DOM 更改前快照。
-        // 但每次 mousemove 都这样做很昂贵。
-        // 我们应该只在我们将要移动时才这样做。
+        const snapshot = new Map();
+        affected.forEach(el => {
+            const r = el.getBoundingClientRect();
+            snapshot.set(el, { left: r.left, top: r.top });
+        });
+        
+        if (targetSibling) {
+            targetContainer.insertBefore(placeholder, targetSibling);
+        } else {
+            targetContainer.appendChild(placeholder);
+        }
+
+        if (hidePlaceholder) {
+            placeholder.classList.add('drag-placeholder-hidden');
+            // 使用内联样式确保生效，防止 CSS 没加载
+            placeholder.style.display = 'none';
+        }
+
+        // --- 同步执行 FLIP Invert ---
+        // 立即读取新位置并应用反转变换，阻止布局跳变
+        affected.forEach(el => {
+            const start = snapshot.get(el);
+            if (!start) return;
+            
+            const rect = el.getBoundingClientRect(); // 强制布局更新
+            const dx = start.left - rect.left;
+            const dy = start.top - rect.top;
+            
+            if (dx !== 0 || dy !== 0) {
+                el.style.transform = `translate(${dx}px, ${dy}px)`;
+                el.style.transition = 'none';
+                
+                // 标记该元素需要播放动画
+                el.dataset.flipping = 'true';
+            }
+        });
+        
+        // --- 异步执行 FLIP Play ---
+        requestAnimationFrame(() => {
+            affected.forEach(el => {
+                if (el.dataset.flipping === 'true') {
+                    delete el.dataset.flipping;
+                    
+                    // 移除 transform 以播放过渡
+                    el.style.transform = '';
+                    el.style.transition = `transform ${DRAG_CONFIG.swapAnimationDuration}ms cubic-bezier(0.2, 0, 0, 1)`;
+                    
+                    const endHandler = () => {
+                         el.style.transition = '';
+                         el.removeEventListener('transitionend', endHandler);
+                    };
+                    el.addEventListener('transitionend', endHandler, {once: true});
+                }
+            });
+        });
+    }
+
+    function updatePlaceholderPosition(dropZone, targetEl, mouseX, mouseY) {
+        // 安全检查
+        if (!DragState.placeholderElement) return;
+
+        const itemSelector = getSortableSelector(dropZone);
+        const hoverItem = targetEl ? targetEl.closest(`${itemSelector}:not(.drag-placeholder)`) : null;
+        
+        // 不再需要手动查找 siblings 和 FLIP 快照，只需计算我们想去哪里
         
         let shouldMove = false;
-        let moveTarget = null;
-        let movePosition = ''; // 'before' 或 'after' 或 'append'
+        let moveTarget = null; // null = append
 
-        if (hoverCard && hoverCard.parentNode === dropZone) {
-            const rect = hoverCard.getBoundingClientRect();
-            // 方向逻辑（支持网格？）
-            // 暂时简单的 X 轴，如果 flex-wrap 则 X+Y
-            // 如果行不同，Y 很重要。
+        if (hoverItem && hoverItem.parentNode === dropZone) {
+            // 使用 getLayoutRect 替代 getBoundingClientRect
+            // 以避免在动画过程中基于“正在移动的视觉位置”进行判定，导致逻辑抖动
+            const rect = getLayoutRect(hoverItem);
             
-            // 检查是否同一行
-            // const placeholderRect = DragState.placeholderElement.getBoundingClientRect();
-            // 但占位符在“克隆模式”下是 visibility hidden，但它占据空间。
-            // 所以我们可以通过使用它的 rect。
-            
-            // 回退到简单的中点逻辑
             const midX = rect.left + rect.width / 2;
             const midY = rect.top + rect.height / 2;
             
-            // 非常简单的网格逻辑：
-            // 如果我们重叠显著？
-            
-            // 使用插入排序样式：
-            // 如果在 midX/midY 之前 -> insertBefore
-            // 如果之后 -> insertAfter
-            
-            // 对于简单列表坚持 X，对于多行检查 Y？
-            // 假设 flex-wrap：
-            // 如果 mouseY 明显在不同行？
-            
-            // 简化：仅使用相对于 hoverCard 的简单索引检查
-            const isAfter = (mouseX > midX) && (Math.abs(mouseY - midY) < rect.height/2);
-            // 或者仅仅基于文档流顺序的 'isAfter'？
-            // 在换行 flex 中，'after' 视觉上意味着右边（或下一行）。
+            // 简单的几何判定：如果在中点右侧或下方，则认为是 "After"
+            const isAfter = (mouseX > midX) && (Math.abs(mouseY - midY) < rect.height * 0.8);
             
             if (isAfter || (mouseY > rect.bottom)) {
-                 if (DragState.placeholderElement.previousElementSibling !== hoverCard) {
+                 if (DragState.placeholderElement.previousElementSibling !== hoverItem) {
                      shouldMove = true;
-                     moveTarget = hoverCard.nextSibling; // 插入到下一个兄弟之前（即 hover 之后）
-                     movePosition = 'insertBefore';
+                     moveTarget = hoverItem.nextSibling;
                  }
             } else {
-                 if (DragState.placeholderElement.nextElementSibling !== hoverCard) {
+                 if (DragState.placeholderElement.nextElementSibling !== hoverItem) {
                      shouldMove = true;
-                     moveTarget = hoverCard;
-                     movePosition = 'insertBefore';
+                     moveTarget = hoverItem;
                  }
             }
         } 
         else if (targetEl === dropZone) {
-            // 容器悬停
-             const lastChild = dropZone.lastElementChild;
-             // 如果最后一个子项不是占位符，且我们超过了它？
-             if (!lastChild || (lastChild === DragState.placeholderElement && dropZone.children.length === 1)) {
-                 // 空或只有自己
+             const items = Array.from(dropZone.children).filter(c => c.matches(itemSelector) && c !== DragState.placeholderElement);
+             const lastItem = items[items.length - 1];
+             
+             if (!lastItem) {
                  if (DragState.placeholderElement.parentNode !== dropZone) {
                      shouldMove = true;
-                     movePosition = 'append';
+                     moveTarget = null;
                  }
              } else {
-                 // 检查是否应该追加到末尾
-                 const lastRect = lastChild.getBoundingClientRect();
-                 if (mouseX > lastRect.right || mouseY > lastRect.bottom) {
-                     if (lastChild !== DragState.placeholderElement) {
+                 const lastRect = getLayoutRect(lastItem);
+                 if (mouseX > lastRect.right - 10 || mouseY > lastRect.bottom - 10) {
+                     const currentLast = dropZone.lastElementChild;
+                     if (currentLast !== DragState.placeholderElement) {
                          shouldMove = true;
-                         movePosition = 'append';
+                         moveTarget = null;
                      }
                  }
              }
         }
 
         if (shouldMove) {
-            // --- FLIP: 第一步 (快照) ---
-            siblings.forEach(el => {
-                const r = el.getBoundingClientRect();
-                flipSnapshot.set(el, { left: r.left, top: r.top });
-            });
-
-            // --- 动作 ---
-            // 如果我们移动占位符，必须确保 drag-over 类保留在正确的 dropZone 上
-            if (DragState.placeholderElement.parentNode !== dropZone) {
-                // 在区域间移动
-                if (movePosition === 'append') dropZone.appendChild(DragState.placeholderElement);
-                else dropZone.insertBefore(DragState.placeholderElement, moveTarget);
-                
-                // 更新 drag-over 状态逻辑
-                // 上一个区域清理？handlePointerMove 通过检查 currentDropZone 来做。
-            } else {
-                // 同区域重新排序
-                if (movePosition === 'append') dropZone.appendChild(DragState.placeholderElement);
-                else dropZone.insertBefore(DragState.placeholderElement, moveTarget);
-            }
-
-            // --- FLIP: 最后一步 (反转 & 播放) ---
-            // 通过读取 rects 隐式强制布局更新
-            requestAnimationFrame(() => {
-                siblings.forEach(el => {
-                    const oldPos = flipSnapshot.get(el);
-                    if (!oldPos) return;
-                    
-                    const newRect = el.getBoundingClientRect();
-                    const dx = oldPos.left - newRect.left;
-                    const dy = oldPos.top - newRect.top;
-                    
-                    if (dx !== 0 || dy !== 0) {
-                        // 反转
-                        el.style.transform = `translate(${dx}px, ${dy}px)`;
-                        el.style.transition = 'none';
-                        
-                        // 播放
-                        requestAnimationFrame(() => {
-                            el.style.transform = '';
-                            el.style.transition = `transform ${DRAG_CONFIG.swapAnimationDuration}ms cubic-bezier(0.2, 0, 0, 1)`;
-                            
-                            // 完成后清理 transition
-                            const handler = () => {
-                                el.style.transition = '';
-                                el.removeEventListener('transitionend', handler);
-                            };
-                            el.addEventListener('transitionend', handler, {once: true});
-                        });
-                    }
-                });
-                flipSnapshot.clear(); // 清理
-            });
+            performPlaceholderMove(dropZone, moveTarget);
         }
     }
 
@@ -826,6 +867,7 @@
     window.Game.UI.Interactions = {
         initDrag,
         animateDropToPlaceholder,
-        setDragConfig
+        setDragConfig,
+        performPlaceholderMove
     };
 })();

@@ -28,6 +28,26 @@
             }
             // 渲染卡牌
             if (window.Game.UI.renderCardList) {
+                // 应用对齐方式
+                const container = document.getElementById('treatment-area-container');
+                if (container && GameState.treatmentArea) {
+                    if (GameState.treatmentArea.centered) {
+                        container.classList.add('area-centered');
+                        container.classList.remove('area-left');
+                    } else {
+                        container.classList.add('area-left');
+                        container.classList.remove('area-centered');
+                    }
+                    
+                    if (GameState.treatmentArea.apartOrTogether === 1) { // 1 = 堆叠
+                         container.classList.add('area-stacked');
+                         container.classList.remove('area-spread');
+                    } else { // 0 = 平铺
+                         container.classList.add('area-spread');
+                         container.classList.remove('area-stacked');
+                    }
+                }
+
                 // 注意：Treatment Area 是公共区域，不属于任何特定 Role，dropZoneId 设为 'treatmentArea'
                 window.Game.UI.renderCardList('treatment-area-container', GameState.treatmentArea.cards || [], 'treatmentArea');
             }

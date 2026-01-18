@@ -38,6 +38,7 @@
             this.forOrAgainst = options.forOrAgainst !== undefined ? options.forOrAgainst : Area.Configs.Generic.forOrAgainst; 
             this.verticalOrHorizontal = options.verticalOrHorizontal !== undefined ? options.verticalOrHorizontal : Area.Configs.Generic.verticalOrHorizontal; 
             this.apartOrTogether = options.apartOrTogether !== undefined ? options.apartOrTogether : Area.Configs.Generic.apartOrTogether; 
+            this.centered = options.centered !== undefined ? options.centered : Area.Configs.Generic.centered;
         }
 
         add(card) {
@@ -62,19 +63,20 @@
     Area.Configs = {
         // 0: 友方/通用, 1: 敌方/特定
         // 0: 垂直, 1: 水平
-        // 0: 分开(独立), 1: 聚合(堆叠)
+        // 0: 分开(独立，平铺), 1: 聚合(堆叠)
+        // 0: 靠左(默认), 1: 居中
         
-        Generic:        { apartOrTogether: 0, forOrAgainst: 0, verticalOrHorizontal: 0 },
+        Generic:        { apartOrTogether: 0, forOrAgainst: 0, verticalOrHorizontal: 0, centered: 0 },
         
         // 公共区域
-        Pile:           { apartOrTogether: 1, forOrAgainst: 1 }, // 牌堆：堆叠，不可见(视为敌方/未知)
-        DiscardPile:    { apartOrTogether: 1, forOrAgainst: 0 }, // 弃牌堆：堆叠，可见
-        TreatmentArea:  { apartOrTogether: 0, forOrAgainst: 0 }, // 处理区：分开(展示)，可见
+        Pile:           { apartOrTogether: 1, forOrAgainst: 1 }, // 牌堆：堆叠
+        DiscardPile:    { apartOrTogether: 1, forOrAgainst: 0 }, // 弃牌堆：堆叠
+        TreatmentArea:  { apartOrTogether: 0, forOrAgainst: 0, centered: 1 }, 
         
         // 玩家区域
-        Hand:           { apartOrTogether: 0, forOrAgainst: 1 }, // 手牌：分开，只有自己可见(对他人是敌方/未知)
-        EquipArea:      { apartOrTogether: 0, forOrAgainst: 0 }, // 装备区：分开，可见
-        JudgeArea:      { apartOrTogether: 0, forOrAgainst: 0 }, // 判定区：分开，可见
+        Hand:           { apartOrTogether: 0, forOrAgainst: 1 }, 
+        EquipArea:      { apartOrTogether: 0, forOrAgainst: 0 }, 
+        JudgeArea:      { apartOrTogether: 0, forOrAgainst: 0 }, 
     };
 
     // 玩家类

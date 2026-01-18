@@ -209,6 +209,7 @@
 
 .main-perspective-container {
     display: flex;
+    min-width: 0; /* Constraint for flex container */
     gap: 20px;
     align-items: flex-start;
 }
@@ -216,6 +217,7 @@
 /* Current Character Panel */
 .current-character-panel {
     flex: 3;
+    min-width: 0; /* Constraint for flex child to allow shrinking */
     background: var(--surface);
     border-radius: 12px;
     padding: 25px;
@@ -354,6 +356,52 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     /* Ensure transform-origin is stable */
     transform-origin: center center;
+}
+
+/* Alignment Utilities */
+.area-centered {
+    justify-content: center !important;
+}
+.area-left {
+    justify-content: flex-start !important;
+}
+
+/* Stacking Utilities */
+.area-stacked {
+    /* 堆叠模式：所有子元素重叠 */
+    position: relative;
+    /* 为了显示堆叠效果，可以不需要 display:flex，或者 flex 但不占宽 */
+    display: block !important; 
+    height: 174px; /* 需要固定高度以容纳绝对定位 */
+    padding-left: 50%; /* 简单居中策略：让第一张牌大致在中间 */
+}
+.area-stacked > * {
+    position: absolute;
+    top: 15px; /* padding */
+    left: 50%;
+    transform: translateX(-50%); /* 居中 */
+    /* 可以添加轻微随机旋转或偏移以增加真实感，但这需要在 JS 中做 */
+    margin: 0 !important;
+}
+
+.area-spread {
+    /* 平铺模式：默认 flex */
+    flex-wrap: nowrap !important;
+    overflow-x: visible;
+    overflow-y: visible; 
+    gap: 0 !important;
+    align-items: flex-start;
+    min-width: 0; /* 防止撑开父容器 */
+    max-width: 100%;
+}
+
+.area-spread .card-placeholder {
+    flex-shrink: 0;
+    transition: margin-left 0.1s ease-out; /* 快速响应 */
+    margin-left: var(--dynamic-card-margin, 10px);
+}
+.area-spread .card-placeholder:first-child {
+    margin-left: 0 !important;
 }
 
 .card-placeholder {
@@ -560,7 +608,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    justify-content: center; /* Horizontally center the cards */
+    /* justify-content: center;  Moved to .area-centered class */
     /* Critical: allow clicks to pass through the empty container space to the watermark below */
     pointer-events: none; 
 }
@@ -850,6 +898,7 @@ body.is-global-dragging #hand-cards-container {
     display: flex;
     flex-direction: column;
     flex: 1;
+    min-width: 0; /* 关键：允许内容区域收缩，触发 JS 动态折叠 */
     align-items: center;
     /* Start from top to keep role-list-top at the top */
     justify-content: flex-start;
@@ -900,6 +949,7 @@ body.is-global-dragging #hand-cards-container {
 .player-hand {
     flex: 1;
     padding-right: 20px;
+    min-width: 0; /* Fixes flex item expansion issue for overlap logic */
 }
 .area-watermark {
     position: absolute;

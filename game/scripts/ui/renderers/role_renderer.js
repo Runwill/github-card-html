@@ -195,6 +195,32 @@
             }
             // 渲染卡牌
             const handCards = selfRole.hand.cards ? selfRole.hand.cards : selfRole.hand;
+            
+            // 应用布局样式
+            const container = document.getElementById('hand-cards-container');
+            if (container) {
+                // 读取配置，如果 selfRole.hand 是 Area 对象则读取其属性，否则使用默认值
+                // Hand 默认：spread(0), left(0) [Area.Configs.Hand 定义]
+                const isStacked = selfRole.hand.apartOrTogether === 1;
+                const isCentered = selfRole.hand.centered === 1;
+                
+                if (isCentered) {
+                    container.classList.add('area-centered');
+                    container.classList.remove('area-left');
+                } else {
+                    container.classList.add('area-left');
+                    container.classList.remove('area-centered');
+                }
+                
+                if (isStacked) {
+                     container.classList.add('area-stacked');
+                     container.classList.remove('area-spread');
+                } else { 
+                     container.classList.add('area-spread');
+                     container.classList.remove('area-stacked');
+                }
+            }
+
             if (window.Game.UI.renderCardList) {
                 window.Game.UI.renderCardList('hand-cards-container', handCards, 'hand');
             }
