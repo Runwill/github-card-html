@@ -39,20 +39,35 @@
         // Speed Control
         const speedRange = document.getElementById('game-speed-range');
         const speedVal = document.getElementById('game-speed-val');
+        const STORAGE_KEY_SPEED = 'card_game_speed_setting';
+
         if (speedRange && speedVal) {
+            // Load saved speed
+            const savedSpeed = localStorage.getItem(STORAGE_KEY_SPEED);
+            if (savedSpeed !== null) {
+                const val = parseInt(savedSpeed, 10);
+                if (!isNaN(val)) {
+                    speedRange.value = val;
+                    speedVal.textContent = `${val}ms`;
+                }
+            }
+
+            // Sync initial value to Controller
+            const currentVal = parseInt(speedRange.value, 10);
+            window.Game.Controller.setSpeed(currentVal);
+
             speedRange.addEventListener('input', (e) => {
                 const val = parseInt(e.target.value, 10);
                 speedVal.textContent = `${val}ms`;
+                
+                // Save to storage
+                localStorage.setItem(STORAGE_KEY_SPEED, val);
+
                 // if (window.Game.Core && window.Game.Core.setSpeed) {
                 //    window.Game.Core.setSpeed(val);
                 // }
                 window.Game.Controller.setSpeed(val);
             });
-            // Init default
-            if (window.Game.Core && window.Game.Core.setSpeed) {
-                // window.Game.Core.setSpeed(parseInt(speedRange.value, 10));
-                window.Game.Controller.setSpeed(parseInt(speedRange.value, 10));
-            }
         }
 
         if (endTurnBtn) {

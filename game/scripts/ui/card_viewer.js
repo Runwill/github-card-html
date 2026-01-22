@@ -15,7 +15,6 @@
     window.Game.UI.openCardViewer = function(title, cards, sourceId) {
         const modal = document.getElementById('card-viewer-modal');
         const grid = document.getElementById('card-viewer-grid');
-        const titleEl = document.getElementById('card-viewer-title');
         const backdrop = document.getElementById('modal-backdrop');
         const modalBody = modal ? modal.querySelector('.modal-body') : null;
         
@@ -28,9 +27,18 @@
         const scrollTarget = grid; 
 
         if (!modal || !grid) return;
-        
-        // Update Title (Remove count suffix as requested)
-        titleEl.textContent = title;
+
+        // Update Background Watermark
+        const watermarkEl = modal.querySelector('#card-viewer-watermark');
+        if (watermarkEl) {
+            watermarkEl.innerHTML = '';
+            // Reuse globally available GameText renderer to generate dynamic HTML tags
+            // This ensures consistency with board/role renderers (e.g. <hand></hand>, <pile></pile>)
+            if (window.Game.UI.GameText && sourceId) {
+                 // sourceId typically matches the term key (pile, discardPile, treatmentArea, hand)
+                 watermarkEl.innerHTML = window.Game.UI.GameText.render(sourceId);
+            }
+        }
         
         // Use standard renderer
         if (window.Game.UI.renderCardList && sourceId) {
@@ -179,17 +187,13 @@
              if (modal._removeScrollListeners) modal._removeScrollListeners();
         };
 
-        // Close on Backdrop Click (DISABLED for modeless)
-        /* 
-        const backdropHandler = (e) => {
-            if (e.target === backdrop) {
+        // Close on Wrapper Click (Empty Area)
+        modal.onclick = (e) => {
+            if (e.target === modal) {
                 cleanupAndClose();
-                backdrop.removeEventListener('click', backdropHandler);
             }
         };
-        backdrop.addEventListener('click', backdropHandler);
-        */
-        
+
         const closeBtn = modal.querySelector('.btn-close');
         if (closeBtn) {
              closeBtn.onclick = (e) => {

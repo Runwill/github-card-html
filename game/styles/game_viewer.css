@@ -2,6 +2,20 @@
    Card Viewer Modal (Grid Layout)
    ========================================================================== */
 
+/* 
+   Override Base Modal Box 
+   We want the internal .modal-content to control the look/size, so we strip 
+   the default container styling from the wrapper.
+*/
+#card-viewer-modal.modal {
+    padding: 20px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    max-width: none !important; 
+    max-height: none !important;
+}
+
 /* Modal Specific Overrides */
 #card-viewer-modal .modal-content {
     /* Stability Fix: Use explicit width instead of fit-content to prevent 
@@ -17,6 +31,9 @@
     padding: 0;
     background: var(--surface);
     border-radius: 12px;
+    /* Match current-character-panel style */
+    box-shadow: 0 4px 12px var(--shadow-1);
+    border: 1px solid var(--border);
     overflow: hidden;
 
     /* Center the modal itself */
@@ -28,13 +45,16 @@
 
 #card-viewer-modal .modal-header {
     flex-shrink: 0;
-    padding: 20px;
-    border-bottom: 1px solid var(--border);
+    padding: 2px 8px; /* Minimal padding */
+    border-bottom: none; /* Removed border for clean look */
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end; /* Align close button to right */
     align-items: center;
-    background: var(--bg-start);
+    background: transparent; /* Transparent header to match panel style */
     width: 100%; /* Ensure header fills full width of expanded modal */
+    min-height: 0;
+    z-index: 20; /* Ensure button clickable over content if needed */
+    margin-bottom: 0; /* Override global .modal-header margin (usually 24px) */
 }
 
 #card-viewer-modal .modal-header h3 {
@@ -47,8 +67,8 @@
 #card-viewer-modal .modal-body {
     flex: 1;
     overflow: hidden; /* Prevent native scroll on wrapper */
-    padding: 20px;
-    background: rgba(0,0,0,0.05); /* Track background */
+    padding: 20px; /* Restored padding for breathing room */
+    background: transparent; /* Removed gray tint to match current-character-panel */
     display: flex;
     align-items: center;
     position: relative; /* Context for absolute overlays */
@@ -58,38 +78,32 @@
     min-width: 0; 
 }
 
-/* Gradient Fade Fogs (Overlay on top of content) */
+/* Gradient Fade Fogs - Replaced with Mask Image for cleaner corners */
+/* The mask fades the content transparency directly instead of adding opaque overlays */
+#card-viewer-modal .modal-body {
+    -webkit-mask-image: linear-gradient(to right, transparent 0px, black 80px, black calc(100% - 80px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0px, black 80px, black calc(100% - 80px), transparent 100%);
+}
+
+#card-viewer-modal .modal-body.at-start {
+    -webkit-mask-image: linear-gradient(to right, black 0px, black calc(100% - 80px), transparent 100%);
+    mask-image: linear-gradient(to right, black 0px, black calc(100% - 80px), transparent 100%);
+}
+
+#card-viewer-modal .modal-body.at-end {
+    -webkit-mask-image: linear-gradient(to right, transparent 0px, black 80px, black 100%);
+    mask-image: linear-gradient(to right, transparent 0px, black 80px, black 100%);
+}
+
+#card-viewer-modal .modal-body.at-start.at-end {
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+/* Disable old overlay elements */
 #card-viewer-modal .modal-body::before,
 #card-viewer-modal .modal-body::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 80px; 
-    pointer-events: none; 
-    z-index: 10;
-    opacity: 1;
-    transition: opacity 0.2s ease-out; /* Smooth fade in/out */
-}
-
-/* Hide Left Fade when at start */
-#card-viewer-modal .modal-body.at-start::before {
-    opacity: 0;
-}
-
-/* Hide Right Fade when at end */
-#card-viewer-modal .modal-body.at-end::after {
-    opacity: 0;
-}
-
-#card-viewer-modal .modal-body::before {
-    left: 0;
-    background: linear-gradient(to right, var(--surface, #ffffff), transparent);
-}
-
-#card-viewer-modal .modal-body::after {
-    right: 0;
-    background: linear-gradient(to left, var(--surface, #ffffff), transparent);
+    display: none;
 }
 
 /* The actual scrollable list */
