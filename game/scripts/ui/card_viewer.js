@@ -11,8 +11,17 @@
     const MAX_SPEED = 80;        // Max speed
     const SCROLL_FRICTION = 0.85; // Deceleration when stopped
 
+    // Singleton cleanup reference to prevent conflict when switching views
+    let activeCleanup = null;
+
     // --- Card Viewer Modal Logic ---
     window.Game.UI.openCardViewer = function(title, cards, sourceId) {
+        // Enforce singleton state: Close any existing viewer properly first
+        if (activeCleanup) {
+            activeCleanup(true); // true = skipping animation/switching mode
+            activeCleanup = null;
+        }
+
         const modal = document.getElementById('card-viewer-modal');
         const grid = document.getElementById('card-viewer-grid');
         const backdrop = document.getElementById('modal-backdrop');
@@ -175,19 +184,44 @@
             };
         }
         
-        // Close Internal Logic
-        const cleanupAndClose = () => {
-             modal.classList.remove('show');
-             // backdrop.classList.remove('show');
-             
-             // Ensure we remove listener to avoid memory leak if we didn't use 'once' (we didn't)
-             // But actually we need to remove the backdrop listener if it was added.
-             // Since we removed 'add', we should remove the 'click' logic below too.
-             
-             if (modal._removeScrollListeners) modal._removeScrollListeners();
+        // Close on Click Outside / Empty Area
+        const outsideClickHandler = (e) => {
+            // Check if modal is actually visible
+            if (!modal.classList.contains('show')) return;
+            
+            // If click is inside .modal-content, ignore it
+            if (modal.querySelector('.modal-content').contains(e.target)) {
+                return;
+            }
+            
+            // Otherwise close (Clicked wrapper padding or outside on body)
+            cleanupAndClose();
         };
 
-        // Close on Wrapper Click (Empty Area)
+        // Delay attaching to document to prevent immediate firing from the opening click
+        setTimeout(() => {
+            document.addEventListener('click', outsideClickHandler);
+        }, 50);
+
+        // Close Internal Logic
+        const cleanupAndClose = (switching = false) => {
+             if (!switching) modal.classList.remove('show');
+             // backdrop.classList.remove('show');
+             
+             if (modal._removeScrollListeners) modal._removeScrollListeners();
+             document.removeEventListener('click', outsideClickHandler);
+             modal.onclick = null;
+             
+             // Clear the global reference if we are closing normally
+             if (!switching && activeCleanup === cleanupAndClose) {
+                activeCleanup = null;
+             }
+        };
+
+        // Register this cleanup as the active one
+        activeCleanup = cleanupAndClose;
+
+        // Close on Wrapper Click (Direct fallback)
         modal.onclick = (e) => {
             if (e.target === modal) {
                 cleanupAndClose();
