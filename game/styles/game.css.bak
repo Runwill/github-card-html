@@ -368,20 +368,165 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
 
 /* Stacking Utilities */
 .area-stacked {
-    /* 堆叠模式：所有子元素重叠 */
-    position: relative;
-    /* 为了显示堆叠效果，可以不需要 display:flex，或者 flex 但不占宽 */
+    /* 堆叠模式：默认单张显示 */
     display: block !important; 
-    height: 174px; /* 需要固定高度以容纳绝对定位 */
-    padding-left: 50%; /* 简单居中策略：让第一张牌大致在中间 */
+    height: 100% !important; /* Fill the slot */
+    min-height: 174px;
+    padding: 0 !important; /* Force remove padding to fit single card exactly */
+    overflow: hidden;
+    position: relative; /* Anchor for absolute hover */
+    transition: box-shadow 0.2s, background-color 0.2s;
 }
-.area-stacked > * {
+
+/* 默认只显示顶牌（DOM中的最后一个子元素） */
+.area-stacked > .card-placeholder {
     position: absolute;
-    top: 15px; /* padding */
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%); /* 居中 */
-    /* 可以添加轻微随机旋转或偏移以增加真实感，但这需要在 JS 中做 */
+    transform: translate(-50%, -50%);
     margin: 0 !important;
+    display: none; /* Hide all by default */
+    z-index: 1;
+}
+
+.area-stacked > .card-placeholder.is-top-card {
+    display: flex; /* Show only top card */
+    box-shadow: 2px 2px 0 #bbb, 4px 4px 0 #999, 0 2px 5px var(--shadow-1);
+}
+
+/* =========================================
+   Deck Slot Style (No-Container Look)
+   ========================================= */
+.deck-slot {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Depth Effect for Cards in Deck Slot */
+.deck-slot.area-stacked > .card-placeholder.is-top-card {
+    /* Richer stack shadow */
+    box-shadow: 
+        1px 1px 0 #888,
+        2px 2px 0 #ddd,
+        3px 3px 0 #888,
+        4px 4px 0 #ddd,
+        5px 5px 0 #888,
+        0 8px 15px rgba(0,0,0,0.4);
+}
+
+/* Empty State Placeholder */
+.deck-slot:empty::after {
+    content: 'EMPTY';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 80px;
+    border: 2px dashed var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* =========================================
+   Pile Inspector (Fan/Roulette View)
+   ========================================= */
+
+/* 2. The Inspector Container */
+.pile-inspector-overlay {
+    position: absolute;
+    /* Position above the pile */
+    bottom: 110%; 
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px; /* Width of the view window */
+    height: 160px; /* Height for cards */
+    
+    /* Transparent container, no background */
+    pointer-events: auto; /* Allow interaction to keep parent :hover active */
+    
+    display: none; /* Hidden by default */
+    perspective: 1000px; /* 3D perspective for fan effect */
+}
+
+/* Show when container is hovered (handled by JS toggling class or direct CSS) */
+/* Best to handle via JS adding a class to container, or just CSS: */
+.board-pile-slot:hover .pile-inspector-overlay {
+    display: block;
+    animation: pileInspectorFadeIn 0.2s ease-out;
+}
+
+@keyframes pileInspectorFadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* The cards inside the inspector */
+.inspector-card {
+    position: absolute;
+    bottom: 10px;
+    left: 50%; /* Center origin */
+    width: 100px;
+    height: 140px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    
+    /* Content alignment */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--text);
+    text-align: center;
+    
+    /* Transform origin at bottom center for fanning */
+    transform-origin: center 200%; 
+    transition: transform 0.1s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+    
+    will-change: transform;
+}
+
+.inspector-card.is-center {
+    z-index: 10;
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--primary-ring);
+}
+
+/* Optional: Back style for inspector items */
+.inspector-card[data-is-back="true"] {
+    background: repeating-linear-gradient(45deg, #444, #444 10px, #555 10px, #555 20px);
+    color: transparent;
+}
+.inspector-card[data-is-back="true"]::after {
+    content: ''; /* No text needed for mini view */
+}
+
+/* Progress Bar / Indicator (Optional) */
+.inspector-progress {
+    position: absolute;
+    bottom: -10px;
+    left: 10px;
+    right: 10px;
+    height: 4px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 2px;
+}
+.inspector-progress-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 2px;
+    width: 0%;
 }
 
 .area-spread {
@@ -981,3 +1126,42 @@ body.is-global-dragging #hand-cards-container {
     background: var(--surface);
 
 }
+/* Card Back Styling */
+.card-placeholder[data-card-key='CardBack'] {
+    background: repeating-linear-gradient(
+        45deg,
+        #444,
+        #444 10px,
+        #555 10px,
+        #555 20px
+    );
+    color: transparent !important;
+    text-shadow: none !important;
+    border: 1px solid #777;
+    /* position: relative;  <-- REMOVED: potentially conflicts with absolute positioning in stacks */
+    /* Flex items formed by cards are usually containing blocks anyway, or we ensure they have some transform */
+}
+
+/* Ensure CardBacks in Stacked/Deck slots stay absolute centered */
+.area-stacked > .card-placeholder[data-card-key='CardBack'] {
+    position: absolute !important;
+}
+
+/* Ensure CardBacks in Spread/Hand slots can contain their absolute ::after children */
+.area-spread > .card-placeholder[data-card-key='CardBack'],
+.player-hand .card-placeholder[data-card-key='CardBack'] {
+    position: relative;
+}
+
+.card-placeholder[data-card-key='CardBack']::after {
+    content: 'BACK';
+    font-size: 0.8em;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    color: rgba(255,255,255,0.2);
+}
+

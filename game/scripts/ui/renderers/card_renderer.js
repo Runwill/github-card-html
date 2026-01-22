@@ -72,7 +72,7 @@
     // 简单的方案：在 renderCardList 每次完事后调用 updateSpreadLayouts。
     
     // 辅助：渲染卡牌列表
-    function renderCardList(containerId, cards, dropZoneId) {
+    function renderCardList(containerId, cards, dropZoneId, options = {}) {
         if (window.Game.UI.isRenderingSuspended) return;
 
         const container = document.getElementById(containerId);
@@ -86,7 +86,47 @@
         // 差量更新 (Diffing) 策略：复用现有 DOM 节点，避免暴力清空导致的闪烁和 Hover 状态丢失
         cards.forEach((card, index) => {
             // 模型层保证 card 是 Card 实例
-            const cardName = card.name || card.key; // 兼容可能不仅叫 name 的情况，但主要依据 Model 定义
+            const originalName = card.name || card.key;
+            
+            // 决定渲染的卡牌名称：是否强制背面
+            
+            // 1. 基础判断：强制背面参数
+            let showBack = !!options.forceFaceDown;
+
+            // 2. 也是最重要的：可见性系统
+            // 规则：
+            // A. 如果 card.visibility == 0 (公开)，则可见。
+            // B. 如果 card.visibility == 1 (私有/背面)，则检查可见性列表。
+            //    如果 当前视角角色 (Main Player) 在 visibleTo 列表中，则可见。
+            //    否则，渲染为卡背。
+            
+            if (!showBack && card.visibility === 1) {
+                // 默认不可见，需检查权限
+                showBack = true; // 先假设不可见
+                
+                const GameState = window.Game.GameState;
+                
+                // 获取当前主视角角色 ID
+                // 假设单机模式下，currentPlayerIndex 指向的是底部的“我”
+                // 或者我们应该有一个明确的 "mainPlayerId" 配置？
+                // 目前使用 players[0] 或者 currentPlayerIndex 作为视角？通常 players[0] 是用户自己。
+                // 为了通用性，我们假设 GameState.mainRoleIndex 或者默认为 local player.
+                
+                // [Logic] 目前单机版，玩家控制的角色通常在索引 0 或 match currentPlayerIndex?
+                // 在 setup_manager.js 中，玩家通常初始化为 players[0]。
+                // 让我们假设视角总是 players[0] (底部角色)。
+                
+                const mainPlayer = GameState.players && GameState.players[0]; // 这是一个很强的假设，但在当前单机上下文中成立
+                
+                if (mainPlayer && card.visibleTo && card.visibleTo.has(mainPlayer.id)) {
+                    showBack = false; // 对我可见
+                }
+            }
+            
+            let renderName = originalName;
+            if (showBack) {
+                renderName = 'CardBack';
+            }
             
             // 尝试复用现有位置的节点
             let cardEl = currentChildren[index];
@@ -104,31 +144,35 @@
             cardEl.setAttribute('data-area-name', dropZoneId);
             cardEl.setAttribute('data-card-index', index);
 
-            // 检查内容是否需要更新 (Dirty Checking)
-            // 使用 data-card-key 记录上次渲染的内容
-            if (isNewNode || cardEl.getAttribute('data-card-key') !== cardName) {
-                if (GameText) {
-                    // 重要：这里是关键连接点。
-                    // 1. 我们传入 cardName (例如 "Sha")
-                    // 2. GameText.render 返回 "<Sha></Sha>"
-                    // 3. 浏览器将其渲染为自定义标签
-                    // 4. card_name.js 的 MutationObserver 捕获到 <SHA> 并将其替换为中文
-                    cardEl.innerHTML = GameText.render(cardName);
-                } else {
-                    if (typeof i18n !== 'undefined' && i18n.t) {
-                        const key = `game.card.${cardName}`;
-                        const text = i18n.t(key, { defaultValue: cardName });
-                        cardEl.innerHTML = text; 
-                    } else {
-                        cardEl.textContent = cardName;
-                    }
-                }
-                cardEl.setAttribute('data-card-key', cardName);
+            // 标记堆叠模式下的顶牌 (Top Card Logic)
+            if (index === cards.length - 1) {
+                cardEl.classList.add('is-top-card');
+            } else {
+                cardEl.classList.remove('is-top-card');
             }
+
+            // 检查内容是否需要更新 (Dirty Checking)
+            // 准备渲染内容
+            let htmlContent = '';
+            if (renderName !== 'CardBack') {
+                if (GameText) {
+                     htmlContent = GameText.render(renderName);
+                } else if (typeof i18n !== 'undefined' && i18n.t) {
+                     const key = `game.card.${renderName}`;
+                     htmlContent = i18n.t(key, { defaultValue: renderName });
+                } else {
+                     htmlContent = renderName;
+                }
+            }
+
+            // 使用标准化 SafeRender 替代手动 data-card-key 检查
+            window.Game.UI.safeRender(cardEl, htmlContent, renderName);
 
             // 总是更新交互元数据 (例如 index 可能变化)
             // 注意：依赖 initDrag 的实现能够处理重复调用 (例如覆盖 ondragstart 属性而非不断 addEventListener)
             if (window.Game.UI.Interactions && window.Game.UI.Interactions.initDrag) {
+                // 关键点：即使渲染为卡背，通过 initDrag 传递的仍是**真实的 card 对象**
+                // 这样拖拽逻辑中使用的数据是真实的，放置时也是真实的。
                 window.Game.UI.Interactions.initDrag(cardEl, card, dropZoneId, index);
             }
         });

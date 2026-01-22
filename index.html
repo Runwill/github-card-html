@@ -40,7 +40,13 @@
     <link rel="stylesheet" type="text/css" href="style/back_to_top.css?v=202512070129">
     <link rel="stylesheet" type="text/css" href="style/permissions.css?v=202512070129">
     <link rel="stylesheet" type="text/css" href="style/collapsible.css?v=202512070129">
-    <link rel="stylesheet" type="text/css" href="game/styles/game.css">
+    <!-- Game Modules (Replaces game.css) -->
+    <link rel="stylesheet" type="text/css" href="game/styles/game_layout.css?v=202512070129">
+    <link rel="stylesheet" type="text/css" href="game/styles/game_board.css?v=202512070129">
+    <link rel="stylesheet" type="text/css" href="game/styles/game_cards.css?v=202512070129">
+    <link rel="stylesheet" type="text/css" href="game/styles/game_roles.css?v=202512070129">
+    <link rel="stylesheet" type="text/css" href="game/styles/game_widgets.css?v=202512070129">
+    <link rel="stylesheet" type="text/css" href="game/styles/game_viewer.css?v=202512070129">
     <link rel="stylesheet" type="text/css" href="game/styles/context_menu.css">
     <link rel="icon" href="data:;base64,=">
     <!-- 预加载首屏字体（康熙）：若未在样式中使用会产生警告，当前未直接使用，先移除预加载以避免控制台噪声 -->
@@ -120,12 +126,18 @@
     <script src="game/data/text_templates.js"></script>
     <script src="game/scripts/ui/context_menu.js"></script>
     <!-- Renderers split modules -->
+    <script src="game/scripts/ui/renderers/render_utils.js"></script>
     <script src="game/scripts/ui/renderers/card_renderer.js"></script>
     <script src="game/scripts/ui/renderers/role_renderer.js"></script>
     <script src="game/scripts/ui/renderers/board_renderer.js"></script>
     <script src="game/scripts/ui/renderers/control_renderer.js"></script>
     <script src="game/scripts/ui/renderers/main_renderer.js"></script>
-    <script src="game/scripts/ui/interactions.js"></script>
+    <!-- Drag & Drop Interaction Modules -->
+    <script src="game/scripts/ui/interactions/sorting.js"></script>
+    <script src="game/scripts/ui/interactions/animation.js"></script>
+    <script src="game/scripts/ui/interactions/index.js"></script>
+    
+    <script src="game/scripts/ui/card_viewer.js"></script>
     <script src="game/scripts/ui/setup_manager.js"></script>
     <script src="game/scripts/ui/main.js"></script>
     <script src="game/scripts/game_main.js"></script>

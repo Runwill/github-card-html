@@ -1,0 +1,227 @@
+/* ==========================================================================
+   Game Board Areas
+   - Table Panel (Opponents/Public)
+   - Board Slots (Piles, Treatment)
+   - Area Configurations (Stacked vs Spread)
+   ========================================================================== */
+
+.game-table-panel {
+    width: 100%;
+    min-height: 120px;
+    background: rgba(0, 0, 0, 0.2); 
+    border-bottom: 1px solid var(--border);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-layout-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch; 
+    width: 100%;
+    min-height: 100%; 
+    flex: 1;
+    gap: 15px;
+}
+
+.table-side-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    min-width: 140px;
+    padding-top: 0; 
+}
+
+.table-center-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100%;
+}
+
+/* Central/Public Area */
+.game-board-panel {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+    margin-bottom: 20px; 
+    /* Centers itself in remaining space */
+    margin-top: auto !important;
+    margin-bottom: auto !important;
+}
+
+.game-board-panel h3 {
+    margin-top: 0;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+/* Container Foundations */
+.cards-container, 
+.treatment-container,
+.player-hand .cards-container,
+.game-card-area {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    min-height: 174px; /* Locked height */
+    width: 100%;
+    box-sizing: border-box;
+    padding: 15px;
+    background-color: rgba(128, 128, 128, 0.05);
+    border-radius: 8px;
+    border: 2px dashed var(--border);
+    transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    transform-origin: center center;
+    position: relative;
+    z-index: 1;
+}
+
+.treatment-area-wrappper {
+    margin-bottom: 20px;
+}
+
+/* Specific override for treatment container */
+.treatment-container {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    pointer-events: none; /* Allow clicks to pass through to watermark */
+}
+
+.treatment-container > * {
+    pointer-events: auto;
+}
+
+/* Allow dropping cards into treatment container when dragging */
+body.is-global-dragging .treatment-container {
+    pointer-events: auto !important;
+}
+
+/* Watermark Text */
+.area-watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--text);
+    opacity: 0.1;
+    pointer-events: auto;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Alignment Utilities */
+.area-centered {
+    justify-content: center !important;
+}
+.area-left {
+    justify-content: flex-start !important;
+}
+
+/* Stacking Utilities (Pile Mode) */
+.area-stacked {
+    display: block !important; 
+    height: 100% !important;
+    min-height: 174px;
+    padding: 0 !important;
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow 0.2s, background-color 0.2s;
+}
+
+/* Hide all except identified top card */
+.area-stacked > .card-placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 !important;
+    display: none;
+    z-index: 1;
+}
+
+.area-stacked > .card-placeholder.is-top-card {
+    display: flex;
+    box-shadow: 2px 2px 0 #bbb, 4px 4px 0 #999, 0 2px 5px var(--shadow-1);
+}
+
+/* Spread Mode Utilities (Hand Mode) */
+.area-spread {
+    flex-wrap: nowrap !important;
+    overflow-x: visible;
+    overflow-y: visible; 
+    gap: 0 !important;
+    align-items: flex-start;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.area-spread .card-placeholder {
+    flex-shrink: 0;
+    transition: margin-left 0.1s ease-out;
+    margin-left: var(--dynamic-card-margin, 10px);
+}
+.area-spread .card-placeholder:first-child {
+    margin-left: 0 !important;
+}
+
+/* =========================================
+   Deck Slot Style (Draw/Discard Piles)
+   ========================================= */
+.deck-slot {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Depth Effect for Cards in Deck Slot - REMOVED for cleaner look per user request */
+/* Just a standard shadow now */
+.deck-slot.area-stacked > .card-placeholder.is-top-card {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Ensure absolute centering logic is robust */
+.deck-slot.area-stacked > .card-placeholder.is-top-card {
+    /* No transformation needed beyond the base absolute rule */
+}
+
+/* Empty State Placeholder */
+.deck-slot:empty::after {
+    content: 'EMPTY';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 80px;
+    border: 2px dashed var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.3;
+    pointer-events: none;
+}

@@ -1,0 +1,173 @@
+/* ==========================================================================
+   Game Layout Core
+   - Main Grid/Flex Structures
+   - Panels & Containers
+   - Responsive Logic
+   ========================================================================== */
+
+/* Term Click Styling (Global Utility) */
+.term-click,
+.crumb span[data-term] {
+    cursor: pointer;
+    font-weight: 600;
+    transition: color 0.2s ease;
+    color: inherit; 
+    position: relative;
+    padding: 0 1px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
+/* Game Panel Container */
+#panel_game {
+    padding: 15px;
+    background-color: var(--bg-start);
+    /* 100vh - Header(~60) - Footer(~40) - Safety Buffer(~60) = ~160px */
+    height: calc(100vh - 160px) !important; 
+    box-sizing: border-box;
+    overflow: hidden !important; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text);
+}
+
+#panel_game.is-active {
+    display: flex !important;
+    flex-direction: column;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 15px;
+    width: 100%;
+    margin: 0; 
+    min-height: 0;
+}
+
+.game-top-section {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 20px;
+    width: 100%;
+    flex: 1 1 auto; 
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 5px;
+    padding-bottom: 10px;
+}
+
+.game-layout-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.game-layout-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Base Panel Styles */
+.game-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px var(--shadow-1);
+    transition: background-color 0.3s ease;
+}
+
+.game-log-panel {
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Custom Scrollbar for Webkit */
+.game-log-panel::-webkit-scrollbar {
+    width: 6px;
+}
+.game-log-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+.game-log-panel::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 3px;
+}
+
+.game-action-panel {
+    display: flex;
+    justify-content: center;
+    padding: 15px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.game-bottom-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    flex-shrink: 0;
+    padding-top: 5px;
+    padding-bottom: 20px; 
+    margin-bottom: 20px;
+}
+
+.game-main-area {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.main-perspective-container {
+    display: flex;
+    min-width: 0;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .game-container {
+        flex-direction: column;
+    }
+    .game-top-section {
+        flex-direction: column;
+    }
+    .game-layout-sidebar {
+        width: 100%;
+        order: -1;
+    }
+    .game-log-panel {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .main-perspective-container {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-main-area {
+        flex-direction: column;
+    }
+}

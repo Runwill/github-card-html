@@ -3,6 +3,27 @@
     window.Game.UI = window.Game.UI || {};
 
     /**
+     * 辅助：统一渲染堆叠型区域（牌堆/弃牌堆）
+     */
+    function renderPileLikeArea(containerId, pileData, dropZoneId, isFaceDown) {
+        if (!pileData) return;
+        
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.classList.add('area-stacked');
+            container.classList.remove('area-spread');
+
+            if (window.Game.UI.renderCardList) {
+                // 仅当明确要求面朝下时才传递 options
+                const options = isFaceDown ? { forceFaceDown: true } : {};
+                window.Game.UI.renderCardList(containerId, pileData.cards || [], dropZoneId, options);
+            }
+            // 初始化轮盘检视器
+            setupPileInspector(container, pileData.cards || [], isFaceDown);
+        }
+    }
+
+    /**
      * 渲染公共区域 (Public Board Areas)
      * e.g. 处理区 (Treatment Area), 牌堆 (Pile) 等
      */
@@ -20,11 +41,8 @@
                 const key = GameState.treatmentArea.name || 'treatmentArea';
                 const renderKey = `area:${key}`;
 
-                if (el.getAttribute('data-render-key') !== renderKey) {
-                    const html = GameText.render(key);
-                    el.innerHTML = html;
-                    el.setAttribute('data-render-key', renderKey);
-                }
+                // 使用 safeRender 替代手动脏检查，现在 render_utils.js 已确保加载
+                window.Game.UI.safeRender(el, GameText.render(key), renderKey);
             }
             // 渲染卡牌
             if (window.Game.UI.renderCardList) {
@@ -53,7 +71,64 @@
             }
         }
 
-        // 2. 将来可以在这里添加 DiscardPile, DrawPile 等可视化逻辑
+        // 2. 牌堆 (Draw Pile)
+        renderPileLikeArea('pile-container', GameState.pile, 'pile', true);
+
+        // 3. 弃牌堆 (Discard Pile)
+        renderPileLikeArea('discard-pile-container', GameState.discardPile, 'discardPile', false);
+    }
+
+    /**
+     * 设置轮盘式检视器
+     *
+     * @param {HTMLElement} container - 鼠标交互的目标容器 (如 pile-container)
+     * @param {Array} cards - 数据源
+     * @param {boolean} forceBack - 是否强制显示背面
+     */
+    /**
+     * 设置点击式检视器 (原轮盘检视器已移除)
+     *
+     * @param {HTMLElement} container - 鼠标交互的目标容器 (如 pile-container)
+     * @param {Array} cards - 数据源
+     * @param {boolean} forceBack - 是否强制显示背面（在此模式下仅做参考，实际查看器会显示）
+     */
+    function setupPileInspector(container, cards, forceBack) {
+        if (!container) return;
+        
+        // 查找或创建 Overlay 容器（位于父级 .board-pile-slot 内）
+        const wrapper = container.closest('.board-pile-slot');
+        if (!wrapper) return;
+
+        // Cleanup legacy inspector overlay
+        const oldOverlay = wrapper.querySelector('.pile-inspector-overlay');
+        if (oldOverlay) oldOverlay.remove();
+        
+        // 绑定数据到 wrapper
+        wrapper._inspectorCards = cards;
+        wrapper._inspectorForceBack = forceBack;
+
+        // 防止重复绑定
+        if (!wrapper.hasAttribute('data-click-bound')) {
+            wrapper.setAttribute('data-click-bound', 'true');
+            wrapper.style.cursor = 'pointer';
+
+            wrapper.addEventListener('click', (e) => {
+                // 如果正在拖拽，不触发
+                if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
+
+                const currentCards = wrapper._inspectorCards || [];
+                const isDeck = wrapper.classList.contains('deck-slot');
+                const title = isDeck ? 'Deck' : 'Discard Pile';
+                const sourceId = isDeck ? 'pile' : 'discardPile'; // Map to GameState keys
+                
+                if (window.Game.UI.openCardViewer) {
+                    // Removed forceBack parameter
+                    window.Game.UI.openCardViewer(title, currentCards, sourceId);
+                } else {
+                    console.warn("Game.UI.openCardViewer not ready");
+                }
+            });
+        }
     }
 
     // 导出

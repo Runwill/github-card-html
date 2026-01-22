@@ -1,0 +1,269 @@
+/* ==========================================================================
+   Game Roles & Characters
+   - Role List Panel
+   - Character Details
+   - Avatars & Status
+   ========================================================================== */
+
+/* Role List Panel */
+.role-list-panel {
+    flex: 1;
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px var(--shadow-1);
+    border: 1px solid var(--border);
+    min-width: 250px;
+}
+
+.role-list-panel h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-muted);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+}
+
+.role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.role-summary {
+    padding: 12px 15px;
+    border-radius: 8px;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text);
+    /* Merged conflicting properties safely */
+    min-width: 120px;
+}
+
+.role-summary:hover {
+    background-color: var(--bg-start);
+    border-color: var(--text-subtle);
+}
+
+.role-summary.active {
+    background-color: var(--token-accent-blue);
+    border-color: var(--primary-2);
+    color: var(--text-active);
+    font-weight: 600;
+    box-shadow: 0 2px 4px var(--primary-ring);
+}
+
+.role-summary .player-name {
+    font-size: 0.95rem;
+}
+
+.role-summary .player-hp {
+    font-size: 0.85rem;
+    color: var(--danger);
+    background: rgba(245, 101, 101, 0.1);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* Table Layout (Opponents) */
+.role-table-layout {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 10px 0;
+    align-items: flex-start;
+    flex-direction: row-reverse; /* Consolidated to the intended layout */
+    justify-content: space-around;
+}
+
+.role-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+.role-row {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+    justify-content: space-around;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+/* Current Character Panel */
+.current-character-panel {
+    flex: 3;
+    min-width: 0;
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 12px var(--shadow-1);
+    border: 1px solid var(--border);
+    display: flex;
+    gap: 25px;
+    /* Merged Layout */
+    flex-direction: row;
+    align-items: center;
+}
+
+.character-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid var(--border); /* Default fallback */
+    /* Table specific overrides merged */
+    width: auto;
+    min-width: 286px;
+    flex-shrink: 0;
+    border-bottom: none;
+    border-left: 1px solid var(--border);
+    padding-bottom: 0;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+/* Responsive adjustment for character info */
+@media (max-width: 768px) {
+    .character-info {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+.char-avatar {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px var(--shadow-2);
+}
+
+.char-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+html[data-theme="dark"] .char-avatar img.position-avatar {
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+.char-details {
+    flex-grow: 1;
+}
+
+.char-details h3 {
+    margin: 0 0 10px 0;
+    color: var(--text);
+    font-size: 1.4rem;
+    white-space: nowrap;
+}
+
+.char-stats {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.char-stats .player-seat,
+.char-stats .player-hand-count {
+   height: fit-content;
+}
+
+.stat-hp, .char-stats .stat-hp {
+    background-color: rgba(245, 101, 101, 0.15);
+    color: var(--danger, #f56565);
+    border: 1px solid rgba(245, 101, 101, 0.3);
+    padding: 2px 8px;
+    border-radius: 12px;
+    min-width: 32px;
+    height: fit-content;
+    font-weight: 700;
+    font-size: 0.85rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 2px 4px var(--shadow-1, rgba(0,0,0,0.1));
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-hp.hp-changed {
+    animation: hp-pulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Hand Cards Area */
+.player-hand {
+    flex: 1;
+    padding-right: 20px;
+    min-width: 0;
+}
+
+.player-hand h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--text-muted);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Hand Area Text Click-Through Fix */
+#hand-cards-container {
+    pointer-events: none;
+}
+#hand-cards-container > * {
+    pointer-events: auto;
+}
+body.is-global-dragging #hand-cards-container {
+    pointer-events: auto !important;
+}
+
+/* Timing Badge */
+.timing-badge {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    padding: 6px 16px;
+    background: var(--bg-panel);
+    border-radius: 20px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+    min-height: 44px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-left: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.timing-badge:empty::before {
+    content: "\00a0";
+    visibility: hidden;
+}
+
+.timing-badge .term-click {
+    border-bottom: none;
+}

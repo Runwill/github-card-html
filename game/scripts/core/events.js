@@ -184,6 +184,22 @@
                          if (card && typeof card === 'object') {
                              card.lyingArea = ctx.movedInArea;
                              // We don't track 'position' property explicitly as it is array index
+
+                             // 设置可见性为区域的默认值
+                             if (ctx.movedInArea.forOrAgainst !== undefined) {
+                                 card.visibility = ctx.movedInArea.forOrAgainst;
+                             }
+                             
+                             // 重置并设置特定角色可见性
+                             // 如果卡牌进入了某人的专属区域 (Owner存在)，则默认对拥有者可见
+                             // 此逻辑实现了 "手牌对自己可见" 的需求
+                             card.visibleTo = new Set();
+                             if (ctx.movedInArea.owner) {
+                                 // 假设 owner 对象有 id 属性
+                                 if (ctx.movedInArea.owner.id !== undefined) {
+                                     card.visibleTo.add(ctx.movedInArea.owner.id);
+                                 }
+                             }
                          }
                      });
                      

@@ -17,9 +17,7 @@
                     (i18n.t('game.resume') || '继续') : 
                     (i18n.t('game.pause') || '暂停');
                 
-                if (pauseBtn.textContent !== btnText) {
-                    pauseBtn.textContent = btnText;
-                }
+                window.Game.UI.safeRender(pauseBtn, btnText, null, true);
             } else {
                 pauseBtn.classList.add('hidden');
             }

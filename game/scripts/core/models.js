@@ -13,6 +13,8 @@
             
             // 运行时状态
             this.lyingArea = null; // 当前所在的区域 (Area对象)
+            this.visibility = 0; // 0: Visible (Generic), 1: Invisible (Generic Private)
+            this.visibleTo = new Set(); // Specifically visible to these Role IDs
         }
 
         // 工厂方法：生成标准测试牌堆
@@ -156,3 +158,11 @@
     window.Game.Models.Player = Player;
 
 })();
+
+// Ensure Hand always has visibility=0 initially if not set
+(function() {
+    if (window.Game && window.Game.Models && window.Game.Models.Area && window.Game.Models.Area.Configs && window.Game.Models.Area.Configs.Hand) {
+        window.Game.Models.Area.Configs.Hand.forOrAgainst = 0;
+    }
+})();
+

@@ -4,6 +4,42 @@
 
     // 占位函数，等待重构
     // TODO: 实现新的 GameTextRenderer 系统
+    
+    /**
+     * Helper: Apply term colors to UI elements
+     */
+    function applyTermStyle(element, termKey, isGlow = false) {
+        if (!element || !termKey) return;
+        
+        const rawColor = window.Game.UI.termColors ? (window.Game.UI.termColors.get(termKey) || window.Game.UI.termColors.get(termKey.toLowerCase())) : null;
+        const color = window.Game.UI.getAdaptiveColor ? window.Game.UI.getAdaptiveColor(rawColor) : rawColor;
+
+        if (color) {
+            element.style.color = color;
+            // Set for CSS variables
+            element.style.setProperty('--term-color', color);
+            
+            if (isGlow) {
+                // Background/Border style (used by Badge)
+                const bgAlpha = window.Game.UI.hexToRgba ? window.Game.UI.hexToRgba(color, 0.1) : 'rgba(0,0,0,0.1)';
+                const borderAlpha = window.Game.UI.hexToRgba ? window.Game.UI.hexToRgba(color, 0.3) : color;
+                
+                element.style.backgroundColor = bgAlpha;
+                element.style.borderColor = borderAlpha;
+            } else {
+                 // Clean up specific props if not glow mode (or leave them if not applicable)
+                 // Main breadcrumb just sets color.
+            }
+            
+            return { color, rawColor }; // Return for further use (e.g. textShadow)
+        } else {
+            element.style.color = '';
+            element.style.backgroundColor = '';
+            element.style.borderColor = '';
+            return null;
+        }
+    }
+
     function updateUI() {
         const GameState = window.Game.Core.GameState;
         if (!GameState) return;
@@ -62,16 +98,15 @@
                     breadcrumbsEl.appendChild(crumb);
                 }
 
-                // 检查内容是否更改以避免 DOM 抖动（MutationObserver 滥用）
                 const newHtml = GameText.render(item.key, item.data);
-                
-                // 仅在语义不同时更新
-                // 注意：属性可能需要标准化比较
-                if (crumb.getAttribute('data-key') !== item.key || crumb.getAttribute('data-val') !== JSON.stringify(item.data)) {
-                     crumb.innerHTML = newHtml;
-                     crumb.setAttribute('data-key', item.key);
-                     crumb.setAttribute('data-val', JSON.stringify(item.data));
-                     
+                // Composite key for uniqueness
+                const uniqueKey = `${item.key}:${JSON.stringify(item.data)}`;
+
+                let updated = window.Game.UI.safeRender(crumb, newHtml, uniqueKey);
+                // safeRender sets data-render-key. We also set data-key for legacy compat if needed.
+                if (updated) crumb.setAttribute('data-key', item.key);
+
+                if (updated) {
                      // 重置动画
                      crumb.style.animation = 'none';
                      crumb.offsetHeight; 
@@ -79,20 +114,8 @@
                 }
 
                 // 处理样式（颜色/阴影）
-                // 我们需要从 GameData.UI.termColors 获取颜色以设置容器样式。
-                // GameText 生成内部术语，但面包屑容器承载视觉权重。
-                const colorKey = item.key;
-                const rawColor = window.Game.UI.termColors ? (window.Game.UI.termColors.get(colorKey) || window.Game.UI.termColors.get(colorKey.toLowerCase())) : null;
-                const color = window.Game.UI.getAdaptiveColor ? window.Game.UI.getAdaptiveColor(rawColor) : rawColor;
-
-                if (color) {
-                    crumb.style.color = color;
-                    // 如果需要，将颜色传递给 CSS 变量供内部使用
-                    crumb.style.setProperty('--term-color', color);
-                } else {
-                    crumb.style.color = '';
-                }
-
+                const styleResult = applyTermStyle(crumb, item.key, false);
+                
                 // 最后一项状态（等待/活动）
                 // 使用索引比较中的 isLast
                 const isItemLast = (index === displayItems.length - 1);
@@ -101,9 +124,9 @@
 
                 if (isItemLast) {
                      crumb.style.opacity = '1';
-                     if (isWaiting && rawColor) {
+                     if (isWaiting && styleResult && styleResult.rawColor) {
                          // 柔和发光效果
-                         const glowColor = window.Game.UI.hexToRgba ? window.Game.UI.hexToRgba(rawColor, 0.3) : rawColor;
+                         const glowColor = window.Game.UI.hexToRgba ? window.Game.UI.hexToRgba(styleResult.rawColor, 0.3) : styleResult.rawColor;
                          crumb.style.textShadow = `0 0 10px ${glowColor}`;
                      } else {
                          crumb.style.textShadow = '';
@@ -126,25 +149,11 @@
             if (currentNode) {
                 // 渲染内容
                 const renderKey = currentNode.name;
-                // 使用 data-render-key 避免因全局高亮修改 DOM 导致的循环重置
-                if (timingBadgeEl.getAttribute('data-render-key') !== renderKey) {
-                    timingBadgeEl.innerHTML = GameText.render(renderKey);
-                    timingBadgeEl.setAttribute('data-render-key', renderKey);
-                }
+                
+                window.Game.UI.safeRender(timingBadgeEl, GameText.render(renderKey), renderKey);
 
                 // 样式
-                const rawColor = window.Game.UI.termColors ? (window.Game.UI.termColors.get(currentNode.name)) : null;
-                const color = window.Game.UI.getAdaptiveColor ? window.Game.UI.getAdaptiveColor(rawColor) : rawColor;
-
-                if (color) {
-                    timingBadgeEl.style.color = color;
-                    timingBadgeEl.style.backgroundColor = window.Game.UI.hexToRgba ? window.Game.UI.hexToRgba(color, 0.1) : 'rgba(0,0,0,0.1)';
-                    timingBadgeEl.style.borderColor = window.Game.UI.hexToRgba ? window.Game.UI.hexToRgba(color, 0.3) : color;
-                } else {
-                    timingBadgeEl.style.color = '';
-                    timingBadgeEl.style.backgroundColor = '';
-                    timingBadgeEl.style.borderColor = '';
-                }
+                applyTermStyle(timingBadgeEl, currentNode.name, true);
             }
         }
 

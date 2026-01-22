@@ -17,13 +17,34 @@
                         <!-- Top Row Opponents -->
                         <div id="role-list-top" class="role-row"></div>
                         
-                        <!-- Treatment Area (Center) -->
+                        <!-- Treatment Area (Center) & Piles -->
                         <div class="game-panel game-board-panel hidden" id="game-board-panel" style="margin-top: 15px; width: 100%;">
-                            <div class="treatment-area-wrappper" style="position: relative;">
-                                <div id="header-treatment-area" class="area-watermark">Treatment Area</div>
-                                <div id="treatment-area-container" class="cards-container treatment-container" data-area-name="treatmentArea">
-                                    <!-- Cards will be rendered here -->
+                            <div class="board-area-row" style="display: flex; gap: 15px; align-items: flex-start; justify-content: center; min-height: 140px;">
+                                
+                                <!-- Draw Pile (Left) -->
+                                <div class="board-pile-slot" style="flex: 0 0 100px; width: 100px; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 5;">
+                                    <div id="header-pile" class="area-watermark" style="font-size: 0.8rem; margin-bottom: 5px; text-align: center; opacity: 0.4;">Draw Pile</div>
+                                    <div id="pile-container" class="cards-container pile-container deck-slot" data-area-name="pile" style="flex: 1; position: relative;">
+                                        <!-- Cards here -->
+                                    </div>
                                 </div>
+
+                                <!-- Treatment Area (Center) -->
+                                <div class="treatment-area-wrappper" style="flex: 1; position: relative; min-width: 0; display: flex; flex-direction: column; z-index: 1;">
+                                    <div id="header-treatment-area" class="area-watermark" style="margin-bottom: 5px;">Treatment Area</div>
+                                    <div id="treatment-area-container" class="cards-container treatment-container" data-area-name="treatmentArea" style="flex: 1;">
+                                        <!-- Cards will be rendered here -->
+                                    </div>
+                                </div>
+
+                                <!-- Discard Pile (Right) -->
+                                <div class="board-pile-slot" style="flex: 0 0 100px; width: 100px; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 5;">
+                                    <div id="header-discard-pile" class="area-watermark" style="font-size: 0.8rem; margin-bottom: 5px; text-align: center; opacity: 0.4;">Discard Pile</div>
+                                    <div id="discard-pile-container" class="cards-container pile-container deck-slot" data-area-name="discardPile" style="flex: 1; position: relative;">
+                                        <!-- Cards here -->
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
