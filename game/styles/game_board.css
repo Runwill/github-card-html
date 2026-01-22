@@ -125,7 +125,7 @@ body.is-global-dragging .treatment-container {
     white-space: nowrap;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    width: 100%;
+    width: auto;
     text-align: center;
     cursor: pointer;
 }

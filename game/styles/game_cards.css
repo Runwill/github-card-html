@@ -48,18 +48,62 @@
 
 /* Card Back Styling */
 .card-placeholder[data-card-key='CardBack'] {
-    background: repeating-linear-gradient(
-        45deg,
-        #444,
-        #444 10px,
-        #555 10px,
-        #555 20px
-    );
+    /* Set explicit background color to prevent transparency issues */
+    background-color: var(--surface) !important;
+    background-image: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%) !important;
+    
+    /* Remove direct background image to allow independent filtering via pseudo-element */
+    /* background-image: none !important;  <-- REMOVED: This was clearing the gradient */
+
+    /* Hide text content ("CardBack") */
     color: transparent !important;
     text-shadow: none !important;
-    border: 1px solid #777;
-    /* position: relative; removed for universal absolute centering safety in stacks */
+
+    /* Match normal card border */
+    border: 1px solid var(--border) !important;
+    
+    /* Ensure no extra gradient overrides */
+    box-shadow: 0 2px 5px var(--shadow-1);
+
+    /* Essential for pseudo-element positioning and clipping */
+    position: relative;
+    overflow: hidden;
+
+    /* Clear legacy filters on the container itself */
+    filter: none !important;
+    opacity: 1 !important;
 }
+
+/* 
+   Image Layer (Pseudo-element)
+   We treat the background image as a separate layer so we can filter IT 
+   without inverting the card's border or background color.
+*/
+.card-placeholder[data-card-key='CardBack']::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    
+    background-image: url('../../source/三兔.png');
+    background-size: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    z-index: 0; 
+    pointer-events: none;
+    
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+/* Dark Mode: Filter ONLY the image layer */
+html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
+    /* Inverts black line-art to white for dark backgrounds */
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+/* Remove old direct rule to prevent conflict */
+/* html[data-theme="dark"] .card-placeholder[data-card-key='CardBack'] { ... } */
 
 /* Ensure CardBacks in Stacked/Deck slots stay absolute centered */
 .area-stacked > .card-placeholder[data-card-key='CardBack'] {
@@ -73,15 +117,7 @@
 }
 
 .card-placeholder[data-card-key='CardBack']::after {
-    content: 'BACK';
-    font-size: 0.8em;
-    font-weight: bold;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 2em;
-    color: rgba(255,255,255,0.2);
+    /* Removed display: none to allow other styles (like Viewer counters) to use ::after */
 }
 
 /* Dragging Ghost/Real Element */

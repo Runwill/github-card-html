@@ -72,9 +72,21 @@
         }
 
         // 2. 牌堆 (Draw Pile)
+        if (GameState.pile) {
+            const el = document.getElementById('header-pile');
+            if (el) {
+                window.Game.UI.safeRender(el, GameText.render('pile'), 'area:pile');
+            }
+        }
         renderPileLikeArea('pile-container', GameState.pile, 'pile', true);
 
         // 3. 弃牌堆 (Discard Pile)
+        if (GameState.discardPile) {
+            const el = document.getElementById('header-discard-pile');
+            if (el) {
+                window.Game.UI.safeRender(el, GameText.render('discardPile'), 'area:discardPile');
+            }
+        }
         renderPileLikeArea('discard-pile-container', GameState.discardPile, 'discardPile', false);
     }
 
@@ -115,6 +127,9 @@
             wrapper.addEventListener('click', (e) => {
                 // 如果正在拖拽，不触发
                 if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
+
+                // Stop propagation to prevent global "Click Outside" handlers from closing existing windows immediately
+                e.stopPropagation();
 
                 const currentCards = wrapper._inspectorCards || [];
                 const isDeck = wrapper.querySelector('#header-pile') != null; // 简单判断，或者检查容器 ID

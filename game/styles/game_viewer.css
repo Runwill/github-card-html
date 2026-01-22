@@ -7,17 +7,19 @@
    We want the internal .modal-content to control the look/size, so we strip 
    the default container styling from the wrapper.
 */
-#card-viewer-modal.modal {
+.card-viewer-modal.modal {
     padding: 20px !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
     max-width: none !important; 
     max-height: none !important;
+    overflow: visible !important; /* Allow dragged content to go outside */
+    pointer-events: none; /* Allow clicking through the empty parts of the wrapper */
 }
 
 /* Modal Specific Overrides */
-#card-viewer-modal .modal-content {
+.card-viewer-modal .modal-content {
     /* Stability Fix: Use explicit width instead of fit-content to prevent 
        overflow scrolling on the viewport when card lists are huge. */
     width: 90vw; 
@@ -41,30 +43,13 @@
     
     /* Ensure box-sizing doesn't add borders to width */
     box-sizing: border-box;
-}
 
-#card-viewer-modal .modal-header {
-    flex-shrink: 0;
-    padding: 2px 8px; /* Minimal padding */
-    border-bottom: none; /* Removed border for clean look */
-    display: flex;
-    justify-content: flex-end; /* Align close button to right */
-    align-items: center;
-    background: transparent; /* Transparent header to match panel style */
-    width: 100%; /* Ensure header fills full width of expanded modal */
-    min-height: 0;
-    z-index: 20; /* Ensure button clickable over content if needed */
-    margin-bottom: 0; /* Override global .modal-header margin (usually 24px) */
-}
-
-#card-viewer-modal .modal-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: var(--text);
+    pointer-events: auto; /* Re-enable clicks on the actual window */
+    position: relative; /* Essential for Drag functionality (left/top) */
 }
 
 /* Wrapper for scroll view */
-#card-viewer-modal .modal-body {
+.card-viewer-modal .modal-body {
     flex: 1;
     overflow: hidden; /* Prevent native scroll on wrapper */
     padding: 20px; /* Restored padding for breathing room */
@@ -80,29 +65,29 @@
 
 /* Gradient Fade Fogs - Replaced with Mask Image for cleaner corners */
 /* The mask fades the content transparency directly instead of adding opaque overlays */
-#card-viewer-modal .modal-body {
+.card-viewer-modal .modal-body {
     -webkit-mask-image: linear-gradient(to right, transparent 0px, black 80px, black calc(100% - 80px), transparent 100%);
     mask-image: linear-gradient(to right, transparent 0px, black 80px, black calc(100% - 80px), transparent 100%);
 }
 
-#card-viewer-modal .modal-body.at-start {
+.card-viewer-modal .modal-body.at-start {
     -webkit-mask-image: linear-gradient(to right, black 0px, black calc(100% - 80px), transparent 100%);
     mask-image: linear-gradient(to right, black 0px, black calc(100% - 80px), transparent 100%);
 }
 
-#card-viewer-modal .modal-body.at-end {
+.card-viewer-modal .modal-body.at-end {
     -webkit-mask-image: linear-gradient(to right, transparent 0px, black 80px, black 100%);
     mask-image: linear-gradient(to right, transparent 0px, black 80px, black 100%);
 }
 
-#card-viewer-modal .modal-body.at-start.at-end {
+.card-viewer-modal .modal-body.at-start.at-end {
     -webkit-mask-image: none;
     mask-image: none;
 }
 
 /* Disable old overlay elements */
-#card-viewer-modal .modal-body::before,
-#card-viewer-modal .modal-body::after {
+.card-viewer-modal .modal-body::before,
+.card-viewer-modal .modal-body::after {
     display: none;
 }
 
@@ -121,9 +106,66 @@
     /* Ensure it fills the modal body but scrolls if body is smaller */
     width: 100%; 
     
+    /* Ensure height allows dropping cards even when empty */
+    min-height: 160px; /* 140px card + 20px padding */
+    
     overflow-x: auto; /* Enable scrolling */
     scrollbar-width: none; /* Firefox Hide */
     -ms-overflow-style: none; /* IE Hide */
+}
+
+/* ==========================================================================
+   Animations (Modern & Fast)
+   Apply animation to .modal-content to bypass global !important transforms on wrapper
+   ========================================================================== */
+@keyframes cardViewerIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+        filter: blur(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes cardViewerOut {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.95);
+        filter: blur(5px);
+    }
+}
+
+/* Reset Outer Animation */
+.card-viewer-modal.modal.show,
+.card-viewer-modal.modal.closing {
+    animation: none !important;
+    transition: none !important;
+}
+
+/* Apply to Inner Content */
+.card-viewer-modal.modal.show .modal-content {
+    /* Spring-like overshoot for "Pop" effect - Reduced bounce (1.56 -> 1.25) */
+    animation: cardViewerIn 0.15s cubic-bezier(0.34, 1.25, 0.64, 1) forwards; 
+    transform-origin: center center;
+    
+    /* Prepare for Dragging */
+    position: relative;
+    top: 0; left: 0;
+    will-change: transform, left, top;
+}
+
+.card-viewer-modal.modal.closing .modal-content {
+    /* Very fast exit */
+    animation: cardViewerOut 0.09s ease-in forwards; 
 }
 
 /* Chrome/Webkit Hide Scrollbar */
@@ -140,7 +182,7 @@
     counter-reset: card-index;
 }
 
-.card-grid .card-placeholder::before {
+.card-grid .card-placeholder::after {
     counter-increment: card-index;
     content: counter(card-index);
     

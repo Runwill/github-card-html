@@ -66,12 +66,10 @@
     }
 
     function initDrag(cardElement, cardData, sourceAreaName, sourceIndex = -1) {
-        // console.log('[Interactions] initDrag called for', cardData);
         cardElement.classList.add('draggable-item');
         cardElement.onpointerdown = (e) => handlePointerDown(e, cardElement, cardData, sourceAreaName, sourceIndex);
         cardElement.ondragstart = () => false;
         cardElement.oncontextmenu = (e) => {
-             // console.log('[Interactions] oncontextmenu triggered');
              if(DragState.isDragging) {
                  e.preventDefault();
                  return;
@@ -79,8 +77,6 @@
              if (window.Game.UI.showCardContextMenu) {
                  e.preventDefault();
                  window.Game.UI.showCardContextMenu(e.clientX, e.clientY, cardData, sourceAreaName, cardElement);
-             } else {
-                 console.error('[Interactions] showCardContextMenu not found');
              }
         };
     }
@@ -147,14 +143,17 @@
         const parent = originalEl.parentElement;
         if (parent && parent.classList.contains('area-stacked')) {
             const prevSibling = originalEl.previousElementSibling;
+            // Check if it's a valid card placeholder (not some other element)
             if (prevSibling && prevSibling.classList.contains('card-placeholder')) {
+                // Determine if we should treat it as top card.
+                // Usually yes, if we lift the top one, the next one becomes top.
                 if (!prevSibling.classList.contains('is-top-card')) {
                     prevSibling.classList.add('is-top-card');
                     DragState.tempRevealedCard = prevSibling;
                 }
             }
         }
-        
+
         const calibrationRect = dragClone.getBoundingClientRect();
         const driftX = calibrationRect.left - rect.left;
         const driftY = calibrationRect.top - rect.top;
@@ -207,13 +206,13 @@
         
         if (dropZone && window.Game.UI.DragSorting) {
              const acceptPlaceholder = dropZone.getAttribute('data-accept-placeholder') !== 'false';
-
+             
              if (acceptPlaceholder) {
                  window.Game.UI.DragSorting.updatePlaceholderPosition(dropZone, targetEl, e.clientX, e.clientY);
-             }
+             } 
              else if (DragState.placeholderElement) {
                  if (DragState.placeholderElement.parentNode !== dropZone) {
-                     window.Game.UI.DragSorting.performPlaceholderMove(dropZone, null, true);
+                     window.Game.UI.DragSorting.performPlaceholderMove(dropZone, null, true); 
                  }
              }
         }
@@ -228,6 +227,7 @@
     }
 
     function cancelDrag(e) {
+        // Cleanup temp revealed card
         if (DragState.tempRevealedCard) {
             DragState.tempRevealedCard.classList.remove('is-top-card');
             DragState.tempRevealedCard = null;
@@ -330,7 +330,7 @@
                     logDragDebug('After Drop Action (All Done)');
                     
                     if (DragState.tempRevealedCard) {
-                        // Let render logic handle classes, just clear the reference
+                        DragState.tempRevealedCard.classList.remove('is-top-card'); // Just in case, though re-render should handle it
                         DragState.tempRevealedCard = null;
                     }
 
