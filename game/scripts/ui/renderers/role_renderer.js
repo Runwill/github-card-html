@@ -107,18 +107,17 @@
              if (seatEl.className !== 'player-seat') seatEl.className = 'player-seat';
             
             const finalHpText = `${selfRole.health}/${selfRole.healthLimit}`;
-            
-            // 使用 safeRender，并简化动画逻辑
-            const isHpChanged = window.Game.UI.safeRender(hpEl, finalHpText, null, true);
 
-            if (isHpChanged) {
+            if (hpEl.textContent !== finalHpText) {
                 hpEl.classList.remove('hp-changed');
-                // Only animate if NOT a role switch (handled externally or assumed stable here)
-                // 简化：只要变了就动，视觉上没问题
-                if (!isRoleChanged) {
+                
+                // Only animate if NOT a role switch AND not empty initial state
+                const isInitial = hpEl.textContent.trim() === '';
+                if (!isRoleChanged && !isInitial) {
                     void hpEl.offsetWidth; 
                     hpEl.classList.add('hp-changed');
                 }
+                hpEl.textContent = finalHpText;
             }
 
             // Main View Hand Count
@@ -155,7 +154,9 @@
             }
 
             const handText = ` ${count}`; // format: space + count
-            window.Game.UI.safeRender(handCountEl, handText, null, true);
+            if (handCountEl.textContent !== handText) {
+                handCountEl.textContent = handText;
+            }
         }
         
         // 上下文菜单绑定
@@ -360,15 +361,16 @@
             if (Array.isArray(key) && key.length > 0) key = key[0];
             if (!key) key = role.name;
             const renderKey = role.characterId ? `char:${role.characterId}:${key}` : `char:default:${key}`;
-            
-            let newNameHtml;
-            if (role.characterId && GameText) {
-                    newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
-            } else {
-                    newNameHtml = GameText ? GameText.render(key) : key;
+            if (nameSpan.getAttribute('data-render-key') !== renderKey) {
+                let newNameHtml;
+                if (role.characterId && GameText) {
+                     newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
+                } else {
+                     newNameHtml = GameText ? GameText.render(key) : key;
+                }
+                nameSpan.innerHTML = newNameHtml;
+                nameSpan.setAttribute('data-render-key', renderKey);
             }
-
-            window.Game.UI.safeRender(nameSpan, newNameHtml, renderKey);
             
             // Stats Row Updates
             
@@ -389,14 +391,14 @@
             const hpSpan = pEl.querySelector('.player-hp');
             const finalHpText = `${role.health}/${role.healthLimit}`;
             
-            // 使用 safeRender，并利用其返回的 boolean 来决定动画
-            // 注意：isText=true
-            const isHpChanged = window.Game.UI.safeRender(hpSpan, finalHpText, null, true);
-            
-            if (isHpChanged) {
-                 hpSpan.classList.remove('hp-changed');
-                 void hpSpan.offsetWidth; // Trigger reflow for animation restart
-                 hpSpan.classList.add('hp-changed');
+            if (hpSpan.textContent !== finalHpText) {
+                // ... hp logic ...
+                hpSpan.classList.remove('hp-changed');
+                if (hpSpan.textContent.trim() !== '') {
+                    void hpSpan.offsetWidth;
+                    hpSpan.classList.add('hp-changed');
+                }
+                hpSpan.textContent = finalHpText;
             }
 
             // 手牌数 (Hand Count) - 去掉图标
@@ -411,24 +413,33 @@
                 // 仅显示数字，根据需求 "写在体力值之后"
                 // 格式: space + count
                 const handText = ` ${count}`;
-                window.Game.UI.safeRender(handCountSpan, handText, null, true);
-                // Remove dynamic opacity, keep style consistent
-                if (handCountSpan.style.opacity !== '1') handCountSpan.style.opacity = '1';
+                if (handCountSpan.textContent !== handText) {
+                    handCountSpan.textContent = handText;
+                    // Remove dynamic opacity, keep style consistent
+                    handCountSpan.style.opacity = '1';
+                }
             }
             
             // 装备区
             const equipDiv = pEl.querySelector('.player-equips');
             if (equipDiv) {
-                let newEquipText = '';
                 if (role.equipArea && role.equipArea.cards && role.equipArea.cards.length > 0) {
                      const equipNames = role.equipArea.cards.map(c => {
+                         // 模型层保证 EquipArea 中的元素是 Card 实例
                          const cName = c.name;
                          return (typeof i18n !== 'undefined' && i18n.t) ? i18n.t(`game.card.${cName}`, {defaultValue: cName}) : cName;
                      });
-                     newEquipText = `[${equipNames.join(',')}]`;
+                     const newEquipText = `[${equipNames.join(',')}]`;
+                     if (equipDiv.textContent !== newEquipText) {
+                         equipDiv.textContent = newEquipText;
+                         // Add a specialized render key if we want to support HTML rendering in future, 
+                         // but for textContent, the content check is usually sufficient unless formatting changes.
+                     }
+                } else {
+                     if (equipDiv.textContent !== '') {
+                        equipDiv.textContent = '';
+                     }
                 }
-                
-                window.Game.UI.safeRender(equipDiv, newEquipText, null, true);
             }
 
             // 右键菜单

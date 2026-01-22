@@ -237,7 +237,7 @@
                             if (player) area = player[areaName];
                         } else {
                             if (areaName === 'hand' || areaName === 'equipArea') {
-                                const player = GameState.players[GameState.currentPlayerIndex]; 
+                                const player = window.Game.UI.getMainPlayer ? window.Game.UI.getMainPlayer() : GameState.players[0]; 
                                 if (player) area = player[areaName];
                             }
                         }
@@ -260,7 +260,7 @@
                             const player = GameState.players.find(p => p.id === roleId);
                             if (player) data = player[areaName];
                         } else {
-                             const player = GameState.players[GameState.currentPlayerIndex];
+                             const player = window.Game.UI.getMainPlayer ? window.Game.UI.getMainPlayer() : GameState.players[0];
                              if (player) data = player[areaName];
                         }
                         if (data) title = `Area: ${areaName}`;

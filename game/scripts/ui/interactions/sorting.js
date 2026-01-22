@@ -123,6 +123,17 @@
         const DragState = UI.DragState;
         if (!DragState || !DragState.placeholderElement) return;
 
+        // 特殊逻辑：堆叠区域 (Pile/Deck) 强制只能“置入顶端”
+        // 视觉上这些区域是堆叠的，用户无法直观地插入中间。
+        // 因此强行将占位符保持在末尾，对应逻辑上的 "Top"。
+        if (dropZone.classList.contains('area-stacked')) {
+            // 如果占位符不在该区域，或者不在末尾，就执行移动
+            if (DragState.placeholderElement.parentNode !== dropZone || DragState.placeholderElement.nextElementSibling) {
+                performPlaceholderMove(dropZone, null); // null sibling = append
+            }
+            return;
+        }
+
         const itemSelector = getSortableSelector(dropZone);
         const hoverItem = targetEl ? targetEl.closest(`${itemSelector}:not(.drag-placeholder)`) : null;
         

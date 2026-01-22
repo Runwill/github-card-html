@@ -20,17 +20,52 @@
         return contextMenuEl;
     }
 
-    function showContextMenu(x, y, player) {
+    /**
+     * 通用菜单渲染器
+     * @param {number} x 
+     * @param {number} y 
+     * @param {string} title 
+     * @param {Array<{label: string, action: Function}>} actions 
+     */
+    function renderMenu(x, y, title, actions) {
         const menu = createContextMenu();
         menu.innerHTML = ''; // 清除之前的内容
         
         // 标题
         const header = document.createElement('div');
         header.className = 'context-menu-header';
-        header.textContent = player.name;
+        header.textContent = title;
         menu.appendChild(header);
+
+        // 动作列表
+        actions.forEach(item => {
+            const el = document.createElement('div');
+            el.className = 'context-menu-item';
+            el.textContent = item.label;
+            el.onclick = (e) => {
+                e.stopPropagation(); // 防止文档点击立即关闭
+                if (item.action) item.action();
+                menu.classList.remove('visible');
+            };
+            menu.appendChild(el);
+        });
+
+        // 定位并显示
+        menu.style.left = `${x}px`;
+        menu.style.top = `${y}px`;
+        menu.classList.add('visible');
         
-        // 操作
+        // 边界检查
+        const rect = menu.getBoundingClientRect();
+        if (rect.right > window.innerWidth) {
+            menu.style.left = `${window.innerWidth - rect.width - 10}px`;
+        }
+        if (rect.bottom > window.innerHeight) {
+            menu.style.top = `${window.innerHeight - rect.height - 10}px`;
+        }
+    }
+
+    function showContextMenu(x, y, player) {
         let actions = [];
         const isSandbox = window.Game.GameState && window.Game.GameState.mode === 'sandbox';
 
@@ -51,50 +86,13 @@
             ];
         }
         
-        actions.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'context-menu-item';
-            el.textContent = item.label;
-            el.onclick = (e) => {
-                e.stopPropagation(); // 防止文档点击立即关闭（虽然我们希望在操作后关闭）
-                if (item.action) item.action();
-                menu.classList.remove('visible');
-            };
-            menu.appendChild(el);
-        });
-
-        // 定位并显示
-        menu.style.left = `${x}px`;
-        menu.style.top = `${y}px`;
-        menu.classList.add('visible');
-        
-        // 如果超出边界则调整（简单检查）
-        const rect = menu.getBoundingClientRect();
-        if (rect.right > window.innerWidth) {
-            menu.style.left = `${window.innerWidth - rect.width - 10}px`;
-        }
-        if (rect.bottom > window.innerHeight) {
-            menu.style.top = `${window.innerHeight - rect.height - 10}px`;
-        }
+        renderMenu(x, y, player.name, actions);
     }
 
     function showCardContextMenu(x, y, card, currentAreaName, cardElement = null) {
-        const menu = createContextMenu();
-        menu.innerHTML = '';
-        
-        // 标题
-        const header = document.createElement('div');
-        header.className = 'context-menu-header';
-        header.textContent = typeof card === 'string' ? card : (card.name || 'Card');
-        menu.appendChild(header);
-
-        // 动作列表
         const actions = [];
         const state = window.Game.GameState;
         
-        // 辅助函数
-        const getPlayer = () => state.players[state.currentPlayerIndex] || state.players[0];
-
         // 动作配置
         const targetConfigs = [
             { key: 'pile', label: '置入牌堆顶' },
@@ -108,18 +106,16 @@
             let area = null;
             if (conf.key) area = state[conf.key];
             if (conf.roleKey) {
-                const p = getPlayer();
+                const p = window.Game.UI.getMainPlayer();
                 if (p) area = p[conf.roleKey];
             }
             
-            // 如果找到了目标区域，就生成一个菜单项
-            // 这里可以清楚看到：label 只是为了显示，action 才是逻辑，两者是并列关系
             if (area) {
                 actions.push({
-                    label: conf.label, // 1. 这个只给按钮显示文字用
-                    action: () => {    // 2. 这个是点击后触发的逻辑，里面没有 label
+                    label: conf.label,
+                    action: () => {
                         window.Game.Controller.dispatch('place', {
-                            moveRole: getPlayer(),
+                            moveRole: window.Game.UI.getMainPlayer(),
                             card: card,
                             toArea: area,
                             element: cardElement
@@ -129,28 +125,8 @@
             }
         });
 
-        // 渲染
-        actions.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'context-menu-item';
-            el.textContent = item.label;
-            el.onclick = (e) => {
-                e.stopPropagation();
-                if (item.action) item.action();
-                menu.classList.remove('visible');
-            };
-            menu.appendChild(el);
-        });
-
-        // 定位并显示
-        menu.style.left = `${x}px`;
-        menu.style.top = `${y}px`;
-        menu.classList.add('visible');
-        
-        // 边界检查
-        const rect = menu.getBoundingClientRect();
-        if (rect.right > window.innerWidth) menu.style.left = `${window.innerWidth - rect.width - 10}px`;
-        if (rect.bottom > window.innerHeight) menu.style.top = `${window.innerHeight - rect.height - 10}px`;
+        const title = typeof card === 'string' ? card : (card.name || 'Card');
+        renderMenu(x, y, title, actions);
     }
 
     window.Game.UI.showContextMenu = showContextMenu;

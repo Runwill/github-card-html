@@ -160,6 +160,11 @@ body.is-global-dragging .treatment-container {
     z-index: 1;
 }
 
+/* Fix: Ensure drag placeholder is always visible so it has dimensions for FLIP */
+.area-stacked > .card-placeholder.drag-placeholder {
+    display: flex !important;
+}
+
 .area-stacked > .card-placeholder.is-top-card {
     display: flex;
     box-shadow: 2px 2px 0 #bbb, 4px 4px 0 #999, 0 2px 5px var(--shadow-1);

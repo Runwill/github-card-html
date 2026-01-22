@@ -4,23 +4,26 @@
 
 /* Modal Specific Overrides */
 #card-viewer-modal .modal-content {
-    /* 1. Uncap width to use screen real estate */
-    max-width: 98vw; 
-    width: fit-content; /* Auto-shrink if few cards */
-    min-width: 300px;   /* Minimum size */
+    /* Stability Fix: Use explicit width instead of fit-content to prevent 
+       overflow scrolling on the viewport when card lists are huge. */
+    width: 90vw; 
+    max-width: 1200px; /* Optional cap for very large screens */
     
     /* height: 80vh;  <-- Removed fixed height */
-    max-height: 80vh; 
-    
+    max-height: 80vh;
+
     display: flex;
     flex-direction: column;
     padding: 0;
     background: var(--surface);
     border-radius: 12px;
     overflow: hidden;
-    
+
     /* Center the modal itself */
     margin: auto; 
+    
+    /* Ensure box-sizing doesn't add borders to width */
+    box-sizing: border-box;
 }
 
 #card-viewer-modal .modal-header {
@@ -40,72 +43,117 @@
     color: var(--text);
 }
 
+/* Wrapper for scroll view */
 #card-viewer-modal .modal-body {
     flex: 1;
-    overflow-x: auto; 
-    overflow-y: hidden; 
-    padding: 20px; /* Reduced padding might give more room? pure preference */
-    background: rgba(0,0,0,0.05);
+    overflow: hidden; /* Prevent native scroll on wrapper */
+    padding: 20px;
+    background: rgba(0,0,0,0.05); /* Track background */
     display: flex;
-    align-items: center; 
-    
-    /* Ensure scrollbar works well */
+    align-items: center;
+    position: relative; /* Context for absolute overlays */
     max-width: 100%;
+    
+    /* CRITICAL FIX: Allow flex container to shrink below content size */
+    min-width: 0; 
 }
 
-/* Close Button */
-.btn-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 5px;
-    line-height: 1;
-    transition: color 0.2s;
-}
-.btn-close:hover {
-    color: var(--danger);
+/* Gradient Fade Fogs (Overlay on top of content) */
+#card-viewer-modal .modal-body::before,
+#card-viewer-modal .modal-body::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px; 
+    pointer-events: none; 
+    z-index: 10;
+    opacity: 1;
+    transition: opacity 0.2s ease-out; /* Smooth fade in/out */
 }
 
-/* Grid Layout for Cards (Horizontal Strip) */
+/* Hide Left Fade when at start */
+#card-viewer-modal .modal-body.at-start::before {
+    opacity: 0;
+}
+
+/* Hide Right Fade when at end */
+#card-viewer-modal .modal-body.at-end::after {
+    opacity: 0;
+}
+
+#card-viewer-modal .modal-body::before {
+    left: 0;
+    background: linear-gradient(to right, var(--surface, #ffffff), transparent);
+}
+
+#card-viewer-modal .modal-body::after {
+    right: 0;
+    background: linear-gradient(to left, var(--surface, #ffffff), transparent);
+}
+
+/* The actual scrollable list */
 .card-grid {
     display: flex;
-    flex-wrap: nowrap; 
-    /* Standard Gap matching other areas */
-    gap: 15px; 
+    flex-wrap: nowrap;
+    gap: 15px;
     justify-content: flex-start;
-    padding: 10px;
+    padding: 10px; /* Slight padding inside scroll view */
     
-    /* Allow resizing based on content */
-    min-width: 100%; 
-    width: max-content; 
+    /* Scroll properties */
+    /* Remove 'width: max-content' to stop forcing parent to expand beyond max-width */
+    /* width: max-content; <--- CAUSES OVERFLOW */
+    
+    /* Ensure it fills the modal body but scrolls if body is smaller */
+    width: 100%; 
+    
+    overflow-x: auto; /* Enable scrolling */
+    scrollbar-width: none; /* Firefox Hide */
+    -ms-overflow-style: none; /* IE Hide */
+}
+
+/* Chrome/Webkit Hide Scrollbar */
+.card-grid::-webkit-scrollbar {
+    display: none;
+}
+
+/* 
+   CSS Counter for Index Badges 
+   Only applied when inside .card-grid (the viewer).
+   When card is dragged out, it loses this context and the badge disappears automatically.
+*/
+.card-grid {
+    counter-reset: card-index;
+}
+
+.card-grid .card-placeholder::before {
+    counter-increment: card-index;
+    content: counter(card-index);
+    
+    position: absolute;
+    top: 2px; /* Inner offset */
+    left: 2px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 4px;
+    z-index: 20; /* Ensure on top of card content */
+    pointer-events: none;
+    font-family: 'Segoe UI', sans-serif;
+    line-height: 1;
+    font-weight: 600;
+    backdrop-filter: blur(2px);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 
 /* Card in Grid */
 .card-grid .card-placeholder {
     position: relative;
-    transform: none !important; 
-    width: 100px; 
+    /* Removed transform: none !important to allow drag-sort animations */
+    width: 100px;
     height: 140px;
     margin: 0;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0; 
 }
-
-.card-grid .card-placeholder:hover {
-    transform: translateY(-5px) !important;
-    box-shadow: 0 8px 15px var(--shadow-2);
-    z-index: 2;
-}
-
-/* Empty State */
-.card-grid-empty {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-    font-size: 1.2rem;
-    font-weight: 500;
-}
+/* ... rest unchanged */

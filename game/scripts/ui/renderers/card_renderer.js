@@ -165,8 +165,24 @@
                 }
             }
 
+            // 注入位置序号 (如果开启)
+            // REFACTOR: Moved to CSS Counter in game_viewer.css for cleaner drag handling.
+            // When dragged out, the counter style won't apply, effectively removing the badge.
+            if (options.showIndex) {
+                 // Mark container as ordered to trigger CSS counters
+                 container.classList.add('is-ordered-list');
+            } else {
+                 container.classList.remove('is-ordered-list');
+            }
+
             // 使用标准化 SafeRender 替代手动 data-card-key 检查
             window.Game.UI.safeRender(cardEl, htmlContent, renderName);
+
+            // 兼容 CSS: game_cards.css 依赖 [data-card-key='CardBack'] 选择器来显示牌背
+            // 因此必须同步 data-card-key 属性
+            if (cardEl.getAttribute('data-card-key') !== renderName) {
+                cardEl.setAttribute('data-card-key', renderName);
+            }
 
             // 总是更新交互元数据 (例如 index 可能变化)
             // 注意：依赖 initDrag 的实现能够处理重复调用 (例如覆盖 ondragstart 属性而非不断 addEventListener)

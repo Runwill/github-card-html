@@ -81,6 +81,7 @@
 
             // --- 鲁棒的视觉收敛 ---
             const targetRect = placeholder.getBoundingClientRect();
+
             const currentRect = el.getBoundingClientRect();
             
             const deltaX = targetRect.left - currentRect.left;

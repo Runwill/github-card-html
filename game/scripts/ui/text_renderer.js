@@ -73,12 +73,19 @@
 
         /**
          * 将文本挂载到容器中。
-         * 这会触发 term.js 中的 MutationObserver
+         * 代理给 window.Game.UI.safeRender 以确保安全性
          */
         mount(container, key, data = {}) {
             if (!container) return;
             const html = this.render(key, data);
-            container.innerHTML = html;
+            
+            // Generate a simple key based on content if none exists
+            // Or just rely on content diffing in safeRender
+            if (window.Game.UI && window.Game.UI.safeRender) {
+                window.Game.UI.safeRender(container, html);
+            } else {
+                container.innerHTML = html;
+            }
         },
 
         /**

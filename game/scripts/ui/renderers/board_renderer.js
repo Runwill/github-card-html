@@ -117,7 +117,7 @@
                 if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
 
                 const currentCards = wrapper._inspectorCards || [];
-                const isDeck = wrapper.classList.contains('deck-slot');
+                const isDeck = wrapper.querySelector('#header-pile') != null; // 简单判断，或者检查容器 ID
                 const title = isDeck ? 'Deck' : 'Discard Pile';
                 const sourceId = isDeck ? 'pile' : 'discardPile'; // Map to GameState keys
                 

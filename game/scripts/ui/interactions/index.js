@@ -66,10 +66,12 @@
     }
 
     function initDrag(cardElement, cardData, sourceAreaName, sourceIndex = -1) {
+        // console.log('[Interactions] initDrag called for', cardData);
         cardElement.classList.add('draggable-item');
         cardElement.onpointerdown = (e) => handlePointerDown(e, cardElement, cardData, sourceAreaName, sourceIndex);
         cardElement.ondragstart = () => false;
         cardElement.oncontextmenu = (e) => {
+             // console.log('[Interactions] oncontextmenu triggered');
              if(DragState.isDragging) {
                  e.preventDefault();
                  return;
@@ -77,6 +79,8 @@
              if (window.Game.UI.showCardContextMenu) {
                  e.preventDefault();
                  window.Game.UI.showCardContextMenu(e.clientX, e.clientY, cardData, sourceAreaName, cardElement);
+             } else {
+                 console.error('[Interactions] showCardContextMenu not found');
              }
         };
     }
@@ -191,13 +195,13 @@
         
         if (dropZone && window.Game.UI.DragSorting) {
              const acceptPlaceholder = dropZone.getAttribute('data-accept-placeholder') !== 'false';
-             
+
              if (acceptPlaceholder) {
                  window.Game.UI.DragSorting.updatePlaceholderPosition(dropZone, targetEl, e.clientX, e.clientY);
-             } 
+             }
              else if (DragState.placeholderElement) {
                  if (DragState.placeholderElement.parentNode !== dropZone) {
-                     window.Game.UI.DragSorting.performPlaceholderMove(dropZone, null, true); 
+                     window.Game.UI.DragSorting.performPlaceholderMove(dropZone, null, true);
                  }
              }
         }
