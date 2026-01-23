@@ -17,7 +17,14 @@
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 2px 5px var(--shadow-1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    
+    /* Expanded Transition for Flip Effect */
+    transition: 
+        transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+        box-shadow 0.2s,
+        background 0.3s,
+        color 0.3s;
+        
     font-size: 0.9rem;
     color: var(--text);
     font-weight: 500;
@@ -26,12 +33,38 @@
     touch-action: none;
     text-align: center;
     padding: 4px;
+    
+    /* Essential for ::before layering */
+    overflow: hidden; 
+}
+
+/* Image Layer Base (Ready to fade in) */
+.card-placeholder::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    
+    /* Configured but hidden */
+    background-image: url('../../source/三兔.png');
+    background-size: 60%;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+    z-index: 0; 
+    pointer-events: none;
+    opacity: 0; /* Hidden by default */
+    transform: scale(0.8); /* Slight zoom in effect validation */
+    
+    transition: 
+        filter 0.3s ease, 
+        opacity 0.3s ease,
+        transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .card-placeholder:hover {
-    box-shadow: 0 8px 15px var(--shadow-2);
-    z-index: 1;
-    border-color: var(--primary-1);
+    box-shadow: 0 8px 15px var(--shadow-2) !important;
+    z-index: 10;
+    border-color: var(--primary-1) !important;
 }
 
 .card-placeholder.press-active {
@@ -48,9 +81,8 @@
 
 /* Card Back Styling */
 .card-placeholder[data-card-key='CardBack'] {
-    /* Set explicit background color to prevent transparency issues */
-    background-color: var(--surface) !important;
-    background-image: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%) !important;
+    /* Keep base background color for the card body */
+    background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%) !important;
     
     /* Remove direct background image to allow independent filtering via pseudo-element */
     /* background-image: none !important;  <-- REMOVED: This was clearing the gradient */
@@ -59,8 +91,8 @@
     color: transparent !important;
     text-shadow: none !important;
 
-    /* Match normal card border */
-    border: 1px solid var(--border) !important;
+    /* Match normal card border - Removed specific rule to allow hover overwrite */
+    /* border: 1px solid var(--border) !important; */
     
     /* Ensure no extra gradient overrides */
     box-shadow: 0 2px 5px var(--shadow-1);
@@ -80,19 +112,11 @@
    without inverting the card's border or background color.
 */
 .card-placeholder[data-card-key='CardBack']::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    opacity: 1; /* Show image */
+    transform: scale(1);
     
-    background-image: url('../../source/三兔.png');
-    background-size: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    
-    z-index: 0; 
-    pointer-events: none;
-    
-    transition: filter 0.3s ease, opacity 0.3s ease;
+    /* Inherit base styles from generic .card-placeholder::before */
+    /* content, pos, bg-image etc are already defined there */
 }
 
 /* Dark Mode: Filter ONLY the image layer */

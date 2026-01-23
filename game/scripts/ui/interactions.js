@@ -370,8 +370,41 @@
                             logDragDebug('Triggering Animation (Event Executed)');
                             if (useRemoteAnimation) {
                                 if (placeholder) placeholder.remove(); 
-                                isAnimationFinished = true; // 视为本地动画阶段立即完成
-                                checkFinish();
+
+                                // [Enhanced Drop Animation]
+                                // Attempt to find the "real" resulting element in the target zone after UI update.
+                                let newTargetEl = null;
+                                const zone = document.querySelector(`[data-drop-zone="${targetZoneId}"]`);
+                                
+                                if (zone) {
+                                    const cardChildren = Array.from(zone.children).filter(c => c.classList.contains('card-placeholder'));
+                                    if (cardChildren.length > 0) {
+                                        // If we had a specific index, try to respect it (though it might be -1 for piles)
+                                        if (targetIndex >= 0 && targetIndex < cardChildren.length) {
+                                             newTargetEl = cardChildren[targetIndex];
+                                        } else {
+                                             // Default to the last element (most common for Deck/Discard Pile additions)
+                                             newTargetEl = cardChildren[cardChildren.length - 1];
+                                        }
+                                    }
+                                }
+
+                                if (newTargetEl && window.Game.UI.DragAnimation) {
+                                    // Animate the ghost to merge with the new UI element.
+                                    // We hide the target temporarily to avoid seeing "double" during the fly-in.
+                                    newTargetEl.style.visibility = 'hidden';
+                                    
+                                    // The animation module will now also sync 'data-card-key' to trigger the flip effect.
+                                    window.Game.UI.DragAnimation.animateDropToPlaceholder(el, newTargetEl, () => {
+                                        isAnimationFinished = true;
+                                        checkFinish();
+                                    });
+                                } else {
+                                    // Fallback if target not found or animation missing
+                                    if (el) el.remove();
+                                    isAnimationFinished = true; 
+                                    checkFinish();
+                                }
                             } else {
                                 playDropAnimation();
                             }

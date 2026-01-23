@@ -49,6 +49,23 @@
         const DragState = UI.DragState;
         const DRAG_CONFIG = UI.DragConfig;
 
+        // --- Feature: Sync Visual State for Flip Animation ---
+        // If the target (placeholder) has a different state (e.g. CardBack),
+        // we apply it to the dragging ghost to trigger CSS transitions (flip/fade).
+        if (placeholder && el) {
+            const targetKey = placeholder.getAttribute('data-card-key');
+            const currentKey = el.getAttribute('data-card-key');
+            
+            if (targetKey && currentKey !== targetKey) {
+                // Determine if we need to force a flip style
+                el.setAttribute('data-card-key', targetKey);
+                
+                // Optional: visual enhancement for flip
+                // We could add a 'flipping' class if we wanted 3D rotate, 
+                // but for now relying on CSS background/opacity transitions.
+            }
+        }
+
         let cssX, cssY;
         
         const styleTransform = el.style.transform || '';

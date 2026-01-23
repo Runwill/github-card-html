@@ -132,13 +132,21 @@
                 e.stopPropagation();
 
                 const currentCards = wrapper._inspectorCards || [];
+                // Retrieve the bound forceBack state
+                const currentForceBack = wrapper._inspectorForceBack;
+
                 const isDeck = wrapper.querySelector('#header-pile') != null; // 简单判断，或者检查容器 ID
                 const title = isDeck ? 'Deck' : 'Discard Pile';
                 const sourceId = isDeck ? 'pile' : 'discardPile'; // Map to GameState keys
                 
-                if (window.Game.UI.openCardViewer) {
-                    // Removed forceBack parameter
-                    window.Game.UI.openCardViewer(title, currentCards, sourceId);
+                if (window.Game.UI.toggleCardViewer) {
+                    window.Game.UI.toggleCardViewer(title, currentCards, sourceId, {
+                        forceFaceDown: currentForceBack 
+                    });
+                } else if (window.Game.UI.openCardViewer) {
+                    window.Game.UI.openCardViewer(title, currentCards, sourceId, {
+                        forceFaceDown: currentForceBack 
+                    });
                 } else {
                     console.warn("Game.UI.openCardViewer not ready");
                 }

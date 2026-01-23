@@ -75,8 +75,16 @@
         });
     };
 
+    window.Game.UI.toggleCardViewer = function(title, cards, sourceId, options = {}) {
+        if (window.Game.UI.viewers[sourceId]) {
+            window.Game.UI.viewers[sourceId].cleanup();
+        } else {
+            window.Game.UI.openCardViewer(title, cards, sourceId, options);
+        }
+    };
+
     // --- Card Viewer Modal Logic ---
-    window.Game.UI.openCardViewer = function(title, cards, sourceId) {
+    window.Game.UI.openCardViewer = function(title, cards, sourceId, options = {}) {
         // 1. Check if already open
         if (window.Game.UI.viewers[sourceId]) {
             const v = window.Game.UI.viewers[sourceId];
@@ -137,10 +145,12 @@
 
         // Cards
         if (window.Game.UI.renderCardList && sourceId) {
-             window.Game.UI.renderCardList(grid.id, cards, sourceId, { 
+             const renderOptions = { 
                 skipLayout: true, 
-                showIndex: true   
-            });
+                showIndex: true,
+                forceFaceDown: options.forceFaceDown // Pass through forceFaceDown
+             };
+             window.Game.UI.renderCardList(grid.id, cards, sourceId, renderOptions);
         } else {
             // Fallback
             grid.innerHTML = '';
