@@ -22,8 +22,9 @@
 .card-viewer-modal .modal-content {
     /* Stability Fix: Use explicit width instead of fit-content to prevent 
        overflow scrolling on the viewport when card lists are huge. */
-    width: 90vw; 
-    max-width: 1200px; /* Optional cap for very large screens */
+    width: fit-content; /* Changed from 90vw to fit-content to allow shrinking */
+    min-width: 140px; /* Minimum width to fit at least one card + padding */
+    max-width: 90vw; /* Cap at 90vw */
     
     /* height: 80vh;  <-- Removed fixed height */
     max-height: 80vh;

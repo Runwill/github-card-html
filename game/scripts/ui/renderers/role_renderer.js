@@ -3,6 +3,63 @@
     window.Game.UI = window.Game.UI || {};
 
     /**
+     * 设置手牌检视器 (Hand Inspector)
+     * 类似 PileInspector，允许点击角色头像/摘要查看其手牌
+     */
+    function setupHandInspector(element, role) {
+        if (!element || !role) return;
+
+        // Cleanup legacy if any
+        // ...
+
+        // update data
+        element._inspectorRole = role;
+
+        if (!element.hasAttribute('data-hand-inspector-bound')) {
+            element.setAttribute('data-hand-inspector-bound', 'true');
+            element.style.cursor = 'pointer';
+
+            element.addEventListener('click', (e) => {
+                // Dragging check
+                if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
+                
+                e.stopPropagation();
+
+                const currentRole = element._inspectorRole;
+                if (!currentRole || !currentRole.hand) return;
+
+                // Determine Mode for Visibility
+                const gs = window.Game.GameState;
+                const isManual = (gs && (gs.mode === 'manual' || gs.mode === 'sandbox'));
+                
+                // Self check
+                const isSelf = (gs && gs.players && gs.players[gs.currentPlayerIndex] === currentRole);
+
+                // Default: Face Down for enemies, Face Up for self
+                // In Manual Mode: Always Face Up
+                let forceBack = !isSelf;
+                if (isManual) forceBack = false;
+
+                const title = `${currentRole.name} 的手牌`;
+                const sourceId = `role:${currentRole.id}`;
+                
+                // 确保手牌是数组
+                const cards = currentRole.hand.cards || [];
+
+                if (window.Game.UI.toggleCardViewer) {
+                    window.Game.UI.toggleCardViewer(title, cards, sourceId, {
+                        forceFaceDown: forceBack 
+                    });
+                } else if (window.Game.UI.openCardViewer) {
+                    window.Game.UI.openCardViewer(title, cards, sourceId, {
+                        forceFaceDown: forceBack 
+                    });
+                }
+            });
+        }
+    }
+
+    /**
      * 解析头像图片路径的辅助函数
      * @deprecated 具体的路径推导逻辑已移至 Game.Models.Player 类中。
      * 这里仅保留作为简单的访问器。
@@ -38,6 +95,9 @@
             }
              // Ensure ID is correct
             currentPanel.setAttribute('data-role-id', selfRole.id);
+            
+            // Attach Hand Inspector Click
+            setupHandInspector(currentPanel, selfRole);
         }
         // 头像 (Avatar) - Main View
         const mainAvatarImg = document.getElementById('char-img');
@@ -328,6 +388,9 @@
                     pEl.classList.add('role-moving');
                 }
             }
+            
+            // Attach Hand Inspector Click (Updates data reference)
+            setupHandInspector(pEl, role);
             
             // 激活状态 (当前回合角色)
             

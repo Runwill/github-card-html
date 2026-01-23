@@ -134,8 +134,12 @@
         // 3. Populate Content
         // ... (rest of function) ...
         const modalBody = modal.querySelector('.modal-body');
-        const watermarkEl = modal.querySelector(`#card-viewer-watermark-${sourceId}`);
-        const grid = modal.querySelector(`#card-viewer-grid-${sourceId}`);
+
+        // Fix: Escape querySelector string for ID containing colons (e.g. role:3)
+        // CSS.escape() is standard, but simple manual escape for colon is safer for selector syntax.
+        // Or simply getElementById which doesn't require escaping
+        const watermarkEl = document.getElementById(`card-viewer-watermark-${sourceId}`);
+        const grid = document.getElementById(`card-viewer-grid-${sourceId}`);
         const scrollTarget = grid;
 
         // Watermark
@@ -340,8 +344,11 @@
              } else if (sourceId === 'treatmentArea') {
                  cards = (GameState.treatmentArea && GameState.treatmentArea.cards) ? GameState.treatmentArea.cards : [];
              } else if (sourceId.startsWith('role:')) {
-                 // role: hand? Not supported yet?
-                 // Assuming pile/discard for now.
+                 const roleId = parseInt(sourceId.split(':')[1]);
+                 const player = GameState.players.find(p => p.id === roleId);
+                 if (player && player.hand) {
+                     cards = player.hand.cards;
+                 }
              }
 
              if (window.Game.UI.renderCardList) {
