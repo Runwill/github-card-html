@@ -181,6 +181,12 @@
         if (window.Game.UI.updateControls) {
             window.Game.UI.updateControls(GameState);
         }
+
+        // 7. 更新所有打开的详情窗口 (Inspect Viewers)
+        // 这一步确保拖拽等操作后，窗口内容实时同步
+        if (window.Game.UI.updateAllViewers) {
+            window.Game.UI.updateAllViewers();
+        }
     }
 
     // 导出

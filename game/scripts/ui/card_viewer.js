@@ -313,9 +313,47 @@
         // Store
         window.Game.UI.viewers[sourceId] = {
             modal: modal,
+            title: title,
+            sourceId: sourceId,
+            options: options, // Save options for re-render
             cleanup: cleanupAndClose,
             openedAt: Date.now() // Track for click-safety
         };
+    };
+
+    // Update function to be called by main loop
+    window.Game.UI.updateAllViewers = function() {
+        if (!window.Game.Core || !window.Game.Core.GameState) return;
+        const GameState = window.Game.Core.GameState;
+
+        Object.values(window.Game.UI.viewers).forEach(viewer => {
+             const { sourceId, modal, options } = viewer;
+             const grid = modal.querySelector('.card-grid');
+             if (!grid) return;
+
+             // Resolve Data Source
+             let cards = [];
+             if (sourceId === 'pile') {
+                 cards = (GameState.pile && GameState.pile.cards) ? GameState.pile.cards : [];
+             } else if (sourceId === 'discardPile') {
+                 cards = (GameState.discardPile && GameState.discardPile.cards) ? GameState.discardPile.cards : [];
+             } else if (sourceId === 'treatmentArea') {
+                 cards = (GameState.treatmentArea && GameState.treatmentArea.cards) ? GameState.treatmentArea.cards : [];
+             } else if (sourceId.startsWith('role:')) {
+                 // role: hand? Not supported yet?
+                 // Assuming pile/discard for now.
+             }
+
+             if (window.Game.UI.renderCardList) {
+                 const renderOptions = { 
+                    skipLayout: true, 
+                    showIndex: true,
+                    forceFaceDown: options.forceFaceDown
+                 };
+                 // This will perform Diffing/Dom updates
+                 window.Game.UI.renderCardList(grid.id, cards, sourceId, renderOptions);
+             }
+        });
     };
 
 })();

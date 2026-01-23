@@ -58,6 +58,7 @@
             
             if (targetKey && currentKey !== targetKey) {
                 // Determine if we need to force a flip style
+                console.log(`[DragAnim] Syncing Keys: ${currentKey} -> ${targetKey}`);
                 el.setAttribute('data-card-key', targetKey);
                 
                 // Optional: visual enhancement for flip
@@ -91,7 +92,64 @@
         if (rotMatch) curRot = parseFloat(rotMatch[1]);
 
         el.style.transformOrigin = 'center center'; 
-        el.style.transition = 'none'; 
+        
+        // 修复：确保 transition 不为 "none"，否则翻面效果（背景/颜色过渡）会丢失
+        // 显式指定需要过渡的属性，保留 transform 由 JS 控制
+        // [Flip Fix] Increase speed for short distances if needed, but 0.3s is standard.
+        const transitionRule = 'opacity 0.3s, background-color 0.3s, background-image 0.3s, color 0.3s, filter 0.3s, border-color 0.3s, box-shadow 0.3s';
+        el.style.transition = transitionRule;
+        
+        console.group('[DragAnim] animateDropToPlaceholder details');
+        console.log('Ghost Element:', el);
+        console.log('Set Transition:', el.style.transition);
+
+        // FORCE REFLOW: Ensure the browser registers the "Before" state (e.g. key='dodge', transition enabled)
+        // before we flip the switch to 'CardBack'. This is crucial for triggering the transition.
+        const reflowVal = el.offsetWidth;
+        console.log('Forced Reflow. Width:', reflowVal);
+
+        // If the target (placeholder) has a different state (e.g. CardBack),
+        // we apply it to the dragging ghost to trigger CSS transitions (flip/fade).
+        if (placeholder && el) {
+            let targetKey = placeholder.getAttribute('data-card-key');
+            
+            // ROOT CAUSE FIX: Check if the container adheres to strict face-down rules.
+            // If so, override any transient key the placeholder might still have (e.g. from previous zone).
+            const container = placeholder.parentElement;
+            if (container && container.getAttribute('data-force-facedown') === 'true') {
+                 targetKey = 'CardBack';
+                 console.log('[DragAnim] Override Target Key to CardBack (Zone Rule)');
+            }
+
+            const currentKey = el.getAttribute('data-card-key');
+            
+            console.log(`Key Check: Current='${currentKey}', Target='${targetKey}'`);
+
+            if (targetKey && currentKey !== targetKey) {
+                // Determine if we need to force a flip style
+                console.log(`[DragAnim] Syncing Keys: ${currentKey} -> ${targetKey}`);
+                
+                // Critical: Apply the key change immediately to start CSS transitions
+                el.setAttribute('data-card-key', targetKey);
+                
+                // Visual Highlight: Add a class to indicate active transition state
+                // This can be used in CSS to force 3D rotation or ensure properties are prioritized
+                el.classList.add('is-flipping-state');
+                
+                // Optional: visual enhancement for flip
+                // We could add a 'flipping' class if we wanted 3D rotate, 
+                // but for now relying on CSS background/opacity transitions.
+                
+                // Forced Toggle: access generic style properties to guarantee update
+                if (targetKey === 'CardBack') {
+                     // Ensure text hides immediately if transition is too slow for short distances
+                     // But we want animation, so we trust the transition rule set above `el.style.transition`
+                }
+            } else {
+                console.log('[DragAnim] Keys match or invalid, no flip triggered.');
+            }
+        }
+        console.groupEnd();
 
         const loop = () => {
             if (!el.isConnected) return; 

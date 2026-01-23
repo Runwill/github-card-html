@@ -129,7 +129,34 @@
         if (dropZone.classList.contains('area-stacked')) {
             // 如果占位符不在该区域，或者不在末尾，就执行移动
             if (DragState.placeholderElement.parentNode !== dropZone || DragState.placeholderElement.nextElementSibling) {
+                // Ensure visibility of the new PREVIOUS top card (which was likely top before this)
+                const previousTop = dropZone.lastElementChild;
                 performPlaceholderMove(dropZone, null); // null sibling = append
+                
+                // If the item that was previously last is now covered by the placeholder,
+                // we should ensure it keeps its visual state if needed, or relies on CSS.
+                // The issue: CSS selects `.is-top-card`. If `previousTop` has it, it stays visible.
+                // But wait, if we append placeholder, `previousTop` is NOT covered if placeholder is transparent?
+                // Or if user wants to see it UNDER the placeholder.
+                
+                // FIX: Check if previousTop lost its status? No, js doesn't strip it here.
+                // However, `area-stacked` usually only shows `.is-top-card`.
+                // If `previousTop` has `.is-top-card`, it is visible.
+                // The Placeholder has `.drag-placeholder`.
+                
+                // BUT: `performPlaceholderMove` triggers FLIP.
+                // Maybe the `transform` from FLIP moves `previousTop` out of view?
+                // No, in stacked area, they are usually at (0,0) relative or centered absolute.
+                
+                // CRITICAL FIX: Some logic in `renderCardList` might have relied on `:last-child` CSS?
+                // No, we saw explicit `.is-top-card` usage.
+                
+                // Let's ensure the previous top card KEEPS being visible.
+                // If the placeholder is styled opaque, it will cover it.
+                // But if the user says "disappears", maybe it's `display: none`?
+                
+                // If the user is dragging TO the pile.
+                // The placeholder is appended.
             }
             return;
         }

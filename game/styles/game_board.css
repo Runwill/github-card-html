@@ -160,9 +160,11 @@ body.is-global-dragging .treatment-container {
     z-index: 1;
 }
 
-/* Fix: Ensure drag placeholder is always visible so it has dimensions for FLIP */
+/* Fix: Ensure drag placeholder is always visible so it has dimensions for FLIP, 
+   BUT hidden visually so it doesn't occlude the stack's top card. */
 .area-stacked > .card-placeholder.drag-placeholder {
     display: flex !important;
+    visibility: hidden !important;
 }
 
 .area-stacked > .card-placeholder.is-top-card {

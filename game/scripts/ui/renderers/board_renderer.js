@@ -10,6 +10,13 @@
         
         const container = document.getElementById(containerId);
         if (container) {
+            // Mark the container if it enforces face-down cards (for Drag Animation Logic)
+            if (isFaceDown) {
+                container.setAttribute('data-force-facedown', 'true');
+            } else {
+                container.removeAttribute('data-force-facedown');
+            }
+
             container.classList.add('area-stacked');
             container.classList.remove('area-spread');
 
