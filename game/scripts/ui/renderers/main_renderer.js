@@ -211,14 +211,18 @@
         } else if (targetZoneId === 'treatmentArea') {
             targetArea = GameState.treatmentArea;
             moveRole = currentPlayer; 
-        } else if (targetZoneId && targetZoneId.startsWith('role:')) {
-            // 特殊处理：拖拽到角色摘要 -> 置入该角色手牌
+        } else if (targetZoneId && (targetZoneId.startsWith('role:') || targetZoneId.startsWith('role-judge:'))) {
+            // 统一处理角色相关区域 (手牌 role:ID 或 判定区 role-judge:ID)
+            const isJudge = targetZoneId.startsWith('role-judge:');
             const roleId = parseInt(targetZoneId.split(':')[1]);
             const targetPlayer = GameState.players.find(p => p.id === roleId);
+            
             if (targetPlayer) {
-                targetArea = targetPlayer.hand;
-                moveRole = currentPlayer; 
-                animationHint = targetZoneId; // 传递动画线索 (e.g. "role:1")
+                targetArea = isJudge ? targetPlayer.judgeArea : targetPlayer.hand;
+                if (targetArea) {
+                    moveRole = currentPlayer; 
+                    animationHint = targetZoneId; 
+                }
             }
         } else if (GameState[targetZoneId]) {
             // 尝试全局区域
@@ -236,6 +240,13 @@
                 sourceArea = currentPlayer.hand;
             } else if (sourceAreaName === 'treatmentArea') {
                 sourceArea = GameState.treatmentArea; 
+            } else if (sourceAreaName && (sourceAreaName.startsWith('role:') || sourceAreaName.startsWith('role-judge:'))) {
+                const isJudge = sourceAreaName.startsWith('role-judge:');
+                const roleId = parseInt(sourceAreaName.split(':')[1]);
+                const p = GameState.players.find(pl => pl.id === roleId);
+                if (p) {
+                    sourceArea = isJudge ? p.judgeArea : p.hand;
+                }
             } else if (GameState[sourceAreaName]) {
                 sourceArea = GameState[sourceAreaName];
             } else {

@@ -19,43 +19,113 @@
             element.setAttribute('data-hand-inspector-bound', 'true');
             element.style.cursor = 'pointer';
 
-            element.addEventListener('click', (e) => {
-                // Dragging check
-                if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
-                
-                e.stopPropagation();
+            // Long Press Logic using simple timeout
+            let pressTimer = null;
+            let isLongPress = false;
+            
+            const startPress = (e) => {
+                 // Check valid left click & no drag
+                 if (e.button !== 0) return;
+                 if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
+                 
+                 isLongPress = false;
+                 pressTimer = setTimeout(() => {
+                     isLongPress = true;
+                     openJudgeInspector();
+                 }, 800); // 800ms for long press
+            };
+            
+            const cancelPress = () => {
+                 if (pressTimer) clearTimeout(pressTimer);
+                 pressTimer = null;
+            };
 
+            const openAreaInspector = (areaType) => {
                 const currentRole = element._inspectorRole;
-                if (!currentRole || !currentRole.hand) return;
+                if (!currentRole) return;
 
-                // Determine Mode for Visibility
-                const gs = window.Game.GameState;
-                const isManual = (gs && (gs.mode === 'manual' || gs.mode === 'sandbox'));
+                const isJudge = (areaType === 'judge');
+                const areaKey = isJudge ? 'judgeArea' : 'hand';
                 
-                // Self check
-                const isSelf = (gs && gs.players && gs.players[gs.currentPlayerIndex] === currentRole);
+                if (!currentRole[areaKey]) return;
 
-                // Default: Face Down for enemies, Face Up for self
-                // In Manual Mode: Always Face Up
-                let forceBack = !isSelf;
-                if (isManual) forceBack = false;
+                // Visibility Details
+                let forceFaceDown = false;
+                if (!isJudge) {
+                    const gs = window.Game.GameState;
+                    const isManual = (gs && (gs.mode === 'manual' || gs.mode === 'sandbox'));
+                    const isSelf = (gs && gs.players && gs.players[gs.currentPlayerIndex] === currentRole);
+                    if (!isManual && !isSelf) forceFaceDown = true;
+                }
 
-                const title = `${currentRole.name} 的手牌`;
-                const sourceId = `role:${currentRole.id}`;
+                const titleSuffix = isJudge ? '判定区' : '手牌';
+                const title = `${currentRole.name} 的${titleSuffix}`;
+                const prefix = isJudge ? 'role-judge:' : 'role:';
+                const sourceId = `${prefix}${currentRole.id}`;
                 
-                // 确保手牌是数组
-                const cards = currentRole.hand.cards || [];
+                const cards = currentRole[areaKey].cards || [];
 
                 if (window.Game.UI.toggleCardViewer) {
-                    window.Game.UI.toggleCardViewer(title, cards, sourceId, {
-                        forceFaceDown: forceBack 
-                    });
+                    window.Game.UI.toggleCardViewer(title, cards, sourceId, { forceFaceDown });
                 } else if (window.Game.UI.openCardViewer) {
-                    window.Game.UI.openCardViewer(title, cards, sourceId, {
-                        forceFaceDown: forceBack 
-                    });
+                    window.Game.UI.openCardViewer(title, cards, sourceId, { forceFaceDown });
                 }
+            };
+
+            // Aliases for Event Handlers
+            const openJudgeInspector = () => openAreaInspector('judge');
+            const openHandInspector = () => openAreaInspector('hand');
+            
+            // Events
+            element.addEventListener('mousedown', startPress);
+            element.addEventListener('touchstart', startPress, {passive: true});
+
+            element.addEventListener('mouseup', (e) => {
+                cancelPress();
+                // We do NOT handle Short Click here anymore to avoid double-trigger with 'click' event.
+                // 'click' event will fire naturally after mouseup if it was a short press.
             });
+            element.addEventListener('touchend', (e) => {
+                cancelPress();
+                if (isLongPress) return;
+                 // Touch equivalence for click
+                 // Note: 'click' event usually fires after touchend, so we might need to prevent double trigger
+                 // But for simplicity, let's rely on 'click' unless we want pure touch handling.
+                 // Actually, mixed mouse/touch logic can be tricky.
+                 // Let's stick to mouseup for desktop and use click for everything if simpler, 
+                 // but long press requires separating down/up.
+                 
+                 // If we use 'click' listener for short press, we can just block it if isLongPress was true?
+            });
+            
+            // Fallback: If original logic was just 'click', we replace it.
+            // But we need to be careful not to break standard Click behavior (e.g. accessibility).
+            
+            // Robust Implementation:
+            // 1. mousedown/touchstart starts timer.
+            // 2. mouseup/touchend clears timer.
+            // 3. 'click' listener handles Short Press (Hand).
+            //    BUT we need to prevent 'click' if Long Press occurred.
+            
+            element.addEventListener('click', (e) => {
+                // If long press triggered, consume this click
+                if (isLongPress) {
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                    isLongPress = false; // Reset
+                    return;
+                }
+                
+                // Normal Click -> Open Hand
+                if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
+                e.stopPropagation();
+                openHandInspector();
+            });
+            
+            // Cancel on move/drag
+            element.addEventListener('mousemove', () => { /* Optional movement threshold check? Simplify for now */ });
+            element.addEventListener('mouseleave', cancelPress);
+            element.addEventListener('touchmove', cancelPress);
         }
     }
 

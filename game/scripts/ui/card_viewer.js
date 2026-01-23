@@ -343,11 +343,13 @@
                  cards = (GameState.discardPile && GameState.discardPile.cards) ? GameState.discardPile.cards : [];
              } else if (sourceId === 'treatmentArea') {
                  cards = (GameState.treatmentArea && GameState.treatmentArea.cards) ? GameState.treatmentArea.cards : [];
-             } else if (sourceId.startsWith('role:')) {
+             } else if (sourceId.startsWith('role:') || sourceId.startsWith('role-judge:')) {
+                 const isJudge = sourceId.startsWith('role-judge:');
                  const roleId = parseInt(sourceId.split(':')[1]);
                  const player = GameState.players.find(p => p.id === roleId);
-                 if (player && player.hand) {
-                     cards = player.hand.cards;
+                 if (player) {
+                     const area = isJudge ? player.judgeArea : player.hand;
+                     if (area && area.cards) cards = area.cards;
                  }
              }
 
