@@ -48,7 +48,7 @@
                     font-size: 12px;
                     font-family: Consolas, Monaco, monospace;
                     pointer-events: none;
-                    z-index: 10000;
+                    z-index: 20000;
                     display: none;
                     max-width: 600px;
                     max-height: 80vh;

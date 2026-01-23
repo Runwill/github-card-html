@@ -294,6 +294,38 @@
         return null;
     };
 
+    // 辅助函数：解析区域标识符为对象 (支持 Manual Mode 直接拖拽)
+    const resolveArea = (identifier) => {
+        if (!identifier) return null;
+        if (typeof identifier === 'object') return identifier; 
+
+        const gs = window.Game.GameState;
+        if (!gs) return null;
+
+        // 1. 检查全局区域 Key (pile, discardPile, treatmentArea等)
+        if (gs[identifier]) return gs[identifier];
+
+        // 2. 检查特定 Player 关联
+        // 'hand' -> 当前玩家手牌 (Pending: 具体指哪个 ID? 默认主视角)
+        // 手动模式下通常认为操作者是主视角玩家 (UI底部)
+        if (identifier === 'hand') {
+            const p = gs.players && (gs.players[gs.currentPlayerIndex || 0] || gs.players[0]);
+            return p ? p.hand : null;
+        }
+
+        // 'role:X' -> 玩家 X 手牌 (拖拽到头像)
+        if (typeof identifier === 'string' && identifier.startsWith('role:')) {
+            const roleId = parseInt(identifier.split(':')[1]);
+            const p = gs.players.find(pl => pl.id === roleId);
+            return p ? p.hand : null; // 默认给手牌
+        }
+
+        // 'hand-0', 'equip-1' 等
+        // ... (将来若有需要在此扩展)
+
+        return null;
+    };
+
     // UI 动作的统一调度方法
     function dispatch(actionType, payload) {
         // --- 动作链 ---
@@ -337,20 +369,31 @@
             if (currentEngine) {
                 if (actionType === 'move') {
                     // payload: { card, toArea, position, fromArea, fromIndex, callbacks, element }
-                    currentEngine.moveCard(payload.card, payload.toArea, payload.position - 1); 
                     
-                    // 触发 UI 回调
-                    if (payload.callbacks) {
-                        if (typeof payload.callbacks.onMoveExecuted === 'function') {
-                            payload.callbacks.onMoveExecuted();
+                    // 解析目标区域，确保它是 Area 对象
+                    const targetArea = resolveArea(payload.toArea);
+
+                    // 确保源区域被传递，以支持那些还没有 lyingArea 属性的新生卡牌 (如从 Pile 中拖出)
+                    const sourceArea = payload.fromArea || resolveArea(payload.fromArea);
+
+                    if (targetArea) {
+                        currentEngine.moveCard(payload.card, targetArea, payload.position - 1, sourceArea); 
+                        
+                        // 触发 UI 回调
+                        if (payload.callbacks) {
+                            if (typeof payload.callbacks.onMoveExecuted === 'function') {
+                                payload.callbacks.onMoveExecuted();
+                            }
+                            setTimeout(() => {
+                               if (typeof payload.callbacks.onComplete === 'function') payload.callbacks.onComplete();
+                            }, 50); 
                         }
-                        setTimeout(() => {
-                           if (typeof payload.callbacks.onComplete === 'function') payload.callbacks.onComplete();
-                        }, 50); 
+                        
+                        // 触发动画
+                        triggerAnimation();
+                    } else {
+                        console.warn("[Controller] Manual Move Skipped: Invalid target area", payload.toArea);
                     }
-                    
-                    // 触发动画
-                    triggerAnimation();
                 } else if (actionType === 'modifyHealth') {
                     // payload: { roleId, delta }
                     if (currentEngine.modifyHealth) {

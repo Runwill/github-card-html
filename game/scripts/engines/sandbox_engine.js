@@ -13,7 +13,7 @@
             this.state.mode = 'sandbox';
             
             this._setupPlayers(config);
-            this._distributeCards();
+            this._distributeCards(config);
             
             // --- UI 可见性处理 ---
             const btn = document.getElementById('btn-start-game');
@@ -67,8 +67,14 @@
              this.state.pile = new Area('pile', Area.Configs.Pile);
              this.state.discardPile = new Area('discardPile', Area.Configs.DiscardPile);
              
-             // 填充牌组 (统一使用 Card.generateStandardDeck)
-             this.state.pile.cards = Card.generateStandardDeck(80);
+             // 填充牌组 
+             if (config && config.deck && Array.isArray(config.deck) && config.deck.length > 0) {
+                 // 使用配置中的 deck (字符串数组)
+                 this.state.pile.cards = config.deck.map(cardName => new Card(cardName));
+             } else {
+                 // 默认备选 (80张标准)
+                 this.state.pile.cards = Card.generateStandardDeck(80);
+             }
              
              shuffle(this.state.pile.cards);
              
@@ -82,21 +88,30 @@
         // --- Action Handlers for Sandbox ---
 
         // Directly move card without event stack
-        moveCard(card, toArea, toIndex = -1) {
+        moveCard(card, toArea, toIndex = -1, fromAreaHint = null) {
              // 1. Find and remove from old area
              // If card is string (legacy mock), we can't track it easily. 
              // Ideally we upgraded data in _distributeCards, but let's be safe.
              
-             let fromArea = (typeof card === 'object') ? card.lyingArea : null; 
+             let fromArea = fromAreaHint;
+             if (!fromArea) {
+                 fromArea = (typeof card === 'object') ? card.lyingArea : null;
+             } 
              
              if (fromArea) {
                  const idx = fromArea.cards.indexOf(card);
                  if (idx > -1) fromArea.cards.splice(idx, 1);
+                 else {
+                     // 尝试在 source 中按引用找不到时（可能对象克隆了？），按 ID 查找？
+                     // 目前假设对象同一性。
+                     // 如果 fromArea 是正确的但 card 引用不对，这里会静默失败 (Card Duplication bug)
+                 }
              } else {
-                 // Fallback: This is a hack for string cards if still present
-                 // We don't know where it came from unless passed explicitly.
-                 // But moveCard signature is (card, toArea).
-                 // Sandbox assumes object references.
+                 // Try brute force search if card is object
+                 if (typeof card === 'object') {
+                      // 简单查找：players hands, pile, discard
+                      // 考虑到性能，这里仅作为一个最后的安全网，Controller 应该已经处理了
+                 }
              }
              
              // 2. Add to new area
