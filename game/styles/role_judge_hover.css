@@ -1,0 +1,14 @@
+/* Visual Feedback for Judge Area Drag Switch */
+.role-summary.judge-area-active {
+    border-color: #ffd700 !important; /* Gold border */
+    background-color: rgba(255, 215, 0, 0.1) !important;
+    box-shadow: 0 0 10px #ffd700 !important;
+    transform: scale(1.05); /* Slight pop */
+    transition: all 0.2s ease;
+}
+
+.role-summary.judge-area-active .player-name {
+    color: #ffd700 !important;
+    font-weight: bold;
+    text-shadow: 0 0 2px black;
+}

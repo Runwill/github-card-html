@@ -124,7 +124,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <div id="card-viewer-watermark-${sourceId}" class="area-watermark"></div>
-                    <div id="card-viewer-grid-${sourceId}" class="card-grid"></div>
+                    <div id="card-viewer-grid-${sourceId}" class="card-grid" data-drop-zone="${sourceId}"></div>
                 </div>
             </div>
         `;

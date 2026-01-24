@@ -61,9 +61,9 @@
         if (!startRect || !window.Game.UI) return;
         
         // -------------------------------------------------------------
-        // 特殊路径：如果指定了动画目标提示（Role Summary）
+        // 特殊路径：如果指定了动画目标提示（Role Summary 或 Judge Area）
         // -------------------------------------------------------------
-        if (animationHint && animationHint.startsWith('role:')) {
+        if (animationHint && (animationHint.startsWith('role:') || animationHint.startsWith('role-judge:'))) {
             const container = document.querySelector(`[data-drop-zone="${animationHint}"]`);
             if (container) {
                 //重建飞行卡牌 (或直接使用传递的元素)
@@ -163,10 +163,15 @@
             
             // 核心修复：
             // 1. 使用 let 声明变量，防止污染全局
-            // 2. 增加 .cards-container 类限制，防止选中 Header（例如 #header-hand-area）或 Card 自身
+            // 2. 增加 .cards-container / .card-grid 类限制，防止选中 Header（例如 #header-hand-area）或 Card 自身
             //    原因：Project 中 role_renderer 给 Header 加了 data-area-name，card_renderer 给 card 也加了。
             //    querySelector 默认会选中 DOM 中靠前的 Header，导致动画目标错误。
-            let container = document.querySelector(`.cards-container[data-area-name="${areaName}"], .cards-container[data-drop-zone="${areaName}"]`);
+            //    同时支持 Card Viewer 的 .card-grid
+            let container = document.querySelector(`
+                .cards-container[data-area-name="${areaName}"], 
+                .cards-container[data-drop-zone="${areaName}"],
+                .card-grid[data-drop-zone="${areaName}"]
+            `);
 
             if (!container) {
                  // Fallback：如果没有 .cards-container 类，尝试 ID 规则（兼容旧布局）
@@ -314,10 +319,14 @@
         }
 
         // 'role:X' -> 玩家 X 手牌 (拖拽到头像)
-        if (typeof identifier === 'string' && identifier.startsWith('role:')) {
+        // 'role-judge:X' -> 玩家 X 判定区
+        if (typeof identifier === 'string' && (identifier.startsWith('role:') || identifier.startsWith('role-judge:'))) {
+            const isJudge = identifier.startsWith('role-judge:');
             const roleId = parseInt(identifier.split(':')[1]);
             const p = gs.players.find(pl => pl.id === roleId);
-            return p ? p.hand : null; // 默认给手牌
+            if (p) {
+                return isJudge ? p.judgeArea : p.hand;
+            }
         }
 
         // 'hand-0', 'equip-1' 等

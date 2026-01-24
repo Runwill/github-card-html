@@ -32,7 +32,7 @@
                  pressTimer = setTimeout(() => {
                      isLongPress = true;
                      openJudgeInspector();
-                 }, 800); // 800ms for long press
+                 }, 400); // 400ms for long press
             };
             
             const cancelPress = () => {
@@ -399,6 +399,67 @@
                 // Drop Zone Config (Trigger Mode)
                 pEl.setAttribute('data-drop-zone', `role:${role.id}`); 
                 pEl.setAttribute('data-accept-placeholder', 'false'); // Do not accept physical card insertion
+
+                // -----------------------------------------------------------------
+                // Feature: Drag Long Hover -> Switch to Judge Area
+                // -----------------------------------------------------------------
+                let dragHoverTimer = null;
+                const originalZoneId = `role:${role.id}`;
+                const judgeZoneId = `role-judge:${role.id}`;
+
+                const clearHoverTimer = () => {
+                    if (dragHoverTimer) {
+                        clearTimeout(dragHoverTimer);
+                        dragHoverTimer = null;
+                    }
+                    // Restore original zone if needed (optional: reset immediately on leave? 
+                    // or keep it until drop? usually reset on leave is safer for UI consistency)
+                    if (pEl.getAttribute('data-drop-zone') === judgeZoneId) {
+                         pEl.setAttribute('data-drop-zone', originalZoneId);
+                         pEl.classList.remove('judge-area-active'); // Optional visual class
+                         // Restore tooltip or name if changed
+                         const nameEl = pEl.querySelector('.player-name');
+                         if (nameEl && nameEl._origName) {
+                             nameEl.innerText = nameEl._origName;
+                             delete nameEl._origName;
+                         }
+                    }
+                };
+
+                // Native Drag Events (if using native D&D)
+                // Note: The custom interactions.js might use mousemove/touchmove simulating drag.
+                // We'll try native events first as they often bubble up from `interactions.js` logic or work in parallel.
+                // If the system uses custom pointer events for drag, we might need to attach to those or rely on CSS :hover state detection in JS loop.
+                // Assuming standard DOM events for now or that interactions.js fires them.
+                
+                // Workaround: interactions.js likely uses pointer events and `elementFromPoint`.
+                // It might NOT fire native `dragenter`.
+                // However, let's try standard mouse events which might still fire if pointer-events aren't none on drag object (they often are none).
+                
+                // Let's bind 'mouseenter' and check global DragState
+                pEl.addEventListener('mouseenter', () => {
+                    const dragState = window.Game.UI.DragState; // Assuming typical location
+                    if (!dragState || !dragState.isDragging) return;
+
+                    clearHoverTimer();
+                    dragHoverTimer = setTimeout(() => {
+                        // Switch to Judge Area
+                        pEl.setAttribute('data-drop-zone', judgeZoneId);
+                        pEl.classList.add('judge-area-active');
+                        
+                        // Visual Feedback: Temporarily change name
+                        const nameEl = pEl.querySelector('.player-name');
+                        if (nameEl) {
+                            nameEl._origName = nameEl.innerText;
+                            nameEl.innerText = "判定区";
+                        }
+                    }, 400); // 400ms hover
+                });
+
+                pEl.addEventListener('mouseleave', clearHoverTimer);
+                pEl.addEventListener('mouseup', clearHoverTimer); // Drop happens on mouseup
+                
+                // -----------------------------------------------------------------
                 
                 // Avatar
                 // Use .char-avatar container to reuse Main View styles from game.css
