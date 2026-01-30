@@ -213,4 +213,38 @@
     margin: 0;
     flex-shrink: 0; 
 }
+
+/* Watermark Tweaks for Detailed Viewer */
+.card-viewer-modal .area-watermark {
+    opacity: 1 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    top: 50%; /* Reverted to 50% for standard centering */
+}
+
+.card-viewer-modal .watermark-owner {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+    opacity: 0.1; /* 调低不透明度，使其接近区域水印的深浅 (此前为 0.4) */
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+    /* text-shadow: 0 1px 2px var(--shadow-1); */ /* 移除阴影以保持扁平淡化 */
+}
+
+/* 强制内部标签（如角色名）继承颜色，覆盖原本的势力色 */
+.card-viewer-modal .watermark-owner * {
+    color: inherit !important;
+}
+
+.card-viewer-modal .watermark-area {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--text);
+    opacity: 0.08;
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+}
 /* ... rest unchanged */

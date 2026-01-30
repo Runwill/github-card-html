@@ -5,7 +5,10 @@ function replace_card_name(path, paragraphs = document){
     // 优化：仅针对 TagName 匹配 (去除类名支持以提升性能)
     const cardMap = new Map();
     card.forEach((info, index) => {
-       if (info.en) cardMap.set(info.en.toUpperCase(), { ...info, index });
+       if (info.en) {
+           const upperKey = info.en.toUpperCase();
+           cardMap.set(upperKey, { ...info, index });
+       }
     });
     
     const dataKey = 'cardProcessed';

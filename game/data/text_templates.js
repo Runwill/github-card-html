@@ -35,8 +35,15 @@
         'judgeArea': '<judgeArea></judgeArea>',
         'treatmentArea': '<treatmentArea></treatmentArea>',
         'discardPile': '<discardPile></discardPile>',
-        'drawPile': '<drawPile></drawPile>',
+        // 修正：将 drawPile 映射到实际存在的术语标签 <pile>
+        'drawPile': '<pile></pile>',
+        'pile': '<pile></pile>',
 
+        // 卡牌 (Standard Cards, Hardcoded based on panel_card.html)
+        'attack': '<attack></attack>',
+        'dodge': '<dodge></dodge>',
+        'deliver': '<deliver></deliver>',
+        
         // Game 时机
         'beforeGameStart': '<beforeGameStart></beforeGameStart>',
         'whenGameStart': '<whenGameStart></whenGameStart>',

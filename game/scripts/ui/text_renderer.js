@@ -68,7 +68,12 @@
             // 转换为小驼峰或帕斯卡命名法？
             // term.js 期望 TAG NAME 与 `en` 属性匹配（HTML 中通常不区分大小写，但 map 使用大写）
             // 如果键是 'Turn'，标签为 <Turn> 或 <turn>
-            return `<${key}></${key}>`;
+            // [用户请求移除 implicit fallback]
+            // return `<${key}></${key}>`;
+            
+            // 如果找不到模板，返回原始键名，以便调试即时发现缺失
+            console.warn(`[GameText] Template not found for key: "${key}"`);
+            return key; 
         },
 
         /**

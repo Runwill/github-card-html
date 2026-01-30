@@ -1,14 +1,19 @@
 /* Visual Feedback for Judge Area Drag Switch */
+
+/* Base Styles (Unified for Light & Dark Mode) */
 .role-summary.judge-area-active {
-    border-color: #ffd700 !important; /* Gold border */
-    background-color: rgba(255, 215, 0, 0.1) !important;
-    box-shadow: 0 0 10px #ffd700 !important;
+    border-color: #ffd700 !important; /* Bright Gold */
+    background-color: rgba(255, 215, 0, 0.15) !important;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.6) !important;
     transform: scale(1.05); /* Slight pop */
     transition: all 0.2s ease;
 }
 
 .role-summary.judge-area-active .player-name {
-    color: #ffd700 !important;
-    font-weight: bold;
-    text-shadow: 0 0 2px black;
+    color: #ffd700 !important; /* Bright Gold */
+    font-weight: 900;
+    /* Universal Black Shadow/Stroke for readability on BOTH Light and Dark backgrounds */
+    text-shadow: 0 1px 2px black, 0 0 1px black !important;
 }
+
+/* Dark Mode Adaptation Block Removed per user request to unify styles */

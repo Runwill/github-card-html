@@ -143,17 +143,20 @@
                 const currentForceBack = wrapper._inspectorForceBack;
 
                 const isDeck = wrapper.querySelector('#header-pile') != null; // 简单判断，或者检查容器 ID
-                const title = isDeck ? 'Deck' : 'Discard Pile';
+                const GameText = window.Game.UI.GameText;
+                // Fix: use 'pile' instead of 'drawPile' to match main view term
+                const title = GameText ? GameText.render(isDeck ? 'pile' : 'discardPile') : (isDeck ? '牌堆' : '弃牌堆');
                 const sourceId = isDeck ? 'pile' : 'discardPile'; // Map to GameState keys
                 
+                const openOptions = {
+                    forceFaceDown: currentForceBack,
+                    areaName: title
+                };
+
                 if (window.Game.UI.toggleCardViewer) {
-                    window.Game.UI.toggleCardViewer(title, currentCards, sourceId, {
-                        forceFaceDown: currentForceBack 
-                    });
+                    window.Game.UI.toggleCardViewer(title, currentCards, sourceId, openOptions);
                 } else if (window.Game.UI.openCardViewer) {
-                    window.Game.UI.openCardViewer(title, currentCards, sourceId, {
-                        forceFaceDown: currentForceBack 
-                    });
+                    window.Game.UI.openCardViewer(title, currentCards, sourceId, openOptions);
                 } else {
                     console.warn("Game.UI.openCardViewer not ready");
                 }

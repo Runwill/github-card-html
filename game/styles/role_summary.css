@@ -13,6 +13,14 @@
     width: 60px !important;
     height: 60px !important;
     margin-bottom: 4px;
+    position: relative; /* Context for absolute badges */
+    overflow: visible; /* Allow badge to pop out */
+}
+
+/* Also ensure main view avatar has context */
+.current-character-panel .char-avatar {
+    position: relative;
+    overflow: visible;
 }
 
 /* Reuse game.css .char-avatar styles, just handle active state */
@@ -69,4 +77,66 @@
     align-items: center;
     justify-content: center;
     margin-top: 2px;
+}
+
+/* Judge Area Card Count Badge (Matches HP Style) */
+@keyframes judgeBubblePop {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.player-judge-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    z-index: 12;
+
+    /* Appearance: Matched with .stat-hp style but using Judge Colors */
+    background-color: rgba(255, 193, 7, 0.15); /* Low opacity yellow background */
+    color: #f59e0b; /* Amber/Gold text (var(--text-gold) usually) */
+    border: 1px solid rgba(255, 193, 7, 0.5); /* Subtle border */
+    
+    /* Layout */
+    min-width: 18px; /* Slightly tighter than hand count */
+    height: 18px;
+    padding: 0 4px; 
+    border-radius: 9px; /* Pill shape */
+
+    /* Typography */
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 0.75rem; 
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: none; /* No shadow needed for this flat style */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Modern Effects */
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    box-shadow: 0 2px 4px var(--shadow-1, rgba(0,0,0,0.1));
+
+    /* Animation */
+    animation: judgeBubblePop 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    transform-origin: center;
+    pointer-events: none;
+}
+
+/* Theme Adaptation */
+html[data-theme="dark"] .player-judge-count {
+    /* Dark Mode: Slightly brighter background/text for contrast */
+    background-color: rgba(255, 215, 0, 0.2);
+    color: #ffd700;
+    border-color: rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
+}
+
+/* Ensure no conflicts with legacy */
+html[data-theme="light"] .player-judge-count {
+     /* Ensure text is readable on light bg */
+     color: #d97706; /* Darker amber for contrast against white/light-gray */
+     background-color: rgba(251, 191, 36, 0.2);
+     border-color: rgba(245, 158, 11, 0.3);
 }

@@ -142,9 +142,46 @@
         const grid = document.getElementById(`card-viewer-grid-${sourceId}`);
         const scrollTarget = grid;
 
-        // Watermark
-        if (watermarkEl && window.Game.UI.GameText && sourceId) {
-            watermarkEl.innerHTML = window.Game.UI.GameText.render(sourceId);
+        // Watermark: Construct distinct lines for Owner and Area if provided
+        if (watermarkEl) {
+            let ownerText = options.ownerName || '';
+            let areaText = options.areaName || '';
+
+            // Fallback: Use GameText or Title if explicit separate names are missing
+            if (!areaText) {
+                if (window.Game.UI.GameText && sourceId) {
+                    // Try to get text from common helper
+                    // Note: This might return combined string if not updated, but better than nothing
+                    const gameText = window.Game.UI.GameText.render(sourceId);
+                    if (gameText) areaText = gameText;
+                }
+                
+                // Last resort fallback to title
+                if (!areaText && title) {
+                    areaText = title;
+                }
+            }
+
+            // Render
+            let html = '';
+            // If we have an owner, display it distinctly (Small Header style)
+            if (ownerText) {
+                html += `<div class="watermark-owner">${ownerText}</div>`;
+            }
+            // If we have area name (Large Watermark style)
+            if (areaText) {
+                html += `<div class="watermark-area">${areaText}</div>`;
+            }
+            
+            // 使用 safeRender 确保动态文本 (Term) 能够正确渲染和绑定
+            // 注意：HTML 字符串是拼接而成的，我们给个复合 Key，或依赖 safeRender 的内部 diff
+            if (window.Game.UI.safeRender) {
+                // key: viewer-watermark-{sourceId}
+                // 移除 Date.now()，依赖 safeRender 和 sourceId 的唯一性
+                window.Game.UI.safeRender(watermarkEl, html, `viewer-wm:${sourceId}`);
+            } else {
+                watermarkEl.innerHTML = html;
+            }
         }
 
         // Cards

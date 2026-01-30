@@ -58,17 +58,49 @@
                     if (!isManual && !isSelf) forceFaceDown = true;
                 }
 
-                const titleSuffix = isJudge ? '判定区' : '手牌';
-                const title = `${currentRole.name} 的${titleSuffix}`;
+                const GameText = window.Game.UI.GameText;
+                const titleSuffix = GameText ? GameText.render(isJudge ? 'judgeArea' : 'hand') : (isJudge ? '判定区' : '手牌');
+                // Use plain text for window title if needed, or allow HTML if the window title supports it. 
+                // Usually window title is plain text for browser windows, but here it's an overlay.
+                // But let's keep the `title` variable loosely capable of string ops.
+                // Actually, `toggleCardViewer` uses `title` for the modal header if provided?
+                // The current implementation of `openCardViewer` doesn't seem to use `title` for rendering a header inside the modal body,
+                // but maybe it's used elsewhere or future proofing.
+                // Let's keep `title` simply constructed for now, or use the area name.
+                const title = `${currentRole.name} ${titleSuffix}`;
+                
                 const prefix = isJudge ? 'role-judge:' : 'role:';
                 const sourceId = `${prefix}${currentRole.id}`;
                 
                 const cards = currentRole[areaKey].cards || [];
 
+                // 优先使用 character 字段 (武将名)，回退使用 role.name
+                let charNameKey = currentRole.character;
+                if (Array.isArray(charNameKey) && charNameKey.length > 0) charNameKey = charNameKey[0];
+                if (!charNameKey) charNameKey = currentRole.name;
+
+                // 使用 GameText 渲染 Character (武将) HTML
+                // 参考 role_renderer.js 中 renderRoleSummary 逻辑
+                let ownerNameHtml = charNameKey;
+                if (GameText) {
+                    if (currentRole.characterId) {
+                        ownerNameHtml = GameText.render('Character', { id: currentRole.characterId, name: charNameKey });
+                    } else {
+                        // 尝试简单的渲染，或保留原样
+                        ownerNameHtml = GameText.render(charNameKey);
+                    }
+                }
+
+                const openOptions = { 
+                    forceFaceDown,
+                    ownerName: ownerNameHtml, // HTML string with <characterName> tag
+                    areaName: titleSuffix        // HTML string from GameText
+                };
+
                 if (window.Game.UI.toggleCardViewer) {
-                    window.Game.UI.toggleCardViewer(title, cards, sourceId, { forceFaceDown });
+                    window.Game.UI.toggleCardViewer(title, cards, sourceId, openOptions);
                 } else if (window.Game.UI.openCardViewer) {
-                    window.Game.UI.openCardViewer(title, cards, sourceId, { forceFaceDown });
+                    window.Game.UI.openCardViewer(title, cards, sourceId, openOptions);
                 }
             };
 
@@ -248,6 +280,36 @@
                     hpEl.classList.add('hp-changed');
                 }
                 hpEl.textContent = finalHpText;
+            }
+
+            // Main View Judge Count (New Feature)
+            // Displayed on the corner of the avatar
+            // We append it to .char-avatar container which holds #char-img
+            const charImg = document.getElementById('char-img');
+            if (charImg && charImg.parentElement && charImg.parentElement.classList.contains('char-avatar')) {
+                let judgeCountEl = document.getElementById('char-judge-count');
+                if (!judgeCountEl) {
+                    judgeCountEl = document.createElement('span');
+                    judgeCountEl.id = 'char-judge-count';
+                    judgeCountEl.className = 'player-judge-count';
+                    charImg.parentElement.appendChild(judgeCountEl);
+                }
+
+                // Calculate Judge Count
+                let jCount = 0;
+                if (selfRole.judgeArea && selfRole.judgeArea.cards) {
+                    jCount = selfRole.judgeArea.cards.length;
+                }
+
+                if (jCount > 0) {
+                    judgeCountEl.style.display = 'flex';
+                    if (judgeCountEl.textContent !== String(jCount)) {
+                        judgeCountEl.textContent = String(jCount);
+                        // Optional pop animation
+                    }
+                } else {
+                    judgeCountEl.style.display = 'none';
+                }
             }
 
             // Main View Hand Count
@@ -471,6 +533,13 @@
                 avatarImg.src = ''; 
                 
                 avatarContainer.appendChild(avatarImg);
+                
+                // Add Judge Count Badge to Avatar Container (Corner)
+                const judgeCountSpan = document.createElement('span');
+                judgeCountSpan.className = 'player-judge-count';
+                judgeCountSpan.style.display = 'none'; // Default hidden
+                avatarContainer.appendChild(judgeCountSpan);
+
                 pEl.appendChild(avatarContainer);
 
                 const nameSpan = document.createElement('span');
@@ -566,6 +635,24 @@
                 nameSpan.setAttribute('data-render-key', renderKey);
             }
             
+            // 判定区牌数 (Judge Count) - 右上角角标
+            const judgeCountSpan = pEl.querySelector('.player-judge-count');
+            if (judgeCountSpan) {
+                let jCount = 0;
+                if (role.judgeArea && role.judgeArea.cards) {
+                    jCount = role.judgeArea.cards.length;
+                }
+                
+                if (jCount > 0) {
+                    judgeCountSpan.style.display = 'flex';
+                    if (judgeCountSpan.textContent !== String(jCount)) {
+                        judgeCountSpan.textContent = String(jCount);
+                    }
+                } else {
+                    judgeCountSpan.style.display = 'none';
+                }
+            }
+
             // Stats Row Updates
             
             // 座次 (Seat)
