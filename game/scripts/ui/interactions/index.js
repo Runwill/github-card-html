@@ -104,31 +104,18 @@
         const originalEl = DragState.dragElement;
         const rect = originalEl.getBoundingClientRect();
         
-        const dragClone = originalEl.cloneNode(true);
-        dragClone.id = ''; // 移除 ID
-        dragClone.classList.add('dragging-real');
-        dragClone.style.transform = 'none';
-        
-        // Use Module: Copy Styles
-        if (window.Game.UI.DragAnimation) {
-            window.Game.UI.DragAnimation.copyComputedStyles(originalEl, dragClone);
-        }
-        
-        dragClone.style.position = 'fixed';
-        dragClone.style.zIndex = 99999;
-        dragClone.style.width = rect.width + 'px';
-        dragClone.style.height = rect.height + 'px';
-        dragClone.style.margin = '0';
+        // Use Module: Create Ghost
+        const dragClone = window.Game.UI.DragAnimation.createGhost(originalEl, rect, { zIndex: '99999' });
+
+        // Remove ID
+        dragClone.id = '';
         
         DragState.initialX = rect.left;
         DragState.initialY = rect.top;
         DragState.offsetX = e.clientX - rect.left;
         DragState.offsetY = e.clientY - rect.top;
         
-        dragClone.style.left = rect.left + 'px';
-        dragClone.style.top = rect.top + 'px';
-        
-        document.body.appendChild(dragClone);
+        // Hide Original
         originalEl.style.visibility = 'hidden';
         
         DragState.dragClone = dragClone; 

@@ -45,7 +45,7 @@
         DragState.rafId = requestAnimationFrame(render);
     }
 
-    function createGhost(source, rect) {
+    function createGhost(source, rect, options = {}) {
         let ghost;
         if (typeof source === 'string') {
             const temp = document.createElement('div');
@@ -65,6 +65,8 @@
 
         if (!ghost) return null;
 
+        const defaultZIndex = '100000'; // High enough to be above Modals (11000)
+
         ghost.classList.add('dragging-real');
         ghost.style.position = 'fixed';
         ghost.style.left = `${rect.left}px`;
@@ -72,7 +74,7 @@
         ghost.style.width = `${rect.width}px`;
         ghost.style.height = `${rect.height}px`;
         ghost.style.margin = '0';
-        ghost.style.zIndex = '9999';
+        ghost.style.zIndex = options.zIndex || defaultZIndex;
         ghost.style.pointerEvents = 'none';
 
         // [Fix] Reset transform to avoid double-offsetting 

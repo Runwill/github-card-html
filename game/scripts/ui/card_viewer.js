@@ -192,15 +192,6 @@
                 forceFaceDown: options.forceFaceDown // Pass through forceFaceDown
              };
              window.Game.UI.renderCardList(grid.id, cards, sourceId, renderOptions);
-        } else {
-            // Fallback
-            grid.innerHTML = '';
-            cards.forEach(card => {
-                const el = document.createElement('div');
-                el.className = 'card-placeholder';
-                el.textContent = card.name || card.key || '???';
-                grid.appendChild(el);
-            });
         }
 
         // 4. Scrolling Animation Logic (Instance Scoped)
