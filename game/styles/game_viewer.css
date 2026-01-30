@@ -49,48 +49,20 @@
     position: relative; /* Essential for Drag functionality (left/top) */
 }
 
-/* Wrapper for scroll view */
+/*Wrapper for scroll view */
 .card-viewer-modal .modal-body {
     flex: 1;
     overflow: hidden; /* Prevent native scroll on wrapper */
-    padding: 20px; /* Restored padding for breathing room */
-    background: transparent; /* Removed gray tint to match current-character-panel */
+    padding: 20px; /* Reverted to 20px per user request */
+    background: transparent;
     display: flex;
     align-items: center;
-    position: relative; /* Context for absolute overlays */
+    position: relative;
     max-width: 100%;
-    
-    /* CRITICAL FIX: Allow flex container to shrink below content size */
-    min-width: 0; 
+    min-width: 0;
 }
 
-/* Gradient Fade Fogs - Replaced with Mask Image for cleaner corners */
-/* The mask fades the content transparency directly instead of adding opaque overlays */
-.card-viewer-modal .modal-body {
-    -webkit-mask-image: linear-gradient(to right, transparent 0px, black 80px, black calc(100% - 80px), transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0px, black 80px, black calc(100% - 80px), transparent 100%);
-}
-
-.card-viewer-modal .modal-body.at-start {
-    -webkit-mask-image: linear-gradient(to right, black 0px, black calc(100% - 80px), transparent 100%);
-    mask-image: linear-gradient(to right, black 0px, black calc(100% - 80px), transparent 100%);
-}
-
-.card-viewer-modal .modal-body.at-end {
-    -webkit-mask-image: linear-gradient(to right, transparent 0px, black 80px, black 100%);
-    mask-image: linear-gradient(to right, transparent 0px, black 80px, black 100%);
-}
-
-.card-viewer-modal .modal-body.at-start.at-end {
-    -webkit-mask-image: none;
-    mask-image: none;
-}
-
-/* Disable old overlay elements */
-.card-viewer-modal .modal-body::before,
-.card-viewer-modal .modal-body::after {
-    display: none;
-}
+/* ... gradient masks ... */
 
 /* The actual scrollable list */
 .card-grid {
@@ -98,27 +70,34 @@
     flex-wrap: nowrap;
     gap: 15px;
     justify-content: flex-start;
-    padding: 10px; /* Slight padding inside scroll view */
+    padding: 10px; /* Reverted to 10px */
     
-    /* Scroll properties */
-    /* Remove 'width: max-content' to stop forcing parent to expand beyond max-width */
-    /* width: max-content; <--- CAUSES OVERFLOW */
-    
-    /* Ensure it fills the modal body but scrolls if body is smaller */
     width: 100%; 
+    min-height: 160px; /* Reverted to 160px */
     
-    /* Ensure height allows dropping cards even when empty */
-    min-height: 160px; /* 140px card + 20px padding */
+    /* ADDED: Minimum width ensures drop target exists */
+    min-width: 350px; 
     
-    overflow-x: auto; /* Enable scrolling */
-    scrollbar-width: none; /* Firefox Hide */
-    -ms-overflow-style: none; /* IE Hide */
+    overflow-x: auto; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    
+    /* Ensure flex items are vertically centered if height > cards */
+    /* align-items: center; <--- REMOVED this, reverting alignment logic to default stretch or start */
+
+    /* Pointer Events Logic for Watermark Interaction */
+    pointer-events: none; /* Let events pass to watermark */
 }
 
-/* ==========================================================================
-   Animations (Modern & Fast)
-   Apply animation to .modal-content to bypass global !important transforms on wrapper
-   ========================================================================== */
+/* Children must capture events */
+.card-grid > * {
+    pointer-events: auto;
+}
+
+/* Enable grid interaction during drag for dropping */
+body.is-global-dragging .card-grid {
+    pointer-events: auto !important;
+}
 @keyframes cardViewerIn {
     0% {
         opacity: 0;
@@ -222,6 +201,16 @@
     align-items: center;
     justify-content: center;
     top: 50%; /* Reverted to 50% for standard centering */
+    
+    /* ALLOW events so hover works. We handle Grid pass-through via .card-grid pointer-events */
+    pointer-events: auto !important;
+    z-index: 0;
+}
+
+/* Ensure Grid is ABOVE the watermark and clickable */
+.card-grid {
+    position: relative;
+    z-index: 1;
 }
 
 .card-viewer-modal .watermark-owner {

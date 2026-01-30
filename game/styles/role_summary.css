@@ -140,3 +140,14 @@ html[data-theme="light"] .player-judge-count {
      background-color: rgba(251, 191, 36, 0.2);
      border-color: rgba(245, 158, 11, 0.3);
 }
+
+/* Update Animation (Pulse on Change) */
+@keyframes judgeCountPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.player-judge-count.count-changed {
+    animation: judgeCountPulse 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}

@@ -304,8 +304,12 @@
                 if (jCount > 0) {
                     judgeCountEl.style.display = 'flex';
                     if (judgeCountEl.textContent !== String(jCount)) {
+                        // Animation for value change
+                        judgeCountEl.classList.remove('count-changed');
+                        void judgeCountEl.offsetWidth; // Force Reflow
+                        judgeCountEl.classList.add('count-changed');
+                        
                         judgeCountEl.textContent = String(jCount);
-                        // Optional pop animation
                     }
                 } else {
                     judgeCountEl.style.display = 'none';
@@ -646,6 +650,11 @@
                 if (jCount > 0) {
                     judgeCountSpan.style.display = 'flex';
                     if (judgeCountSpan.textContent !== String(jCount)) {
+                        // Animation for value change
+                        judgeCountSpan.classList.remove('count-changed');
+                        void judgeCountSpan.offsetWidth; // Force Reflow
+                        judgeCountSpan.classList.add('count-changed');
+                        
                         judgeCountSpan.textContent = String(jCount);
                     }
                 } else {

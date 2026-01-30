@@ -106,7 +106,8 @@
 }
 
 /* Allow dropping cards into treatment container when dragging */
-body.is-global-dragging .treatment-container {
+body.is-global-dragging .treatment-container,
+body.is-global-dragging .deck-slot {
     pointer-events: auto !important;
 }
 
@@ -198,8 +199,11 @@ body.is-global-dragging .treatment-container {
 .deck-slot {
     background: transparent !important;
     border: none !important;
-    box-shadow: none !important;
+    box-shadow: none !important;    pointer-events: none; /* Allow events to pass through to watermark/text */
 }
+
+.deck-slot > * {
+    pointer-events: auto;}
 
 /* Depth Effect for Cards in Deck Slot - REMOVED for cleaner look per user request */
 /* Just a standard shadow now */
