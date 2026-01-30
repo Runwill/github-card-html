@@ -104,31 +104,37 @@
         const originalEl = DragState.dragElement;
         const rect = originalEl.getBoundingClientRect();
         
-        const dragClone = originalEl.cloneNode(true);
-        dragClone.id = ''; // 移除 ID
-        dragClone.classList.add('dragging-real');
-        dragClone.style.transform = 'none';
-        
-        // Use Module: Copy Styles
-        if (window.Game.UI.DragAnimation) {
-            window.Game.UI.DragAnimation.copyComputedStyles(originalEl, dragClone);
+        // Refactor: Use shared createGhost if available
+        let dragClone;
+        if (window.Game.UI.DragAnimation && window.Game.UI.DragAnimation.createGhost) {
+            dragClone = window.Game.UI.DragAnimation.createGhost(originalEl, rect);
+            // Ensure specific drag styling overrides if needed
+            dragClone.style.zIndex = 99999; 
+            // Reset transform invoked by shared creator if any (createGhost doesn't set transform, but keeps it clean)
+        } else {
+            // Fallback (Legacy)
+            dragClone = originalEl.cloneNode(true);
+            dragClone.id = ''; 
+            dragClone.classList.add('dragging-real');
+            dragClone.style.transform = 'none';
+            if (window.Game.UI.DragAnimation) {
+                window.Game.UI.DragAnimation.copyComputedStyles(originalEl, dragClone);
+            }
+            dragClone.style.position = 'fixed';
+            dragClone.style.zIndex = 99999;
+            dragClone.style.width = rect.width + 'px';
+            dragClone.style.height = rect.height + 'px';
+            dragClone.style.margin = '0';
+            dragClone.style.left = rect.left + 'px';
+            dragClone.style.top = rect.top + 'px';
+            document.body.appendChild(dragClone);
         }
-        
-        dragClone.style.position = 'fixed';
-        dragClone.style.zIndex = 99999;
-        dragClone.style.width = rect.width + 'px';
-        dragClone.style.height = rect.height + 'px';
-        dragClone.style.margin = '0';
-        
+
         DragState.initialX = rect.left;
         DragState.initialY = rect.top;
         DragState.offsetX = e.clientX - rect.left;
         DragState.offsetY = e.clientY - rect.top;
         
-        dragClone.style.left = rect.left + 'px';
-        dragClone.style.top = rect.top + 'px';
-        
-        document.body.appendChild(dragClone);
         originalEl.style.visibility = 'hidden';
         
         DragState.dragClone = dragClone; 
@@ -418,7 +424,7 @@
                                     // We must force the UNDERLYING card visible so the stack doesn't appear empty during animation.
                                     let prevStackCard = null;
                                     const isStacked = zone && zone.classList.contains('area-stacked');
-                                    if (isStacked) {
+                                    if (isStacked && isCardTarget) {
                                         // newTargetEl is likely the last child. Find the one before it.
                                         prevStackCard = newTargetEl.previousElementSibling;
                                         // Ensure it's a card and not something else

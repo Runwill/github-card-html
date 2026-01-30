@@ -58,115 +58,39 @@
 
     // 辅助函数：动画逻辑
     const performFlipAnimation = (startRect, toArea, movedCard, animationHint, cardHTML, passedEl) => {
-        if (!startRect || !window.Game.UI) return;
-        
+        if (!startRect || !window.Game.UI || !window.Game.UI.DragAnimation) return;
+        const DragAnim = window.Game.UI.DragAnimation;
+
         // -------------------------------------------------------------
         // 特殊路径：如果指定了动画目标提示（Role Summary 或 Judge Area）
         // -------------------------------------------------------------
         if (animationHint && (animationHint.startsWith('role:') || animationHint.startsWith('role-judge:'))) {
-            const container = document.querySelector(`[data-drop-zone="${animationHint}"]`);
+            let container = document.querySelector(`[data-drop-zone="${animationHint}"]`);
+            
+            // Fallback for Judge Area
+            if (!container && animationHint.startsWith('role-judge:')) {
+                const roleId = animationHint.split(':')[1];
+                container = document.querySelector(`[data-drop-zone="role:${roleId}"]`);
+            }
+
             if (container) {
-                //重建飞行卡牌 (或直接使用传递的元素)
-                let flyer = passedEl;
-                let isReusedElement = !!flyer;
+                // 使用 shared createGhost，支持传入 element 或 html string
+                const flyer = DragAnim.createGhost(passedEl || cardHTML, startRect);
+                if (!flyer) return;
 
-                if (!flyer) {
-                     // Fallback: Create new
-                     if (cardHTML) {
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = cardHTML;
-                        flyer = tempDiv.firstElementChild;
-                        if (flyer) {
-                            flyer.style.transform = '';
-                            flyer.style.transition = '';
-                        }
-                    }
-                    if (!flyer) {
-                        flyer = document.createElement('div');
-                        flyer.className = 'card dragging-real';
-                        flyer.style.background = 'white'; 
-                        flyer.style.border = '1px solid #ccc';
-                    }
-                    // 如果是新建的，需要设置初始状态
-                    flyer.style.position = 'fixed';
-                    flyer.style.left = `${startRect.left}px`;
-                    flyer.style.top = `${startRect.top}px`;
-                    flyer.style.width = `${startRect.width}px`;
-                    flyer.style.height = `${startRect.height}px`;
-                    flyer.style.zIndex = '9999';
-                    flyer.style.pointerEvents = 'none';
-                    flyer.style.margin = '0';
-                    flyer.style.transform = '';
-                    if (!flyer.classList.contains('dragging-real')) flyer.classList.add('dragging-real');
-                    document.body.appendChild(flyer);
-                } else {
-                    // 如果是复用的，确保它还在 DOM 上（虽然 interactions.js 没移除它，但我们确认一下）
-                    if (!flyer.isConnected) document.body.appendChild(flyer);
-                    // 确保不会再响应鼠标
-                    flyer.style.pointerEvents = 'none';
-                    flyer.style.zIndex = '9999';
-                }
+                // 目标：定位到摘要角色的中心，且保持卡牌原有大小
+                DragAnim.animateDropToPlaceholder(flyer, container, null, { matchSize: false });
                 
-                // 目标：根据用户要求，定位到摘要角色的中心 (container 本身)，而不是头像
-                const targetRectBase = container.getBoundingClientRect();
-
-                // 目标大小：保持原大小（根据用户要求，不进行缩放）
-                // 此时 startRect 应该是准确的。
-                
-                const targetW = startRect.width;
-                const targetH = startRect.height;
-                // 计算居中位置
-                const targetLeft = targetRectBase.left + targetRectBase.width/2 - targetW/2;
-                const targetTop = targetRectBase.top + targetRectBase.height/2 - targetH/2;
-                
-                // --- 使用 CSS Transition ---
-                if (isReusedElement) {
-                    const initialX = parseFloat(flyer.style.left) || 0;
-                    const initialY = parseFloat(flyer.style.top) || 0;
-                    
-                    const finalTx = targetLeft - initialX;
-                    const finalTy = targetTop - initialY;
-                    
-                    requestAnimationFrame(() => {
-                        // ease-in 在开始时速度为0，会导致"先慢后快"的感觉
-                        // 改为 linear 并在较短时间内完成，以维持拖拽时的速度感
-                        flyer.style.transition = 'transform 0.15s linear'; 
-                        flyer.style.transform = `translate(${finalTx}px, ${finalTy}px)`;
-                    });
-                } else {
-                    const deltaX = targetLeft - startRect.left;
-                    const deltaY = targetTop - startRect.top;
-                    
-                    requestAnimationFrame(() => {
-                        flyer.style.transition = 'transform 0.15s linear';
-                        flyer.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-                    });
-                }
-
-                flyer.addEventListener('transitionend', () => {
-                    flyer.remove();
-                }, {once: true});
-                
-                return; // 动画接管完成，退出
+                return; // 动画接管完成
             }
         }
 
-        // 关键修复：移除 requestAnimationFrame 包装
-        // 因为调用者（dispatch）已经负责了时机控制 (requestAnimationFrame 或微任务)
-        // 双重 RAF 会导致逻辑推迟到下一帧，从而导致一帧的“闪烁”（即卡牌先在目标位置渲染了一次）
-        
-        // 2. 在容器中找到卡牌元素
-        // 优化：查找容器，同时兼容 HTML 静态属性 (data-area-name) 和 渲染器动态属性 (data-drop-zone)
-            // 关键：必须使用 :not(.card) 排除卡牌自身，因为 renderCardList 也会给卡牌元素标记相同的区域名
-            
+        // -------------------------------------------------------------
+        // 2. 标准移动：在容器中找到目标卡牌元素
+        // -------------------------------------------------------------
             const areaName = toArea.name || toArea;
             
-            // 核心修复：
-            // 1. 使用 let 声明变量，防止污染全局
-            // 2. 增加 .cards-container / .card-grid 类限制，防止选中 Header（例如 #header-hand-area）或 Card 自身
-            //    原因：Project 中 role_renderer 给 Header 加了 data-area-name，card_renderer 给 card 也加了。
-            //    querySelector 默认会选中 DOM 中靠前的 Header，导致动画目标错误。
-            //    同时支持 Card Viewer 的 .card-grid
+            // 查找容器
             let container = document.querySelector(`
                 .cards-container[data-area-name="${areaName}"], 
                 .cards-container[data-drop-zone="${areaName}"],
@@ -174,104 +98,38 @@
             `);
 
             if (!container) {
-                 // Fallback：如果没有 .cards-container 类，尝试 ID 规则（兼容旧布局）
                  container = document.getElementById(`${areaName}-container`);
-                 // console.warn(`[Animation] Container not found for area: ${areaName}`);
                  if (!container) return; 
             }
             
-            // 3. 在容器中找到目标卡牌 (通常是最后加入的那张)
-            // 因为我们刚刚添加了它，通常 "Place To" 把它放在末尾或特定索引
-            // 目前，如果没有索引跟踪，假设它是最后一个，或者尝试匹配
+            // 找到目标卡牌 (通常是最后加入的那张)
             let targetEl = null;
 
-            // 简单的启发式更新：如果是新添加到末尾的
             if (container.lastElementChild) {
                 targetEl = container.lastElementChild;
-                // 注意：旧代码曾排除 'card-placeholder'，但现在的 CardRenderer 默认使用此 class 作为卡牌容器
-                // 因此我们只应该排除那些完全为空或明显不可见的元素
                 if (targetEl.className === 'card-placeholder' && !targetEl.hasChildNodes()) {
                      targetEl = null; 
                 }
             }
             
-            // 改进：如果可能，尝试通过 ID 匹配 (Sandbox)
-            if (movedCard && typeof movedCard === 'object' && movedCard.id) {
-                 // 通过某些属性查找？渲染器通常不把 ID 放在 DOM 上，除非我们更新了 card_renderer
-            }
+            // 如果提供了卡牌ID，尝试更精确匹配 (略)
+            // ...
 
             if (targetEl) {
-                // -------------------------------------------------------------
-                // 统一动画体验：使用 Interactions.animateDropToPlaceholder
-                // -------------------------------------------------------------
-                if (window.Game.UI.Interactions && window.Game.UI.Interactions.animateDropToPlaceholder) {
-                    
-                    // 1. 克隆一个用于飞行的元素
-                    // 由于 targetEl 已经是渲染好的样子，我们直接克隆它，或者创建一个临时的 visually identical element
-                    // 为了简单起见，且为了包含 CardRenderer 的效果，我们克隆 targetEl
-                    const clone = targetEl.cloneNode(true);
-                    
-                    // 2. 设置克隆体的初始状态 (Match startRect)
-                    clone.style.position = 'fixed';
-                    clone.style.left = `${startRect.left}px`;
-                    clone.style.top = `${startRect.top}px`;
-                    clone.style.width = `${startRect.width}px`;
-                    clone.style.height = `${startRect.height}px`;
-                    clone.style.margin = '0';
-                    clone.style.zIndex = '9999';
-                    clone.style.pointerEvents = 'none'; // 防止干扰鼠标
-                    clone.style.transition = 'none';
-                    clone.style.transform = ''; // 确保没有 transform
-                    // clone.classList.remove('card-placeholder'); // 错误：不要移除，它是卡牌的基础样式！
-                    
-                    // 添加 "正在拖拽" 的视觉效果 (阴影/透明度)
-                    clone.classList.add('dragging-real'); 
-                    
-                    // 如果原元素有特定背景或颜色可能是由其他 class 控制的，保留它们
-                    clone.classList.add('draggable-item'); // 确保样式一致
-                    
-                    // 3. 将克隆体添加到 body
-                    document.body.appendChild(clone);
-                    
-                    // 4. 隐藏真实目标 (作为 placeholder)
-                    // 使用 visibility: hidden 占据空间但不显示
-                    targetEl.style.visibility = 'hidden';
-                    
-                    // 5. 执行动画
-                    // animateDropToPlaceholder(el, placeholder, onComplete)
-                    window.Game.UI.Interactions.animateDropToPlaceholder(clone, targetEl, () => {
-                        // 动画结束，animateDropToPlaceholder 会移除 clone 并恢复 targetEl 的 visibility
-                        // 但我们需要确保 CSS Timer 或其他清理也是正确的
-                        // interactions.js 内部已经处理了: element.remove(), placeholder.style.visibility = ''
-                        
-                        // 强制再确认一次，防止任何意外
-                        if (targetEl) targetEl.style.visibility = '';
-                    });
-                    
-                    return; // 动画交接完成，退出
-                }
-
-                // -------------------------------------------------------------
-                // Fallback: 旧的 CSS FLIP 实现
-                // -------------------------------------------------------------
-                const endRect = targetEl.getBoundingClientRect();
-                const dx = startRect.left - endRect.left;
-                const dy = startRect.top - endRect.top;
-
-                // 翻转 (Invert)
-                targetEl.style.transform = `translate(${dx}px, ${dy}px)`;
-                targetEl.style.transition = 'none';
-                targetEl.style.zIndex = 1000;
-
-                // 播放 (Play)
-                requestAnimationFrame(() => {
-                    targetEl.style.transform = '';
-                    targetEl.style.transition = 'transform 0.4s cubic-bezier(0.2, 0, 0, 1)';
-                    
-                    targetEl.addEventListener('transitionend', () => {
-                        targetEl.style.transition = '';
-                        targetEl.style.zIndex = '';
-                    }, {once: true});
+                // 使用 shared createGhost (克隆目标，因为目标已经是我们想要的样子)
+                // 这里我们想模拟 "起飞然后降落"。
+                // 此时 startRect 是旧位置。targetEl 是新位置。
+                
+                // 为了视觉连贯，我们应该克隆 targetEl (有正面的样式)，但放在 startRect。
+                // *注意*: 如果是从背面翻到正面，或者样式改变，克隆 targetEl 是对的。
+                const flyer = DragAnim.createGhost(targetEl, startRect);
+                
+                // 隐藏真实目标
+                targetEl.style.visibility = 'hidden';
+                
+                // 执行动画 -> 飞向 targetEl (默认 matchSize=true)
+                DragAnim.animateDropToPlaceholder(flyer, targetEl, () => {
+                    if (targetEl) targetEl.style.visibility = '';
                 });
             }
     };

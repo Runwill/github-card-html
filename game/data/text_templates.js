@@ -29,6 +29,14 @@
         'throwing': '<throwing></throwing>',
         'concluding': '<concluding></concluding>',
 
+        // 阶段节点映射 (Match game_def.js Stage names)
+        'preparingStage': '<preparingStage></preparingStage>',
+        'dealingStage': '<dealingStage></dealingStage>',
+        'gettingStage': '<gettingStage></gettingStage>',
+        'actingStage': '<actingStage></actingStage>',
+        'throwingStage': '<throwingStage></throwingStage>',
+        'concludingStage': '<concludingStage></concludingStage>',
+
         // 区域（确保它们映射到术语）
         'hand': '<hand></hand>',
         'equipArea': '<equipArea></equipArea>',
@@ -53,6 +61,48 @@
         'whenRoundStart': '<whenRoundStart></whenRoundStart>',
         'whenRoundFinish': '<whenRoundFinish></whenRoundFinish>',
         'afterRoundFinish': '<afterRoundFinish></afterRoundFinish>',
+
+        // 回合 (Turn) 相关时机
+        'beforeTurnStart': '<beforeTurnStart></beforeTurnStart>',
+        'whenTurnStart': '<whenTurnStart></whenTurnStart>',
+        'whenTurnFinish': '<whenTurnFinish></whenTurnFinish>',
+        'afterTurnFinish': '<afterTurnFinish></afterTurnFinish>',
+
+        // 阶段 (Stage) 相关时机 - Preparing
+        'beforePreparingStageStart': '<beforePreparingStageStart></beforePreparingStageStart>',
+        'whenPreparingStageStart': '<whenPreparingStageStart></whenPreparingStageStart>',
+        'whenPreparingStageFinish': '<whenPreparingStageFinish></whenPreparingStageFinish>',
+        'afterPreparingStageFinish': '<afterPreparingStageFinish></afterPreparingStageFinish>',
+
+        // Dealing
+        'beforeDealingStageStart': '<beforeDealingStageStart></beforeDealingStageStart>',
+        'whenDealingStageStart': '<whenDealingStageStart></whenDealingStageStart>',
+        'whenDealingStageFinish': '<whenDealingStageFinish></whenDealingStageFinish>',
+        'afterDealingStageFinish': '<afterDealingStageFinish></afterDealingStageFinish>',
+
+        // Getting
+        'beforeGettingStageStart': '<beforeGettingStageStart></beforeGettingStageStart>',
+        'whenGettingStageStart': '<whenGettingStageStart></whenGettingStageStart>',
+        'whenGettingStageFinish': '<whenGettingStageFinish></whenGettingStageFinish>',
+        'afterGettingStageFinish': '<afterGettingStageFinish></afterGettingStageFinish>',
+
+        // Acting
+        'beforeActingStageStart': '<beforeActingStageStart></beforeActingStageStart>',
+        'whenActingStageStart': '<whenActingStageStart></whenActingStageStart>',
+        'whenActingStageFinish': '<whenActingStageFinish></whenActingStageFinish>',
+        'afterActingStageFinish': '<afterActingStageFinish></afterActingStageFinish>',
+
+        // Throwing
+        'beforeThrowingStageStart': '<beforeThrowingStageStart></beforeThrowingStageStart>',
+        'whenThrowingStageStart': '<whenThrowingStageStart></whenThrowingStageStart>',
+        'whenThrowingStageFinish': '<whenThrowingStageFinish></whenThrowingStageFinish>',
+        'afterThrowingStageFinish': '<afterThrowingStageFinish></afterThrowingStageFinish>',
+
+        // Concluding
+        'beforeConcludingStageStart': '<beforeConcludingStageStart></beforeConcludingStageStart>',
+        'whenConcludingStageStart': '<whenConcludingStageStart></whenConcludingStageStart>',
+        'whenConcludingStageFinish': '<whenConcludingStageFinish></whenConcludingStageFinish>',
+        'afterConcludingStageFinish': '<afterConcludingStageFinish></afterConcludingStageFinish>',
 
         // 体力事件
         'Recover': '<recover><recoverBody></recoverBody></recover>',

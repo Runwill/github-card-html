@@ -45,12 +45,58 @@
         DragState.rafId = requestAnimationFrame(render);
     }
 
-    function animateDropToPlaceholder(el, placeholder, onComplete) {
+    function createGhost(source, rect) {
+        let ghost;
+        if (typeof source === 'string') {
+            const temp = document.createElement('div');
+            temp.innerHTML = source;
+            ghost = temp.firstElementChild;
+        } else if (source && source.nodeType === 1) {
+            ghost = source.cloneNode(true);
+            copyComputedStyles(source, ghost);
+            // Sync specific state attributes if useful
+            if (source.getAttribute('data-card-key')) {
+                ghost.setAttribute('data-card-key', source.getAttribute('data-card-key'));
+            }
+        } else {
+            ghost = document.createElement('div');
+            ghost.className = 'card dragging-real';
+        }
+
+        if (!ghost) return null;
+
+        ghost.classList.add('dragging-real');
+        ghost.style.position = 'fixed';
+        ghost.style.left = `${rect.left}px`;
+        ghost.style.top = `${rect.top}px`;
+        ghost.style.width = `${rect.width}px`;
+        ghost.style.height = `${rect.height}px`;
+        ghost.style.margin = '0';
+        ghost.style.zIndex = '9999';
+        ghost.style.pointerEvents = 'none';
+
+        // [Fix] Reset transform to avoid double-offsetting 
+        // (since we set left/top to the current visual position already)
+        ghost.style.transform = 'none'; 
+        
+        // Remove ID to avoid duplicates
+        ghost.removeAttribute('id');
+
+        document.body.appendChild(ghost);
+        return ghost;
+    }
+
+    function animateDropToPlaceholder(el, placeholder, onComplete, options = {}) {
         const DragState = UI.DragState;
         const DRAG_CONFIG = UI.DragConfig;
+        
+        // Options defaults
+        const { 
+            matchSize = true,  // If false, centers on target but keeps ghost size
+            forceCenter = false // If true, calculates target based on center point alignment
+        } = options;
 
-        // --- Feature: Sync Visual State for Flip Animation ---
-        // If the target (placeholder) has a different state (e.g. CardBack),
+        // ... existing sync logic ...
         // we apply it to the dragging ghost to trigger CSS transitions (flip/fade).
         if (placeholder && el) {
             const targetKey = placeholder.getAttribute('data-card-key');
@@ -156,19 +202,51 @@
 
             // --- 鲁棒的视觉收敛 ---
             const targetRect = placeholder.getBoundingClientRect();
-
             const currentRect = el.getBoundingClientRect();
             
-            const deltaX = targetRect.left - currentRect.left;
-            const deltaY = targetRect.top - currentRect.top;
-            const deltaW = targetRect.width - currentRect.width;
-            const deltaH = targetRect.height - currentRect.height;
+            let targetXStr, targetYStr, targetWStr, targetHStr;
+
+            if (matchSize) {
+                targetXStr = targetRect.left;
+                targetYStr = targetRect.top;
+                targetWStr = targetRect.width;
+                targetHStr = targetRect.height;
+            } else {
+                // If not matching size, we center the ghost on the target
+                // Target coord = TargetCenter - GhostSize/2
+                // Ideally preserve ghost current size, but here we iterate so we use currentRect attributes
+                // NOTE: 'currentRect' changes as we animate if we change width/height.
+                // If matchSize is false, we want constant width/height equal to what we started or have now.
+                
+                // Let's assume we maintain cssW/cssH as constant if matchSize=false, 
+                // but we need to compute the destination XY based on that size.
+                
+                targetWStr = cssW; // Keep current driven size
+                targetHStr = cssH;
+                
+                // Center alignment
+                const targetCenterX = targetRect.left + targetRect.width / 2;
+                const targetCenterY = targetRect.top + targetRect.height / 2;
+                
+                targetXStr = targetCenterX - cssW / 2;
+                targetYStr = targetCenterY - cssH / 2;
+            }
+
+            const deltaX = targetXStr - currentRect.left;
+            const deltaY = targetYStr - currentRect.top;
+            const deltaW = targetWStr - currentRect.width;
+            const deltaH = targetHStr - currentRect.height;
             const factor = DRAG_CONFIG.lerpFactor;
 
             cssX += deltaX * factor;
             cssY += deltaY * factor;
-            cssW += deltaW * factor;
-            cssH += deltaH * factor;
+            
+            // Only lerp size if matching
+            if (matchSize) {
+                cssW += deltaW * factor;
+                cssH += deltaH * factor;
+            }
+            
             curRot += (0 - curRot) * factor;
 
             el.style.transform = `translate(${cssX}px, ${cssY}px) rotate(${curRot}deg)`;
@@ -184,20 +262,23 @@
             ) {
                 el.remove();
                 
-                placeholder.style.visibility = '';
-                placeholder.classList.remove('drag-placeholder');
+                if (placeholder && placeholder.style) {
+                    placeholder.style.visibility = '';
+                    placeholder.classList.remove('drag-placeholder');
 
-                if (window.getComputedStyle(placeholder).transitionProperty !== 'none') {
-                    placeholder.style.transition = 'none';
-                    placeholder.style.boxShadow = '0 15px 30px rgba(0,0,0,0.3)';
-                    void placeholder.offsetWidth;
-                    placeholder.style.transition = 'box-shadow 0.1s ease-out';
-                    placeholder.style.boxShadow = '';
-                    
-                    setTimeout(() => {
-                         if (placeholder) placeholder.style.transition = '';
-                    }, 100);
-                }                
+                    if (window.getComputedStyle(placeholder).transitionProperty !== 'none') {
+                        placeholder.style.transition = 'none';
+                        placeholder.style.boxShadow = '0 15px 30px rgba(0,0,0,0.3)';
+                        void placeholder.offsetWidth;
+                        placeholder.style.transition = 'box-shadow 0.1s ease-out';
+                        placeholder.style.boxShadow = '';
+                        
+                        setTimeout(() => {
+                             if (placeholder) placeholder.style.transition = '';
+                        }, 100);
+                    }
+                }
+                
                 if (onComplete) onComplete();
             } else {
                 requestAnimationFrame(loop);
@@ -209,6 +290,7 @@
     UI.DragAnimation = {
         startAnimationLoop,
         animateDropToPlaceholder,
+        createGhost,
         copyComputedStyles
     };
 
