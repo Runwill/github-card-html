@@ -303,7 +303,7 @@
         }
         
         // 装备区入口绑定 (Equipment Button)
-        const equipBtn = document.getElementById('btn-equip-detail');
+        const equipBtn = document.querySelector('.main-equip-btn');
         if (equipBtn) {
             setupEquipmentButton(equipBtn, selfRole, GameText);
         }
@@ -736,7 +736,6 @@
                  const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
                  summaryEquipBtn = document.createElement('button');
                  summaryEquipBtn.className = 'equip-detail-btn summary-equip-btn';
-                 summaryEquipBtn.title = 'Equipment';
                  summaryEquipBtn.innerText = '備';
                  statsDiv.appendChild(summaryEquipBtn);
             }

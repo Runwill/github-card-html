@@ -277,7 +277,7 @@ body.is-global-dragging #hand-cards-container {
 
 .equip-detail-btn {
     background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    border: 1px solid rgba(176, 204, 232, 0.3); /* Soft Blue tint */
     border-radius: 4px; /* Square with slight roundness */
     width: 24px;
     height: 24px;
@@ -288,7 +288,7 @@ body.is-global-dragging #hand-cards-container {
     font-size: 16px; /* Increased slightly for ZhuanShu readability */
     font-weight: normal; /* ZhuanShu is naturally bold */
     font-family: '明朝';
-    color: #ffd700; /* Gold color for 'Equipment' */
+    color: #b0cce8; /* Soft Blue color for 'Equipment' */
     opacity: 0.9;
     transition: all 0.2s;
     padding: 0;
@@ -298,18 +298,18 @@ body.is-global-dragging #hand-cards-container {
 
 .equip-detail-btn:hover {
     opacity: 1;
-    background: rgba(255, 215, 0, 0.2); /* Gold tint */
-    border-color: #ffd700;
+    background: rgba(176, 204, 232, 0.2); /* Soft Blue tint */
+    border-color: #b0cce8;
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    text-shadow: 0 0 5px rgba(176, 204, 232, 0.5);
 }
 
 .equip-detail-btn:active {
     transform: translateY(1px);
     box-shadow: 0 0 1px rgba(0,0,0,0.5);
-    background: rgba(255, 215, 0, 0.3);
-    border-color: #b89600; 
+    background: rgba(176, 204, 232, 0.3);
+    border-color: #8da3ba; 
 }
 
 /* Light Theme Support */
@@ -352,4 +352,22 @@ html[data-theme="light"] .equip-detail-btn:active {
 /* Show Button on Hover */
 .role-summary:hover .summary-equip-btn {
     display: inline-block !important;
+}
+
+/* Main View Hover Interaction */
+.char-stats {
+    min-height: 31.5px; /* Prevent jump */
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.char-stats:hover .stat-hp, 
+.char-stats:hover .player-hand-count,
+.char-stats:hover #char-hand-count { /* Specific ID override if needed */
+    display: none !important;
+}
+
+.char-stats:hover .main-equip-btn {
+    display: inline-flex !important;
 }
