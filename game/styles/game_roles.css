@@ -312,6 +312,44 @@ body.is-global-dragging #hand-cards-container {
     border-color: #8da3ba; 
 }
 
+/* Judge Button (Yellow/Gold) */
+.judge-detail-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: normal;
+    font-family: '明朝';
+    color: #ffd700;
+    opacity: 0.9;
+    transition: all 0.2s;
+    padding: 0;
+    margin-left: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.judge-detail-btn:hover {
+    opacity: 1;
+    background: rgba(255, 215, 0, 0.2);
+    border-color: #ffd700;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.judge-detail-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 1px rgba(0,0,0,0.5);
+    background: rgba(255, 215, 0, 0.3);
+    border-color: #b89600; 
+}
+
 /* Light Theme Support */
 html[data-theme="light"] .equip-detail-btn {
     background: rgba(255, 255, 255, 0.6);
@@ -332,54 +370,16 @@ html[data-theme="light"] .equip-detail-btn:active {
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 }
 
-/* Judge Detail Button (Yellow/Gold) */
-.judge-detail-btn {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    border-radius: 4px;
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: normal;
-    font-family: '明朝';
-    color: #ffd700;
-    opacity: 0.9;
-    transition: all 0.2s;
-    padding: 0;
-    margin-left: 2px;
-    margin-right: 2px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-
-.judge-detail-btn:hover {
-    opacity: 1;
-    background: rgba(255, 215, 0, 0.2);
-    border-color: #ffd700;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
-}
-
-.judge-detail-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 0 1px rgba(0,0,0,0.5);
-    background: rgba(255, 215, 0, 0.3);
-    border-color: #b89600; 
-}
-
 /* Sidebar Role Hover Interaction */
-.summary-equip-btn, .summary-judge-btn {
+.summary-judge-btn,
+.summary-equip-btn {
     display: none;
     /* Adjust size for sidebar context if needed, inherits main style otherwise */
     width: 24px;
     height: 24px;
     font-size: 14px;
     line-height: 22px;
-    margin: 0 2px; /* Slight gap between buttons */
+    margin: 0 2px;
 }
 
 /* Hide Stats on Hover - Relaxed Selector */
@@ -388,9 +388,9 @@ html[data-theme="light"] .equip-detail-btn:active {
     display: none !important;
 }
 
-/* Show Buttons on Hover */
-.role-summary:hover .summary-equip-btn,
-.role-summary:hover .summary-judge-btn {
+/* Show Button on Hover */
+.role-summary:hover .summary-judge-btn,
+.role-summary:hover .summary-equip-btn {
     display: inline-block !important;
 }
 
@@ -408,11 +408,7 @@ html[data-theme="light"] .equip-detail-btn:active {
     display: none !important;
 }
 
-.char-stats:hover .main-equip-btn,
-.char-stats:hover .main-judge-btn {
-    display: inline-flex !important;
-}
-
+.char-stats:hover .main-judge-btn,
 .char-stats:hover .main-equip-btn {
     display: inline-flex !important;
 }

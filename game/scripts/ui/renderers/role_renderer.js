@@ -176,6 +176,51 @@
     }
 
     /**
+     * Binds click event to a judge button to open the judge area viewer
+     */
+    function setupJudgeButton(btn, role, GameText) {
+        if (!btn || !role) return;
+        
+        btn.onclick = (e) => {
+            e.stopPropagation();
+
+            const areaKey = 'judgeArea';
+            // Even if empty, we might want to show it? Assuming logic similar to others.
+            // But usually we check if area exists.
+            if (!role[areaKey]) return;
+
+            const GT = GameText || window.Game.UI.GameText;
+            const titleSuffix = GT ? GT.render('judgeArea') : 'Judge Area';
+            const title = `${role.name} ${titleSuffix}`;
+            const prefix = 'role-judge:';
+            const sourceId = `${prefix}${role.id}`;
+            const cards = role[areaKey].cards || [];
+
+            // Resolve Name
+            let charNameKey = role.character;
+            if (Array.isArray(charNameKey) && charNameKey.length > 0) charNameKey = charNameKey[0];
+            if (!charNameKey) charNameKey = role.name;
+
+            let ownerNameHtml = charNameKey;
+            if (GT) {
+                ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
+            }
+
+            const openOptions = { 
+                forceFaceDown: false, // Judge area is public
+                ownerName: ownerNameHtml,
+                areaName: titleSuffix
+            };
+
+            if (window.Game.UI.toggleCardViewer) {
+                window.Game.UI.toggleCardViewer(title, cards, sourceId, openOptions);
+            } else if (window.Game.UI.openCardViewer) {
+                window.Game.UI.openCardViewer(title, cards, sourceId, openOptions);
+            }
+        };
+    }
+
+    /**
      * Binds click event to an equipment button to open the equipment viewer
      */
     function setupEquipmentButton(btn, role, GameText) {
@@ -188,37 +233,15 @@
                  // Check if already open to Toggle Closed
                  const existing = window.Game.UI.viewers && window.Game.UI.viewers['equipArea'];
                  
-                 // If opening for a different role, we should close the old one and open new
-                 // If opening for same role, we toggle close.
-                 // Current simple logic: just toggle close if any exists. 
-                 // But wait, if I click Role A, then Role B, Role A's should close and Role B's open.
-                 // The existing logic `if (existing && existing.cleanup)` closes it. 
-                 // We need to differentiate "Close because I clicked same button" vs "Close because I opened another".
-                 // BUT `createEquipmentViewer` likely handles "Close others" internally or we can just close current.
-                 // Let's keep the toggle behavior: If I click, and it's open, is it MINE?
-                 // Since we don't store "owner" on the viewer easily accessible here without digging, 
-                 // let's simple Close if Open. 
-                 
-                 // IMPROVEMENT: Checking if the currently open viewer belongs to THIS role would be better for a true toggle.
-                 // But for now, adhering to previous behavior (Toggle Closed).
-                 
-                 if (existing && existing.cleanup) {
-                     existing.cleanup();
-                     // If we just wanted to close (toggle), we are done via cleanup.
-                     // But if we clicked a DIFFERENT role, we might want to open?
-                     // The previous code in updateSelfRoleInfo just did: if existing, cleanup and return.
-                     // This implies "Toggle Mode": Button 1 Open -> Click Button 1 -> Close.
-                     // But Click Button 1 (Open) -> Click Button 2 -> Close Button 1 (via logic) -> Return? NO.
-                     // We probably want to open Button 2.
-                     
-                     // Let's assume the previous logic was for Self only, so there was only 1 button.
-                     // Now we have multiple.
-                     // Simple UX: Always Open. If Open, Close old.
-                     // True Toggle: If Open AND source is same, Close. If Open and source diff, Close old + Open new.
-                     
-                     // Let's attach a tag to the viewer to know who owns it.
+                 // Toggle Logic: If exists and belongs to THIS role, close and do nothing else.
+                 if (existing) {
+                     // We need to match the owner. 
+                     // Note: createEquipmentViewer returns the DOM el, not the viewer object.
+                     // The viewer object is in window.Game.UI.viewers['equipArea'].
+                     // We must ensure we tagged the viewer object correctly last time.
                      if (existing._ownerId === role.id) {
-                         return; // Just close (toggled off)
+                         existing.cleanup();
+                         return;
                      }
                  }
 
@@ -231,52 +254,18 @@
                  const GT = GameText || window.Game.UI.GameText;
                  const ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
 
-                 const viewer = window.Game.UI.createEquipmentViewer('equipArea', equipData, {
+                 // Create (this internally closes any existing viewers)
+                 window.Game.UI.createEquipmentViewer('equipArea', equipData, {
                      ownerName: ownerNameHtml,
                      areaName: 'Equipment' // Localization?
                  });
-                 if (viewer) viewer._ownerId = role.id; // Tag for toggle logic
+                 
+                 // Tag the NEW control object in the registry (NOT the returned DOM element)
+                 const newViewer = window.Game.UI.viewers['equipArea'];
+                 if (newViewer) newViewer._ownerId = role.id; 
              }
         };
     }
-
-    /**
-     * Bind click event to toggle judge area viewer
-     */
-     function setupJudgeButton(btn, role, GameText) {
-        if (!btn || !role) return;
-
-        btn.onclick = (e) => {
-             e.stopPropagation(); 
-             
-             if (window.Game.UI.createEquipmentViewer) {
-                 const existing = window.Game.UI.viewers && window.Game.UI.viewers['judgeArea'];
-                 
-                 if (existing && existing.cleanup) {
-                     existing.cleanup();
-                     if (existing._ownerId === role.id) {
-                         return;
-                     }
-                 }
-
-                 // Open New - Reusing Equipment Viewer logic but for Judge cards
-                 // We pass judgeArea cards as if they were equipment list
-                 // The viewer might display them simply as a list of cards if the structure matches expectation (array of cards)
-                 const judgeData = role.judgeArea ? role.judgeArea.cards : [];
-                 
-                 const GT = GameText || window.Game.UI.GameText;
-                 const charNameKey = role.character || role.name;
-
-                 const ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
-                 
-                 const viewer = window.Game.UI.createEquipmentViewer('judgeArea', judgeData, {
-                     ownerName: ownerNameHtml,
-                     areaName: 'JudgeArea' 
-                 });
-                 if (viewer) viewer._ownerId = role.id; 
-             }
-        };
-     }
 
     /**
      * 渲染自身角色信息 (Self Role Info)
@@ -345,8 +334,8 @@
         if (equipBtn) {
             setupEquipmentButton(equipBtn, selfRole, GameText);
         }
-
-        // 判定区入口绑定 (Judge Judge Button)
+        
+        // 判定区入口绑定 (Judge Button)
         const judgeBtn = document.querySelector('.main-judge-btn');
         if (judgeBtn) {
             setupJudgeButton(judgeBtn, selfRole, GameText);
@@ -774,20 +763,25 @@
 
             // Stats Row Updates
             
-            // Bind Judge Area Button (Created first to appear left if appending order matters, or use insertBefore)
+            // Bind Judge Button
             let summaryJudgeBtn = pEl.querySelector('.summary-judge-btn');
             if (!summaryJudgeBtn) {
                  const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
                  summaryJudgeBtn = document.createElement('button');
                  summaryJudgeBtn.className = 'judge-detail-btn summary-judge-btn';
                  summaryJudgeBtn.innerText = '判';
-                 // Insert as first child or append if empty, but usually appending works
-                 // To ensure Judge is before Equip, we handle Equip creation after or re-order.
-                 statsDiv.appendChild(summaryJudgeBtn);
+                 // Insert before equip button if it exists, or just append (order matters in creation if appending)
+                 // If equip button exists, insertBefore it.
+                 const equipBtn = pEl.querySelector('.summary-equip-btn');
+                 if (equipBtn) {
+                     statsDiv.insertBefore(summaryJudgeBtn, equipBtn);
+                 } else {
+                     statsDiv.appendChild(summaryJudgeBtn);
+                 }
             }
             setupJudgeButton(summaryJudgeBtn, role, GameText);
-
-            // Bind Equipment Button
+            
+            // Bind Equipment Button (Ensure it exists for legacy elements or updates)
             let summaryEquipBtn = pEl.querySelector('.summary-equip-btn');
             if (!summaryEquipBtn) {
                  const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
