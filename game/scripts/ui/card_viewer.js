@@ -83,6 +83,63 @@
         }
     };
 
+    /**
+     * Helper: Attach Drag-to-Move Logic to a Modal
+     */
+    function attachModalDrag(modal) {
+        const modalContent = modal.querySelector('.modal-content');
+        if (!modalContent) return null;
+
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        const onMouseDown = (e) => {
+            if (e.button !== 0) return;
+            // Ignore interaction elements
+            if (e.target.closest('.card-placeholder') || e.target.closest('button')) return;
+            
+            // Bring to front
+            modal.style.zIndex = ++window.Game.UI.maxViewerZIndex;
+
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            const style = window.getComputedStyle(modalContent);
+            initialLeft = parseInt(style.left) || 0;
+            initialTop = parseInt(style.top) || 0;
+            
+            modalContent.style.cursor = 'grabbing';
+            document.body.style.userSelect = 'none';
+            
+            document.addEventListener('mousemove', onMouseMoveDrag);
+            document.addEventListener('mouseup', onMouseUpDrag);
+        };
+
+        const onMouseMoveDrag = (e) => {
+            if (!isDragging) return;
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            modalContent.style.left = `${initialLeft + dx}px`;
+            modalContent.style.top = `${initialTop + dy}px`;
+        };
+
+        const onMouseUpDrag = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            modalContent.style.cursor = '';
+            document.body.style.userSelect = '';
+            document.removeEventListener('mousemove', onMouseMoveDrag);
+            document.removeEventListener('mouseup', onMouseUpDrag);
+        };
+
+        modalContent.addEventListener('mousedown', onMouseDown);
+        
+        return () => { // Cleanup function
+             modalContent.removeEventListener('mousedown', onMouseDown);
+        };
+    }
+
     // --- Card Viewer Modal Logic ---
     window.Game.UI.openCardViewer = function(title, cards, sourceId, options = {}) {
         // 1. Check if already open
@@ -268,61 +325,10 @@
         }
 
         // 5. Drag Logic (Instance Scoped)
-        const modalContent = modal.querySelector('.modal-content');
-        let dragCleanup = null;
-        if (modalContent) {
-            let isDragging = false;
-            let startX, startY, initialLeft, initialTop;
+        // Replaced inline logic with shared helper
+        const dragCleanup = attachModalDrag(modal);
+        const modalContent = modal.querySelector('.modal-content'); // Keep this reference if needed elsewhere, though it was local before.
 
-            const onMouseDown = (e) => {
-                if (e.button !== 0) return;
-                if (e.target.closest('.card-placeholder') || e.target.closest('button')) return;
-                
-                // Bring to front on click
-                modal.style.zIndex = ++window.Game.UI.maxViewerZIndex;
-
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                
-                // We drag the CONTENT relative to its current position
-                // Note: The Wrapper (modal) is fixed. The Content is relative.
-                // We move the Content using left/top.
-                const style = window.getComputedStyle(modalContent);
-                initialLeft = parseInt(style.left) || 0;
-                initialTop = parseInt(style.top) || 0;
-                
-                modalContent.style.cursor = 'grabbing';
-                document.body.style.userSelect = 'none';
-                
-                document.addEventListener('mousemove', onMouseMoveDrag);
-                document.addEventListener('mouseup', onMouseUpDrag);
-            };
-
-            const onMouseMoveDrag = (e) => {
-                if (!isDragging) return;
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                modalContent.style.left = `${initialLeft + dx}px`;
-                modalContent.style.top = `${initialTop + dy}px`;
-            };
-
-            const onMouseUpDrag = () => {
-                if (!isDragging) return;
-                isDragging = false;
-                modalContent.style.cursor = '';
-                document.body.style.userSelect = '';
-                document.removeEventListener('mousemove', onMouseMoveDrag);
-                document.removeEventListener('mouseup', onMouseUpDrag);
-            };
-
-            modalContent.addEventListener('mousedown', onMouseDown);
-            dragCleanup = () => {
-                 modalContent.removeEventListener('mousedown', onMouseDown);
-                 document.removeEventListener('mousemove', onMouseMoveDrag);
-                 document.removeEventListener('mouseup', onMouseUpDrag);
-            };
-        }
 
         // 6. Cleanup & Close
         const cleanupAndClose = () => {
@@ -392,5 +398,110 @@
              }
         });
     };
+
+    /**
+     * 创建装备区详细查看器
+     * 显示 4 个独立的插槽
+     */
+    window.Game.UI.createEquipmentViewer = function(sourceId, equipCards, options = {}) {
+        // 1. 关闭现有
+        Object.values(window.Game.UI.viewers).forEach(v => v.cleanup());
+        
+        // 2. 创建模态框
+        const modal = document.createElement('div');
+        modal.className = 'card-viewer-modal modal show';
+        modal.style.zIndex = ++window.Game.UI.maxViewerZIndex;
+        
+        // 居中定位
+        /* 
+           对于装备栏，我们通常不需要复杂的滚动条，直接居中显示。
+        */
+        
+        modal.innerHTML = `
+            <div class="modal-content" style="width: auto; max-width: 95vw;">
+                <div class="modal-body" style="padding: 20px; flex-direction: column;">
+                    <div id="card-viewer-watermark-${sourceId}" class="area-watermark"></div>
+                    
+                    <div class="equipment-slots-container">
+                        <div id="equip-slot-0" class="equip-slot" data-slot="0" data-label="武器/Weapon" data-drop-zone="${sourceId}"></div>
+                        <div id="equip-slot-1" class="equip-slot" data-slot="1" data-label="防具/Armor" data-drop-zone="${sourceId}"></div>
+                        <div id="equip-slot-2" class="equip-slot" data-slot="2" data-label="+1 马/Horse" data-drop-zone="${sourceId}"></div>
+                        <div id="equip-slot-3" class="equip-slot" data-slot="3" data-label="-1 马/Horse" data-drop-zone="${sourceId}"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // 3. 填充内容
+        const watermarkEl = document.getElementById(`card-viewer-watermark-${sourceId}`);
+        
+        // Watermark Logic
+        let ownerText = options.ownerName || '';
+        let areaText = options.areaName || 'Equipment'; // Default text
+        
+        // Render Watermark
+        let html = '';
+        if (ownerText) html += `<div class="watermark-owner">${ownerText}</div>`;
+        if (areaText) html += `<div class="watermark-area">${areaText}</div>`;
+        if (watermarkEl) window.Game.UI.safeRender(watermarkEl, html, `viewer-wm:${sourceId}`);
+
+        // Render Slots
+        // equipCards expected to be Array[4] or sparse array
+        const slots = [0, 1, 2, 3];
+        const cardList = Array.isArray(equipCards) ? equipCards : [];
+        
+        slots.forEach(index => {
+            const slotId = `equip-slot-${index}`;
+            const card = cardList[index]; // Simple index mapping
+            
+            // Render specific card to specific slot
+            if (window.Game.UI.renderCardList) {
+                // We treat this slot as a tiny 'list' of 1 card for rendering purposes
+                // But we must ensure renderCardList supports this container
+                // Or we manually render if easier.
+                // Using renderCardList ensures consistency (styles, classes, generic tooltips)
+                const singleCardList = card ? [card] : [];
+                
+                // Note: The dropZoneId is usually the generic 'equipArea' (sourceId)
+                // But specifically targeting a slot might require logic in drag handler.
+                // For now, we pass sourceId.
+                window.Game.UI.renderCardList(slotId, singleCardList, sourceId);
+            }
+        });
+
+        // 5. Drag Logic
+        const dragCleanup = attachModalDrag(modal);
+
+        // 4. Cleanup / Close Logic
+        const cleanup = () => {
+             if (dragCleanup) dragCleanup();
+             modal.classList.add('closing');
+             modal.addEventListener('animationend', () => {
+                 if(modal.parentNode) modal.parentNode.removeChild(modal);
+             }, {once:true});
+             delete window.Game.UI.viewers[sourceId];
+        };
+
+        // Reuse global close logic (document click) - No specific listeners needed on modal
+        // if CSS pointer-events is set correctly (wrapper none, content auto), clicks fall through.
+        // If wrapper blocks, global closer handles it if it doesn't match .card-viewer-modal check?
+        // Actually earlier analysis suggests openCardViewer relies on `document.addEventListener('click')`
+        // checking `!e.target.closest('.card-viewer-modal')`.
+        // If modal wrapper has pointer-events:auto, clicking it protects it from global close.
+        // If modal wrapper has pointer-events:none, clicking it passes to body -> global close.
+        
+        // Assuming standard behavior is sufficient:
+        window.Game.UI.viewers[sourceId] = { 
+            modal, 
+            cleanup,
+            openedAt: Date.now() // Required for global click-to-close logic
+        };
+        
+        return modal;
+    };
+
+    window.Game.UI.createCardViewer = window.Game.UI.openCardViewer;
 
 })();

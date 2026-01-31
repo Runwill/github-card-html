@@ -155,14 +155,7 @@
             // 准备渲染内容
             let htmlContent = '';
             if (renderName !== 'CardBack') {
-                if (GameText) {
-                     htmlContent = GameText.render(renderName);
-                } else if (typeof i18n !== 'undefined' && i18n.t) {
-                     const key = `game.card.${renderName}`;
-                     htmlContent = i18n.t(key, { defaultValue: renderName });
-                } else {
-                     htmlContent = renderName;
-                }
+                 htmlContent = GameText.render(renderName);
             }
 
             // 注入位置序号 (如果开启)

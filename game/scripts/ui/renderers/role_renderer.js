@@ -59,7 +59,7 @@
                 }
 
                 const GameText = window.Game.UI.GameText;
-                const titleSuffix = GameText ? GameText.render(isJudge ? 'judgeArea' : 'hand') : (isJudge ? '判定区' : '手牌');
+                const titleSuffix = GameText.render(isJudge ? 'judgeArea' : 'hand');
                 // Use plain text for window title if needed, or allow HTML if the window title supports it. 
                 // Usually window title is plain text for browser windows, but here it's an overlay.
                 // But let's keep the `title` variable loosely capable of string ops.
@@ -80,15 +80,9 @@
                 if (!charNameKey) charNameKey = currentRole.name;
 
                 // 使用 GameText 渲染 Character (武将) HTML
-                // 参考 role_renderer.js 中 renderRoleSummary 逻辑
                 let ownerNameHtml = charNameKey;
                 if (GameText) {
-                    if (currentRole.characterId) {
-                        ownerNameHtml = GameText.render('Character', { id: currentRole.characterId, name: charNameKey });
-                    } else {
-                        // 尝试简单的渲染，或保留原样
-                        ownerNameHtml = GameText.render(charNameKey);
-                    }
+                    ownerNameHtml = GameText.render('Character', { id: currentRole.characterId, name: charNameKey });
                 }
 
                 const openOptions = { 
@@ -109,8 +103,15 @@
             const openHandInspector = () => openAreaInspector('hand');
             
             // Events
-            element.addEventListener('mousedown', startPress);
-            element.addEventListener('touchstart', startPress, {passive: true});
+            element.addEventListener('mousedown', (e) => {
+                // Ignore clicks on equipment button to prevent double opening
+                if (e.target.closest('#btn-equip-detail') || e.target.closest('.equip-detail-btn')) return;
+                startPress(e);
+            });
+            element.addEventListener('touchstart', (e) => {
+                if (e.target.closest('#btn-equip-detail') || e.target.closest('.equip-detail-btn')) return;
+                startPress(e);
+            }, {passive: true});
 
             element.addEventListener('mouseup', (e) => {
                 cancelPress();
@@ -140,6 +141,9 @@
             //    BUT we need to prevent 'click' if Long Press occurred.
             
             element.addEventListener('click', (e) => {
+                // Ignore clicks on equipment button
+                if (e.target.closest('#btn-equip-detail') || e.target.closest('.equip-detail-btn')) return;
+
                 // If long press triggered, consume this click
                 if (isLongPress) {
                     e.stopImmediatePropagation();
@@ -225,20 +229,43 @@
              if (!key) key = selfRole.name;
 
              // 使用 GameText 渲染 Character (武将)
-             let html;
              // 构造一个唯一标识，用于检查数据是否真正改变
              const renderKey = selfRole.characterId ? `char:${selfRole.characterId}:${key}` : `char:default:${key}`;
 
-             if (selfRole.characterId) {
-                 html = GameText.render('Character', { id: selfRole.characterId, name: key });
-             } else {
-                 html = GameText.render(key);
-             }
+             const html = GameText.render('Character', { id: selfRole.characterId, name: key });
 
              // 使用 GameText.UI.safeRender 替代手动脏检查，更健壮
              window.Game.UI.safeRender(nameEl, html, renderKey);
         }
         
+        // 装备区入口绑定 (Equipment Button)
+        const equipBtn = document.getElementById('btn-equip-detail');
+        if (equipBtn) {
+            // Avoid duplicate binding using a flag or just onlclick assignment
+            equipBtn.onclick = () => {
+                 if (window.Game.UI.createEquipmentViewer) {
+                     // Check if already open to Toggle Closed
+                     const existing = window.Game.UI.viewers && window.Game.UI.viewers['equipArea'];
+                     if (existing && existing.cleanup) {
+                         existing.cleanup();
+                         return;
+                     }
+
+                     // Pass equipArea data (assuming standard Models structure)
+                     const equipData = selfRole.equipArea ? selfRole.equipArea.cards : [];
+                     
+                     // Helper: Resolve Rich HTML Name
+                     const charNameKey = selfRole.character || selfRole.name;
+                     const ownerNameHtml = GameText.render('Character', { id: selfRole.characterId, name: charNameKey });
+
+                     window.Game.UI.createEquipmentViewer('equipArea', equipData, {
+                         ownerName: ownerNameHtml,
+                         areaName: 'Equipment'
+                     });
+                 }
+            };
+        }
+
         // 血量 (Main View)
         const hpEl = document.getElementById('char-hp-display');
         if (hpEl) {
@@ -629,12 +656,9 @@
             if (!key) key = role.name;
             const renderKey = role.characterId ? `char:${role.characterId}:${key}` : `char:default:${key}`;
             if (nameSpan.getAttribute('data-render-key') !== renderKey) {
-                let newNameHtml;
-                if (role.characterId && GameText) {
-                     newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
-                } else {
-                     newNameHtml = GameText ? GameText.render(key) : key;
-                }
+                const newNameHtml = GameText 
+                    ? GameText.render('Character', { id: role.characterId, name: key }) 
+                    : key;
                 nameSpan.innerHTML = newNameHtml;
                 nameSpan.setAttribute('data-render-key', renderKey);
             }

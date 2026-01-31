@@ -256,3 +256,54 @@ body.is-global-dragging .card-grid {
     letter-spacing: 0.1em;
 }
 /* ... rest unchanged */
+
+/* Equipment Viewer Layout */
+.equipment-slots-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping if small screen */
+    gap: 20px;
+    padding: 30px;
+    justify-content: center;
+    width: 100%;
+}
+
+.equip-slot {
+    width: 100px;
+    height: 140px;
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.05);
+    transition: border-color 0.2s;
+}
+
+.equip-slot.highlight {
+    border-color: var(--primary);
+    background: rgba(var(--primary-rgb), 0.1);
+}
+
+.equip-slot::before {
+    content: attr(data-label);
+    position: absolute;
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: bold;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Ensure contents are above label */
+.equip-slot > * {
+    z-index: 1;
+}
+
+.equip-slot .card-placeholder {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+

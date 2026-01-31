@@ -267,3 +267,33 @@ body.is-global-dragging #hand-cards-container {
 .timing-badge .term-click {
     border-bottom: none;
 }
+
+/* Character Details Name Row */
+.char-details .name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.equip-detail-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0.6;
+    transition: all 0.2s;
+    color: var(--text);
+    padding: 0;
+}
+
+.equip-detail-btn:hover {
+    opacity: 1;
+    background: var(--surface-2);
+    transform: scale(1.1);
+}

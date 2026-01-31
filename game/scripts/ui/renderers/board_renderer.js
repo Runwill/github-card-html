@@ -145,7 +145,7 @@
                 const isDeck = wrapper.querySelector('#header-pile') != null; // 简单判断，或者检查容器 ID
                 const GameText = window.Game.UI.GameText;
                 // Fix: use 'pile' instead of 'drawPile' to match main view term
-                const title = GameText ? GameText.render(isDeck ? 'pile' : 'discardPile') : (isDeck ? '牌堆' : '弃牌堆');
+                const title = GameText.render(isDeck ? 'pile' : 'discardPile');
                 const sourceId = isDeck ? 'pile' : 'discardPile'; // Map to GameState keys
                 
                 const openOptions = {

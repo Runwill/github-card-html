@@ -208,6 +208,9 @@
         if (targetZoneId === 'hand') {
             targetArea = currentPlayer.hand;
             moveRole = currentPlayer;
+        } else if (targetZoneId === 'equipArea') {
+            targetArea = currentPlayer.equipArea;
+            moveRole = currentPlayer;
         } else if (targetZoneId === 'treatmentArea') {
             targetArea = GameState.treatmentArea;
             moveRole = currentPlayer; 
@@ -238,6 +241,8 @@
             let sourceArea = null;
             if (sourceAreaName === 'hand') {
                 sourceArea = currentPlayer.hand;
+            } else if (sourceAreaName === 'equipArea') {
+                 sourceArea = currentPlayer.equipArea;
             } else if (sourceAreaName === 'treatmentArea') {
                 sourceArea = GameState.treatmentArea; 
             } else if (sourceAreaName && (sourceAreaName.startsWith('role:') || sourceAreaName.startsWith('role-judge:'))) {
