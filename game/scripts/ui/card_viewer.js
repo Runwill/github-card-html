@@ -206,7 +206,7 @@
 
             // Fallback: Use GameText or Title if explicit separate names are missing
             if (!areaText) {
-                if (window.Game.UI.GameText && sourceId) {
+                if (sourceId) {
                     // Try to get text from common helper
                     // Note: This might return combined string if not updated, but better than nothing
                     const gameText = window.Game.UI.GameText.render(sourceId);

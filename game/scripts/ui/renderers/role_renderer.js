@@ -180,7 +180,6 @@
      * 对应用户操作的当前角色 (UI底部面板)
      */
     function updateSelfRoleInfo(GameState, GameText) {
-        if (!GameText) return;
         
         const selfRole = GameState.players[GameState.currentPlayerIndex];
         if (!selfRole) return;
@@ -656,9 +655,7 @@
             if (!key) key = role.name;
             const renderKey = role.characterId ? `char:${role.characterId}:${key}` : `char:default:${key}`;
             if (nameSpan.getAttribute('data-render-key') !== renderKey) {
-                const newNameHtml = GameText 
-                    ? GameText.render('Character', { id: role.characterId, name: key }) 
-                    : key;
+                const newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
                 nameSpan.innerHTML = newNameHtml;
                 nameSpan.setAttribute('data-render-key', renderKey);
             }

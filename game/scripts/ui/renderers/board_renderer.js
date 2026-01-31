@@ -35,7 +35,7 @@
      * e.g. 处理区 (Treatment Area), 牌堆 (Pile) 等
      */
     function renderBoard(GameState, GameText) {
-        if (!GameText || !GameState) return;
+        if (!GameState) return;
 
         // 1. 处理区 (Treatment Area)
         if (GameState.treatmentArea) {

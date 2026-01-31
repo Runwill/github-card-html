@@ -49,7 +49,7 @@
         const GameText = window.Game.UI.GameText;
 
         // 1. 渲染面包屑
-        if (breadcrumbsEl && GameText) {
+        if (breadcrumbsEl) {
             const activeProcesses = window.Game.Core.getActiveProcesses();
 
             // 用于对比/渲染的结构数据
@@ -144,7 +144,7 @@
         }
 
         // 2. 渲染时机徽标
-        if (timingBadgeEl && GameText) {
+        if (timingBadgeEl) {
             const currentNode = window.Game.Core.getCurrentNode();
             if (currentNode) {
                 // 渲染内容
