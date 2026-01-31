@@ -241,6 +241,44 @@
     }
 
     /**
+     * Bind click event to toggle judge area viewer
+     */
+     function setupJudgeButton(btn, role, GameText) {
+        if (!btn || !role) return;
+
+        btn.onclick = (e) => {
+             e.stopPropagation(); 
+             
+             if (window.Game.UI.createEquipmentViewer) {
+                 const existing = window.Game.UI.viewers && window.Game.UI.viewers['judgeArea'];
+                 
+                 if (existing && existing.cleanup) {
+                     existing.cleanup();
+                     if (existing._ownerId === role.id) {
+                         return;
+                     }
+                 }
+
+                 // Open New - Reusing Equipment Viewer logic but for Judge cards
+                 // We pass judgeArea cards as if they were equipment list
+                 // The viewer might display them simply as a list of cards if the structure matches expectation (array of cards)
+                 const judgeData = role.judgeArea ? role.judgeArea.cards : [];
+                 
+                 const GT = GameText || window.Game.UI.GameText;
+                 const charNameKey = role.character || role.name;
+
+                 const ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
+                 
+                 const viewer = window.Game.UI.createEquipmentViewer('judgeArea', judgeData, {
+                     ownerName: ownerNameHtml,
+                     areaName: 'JudgeArea' 
+                 });
+                 if (viewer) viewer._ownerId = role.id; 
+             }
+        };
+     }
+
+    /**
      * 渲染自身角色信息 (Self Role Info)
      * 对应用户操作的当前角色 (UI底部面板)
      */
@@ -306,6 +344,12 @@
         const equipBtn = document.querySelector('.main-equip-btn');
         if (equipBtn) {
             setupEquipmentButton(equipBtn, selfRole, GameText);
+        }
+
+        // 判定区入口绑定 (Judge Judge Button)
+        const judgeBtn = document.querySelector('.main-judge-btn');
+        if (judgeBtn) {
+            setupJudgeButton(judgeBtn, selfRole, GameText);
         }
 
         // 血量 (Main View)
@@ -730,7 +774,20 @@
 
             // Stats Row Updates
             
-            // Bind Equipment Button (Ensure it exists for legacy elements or updates)
+            // Bind Judge Area Button (Created first to appear left if appending order matters, or use insertBefore)
+            let summaryJudgeBtn = pEl.querySelector('.summary-judge-btn');
+            if (!summaryJudgeBtn) {
+                 const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
+                 summaryJudgeBtn = document.createElement('button');
+                 summaryJudgeBtn.className = 'judge-detail-btn summary-judge-btn';
+                 summaryJudgeBtn.innerText = '判';
+                 // Insert as first child or append if empty, but usually appending works
+                 // To ensure Judge is before Equip, we handle Equip creation after or re-order.
+                 statsDiv.appendChild(summaryJudgeBtn);
+            }
+            setupJudgeButton(summaryJudgeBtn, role, GameText);
+
+            // Bind Equipment Button
             let summaryEquipBtn = pEl.querySelector('.summary-equip-btn');
             if (!summaryEquipBtn) {
                  const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
