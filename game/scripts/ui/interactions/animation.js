@@ -4,16 +4,6 @@
     
     const UI = window.Game.UI;
 
-    function copyComputedStyles(source, target) {
-        const computed = window.getComputedStyle(source);
-        const properties = [
-            'fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 
-            'color', 'textAlign', 'letterSpacing', 'textShadow'
-        ];
-        properties.forEach(prop => target.style[prop] = computed[prop]);
-        target.style.boxSizing = 'border-box';
-    }
-
     function startAnimationLoop() {
         const DragState = UI.DragState;
         const DRAG_CONFIG = UI.DragConfig;
@@ -53,7 +43,7 @@
             ghost = temp.firstElementChild;
         } else if (source && source.nodeType === 1) {
             ghost = source.cloneNode(true);
-            copyComputedStyles(source, ghost);
+            UI.copyStyles(source, ghost);
             // Sync specific state attributes if useful
             if (source.getAttribute('data-card-key')) {
                 ghost.setAttribute('data-card-key', source.getAttribute('data-card-key'));
@@ -147,14 +137,9 @@
         const transitionRule = 'opacity 0.3s, background-color 0.3s, background-image 0.3s, color 0.3s, filter 0.3s, border-color 0.3s, box-shadow 0.3s';
         el.style.transition = transitionRule;
         
-        console.group('[DragAnim] animateDropToPlaceholder details');
-        console.log('Ghost Element:', el);
-        console.log('Set Transition:', el.style.transition);
-
         // FORCE REFLOW: Ensure the browser registers the "Before" state (e.g. key='dodge', transition enabled)
         // before we flip the switch to 'CardBack'. This is crucial for triggering the transition.
         const reflowVal = el.offsetWidth;
-        console.log('Forced Reflow. Width:', reflowVal);
 
         // If the target (placeholder) has a different state (e.g. CardBack),
         // we apply it to the dragging ghost to trigger CSS transitions (flip/fade).
@@ -166,38 +151,19 @@
             const container = placeholder.parentElement;
             if (container && container.getAttribute('data-force-facedown') === 'true') {
                  targetKey = 'CardBack';
-                 console.log('[DragAnim] Override Target Key to CardBack (Zone Rule)');
             }
 
             const currentKey = el.getAttribute('data-card-key');
             
-            console.log(`Key Check: Current='${currentKey}', Target='${targetKey}'`);
-
             if (targetKey && currentKey !== targetKey) {
-                // Determine if we need to force a flip style
-                console.log(`[DragAnim] Syncing Keys: ${currentKey} -> ${targetKey}`);
-                
                 // Critical: Apply the key change immediately to start CSS transitions
                 el.setAttribute('data-card-key', targetKey);
                 
                 // Visual Highlight: Add a class to indicate active transition state
                 // This can be used in CSS to force 3D rotation or ensure properties are prioritized
                 el.classList.add('is-flipping-state');
-                
-                // Optional: visual enhancement for flip
-                // We could add a 'flipping' class if we wanted 3D rotate, 
-                // but for now relying on CSS background/opacity transitions.
-                
-                // Forced Toggle: access generic style properties to guarantee update
-                if (targetKey === 'CardBack') {
-                     // Ensure text hides immediately if transition is too slow for short distances
-                     // But we want animation, so we trust the transition rule set above `el.style.transition`
-                }
-            } else {
-                console.log('[DragAnim] Keys match or invalid, no flip triggered.');
             }
         }
-        console.groupEnd();
 
         const loop = () => {
             if (!el.isConnected) return; 
@@ -293,7 +259,7 @@
         startAnimationLoop,
         animateDropToPlaceholder,
         createGhost,
-        copyComputedStyles
+        // copyComputedStyles (Removed: now in UI.copyStyles)
     };
 
 })();

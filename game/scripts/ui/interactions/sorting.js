@@ -3,42 +3,10 @@
     window.Game.UI = window.Game.UI || {};
 
     const UI = window.Game.UI;
+    const getLayoutRect = UI.getLayoutRect; // Import from global
 
     function getSortableSelector(el) {
         return el.getAttribute('data-item-selector') || '.card-placeholder';
-    }
-
-    // 获取元素真实的布局 Rect (忽略 Transform 动画的影响)
-    function getLayoutRect(el) {
-        const rect = el.getBoundingClientRect();
-        const style = window.getComputedStyle(el);
-        const transform = style.transform;
-        
-        if (transform && transform !== 'none') {
-            // 解析 matrix(a, b, c, d, tx, ty)
-            const match = transform.match(/matrix\((.+)\)/);
-            if (match) {
-                const values = match[1].split(',').map(parseFloat);
-                if (values.length >= 6) {
-                    const tx = values[4];
-                    const ty = values[5];
-                    // 视觉位置 = 布局位置 + transform
-                    // 布局位置 = 视觉位置 - transform
-                    return {
-                        left: rect.left - tx,
-                        top: rect.top - ty,
-                        right: rect.right - tx,
-                        bottom: rect.bottom - ty,
-                        width: rect.width,
-                        height: rect.height,
-                        // 兼容 x, y
-                        x: rect.left - tx,
-                        y: rect.top - ty
-                    };
-                }
-            }
-        }
-        return rect;
     }
 
     function performPlaceholderMove(targetContainer, targetSibling, hidePlaceholder = false) {

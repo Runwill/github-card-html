@@ -63,6 +63,25 @@
 }
 
 /* ... gradient masks ... */
+/* Default: Mask logic driven by JS classes .at-start / .at-end */
+
+/* 1. At Start (Hide Right Edge if overflow) */
+.card-viewer-modal .modal-body.at-start:not(.at-end) {
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - 60px), transparent 100%);
+}
+
+/* 2. At End (Hide Left Edge) */
+.card-viewer-modal .modal-body.at-end:not(.at-start) {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60px);
+    mask-image: linear-gradient(to right, transparent 0%, black 60px);
+}
+
+/* 3. In Middle (Hide Both) */
+.card-viewer-modal .modal-body:not(.at-start):not(.at-end) {
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
+}
 
 /* The actual scrollable list */
 .card-grid {

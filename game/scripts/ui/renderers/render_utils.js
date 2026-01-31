@@ -83,4 +83,59 @@
 
     window.Game.UI.safeRender = safeRender;
     // window.Game.UI.safeRenderList = safeRenderList; // 暂不需要，具体列表逻辑较复杂
+
+    /**
+     * 获取元素真实的布局 Rect (忽略 Transform 动画的影响)
+     * 用于在 FLIP 动画或拖拽计算中获取元素的“最终/目前”所占位置，而非视觉位置。
+     */
+    function getLayoutRect(el) {
+        if (!el) return null;
+        const rect = el.getBoundingClientRect();
+        const style = window.getComputedStyle(el);
+        const transform = style.transform;
+        
+        if (transform && transform !== 'none') {
+            // 解析 matrix(a, b, c, d, tx, ty)
+            const match = transform.match(/matrix\((.+)\)/);
+            if (match) {
+                const values = match[1].split(',').map(parseFloat);
+                if (values.length >= 6) {
+                    const tx = values[4];
+                    const ty = values[5];
+                    // 视觉位置 = 布局位置 + transform
+                    // 布局位置 = 视觉位置 - transform
+                    return {
+                        left: rect.left - tx,
+                        top: rect.top - ty,
+                        right: rect.right - tx,
+                        bottom: rect.bottom - ty,
+                        width: rect.width,
+                        height: rect.height,
+                        // 兼容 x, y
+                        x: rect.left - tx,
+                        y: rect.top - ty
+                    };
+                }
+            }
+        }
+        return rect;
+    }
+
+    /**
+     * 复制计算后的关键样式属性
+     * 用于克隆体 (Ghost) 或 测量元素
+     */
+    function copyStyles(source, target) {
+        if (!source || !target) return;
+        const computed = window.getComputedStyle(source);
+        const properties = [
+            'fontFamily', 'fontSize', 'fontWeight', 'lineHeight', 
+            'color', 'textAlign', 'letterSpacing', 'textShadow'
+        ];
+        properties.forEach(prop => target.style[prop] = computed[prop]);
+        target.style.boxSizing = 'border-box';
+    }
+
+    window.Game.UI.getLayoutRect = getLayoutRect;
+    window.Game.UI.copyStyles = copyStyles;
 })();
