@@ -161,7 +161,7 @@
             // Cancel on move/drag
             element.addEventListener('mousemove', () => { /* Optional movement threshold check? Simplify for now */ });
             element.addEventListener('mouseleave', cancelPress);
-            element.addEventListener('touchmove', cancelPress);
+            element.addEventListener('touchmove', cancelPress, { passive: true });
         }
     }
 
@@ -173,6 +173,71 @@
     function resolveAvatarUrl(role) {
         // 模型层（Player Class）现在负责确保 avatar 属性总是存在的
         return role.avatar || '';
+    }
+
+    /**
+     * Binds click event to an equipment button to open the equipment viewer
+     */
+    function setupEquipmentButton(btn, role, GameText) {
+        if (!btn || !role) return;
+
+        btn.onclick = (e) => {
+             e.stopPropagation(); // Prevent triggering parent click (Hand Inspector)
+             
+             if (window.Game.UI.createEquipmentViewer) {
+                 // Check if already open to Toggle Closed
+                 const existing = window.Game.UI.viewers && window.Game.UI.viewers['equipArea'];
+                 
+                 // If opening for a different role, we should close the old one and open new
+                 // If opening for same role, we toggle close.
+                 // Current simple logic: just toggle close if any exists. 
+                 // But wait, if I click Role A, then Role B, Role A's should close and Role B's open.
+                 // The existing logic `if (existing && existing.cleanup)` closes it. 
+                 // We need to differentiate "Close because I clicked same button" vs "Close because I opened another".
+                 // BUT `createEquipmentViewer` likely handles "Close others" internally or we can just close current.
+                 // Let's keep the toggle behavior: If I click, and it's open, is it MINE?
+                 // Since we don't store "owner" on the viewer easily accessible here without digging, 
+                 // let's simple Close if Open. 
+                 
+                 // IMPROVEMENT: Checking if the currently open viewer belongs to THIS role would be better for a true toggle.
+                 // But for now, adhering to previous behavior (Toggle Closed).
+                 
+                 if (existing && existing.cleanup) {
+                     existing.cleanup();
+                     // If we just wanted to close (toggle), we are done via cleanup.
+                     // But if we clicked a DIFFERENT role, we might want to open?
+                     // The previous code in updateSelfRoleInfo just did: if existing, cleanup and return.
+                     // This implies "Toggle Mode": Button 1 Open -> Click Button 1 -> Close.
+                     // But Click Button 1 (Open) -> Click Button 2 -> Close Button 1 (via logic) -> Return? NO.
+                     // We probably want to open Button 2.
+                     
+                     // Let's assume the previous logic was for Self only, so there was only 1 button.
+                     // Now we have multiple.
+                     // Simple UX: Always Open. If Open, Close old.
+                     // True Toggle: If Open AND source is same, Close. If Open and source diff, Close old + Open new.
+                     
+                     // Let's attach a tag to the viewer to know who owns it.
+                     if (existing._ownerId === role.id) {
+                         return; // Just close (toggled off)
+                     }
+                 }
+
+                 // Pass equipArea data (assuming standard Models structure)
+                 const equipData = role.equipArea ? role.equipArea.cards : [];
+                 
+                 // Helper: Resolve Rich HTML Name
+                 const charNameKey = role.character || role.name;
+                 // GameText might need to be retrieved from window if not passed, but we pass it or fallback
+                 const GT = GameText || window.Game.UI.GameText;
+                 const ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
+
+                 const viewer = window.Game.UI.createEquipmentViewer('equipArea', equipData, {
+                     ownerName: ownerNameHtml,
+                     areaName: 'Equipment' // Localization?
+                 });
+                 if (viewer) viewer._ownerId = role.id; // Tag for toggle logic
+             }
+        };
     }
 
     /**
@@ -240,29 +305,7 @@
         // 装备区入口绑定 (Equipment Button)
         const equipBtn = document.getElementById('btn-equip-detail');
         if (equipBtn) {
-            // Avoid duplicate binding using a flag or just onlclick assignment
-            equipBtn.onclick = () => {
-                 if (window.Game.UI.createEquipmentViewer) {
-                     // Check if already open to Toggle Closed
-                     const existing = window.Game.UI.viewers && window.Game.UI.viewers['equipArea'];
-                     if (existing && existing.cleanup) {
-                         existing.cleanup();
-                         return;
-                     }
-
-                     // Pass equipArea data (assuming standard Models structure)
-                     const equipData = selfRole.equipArea ? selfRole.equipArea.cards : [];
-                     
-                     // Helper: Resolve Rich HTML Name
-                     const charNameKey = selfRole.character || selfRole.name;
-                     const ownerNameHtml = GameText.render('Character', { id: selfRole.characterId, name: charNameKey });
-
-                     window.Game.UI.createEquipmentViewer('equipArea', equipData, {
-                         ownerName: ownerNameHtml,
-                         areaName: 'Equipment'
-                     });
-                 }
-            };
+            setupEquipmentButton(equipBtn, selfRole, GameText);
         }
 
         // 血量 (Main View)
@@ -594,14 +637,16 @@
                 const hpSpan = document.createElement('span');
                 hpSpan.className = 'player-hp stat-hp';
                 statsDiv.appendChild(hpSpan);
+
+                // Equipment Button (Summary View) - Hidden by default, shown on hover
+                const summaryEquipBtn = document.createElement('button');
+                summaryEquipBtn.className = 'equip-detail-btn summary-equip-btn';
+                summaryEquipBtn.title = 'Equipment';
+                summaryEquipBtn.innerText = '備'; 
+                // Style adjustment for summary context if needed is done via CSS
+                statsDiv.appendChild(summaryEquipBtn);
                 
                 pEl.appendChild(statsDiv);
-                
-                const equipDiv = document.createElement('div');
-                equipDiv.className = 'player-equips';
-                equipDiv.style.fontSize = '0.8em';
-                equipDiv.style.color = '#aaa';
-                pEl.appendChild(equipDiv);
                 
                 // Add animation class for new elements (e.g. moving from Main View to Role View)
                 pEl.classList.add('role-moving');
@@ -685,6 +730,18 @@
 
             // Stats Row Updates
             
+            // Bind Equipment Button (Ensure it exists for legacy elements or updates)
+            let summaryEquipBtn = pEl.querySelector('.summary-equip-btn');
+            if (!summaryEquipBtn) {
+                 const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
+                 summaryEquipBtn = document.createElement('button');
+                 summaryEquipBtn.className = 'equip-detail-btn summary-equip-btn';
+                 summaryEquipBtn.title = 'Equipment';
+                 summaryEquipBtn.innerText = '備';
+                 statsDiv.appendChild(summaryEquipBtn);
+            }
+            setupEquipmentButton(summaryEquipBtn, role, GameText);
+
             // 座次 (Seat)
             const seatSpan = pEl.querySelector('.player-seat');
             /* Seat Temporarily Hidden
@@ -731,28 +788,6 @@
                 }
             }
             
-            // 装备区
-            const equipDiv = pEl.querySelector('.player-equips');
-            if (equipDiv) {
-                if (role.equipArea && role.equipArea.cards && role.equipArea.cards.length > 0) {
-                     const equipNames = role.equipArea.cards.map(c => {
-                         // 模型层保证 EquipArea 中的元素是 Card 实例
-                         const cName = c.name;
-                         return (typeof i18n !== 'undefined' && i18n.t) ? i18n.t(`game.card.${cName}`, {defaultValue: cName}) : cName;
-                     });
-                     const newEquipText = `[${equipNames.join(',')}]`;
-                     if (equipDiv.textContent !== newEquipText) {
-                         equipDiv.textContent = newEquipText;
-                         // Add a specialized render key if we want to support HTML rendering in future, 
-                         // but for textContent, the content check is usually sufficient unless formatting changes.
-                     }
-                } else {
-                     if (equipDiv.textContent !== '') {
-                        equipDiv.textContent = '';
-                     }
-                }
-            }
-
             // 右键菜单
             pEl.oncontextmenu = (e) => {
                 e.preventDefault();

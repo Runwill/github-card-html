@@ -276,24 +276,80 @@ body.is-global-dragging #hand-cards-container {
 }
 
 .equip-detail-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 4px; /* Square with slight roundness */
+    width: 24px;
+    height: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 14px;
-    opacity: 0.6;
+    font-size: 16px; /* Increased slightly for ZhuanShu readability */
+    font-weight: normal; /* ZhuanShu is naturally bold */
+    font-family: '明朝';
+    color: #ffd700; /* Gold color for 'Equipment' */
+    opacity: 0.9;
     transition: all 0.2s;
-    color: var(--text);
     padding: 0;
+    margin-left: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .equip-detail-btn:hover {
     opacity: 1;
-    background: var(--surface-2);
-    transform: scale(1.1);
+    background: rgba(255, 215, 0, 0.2); /* Gold tint */
+    border-color: #ffd700;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.equip-detail-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 1px rgba(0,0,0,0.5);
+    background: rgba(255, 215, 0, 0.3);
+    border-color: #b89600; 
+}
+
+/* Light Theme Support */
+html[data-theme="light"] .equip-detail-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(139, 69, 19, 0.3); /* SaddleBrown tint */
+    color: #8B4513; /* SaddleBrown for visibility on light */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+html[data-theme="light"] .equip-detail-btn:hover {
+    background: rgba(139, 69, 19, 0.1);
+    border-color: #8B4513;
+    text-shadow: none; /* Clean look for light mode */
+}
+
+html[data-theme="light"] .equip-detail-btn:active {
+    background: rgba(139, 69, 19, 0.2);
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Sidebar Role Hover Interaction */
+.summary-equip-btn {
+    display: none;
+    /* Adjust size for sidebar context if needed, inherits main style otherwise */
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    line-height: 22px;
+    margin: 0 auto;
+}
+
+/* Hide Stats on Hover - Relaxed Selector */
+.role-summary:hover .player-hp,
+.role-summary:hover .player-hand-count {
+    display: none !important;
+}
+
+/* Show Button on Hover */
+.role-summary:hover .summary-equip-btn {
+    display: inline-block !important;
 }

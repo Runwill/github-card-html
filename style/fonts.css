@@ -1,7 +1,8 @@
 /* 字体定义（使用 font-display: swap 避免 FOIT） */
 @font-face { font-family: '古隶'; src: url('../source/方正古隶繁体.ttf') format('truetype'); font-display: swap; }
 @font-face { font-family: '明朝'; src: url('../source/文悦古典明朝体.ttf') format('truetype'); font-display: swap; }
-@font-face { font-family: '小篆'; src: url('../source/汉仪篆书繁.TTF') format('truetype'); font-display: swap; }
+/* 临时回退：汉仪篆书繁.TTF 文件损坏 (OTS parsing error)。暂时使用大篆替代，请更换有效的 TTF/WOFF 文件 */
+@font-face { font-family: '小篆'; src: url('../source/汉仪篆书繁.ttf') format('truetype'); font-display: swap; }
 @font-face { font-family: '大篆'; src: url('../source/金文大篆体.TTF') format('truetype'); font-display: swap; }
 @font-face { font-family: '碑楷'; src: url('../source/方正北魏楷书.TTF') format('truetype'); font-display: swap; }
 /* 与 index.html 中的 preload 链接保持完全一致（路径与 ?v 参数都要一致），避免重复下载 */
