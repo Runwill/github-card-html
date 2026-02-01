@@ -169,19 +169,39 @@
         const count = Object.keys(window.Game.UI.viewers).length;
         const offset = count * 20; 
         
-        // Center positioning logic override
-        // Base .modal has fixed top: 50%, left: 50%, transform: translate(-50%, -50%)
-        // We want to add an offset. 
-        // We can't easily add to '50%'. 
-        // But we can adjust margin-left / margin-top.
         modal.style.marginLeft = `${offset}px`;
         modal.style.marginTop = `${offset}px`;
 
+        // Determine Layout
+        let bodyContent = '';
+        if (options.slots && Array.isArray(options.slots)) {
+            // Layout: Multi-Slot (e.g. Equipment)
+            bodyContent = `<div class="equipment-slots-container">
+                ${options.slots.map(slot => `
+                    <div id="viewer-slot-${sourceId}-${slot.index}" 
+                         class="equip-slot" 
+                         data-slot="${slot.index}" 
+                         data-label="${slot.label || ''}" 
+                         data-drop-zone="${sourceId}:slot:${slot.index}"></div>
+                `).join('')}
+            </div>`;
+        } else {
+            // Layout: Standard Grid (Hand, Pile, Judge)
+            // Note: Escape sourceId just in case, but usually safe for ID attribute if simple chars
+            // We use simple string interpolation here.
+            bodyContent = `<div id="card-viewer-grid-${sourceId}" class="card-grid" data-drop-zone="${sourceId}"></div>`;
+        }
+
+        // Modal Content
+        // Use auto width for slots to fit content tightly
+        const modalStyle = options.slots ? 'width: auto; max-width: 95vw;' : '';
+        const bodyStyle = options.slots ? 'padding: 20px; flex-direction: column;' : '';
+
         modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-body">
+            <div class="modal-content" style="${modalStyle}">
+                <div class="modal-body" style="${bodyStyle}">
                     <div id="card-viewer-watermark-${sourceId}" class="area-watermark"></div>
-                    <div id="card-viewer-grid-${sourceId}" class="card-grid" data-drop-zone="${sourceId}"></div>
+                    ${bodyContent}
                 </div>
             </div>
         `;
@@ -189,95 +209,103 @@
         document.body.appendChild(modal);
 
         // 3. Populate Content
-        // ... (rest of function) ...
         const modalBody = modal.querySelector('.modal-body');
-
-        // Fix: Escape querySelector string for ID containing colons (e.g. role:3)
-        // CSS.escape() is standard, but simple manual escape for colon is safer for selector syntax.
-        // Or simply getElementById which doesn't require escaping
         const watermarkEl = document.getElementById(`card-viewer-watermark-${sourceId}`);
-        const grid = document.getElementById(`card-viewer-grid-${sourceId}`);
-        const scrollTarget = grid;
+        // Scroll Target depends on layout
+        const scrollTarget = options.slots ? null : document.getElementById(`card-viewer-grid-${sourceId}`);
 
-        // Watermark: Construct distinct lines for Owner and Area if provided
+        // Watermark Logic
         if (watermarkEl) {
             let ownerText = options.ownerName || '';
             let areaText = options.areaName || '';
 
-            // Fallback: Use GameText or Title if explicit separate names are missing
             if (!areaText) {
                 if (sourceId) {
-                    // Try to get text from common helper
-                    // Note: This might return combined string if not updated, but better than nothing
-                    const gameText = window.Game.UI.GameText.render(sourceId);
+                    const gameText = window.Game.UI.GameText ? window.Game.UI.GameText.render(sourceId) : sourceId;
                     if (gameText) areaText = gameText;
                 }
-                
-                // Last resort fallback to title
-                if (!areaText && title) {
-                    areaText = title;
-                }
+                if (!areaText && title) areaText = title;
             }
 
-            // Render
             let html = '';
-            // If we have an owner, display it distinctly (Small Header style)
-            if (ownerText) {
-                html += `<div class="watermark-owner">${ownerText}</div>`;
-            }
-            // If we have area name (Large Watermark style)
-            if (areaText) {
-                html += `<div class="watermark-area">${areaText}</div>`;
-            }
+            if (ownerText) html += `<div class="watermark-owner">${ownerText}</div>`;
+            if (areaText) html += `<div class="watermark-area">${areaText}</div>`;
             
-            // 使用 safeRender 确保动态文本 (Term) 能够正确渲染和绑定
-            // 注意：HTML 字符串是拼接而成的，我们给个复合 Key，或依赖 safeRender 的内部 diff
             if (window.Game.UI.safeRender) {
-                // key: viewer-watermark-{sourceId}
-                // 移除 Date.now()，依赖 safeRender 和 sourceId 的唯一性
                 window.Game.UI.safeRender(watermarkEl, html, `viewer-wm:${sourceId}`);
             } else {
                 watermarkEl.innerHTML = html;
             }
         }
 
-        // Cards
-        if (window.Game.UI.renderCardList && sourceId) {
-             const renderOptions = { 
-                skipLayout: true, 
-                showIndex: true,
-                forceFaceDown: options.forceFaceDown // Pass through forceFaceDown
-             };
-             window.Game.UI.renderCardList(grid.id, cards, sourceId, renderOptions);
+        // Initial Card Render
+        if (window.Game.UI.renderCardList) {
+            if (options.slots) {
+                // Multi-Slot: cards is [ [Card...], [Card...] ]
+                // Or user passed flat array? We expect Array of Arrays.
+                // Or the caller logic will handle updating via updateAllViewers shortly anyway.
+                // Let's try to render initial state if possible.
+                options.slots.forEach(slot => {
+                    let slotCards = [];
+                    if (Array.isArray(cards)) {
+                        if (Array.isArray(cards[slot.index])) {
+                            slotCards = cards[slot.index];
+                        } else if (cards[slot.index]) {
+                            // Single card fallback
+                             slotCards = [cards[slot.index]];
+                        }
+                    }
+                    
+                    const slotElId = `viewer-slot-${sourceId}-${slot.index}`;
+                    const slotDropZone = `${sourceId}:slot:${slot.index}`;
+                    window.Game.UI.renderCardList(slotElId, slotCards, slotDropZone, { 
+                        skipLayout: true, 
+                        forceFaceDown: false 
+                    });
+                });
+            } else {
+                // Single Grid
+                const gridId = `card-viewer-grid-${sourceId}`;
+                window.Game.UI.renderCardList(gridId, cards, sourceId, { 
+                    skipLayout: true, 
+                    showIndex: true,
+                    forceFaceDown: options.forceFaceDown
+                });
+            }
         }
 
         // 4. Scrolling Animation Logic (Instance Scoped)
+        // Only if scrollTarget exists (Grid Layout)
         let scrollRafId = null;
-        let scrollVelocity = 0;
-        let scrollDirection = 0;
+        let dragCleanup = null;
 
-        // Auto-scroll to end
         if (scrollTarget) {
+            // ... (Existing Scroll Logic for Grid) ...
+            let scrollVelocity = 0;
+            let scrollDirection = 0;
+
+            const updateStartEndClasses = () => {
+                 if (!modalBody || !scrollTarget) return;
+                 const TOLERANCE = 5; 
+                 const current = scrollTarget.scrollLeft;
+                 const max = scrollTarget.scrollWidth - scrollTarget.clientWidth;
+                 modalBody.classList.toggle('at-start', current <= TOLERANCE);
+                 modalBody.classList.toggle('at-end', current >= max - TOLERANCE);
+            };
+
+            // Auto-scroll to end on open
             requestAnimationFrame(() => {
                 scrollTarget.scrollLeft = scrollTarget.scrollWidth;
                 updateStartEndClasses();
             });
-        }
 
-        function updateStartEndClasses() {
-             if (!modalBody || !scrollTarget) return;
-             const TOLERANCE = 5; 
-             const current = scrollTarget.scrollLeft;
-             const max = scrollTarget.scrollWidth - scrollTarget.clientWidth;
-             
-             modalBody.classList.toggle('at-start', current <= TOLERANCE);
-             modalBody.classList.toggle('at-end', current >= max - TOLERANCE);
-        }
-
-        if (modalBody && scrollTarget) {
             const ZONE_WIDTH = 80;
+            const MAX_SPEED = 80;
+            const SCROLL_ACCEL = 3.0;
+            const SCROLL_FRICTION = 0.85;
+
             const updateScroll = () => {
-                if (!document.body.contains(modal)) { // Check if removed
+                if (!document.body.contains(modal)) { 
                     scrollRafId = null;
                     return;
                 }
@@ -324,38 +352,30 @@
             modalBody.addEventListener('mouseleave', onMouseLeave);
         }
 
-        // 5. Drag Logic (Instance Scoped)
-        // Replaced inline logic with shared helper
-        const dragCleanup = attachModalDrag(modal);
-        const modalContent = modal.querySelector('.modal-content'); // Keep this reference if needed elsewhere, though it was local before.
-
+        // 5. Drag Logic
+        dragCleanup = attachModalDrag(modal);
 
         // 6. Cleanup & Close
         const cleanupAndClose = () => {
-             // Remove from registry immediately to prevent loop
              if (window.Game.UI.viewers[sourceId]) delete window.Game.UI.viewers[sourceId];
-
-             // Stop loops
              if (scrollRafId) cancelAnimationFrame(scrollRafId);
              if (dragCleanup) dragCleanup();
              
-             // Animate Out
              modal.classList.add('closing');
              const onAnimEnd = () => {
                  if (modal.parentNode) modal.parentNode.removeChild(modal);
              };
              modal.addEventListener('animationend', onAnimEnd);
-             setTimeout(onAnimEnd, 250); // Fallback
+             setTimeout(onAnimEnd, 250); 
         };
 
-        // Store
         window.Game.UI.viewers[sourceId] = {
             modal: modal,
             title: title,
             sourceId: sourceId,
-            options: options, // Save options for re-render
+            options: options, 
             cleanup: cleanupAndClose,
-            openedAt: Date.now() // Track for click-safety
+            openedAt: Date.now()
         };
     };
 
@@ -366,42 +386,42 @@
 
         Object.values(window.Game.UI.viewers).forEach(viewer => {
              const { sourceId, modal, options } = viewer;
+             if (!sourceId) return;
 
-             if (!sourceId) return; // Safety check
-             
-             // --- Special Case: Equipment Viewer (Multi-Slot) ---
-             if (modal.classList.contains('card-viewer-modal') && modal.querySelector('.equipment-slots-container')) {
-                 // Check if it's an equipment viewer
-                 // Resolve ID to role
-                 // Format: role:ID:equip
+             // --- Type A: Multi-Slot Viewer (Generic) ---
+             if (options.slots && Array.isArray(options.slots)) {
+                 // Logic: Determine Data Source based on ID, then fill slots
+                 // Currently only supports Role Equipment via 'role:ID:equip' pattern
+                 let allSlotsData = null;
+
                  if (sourceId.startsWith('role:') && sourceId.includes(':equip')) {
                      const roleId = parseInt(sourceId.split(':')[1]);
                      const player = GameState.players.find(p => p.id === roleId);
-                     
                      if (player && player.equipSlots) {
-                         // Iterate slots 0..3
-                         player.equipSlots.forEach((slotArea, index) => {
-                             const slotId = `equip-slot-${index}`;
-                             // Only update if slot container exists
-                             if (modal.querySelector(`#${slotId}`)) {
-                                 const cards = slotArea.cards; // Should be array of 1 or 0
-                                 
-                                 // Render with correct options (forceFaceDown false)
-                                 const renderOptions = { 
-                                    skipLayout: true, // Slots are fixed size
-                                    forceFaceDown: false // Equipment is public, usually
-                                 };
-                                 
-                                 const slotDropZone = `${sourceId}:slot:${index}`;
-                                 window.Game.UI.renderCardList(slotId, cards, slotDropZone, renderOptions);
-                             }
-                         });
+                         allSlotsData = player.equipSlots.map(s => s.cards);
                      }
                  }
-                 return; // Handled
+                 
+                 // Render if we found data
+                 if (allSlotsData) {
+                     options.slots.forEach(slot => {
+                         const targetId = `viewer-slot-${sourceId}-${slot.index}`;
+                         if (document.getElementById(targetId)) {
+                             const idx = slot.index;
+                             const cards = (allSlotsData[idx] && Array.isArray(allSlotsData[idx])) ? allSlotsData[idx] : [];
+                             const dropZone = `${sourceId}:slot:${idx}`; // Consistent Drop Zone
+                             
+                             window.Game.UI.renderCardList(targetId, cards, dropZone, { 
+                                 skipLayout: true, 
+                                 forceFaceDown: false 
+                             });
+                         }
+                     });
+                 }
+                 return;
              }
 
-             // --- Standard Grid Viewer ---
+             // --- Type B: Standard Grid Viewer ---
              const grid = modal.querySelector('.card-grid');
              if (!grid) return;
 
@@ -415,8 +435,6 @@
                  cards = (GameState.treatmentArea && GameState.treatmentArea.cards) ? GameState.treatmentArea.cards : [];
              } else if (sourceId.startsWith('role:') || sourceId.startsWith('role-judge:')) {
                  const isJudge = sourceId.startsWith('role-judge:');
-                 const isEquip = sourceId.includes(':equip'); // Though handled above, just safety
-                 
                  // Fix: Parse ID carefully
                  const roleId = parseInt(sourceId.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));
                  
@@ -425,153 +443,20 @@
                      // Determine Area
                      let area = null;
                      if (isJudge) area = player.judgeArea;
-                     else if (isEquip) area = player.equipArea; // Legacy flat getter if used here
-                     else area = player.hand;
+                     else area = player.hand; // Default to hand for simple role:ID
                      
                      if (area && area.cards) cards = area.cards;
                  }
              }
 
              if (window.Game.UI.renderCardList) {
-                 const renderOptions = { 
+                 window.Game.UI.renderCardList(grid.id, cards, sourceId, { 
                     skipLayout: true, 
                     showIndex: true,
                     forceFaceDown: options.forceFaceDown
-                 };
-                 // This will perform Diffing/Dom updates
-                 window.Game.UI.renderCardList(grid.id, cards, sourceId, renderOptions);
+                 });
              }
         });
-    };
-
-    /**
-     * 创建装备区详细查看器
-     * 显示 4 个独立的插槽
-     */
-    window.Game.UI.createEquipmentViewer = function(sourceId, equipCards, options = {}) {
-        // 1. 关闭现有
-        Object.values(window.Game.UI.viewers).forEach(v => v.cleanup());
-        
-        // 2. 创建模态框
-        const modal = document.createElement('div');
-        modal.className = 'card-viewer-modal modal show';
-        modal.style.zIndex = ++window.Game.UI.maxViewerZIndex;
-        
-        // 居中定位
-        /* 
-           对于装备栏，我们通常不需要复杂的滚动条，直接居中显示。
-        */
-        
-        modal.innerHTML = `
-            <div class="modal-content" style="width: auto; max-width: 95vw;">
-                <div class="modal-body" style="padding: 20px; flex-direction: column;">
-                    <div id="card-viewer-watermark-${sourceId}" class="area-watermark"></div>
-                    
-                    <div class="equipment-slots-container">
-                        <div id="equip-slot-0" class="equip-slot" data-slot="0" data-label="武器/Weapon" data-drop-zone="${sourceId}:slot:0"></div>
-                        <div id="equip-slot-1" class="equip-slot" data-slot="1" data-label="防具/Armor" data-drop-zone="${sourceId}:slot:1"></div>
-                        <div id="equip-slot-2" class="equip-slot" data-slot="2" data-label="+1 马/Horse" data-drop-zone="${sourceId}:slot:2"></div>
-                        <div id="equip-slot-3" class="equip-slot" data-slot="3" data-label="-1 马/Horse" data-drop-zone="${sourceId}:slot:3"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(modal);
-
-        // 3. 填充内容
-        const watermarkEl = document.getElementById(`card-viewer-watermark-${sourceId}`);
-        
-        // Watermark Logic
-        let ownerText = options.ownerName || '';
-        let areaText = options.areaName || 'Equipment'; // Default text
-        
-        // Render Watermark
-        let html = '';
-        if (ownerText) html += `<div class="watermark-owner">${ownerText}</div>`;
-        if (areaText) html += `<div class="watermark-area">${areaText}</div>`;
-        if (watermarkEl) window.Game.UI.safeRender(watermarkEl, html, `viewer-wm:${sourceId}`);
-
-        // Render Slots
-        // equipCards can be a flat Array(4) (Legacy/Proxy) OR we might be passed new structure.
-        // Assuming current caller passes `role.equipArea` (proxy getter) -> Cards[0..N].
-        // If we updated Player to return 4 cards (some null) from equipArea getter, then:
-        // We iterate 0..3
-        
-        // Wait, if equipCards comes from `role.equipArea` (cards getter), it uses flatMap() in my new implementation.
-        // flatMap skips empty arrays. So [CardA, null, null, CardB] -> flatMap -> [CardA, CardB].
-        // This LOSES slot info again!
-        // We must change the caller in role_renderer.js to pass the RAW slots or a full array.
-        
-        // However, if we assume `equipCards` passed here might be the sparse array, let's just use it.
-        // But if `role_renderer` passes `role.equipArea.cards` (which is flattened), we are stuck.
-        
-        // Better fix: `createEquipmentViewer` should accept the ROLE or the SLOT ARRAY, not just a list of cards.
-        // But let's look at `role_renderer.js`. It passes `role.equipArea ? role.equipArea.cards : []`.
-        // I need to update ROLE RENDERER first.
-        
-        // Assuming role_renderer now passes ARRAY OF ARRAYS for slots: [ [C1], [C2,C3], [], [C4] ]
-        // OR fallback flat array (which means slot 0=[C1], 1=[C2]... ) if legacy.
-        
-        const filledSlots = new Array(4).fill(null).map(() => []); // Init with empty arrays
-        
-        if (Array.isArray(equipCards)) {
-             equipCards.forEach((item, i) => {
-                 if (i >= 0 && i < 4) {
-                     if (Array.isArray(item)) {
-                         filledSlots[i] = item;
-                     } else if (item) {
-                         filledSlots[i] = [item];
-                     }
-                 }
-             });
-        }
-        
-        filledSlots.forEach((slotCards, index) => {
-            const slotId = `equip-slot-${index}`;
-            
-            // Render specific card to specific slot
-            if (window.Game.UI.renderCardList) {
-                // Use sourceId mixed with slot for precise drops or ID tracking? 
-                // renderCardList usually appends to DOM.
-                
-                // IMPORTANT: Ensure drop zone is correct passing down
-                const slotDropZone = `${sourceId}:slot:${index}`;
-                window.Game.UI.renderCardList(slotId, slotCards, slotDropZone);
-            }
-        });
-
-        // 5. Drag Logic
-        const dragCleanup = attachModalDrag(modal);
-
-        // 4. Cleanup / Close Logic
-        const cleanup = () => {
-             if (dragCleanup) dragCleanup();
-             modal.classList.add('closing');
-             modal.addEventListener('animationend', () => {
-                 if(modal.parentNode) modal.parentNode.removeChild(modal);
-             }, {once:true});
-             delete window.Game.UI.viewers[sourceId];
-        };
-
-        // Reuse global close logic (document click) - No specific listeners needed on modal
-        // if CSS pointer-events is set correctly (wrapper none, content auto), clicks fall through.
-        // If wrapper blocks, global closer handles it if it doesn't match .card-viewer-modal check?
-        // Actually earlier analysis suggests openCardViewer relies on `document.addEventListener('click')`
-        // checking `!e.target.closest('.card-viewer-modal')`.
-        // If modal wrapper has pointer-events:auto, clicking it protects it from global close.
-        // If modal wrapper has pointer-events:none, clicking it passes to body -> global close.
-        
-        // Assuming standard behavior is sufficient:
-        window.Game.UI.viewers[sourceId] = { 
-            modal, 
-            cleanup,
-            sourceId, // Essential for updateAllViewers
-            options,
-            openedAt: Date.now() // Required for global click-to-close logic
-        };
-        
-        return modal;
     };
 
     window.Game.UI.createCardViewer = window.Game.UI.openCardViewer;

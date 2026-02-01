@@ -229,52 +229,46 @@
         btn.onclick = (e) => {
              e.stopPropagation(); // Prevent triggering parent click (Hand Inspector)
              
-             if (window.Game.UI.createEquipmentViewer) {
+             if (window.Game.UI.openCardViewer) {
                  // Check if already open to Toggle Closed
-                 const existing = window.Game.UI.viewers && window.Game.UI.viewers['equipArea'];
+                 const viewerSourceId = `role:${role.id}:equip`;
+                 const existing = window.Game.UI.viewers && window.Game.UI.viewers[viewerSourceId];
                  
-                 // Toggle Logic: If exists and belongs to THIS role, close and do nothing else.
+                 // Toggle Logic: If exists and belongs to THIS role (implicit by sourceId), close.
                  if (existing) {
-                     // We need to match the owner. 
-                     // Note: createEquipmentViewer returns the DOM el, not the viewer object.
-                     // The viewer object is in window.Game.UI.viewers['equipArea'].
-                     // We must ensure we tagged the viewer object correctly last time.
-                     if (existing._ownerId === role.id) {
-                         existing.cleanup();
-                         return;
-                     }
+                     existing.cleanup();
+                     return;
                  }
 
-                 // Pass equipArea data (assuming standard Models structure)
-                 // NEW LOGIC: Use `equipSlots` if available for precise positioning
+                 // Prepare Slot Data
                  let equipData = [];
                  if (role.equipSlots) {
                      // Map slots to full arrays [ [Card], [Card,Card], [], [Card] ]
                      equipData = role.equipSlots.map(slot => slot.cards || []);
                  } else {
-                     // Fallback
-                     equipData = role.equipArea ? role.equipArea.cards : [];
+                     // Fallback for legacy data structures
+                     equipData = [[], [], [], []]; 
                  }
                  
+                 // Define Slot Metadata (The "Schematics")
+                 const slotsDef = [
+                     { index: 0, label: '武器/Weapon' },
+                     { index: 1, label: '防具/Armor' },
+                     { index: 2, label: '+1 马/Horse' },
+                     { index: 3, label: '-1 马/Horse' }
+                 ];
+
                  // Helper: Resolve Rich HTML Name
                  const charNameKey = role.character || role.name;
-                 // GameText might need to be retrieved from window if not passed, but we pass it or fallback
                  const GT = GameText || window.Game.UI.GameText;
                  const ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
 
-                 // Use a distinct sourceId for this role's equipment area
-                 // Format: role:{id}:equip
-                 const viewerSourceId = `role:${role.id}:equip`;
-
-                 // Create (this internally closes any existing viewers)
-                 window.Game.UI.createEquipmentViewer(viewerSourceId, equipData, {
+                 // Create Generic Viewer with Slots Config
+                 window.Game.UI.openCardViewer(null, equipData, viewerSourceId, {
                      ownerName: ownerNameHtml,
-                     areaName: 'Equipment' 
+                     areaName: 'Equipment',
+                     slots: slotsDef
                  });
-                 
-                 // Tag the NEW control object in the registry
-                 const newViewer = window.Game.UI.viewers[viewerSourceId];
-                 if (newViewer) newViewer._ownerId = role.id; 
              }
         };
     }
