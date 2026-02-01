@@ -762,33 +762,50 @@
             }
 
             // Stats Row Updates
-            
+            const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
+
+            // Ensure Wrapper Group exists
+            let btnGroup = pEl.querySelector('.stats-btn-group');
+            if (!btnGroup) {
+                btnGroup = document.createElement('div');
+                btnGroup.className = 'stats-btn-group';
+                statsDiv.appendChild(btnGroup);
+            }
+
             // Bind Judge Button
             let summaryJudgeBtn = pEl.querySelector('.summary-judge-btn');
             if (!summaryJudgeBtn) {
-                 const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
                  summaryJudgeBtn = document.createElement('button');
                  summaryJudgeBtn.className = 'judge-detail-btn summary-judge-btn';
                  summaryJudgeBtn.innerText = '判';
-                 // Insert before equip button if it exists, or just append (order matters in creation if appending)
-                 // If equip button exists, insertBefore it.
-                 const equipBtn = pEl.querySelector('.summary-equip-btn');
+                 // Insert Logic for ordering is simplified if we just append to group
+                 // But if we want specific order [Judge] [Equip]
+                 const equipBtn = btnGroup.querySelector('.summary-equip-btn');
                  if (equipBtn) {
-                     statsDiv.insertBefore(summaryJudgeBtn, equipBtn);
+                     btnGroup.insertBefore(summaryJudgeBtn, equipBtn);
                  } else {
-                     statsDiv.appendChild(summaryJudgeBtn);
+                     btnGroup.appendChild(summaryJudgeBtn);
                  }
+            } else {
+                // Determine if it needs moving to wrapper (Upgrade from old layout)
+                if (summaryJudgeBtn.parentElement !== btnGroup) {
+                    btnGroup.appendChild(summaryJudgeBtn);
+                }
             }
             setupJudgeButton(summaryJudgeBtn, role, GameText);
             
             // Bind Equipment Button (Ensure it exists for legacy elements or updates)
             let summaryEquipBtn = pEl.querySelector('.summary-equip-btn');
             if (!summaryEquipBtn) {
-                 const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
                  summaryEquipBtn = document.createElement('button');
                  summaryEquipBtn.className = 'equip-detail-btn summary-equip-btn';
                  summaryEquipBtn.innerText = '備';
-                 statsDiv.appendChild(summaryEquipBtn);
+                 btnGroup.appendChild(summaryEquipBtn);
+            } else {
+                // Ensure in wrapper
+                if (summaryEquipBtn.parentElement !== btnGroup) {
+                    btnGroup.appendChild(summaryEquipBtn);
+                }
             }
             setupEquipmentButton(summaryEquipBtn, role, GameText);
 

@@ -370,45 +370,78 @@ html[data-theme="light"] .equip-detail-btn:active {
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 }
 
-/* Sidebar Role Hover Interaction */
+/* ==========================================================================
+   Advanced Stats/Button Transition (Main & Sidebar)
+   ========================================================================== */
+
+/* Button Group Container */
+.stats-btn-group {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    
+    /* Initial Hidden State */
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 5;
+}
+
+/* Sidebar Specific Button Styles */
 .summary-judge-btn,
 .summary-equip-btn {
-    display: none;
-    /* Adjust size for sidebar context if needed, inherits main style otherwise */
     width: 24px;
     height: 24px;
     font-size: 14px;
     line-height: 22px;
-    margin: 0 2px;
 }
 
-/* Hide Stats on Hover - Relaxed Selector */
+/* 
+   Hover Interactions 
+   Apply to both .role-summary (Sidebar) and .char-stats (Main View) 
+   Assuming .char-stats is the hover trigger in Main View.
+   In Sidebar, .role-summary is the trigger.
+*/
+
+/* 1. Hide Stats on Hover */
 .role-summary:hover .player-hp,
-.role-summary:hover .player-hand-count {
-    display: none !important;
+.role-summary:hover .player-hand-count,
+.char-stats:hover .stat-hp,
+.char-stats:hover .player-hand-count {
+    opacity: 0 !important;
+    transform: scale(0.9);
+    pointer-events: none; /* Ensure clicks pass through if needed */
 }
 
-/* Show Button on Hover */
-.role-summary:hover .summary-judge-btn,
-.role-summary:hover .summary-equip-btn {
-    display: inline-block !important;
+/* 2. Show Button Group on Hover */
+.role-summary:hover .stats-btn-group,
+.char-stats:hover .stats-btn-group {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
 }
 
-/* Main View Hover Interaction */
+/* Ensure Stats have transition properties */
+.player-hp, .player-hand-count, .stat-hp {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    /* Ensure they take up layout space */
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Main View Container Adjustment */
 .char-stats {
-    min-height: 31.5px; /* Prevent jump */
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    position: relative; /* Context for absolute buttons */
+    min-height: 32px;  /* Maintain height */
+    min-width: 60px;   /* Maintain minimal width for buttons */
 }
-
-.char-stats:hover .stat-hp, 
-.char-stats:hover .player-hand-count,
-.char-stats:hover #char-hand-count { /* Specific ID override if needed */
-    display: none !important;
-}
-
-.char-stats:hover .main-judge-btn,
-.char-stats:hover .main-equip-btn {
-    display: inline-flex !important;
+/* Sidebar Container Adjustment */
+.player-stats-row {
+    position: relative; /* Context for absolute buttons */
+    /* Ensure flex centering for stats */
 }
