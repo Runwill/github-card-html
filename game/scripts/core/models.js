@@ -41,22 +41,44 @@
             this.verticalOrHorizontal = options.verticalOrHorizontal !== undefined ? options.verticalOrHorizontal : Area.Configs.Generic.verticalOrHorizontal; 
             this.apartOrTogether = options.apartOrTogether !== undefined ? options.apartOrTogether : Area.Configs.Generic.apartOrTogether; 
             this.centered = options.centered !== undefined ? options.centered : Area.Configs.Generic.centered;
+            
+            // New Flag: Fixed Slots (Sparse Array behavior)
+            this.fixedSlots = options.fixedSlots || false; 
         }
 
         add(card) {
-            this.cards.push(card);
+            if (this.fixedSlots) {
+                // Determine first empty slot? Or just push? 
+                // Default add() for fixedSlots is ambiguous, try to find first null
+                const emptyIdx = this.cards.findIndex(c => c === null);
+                if (emptyIdx > -1) {
+                    this.cards[emptyIdx] = card;
+                } else {
+                    this.cards.push(card); // Overflow or valid next slot
+                }
+            } else {
+                this.cards.push(card);
+            }
         }
 
         remove(card) {
             const index = this.cards.indexOf(card);
             if (index > -1) {
-                this.cards.splice(index, 1);
+                if (this.fixedSlots) {
+                    this.cards[index] = null; // Replace with null hole
+                } else {
+                    this.cards.splice(index, 1);
+                }
             }
         }
 
         removeAt(index) {
             if (index > -1 && index < this.cards.length) {
-                this.cards.splice(index, 1);
+                if (this.fixedSlots) {
+                    this.cards[index] = null;
+                } else {
+                    this.cards.splice(index, 1);
+                }
             }
         }
     }
@@ -77,7 +99,8 @@
         
         // 玩家区域
         Hand:           { apartOrTogether: 0, forOrAgainst: 1 }, 
-        EquipArea:      { apartOrTogether: 0, forOrAgainst: 0 }, 
+        EquipArea:      { apartOrTogether: 0, forOrAgainst: 0 }, // Deprecated concept, kept for safety
+        EquipSlot:      { apartOrTogether: 0, forOrAgainst: 0 }, // Use this for slots
         JudgeArea:      { apartOrTogether: 0, forOrAgainst: 0 }, 
     };
 
@@ -122,12 +145,45 @@
             // 注意：依赖 Area.Configs 已定义
             const Area = window.Game.Models.Area;
             this.hand = new Area('hand', Area.Configs.Hand);
-            this.equipArea = new Area('equipArea', Area.Configs.EquipArea);
             this.judgeArea = new Area('judgeArea', Area.Configs.JudgeArea);
 
             this.hand.owner = this;
-            this.equipArea.owner = this;
             this.judgeArea.owner = this;
+            
+            // --- New Equipment Logic: 4 Independent Areas ---
+            this.equipSlots = [
+                new Area('equip_0', Area.Configs.EquipSlot), // Weapon
+                new Area('equip_1', Area.Configs.EquipSlot), // Armor
+                new Area('equip_2', Area.Configs.EquipSlot), // +1
+                new Area('equip_3', Area.Configs.EquipSlot)  // -1
+            ];
+            this.equipSlots.forEach(s => s.owner = this);
+
+            // Backwards Compatibility for 'equipArea' (Read/Write Proxy)
+            // Existing code expects player.equipArea.cards to be a list of equipped cards
+            Object.defineProperty(this, 'equipArea', {
+                get: () => {
+                    const ctx = this;
+                    return {
+                        name: 'equipArea',
+                        owner: ctx,
+                        // flatten active cards
+                        get cards() {
+                             return ctx.equipSlots.flatMap(s => s.cards);
+                        },
+                        // Proxy add/remove
+                        remove: (card) => {
+                            ctx.equipSlots.forEach(s => s.remove(card));
+                        },
+                        add: (card) => { 
+                            // Try find empty slot? Or just default to weapon?
+                            // Safe fallback: equipSlots[0]
+                             console.warn('[Deprecation] Direct add() to equipArea is unsafe. Use equipSlots.');
+                             if (ctx.equipSlots[0].cards.length === 0) ctx.equipSlots[0].add(card);
+                        }
+                    }
+                }
+            });
             
             // 默认可见性设置
             // 手牌自己可见

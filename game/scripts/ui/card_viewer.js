@@ -366,6 +366,42 @@
 
         Object.values(window.Game.UI.viewers).forEach(viewer => {
              const { sourceId, modal, options } = viewer;
+
+             if (!sourceId) return; // Safety check
+             
+             // --- Special Case: Equipment Viewer (Multi-Slot) ---
+             if (modal.classList.contains('card-viewer-modal') && modal.querySelector('.equipment-slots-container')) {
+                 // Check if it's an equipment viewer
+                 // Resolve ID to role
+                 // Format: role:ID:equip
+                 if (sourceId.startsWith('role:') && sourceId.includes(':equip')) {
+                     const roleId = parseInt(sourceId.split(':')[1]);
+                     const player = GameState.players.find(p => p.id === roleId);
+                     
+                     if (player && player.equipSlots) {
+                         // Iterate slots 0..3
+                         player.equipSlots.forEach((slotArea, index) => {
+                             const slotId = `equip-slot-${index}`;
+                             // Only update if slot container exists
+                             if (modal.querySelector(`#${slotId}`)) {
+                                 const cards = slotArea.cards; // Should be array of 1 or 0
+                                 
+                                 // Render with correct options (forceFaceDown false)
+                                 const renderOptions = { 
+                                    skipLayout: true, // Slots are fixed size
+                                    forceFaceDown: false // Equipment is public, usually
+                                 };
+                                 
+                                 const slotDropZone = `${sourceId}:slot:${index}`;
+                                 window.Game.UI.renderCardList(slotId, cards, slotDropZone, renderOptions);
+                             }
+                         });
+                     }
+                 }
+                 return; // Handled
+             }
+
+             // --- Standard Grid Viewer ---
              const grid = modal.querySelector('.card-grid');
              if (!grid) return;
 
@@ -379,10 +415,19 @@
                  cards = (GameState.treatmentArea && GameState.treatmentArea.cards) ? GameState.treatmentArea.cards : [];
              } else if (sourceId.startsWith('role:') || sourceId.startsWith('role-judge:')) {
                  const isJudge = sourceId.startsWith('role-judge:');
-                 const roleId = parseInt(sourceId.split(':')[1]);
+                 const isEquip = sourceId.includes(':equip'); // Though handled above, just safety
+                 
+                 // Fix: Parse ID carefully
+                 const roleId = parseInt(sourceId.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));
+                 
                  const player = GameState.players.find(p => p.id === roleId);
                  if (player) {
-                     const area = isJudge ? player.judgeArea : player.hand;
+                     // Determine Area
+                     let area = null;
+                     if (isJudge) area = player.judgeArea;
+                     else if (isEquip) area = player.equipArea; // Legacy flat getter if used here
+                     else area = player.hand;
+                     
                      if (area && area.cards) cards = area.cards;
                  }
              }
@@ -423,10 +468,10 @@
                     <div id="card-viewer-watermark-${sourceId}" class="area-watermark"></div>
                     
                     <div class="equipment-slots-container">
-                        <div id="equip-slot-0" class="equip-slot" data-slot="0" data-label="武器/Weapon" data-drop-zone="${sourceId}"></div>
-                        <div id="equip-slot-1" class="equip-slot" data-slot="1" data-label="防具/Armor" data-drop-zone="${sourceId}"></div>
-                        <div id="equip-slot-2" class="equip-slot" data-slot="2" data-label="+1 马/Horse" data-drop-zone="${sourceId}"></div>
-                        <div id="equip-slot-3" class="equip-slot" data-slot="3" data-label="-1 马/Horse" data-drop-zone="${sourceId}"></div>
+                        <div id="equip-slot-0" class="equip-slot" data-slot="0" data-label="武器/Weapon" data-drop-zone="${sourceId}:slot:0"></div>
+                        <div id="equip-slot-1" class="equip-slot" data-slot="1" data-label="防具/Armor" data-drop-zone="${sourceId}:slot:1"></div>
+                        <div id="equip-slot-2" class="equip-slot" data-slot="2" data-label="+1 马/Horse" data-drop-zone="${sourceId}:slot:2"></div>
+                        <div id="equip-slot-3" class="equip-slot" data-slot="3" data-label="-1 马/Horse" data-drop-zone="${sourceId}:slot:3"></div>
                     </div>
                 </div>
             </div>
@@ -448,26 +493,51 @@
         if (watermarkEl) window.Game.UI.safeRender(watermarkEl, html, `viewer-wm:${sourceId}`);
 
         // Render Slots
-        // equipCards expected to be Array[4] or sparse array
-        const slots = [0, 1, 2, 3];
-        const cardList = Array.isArray(equipCards) ? equipCards : [];
+        // equipCards can be a flat Array(4) (Legacy/Proxy) OR we might be passed new structure.
+        // Assuming current caller passes `role.equipArea` (proxy getter) -> Cards[0..N].
+        // If we updated Player to return 4 cards (some null) from equipArea getter, then:
+        // We iterate 0..3
         
-        slots.forEach(index => {
+        // Wait, if equipCards comes from `role.equipArea` (cards getter), it uses flatMap() in my new implementation.
+        // flatMap skips empty arrays. So [CardA, null, null, CardB] -> flatMap -> [CardA, CardB].
+        // This LOSES slot info again!
+        // We must change the caller in role_renderer.js to pass the RAW slots or a full array.
+        
+        // However, if we assume `equipCards` passed here might be the sparse array, let's just use it.
+        // But if `role_renderer` passes `role.equipArea.cards` (which is flattened), we are stuck.
+        
+        // Better fix: `createEquipmentViewer` should accept the ROLE or the SLOT ARRAY, not just a list of cards.
+        // But let's look at `role_renderer.js`. It passes `role.equipArea ? role.equipArea.cards : []`.
+        // I need to update ROLE RENDERER first.
+        
+        // Assuming role_renderer now passes ARRAY OF ARRAYS for slots: [ [C1], [C2,C3], [], [C4] ]
+        // OR fallback flat array (which means slot 0=[C1], 1=[C2]... ) if legacy.
+        
+        const filledSlots = new Array(4).fill(null).map(() => []); // Init with empty arrays
+        
+        if (Array.isArray(equipCards)) {
+             equipCards.forEach((item, i) => {
+                 if (i >= 0 && i < 4) {
+                     if (Array.isArray(item)) {
+                         filledSlots[i] = item;
+                     } else if (item) {
+                         filledSlots[i] = [item];
+                     }
+                 }
+             });
+        }
+        
+        filledSlots.forEach((slotCards, index) => {
             const slotId = `equip-slot-${index}`;
-            const card = cardList[index]; // Simple index mapping
             
             // Render specific card to specific slot
             if (window.Game.UI.renderCardList) {
-                // We treat this slot as a tiny 'list' of 1 card for rendering purposes
-                // But we must ensure renderCardList supports this container
-                // Or we manually render if easier.
-                // Using renderCardList ensures consistency (styles, classes, generic tooltips)
-                const singleCardList = card ? [card] : [];
+                // Use sourceId mixed with slot for precise drops or ID tracking? 
+                // renderCardList usually appends to DOM.
                 
-                // Note: The dropZoneId is usually the generic 'equipArea' (sourceId)
-                // But specifically targeting a slot might require logic in drag handler.
-                // For now, we pass sourceId.
-                window.Game.UI.renderCardList(slotId, singleCardList, sourceId);
+                // IMPORTANT: Ensure drop zone is correct passing down
+                const slotDropZone = `${sourceId}:slot:${index}`;
+                window.Game.UI.renderCardList(slotId, slotCards, slotDropZone);
             }
         });
 
@@ -496,6 +566,8 @@
         window.Game.UI.viewers[sourceId] = { 
             modal, 
             cleanup,
+            sourceId, // Essential for updateAllViewers
+            options,
             openedAt: Date.now() // Required for global click-to-close logic
         };
         

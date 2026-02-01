@@ -246,7 +246,15 @@
                  }
 
                  // Pass equipArea data (assuming standard Models structure)
-                 const equipData = role.equipArea ? role.equipArea.cards : [];
+                 // NEW LOGIC: Use `equipSlots` if available for precise positioning
+                 let equipData = [];
+                 if (role.equipSlots) {
+                     // Map slots to full arrays [ [Card], [Card,Card], [], [Card] ]
+                     equipData = role.equipSlots.map(slot => slot.cards || []);
+                 } else {
+                     // Fallback
+                     equipData = role.equipArea ? role.equipArea.cards : [];
+                 }
                  
                  // Helper: Resolve Rich HTML Name
                  const charNameKey = role.character || role.name;
@@ -254,14 +262,18 @@
                  const GT = GameText || window.Game.UI.GameText;
                  const ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
 
+                 // Use a distinct sourceId for this role's equipment area
+                 // Format: role:{id}:equip
+                 const viewerSourceId = `role:${role.id}:equip`;
+
                  // Create (this internally closes any existing viewers)
-                 window.Game.UI.createEquipmentViewer('equipArea', equipData, {
+                 window.Game.UI.createEquipmentViewer(viewerSourceId, equipData, {
                      ownerName: ownerNameHtml,
-                     areaName: 'Equipment' // Localization?
+                     areaName: 'Equipment' 
                  });
                  
-                 // Tag the NEW control object in the registry (NOT the returned DOM element)
-                 const newViewer = window.Game.UI.viewers['equipArea'];
+                 // Tag the NEW control object in the registry
+                 const newViewer = window.Game.UI.viewers[viewerSourceId];
                  if (newViewer) newViewer._ownerId = role.id; 
              }
         };
