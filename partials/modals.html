@@ -29,7 +29,7 @@
     <button id="announcements-button" class="sidebar-menu_button" data-i18n="sidebar.announcements">更新公告</button>
   </li>
   <li>
-    <button id="key-settings-button" class="sidebar-menu_button" data-i18n="sidebar.keySettings">按键设置</button>
+    <button id="settings-button" class="sidebar-menu_button" data-i18n="sidebar.settings">设置</button>
   </li>
   <li>
     <button id="theme-toggle-button" class="sidebar-menu_button" data-i18n="theme.toggle.toDark">切换为深色</button>
@@ -161,6 +161,19 @@
     <div id="announcements-content" class="ann-content"></div>
   </div>
 
+  <!-- 设置菜单（与侧边栏同样式） -->
+  <div id="settings-menu" class="panel">
+    <li>
+      <button id="settings-menu-back" class="sidebar-menu_button" data-i18n="account.menu.back">返回</button>
+    </li>
+    <li>
+      <button id="key-settings-button" class="sidebar-menu_button" data-i18n="sidebar.keySettings">按键设置</button>
+    </li>
+    <li>
+      <button id="game-settings-button" class="sidebar-menu_button" data-i18n="sidebar.gameSettings">对局设置</button>
+    </li>
+  </div>
+
   <!-- 按键设置弹窗 -->
   <div id="key-settings-modal" class="modal update-modal">
     <div class="modal-header">
@@ -180,4 +193,35 @@
       </div>
     </div>
     <div id="key-settings-message" class="modal-message"></div>
+  </div>
+
+  <!-- 对局设置弹窗 -->
+  <div id="game-settings-modal" class="modal update-modal">
+    <div class="modal-header">
+      <h2 data-i18n="modal.gameSettings.title">对局设置</h2>
+    </div>
+    <div class="modal-form">
+      <!-- 时机播放速度 -->
+      <div class="info-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <span class="info-label" data-i18n="gameSettings.playbackSpeed">时机播放速度</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="range" id="game-speed-range" class="setting-slider" min="0" max="1000" step="10" value="0">
+          <span id="game-speed-val" style="font-size: 13px; color: #718096; min-width: 42px; text-align: right; font-variant-numeric: tabular-nums;">0ms</span>
+        </div>
+      </div>
+      <!-- 拖动惯性 -->
+      <div class="info-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <span class="info-label" data-i18n="gameSettings.dragInertia">拖动惯性</span>
+        <div class="arrow-selector" id="inertia-selector">
+          <button type="button" class="arrow-btn" id="inertia-prev">‹</button>
+          <span class="arrow-value" id="inertia-value">中等</span>
+          <button type="button" class="arrow-btn" id="inertia-next">›</button>
+        </div>
+      </div>
+      <!-- 重置按钮 -->
+      <div style="text-align: right; margin-top: 6px;">
+        <button type="button" id="game-settings-reset" class="btn btn--sm btn--ghost" data-i18n="gameSettings.reset">重置</button>
+      </div>
+    </div>
+    <div id="game-settings-message" class="modal-message"></div>
   </div>

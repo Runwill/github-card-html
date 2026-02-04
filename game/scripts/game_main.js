@@ -28,6 +28,11 @@
         if (window.Game.Setup && window.Game.Setup.init) {
             window.Game.Setup.init();
         }
+        
+        // Load saved game settings (speed, inertia)
+        if (window.KeySettings && window.KeySettings.loadGameSettings) {
+            window.KeySettings.loadGameSettings();
+        }
 
         if (pauseBtn) {
             pauseBtn.addEventListener('click', () => {
@@ -36,40 +41,6 @@
             });
         }
         
-        // Speed Control
-        const speedRange = document.getElementById('game-speed-range');
-        const speedVal = document.getElementById('game-speed-val');
-        const STORAGE_KEY_SPEED = 'card_game_speed_setting';
-
-        if (speedRange && speedVal) {
-            // Load saved speed
-            const savedSpeed = localStorage.getItem(STORAGE_KEY_SPEED);
-            if (savedSpeed !== null) {
-                const val = parseInt(savedSpeed, 10);
-                if (!isNaN(val)) {
-                    speedRange.value = val;
-                    speedVal.textContent = `${val}ms`;
-                }
-            }
-
-            // Sync initial value to Controller
-            const currentVal = parseInt(speedRange.value, 10);
-            window.Game.Controller.setSpeed(currentVal);
-
-            speedRange.addEventListener('input', (e) => {
-                const val = parseInt(e.target.value, 10);
-                speedVal.textContent = `${val}ms`;
-                
-                // Save to storage
-                localStorage.setItem(STORAGE_KEY_SPEED, val);
-
-                // if (window.Game.Core && window.Game.Core.setSpeed) {
-                //    window.Game.Core.setSpeed(val);
-                // }
-                window.Game.Controller.setSpeed(val);
-            });
-        }
-
         if (endTurnBtn) {
             endTurnBtn.addEventListener('click', window.Game.Core.advanceState);
             // Update button text to "Next Step"

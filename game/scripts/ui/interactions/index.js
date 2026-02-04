@@ -40,11 +40,6 @@
     window.Game.UI.DragState = DragState;
     window.Game.UI.DragConfig = DRAG_CONFIG;
     
-    function setDragConfig(config) {
-        if (typeof config.lerpFactor === 'number') {
-            DRAG_CONFIG.lerpFactor = config.lerpFactor;
-        }
-    }
 
     // 调试辅助函数
     function logDragDebug(phase) {
@@ -501,8 +496,7 @@
     // Usually they just operate on state.
 
     window.Game.UI.Interactions = {
-        initDrag,
-        setDragConfig
+        initDrag
     };
 
 })();

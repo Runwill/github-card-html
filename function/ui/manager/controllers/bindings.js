@@ -18,7 +18,7 @@
   function init(){
     // Menu & overlays
   $('menu-toggle')?.addEventListener('click', (e) => { e.stopPropagation(); C.sidebar?.toggleSidebar?.(); });
-  $('sidebar-backdrop')?.addEventListener('click', () => { C.accountMenu?.hideAccountMenu?.(); C.sidebar?.hideSidebar?.(); });
+  $('sidebar-backdrop')?.addEventListener('click', () => { C.settingsMenu?.hideSettingsMenu?.(); C.accountMenu?.hideAccountMenu?.(); C.sidebar?.hideSidebar?.(); });
     $('modal-backdrop')?.addEventListener('click', () => {
       const st = (Core.state && Core.state.get && Core.state.get()) || {};
       if (st.currentModal && st.returnToAccountMenuOnClose) {
@@ -27,13 +27,16 @@
     });
     $('sidebar-menu')?.addEventListener('click', (e) => e.stopPropagation());
     $('account-menu')?.addEventListener('click', (e) => e.stopPropagation());
-  ;['update-account-modal','approve-user-modal','avatar-modal','avatar-crop-modal','account-info-modal','announcements-modal'].forEach(id => $(id)?.addEventListener('click', (e)=>e.stopPropagation()));
+    $('settings-menu')?.addEventListener('click', (e) => e.stopPropagation());
+  ;['update-account-modal','approve-user-modal','avatar-modal','avatar-crop-modal','account-info-modal','announcements-modal','key-settings-modal','game-settings-modal'].forEach(id => $(id)?.addEventListener('click', (e)=>e.stopPropagation()));
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         const st = (Core.state && Core.state.get && Core.state.get()) || {};
         if (st.currentModal) {
           if (st.returnToAccountMenuOnClose) { const cur = st.currentModal; C.modal?.hideModal?.(cur); C.accountMenu?.showAccountMenu?.(); Core.state?.set?.({ returnToAccountMenuOnClose: false }); }
           else { C.modal?.hideAllModals?.(); }
+        } else if (st.settingsMenuVisible) {
+          C.settingsMenu?.hideSettingsMenu?.();
         } else { C.accountMenu?.hideAccountMenu?.(); C.sidebar?.hideSidebar?.(); }
       }
     });
@@ -41,6 +44,8 @@
     // Menu actions
     $('open-account-menu-button')?.addEventListener('click', () => C.accountMenu?.showAccountMenu?.());
     $('account-menu-back')?.addEventListener('click', () => { C.accountMenu?.hideAccountMenu?.(); C.sidebar?.showSidebar?.(); });
+    $('settings-button')?.addEventListener('click', () => C.settingsMenu?.showSettingsMenu?.());
+    $('settings-menu-back')?.addEventListener('click', () => { C.settingsMenu?.hideSettingsMenu?.(); C.sidebar?.showSidebar?.(); });
     $('update-account-button')?.addEventListener('click', () => C.modal?.showModal?.('update-account-modal'));
     $('account-info-button')?.addEventListener('click', () => C.accountInfo?.openAccountInfo?.());
 

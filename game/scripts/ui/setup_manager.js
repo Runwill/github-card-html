@@ -177,14 +177,6 @@
         const modeSelect = document.getElementById('setup-mode-select');
         const mode = modeSelect ? modeSelect.value : 'auto';
 
-        // 设置拖拽惯性
-        const inertiaSelect = document.getElementById('setup-drag-inertia-select');
-        if (inertiaSelect && window.Game.UI.Interactions && window.Game.UI.Interactions.setDragConfig) {
-            const lerpFactor = parseFloat(inertiaSelect.value);
-            window.Game.UI.Interactions.setDragConfig({ lerpFactor });
-            console.log(`[Setup] Drag Inertia set to ${lerpFactor}`);
-        }
-
         // 隐藏设置面板
         hideSetupPanel();
 

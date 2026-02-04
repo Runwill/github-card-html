@@ -16,6 +16,8 @@
     'sidebar.logout': '退出',
   'sidebar.announcements': '更新公告',
   'sidebar.keySettings': '按键设置',
+  'sidebar.settings': '设置',
+  'sidebar.gameSettings': '对局设置',
 
     'account.menu.back': '返回',
     'account.menu.info': '名片',
@@ -31,6 +33,7 @@
     'modal.approvals.title': '审核',
   'modal.announcements.title': '更新公告',
   'modal.keySettings.title': '按键设置',
+  'modal.gameSettings.title': '对局设置',
 
     'modal.avatar.title': '头像',
     'modal.avatar.upload': '上传头像',
@@ -52,7 +55,17 @@
     'keySettings.inspect': '显示属性',
     'keySettings.notSet': '未设置',
     'keySettings.pressKey': '请按下按键...',
-    'keySettings.hint': '按下 Esc 或 Backspace 可清除设置。',
+    'keySettings.hint': 'Esc 恢复预设，Backspace 清除绑定。',
+
+    'gameSettings.playbackSpeed': '时机速度',
+    'gameSettings.dragInertia': '拖动惯性',
+    'gameSettings.reset': '重置',
+    'gameSettings.inertia.veryHeavy': '0.1 - 非常重',
+    'gameSettings.inertia.heavy': '0.15 - 较重',
+    'gameSettings.inertia.medium': '0.25 - 中等 (默认)',
+    'gameSettings.inertia.light': '0.5 - 轻盈',
+    'gameSettings.inertia.veryLight': '0.8 - 非常灵敏',
+    'gameSettings.inertia.instant': '1.0 - 即时',
 
     'theme.toggle.toLight': '切换为浅色',
     'theme.toggle.toDark': '切换为深色',
@@ -178,6 +191,8 @@
     'sidebar.logout': 'Log out',
   'sidebar.announcements': 'Updates',
   'sidebar.keySettings': 'Key Settings',
+  'sidebar.settings': 'Settings',
+  'sidebar.gameSettings': 'Game Settings',
 
     'account.menu.back': 'Back',
     'account.menu.info': 'Profile',
@@ -193,6 +208,7 @@
     'modal.approvals.title': 'Approvals',
   'modal.announcements.title': 'Updates',
   'modal.keySettings.title': 'Key Settings',
+  'modal.gameSettings.title': 'Game Settings',
 
     'modal.avatar.title': 'Avatar',
     'modal.avatar.upload': 'Upload avatar',
@@ -214,7 +230,17 @@
     'keySettings.inspect': 'Show Attributes',
     'keySettings.notSet': 'Not set',
     'keySettings.pressKey': 'Press a key...',
-    'keySettings.hint': 'Press Esc or Backspace to clear settings.',
+    'keySettings.hint': 'Esc to reset default, Backspace to unassign.',
+
+    'gameSettings.playbackSpeed': 'Timing Speed',
+    'gameSettings.dragInertia': 'Drag Inertia',
+    'gameSettings.reset': 'Reset',
+    'gameSettings.inertia.veryHeavy': '0.1 - Very Heavy',
+    'gameSettings.inertia.heavy': '0.15 - Heavy',
+    'gameSettings.inertia.medium': '0.25 - Medium (Default)',
+    'gameSettings.inertia.light': '0.5 - Light',
+    'gameSettings.inertia.veryLight': '0.8 - Very Responsive',
+    'gameSettings.inertia.instant': '1.0 - Instant',
 
     'theme.toggle.toLight': 'Switch to light',
     'theme.toggle.toDark': 'Switch to dark',
