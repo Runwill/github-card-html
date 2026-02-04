@@ -75,6 +75,12 @@
         ghost.removeAttribute('id');
 
         document.body.appendChild(ghost);
+
+        // Animate Lift: Apply 'lifted' class after a brief delay to trigger CSS transition
+        requestAnimationFrame(() => {
+            ghost.classList.add('lifted');
+        });
+
         return ghost;
     }
 

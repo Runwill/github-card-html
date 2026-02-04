@@ -276,8 +276,9 @@ body.is-global-dragging #hand-cards-container {
 }
 
 .equip-detail-btn {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(176, 204, 232, 0.3); /* Soft Blue tint */
+    /* Base: Light Mode (Default) */
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(44, 82, 130, 0.3); /* Dark Blue tint */
     border-radius: 4px; /* Square with slight roundness */
     width: 24px;
     height: 24px;
@@ -288,34 +289,34 @@ body.is-global-dragging #hand-cards-container {
     font-size: 16px; /* Increased slightly for ZhuanShu readability */
     font-weight: normal; /* ZhuanShu is naturally bold */
     font-family: '明朝';
-    color: #b0cce8; /* Soft Blue color for 'Equipment' */
+    color: #2c5282; /* Dark Blue for Light Mode */
     opacity: 0.9;
     transition: all 0.2s;
     padding: 0;
     margin-left: 4px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .equip-detail-btn:hover {
     opacity: 1;
-    background: rgba(176, 204, 232, 0.2); /* Soft Blue tint */
-    border-color: #b0cce8;
+    background: rgba(44, 82, 130, 0.1);
+    border-color: #2c5282;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    text-shadow: 0 0 5px rgba(176, 204, 232, 0.5);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    /* No text shadow in light mode by default for cleanness */
 }
 
 .equip-detail-btn:active {
     transform: translateY(1px);
-    box-shadow: 0 0 1px rgba(0,0,0,0.5);
-    background: rgba(176, 204, 232, 0.3);
-    border-color: #8da3ba; 
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    background: rgba(44, 82, 130, 0.2);
+    border-color: #2c5282; 
 }
 
-/* Judge Button (Yellow/Gold) */
+/* Judge Button (Yellow/Gold) - Base: Light Mode */
 .judge-detail-btn {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 215, 0, 0.3);
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(184, 134, 11, 0.3); /* DarkGoldenRod tint */
     border-radius: 4px;
     width: 24px;
     height: 24px;
@@ -326,49 +327,71 @@ body.is-global-dragging #hand-cards-container {
     font-size: 16px;
     font-weight: normal;
     font-family: '明朝';
-    color: #ffd700;
+    color: #B8860B; /* DarkGoldenRod */
     opacity: 0.9;
     transition: all 0.2s;
     padding: 0;
     margin-left: 4px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .judge-detail-btn:hover {
     opacity: 1;
-    background: rgba(255, 215, 0, 0.2);
-    border-color: #ffd700;
+    background: rgba(184, 134, 11, 0.1);
+    border-color: #B8860B;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .judge-detail-btn:active {
     transform: translateY(1px);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    background: rgba(184, 134, 11, 0.2);
+    border-color: #B8860B; 
+}
+
+/* Dark Mode Adaptation */
+html[data-theme="dark"] .equip-detail-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(176, 204, 232, 0.3); /* Soft Blue tint */
+    color: #b0cce8; /* Soft Blue */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+html[data-theme="dark"] .equip-detail-btn:hover {
+    background: rgba(176, 204, 232, 0.2);
+    border-color: #b0cce8;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 0 5px rgba(176, 204, 232, 0.5);
+}
+
+html[data-theme="dark"] .equip-detail-btn:active {
+    box-shadow: 0 0 1px rgba(0,0,0,0.5);
+    background: rgba(176, 204, 232, 0.3);
+    border-color: #8da3ba; 
+}
+
+html[data-theme="dark"] .judge-detail-btn {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 215, 0, 0.3); /* Gold tint */
+    color: #ffd700; /* Gold */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+html[data-theme="dark"] .judge-detail-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: #ffd700;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+html[data-theme="dark"] .judge-detail-btn:active {
     box-shadow: 0 0 1px rgba(0,0,0,0.5);
     background: rgba(255, 215, 0, 0.3);
     border-color: #b89600; 
 }
 
-/* Light Theme Support */
-html[data-theme="light"] .equip-detail-btn {
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(139, 69, 19, 0.3); /* SaddleBrown tint */
-    color: #8B4513; /* SaddleBrown for visibility on light */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-html[data-theme="light"] .equip-detail-btn:hover {
-    background: rgba(139, 69, 19, 0.1);
-    border-color: #8B4513;
-    text-shadow: none; /* Clean look for light mode */
-}
-
-html[data-theme="light"] .equip-detail-btn:active {
-    background: rgba(139, 69, 19, 0.2);
-    transform: translateY(1px);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-}
+/* Cleanup Legacy Explicit Light Blocks if they existed below */
 
 /* ==========================================================================
    Advanced Stats/Button Transition (Main & Sidebar)

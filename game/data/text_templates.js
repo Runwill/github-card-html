@@ -41,8 +41,15 @@
         'hand': '<hand></hand>',
         'equipArea': '<equipArea></equipArea>',
         'judgeArea': '<judgeArea></judgeArea>',
-        'treatmentArea': '<treatmentArea></treatmentArea>',
+        'treatArea': '<treatArea></treatArea>',
+        'treatmentArea': '<treatArea></treatArea>',
         'discardPile': '<discardPile></discardPile>',
+
+        // 装备槽位 (Equipment Slots)
+        'weaponSlot': '<weaponSlot epithet=1></weaponSlot>',
+        'armorSlot': '<armorSlot epithet=1></armorSlot>',
+        'defensiveSlot': '<defensiveSlot epithet=1></defensiveSlot>',
+        'offensiveSlot': '<offensiveSlot epithet=1></offensiveSlot>',
         // 修正：将 drawPile 映射到实际存在的术语标签 <pile>
         'drawPile': '<pile></pile>',
         'pile': '<pile></pile>',

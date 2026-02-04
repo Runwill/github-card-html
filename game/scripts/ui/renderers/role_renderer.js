@@ -250,23 +250,24 @@
                      equipData = [[], [], [], []]; 
                  }
                  
-                 // Define Slot Metadata (The "Schematics")
-                 const slotsDef = [
-                     { index: 0, label: '武器/Weapon' },
-                     { index: 1, label: '防具/Armor' },
-                     { index: 2, label: '+1 马/Horse' },
-                     { index: 3, label: '-1 马/Horse' }
-                 ];
-
                  // Helper: Resolve Rich HTML Name
                  const charNameKey = role.character || role.name;
                  const GT = GameText || window.Game.UI.GameText;
                  const ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
 
+                 // Define Slot Metadata (The "Schematics")
+                 // Assume GT (GameText) is always available in this context as per system design
+                 const slotsDef = [
+                     { index: 0, label: GT.render('weaponSlot') },
+                     { index: 1, label: GT.render('armorSlot') },
+                     { index: 2, label: GT.render('defensiveSlot') },
+                     { index: 3, label: GT.render('offensiveSlot') }
+                 ];
+
                  // Create Generic Viewer with Slots Config
                  window.Game.UI.openCardViewer(null, equipData, viewerSourceId, {
                      ownerName: ownerNameHtml,
-                     areaName: 'Equipment',
+                     areaName: GT.render('equipArea'),
                      slots: slotsDef
                  });
              }

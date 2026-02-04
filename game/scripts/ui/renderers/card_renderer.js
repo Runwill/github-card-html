@@ -81,7 +81,10 @@
         container.setAttribute('data-drop-zone', dropZoneId);
         
         const GameText = window.Game.UI.GameText;
-        const currentChildren = Array.from(container.children);
+        // Filter out static content (like labels) so they aren't removed or treated as card slots
+        const currentChildren = Array.from(container.children).filter(c => 
+            c.classList.contains('card-placeholder')
+        );
 
         // 差量更新 (Diffing) 策略：复用现有 DOM 节点，避免暴力清空导致的闪烁和 Hover 状态丢失
         cards.forEach((card, index) => {
@@ -187,8 +190,15 @@
         });
 
         // 移除多余的节点
-        while (container.children.length > cards.length) {
-            container.removeChild(container.lastChild);
+        // FIX: 不要直接比较 container.children.length，因为其中可能包含非卡牌元素（如Label标签）
+        // 应该只计算和移除 .card-placeholder 类型的元素
+        const extraChildren = Array.from(container.children).filter(c => 
+            c.classList.contains('card-placeholder')
+        );
+        
+        // 从列表末尾开始移除多余的卡牌元素
+        for (let i = cards.length; i < extraChildren.length; i++) {
+            extraChildren[i].remove();
         }
 
         // 触发布局更新 (如果是平铺区域)

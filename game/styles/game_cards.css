@@ -162,11 +162,23 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
 }
 
 .dragging-real {
-    box-shadow: 0 15px 30px rgba(0,0,0,0.3) !important;
-    opacity: 0.95;
+    /* Initial Drag State (Before Lift) - Matches the resting card */
+    box-shadow: 0 2px 5px var(--shadow-1) !important; /* Force match initial state */
+    opacity: 1;
     pointer-events: none;
     cursor: grabbing;
-    will-change: transform, left, top;
+    will-change: transform, left, top, box-shadow;
+    z-index: 10000;
+    
+    /* Smooth Lift Animation */
+    transition: box-shadow 0.25s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.2s;
+}
+
+.dragging-real.lifted {
+    /* Lifted State (Active Dragging) */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4) !important;
+    opacity: 0.95;
+    /* Transform scaling is handled by JS loop if needed, or we rely on shadow for depth */
 }
 
 .drag-placeholder {

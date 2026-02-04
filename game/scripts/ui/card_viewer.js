@@ -176,13 +176,18 @@
         let bodyContent = '';
         if (options.slots && Array.isArray(options.slots)) {
             // Layout: Multi-Slot (e.g. Equipment)
+            // Note: We use a Wrapper for drop targeting and Label display.
+            // The inner .equip-slot is the container for renderCardList but has pointer-events: none to allow pass-through.
             bodyContent = `<div class="equipment-slots-container">
                 ${options.slots.map(slot => `
-                    <div id="viewer-slot-${sourceId}-${slot.index}" 
-                         class="equip-slot" 
-                         data-slot="${slot.index}" 
-                         data-label="${slot.label || ''}" 
-                         data-drop-zone="${sourceId}:slot:${slot.index}"></div>
+                    <div class="equip-slot-wrapper">
+                        <div id="viewer-slot-${sourceId}-${slot.index}" 
+                             class="equip-slot" 
+                             data-slot="${slot.index}" 
+                             data-drop-zone="${sourceId}:slot:${slot.index}">
+                            <div class="equip-slot-label">${slot.label || ''}</div>
+                        </div>
+                    </div>
                 `).join('')}
             </div>`;
         } else {
