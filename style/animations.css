@@ -4,7 +4,6 @@
 @keyframes fadeInScale { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 @keyframes slideInFromRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes textGlow { from { opacity: 0; } to { opacity: 1; } }
-@keyframes ripple-animation { to { transform: scale(4); opacity: 0; } }
 @keyframes highlight { 0% { background-size: 0% 100%; } 100% { background-size: 100% 100%; } }
 
 h1, h2, h3, .indent, padding {
@@ -29,8 +28,6 @@ padding padding padding { animation-delay: 0.12s; }
 
 .animate-in { animation-play-state: running; }
 .fade-in-on-scroll.visible { opacity: 1; transform: translateY(0); }
-
-.ripple { position: absolute; border-radius: 50%; background: rgba(45, 55, 72, 0.3); transform: scale(0); animation: ripple-animation 0.6s linear; pointer-events: none; }
 
 .button, .wave {
     position: relative;

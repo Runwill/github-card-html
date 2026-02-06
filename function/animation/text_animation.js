@@ -13,7 +13,6 @@ class TextAnimationController {
         this.assignAnimationIndexes();
         this.setupInitialAnimations();
         this.setupScrollAnimations();
-        this.setupInteractiveAnimations();
     }
 
     assignAnimationIndexes() {
@@ -57,32 +56,6 @@ class TextAnimationController {
         });
     }
 
-    setupInteractiveAnimations() {
-        document.querySelectorAll('.button, .btn').forEach(button => {
-            button.addEventListener('click', this.createRippleEffect);
-        });
-    }
-
-    createRippleEffect(event) {
-        const button = event.currentTarget;
-        const rect = button.getBoundingClientRect();
-        const ripple = document.createElement('span');
-        
-        const size = Math.max(rect.width, rect.height);
-        const x = event.clientX - rect.left - size / 2;
-        const y = event.clientY - rect.top - size / 2;
-        
-        Object.assign(ripple.style, {
-            width: size + 'px',
-            height: size + 'px',
-            left: x + 'px',
-            top: y + 'px'
-        });
-        ripple.classList.add('ripple');
-        
-        button.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 1000);
-    }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
