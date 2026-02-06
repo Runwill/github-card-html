@@ -9,59 +9,58 @@
   const dom = Core.dom || {};
   const $ = dom.$ || ((id)=>document.getElementById(id));
   const qs = dom.qs || ((s)=>document.querySelector(s));
-  const api = dom.api || (u=>u);
   const resolveAvatarUrl = dom.resolveAvatarUrl || (u=>u||'');
-  const messages = Core.messages || {};
-  const toast = messages.toast || (m=>{ try{ alert(m); }catch{} });
-  const t = (typeof window.t==='function') ? window.t : (k)=>k;
+  const userService = Core.userService || {};
 
   function init(){
-    // Menu & overlays
-  $('menu-toggle')?.addEventListener('click', (e) => { e.stopPropagation(); C.sidebar?.toggleSidebar?.(); });
-  $('sidebar-backdrop')?.addEventListener('click', () => { C.settingsMenu?.hideSettingsMenu?.(); C.accountMenu?.hideAccountMenu?.(); C.sidebar?.hideSidebar?.(); });
-    $('modal-backdrop')?.addEventListener('click', () => {
-      const st = (Core.state && Core.state.get && Core.state.get()) || {};
-      if (st.currentModal && st.returnToAccountMenuOnClose) {
-        C.modal?.hideModal?.(st.currentModal); C.accountMenu?.showAccountMenu?.(); Core.state?.set?.({ returnToAccountMenuOnClose: false });
-      } else { C.modal?.hideAllModals?.(); }
-    });
-    $('sidebar-menu')?.addEventListener('click', (e) => e.stopPropagation());
-    $('account-menu')?.addEventListener('click', (e) => e.stopPropagation());
-    $('settings-menu')?.addEventListener('click', (e) => e.stopPropagation());
-  ;['update-account-modal','approve-user-modal','avatar-modal','avatar-crop-modal','account-info-modal','announcements-modal','key-settings-modal','game-settings-modal'].forEach(id => $(id)?.addEventListener('click', (e)=>e.stopPropagation()));
+    const OV = C.overlay; // 统一覆盖层系统
+
+    // ── 全局交互 ──
+
+    // 背景点击：返回上一级
+    $('modal-backdrop')?.addEventListener('click', () => OV?.back?.());
+
+    // ESC：关闭所有
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        const st = (Core.state && Core.state.get && Core.state.get()) || {};
-        if (st.currentModal) {
-          if (st.returnToAccountMenuOnClose) { const cur = st.currentModal; C.modal?.hideModal?.(cur); C.accountMenu?.showAccountMenu?.(); Core.state?.set?.({ returnToAccountMenuOnClose: false }); }
-          else { C.modal?.hideAllModals?.(); }
-        } else if (st.settingsMenuVisible) {
-          C.settingsMenu?.hideSettingsMenu?.();
-        } else { C.accountMenu?.hideAccountMenu?.(); C.sidebar?.hideSidebar?.(); }
+      if (e.key === 'Escape' && OV?.isAnyOpen?.()) {
+        e.preventDefault();
+        OV.closeAll();
       }
     });
 
-    // Menu actions
-    $('open-account-menu-button')?.addEventListener('click', () => C.accountMenu?.showAccountMenu?.());
-    $('account-menu-back')?.addEventListener('click', () => { C.accountMenu?.hideAccountMenu?.(); C.sidebar?.showSidebar?.(); });
-    $('settings-button')?.addEventListener('click', () => C.settingsMenu?.showSettingsMenu?.());
-    $('settings-menu-back')?.addEventListener('click', () => { C.settingsMenu?.hideSettingsMenu?.(); C.sidebar?.showSidebar?.(); });
-    $('update-account-button')?.addEventListener('click', () => C.modal?.showModal?.('update-account-modal'));
-    $('account-info-button')?.addEventListener('click', () => C.accountInfo?.openAccountInfo?.());
+    // 所有面板和弹窗阻止点击穿透
+    ['sidebar-menu','account-menu','settings-menu',
+     'update-account-modal','approve-user-modal','avatar-modal','avatar-crop-modal',
+     'account-info-modal','announcements-modal','key-settings-modal','game-settings-modal'
+    ].forEach(id => $(id)?.addEventListener('click', (e) => e.stopPropagation()));
 
+    // ── 侧边栏主菜单 ──
+    $('menu-toggle')?.addEventListener('click', (e) => { e.stopPropagation(); C.sidebar?.toggleSidebar?.(); });
+    $('header-avatar')?.addEventListener('click', (e) => { e.stopPropagation(); C.sidebar?.showSidebar?.(); });
+
+    // ── 菜单导航按钮 ──
+    $('open-account-menu-button')?.addEventListener('click', () => OV?.open?.('account-menu'));
+    $('account-menu-back')?.addEventListener('click', () => OV?.back?.());
+    $('settings-button')?.addEventListener('click', () => OV?.open?.('settings-menu'));
+    $('settings-menu-back')?.addEventListener('click', () => OV?.back?.());
+
+    // ── 弹窗打开按钮 ──
+    $('update-account-button')?.addEventListener('click', () => OV?.open?.('update-account-modal'));
+    $('account-info-button')?.addEventListener('click', () => C.accountInfo?.openAccountInfo?.());
     $('approve-request-button')?.addEventListener('click', () => C.approvals?.onApproveClick?.());
     $('announcements-button')?.addEventListener('click', () => {
       try { window.loadAnnouncements?.(); } catch(_){}
-      C.modal?.showModal?.('announcements-modal');
+      OV?.open?.('announcements-modal');
     });
-  $('logout-button')?.addEventListener('click', () => C.session?.handleLogout?.());
+    $('logout-button')?.addEventListener('click', () => C.session?.handleLogout?.());
 
+    // ── 头像弹窗 ──
     const fileInput = $('upload-avatar-input');
-    $('avatar-modal-upload')?.addEventListener('click', ()=> fileInput?.click());
-    $('avatar-modal-close')?.addEventListener('click', () => C.modal?.hideModal?.('avatar-modal'));
+    $('avatar-modal-upload')?.addEventListener('click', () => fileInput?.click());
+    $('avatar-modal-close')?.addEventListener('click', () => OV?.back?.());
     fileInput?.addEventListener('change', (e) => C.avatar?.openAvatarCropper?.(e));
     $('upload-avatar-button')?.addEventListener('click', async () => {
-      try { await Core.userService?.refreshCurrentUserFromServer?.(); } catch {}
+      try { await userService?.refreshCurrentUserFromServer?.(); } catch {}
       const preview = $('avatar-modal-preview');
       const resolved = resolveAvatarUrl(localStorage.getItem('avatar'));
       if (preview) {
@@ -69,16 +68,15 @@
         else { try { preview.removeAttribute('src'); } catch {} preview.style.display = 'none'; }
       }
       C.avatar?.loadPendingAvatarPreview?.();
-      C.modal?.showModal?.('avatar-modal');
+      OV?.open?.('avatar-modal');
     });
 
-    $('header-avatar')?.addEventListener('click', (e)=>{ e.stopPropagation(); C.sidebar?.showSidebar?.(); });
-
+    // ── 初始化头像显示 ──
     const resolved = resolveAvatarUrl(localStorage.getItem('avatar'));
     const sidebarPrev = $('sidebar-avatar-preview'); if (sidebarPrev && resolved) { sidebarPrev.src = resolved; sidebarPrev.style.display = 'inline-block'; }
     const headerAvatar = $('header-avatar'); if (headerAvatar && resolved) { headerAvatar.src = resolved; headerAvatar.style.display = 'inline-block'; }
 
-    // Role-based visibility
+    // ── 角色权限可见性 ──
     const role = localStorage.getItem('role');
     if (C.approvals && typeof C.approvals.updateVisibilityByRole === 'function') {
       C.approvals.updateVisibilityByRole(role);
@@ -88,10 +86,10 @@
       if (permBtn) {
         permBtn.style.display = (role === 'admin') ? '' : 'none';
         permBtn.addEventListener('click', () => {
-          C.accountMenu?.hideAccountMenu?.(); C.sidebar?.hideSidebar?.(); C.modal?.hideAllModals?.();
+          OV?.closeAll?.();
           try {
             const a = document.querySelector('#example-tabs a[href="#panel_permissions"]');
-            if (a) { a.click(); }
+            if (a) a.click();
             if (typeof window.renderPermissionsPanel === 'function') window.renderPermissionsPanel('');
           } catch {}
         });
@@ -106,7 +104,7 @@
       else { if (permTabEl) permTabEl.style.display = ''; if (permPanelEl) permPanelEl.style.display = ''; }
     }
 
-    // Forms
+    // ── 表单 ──
     $('updateForm')?.addEventListener('submit', (e) => C.accountUpdateForm?.handleUpdateFormSubmit?.(e));
   }
 

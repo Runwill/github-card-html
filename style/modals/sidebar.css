@@ -1,10 +1,4 @@
-/* Sidebar/backdrop split from modal.css */
-#sidebar-backdrop { 
-  backdrop-filter: blur(8px); 
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 7990; 
-  background: rgba(0, 0, 0, 0.2);
-}
+/* Sidebar/backdrop merged into modal-backdrop */
 
 #sidebar-menu, #account-menu, #settings-menu {
   border: 1px solid var(--border, rgba(226,232,240,0.8));
@@ -15,7 +9,7 @@
   box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
   min-width: 240px;
   padding: 16px;
-  z-index: 8000;
+  z-index: 10000;
 }
 
 #sidebar-menu li, #account-menu li, #settings-menu li { 

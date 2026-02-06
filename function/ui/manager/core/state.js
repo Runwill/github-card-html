@@ -11,8 +11,8 @@
   var state = {
     sidebarVisible: false,
     accountMenuVisible: false,
-    currentModal: null,
-    returnToAccountMenuOnClose: false
+    settingsMenuVisible: false,
+    currentModal: null
   };
 
   function get(){ return state; }

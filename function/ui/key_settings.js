@@ -184,23 +184,10 @@
       const keySettingsBtn = document.getElementById(KEY_SETTINGS_BUTTON_ID);
       if (keySettingsBtn) {
         keySettingsBtn.addEventListener('click', () => {
-          // Close settings menu first
-          if (window.CardUI?.Manager?.Controllers?.settingsMenu) {
-            window.CardUI.Manager.Controllers.settingsMenu.hideSettingsMenu();
-          }
-          
-          if (window.CardUI?.Manager?.Controllers?.modal) {
-            window.CardUI.Manager.Controllers.modal.showModal('key-settings-modal');
-          } else {
-             // Fallback
-             const modal = document.getElementById('key-settings-modal');
-             const backdrop = document.getElementById('modal-backdrop');
-             if(modal && backdrop) {
-                 backdrop.classList.add('show');
-                 modal.classList.add('show');
-                 modal.style.display = 'block';
-                 backdrop.style.display = 'block';
-             }
+          // 导航栈会自动隐藏 settings-menu 并保留在栈中
+          var OV = window.CardUI?.Manager?.Controllers?.overlay;
+          if (OV) {
+            OV.open('key-settings-modal');
           }
           updateUI();
         });
@@ -210,22 +197,10 @@
       const gameSettingsBtn = document.getElementById(GAME_SETTINGS_BUTTON_ID);
       if (gameSettingsBtn) {
         gameSettingsBtn.addEventListener('click', () => {
-          // Close settings menu first
-          if (window.CardUI?.Manager?.Controllers?.settingsMenu) {
-            window.CardUI.Manager.Controllers.settingsMenu.hideSettingsMenu();
-          }
-          
-          if (window.CardUI?.Manager?.Controllers?.modal) {
-            window.CardUI.Manager.Controllers.modal.showModal('game-settings-modal');
-          } else {
-             const modal = document.getElementById('game-settings-modal');
-             const backdrop = document.getElementById('modal-backdrop');
-             if(modal && backdrop) {
-                 backdrop.classList.add('show');
-                 modal.classList.add('show');
-                 modal.style.display = 'block';
-                 backdrop.style.display = 'block';
-             }
+          // 导航栈会自动隐藏 settings-menu 并保留在栈中
+          var OV = window.CardUI?.Manager?.Controllers?.overlay;
+          if (OV) {
+            OV.open('game-settings-modal');
           }
           initGameSettingsUI();
         });
