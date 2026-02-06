@@ -29,14 +29,14 @@
     });
 
     // 所有面板和弹窗阻止点击穿透
-    ['sidebar-menu','account-menu','settings-menu',
-     'update-account-modal','approve-user-modal','avatar-modal','avatar-crop-modal',
-     'account-info-modal','announcements-modal','key-settings-modal','game-settings-modal'
-    ].forEach(id => $(id)?.addEventListener('click', (e) => e.stopPropagation()));
+    (OV?.panelIds || []).forEach(id => $(id)?.addEventListener('click', (e) => e.stopPropagation()));
 
     // ── 侧边栏主菜单 ──
-    $('menu-toggle')?.addEventListener('click', (e) => { e.stopPropagation(); C.sidebar?.toggleSidebar?.(); });
-    $('header-avatar')?.addEventListener('click', (e) => { e.stopPropagation(); C.sidebar?.showSidebar?.(); });
+    $('menu-toggle')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (OV?.isAnyOpen?.()) OV.closeAll(); else OV?.open?.('sidebar-menu');
+    });
+    $('header-avatar')?.addEventListener('click', (e) => { e.stopPropagation(); OV?.open?.('sidebar-menu'); });
 
     // ── 菜单导航按钮 ──
     $('open-account-menu-button')?.addEventListener('click', () => OV?.open?.('account-menu'));

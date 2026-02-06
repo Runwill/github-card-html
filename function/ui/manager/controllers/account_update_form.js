@@ -31,7 +31,7 @@
       var response = await fetch(api('/api/change-password'), { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ id: id, oldPassword: oldPassword, newPassword: newPassword }) });
       if (response.ok) {
         showMessage(responseMessage, t('success.pwdUpdated'), 'success');
-        setTimeout(function(){ try { w.CardUI.Manager.Controllers.modal && w.CardUI.Manager.Controllers.modal.hideModal('update-account-modal'); } catch(_){ } w.location.href = 'login.html'; }, 2000);
+        setTimeout(function(){ try { w.CardUI.Manager.Controllers.overlay.closeAll(); } catch(_){ } w.location.href = 'login.html'; }, 2000);
       } else {
         var errMsg = '';
         try { var data = await response.json(); errMsg = (data && data.message) || ''; } catch(_){ }

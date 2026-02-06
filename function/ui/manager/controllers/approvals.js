@@ -29,7 +29,7 @@
       var arr = await Promise.all(reqs.map(toJson));
       var total = arr.reduce(function(sum,a){ return sum + (Array.isArray(a) ? a.length : 0); }, 0);
       if (total > 0) {
-        try { w.CardUI.Manager.Controllers.modal && w.CardUI.Manager.Controllers.modal.showModal('approve-user-modal'); } catch(_){ }
+        try { w.CardUI.Manager.Controllers.overlay.open('approve-user-modal'); } catch(_){ }
       } else {
         var msg = t('toast.noRequests');
         try { toast(msg); } catch(_){ try{ alert(msg); }catch(__){} }

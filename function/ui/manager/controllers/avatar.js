@@ -37,7 +37,7 @@
     var reader = new FileReader();
     reader.onload = function(){
       img.src = reader.result;
-      try { w.CardUI.Manager.Controllers.modal && w.CardUI.Manager.Controllers.modal.showModal(modalId); } catch(_){ }
+      try { w.CardUI.Manager.Controllers.overlay.open(modalId); } catch(_){ }
       setTimeout(function(){
         try {
           cropper = new w.Cropper(img, { viewMode: 1, aspectRatio: 1, dragMode: 'move', autoCropArea: 1, background: false, guides: false, cropBoxResizable: false, cropBoxMovable: false, toggleDragModeOnDblclick: false, movable: true, zoomable: true, responsive: true, minContainerHeight: 320, ready: function(){ try { cropper && cropper.setDragMode('move'); } catch(_){ } } });
@@ -46,7 +46,7 @@
     };
     reader.readAsDataURL(file);
     var cleanup = function(){ if (cropper) { try { cropper.destroy(); } catch(_){ } cropper = null; } var input = $('upload-avatar-input'); if (input) input.value = ''; };
-    var onCancel = function(){ cleanup(); try { w.CardUI.Manager.Controllers.modal && w.CardUI.Manager.Controllers.modal.hideModal(modalId); } catch(_){ } try { w.CardUI.Manager.Controllers.modal && w.CardUI.Manager.Controllers.modal.showModal('avatar-modal'); } catch(_){ } };
+    var onCancel = function(){ cleanup(); try { w.CardUI.Manager.Controllers.overlay.back(); } catch(_){ } };
     var onConfirm = function(){
       try {
         msg.textContent = t('status.cropping');
@@ -56,9 +56,8 @@
           if (!blob) { msg.textContent = t('error.exportFailed'); msg.className = 'modal-message error'; return; }
           var croppedFile = new File([blob], 'avatar.png', { type: 'image/png' });
           handleCroppedUpload(croppedFile, msg).then(function(){
-            try { w.CardUI.Manager.Controllers.modal && w.CardUI.Manager.Controllers.modal.hideModal(modalId); } catch(_){ }
             cleanup();
-            try { w.CardUI.Manager.Controllers.modal && w.CardUI.Manager.Controllers.modal.showModal('avatar-modal'); } catch(_){ }
+            try { w.CardUI.Manager.Controllers.overlay.back(); } catch(_){ }
           });
         }, 'image/png');
       } catch (e) {

@@ -87,7 +87,7 @@
       } catch {}
     } catch {}
     // 打开弹窗
-    try { const modal = Ctrls.modal; if (modal && modal.showModal) modal.showModal('account-info-modal'); } catch {}
+    Ctrls.overlay.open('account-info-modal');
   }
 
   Ctrls.accountInfo = { openAccountInfo };
