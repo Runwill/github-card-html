@@ -15,8 +15,7 @@ class WaveButtonManager {
     }
 
     handleClick(event) {
-    // 匹配 .ripple-button 和 .btn
-    const button = event.target.closest('.ripple-button, .btn');
+    const button = event.target.closest('.ripple-button');
         if (button) {
             // 立即创建波纹效果，不等待DOM检查
             this.createRipple(event, button);
