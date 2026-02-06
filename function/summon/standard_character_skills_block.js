@@ -1,11 +1,9 @@
 // 等价精简版：并发请求角色与技能，渲染标准“角色技能”区块
 // 保持原有 DOM 结构/类名/顺序；仅收紧实现以减少体积
 async function summonCharacterSkill() {
-    const characterUrl = window.getEndpointUrl('character', '/api/character')
-    const skillUrl = window.getEndpointUrl('skill', '/api/skill?strength=' + encodeURIComponent(localStorage.getItem('strength')))
     const [characterData, skillData] = await Promise.all([
-        window.fetchJSON(characterUrl, []),
-        window.fetchJSON(skillUrl, [])
+        fetchJsonCached(endpoints.character()).catch(() => []),
+        fetchJsonCached(endpoints.skill()).catch(() => [])
     ])
     CharacterSkillReplace(characterData || [], skillData || [])
 }

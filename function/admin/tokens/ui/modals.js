@@ -5,25 +5,7 @@
   const { esc, setByPath } = T;
   const { apiJson } = T;
 
-  function showTokensToast(message){
-    try{
-      let container=document.querySelector('.tokens-toast-container');
-      if(!container){ container=document.createElement('div'); container.className='tokens-toast-container'; document.body.appendChild(container); }
-  const toast=document.createElement('div'); toast.className='tokens-toast'; toast.textContent=message || window.t('status.updated') || '';
-      container.appendChild(toast);
-      setTimeout(()=>{ try{ toast.remove(); }catch(_){ } if(container && container.children.length===0){ try{ container.remove(); }catch(_){ } } }, 2200);
-    }catch(_){}
-  }
-  // 统一 toast 出口：优先使用全局 tokensAdmin.showToast
-  function toast(msg){
-    try{
-      if (window.tokensAdmin && typeof window.tokensAdmin.showToast === 'function') {
-        window.tokensAdmin.showToast(msg);
-      } else {
-        showTokensToast(msg);
-      }
-    }catch(_){ }
-  }
+  function toast(msg){ try{ T.showToast(msg); }catch(_){} }
   // 新建弹窗：懒加载构建 DOM 节点
   function ensureCreateModal(){
     let backdrop=document.getElementById('tokens-create-backdrop');

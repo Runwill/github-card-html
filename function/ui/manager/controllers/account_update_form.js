@@ -2,7 +2,7 @@
 // CardUI Manager Controllers - account update form (change password)
 (function(){
   'use strict';
-  var w = (typeof window !== 'undefined') ? window : this;
+  var w = window;
   w.CardUI = w.CardUI || {};
   w.CardUI.Manager = w.CardUI.Manager || {};
   w.CardUI.Manager.Core = w.CardUI.Manager.Core || {};

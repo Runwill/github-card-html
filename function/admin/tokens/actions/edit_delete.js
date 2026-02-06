@@ -6,27 +6,6 @@
   const { setByPath, deleteFieldInDocByPath, computeTint } = T;
   const { apiJson } = T;
 
-  // 轻量 Toast
-  function showTokensToast(message) {
-    try {
-      let container = document.querySelector('.tokens-toast-container');
-      if (!container) {
-        container = document.createElement('div');
-        container.className = 'tokens-toast-container';
-        document.body.appendChild(container);
-      }
-      const toast = document.createElement('div');
-      toast.className = 'tokens-toast';
-  toast.textContent = message || window.t('status.updated') || '';
-      container.appendChild(toast);
-      setTimeout(() => {
-        try { toast.remove(); } catch (_) {}
-        if (container && container.children.length === 0) {
-          try { container.remove(); } catch (_) {}
-        }
-      }, 2200);
-    } catch (_) {}
-  }
 
   // 行内编辑（单击 kv 值触发）
   function bindInlineEdit(rootEl) {
@@ -252,7 +231,7 @@
           try { window.tokensAdmin.logChange && window.tokensAdmin.logChange('update', { collection: coll, id, path, from: oldText, to: value, value }); } catch (_) {}
 
           target.textContent = (type === 'boolean' || type === 'number') ? String(value) : value;
-          try { showTokensToast('已保存'); } catch (_) {}
+          try { T.showToast('已保存'); } catch (_) {}
 
           try { window.tokensAdmin.updateDocInState(coll, id, (doc) => setByPath(doc, path, value)); } catch (_) {}
 
@@ -365,7 +344,7 @@
       if (!btn) return;
 
       if (!ev.ctrlKey && !document.body.classList.contains('ctrl-down')) {
-  try { showTokensToast(window.t('tokens.toast.useCtrlToDelete')); } catch (_) {}
+  try { T.showToast(window.t('tokens.toast.useCtrlToDelete')); } catch (_) {}
         return;
       }
 
@@ -399,7 +378,7 @@
       if (!btn) return;
 
       if (!ev.ctrlKey && !document.body.classList.contains('ctrl-down')) {
-  try { showTokensToast(window.t('tokens.toast.useCtrlToEdit')); } catch (_) {}
+  try { T.showToast(window.t('tokens.toast.useCtrlToEdit')); } catch (_) {}
         return;
       }
 

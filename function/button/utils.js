@@ -13,9 +13,8 @@
   // 标签替换：仅更换标签名，保留内容
   function replaceTag(from,to,scope){ (scope||document).querySelectorAll(from).forEach(el=>{ const neo=document.createElement(to); neo.innerHTML=el.innerHTML; el.parentNode?.replaceChild(neo,el); }); }
 
-  // 轻量缓存：term-dynamic
-  let termDynamicCache=null;
-  async function getTermDynamic(url){ const ep=url || (window.endpoints?.termDynamic? endpoints.termDynamic() : '/api/term-dynamic'); if(termDynamicCache) return termDynamicCache; const res=await fetch(ep); return (termDynamicCache=await res.json()); }
+  // 复用全局 fetchJsonCached 获取 term-dynamic 数据
+  function getTermDynamic(url){ const ep=url || (window.endpoints?.termDynamic? endpoints.termDynamic() : '/api/term-dynamic'); return fetchJsonCached(ep); }
 
   global.ButtonUtils={applyButtonState,toggleDisplay,replaceTag,getTermDynamic};
 })(window);

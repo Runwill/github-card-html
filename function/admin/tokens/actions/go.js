@@ -77,7 +77,7 @@
 
       const hrefRaw = findHtml(doc);
       if (!hrefRaw) {
-        try { if (window.showTokensToast) window.showTokensToast(window.t('tokens.go.notFound')); } catch (_) {}
+        try { T.showToast(window.t('tokens.go.notFound')); } catch (_) {}
         return;
       }
 

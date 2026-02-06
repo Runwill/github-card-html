@@ -1,10 +1,10 @@
 // 等价精简版：渲染所有标准“角色段落”与技能列表
 // 维持原 HTML 输出与交互（搜索条动画、类名、顺序），仅减少拼接与循环开销
 function summonCharacters() {
-    const characterUrl = window.getEndpointUrl('character', '/api/character')
-    const skillUrl = window.getEndpointUrl('skill', '/api/skill?strength=' + encodeURIComponent(localStorage.getItem('strength')))
-    Promise.all([window.fetchJSON(characterUrl, []), window.fetchJSON(skillUrl, [])])
-        .then(([c, s]) => CharacterReplace(c || [], s || []))
+    Promise.all([
+        fetchJsonCached(endpoints.character()).catch(() => []),
+        fetchJsonCached(endpoints.skill()).catch(() => [])
+    ]).then(([c, s]) => CharacterReplace(c || [], s || []))
 }
 
 function CharacterReplace(character, skill) {

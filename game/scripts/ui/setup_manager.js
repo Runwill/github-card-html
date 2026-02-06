@@ -163,6 +163,7 @@
                 character: [charData.name], // GameText 需要
                 hp: charData.health || 4,
                 maxHp: charData.health || 4, // 默认当前血量即上限
+                position: charData.position || '', // 势力/位置，用于推导头像
                 avatar: charData.avatar || '', // 如果有
                 _originalData: charData
             });

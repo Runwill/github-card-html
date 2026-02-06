@@ -1,7 +1,7 @@
 // 应用启动入口：等待局部片段加载后绑定事件并刷新当前用户数据。
 (function(){
   'use strict';
-  var w = (typeof window !== 'undefined') ? window : this;
+  var w = window;
   function onReady(){
     try { var ready = (w.partialsReady instanceof Promise) ? w.partialsReady : Promise.resolve();
       ready.then(function(){
