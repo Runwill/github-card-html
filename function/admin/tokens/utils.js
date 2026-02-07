@@ -75,5 +75,14 @@
     return `color-mix(in srgb, ${col} ${accentPct}%, var(--surface))`;
   };
 
-  Object.assign(window.tokensAdmin, { esc, setByPath, deleteFieldInDocByPath, getAccent, computeTint });
+  const HIDE_KEYS = new Set(['_id', '__v', '_v', 'py']);
+  function stripHidden(v){
+    if (!v || typeof v !== 'object') return v;
+    if (Array.isArray(v)) return v.map(stripHidden);
+    const o = {};
+    for (const k of Object.keys(v)) { if (!HIDE_KEYS.has(k)) o[k] = stripHidden(v[k]); }
+    return o;
+  }
+
+  Object.assign(window.tokensAdmin, { esc, setByPath, deleteFieldInDocByPath, getAccent, computeTint, HIDE_KEYS, stripHidden });
 })();

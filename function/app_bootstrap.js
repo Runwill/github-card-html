@@ -3,16 +3,6 @@
 ;(function(){
   const sr = (fn)=>{ try { return typeof fn === 'function' ? fn() : undefined } catch(_) {} }
   window.delay ||= (ms)=>new Promise(r=>setTimeout(r,ms))
-  window.filterParagraphs ||= function(){
-    try{
-      const q=(document.getElementById('search-input')?.value||'').trim().toLowerCase()
-      document.querySelectorAll('.characterParagraph').forEach(p=>{
-        const t=(p.textContent||'').toLowerCase()
-        const m=[...q].every(ch=>t.includes(ch))
-        p.classList.toggle('hidden',!m)
-      })
-    }catch(_){}
-  }
 
   document.addEventListener('DOMContentLoaded',()=>{
     const ready = window.partialsReady?.then ? window.partialsReady : Promise.resolve()

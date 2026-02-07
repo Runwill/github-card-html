@@ -33,14 +33,7 @@
   // 动态类型缓存（用于类型下拉与“结果”过滤映射），初始即包含全部预置类型
   let KNOWN_TYPES = new Set(PRESET_LOG_TYPES);
 
-  function isAnimating(el){ return !!(el && (el.classList.contains('is-opening') || el.classList.contains('is-closing'))); }
-  function isOpen(el){ return !!(el && el.classList.contains('is-open')); }
-  function openCollapsible(el){
-    try{ if (!el || isAnimating(el) || isOpen(el)) return; const startH = el.offsetHeight; el.classList.add('is-opening'); el.style.height = startH + 'px'; void el.offsetHeight; const targetH = el.scrollHeight; el.style.height = targetH + 'px'; const onEnd=(e)=>{ if(e&&e.target!==el) return; el.removeEventListener('transitionend', onEnd); el.classList.remove('is-opening'); el.classList.add('is-open'); el.style.height = 'auto'; }; el.addEventListener('transitionend', onEnd);}catch(_){}
-  }
-  function closeCollapsible(el){
-    try{ if (!el || isAnimating(el) || !isOpen(el)) return; const startH = el.scrollHeight; el.style.height = startH + 'px'; void el.offsetHeight; el.classList.add('is-closing'); el.classList.remove('is-open'); el.style.height = '0px'; const onEnd=(e)=>{ if(e&&e.target!==el) return; el.removeEventListener('transitionend', onEnd); el.classList.remove('is-closing'); }; el.addEventListener('transitionend', onEnd);}catch(_){}
-  }
+  const { isAnimating, isOpen, openCollapsible, closeCollapsible } = window.CollapsibleAnim;
 
   function parseTimeValue(v){ try{ if(v==null) return undefined; if(v instanceof Date) return v.getTime(); if(typeof v==='number') return v; if(typeof v==='string'){ const t=Date.parse(v); return isNaN(t)? undefined : t; } return undefined; }catch(_){ return undefined; } }
   function getLocaleFromI18n(){ try{ const lang=(window.i18n&&window.i18n.getLang&&window.i18n.getLang())||'zh'; if(lang==='zh') return 'zh-CN'; if(lang==='en') return 'en-US'; return 'en-US'; }catch(_){ return 'en-US'; } }

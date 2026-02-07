@@ -5,56 +5,10 @@
   const MAX_LOGS = 200;
   // localStorage persistence removed; logs are pulled from server
 
-  // 折叠/展开动画：与 tokens.css 中的 .collapsible 配合
-  function isAnimating(el){ return !!(el && (el.classList.contains('is-opening') || el.classList.contains('is-closing'))); }
-  function isOpen(el){ return !!(el && el.classList.contains('is-open')); }
-  function openCollapsible(el){
-    try{
-      if (!el || isAnimating(el) || isOpen(el)) return;
-      const startH = el.offsetHeight; // 可能为 0
-      el.classList.add('is-opening');
-      el.style.height = startH + 'px';
-      // 读一次触发重排
-      void el.offsetHeight;
-      const targetH = el.scrollHeight;
-      el.style.height = targetH + 'px';
-      const onEnd = (e)=>{
-        if (e && e.target !== el) return;
-        el.removeEventListener('transitionend', onEnd);
-        el.classList.remove('is-opening');
-        el.classList.add('is-open');
-        el.style.height = 'auto';
-      };
-      el.addEventListener('transitionend', onEnd);
-    }catch(_){ }
-  }
-  function closeCollapsible(el){
-    try{
-      if (!el || isAnimating(el) || !isOpen(el)) return;
-      const startH = el.scrollHeight; // 已展开高度（可能被 max-height 限制）
-      el.style.height = startH + 'px';
-      // 读一次触发重排
-      void el.offsetHeight;
-      el.classList.add('is-closing');
-      el.classList.remove('is-open');
-      el.style.height = '0px';
-      const onEnd = (e)=>{
-        if (e && e.target !== el) return;
-        el.removeEventListener('transitionend', onEnd);
-        el.classList.remove('is-closing');
-        // 维持 0 高度
-      };
-      el.addEventListener('transitionend', onEnd);
-    }catch(_){ }
-  }
-
-  function html(s) {
-    try {
-      if (s == null) return '';
-      const t = String(s);
-      return t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-    } catch (_) { return String(s || ''); }
-  }
+  // 折叠/展开动画：复用全局工具
+  const { isAnimating, isOpen, openCollapsible, closeCollapsible } = window.CollapsibleAnim;
+  // HTML 转义：复用 tokensAdmin.esc
+  const esc = window.tokensAdmin.esc;
 
   function ensureTokensLogArea() {
     try {
@@ -348,11 +302,11 @@
     const iso = new Date(ts).toISOString();
   const timeAbs = formatAbsForLang(ts);
     const timeRel = formatRel(ts);
-    const timeHtml = `<time class="log-time" datetime="${html(iso)}" data-ts="${html(String(ts))}" data-rel="${html(timeRel)}" data-abs="${html(timeAbs)}">${html(timeRel)}</time>`;
+    const timeHtml = `<time class="log-time" datetime="${esc(iso)}" data-ts="${esc(String(ts))}" data-rel="${esc(timeRel)}" data-abs="${esc(timeAbs)}">${esc(timeRel)}</time>`;
   const cKey = payload && payload.collection ? mapCollectionKey(payload.collection) : '';
     const tag = (payload && payload.collection) ? resolveLabel(payload.collection, payload && payload.id, payload && payload.label) : '';
   const pill = (key, cls='')=> `<i class="log-pill ${cls}" data-i18n="${key}"></i>`;
-    const code = (txt)=> `<code class="log-code">${html(txt||'')}</code>`;
+    const code = (txt)=> `<code class="log-code">${esc(txt||'')}</code>`;
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
     const actions = `<div class="log-actions"><button class="btn-copy" data-i18n="common.copy" data-i18n-attr="aria-label" data-i18n-aria-label="common.copy"></button><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div>`;
     if (type === 'create') {
@@ -368,24 +322,24 @@
           return '';
         }catch(_){ return ''; }
       })();
-  return `<div class="log-row is-create">${timeHtml}${pill('tokens.log.create','is-green')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(label)}]</i><i class="log-msg">${code(msg)}</i>${actions}</div>`;
+  return `<div class="log-row is-create">${timeHtml}${pill('tokens.log.create','is-green')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(label)}]</i><i class="log-msg">${code(msg)}</i>${actions}</div>`;
     }
     if (type === 'delete-doc') {
-  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteDoc','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i>${actions}</div>`;
+  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteDoc','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i>${actions}</div>`;
     }
     if (type === 'delete-field') {
       const from = pickOld(payload);
-  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteField','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val"><span data-i18n="tokens.log.prev"></span>${code(json(from))}</i>`:''}${actions}</div>`;
+  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteField','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val"><span data-i18n="tokens.log.prev"></span>${code(json(from))}</i>`:''}${actions}</div>`;
     }
     if (type === 'update') {
       const v = pickNew(payload);
       const from = pickOld(payload);
-  return `<div class="log-row is-update">${timeHtml}${pill('tokens.log.update','is-blue')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i>${actions}</div>`;
+  return `<div class="log-row is-update">${timeHtml}${pill('tokens.log.update','is-blue')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i>${actions}</div>`;
     }
     if (type === 'save-edits') {
       const sets = (payload && payload.sets) || [];
       const dels = (payload && payload.dels) || [];
-  const head = `<div class="log-row is-save">${timeHtml}${pill('tokens.edit.submit','is-indigo')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${html(tag)}]</i><i class="log-head" data-i18n="tokens.log.saveSummary" data-i18n-params='${html(JSON.stringify({ sets: sets.length, dels: dels.length }))}'></i>${actions}</div>`;
+  const head = `<div class="log-row is-save">${timeHtml}${pill('tokens.edit.submit','is-indigo')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><i class="log-head" data-i18n="tokens.log.saveSummary" data-i18n-params='${esc(JSON.stringify({ sets: sets.length, dels: dels.length }))}'></i>${actions}</div>`;
       const pick = (val) => (val && typeof val === 'object') ? JSON.stringify(val) : val;
       const detail = [];
       sets.slice(0, 10).forEach(s => { detail.push(`<div class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(pick(s.from))} → `:''}${code(pick(s.to))}</div>`); });
