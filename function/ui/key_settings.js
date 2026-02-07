@@ -266,110 +266,34 @@
   const DEFAULT_SPEED = 0;
   const DEFAULT_INERTIA_INDEX = 3; // 默认中等
   let currentInertiaIndex = DEFAULT_INERTIA_INDEX;
-  
-  function initGameSettingsUI() {
-    const speedRange = document.getElementById('game-speed-range');
-    const speedVal = document.getElementById('game-speed-val');
-    const inertiaPrev = document.getElementById('inertia-prev');
-    const inertiaNext = document.getElementById('inertia-next');
-    const inertiaValue = document.getElementById('inertia-value');
-    
-    // === Speed Slider ===
-    if (speedRange && speedVal) {
-      const savedSpeed = localStorage.getItem(STORAGE_KEY_SPEED);
-      if (savedSpeed !== null) {
-        const val = parseInt(savedSpeed, 10);
-        if (!isNaN(val)) {
-          speedRange.value = val;
-          speedVal.textContent = `${val}ms`;
-        }
-      }
-      
-      // Remove old listeners by cloning
-      const newSpeedRange = speedRange.cloneNode(true);
-      speedRange.parentNode.replaceChild(newSpeedRange, speedRange);
-      
-      newSpeedRange.addEventListener('input', (e) => {
-        const val = parseInt(e.target.value, 10);
-        const valDisplay = document.getElementById('game-speed-val');
-        if (valDisplay) valDisplay.textContent = `${val}ms`;
-        localStorage.setItem(STORAGE_KEY_SPEED, val);
-        
-        if (window.Game?.Controller?.setSpeed) {
-          window.Game.Controller.setSpeed(val);
-        }
-      });
-    }
-    
-    // === Inertia Arrow Selector ===
-    if (inertiaPrev && inertiaNext && inertiaValue) {
-      // Load saved inertia
-      const savedInertia = localStorage.getItem(STORAGE_KEY_INERTIA);
-      if (savedInertia !== null) {
-        const val = parseFloat(savedInertia);
-        const idx = INERTIA_OPTIONS.findIndex(opt => opt.value === val);
-        if (idx !== -1) currentInertiaIndex = idx;
-      }
-      updateInertiaDisplay();
-      
-      // Clone to remove old listeners
-      const newPrev = inertiaPrev.cloneNode(true);
-      const newNext = inertiaNext.cloneNode(true);
-      inertiaPrev.parentNode.replaceChild(newPrev, inertiaPrev);
-      inertiaNext.parentNode.replaceChild(newNext, inertiaNext);
-      
-      newPrev.addEventListener('click', () => {
-        if (currentInertiaIndex > 0) {
-          currentInertiaIndex--;
-          saveAndApplyInertia();
-        }
-      });
-      
-      newNext.addEventListener('click', () => {
-        if (currentInertiaIndex < INERTIA_OPTIONS.length - 1) {
-          currentInertiaIndex++;
-          saveAndApplyInertia();
-        }
-      });
-    }
-    
-    // === Reset Button ===
-    const resetBtn = document.getElementById('game-settings-reset');
-    if (resetBtn) {
-      const newResetBtn = resetBtn.cloneNode(true);
-      resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
-      
-      newResetBtn.addEventListener('click', () => {
-        // Reset speed
-        const speedRange = document.getElementById('game-speed-range');
-        const speedVal = document.getElementById('game-speed-val');
-        if (speedRange) speedRange.value = DEFAULT_SPEED;
-        if (speedVal) speedVal.textContent = `${DEFAULT_SPEED}ms`;
-        localStorage.setItem(STORAGE_KEY_SPEED, DEFAULT_SPEED);
-        if (window.Game?.Controller?.setSpeed) {
-          window.Game.Controller.setSpeed(DEFAULT_SPEED);
-        }
-        
-        // Reset inertia
-        currentInertiaIndex = DEFAULT_INERTIA_INDEX;
-        saveAndApplyInertia();
-      });
+
+  // 替换元素并绑定新监听器（消除 cloneNode 样板）
+  function rebind(id, event, handler) {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const fresh = el.cloneNode(true);
+    el.parentNode.replaceChild(fresh, el);
+    fresh.addEventListener(event, handler);
+    return fresh;
+  }
+
+  // 应用速度值到 UI + 存储 + 控制器
+  function applySpeed(val) {
+    const range = document.getElementById('game-speed-range');
+    const display = document.getElementById('game-speed-val');
+    if (range) range.value = val;
+    if (display) display.textContent = `${val}ms`;
+    localStorage.setItem(STORAGE_KEY_SPEED, val);
+    if (window.Game?.Controller?.setSpeed) window.Game.Controller.setSpeed(val);
+  }
+
+  function applyInertiaConfig(lerpFactor) {
+    if (window.Game?.UI?.DragConfig) {
+      window.Game.UI.DragConfig.lerpFactor = lerpFactor;
+      console.log(`[Settings] Drag Inertia set to ${lerpFactor}`);
     }
   }
-  
-  function updateInertiaDisplay() {
-    const inertiaValue = document.getElementById('inertia-value');
-    const inertiaPrev = document.getElementById('inertia-prev');
-    const inertiaNext = document.getElementById('inertia-next');
-    
-    if (inertiaValue && INERTIA_OPTIONS[currentInertiaIndex]) {
-      inertiaValue.textContent = INERTIA_OPTIONS[currentInertiaIndex].label;
-    }
-    // 更新箭头按钮禁用状态
-    if (inertiaPrev) inertiaPrev.disabled = currentInertiaIndex <= 0;
-    if (inertiaNext) inertiaNext.disabled = currentInertiaIndex >= INERTIA_OPTIONS.length - 1;
-  }
-  
+
   function saveAndApplyInertia() {
     updateInertiaDisplay();
     const opt = INERTIA_OPTIONS[currentInertiaIndex];
@@ -378,29 +302,60 @@
       applyInertiaConfig(opt.value);
     }
   }
-  
-  function applyInertiaConfig(lerpFactor) {
-    if (window.Game?.UI?.DragConfig) {
-      window.Game.UI.DragConfig.lerpFactor = lerpFactor;
-      console.log(`[Settings] Drag Inertia set to ${lerpFactor}`);
+
+  function updateInertiaDisplay() {
+    const inertiaValue = document.getElementById('inertia-value');
+    const inertiaPrev = document.getElementById('inertia-prev');
+    const inertiaNext = document.getElementById('inertia-next');
+    if (inertiaValue && INERTIA_OPTIONS[currentInertiaIndex]) {
+      inertiaValue.textContent = INERTIA_OPTIONS[currentInertiaIndex].label;
+    }
+    if (inertiaPrev) inertiaPrev.disabled = currentInertiaIndex <= 0;
+    if (inertiaNext) inertiaNext.disabled = currentInertiaIndex >= INERTIA_OPTIONS.length - 1;
+  }
+
+  function loadInertiaIndex() {
+    const saved = localStorage.getItem(STORAGE_KEY_INERTIA);
+    if (saved !== null) {
+      const idx = INERTIA_OPTIONS.findIndex(opt => opt.value === parseFloat(saved));
+      if (idx !== -1) currentInertiaIndex = idx;
     }
   }
   
+  function initGameSettingsUI() {
+    // === Speed Slider ===
+    const savedSpeed = localStorage.getItem(STORAGE_KEY_SPEED);
+    if (savedSpeed !== null) applySpeed(parseInt(savedSpeed, 10));
+
+    rebind('game-speed-range', 'input', (e) => applySpeed(parseInt(e.target.value, 10)));
+
+    // === Inertia Arrow Selector ===
+    loadInertiaIndex();
+    updateInertiaDisplay();
+
+    rebind('inertia-prev', 'click', () => {
+      if (currentInertiaIndex > 0) { currentInertiaIndex--; saveAndApplyInertia(); }
+    });
+    rebind('inertia-next', 'click', () => {
+      if (currentInertiaIndex < INERTIA_OPTIONS.length - 1) { currentInertiaIndex++; saveAndApplyInertia(); }
+    });
+
+    // === Reset Button ===
+    rebind('game-settings-reset', 'click', () => {
+      applySpeed(DEFAULT_SPEED);
+      currentInertiaIndex = DEFAULT_INERTIA_INDEX;
+      saveAndApplyInertia();
+    });
+  }
+  
   function loadGameSettings() {
-    // Load and apply speed
     const savedSpeed = localStorage.getItem(STORAGE_KEY_SPEED);
     if (savedSpeed !== null) {
       const val = parseInt(savedSpeed, 10);
-      if (!isNaN(val) && window.Game?.Controller?.setSpeed) {
-        window.Game.Controller.setSpeed(val);
-      }
+      if (!isNaN(val) && window.Game?.Controller?.setSpeed) window.Game.Controller.setSpeed(val);
     }
-    
-    // Load and apply inertia
     const savedInertia = localStorage.getItem(STORAGE_KEY_INERTIA);
-    if (savedInertia !== null) {
-      applyInertiaConfig(parseFloat(savedInertia));
-    }
+    if (savedInertia !== null) applyInertiaConfig(parseFloat(savedInertia));
   }
   
   // Expose API
