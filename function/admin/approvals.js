@@ -15,6 +15,24 @@
     return out;
   }
 
+  // 极简 DOM 工厂
+  function el(tag, attrs, children){
+    const e = document.createElement(tag);
+    if (attrs) {
+      for (const k of Object.keys(attrs)) {
+        if (k === 'text')        e.textContent = attrs[k];
+        else if (k === 'cls')    e.className = attrs[k];
+        else if (k === 'onclick') e.onclick = attrs[k];
+        else if (k === 'style' && typeof attrs[k] === 'object') Object.assign(e.style, attrs[k]);
+        else e[k] = attrs[k];
+      }
+    }
+    if (children) {
+      (Array.isArray(children) ? children : [children]).forEach(c => { if (c) e.appendChild(c); });
+    }
+    return e;
+  }
+
   // ── fetchPending 工厂 ──
   function makeFetchPending(path, label){
     return async function(){ try { const arr = await jsonGet(path); return Array.isArray(arr) ? arr : []; } catch(e){ console.error(label, e); return []; } };
@@ -109,52 +127,40 @@
   (intros||[]).forEach(rec => items.push({ type:'intro', id:rec._id, createdAt: rec.createdAt ? new Date(rec.createdAt) : new Date(0), username: (rec.user && rec.user.username) ? rec.user.username : '', newIntro: rec.newIntro || '' }));
       items.sort((a,b)=> b.createdAt - a.createdAt);
         if (!items.length) {
-          const empty = document.createElement('p');
-          empty.className = 'empty-hint empty-overlay';
-          Object.assign(empty.style, { position:'absolute', inset:'0', display:'flex', alignItems:'center', justifyContent:'center', margin:'0', opacity:'1' });
-          empty.textContent = '空';
-          container.appendChild(empty);
+          container.appendChild(el('p', {
+            cls: 'empty-hint empty-overlay', text: '空',
+            style: { position:'absolute', inset:'0', display:'flex',
+                     alignItems:'center', justifyContent:'center',
+                     margin:'0', opacity:'1' }
+          }));
           return;
         }
       // 清理可能存在的空态覆盖
       const existEmpty = container.querySelector('.empty-overlay'); if (existEmpty) existEmpty.remove();
       const abs = (u) => (endpoints && endpoints.abs ? endpoints.abs(u) : (u || ''));
       items.forEach(it => {
-        const row = document.createElement('div'); row.className = 'approval-row';
-        const left = document.createElement('div'); left.className = 'approval-left';
-        if (it.type === 'avatar' && it.url) {
-          const img = document.createElement('img');
-          img.src = abs(it.url); img.alt = 'avatar'; img.className = 'approval-img';
-          left.appendChild(img);
-        }
-        const text = document.createElement('div');
-        const t1 = document.createElement('div'); t1.className = 'approval-title';
-        if (it.type === 'register') t1.textContent = `注册：${it.username || ''}`;
-        else if (it.type === 'avatar') t1.textContent = `头像：${it.username || ''}`;
-        else if (it.type === 'username') t1.textContent = `用户名：${it.username || ''} → ${it.newUsername || ''}`;
-        else if (it.type === 'intro') {
-          const preview = (it.newIntro || '').replace(/\s+/g,' ').slice(0, 60);
-          t1.textContent = `简介：${it.username || ''} → ${preview}${(it.newIntro && it.newIntro.length>60)?'…':''}`;
-        }
-        const t2 = document.createElement('div'); t2.className = 'approval-sub'; t2.textContent = it.createdAt.toLocaleString();
-        text.appendChild(t1); text.appendChild(t2);
-        left.appendChild(text);
+        let titleText;
+        if (it.type === 'register') titleText = `注册：${it.username || ''}`;
+        else if (it.type === 'avatar') titleText = `头像：${it.username || ''}`;
+        else if (it.type === 'username') titleText = `用户名：${it.username || ''} → ${it.newUsername || ''}`;
+        else { const p = (it.newIntro || '').replace(/\s+/g,' ').slice(0,60); titleText = `简介：${it.username || ''} → ${p}${(it.newIntro&&it.newIntro.length>60)?'…':''}`;}
 
-        const right = document.createElement('div'); right.className = 'approval-right';
-  const approveBtn = document.createElement('button');
-        approveBtn.className = 'btn btn--success btn--sm';
-        approveBtn.textContent = '通过';
-        approveBtn.onclick = (e) => HANDLER[it.type](it.id, 'approve', e.currentTarget);
-        const rejectBtn = document.createElement('button');
-        rejectBtn.className = 'btn btn--danger btn--sm';
-        rejectBtn.textContent = '拒绝';
-        rejectBtn.onclick = (e) => HANDLER[it.type](it.id, 'reject', e.currentTarget);
-        right.appendChild(approveBtn);
-        right.appendChild(rejectBtn);
-
-        row.appendChild(left);
-        row.appendChild(right);
-        container.appendChild(row);
+        const left = el('div', { cls:'approval-left' }, [
+          it.type === 'avatar' && it.url
+            ? el('img', { src: abs(it.url), alt: 'avatar', cls: 'approval-img' })
+            : null,
+          el('div', null, [
+            el('div', { cls: 'approval-title', text: titleText }),
+            el('div', { cls: 'approval-sub',   text: it.createdAt.toLocaleString() })
+          ])
+        ]);
+        const right = el('div', { cls:'approval-right' }, [
+          el('button', { cls: 'btn btn--success btn--sm', text: '通过',
+            onclick: (e) => HANDLER[it.type](it.id, 'approve', e.currentTarget) }),
+          el('button', { cls: 'btn btn--danger btn--sm',  text: '拒绝',
+            onclick: (e) => HANDLER[it.type](it.id, 'reject', e.currentTarget) })
+        ]);
+        container.appendChild(el('div', { cls:'approval-row' }, [left, right]));
       });
     } catch(e){
       console.error('渲染审核项失败:', e);
