@@ -6,6 +6,22 @@
   const { apiJson } = T;
 
   function toast(msg){ try{ T.showToast(msg); }catch(_){} }
+  // V7: 弹窗打开动画（display→show→animate-in→focus）
+  function showModalAnim(backdrop, modal, editor){
+    backdrop.style.display='block'; modal.style.display='block';
+    try{ const h2=modal.querySelector('.modal-header h2'); if(h2){ h2.classList.remove('animate-in','visible'); void h2.offsetWidth; h2.classList.add('animate-in'); } }catch(_){ }
+    requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); });
+    setTimeout(()=>{ try{ editor.focus(); }catch(_){} }, 80);
+  }
+  // V8: 带 details 的错误 toast
+  function toastError(e, fallbackKey){
+    try{
+      if(e && e.data && Array.isArray(e.data.details) && e.data.details.length){
+        const base = window.t(fallbackKey) || (e && e.message) || '';
+        toast(base + '：' + e.data.details.join('；'));
+      } else { toast((e && e.message) || window.t(fallbackKey)); }
+    }catch(_){ toast(window.t(fallbackKey)); }
+  }
   // 新建弹窗：懒加载构建 DOM 节点
   function ensureCreateModal(){
     let backdrop=document.getElementById('tokens-create-backdrop');
@@ -77,29 +93,13 @@
   hideCreateModal();
   try{ toast(window.t('tokens.toast.created')); }catch(_){ }
         if(window.renderTokensDashboard) window.renderTokensDashboard(false);
-      }catch(e){
-        try{
-          if(e && e.data && Array.isArray(e.data.details) && e.data.details.length){
-            const base = window.t('tokens.error.createFailed') || (e && e.message) || '';
-            toast(base + '：' + e.data.details.join('；'));
-          } else {
-            toast((e && e.message) || window.t('tokens.error.createFailed'));
-          }
-  }catch(_){ toast(window.t('tokens.error.createFailed')); }
-      }
+      }catch(e){ toastError(e, 'tokens.error.createFailed'); }
     };
   btnCancel.onclick= hideCreateModal; btnSubmit.onclick= submit;
   // 只读用户：仅做禁用视觉，去掉悬浮提示，点击再弹 toast
   if(!canEdit){ try{ btnSubmit.classList.add('is-disabled'); }catch(_){ } }
   else { try{ btnSubmit.classList.remove('is-disabled'); }catch(_){ } }
-    backdrop.style.display='block'; modal.style.display='block';
-    // 确保标题进入动画：移除残留的 visible，再触发 animate-in
-    try{
-      const h2 = modal.querySelector('.modal-header h2');
-      if(h2){ h2.classList.remove('animate-in','visible'); void h2.offsetWidth; h2.classList.add('animate-in'); }
-    }catch(_){ }
-    requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); });
-    setTimeout(()=>{ try{ editor.focus(); }catch(_){} }, 80);
+    showModalAnim(backdrop, modal, editor);
   }
   // 编辑弹窗：与新建弹窗布局一致，含“另存”按钮
   function ensureEditModal(){
@@ -149,16 +149,7 @@
         hideEditModal();
   try{ toast(window.t('status.updated')); }catch(_){ }
         if(window.renderTokensDashboard) window.renderTokensDashboard(false);
-      }catch(e){
-        try{
-          if(e && e.data && Array.isArray(e.data.details) && e.data.details.length){
-            const base = window.t('tokens.error.updateFailed') || (e && e.message) || '';
-            toast(base + '：' + e.data.details.join('；'));
-          } else {
-            toast((e && e.message) || window.t('tokens.error.updateFailed'));
-          }
-  }catch(_){ toast(window.t('tokens.error.updateFailed')); }
-      }
+      }catch(e){ toastError(e, 'tokens.error.updateFailed'); }
     };
     const saveAs = async ()=>{
   if(!canEdit){ toast(window.t('common.noPermission')); return; }
@@ -173,16 +164,7 @@
         hideEditModal();
   try{ toast(window.t('tokens.toast.savedAs')); }catch(_){ }
         if(window.renderTokensDashboard) window.renderTokensDashboard(false);
-      }catch(e){
-        try{
-          if(e && e.data && Array.isArray(e.data.details) && e.data.details.length){
-            const base = window.t('tokens.error.createFailed') || (e && e.message) || '';
-            toast(base + '：' + e.data.details.join('；'));
-          } else {
-            toast((e && e.message) || window.t('tokens.error.createFailed'));
-          }
-  }catch(_){ toast(window.t('tokens.error.createFailed')); }
-      }
+      }catch(e){ toastError(e, 'tokens.error.createFailed'); }
     };
     btnCancel.onclick= hideEditModal; btnSubmit.onclick= submit; if(btnSaveAs) btnSaveAs.onclick = saveAs;
     // 只读用户：仅做禁用视觉，去掉悬浮提示，点击再弹 toast
@@ -193,13 +175,7 @@
       try{ btnSubmit.classList.remove('is-disabled'); }catch(_){ }
       try{ if(btnSaveAs){ btnSaveAs.classList.remove('is-disabled'); } }catch(_){ }
     }
-    backdrop.style.display='block'; modal.style.display='block';
-    try{
-      const h2 = modal.querySelector('.modal-header h2');
-      if(h2){ h2.classList.remove('animate-in','visible'); void h2.offsetWidth; h2.classList.add('animate-in'); }
-    }catch(_){ }
-    requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); });
-    setTimeout(()=>{ try{ editor.focus(); }catch(_){ } }, 80);
+    showModalAnim(backdrop, modal, editor);
   }
   Object.assign(window.tokensAdmin, { showCreateModal, hideCreateModal, openEditModal, hideEditModal });
 })();
