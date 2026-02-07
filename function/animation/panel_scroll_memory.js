@@ -23,10 +23,6 @@
     }
   }
 
-  function currentScrollY() {
-    return window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
-  }
-
   function restoreFor(panelId) {
     if (!panelId) return;
     const targetY = readScroll(panelId);
@@ -40,7 +36,7 @@
     tabLinks.forEach((a) => {
       a.addEventListener('click', function() {
         const currentId = getActivePanelId();
-        if (currentId) saveScroll(currentId, currentScrollY());
+        if (currentId) saveScroll(currentId, window.scrollY);
         // 兜底：若 Foundation 事件未触发，切换后尝试恢复
         setTimeout(() => restoreFor(getActivePanelId()), 0);
       }, { passive: true });
@@ -59,7 +55,7 @@
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentId = getActivePanelId();
-          if (currentId) saveScroll(currentId, currentScrollY());
+          if (currentId) saveScroll(currentId, window.scrollY);
           ticking = false;
         });
         ticking = true;

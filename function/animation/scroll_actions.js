@@ -8,20 +8,12 @@
   let __opSeq = 0;
 
   function cancelCurrentOp(reason){
-    try {
-      const op = __currentOp;
-      __currentOp = null;
-      if (!op) return;
-      // 取消滚动稳定监听
-      try { op.settle && op.settle.cancel && op.settle.cancel(); } catch(_) {}
-      // 移除覆盖层
-      try { op.removeOverlay && op.removeOverlay(); } catch(_) {}
-      // 尝试打断平滑滚动（通过发起一次瞬时到当前位移的滚动）
-      try {
-        const y = window.pageYOffset || document.documentElement.scrollTop || 0;
-        window.scrollTo({ top: y, behavior: 'auto' });
-      } catch(_) {}
-    } catch(_) {}
+    const op = __currentOp;
+    __currentOp = null;
+    if (!op) return;
+    try { op.settle && op.settle.cancel(); } catch(_) {}
+    try { op.removeOverlay && op.removeOverlay(); } catch(_) {}
+    window.scrollTo({ top: window.scrollY, behavior: 'auto' });
   }
   function selectTab(panelId){
     try {
@@ -187,22 +179,20 @@
     scheduleRowHighlight(scrollTarget, panelId, switching, opts)
   }
 
-  function commonFlow(panelId, $matches, opts){
-    // 选择第一个可滚动的目标
-    let scrollTarget = null
+  function findFirstTarget($matches, closestSelector){
+    let target = null
     $matches.each(function(){
-      const el = this
-      // 忽略仅用于淡入淡出的辅助元素
-      if (!el.classList || !el.classList.contains('fadeOnly')) {
-        if (!scrollTarget) scrollTarget = el
-        // 找到第一个即停止
-        if (scrollTarget) return false 
+      if (!this.classList || !this.classList.contains('fadeOnly')) {
+        target = closestSelector ? ($(this).closest(closestSelector)[0] || this) : this
+        return false
       }
     })
+    return target
+  }
 
-    if (scrollTarget) {
-      executeScrollAction(panelId, scrollTarget, opts)
-    }
+  function commonFlow(panelId, $matches, opts){
+    const scrollTarget = findFirstTarget($matches, opts && opts.closestContainer)
+    if (scrollTarget) executeScrollAction(panelId, scrollTarget, opts)
   }
 
   // 展开目标元素到 panel_term 的路径上所有被折叠的 collapsible 节点，然后再滚动
@@ -257,25 +247,7 @@
   // 根据最近容器居中（用于武将容器等），centerSelector 可选
   function scrollToClassWithCenter(panelId, className, centerSelector, opts){
     const $matches = $(`.scroll.${className}`)
-    if (!$matches || !$matches.length) return
-
-    let scrollTarget = null
-    $matches.each(function(){
-      const el = this
-      if (!el.classList || !el.classList.contains('fadeOnly')) {
-        if (!scrollTarget) {
-          const container = centerSelector ? $(el).closest(centerSelector)[0] : el
-          scrollTarget = container || el
-        }
-        if (scrollTarget) return false
-      }
-    })
-
-    if (scrollTarget) {
-      // 强制启用居中
-      const newOpts = Object.assign({}, opts, { center: true })
-      executeScrollAction(panelId, scrollTarget, newOpts)
-    }
+    if ($matches && $matches.length) commonFlow(panelId, $matches, Object.assign({}, opts, { center: true, closestContainer: centerSelector }))
   }
 
   // 暴露到全局
@@ -285,7 +257,6 @@
     scrollToTagAndFlash,
     scrollToClassWithCenter,
     cancel: cancelCurrentOp,
-  // 内部使用的高亮函数不再暴露
   }
 
   // 监听活动 panel 变化：若与当前操作目标不一致，则取消当前操作
