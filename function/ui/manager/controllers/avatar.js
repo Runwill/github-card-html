@@ -81,12 +81,9 @@
       if (data && data.applied) {
         if (typeof data.relativeUrl === 'string' && w.localStorage) w.localStorage.setItem('avatar', data.relativeUrl);
         var resolved = resolveAvatarUrl(w.localStorage ? w.localStorage.getItem('avatar') : '');
-        var preview = $('avatar-modal-preview'); if (preview && resolved) { preview.src = resolved; preview.style.display = 'inline-block'; }
-        try {
-          var sidebarPrev = $('sidebar-avatar-preview'); var headerAvatar = $('header-avatar');
-          if (sidebarPrev && resolved) { sidebarPrev.src = resolved; sidebarPrev.style.display = 'inline-block'; }
-          if (headerAvatar && resolved) { headerAvatar.src = resolved; headerAvatar.style.display = 'inline-block'; }
-        } catch(_){ }
+        ['avatar-modal-preview', 'sidebar-avatar-preview', 'header-avatar'].forEach(function(id){
+          var el = $(id); if (el && resolved) { el.src = resolved; el.style.display = 'inline-block'; }
+        });
         showMessage($('avatar-modal-message'), t('success.avatarUpdatedImmediate'), 'success');
         if (messageEl) messageEl.textContent = t('status.updated');
         var wrap = $('avatar-pending-wrap'); if (wrap) wrap.style.display = 'none';
