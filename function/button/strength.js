@@ -9,5 +9,5 @@ function check_strength(){
 function change_strength(){
     const cur = Number(localStorage.getItem('strength')) || 0;
     localStorage.setItem('strength', (cur + 1) % 3);
-    check_strength();
+    location.reload();
 }

@@ -15,23 +15,9 @@ const HIGHLIGHT_CONFIG = {
  * 用于追踪当前活跃的高亮元素，并在元素被移除DOM时强制执行清理逻辑
  */
 const ActiveHighlightRegistry = {
-    items: new Set(), // Set<{ element: HTMLElement, cleanup: Function }>
-    
-    add(element, cleanup) {
-        for (const item of this.items) {
-            if (item.element === element) return;
-        }
-        this.items.add({ element, cleanup });
-    },
-    
-    remove(element) {
-        for (const item of this.items) {
-            if (item.element === element) {
-                this.items.delete(item);
-                break;
-            }
-        }
-    }
+    items: new Map(), // Map<HTMLElement, Function>
+    add(element, cleanup) { this.items.set(element, cleanup); },
+    remove(element) { this.items.delete(element); }
 };
 
 // 全局 MutationObserver 监听节点移除
@@ -43,14 +29,10 @@ if (window.MutationObserver) {
             if (mutation.removedNodes.length > 0) {
                 mutation.removedNodes.forEach((removedNode) => {
                     if (removedNode.nodeType === 1) {
-                        for (const item of ActiveHighlightRegistry.items) {
-                            if (removedNode === item.element || (removedNode.contains && removedNode.contains(item.element))) {
-                                try {
-                                    item.cleanup(item.element);
-                                } catch (e) { 
-                                    console.error('Highlight cleanup failed for detached element', e); 
-                                }
-                                ActiveHighlightRegistry.items.delete(item);
+                        for (const [el, cleanup] of ActiveHighlightRegistry.items) {
+                            if (removedNode === el || (removedNode.contains && removedNode.contains(el))) {
+                                try { cleanup(el); } catch (e) { console.error('Highlight cleanup failed for detached element', e); }
+                                ActiveHighlightRegistry.items.delete(el);
                             }
                         }
                     }
@@ -131,79 +113,54 @@ function addStandardHighlight(element, color, scrollSelector) {
  * @param {string} mode - 模式：'', 'divided', 'part'
  */
 function termHighlight(term, element, mode='') {
-    const HIGHLIGHT_OPACITY = '60'
-
-    function getHighlightColor(baseColor) {
-        return baseColor ? `${baseColor}${HIGHLIGHT_OPACITY}` : ''
+    // divided 模式：对每个 part 执行 fn(enSelector, color)
+    const eachDivided = (currentTerm, fn) => {
+        currentTerm.part.forEach((part) => {
+            fn(part.en, part.termedPart ? (part.color || currentTerm.color) + '60' : currentTerm.color)
+        })
     }
 
     const performCleanup = (target) => {
         const currentTerm = term[target.i]
-        if (!currentTerm) {
-             removeHighlight(target);
-             return;
-        }
+        if (!currentTerm) { removeHighlight(target); return; }
 
         if(mode=='divided'){
-            currentTerm.part.forEach((part) => {
-                const enSelector = part.en
-                removeHighlight($(element).children(enSelector))
-                removeHighlight(`${currentTerm.en}.scroll ${enSelector}`)
+            eachDivided(currentTerm, (sel) => {
+                removeHighlight($(element).children(sel))
+                removeHighlight(`${currentTerm.en}.scroll ${sel}`)
             })
         }else if(mode=='part'){
             const currentPart = currentTerm?.part[target.j]
-            if (currentPart) {
-                removeHighlight(`${currentPart.en}.scroll`)
-            }
+            if (currentPart) removeHighlight(`${currentPart.en}.scroll`)
         }else{
             removeHighlight(target)
             removeHighlight(`${currentTerm.en}.scroll`)
-            
             if ($(target).hasClass('highlight') || currentTerm.highlight) {
-                const containerType = $(target).closest('pronounScope').length > 0 
-                    ? 'pronounScope' 
-                    : 'padding'
-                
-                const specialHighlightElements = $(target).closest(containerType).find(currentTerm.en)
-                removeHighlight(specialHighlightElements)
+                const containerType = $(target).closest('pronounScope').length > 0 ? 'pronounScope' : 'padding'
+                removeHighlight($(target).closest(containerType).find(currentTerm.en))
             }
         }
     };
 
     $(element).mouseover((event) => {
         const target = event.currentTarget
-        
-        // 注册 Cleanup
         ActiveHighlightRegistry.add(target, (el) => performCleanup(el));
-
         const currentTerm = term[target.i]
-        
+
         if(mode=='divided'){
-            currentTerm.part.forEach((part) => {
-                const enSelector = part.en
-                const color = part.termedPart 
-                    ? (part.color || currentTerm.color) + '60'
-                    : currentTerm.color
-                
-                applyHighlight($(element).children(enSelector), color)
-                applyHighlight(`${currentTerm.en}.scroll ${enSelector}`, color)
+            eachDivided(currentTerm, (sel, color) => {
+                applyHighlight($(element).children(sel), color)
+                applyHighlight(`${currentTerm.en}.scroll ${sel}`, color)
             })
         }else if(mode=='part'){
             const currentPart = currentTerm?.part[target.j]
-            const highlightColor = getHighlightColor(currentPart.color || currentTerm.color)
-            
-            applyHighlight(`${currentPart.en}.scroll`, highlightColor)
+            applyHighlight(`${currentPart.en}.scroll`, (currentPart.color || currentTerm.color) + '60')
         }else{
             applyHighlight(target, currentTerm.color)
             applyHighlight(`${currentTerm.en}.scroll`, currentTerm.color)
-            
             if ($(target).hasClass('highlight') || currentTerm.highlight) {
-                const containerType = $(target).closest('pronounScope').length > 0 
-                    ? 'pronounScope' 
-                    : 'padding'
-                
-                const specialHighlightElements = $(target).closest(containerType).find(currentTerm.en)
-                applyHighlight(specialHighlightElements, "#fddfdf")
+                const containerType = $(target).closest('pronounScope').length > 0 ? 'pronounScope' : 'padding'
+                applyHighlight($(target).closest(containerType).find(currentTerm.en), "#fddfdf")
             }
         }
     }).mouseout((event) => {

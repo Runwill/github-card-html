@@ -51,8 +51,8 @@
 
     // 返回移除函数，供取消时调用
     return function removeOverlay(){
-      try { clearTimeout(fadeOutTimer) } catch(_) {}
-      try { if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay) } catch(_) {}
+      clearTimeout(fadeOutTimer)
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay)
     }
   }
 
