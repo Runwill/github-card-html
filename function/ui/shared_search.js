@@ -151,58 +151,34 @@
   }
 
   // 简单的“将池页”筛选：根据输入内容隐藏/显示 <characterParagraph>
-  window.filterParagraphs = function(){
-    try {
-      const input = document.getElementById('search-input');
-      if (!input) return;
-      const keyword = String(input.value || '').trim();
-      const paras = document.querySelectorAll('#panel_character .standardCharactersBlock .characterParagraph');
-      if (!paras.length) return;
-      if (!keyword) {
-        paras.forEach(p => p.style.display = '');
-        return;
-      }
-      const kw = keyword.toLowerCase();
-      paras.forEach(p => {
-        const txt = (p.textContent || p.innerText || '').toLowerCase();
-        p.style.display = txt.includes(kw) ? '' : 'none';
-      });
-    } catch(_){}
-  };
-
-    // 技能页筛选：根据输入内容隐藏/显示 .skill-row（每行一个技能）
-    window.filterSkills = function(){
+  // 通用筛选工厂：根据关键词隐藏/显示匹配元素，可选处理相邻节点
+  function makeFilter(selector, afterToggle) {
+    return function() {
       try {
         const input = document.getElementById('search-input');
         if (!input) return;
-        const keyword = String(input.value || '').trim();
-        const rows = document.querySelectorAll('#panel_skill .standardCharacterSkillsBlock .skill-row');
-        if (!rows.length) return;
-        const toggleBrs = (row, show) => {
-          // 处理 row 后面的两个 <br>
-          let n = row.nextSibling, count = 0;
-          while (n && count < 2) {
-            if (n.nodeType === 1 && n.nodeName === 'BR') { // Element BR
-              n.style.display = show ? '' : 'none';
-              count++;
-            }
-            // 遇到下一个技能行则提前结束
-            if (n.nodeType === 1 && n.classList && n.classList.contains('skill-row')) break;
-            n = n.nextSibling;
-          }
-        };
-        if (!keyword) {
-          rows.forEach(r => { r.style.display = ''; toggleBrs(r, true); });
-          return;
-        }
-        const kw = keyword.toLowerCase();
-        rows.forEach(r => {
-          const txt = (r.textContent || r.innerText || '').toLowerCase();
-          const match = txt.includes(kw);
-          r.style.display = match ? '' : 'none';
-          toggleBrs(r, match);
+        const kw = String(input.value || '').trim().toLowerCase();
+        const items = document.querySelectorAll(selector);
+        if (!items.length) return;
+        items.forEach(el => {
+          const show = !kw || (el.textContent || el.innerText || '').toLowerCase().includes(kw);
+          el.style.display = show ? '' : 'none';
+          if (afterToggle) afterToggle(el, show);
         });
       } catch(_){}
     };
+  }
+
+  function toggleTrailingBrs(row, show) {
+    let n = row.nextSibling, count = 0;
+    while (n && count < 2) {
+      if (n.nodeType === 1 && n.nodeName === 'BR') { n.style.display = show ? '' : 'none'; count++; }
+      if (n.nodeType === 1 && n.classList && n.classList.contains('skill-row')) break;
+      n = n.nextSibling;
+    }
+  }
+
+  window.filterParagraphs = makeFilter('#panel_character .standardCharactersBlock .characterParagraph');
+  window.filterSkills = makeFilter('#panel_skill .standardCharacterSkillsBlock .skill-row', toggleTrailingBrs);
 
 })();
