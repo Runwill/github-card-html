@@ -3,7 +3,7 @@
   // 本地内存数据操作：插入/更新/删除/查找 和 搜索过滤
 
   const T = window.tokensAdmin;
-  const { state } = T;
+  const { state, HIDE_KEYS } = T;
 
   function ensureArraysForSkills() {
     if (!state.data) state.data = {};
@@ -86,8 +86,6 @@
     return null;
   }
 
-  const HIDE_KEYS = new Set(['_id', '__v', '_v', 'py']);
-
   // 递归包含判断（限制深度，忽略隐藏字段）
   function deepContains(v, kw, depth = 0) {
     try {
@@ -154,6 +152,5 @@
     findDocInState,
     deepContains,
     filterByQuery,
-    HIDE_KEYS,
   });
 })();

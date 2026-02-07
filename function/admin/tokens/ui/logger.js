@@ -172,66 +172,8 @@
     } catch (_) { return null; }
   }
 
-  function fmtTime(d) {
-    try { return new Date(d || Date.now()).toLocaleTimeString(); } catch (_) { return '' + (d || Date.now()); }
-  }
-
-  // 解析各种时间输入为时间戳（ms）
-  function parseTimeValue(v){
-    try{
-      if (v == null) return undefined;
-      if (v instanceof Date) return v.getTime();
-      if (typeof v === 'number') return v;
-      if (typeof v === 'string') { const t = Date.parse(v); return isNaN(t) ? undefined : t; }
-      return undefined;
-    }catch(_){ return undefined; }
-  }
-
-  function getLocaleFromI18n(){
-    try{
-      const lang = (window.i18n && window.i18n.getLang && window.i18n.getLang()) || 'zh';
-      if (lang === 'zh') return 'zh-CN';
-      if (lang === 'en') return 'en-US';
-      // debug 或未知语言，退回 en-US，避免浏览器环境差异
-      return 'en-US';
-    }catch(_){ return 'en-US'; }
-  }
-
-  function formatAbs(v){
-    try{ const t = parseTimeValue(v) ?? Date.now(); return new Date(t).toLocaleString(); }catch(_){ return String(v||''); }
-  }
-
-  function formatAbsForLang(v){
-    try{
-      const t = parseTimeValue(v) ?? Date.now();
-      const locale = getLocaleFromI18n();
-      // 降低差异性：不依赖系统默认区域
-      return new Date(t).toLocaleString(locale);
-    }catch(_){ return formatAbs(v); }
-  }
-
-  function formatRel(v){
-    try{
-      const now = Date.now();
-      const t = parseTimeValue(v) ?? now;
-      let diff = Math.floor((now - t) / 1000); // 秒
-      if (diff < -5) { // 未来时间，简单处理为“刚刚”以避免困惑
-  return window.t('time.justNow');
-      }
-  if (diff < 5) return window.t('time.justNow');
-  if (diff < 60) return window.t('time.secondsAgo', { n: diff });
-      const m = Math.floor(diff / 60);
-  if (m < 60) return window.t('time.minutesAgo', { n: m });
-      const h = Math.floor(m / 60);
-  if (h < 24) return window.t('time.hoursAgo', { n: h });
-      const d = Math.floor(h / 24);
-  if (d < 30) return window.t('time.daysAgo', { n: d });
-      const mo = Math.floor(d / 30);
-  if (mo < 12) return window.t('time.monthsAgo', { n: mo });
-      const y = Math.floor(mo / 12);
-  return window.t('time.yearsAgo', { n: y });
-    }catch(_){ return ''; }
-  }
+  // 时间工具：复用全局 TimeFmt
+  const { parseTimeValue, formatAbsForLang, formatRel } = window.TimeFmt;
 
   // 从对象中提取时间字段（服务端/前端均可用）
   function pickLogTime(v){

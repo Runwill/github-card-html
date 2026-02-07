@@ -217,7 +217,7 @@
 
         // 审核员可编辑但不可保存：直接提示并还原文字，不提交
         if (!canEdit) {
-          try { window.tokensAdmin.showToast && window.tokensAdmin.showToast('无权限'); } catch (_) {}
+          T.showToast('无权限');
           revert();
           return;
         }
@@ -228,12 +228,12 @@
 
         try {
           await apiJson('/tokens/update', { method: 'POST', auth: true, body: { collection: coll, id, path, value, valueType: type } });
-          try { window.tokensAdmin.logChange && window.tokensAdmin.logChange('update', { collection: coll, id, path, from: oldText, to: value, value }); } catch (_) {}
+          T.logChange('update', { collection: coll, id, path, from: oldText, to: value, value });
 
           target.textContent = (type === 'boolean' || type === 'number') ? String(value) : value;
-          try { T.showToast('已保存'); } catch (_) {}
+          T.showToast('已保存');
 
-          try { window.tokensAdmin.updateDocInState(coll, id, (doc) => setByPath(doc, path, value)); } catch (_) {}
+          T.updateDocInState(coll, id, (doc) => setByPath(doc, path, value));
 
           if (path === 'color') {
             const col = value;
@@ -298,7 +298,7 @@
       if (ev.ctrlKey || document.body.classList.contains('ctrl-down')) {
         const maybe = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
         if (maybe) {
-          try { window.tokensAdmin.showToast && window.tokensAdmin.showToast(window.t('tokens.toast.useCtrlToDelete')); } catch (_) {}
+          T.showToast(window.t('tokens.toast.useCtrlToDelete'));
           ev.preventDefault();
           return;
         }
@@ -324,10 +324,10 @@
 
       try {
   await apiJson('/tokens/delete', { method: 'POST', auth: true, body: { collection: coll, id, path } });
-  try { window.tokensAdmin.logChange && window.tokensAdmin.logChange('delete-field', { collection: coll, id, path, from: (row && row.querySelector ? (row.querySelector('.kv-val')?.textContent) : undefined) }); } catch (_) {}
-        try { window.tokensAdmin.updateDocInState(coll, id, (doc) => deleteFieldInDocByPath(doc, path)); } catch (_) {}
+  T.logChange('delete-field', { collection: coll, id, path, from: row.querySelector('.kv-val')?.textContent });
+        T.updateDocInState(coll, id, (doc) => deleteFieldInDocByPath(doc, path));
         row.remove();
-  try { window.tokensAdmin.showToast && window.tokensAdmin.showToast(window.t('tokens.toast.deleted')); } catch (_) {}
+  T.showToast(window.t('tokens.toast.deleted'));
       } catch (e) {
   alert(e.message || window.t('tokens.error.deleteFailed'));
       }
@@ -344,7 +344,7 @@
       if (!btn) return;
 
       if (!ev.ctrlKey && !document.body.classList.contains('ctrl-down')) {
-  try { T.showToast(window.t('tokens.toast.useCtrlToDelete')); } catch (_) {}
+  T.showToast(window.t('tokens.toast.useCtrlToDelete'));
         return;
       }
 
@@ -358,10 +358,10 @@
 
       try {
   await apiJson('/tokens/remove', { method: 'POST', auth: true, body: { collection: coll, id } });
-  try { window.tokensAdmin.logChange && window.tokensAdmin.logChange('delete-doc', { collection: coll, id }); } catch (_) {}
-        try { window.tokensAdmin.removeDocFromState(coll, id); } catch (_) {}
+  T.logChange('delete-doc', { collection: coll, id });
+        T.removeDocFromState(coll, id);
         card.remove();
-  try { window.tokensAdmin.showToast && window.tokensAdmin.showToast(window.t('tokens.toast.deleted')); } catch (_) {}
+  T.showToast(window.t('tokens.toast.deleted'));
       } catch (e) {
   alert(e.message || window.t('tokens.error.deleteFailed'));
       }
@@ -378,7 +378,7 @@
       if (!btn) return;
 
       if (!ev.ctrlKey && !document.body.classList.contains('ctrl-down')) {
-  try { T.showToast(window.t('tokens.toast.useCtrlToEdit')); } catch (_) {}
+  T.showToast(window.t('tokens.toast.useCtrlToEdit'));
         return;
       }
 
