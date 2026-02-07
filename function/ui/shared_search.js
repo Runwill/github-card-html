@@ -8,19 +8,12 @@
   const createSearchBox = () => {
     const container = document.createElement('div');
     container.className = 'search-container';
-    container.style.zIndex = '100';
-    container.style.top = '10%';
 
     const input = document.createElement('input');
     input.type = 'text';
     input.id = 'search-input';
     input.placeholder = '检索';
     input.autocomplete = 'off';
-    input.style.position = 'relative';
-    input.style.transition = 'right 1s ease, transform 0.2s ease, box-shadow 0.2s ease';
-    input.style.transform = 'translateY(0) scale(1)';
-    input.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)';
-    input.style.right = '-95%';
 
     // 仅当当前位于“将池页”时才真正触发筛选
     input.addEventListener('input', () => {
@@ -58,21 +51,20 @@
 
   function attachAnimation(container){
     const input = container.querySelector('#search-input');
-    let isFocused = false, isShowingAnimation = false, isDropped = false, animationTimers = [];
-    const clear = () => { animationTimers.forEach(t => clearTimeout(t)); animationTimers = []; };
-    const lift  = () => { input.style.transform = 'translateY(-3px) scale(1.01)'; input.style.boxShadow = '0 5px 10px rgba(0,0,0,0.15)'; isDropped = false; };
-    const drop  = () => { input.style.transform = 'translateY(0) scale(1)';     input.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)'; isDropped = true; };
-    const show  = () => { clear(); isShowingAnimation = true; lift(); animationTimers.push(
-      setTimeout(() => { input.style.right = '0' }, 200),
+    let isFocused = false, isShowingAnimation = false, isDropped = false, timers = [];
+    const clear = () => { timers.forEach(t => clearTimeout(t)); timers = []; };
+    const lift  = () => { input.classList.add('is-lifted'); isDropped = false; };
+    const drop  = () => { input.classList.remove('is-lifted'); isDropped = true; };
+    const show  = () => { clear(); isShowingAnimation = true; lift(); timers.push(
+      setTimeout(() => { input.classList.add('is-shown') }, 200),
       setTimeout(() => { isShowingAnimation = false; if (isFocused) drop() }, 1200)
     ); };
     const hide  = () => {
-      // 让小屏也自动缩回：去掉仅限大屏 (window.innerWidth > 1101) 的条件
       if (!isFocused) {
         clear(); isShowingAnimation = false;
         const delay = isDropped ? 200 : 0; if (isDropped) lift();
-        animationTimers.push(
-          setTimeout(() => { input.style.right = '-95%' }, delay),
+        timers.push(
+          setTimeout(() => { input.classList.remove('is-shown') }, delay),
           setTimeout(drop, 1200)
         );
       }

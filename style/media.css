@@ -1,6 +1,4 @@
 /* 响应式样式 */
-/* 基础缺省：小中屏默认搜索框靠右 0，底部占位 0.5em；大屏断点再覆盖 */
-#search-input { right: 0; }
 #block-under-search { height: 0.5em; }
 @media (max-width: 390px) {
     html { font-size: 15px; }
@@ -146,5 +144,22 @@
 
 /* strength_title 的字号已分发到各断点，保持一致（18px） */
 
-#search-input { right: -95%; }
-.search-container { margin-left: -200px; margin-right: -200px; padding-left: 200px; padding-right: 200px; position: sticky; }
+#search-input {
+  position: relative;
+  right: -95%;
+  transition: right 1s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transform: translateY(0) scale(1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+#search-input.is-lifted {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+}
+#search-input.is-shown { right: 0; }
+.search-container {
+  z-index: 100;
+  top: 10%;
+  margin-left: -200px; margin-right: -200px;
+  padding-left: 200px; padding-right: 200px;
+  position: sticky;
+}
