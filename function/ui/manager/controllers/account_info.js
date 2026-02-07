@@ -1,11 +1,8 @@
 // 账户信息弹窗渲染与角色/权限徽章展示控制器。
 (function(){
   'use strict';
-  const root = (window.CardUI = window.CardUI || {});
-  const M = (root.Manager = root.Manager || {});
-  const Core = (M.Core = M.Core || {});
-  const Ctrls = (M.Controllers = M.Controllers || {});
-
+  const Core = window.CardUI.Manager.Core;
+  const Ctrls = window.CardUI.Manager.Controllers;
   const dom = Core.dom || {};
   const $ = dom.$ || ((id)=>document.getElementById(id));
   const qs = dom.qs || ((s)=>document.querySelector(s));

@@ -3,10 +3,6 @@
 (function(){
   'use strict';
   var w = window;
-  w.CardUI = w.CardUI || {};
-  w.CardUI.Manager = w.CardUI.Manager || {};
-  w.CardUI.Manager.Controllers = w.CardUI.Manager.Controllers || {};
-
   var dom = w.CardUI.Manager.Core.dom || {};
   var userService = w.CardUI.Manager.Core.userService || {};
   var $ = dom.$ || function(id){ return document.getElementById(id); };

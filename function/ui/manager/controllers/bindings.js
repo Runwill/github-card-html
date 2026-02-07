@@ -1,11 +1,8 @@
 // 全局事件绑定与界面交互初始化（菜单、遮罩、模态、角色可见性等）。
 (function(){
   'use strict';
-  const root = (window.CardUI = window.CardUI || {});
-  const M = (root.Manager = root.Manager || {});
-  const Core = (M.Core = M.Core || {});
-  const C = (M.Controllers = M.Controllers || {});
-
+  const Core = window.CardUI.Manager.Core;
+  const C = window.CardUI.Manager.Controllers;
   const dom = Core.dom || {};
   const $ = dom.$ || ((id)=>document.getElementById(id));
   const qs = dom.qs || ((s)=>document.querySelector(s));
