@@ -12,77 +12,66 @@
     if (!Array.isArray(state.data.s2)) state.data.s2 = [];
   }
 
-  function pushDocToState(collection, doc) {
+  // collection → state 数组映射
+  const COL_MAP = {
+    'term-fixed':   'termFixed',
+    'term-dynamic': 'termDynamic',
+    'card':         'cards',
+    'character':    'characters',
+  };
+  function getArrays(collection) {
     if (!state.data) state.data = {};
-    if (collection === 'term-fixed') {
-      (state.data.termFixed ||= []).unshift(doc);
-    } else if (collection === 'term-dynamic') {
-      (state.data.termDynamic ||= []).unshift(doc);
-    } else if (collection === 'card') {
-      (state.data.cards ||= []).unshift(doc);
-    } else if (collection === 'character') {
-      (state.data.characters ||= []).unshift(doc);
-    } else if (collection === 'skill') {
+    const key = COL_MAP[collection];
+    if (key) return [state.data[key] ||= []];
+    if (collection === 'skill') {
+      ensureArraysForSkills();
+      return [state.data.s0, state.data.s1, state.data.s2];
+    }
+    return Object.keys(state.data)
+      .map(k => state.data[k])
+      .filter(Array.isArray);
+  }
+
+  function pushDocToState(collection, doc) {
+    if (collection === 'skill') {
       ensureArraysForSkills();
       const s = Number(doc && doc.strength);
       if (s === 1) state.data.s1.unshift(doc);
       else if (s === 2) state.data.s2.unshift(doc);
       else state.data.s0.unshift(doc);
+    } else {
+      const arrs = getArrays(collection);
+      if (arrs[0]) arrs[0].unshift(doc);
     }
   }
 
   function updateDocInState(collection, id, updater) {
     if (!state.data) return false;
-    const touch = (arr) => {
-      if (!Array.isArray(arr)) return false;
-      for (const d of arr) {
-        if (d && String(d._id) === String(id)) {
-          updater(d);
-          return true;
-        }
-      }
-      return false;
-    };
-    let updated = false;
-    if (collection === 'term-fixed') updated = touch(state.data.termFixed);
-    else if (collection === 'term-dynamic') updated = touch(state.data.termDynamic);
-    else if (collection === 'card') updated = touch(state.data.cards);
-    else if (collection === 'character') updated = touch(state.data.characters);
-    else if (collection === 'skill') updated = touch(state.data.s0) || touch(state.data.s1) || touch(state.data.s2);
-    if (!updated) {
-      for (const k of Object.keys(state.data)) {
-        if (touch(state.data[k])) { updated = true; break; }
-      }
+    const sid = String(id);
+    for (const arr of getArrays(collection)) {
+      const d = arr.find(d => d && String(d._id) === sid);
+      if (d) { updater(d); return true; }
     }
-    return updated;
+    return false;
   }
 
   function removeDocFromState(collection, id) {
     if (!state.data) return false;
-    const rm = (arr) => {
-      if (!Array.isArray(arr)) return false;
-      const i = arr.findIndex(d => d && String(d._id) === String(id));
+    const sid = String(id);
+    for (const arr of getArrays(collection)) {
+      const i = arr.findIndex(d => d && String(d._id) === sid);
       if (i >= 0) { arr.splice(i, 1); return true; }
-      return false;
-    };
-    if (collection === 'term-fixed') return rm(state.data.termFixed);
-    if (collection === 'term-dynamic') return rm(state.data.termDynamic);
-    if (collection === 'card') return rm(state.data.cards);
-    if (collection === 'character') return rm(state.data.characters);
-    if (collection === 'skill') return rm(state.data.s0) || rm(state.data.s1) || rm(state.data.s2);
-    for (const k of Object.keys(state.data)) { if (rm(state.data[k])) return true; }
+    }
     return false;
   }
 
   function findDocInState(collection, id) {
     if (!state.data) return null;
-    const pick = (arr) => Array.isArray(arr) ? (arr.find(d => d && String(d._id) === String(id)) || null) : null;
-    if (collection === 'term-fixed') return pick(state.data.termFixed);
-    if (collection === 'term-dynamic') return pick(state.data.termDynamic);
-    if (collection === 'card') return pick(state.data.cards);
-    if (collection === 'character') return pick(state.data.characters);
-    if (collection === 'skill') return pick(state.data.s0) || pick(state.data.s1) || pick(state.data.s2);
-    for (const k of Object.keys(state.data)) { const hit = pick(state.data[k]); if (hit) return hit; }
+    const sid = String(id);
+    for (const arr of getArrays(collection)) {
+      const hit = arr.find(d => d && String(d._id) === sid);
+      if (hit) return hit;
+    }
     return null;
   }
 
