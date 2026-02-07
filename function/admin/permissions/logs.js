@@ -181,84 +181,36 @@
 
   function pill(key, cls){ return `<i class="log-pill ${cls||''}" data-i18n="${key}"></i>`; }
 
-  // 与词元日志保持一致的色彩语义
-  function typeCls(t){
-    switch(String(t||'')){
-      case 'register': return 'is-green'; // 兼容旧类型名
-      case 'user-registered': return 'is-green';
-      case 'password-change': return 'is-indigo';
-      case 'role-changed': return 'is-indigo';
-      case 'avatar-submitted': return 'is-indigo';
-      case 'avatar-approved': return 'is-green';
-      case 'avatar-rejected': return 'is-red';
-      case 'username-submitted': return 'is-indigo';
-      case 'username-approved': return 'is-green';
-      case 'username-rejected': return 'is-red';
-      case 'username-cancelled': return 'is-blue';
-      case 'intro-submitted': return 'is-indigo';
-      case 'intro-approved': return 'is-green';
-      case 'intro-rejected': return 'is-red';
-      case 'intro-cancelled': return 'is-blue';
-      case 'user-approved': return 'is-green';
-      case 'user-rejected': return 'is-red';
-      case 'permissions-granted': return 'is-green';
-      case 'permissions-revoked': return 'is-red';
-      case 'permissions-replaced': return 'is-indigo';
-      default: return '';
-    }
-  }
+  // ── 日志类型 → CSS 类名 / i18n key / 消息 key 映射表 ──
+  var TYPE_CLS = {
+    'register':'is-green','user-registered':'is-green','user-approved':'is-green','user-rejected':'is-red',
+    'password-change':'is-indigo','role-changed':'is-indigo',
+    'avatar-submitted':'is-indigo','avatar-approved':'is-green','avatar-rejected':'is-red',
+    'username-submitted':'is-indigo','username-approved':'is-green','username-rejected':'is-red','username-cancelled':'is-blue',
+    'intro-submitted':'is-indigo','intro-approved':'is-green','intro-rejected':'is-red','intro-cancelled':'is-blue',
+    'permissions-granted':'is-green','permissions-revoked':'is-red','permissions-replaced':'is-indigo'
+  };
+  var TYPE_KEY = {
+    'register':'permissions.log.register','user-registered':'permissions.log.register',
+    'password-change':'permissions.log.passwordChanged','role-changed':'permissions.log.roleChanged',
+    'avatar-submitted':'permissions.log.avatarSubmitted','avatar-approved':'permissions.log.avatarApproved','avatar-rejected':'permissions.log.avatarRejected',
+    'username-submitted':'permissions.log.usernameSubmitted','username-approved':'permissions.log.usernameApproved','username-rejected':'permissions.log.usernameRejected','username-cancelled':'permissions.log.usernameCancelled',
+    'intro-submitted':'permissions.log.introSubmitted','intro-approved':'permissions.log.introApproved','intro-rejected':'permissions.log.introRejected','intro-cancelled':'permissions.log.introCancelled',
+    'user-approved':'permissions.log.userApproved','user-rejected':'permissions.log.userRejected',
+    'permissions-granted':'permissions.log.granted','permissions-revoked':'permissions.log.revoked','permissions-replaced':'permissions.log.replaced'
+  };
+  var MSG_KEY = {
+    'user-registered':'permissions.msg.userRegistered','user-approved':'permissions.msg.userApproved','user-rejected':'permissions.msg.userRejected',
+    'password-change':'permissions.msg.passwordChanged','role-changed':'permissions.msg.roleChanged',
+    'avatar-submitted':'permissions.msg.avatarSubmitted','avatar-approved':'permissions.msg.avatarApproved','avatar-rejected':'permissions.msg.avatarRejected',
+    'username-submitted':'permissions.msg.usernameSubmitted','username-approved':'permissions.msg.usernameApproved','username-rejected':'permissions.msg.usernameRejected','username-cancelled':'permissions.msg.usernameCancelled',
+    'intro-submitted':'permissions.msg.introSubmitted','intro-approved':'permissions.msg.introApproved','intro-rejected':'permissions.msg.introRejected','intro-cancelled':'permissions.msg.introCancelled',
+    'permissions-granted':'permissions.msg.granted','permissions-revoked':'permissions.msg.revoked','permissions-replaced':'permissions.msg.replaced'
+  };
 
-  function typeKey(t){
-    switch(String(t||'')){
-      case 'register': return 'permissions.log.register'; // 兼容旧类型名
-      case 'user-registered': return 'permissions.log.register';
-      case 'password-change': return 'permissions.log.passwordChanged';
-      case 'role-changed': return 'permissions.log.roleChanged';
-      case 'avatar-submitted': return 'permissions.log.avatarSubmitted';
-      case 'avatar-approved': return 'permissions.log.avatarApproved';
-      case 'avatar-rejected': return 'permissions.log.avatarRejected';
-      case 'username-submitted': return 'permissions.log.usernameSubmitted';
-      case 'username-approved': return 'permissions.log.usernameApproved';
-      case 'username-rejected': return 'permissions.log.usernameRejected';
-      case 'username-cancelled': return 'permissions.log.usernameCancelled';
-      case 'intro-submitted': return 'permissions.log.introSubmitted';
-      case 'intro-approved': return 'permissions.log.introApproved';
-      case 'intro-rejected': return 'permissions.log.introRejected';
-      case 'intro-cancelled': return 'permissions.log.introCancelled';
-      case 'user-approved': return 'permissions.log.userApproved';
-      case 'user-rejected': return 'permissions.log.userRejected';
-      case 'permissions-granted': return 'permissions.log.granted';
-      case 'permissions-revoked': return 'permissions.log.revoked';
-      case 'permissions-replaced': return 'permissions.log.replaced';
-      default: return '';
-    }
-  }
-
-  // 根据日志类型返回消息 i18n key
-  function msgKey(t){
-    switch(String(t||'')){
-      case 'user-registered': return 'permissions.msg.userRegistered';
-      case 'user-approved': return 'permissions.msg.userApproved';
-      case 'user-rejected': return 'permissions.msg.userRejected';
-      case 'password-change': return 'permissions.msg.passwordChanged';
-      case 'role-changed': return 'permissions.msg.roleChanged';
-      case 'avatar-submitted': return 'permissions.msg.avatarSubmitted';
-      case 'avatar-approved': return 'permissions.msg.avatarApproved';
-      case 'avatar-rejected': return 'permissions.msg.avatarRejected';
-      case 'username-submitted': return 'permissions.msg.usernameSubmitted';
-      case 'username-approved': return 'permissions.msg.usernameApproved';
-      case 'username-rejected': return 'permissions.msg.usernameRejected';
-      case 'username-cancelled': return 'permissions.msg.usernameCancelled';
-      case 'intro-submitted': return 'permissions.msg.introSubmitted';
-      case 'intro-approved': return 'permissions.msg.introApproved';
-      case 'intro-rejected': return 'permissions.msg.introRejected';
-      case 'intro-cancelled': return 'permissions.msg.introCancelled';
-      case 'permissions-granted': return 'permissions.msg.granted';
-      case 'permissions-revoked': return 'permissions.msg.revoked';
-      case 'permissions-replaced': return 'permissions.msg.replaced';
-      default: return '';
-    }
-  }
+  function typeCls(t){ return TYPE_CLS[String(t||'')] || ''; }
+  function typeKey(t){ return TYPE_KEY[String(t||'')] || ''; }
+  function msgKey(t){ return MSG_KEY[String(t||'')] || ''; }
 
   function makeRow(log){
     try{
