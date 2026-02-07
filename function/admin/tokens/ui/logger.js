@@ -395,60 +395,16 @@
   document.addEventListener('DOMContentLoaded', function(){
     const ready = (window.partialsReady instanceof Promise) ? window.partialsReady : Promise.resolve();
     ready.then(()=>{ try{ hydrateLogs(); }catch(_){ } }).then(()=>{
-      // 启动一个轻量的定时器，每分钟刷新一次相对时间显示
-      try{
-        if (!window.__tokensLogRelTimer){
-          window.__tokensLogRelTimer = setInterval(()=>{
-            try{
-                document.querySelectorAll('.log-time[data-ts]')?.forEach(el=>{
-                  const ts = Number(el.getAttribute('data-ts')) || Date.now();
-                  const rel = formatRel(ts);
-                  el.setAttribute('data-rel', rel);
-                  // 正在悬浮时不打断绝对时间展示
-                  if (!el.matches(':hover')) {
-                    el.textContent = rel;
-                  }
-                });
-            }catch(_){ }
-          }, 60000);
-        }
-      }catch(_){ }
-
-        // 悬浮时切换为绝对时间，移开恢复相对时间（事件委托）
-        try{
-          const root = document.getElementById('tokens-log') || document;
-          const onOver = (e)=>{
-            const t = e.target && e.target.closest ? e.target.closest('.log-time') : null;
-            if (t) { const abs = t.getAttribute('data-abs'); if (abs) t.textContent = abs; }
-          };
-          const onOut = (e)=>{
-            const t = e.target && e.target.closest ? e.target.closest('.log-time') : null;
-            if (t) { const rel = t.getAttribute('data-rel'); if (rel) t.textContent = rel; }
-          };
-          root.addEventListener('mouseover', onOver);
-          root.addEventListener('mouseout', onOut);
-        }catch(_){ }
+      try{ LogUtils.startRelTimeRefresh('.log-time[data-ts]', '__tokensLogRelTimer'); }catch(_){ }
+        try{ LogUtils.bindLogTimeHover(document.getElementById('tokens-log') || document); }catch(_){ }
     });
 
     // 语言切换时：
     // 1) 重新应用 i18n 到日志面板（更新所有 data-i18n 文案）
     // 2) 立即刷新一次相对时间文案，避免等待下一分钟
     function onI18nChanged(){
-      try {
-        const panel = document.getElementById('tokens-log-panel');
-        if (panel && window.i18n && window.i18n.apply) window.i18n.apply(panel);
-      } catch (_){ }
-      try{
-        document.querySelectorAll('.log-time[data-ts]')?.forEach(el=>{
-          const ts = Number(el.getAttribute('data-ts')) || Date.now();
-          const rel = formatRel(ts);
-          const abs = formatAbsForLang(ts);
-          el.setAttribute('data-rel', rel);
-          el.setAttribute('data-abs', abs);
-          // 悬浮显示绝对时间；非悬浮显示相对时间
-          el.textContent = el.matches(':hover') ? abs : rel;
-        });
-      }catch(_){ }
+      try { const panel = document.getElementById('tokens-log-panel'); if (panel && window.i18n && window.i18n.apply) window.i18n.apply(panel); } catch (_){ }
+      LogUtils.refreshLogTimes('.log-time[data-ts]');
     }
     try{ document.addEventListener('i18n:changed', onI18nChanged); }catch(_){ }
     try{ window.addEventListener && window.addEventListener('i18n:changed', onI18nChanged); }catch(_){ }

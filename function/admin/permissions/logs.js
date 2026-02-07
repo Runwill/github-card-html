@@ -436,56 +436,11 @@
     function bindDeleteDelegation(){
       try{
         const root = document.getElementById('perms-log');
-        if (root && !root.__delDelegationBound) {
-          root.__delDelegationBound = true;
-          
-          // Copy delegation
-          root.addEventListener('click', (ev) => {
-            const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-copy') : null;
-            if (!btn) return;
-            const entry = btn.closest('.tokens-log__entry');
-            if (!entry) return;
-            
-            const clone = entry.cloneNode(true);
-            const actions = clone.querySelector('.log-actions');
-            if (actions) actions.remove();
-            
-            const timeEl = clone.querySelector('.log-time');
-            if (timeEl && timeEl.hasAttribute('data-abs')) {
-                timeEl.textContent = timeEl.getAttribute('data-abs') + ' ';
-            }
-            
-            const text = clone.innerText.replace(/\s+/g, ' ').trim();
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    const originalI18n = btn.getAttribute('data-i18n');
-                    btn.setAttribute('data-i18n', 'common.copied');
-                    if (window.i18n && window.i18n.apply) window.i18n.apply(btn);
-                    setTimeout(() => {
-                        btn.setAttribute('data-i18n', originalI18n || 'common.copy');
-                        if (window.i18n && window.i18n.apply) window.i18n.apply(btn);
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Copy failed', err);
-                });
-            }
-          });
-
-          root.addEventListener('click', (ev)=>{
-            const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
-            if (!btn) return;
-            const entry = btn.closest('.tokens-log__entry');
-            if (!entry) return;
-            (async ()=>{
-              const id = entry.getAttribute('data-log-id');
-              if (id) {
-                try { await apiDelete(`/user/logs/${encodeURIComponent(id)}`); } catch(e){ alert((e && e.message) || ''); return; }
-              }
-              try { entry.remove(); } catch(_){ }
-            })();
-          });
-        }
+        if (!root) return;
+        LogUtils.bindLogCopy(root);
+        LogUtils.bindLogDelete(root, async (id)=>{
+          if (id) await apiDelete(`/user/logs/${encodeURIComponent(id)}`);
+        });
       }catch(_){ }
     }
 
@@ -528,29 +483,11 @@
       }catch(_){ }
     });
 
-  // 每分钟刷新相对时间
-    if (!window.__permsLogTimer){
-      window.__permsLogTimer = setInterval(()=>{
-        try{ document.querySelectorAll('#perms-log .log-time[data-ts]')?.forEach(el=>{ const ts=Number(el.getAttribute('data-ts'))||Date.now(); const rel=formatRel(ts); el.setAttribute('data-rel', rel); if(!el.matches(':hover')) el.textContent = rel; }); }catch(_){}
-      }, 60000);
-    }
+  // 相对时间刷新 + 悬浮切换
+    LogUtils.startRelTimeRefresh('#perms-log .log-time[data-ts]', '__permsLogTimer');
+    try{ LogUtils.bindLogTimeHover(document.getElementById('perms-log') || document); }catch(_){ }
 
-    // 悬浮时切换为绝对时间，移开恢复相对时间（与词元日志一致）
-    try{
-      const root = document.getElementById('perms-log') || document;
-      const onOver = (e)=>{
-        const t = e.target && e.target.closest ? e.target.closest('.log-time') : null;
-        if (t) { const abs = t.getAttribute('data-abs'); if (abs) t.textContent = abs; }
-      };
-      const onOut = (e)=>{
-        const t = e.target && e.target.closest ? e.target.closest('.log-time') : null;
-        if (t) { const rel = t.getAttribute('data-rel'); if (rel) t.textContent = rel; }
-      };
-      root.addEventListener('mouseover', onOver);
-      root.addEventListener('mouseout', onOut);
-    }catch(_){ }
-
-    // 日志内“删除”按钮事件委托（单条删除）：兜底绑定（若上方未能绑定，这里再尝试一次）
+    // 兜底绑定删除/复制委托
     try { bindDeleteDelegation(); } catch(_){ }
 
     // 语言切换：重渲染 i18n + 刷新时间格式
@@ -558,7 +495,7 @@
       try{ const panel=document.getElementById('perms-log-panel'); if(panel && window.i18n && window.i18n.apply) window.i18n.apply(panel);}catch(_){ }
       // 语言变化时同步更新日期输入的地区
       try{ const panel=document.getElementById('perms-log-panel'); const filters = panel ? panel.querySelector('.tokens-log__filters') : null; setDateInputLang(filters||panel); }catch(_){ }
-      try{ document.querySelectorAll('#perms-log .log-time[data-ts]')?.forEach(el=>{ const ts=Number(el.getAttribute('data-ts'))||Date.now(); const rel=formatRel(ts); const abs=formatAbsForLang(ts); el.setAttribute('data-rel', rel); el.setAttribute('data-abs', abs); el.textContent = el.matches(':hover')? abs : rel; }); }catch(_){ }
+      LogUtils.refreshLogTimes('#perms-log .log-time[data-ts]');
       // 语言变化时更新类型格式预览
       try{ updateFormatPreview(); }catch(_){ }
       // 语言变化时重新本地化角色变更消息中的角色名
