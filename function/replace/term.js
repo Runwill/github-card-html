@@ -14,9 +14,6 @@ function replace_term(path, mode, paragraphs = document) {
 
         // 定义处理单个节点的函数 (核心逻辑抽取)
         const processNode = (node, termData, index) => {
-            // 防止重复处理
-            if (node.dataset.termProcessed) return;
-
             const $node = $(node);
             const t = termData;
 
@@ -118,9 +115,6 @@ function replace_term(path, mode, paragraphs = document) {
                    }
                 }
             }
-            
-            // 标记已处理
-            node.dataset.termProcessed = "true";
         };
 
         // 适配器：将 scanAndObserve 的 (node) 调用转换为 processNode(node, data, index)

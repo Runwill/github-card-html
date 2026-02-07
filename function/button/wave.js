@@ -2,16 +2,7 @@
 class WaveButtonManager {
     constructor() {
         this.activeRipples = new Set();
-        this.animationFrameId = null;
-        // 直接绑定事件（实例在 DOMContentLoaded 时创建）
-        this.setupEventListeners();
-    }
-
-    setupEventListeners() {
-        // 捕获阶段处理点击
         document.addEventListener('click', this.handleClick.bind(this), true);
-        // 页面卸载时清理资源
-        window.addEventListener('beforeunload', this.cleanup.bind(this));
     }
 
     handleClick(event) {
@@ -68,7 +59,7 @@ class WaveButtonManager {
         this.activeRipples.add(ripple);
 
         // 清理机制：优先依赖动画结束事件，备用超时兜底
-        const remove = () => this.removeRipple(ripple, button);
+        const remove = () => this.removeRipple(ripple);
         ripple.addEventListener('animationend', remove, { once: true });
         setTimeout(() => { if (this.activeRipples.has(ripple)) remove(); }, 400);
     }
@@ -89,27 +80,9 @@ class WaveButtonManager {
         return brightness > 128 ? 'rgba(0, 0, 0, 0.2)' : 'rgba(255, 255, 255, 0.3)';
     }
 
-    removeRipple(ripple, button) {
-        if (ripple && ripple.parentNode) {
-            // 使用requestAnimationFrame优化DOM操作
-            this.animationFrameId = requestAnimationFrame(() => {
-                ripple.parentNode.removeChild(ripple);
-            });
-        }
+    removeRipple(ripple) {
+        if (ripple && ripple.parentNode) ripple.parentNode.removeChild(ripple);
         this.activeRipples.delete(ripple);
-    }
-
-    // 清理所有活动的波纹效果
-    cleanup() {
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-        }
-
-        this.activeRipples.forEach(ripple => {
-            if (ripple && ripple.parentNode) ripple.parentNode.removeChild(ripple);
-        });
-
-        this.activeRipples.clear();
     }
 }
 
@@ -161,11 +134,4 @@ function add_button_wave() {
             document.head.appendChild(style);
         }
     }
-    return waveButtonManager;
 }
-
-// 导出管理器实例以供外部使用
-window.WaveButtonManager = WaveButtonManager;
-
-// 自动初始化
-document.addEventListener('DOMContentLoaded', add_button_wave);

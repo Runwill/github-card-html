@@ -1,7 +1,6 @@
 function replace_character_name(path, paragraphs = document){
     // 返回 Promise，供进度条与启动流程感知完成时机
     return fetchJsonCached(path).then(character => {
-        const characterID = character.map(c => c.id).sort((a, b) => a - b)
         const idToName = new Map(character.map(c => [c.id, c.name]))
         const classPrefix = 'characterID' // 目标类名前缀
         const dataKey = 'characterProcessed' // 处理标记
@@ -35,13 +34,11 @@ function replace_character_name(path, paragraphs = document){
             });
         };
 
-        if (window.scanAndObserve) {
-            window.scanAndObserve({
-                root: paragraphs,
-                processor: processLogic,
-                dataKey: dataKey,
-                selector: `[class*="${classPrefix}"]`
-            });
-        }
+        scanAndObserve({
+            root: paragraphs,
+            processor: processLogic,
+            dataKey: dataKey,
+            selector: `[class*="${classPrefix}"]`
+        });
     })
 }
