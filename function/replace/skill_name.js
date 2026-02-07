@@ -1,17 +1,4 @@
-﻿// 添加自定义缓动函数以增强tooltip动画效果
-if (typeof jQuery !== 'undefined') {
-    jQuery.extend(jQuery.easing, {
-        easeOutBack: function (x, t, b, c, d, s) {
-            if (s == undefined) s = 1.70158;
-            return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
-        },
-        easeInQuad: function (x, t, b, c, d) {
-            return c*(t/=d)*t + b;
-        }
-    });
-}
-
-function replace_skill_name(path, paragraphs = document){
+﻿function replace_skill_name(path, paragraphs = document){
   // 返回 Promise，供进度条与启动流程感知完成时机
   return fetchJsonCached(path).then(skill => {
         const dataKey = 'skillProcessed';

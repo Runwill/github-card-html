@@ -7,6 +7,23 @@
 
   // 折叠/展开动画：复用全局工具
   const { isAnimating, isOpen, openCollapsible, closeCollapsible } = window.CollapsibleAnim;
+
+  function bindCollapseBtn(header, panel){
+    if (!header) return;
+    header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
+      const btn = e.currentTarget;
+      const w = panel.querySelector('.tokens-log__wrap');
+      if (!w || isAnimating(w)) return;
+      if (isOpen(w)) {
+        closeCollapsible(w);
+        if (btn) { try{ btn.setAttribute('data-i18n','common.expand'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.remove('is-expanded'); }
+      } else {
+        openCollapsible(w);
+        if (btn) { try{ btn.setAttribute('data-i18n','common.collapse'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.add('is-expanded'); }
+      }
+    });
+  }
+
   // HTML 转义：复用 tokensAdmin.esc
   const T = window.tokensAdmin;
   const esc = T.esc;
@@ -64,38 +81,14 @@
               T.showToast(window.t('tokens.toast.cleared'));
             }catch(e){ alert((e && e.message) || window.t('tokens.error.updateFailed')); }
           });
-          header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
-            const btn = e.currentTarget;
-            const w = panel.querySelector('.tokens-log__wrap');
-            if (!w) return;
-            if (isAnimating(w)) return; // 动画中忽略重复点击
-            if (isOpen(w)) {
-              closeCollapsible(w);
-              if (btn) { try{ btn.setAttribute('data-i18n','common.expand'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.remove('is-expanded'); }
-            } else {
-              openCollapsible(w);
-              if (btn) { try{ btn.setAttribute('data-i18n','common.collapse'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.add('is-expanded'); }
-            }
-          });
+          bindCollapseBtn(header, panel);
         }catch(_){ }
       } else {
         body = document.getElementById('tokens-log');
         // 绑定控制按钮（在已存在面板时需要从 panel 查询 header）
   const headerEl = panel.querySelector('.tokens-log__header');
   headerEl?.querySelector('.js-log-clear')?.addEventListener('click',()=>{ try{ body.innerHTML=''; }catch(_){} });
-        headerEl?.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
-          const btn = e.currentTarget;
-          const w = panel.querySelector('.tokens-log__wrap');
-          if (!w) return;
-          if (isAnimating(w)) return;
-          if (isOpen(w)) {
-            closeCollapsible(w);
-            if (btn) { try{ btn.setAttribute('data-i18n','common.expand'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.remove('is-expanded'); }
-          } else {
-            openCollapsible(w);
-            if (btn) { try{ btn.setAttribute('data-i18n','common.collapse'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.add('is-expanded'); }
-          }
-        });
+        bindCollapseBtn(headerEl, panel);
       }
 
       // 日志内“删除”按钮事件委托（样式与删除词元属性一致：.btn-del）；若有 _id 则请求后端删除

@@ -4,11 +4,9 @@
   'use strict';
   var w = window;
   var dom = (w.CardUI.Manager.Core.dom) || {};
-  var messages = (w.CardUI.Manager.Core.messages) || {};
   var $ = dom.$ || function(id){ return document.getElementById(id); };
   var qs = dom.qs || function(s){ return document.querySelector(s); };
   var api = dom.api || function(u){ return u; };
-  var toast = messages.toast || function(msg){ try{ alert(msg); }catch(_){ } };
 
   async function onApproveClick(){
     var token = (w.localStorage && w.localStorage.getItem('token')) || '';
@@ -27,11 +25,11 @@
         try { w.CardUI.Manager.Controllers.overlay.open('approve-user-modal'); } catch(_){ }
       } else {
         var msg = t('toast.noRequests');
-        try { toast(msg); } catch(_){ try{ alert(msg); }catch(__){} }
+        w.showToast(msg);
       }
     } catch(_){
       var msg2 = t('toast.noRequests');
-      try { toast(msg2); } catch(_){ try{ alert(msg2); }catch(__){} }
+      w.showToast(msg2);
     }
   }
 

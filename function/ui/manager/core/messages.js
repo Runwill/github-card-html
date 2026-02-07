@@ -11,9 +11,5 @@
     element.className = 'modal-message ' + (type || '');
   }
 
-  function toast(msg){
-    w.showToast(msg);
-  }
-
-  ns.messages = { showMessage: showMessage, toast: toast };
+  ns.messages = { showMessage: showMessage };
 })();

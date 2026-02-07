@@ -9,6 +9,19 @@
   var $ = dom.$ || function(id){ return document.getElementById(id); };
   var api = dom.api || function(u){ return u; };
 
+  // 共享 flash message 辅助
+  function showFlash(type, text){
+    var msgEl = $('account-info-message');
+    if (!msgEl) return;
+    msgEl.textContent = text;
+    msgEl.className = 'modal-message ' + (type || '');
+    msgEl.classList.remove('msg-flash');
+    void msgEl.offsetWidth;
+    msgEl.classList.add('msg-flash');
+    var onEnd = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onEnd); };
+    msgEl.addEventListener('animationend', onEnd);
+  }
+
   // Animation helpers
   function animateShow(el, displayType) {
     if (!el) return;
@@ -50,18 +63,7 @@
   function setupIntroInlineEdit(){
     var introEl = $('account-info-intro');
     if (!introEl || introEl.tagName !== 'TEXTAREA') return;
-    var msgEl = $('account-info-message');
     var original = introEl.value || '';
-    var showFlash = function(type, text){
-      if (!msgEl) return;
-      msgEl.textContent = text;
-      msgEl.className = 'modal-message ' + (type || '');
-      msgEl.classList.remove('msg-flash');
-      void msgEl.offsetWidth; // reflow
-      msgEl.classList.add('msg-flash');
-      var onAnimEnd = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); };
-      msgEl.addEventListener('animationend', onAnimEnd);
-    };
     var saving = false; var _introSaveFailed = false; var _introLastTried = '';
 
     var doSave = async function(){
@@ -155,32 +157,19 @@
       var cleanup = function(){ nameEl.removeAttribute('contenteditable'); nameEl.classList.remove('is-editing'); nameEl.removeAttribute('role'); nameEl.removeAttribute('aria-label'); _isEditing = false; };
 
       var doSave = async function(){
-        var newName = (nameEl.textContent || '').trim(); var msgEl = $('account-info-message');
+        var newName = (nameEl.textContent || '').trim();
         if (_usernameSaveFailed && newName === _usernameLastTried) { try { nameEl.focus(); } catch(_){ } return; }
         if (!newName || newName === oldName) { cleanup(); return; }
         
         // Check if new name matches pending name
         var pendingTag = $('account-info-username-pending-inline');
         if (pendingTag && pendingTag.dataset.pendingName === newName) {
-          if (msgEl) {
-            // Mimic success message to provide consistent feedback without network request
-            msgEl.textContent = t('success.usernameSubmitted');
-            msgEl.className = 'modal-message success';
-            msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash');
-            var onAnimEndSame = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEndSame); };
-            msgEl.addEventListener('animationend', onAnimEndSame);
-          }
+          showFlash('success', t('success.usernameSubmitted'));
           cleanup(); return;
         }
 
         if (newName.length > 12) {
-          if (msgEl) {
-            msgEl.textContent = t('error.usernameMax');
-            msgEl.className = 'modal-message error';
-            msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash');
-            var onAnimEnd = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd); };
-            msgEl.addEventListener('animationend', onAnimEnd);
-          }
+          showFlash('error', t('error.usernameMax'));
           try { nameEl.focus(); } catch(_){ }
           return;
         }
@@ -192,24 +181,24 @@
           var respJson = await resp.clone().json().catch(function(){ return null; });
           if (!resp.ok) {
             var msg = t('error.updateFailed'); try { var data = await resp.json(); msg = (data && (data.message || msg)); } catch(_){ }
-            if (msgEl) { msgEl.textContent = msg; msgEl.className = 'modal-message error'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); var onAnimEnd2 = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd2); }; msgEl.addEventListener('animationend', onAnimEnd2); }
+            showFlash('error', msg);
             _usernameSaveFailed = true; _usernameLastTried = newName; _saving = false; nameEl.removeAttribute('aria-busy'); return;
           }
           _usernameSaveFailed = false; _usernameLastTried = '';
           if (respJson && respJson.applied) {
             if (w.localStorage) w.localStorage.setItem('username', newName);
             refreshUsernameUI(newName);
-            if (msgEl) { msgEl.textContent = t('success.usernameUpdatedImmediate'); msgEl.className = 'modal-message success'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); var onAnimEnd3 = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd3); }; msgEl.addEventListener('animationend', onAnimEnd3); }
+            showFlash('success', t('success.usernameUpdatedImmediate'));
             try { var tag = $('account-info-username-pending-inline'); if (tag) animateHide(tag, function(){ tag.textContent = ''; }); var btn = $('account-info-username-cancel-inline'); if (btn) animateHide(btn); } catch(_){ }
           } else {
-            if (msgEl) { msgEl.textContent = t('success.usernameSubmitted'); msgEl.className = 'modal-message success'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); var onAnimEnd4 = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd4); }; msgEl.addEventListener('animationend', onAnimEnd4); }
+            showFlash('success', t('success.usernameSubmitted'));
             nameEl.textContent = oldName; // revert to old name
             loadPendingUsernameBadge();
           }
           _saving = false; nameEl.removeAttribute('aria-busy'); cleanup();
         } catch(e){
           console.error(t('error.updateUsernameFailedPrefix'), e);
-          if (msgEl) { msgEl.textContent = t('error.networkRetryLater'); msgEl.className = 'modal-message error'; msgEl.classList.remove('msg-flash'); void msgEl.offsetWidth; msgEl.classList.add('msg-flash'); var onAnimEnd5 = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onAnimEnd5); }; msgEl.addEventListener('animationend', onAnimEnd5); }
+          showFlash('error', t('error.networkRetryLater'));
           _usernameSaveFailed = true; _usernameLastTried = newName; _saving = false; nameEl.removeAttribute('aria-busy');
         }
       };

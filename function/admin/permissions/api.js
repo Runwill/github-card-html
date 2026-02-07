@@ -6,19 +6,16 @@
 
   function authHeader(){ return { 'Authorization': `Bearer ${localStorage.getItem('token')||''}` }; }
 
+  function handle401(r){
+    if (r.status === 401) {
+      try { console.warn('[permissions/api] 401 未授权（可能登录已过期）'); } catch(_){ }
+      try { if (w.CardUI && w.CardUI.Manager && w.CardUI.Manager.Controllers && typeof w.CardUI.Manager.Controllers.session?.handleLogout === 'function') w.CardUI.Manager.Controllers.session.handleLogout(); } catch(_){ }
+    }
+  }
+
   async function jsonGet(path){
     const r = await fetch(`${API_ROOT}${path}`, { headers: authHeader() });
-    if (!r.ok) {
-      if (r.status === 401) {
-        try { console.warn('[permissions/api] 401 未授权（可能登录已过期）'); } catch(_){ }
-        try {
-          if (w.CardUI && w.CardUI.Manager && w.CardUI.Manager.Controllers && typeof w.CardUI.Manager.Controllers.session?.handleLogout === 'function') {
-            w.CardUI.Manager.Controllers.session.handleLogout();
-          }
-        } catch(_){ }
-      }
-      throw new Error(`HTTP ${r.status}`);
-    }
+    if (!r.ok) { handle401(r); throw new Error(`HTTP ${r.status}`); }
     return r.json();
   }
 
@@ -29,34 +26,14 @@
       body: JSON.stringify(body||{})
     });
     const out = await r.json().catch(()=>({}));
-    if (!r.ok) {
-      if (r.status === 401) {
-        try { console.warn('[permissions/api] 401 未授权（可能登录已过期）'); } catch(_){ }
-        try {
-          if (w.CardUI && w.CardUI.Manager && w.CardUI.Manager.Controllers && typeof w.CardUI.Manager.Controllers.session?.handleLogout === 'function') {
-            w.CardUI.Manager.Controllers.session.handleLogout();
-          }
-        } catch(_){ }
-      }
-      throw new Error((out && out.message) || `HTTP ${r.status}`);
-    }
+    if (!r.ok) { handle401(r); throw new Error((out && out.message) || `HTTP ${r.status}`); }
     return out;
   }
 
   async function jsonDelete(path){
     const r = await fetch(`${API_ROOT}${path}`, { method: 'DELETE', headers: authHeader() });
     const out = await r.json().catch(()=>({}));
-    if (!r.ok) {
-      if (r.status === 401) {
-        try { console.warn('[permissions/api] 401 未授权（可能登录已过期）'); } catch(_){ }
-        try {
-          if (w.CardUI && w.CardUI.Manager && w.CardUI.Manager.Controllers && typeof w.CardUI.Manager.Controllers.session?.handleLogout === 'function') {
-            w.CardUI.Manager.Controllers.session.handleLogout();
-          }
-        } catch(_){ }
-      }
-      throw new Error((out && out.message) || `HTTP ${r.status}`);
-    }
+    if (!r.ok) { handle401(r); throw new Error((out && out.message) || `HTTP ${r.status}`); }
     return out;
   }
 

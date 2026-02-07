@@ -1,6 +1,5 @@
 // 审核模块：统一管理注册与头像审核（管理员/版主）
-(function(){
-  const API = (endpoints && endpoints.base ? endpoints.base() : '').replace(/\/$/, '') + '/api';
+(function(){  const API = (endpoints && endpoints.base ? endpoints.base() : '').replace(/\/$/, '') + '/api';
   const authHeader = () => ({ 'Authorization': `Bearer ${localStorage.getItem('token')||''}` });
   const refreshUser = () => { try { const us = window.CardUI && window.CardUI.Manager && window.CardUI.Manager.Core && window.CardUI.Manager.Core.userService; if (us && us.refreshCurrentUserFromServer) us.refreshCurrentUserFromServer(); } catch(_){} };
 
@@ -16,22 +15,14 @@
     return out;
   }
 
-  window.fetchPendingUsers = async function(){
-    try { const arr = await jsonGet('/pending-users'); return Array.isArray(arr) ? arr : []; } catch(e){ console.error('获取未激活用户失败:', e); return []; }
-  };
-  window.fetchPendingAvatars = async function(){
-    try { const arr = await jsonGet('/avatar/pending'); return Array.isArray(arr) ? arr : []; } catch(e){ console.error('获取待审头像失败:', e); return []; }
-  };
-
-  // 用户名变更：待审列表
-  window.fetchPendingUsernames = async function(){
-    try { const arr = await jsonGet('/username/pending'); return Array.isArray(arr) ? arr : []; } catch(e){ console.error('获取待审用户名失败:', e); return []; }
-  };
-
-  // 简介变更：待审列表
-  window.fetchPendingIntros = async function(){
-    try { const arr = await jsonGet('/intro/pending'); return Array.isArray(arr) ? arr : []; } catch(e){ console.error('获取待审简介失败:', e); return []; }
-  };
+  // ── fetchPending 工厂 ──
+  function makeFetchPending(path, label){
+    return async function(){ try { const arr = await jsonGet(path); return Array.isArray(arr) ? arr : []; } catch(e){ console.error(label, e); return []; } };
+  }
+  window.fetchPendingUsers     = makeFetchPending('/pending-users',    '获取未激活用户失败:');
+  window.fetchPendingAvatars   = makeFetchPending('/avatar/pending',   '获取待审头像失败:');
+  window.fetchPendingUsernames = makeFetchPending('/username/pending', '获取待审用户名失败:');
+  window.fetchPendingIntros    = makeFetchPending('/intro/pending',    '获取待审简介失败:');
 
   function removeApprovalRowFromTrigger(trigger){
     try {
@@ -72,75 +63,37 @@
     } catch(_){}
   }
 
-  window.handleUserApproval = async function(userId, action, trigger){
+  // ── 通用审批处理 ──
+  async function handleApproval(apiPath, body, trigger, postSuccess){
+    const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
     try {
-      // 禁用当前行按钮，避免重复提交
-      const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
       row && row.querySelectorAll('button').forEach(b=>b.disabled=true);
-      await jsonPost('/approve', { userId, action });
+      await jsonPost(apiPath, body);
       removeApprovalRowFromTrigger(trigger);
-      // 审批通过后，强制刷新权限页的用户列表，以便管理员能立即在权限页看到新用户
-      try {
-        if (window.TokensPerm) {
-          if (window.TokensPerm.refreshUsers) window.TokensPerm.refreshUsers(true);
-          if (window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs();
-        }
-      } catch(_){ }
-    } catch(e){
-      alert(e.message || '操作失败');
-      const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
-      row && row.querySelectorAll('button').forEach(b=>b.disabled=false);
-    }
-  };
-  window.handleAvatarApproval = async function(recordId, action, trigger){
-    try {
-      const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
-      row && row.querySelectorAll('button').forEach(b=>b.disabled=true);
-      await jsonPost('/avatar/approve', { recordId, action });
-      removeApprovalRowFromTrigger(trigger);
-      refreshUser();
-      // 自动刷新日志
+      if (postSuccess) postSuccess();
       try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
     } catch(e){
       alert(e.message || '操作失败');
-      const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
       row && row.querySelectorAll('button').forEach(b=>b.disabled=false);
     }
+  }
+
+  window.handleUserApproval = function(userId, action, trigger){
+    return handleApproval('/approve', { userId, action }, trigger, () => {
+      try { if (window.TokensPerm && window.TokensPerm.refreshUsers) window.TokensPerm.refreshUsers(true); } catch(_){ }
+    });
+  };
+  window.handleAvatarApproval = function(recordId, action, trigger){
+    return handleApproval('/avatar/approve', { recordId, action }, trigger, refreshUser);
+  };
+  window.handleUsernameApproval = function(recordId, action, trigger){
+    return handleApproval('/username/approve', { recordId, action }, trigger, refreshUser);
+  };
+  window.handleIntroApproval = function(recordId, action, trigger){
+    return handleApproval('/intro/approve', { recordId, action }, trigger, refreshUser);
   };
 
-  // 用户名变更：审批
-  window.handleUsernameApproval = async function(recordId, action, trigger){
-    try {
-      const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
-      row && row.querySelectorAll('button').forEach(b=>b.disabled=true);
-      await jsonPost('/username/approve', { recordId, action });
-      removeApprovalRowFromTrigger(trigger);
-      refreshUser();
-      // 自动刷新日志
-      try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
-    } catch(e){
-      alert(e.message || '操作失败');
-      const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
-      row && row.querySelectorAll('button').forEach(b=>b.disabled=false);
-    }
-  };
-
-  // 简介变更：审批
-  window.handleIntroApproval = async function(recordId, action, trigger){
-    try {
-      const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
-      row && row.querySelectorAll('button').forEach(b=>b.disabled=true);
-      await jsonPost('/intro/approve', { recordId, action });
-      // 自动刷新日志
-      try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
-      removeApprovalRowFromTrigger(trigger);
-      refreshUser();
-    } catch(e){
-      alert(e.message || '操作失败');
-      const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
-      row && row.querySelectorAll('button').forEach(b=>b.disabled=false);
-    }
-  };
+  const HANDLER = { register: handleUserApproval, avatar: handleAvatarApproval, username: handleUsernameApproval, intro: handleIntroApproval };
 
   window.renderApprovals = async function(){
     const container = document.getElementById('pending-approvals-modal-content');
@@ -191,11 +144,11 @@
   const approveBtn = document.createElement('button');
         approveBtn.className = 'btn btn--success btn--sm';
         approveBtn.textContent = '通过';
-  approveBtn.onclick = (e) => { if (it.type === 'register') handleUserApproval(it.id, 'approve', e.currentTarget); else if (it.type === 'avatar') handleAvatarApproval(it.id, 'approve', e.currentTarget); else if (it.type === 'username') handleUsernameApproval(it.id, 'approve', e.currentTarget); else handleIntroApproval(it.id, 'approve', e.currentTarget); };
+        approveBtn.onclick = (e) => HANDLER[it.type](it.id, 'approve', e.currentTarget);
         const rejectBtn = document.createElement('button');
         rejectBtn.className = 'btn btn--danger btn--sm';
         rejectBtn.textContent = '拒绝';
-  rejectBtn.onclick = (e) => { if (it.type === 'register') handleUserApproval(it.id, 'reject', e.currentTarget); else if (it.type === 'avatar') handleAvatarApproval(it.id, 'reject', e.currentTarget); else if (it.type === 'username') handleUsernameApproval(it.id, 'reject', e.currentTarget); else handleIntroApproval(it.id, 'reject', e.currentTarget); };
+        rejectBtn.onclick = (e) => HANDLER[it.type](it.id, 'reject', e.currentTarget);
         right.appendChild(approveBtn);
         right.appendChild(rejectBtn);
 

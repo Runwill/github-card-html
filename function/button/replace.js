@@ -28,7 +28,7 @@ function elementReplaceCheck(key, name, event){
     const setStatus = (v) => { term_status[name] = v; };
 
     // 引入缓存的数据源
-    const getData = () => ButtonUtils.getTermDynamic(endpoints.termDynamic());
+    const getData = () => fetchJsonCached(endpoints.termDynamic());
 
     getData().then(term => {
         const targetObject = term.find(item => item.en === key);
