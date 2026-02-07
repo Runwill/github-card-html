@@ -22,6 +22,36 @@
     msgEl.addEventListener('animationend', onEnd);
   }
 
+  // 通用保存辅助: fetch + 错误/busy 状态管理
+  // state = { saveFailed, lastTried } 会被函数修改
+  async function trySave(el, url, body, state, onOk) {
+    el.setAttribute('aria-busy', 'true');
+    try {
+      var resp = await fetch(api(url), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      var respJson = await resp.clone().json().catch(function(){ return null; });
+      if (!resp.ok) {
+        var msg = t('error.updateFailed');
+        try { var data = await resp.json(); msg = (data && (data.message || msg)); } catch(_){ }
+        showFlash('error', msg);
+        state.saveFailed = true;
+        return;
+      }
+      state.saveFailed = false;
+      state.lastTried = '';
+      await onOk(respJson);
+    } catch(e) {
+      console.error(e);
+      showFlash('error', t('error.networkRetryLater'));
+      state.saveFailed = true;
+    } finally {
+      el.removeAttribute('aria-busy');
+    }
+  }
+
   // Animation helpers
   function animateShow(el, displayType) {
     if (!el) return;
@@ -64,27 +94,18 @@
     var introEl = $('account-info-intro');
     if (!introEl || introEl.tagName !== 'TEXTAREA') return;
     var original = introEl.value || '';
-    var saving = false; var _introSaveFailed = false; var _introLastTried = '';
-
+    var saving = false;
+    var _introState = { saveFailed: false, lastTried: '' };
     var doSave = async function(){
       var id = w.localStorage ? w.localStorage.getItem('id') : '';
       if (!id) { alert(t('error.noLoginSimple')); return; }
       var newIntro = (introEl.value || '').trim();
-      if (_introSaveFailed && newIntro === _introLastTried) { try { introEl.focus(); } catch(_){ } return; }
+      if (_introState.saveFailed && newIntro === _introState.lastTried) { try { introEl.focus(); } catch(_){ } return; }
       if (newIntro === original) { return; }
       if (newIntro.length > 500) { showFlash('error', t('error.introMax')); return; }
-      saving = true; introEl.setAttribute('aria-busy', 'true');
-      try {
-        var resp = await fetch(api('/api/intro/change'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: id, newIntro: newIntro }) });
-        var respJson = await resp.clone().json().catch(function(){ return null; });
-        if (!resp.ok) {
-          var msg = t('error.updateFailed');
-          try { var data = await resp.json(); msg = (data && (data.message || msg)); } catch(_){ }
-          showFlash('error', msg);
-          _introSaveFailed = true; _introLastTried = newIntro; saving = false; introEl.removeAttribute('aria-busy');
-          return;
-        }
-        _introSaveFailed = false; _introLastTried = '';
+      saving = true;
+      _introState.lastTried = newIntro;
+      await trySave(introEl, '/api/intro/change', { userId: id, newIntro: newIntro }, _introState, async function(respJson) {
         if (respJson && respJson.applied) {
           if (w.localStorage) w.localStorage.setItem('intro', newIntro);
           original = newIntro; introEl.value = newIntro;
@@ -92,15 +113,11 @@
           try { var wrap = document.getElementById('account-info-intro-pending'); if (wrap) animateHide(wrap, function(){ wrap.innerHTML = ''; }); } catch(_){ }
         } else {
           showFlash('success', t('success.introSubmitted'));
-          introEl.value = original; // revert to old intro
+          introEl.value = original;
           await loadPendingIntroBadge();
         }
-        saving = false; introEl.removeAttribute('aria-busy');
-      } catch(e){
-        console.error(t('error.updateIntroFailedPrefix'), e);
-        showFlash('error', t('error.networkRetryLater'));
-        _introSaveFailed = true; _introLastTried = newIntro; saving = false; introEl.removeAttribute('aria-busy');
-      }
+      });
+      saving = false;
     };
 
     var onKeydown = function(ev){
@@ -147,7 +164,7 @@
   function setupUsernameInlineEdit(){
     var nameEl = $('account-info-username-main'); if (!nameEl) return;
     try { nameEl.classList.add('is-editable'); } catch(_){ }
-    var _isEditing = false; var _usernameSaveFailed = false; var _usernameLastTried = ''; var _saving = false;
+    var _isEditing = false; var _usernameState = { saveFailed: false, lastTried: '' }; var _saving = false;
 
     var startEdit = function(){
       if (_isEditing) return; _isEditing = true;
@@ -158,10 +175,9 @@
 
       var doSave = async function(){
         var newName = (nameEl.textContent || '').trim();
-        if (_usernameSaveFailed && newName === _usernameLastTried) { try { nameEl.focus(); } catch(_){ } return; }
+        if (_usernameState.saveFailed && newName === _usernameState.lastTried) { try { nameEl.focus(); } catch(_){ } return; }
         if (!newName || newName === oldName) { cleanup(); return; }
         
-        // Check if new name matches pending name
         var pendingTag = $('account-info-username-pending-inline');
         if (pendingTag && pendingTag.dataset.pendingName === newName) {
           showFlash('success', t('success.usernameSubmitted'));
@@ -175,16 +191,9 @@
         }
         var id = w.localStorage ? w.localStorage.getItem('id') : '';
         if (!id) { alert(t('error.noLoginSimple')); cleanup(); return; }
-        _saving = true; nameEl.setAttribute('aria-busy', 'true');
-        try {
-          var resp = await fetch(api('/api/username/change'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: id, newUsername: newName }) });
-          var respJson = await resp.clone().json().catch(function(){ return null; });
-          if (!resp.ok) {
-            var msg = t('error.updateFailed'); try { var data = await resp.json(); msg = (data && (data.message || msg)); } catch(_){ }
-            showFlash('error', msg);
-            _usernameSaveFailed = true; _usernameLastTried = newName; _saving = false; nameEl.removeAttribute('aria-busy'); return;
-          }
-          _usernameSaveFailed = false; _usernameLastTried = '';
+        _saving = true;
+        _usernameState.lastTried = newName;
+        await trySave(nameEl, '/api/username/change', { userId: id, newUsername: newName }, _usernameState, async function(respJson) {
           if (respJson && respJson.applied) {
             if (w.localStorage) w.localStorage.setItem('username', newName);
             refreshUsernameUI(newName);
@@ -192,21 +201,17 @@
             try { var tag = $('account-info-username-pending-inline'); if (tag) animateHide(tag, function(){ tag.textContent = ''; }); var btn = $('account-info-username-cancel-inline'); if (btn) animateHide(btn); } catch(_){ }
           } else {
             showFlash('success', t('success.usernameSubmitted'));
-            nameEl.textContent = oldName; // revert to old name
+            nameEl.textContent = oldName;
             loadPendingUsernameBadge();
           }
-          _saving = false; nameEl.removeAttribute('aria-busy'); cleanup();
-        } catch(e){
-          console.error(t('error.updateUsernameFailedPrefix'), e);
-          showFlash('error', t('error.networkRetryLater'));
-          _usernameSaveFailed = true; _usernameLastTried = newName; _saving = false; nameEl.removeAttribute('aria-busy');
-        }
+        });
+        _saving = false; cleanup();
       };
       var onKey = function(ev){ if (ev.key === 'Enter' && !ev.shiftKey && !ev.ctrlKey && !ev.metaKey) { ev.preventDefault(); doSave(); } else if (ev.key === 'Escape') { ev.preventDefault(); cleanup(); } };
       var onBlur = function(){ if (!_saving) cleanup(); };
       nameEl.addEventListener('keydown', onKey);
       nameEl.addEventListener('blur', onBlur, { once: true });
-      var onInput = function(){ if (_usernameSaveFailed) { _usernameSaveFailed = false; } };
+      var onInput = function(){ if (_usernameState.saveFailed) { _usernameState.saveFailed = false; } };
       nameEl.addEventListener('input', onInput, { once: false });
     };
 
