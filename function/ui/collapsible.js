@@ -170,16 +170,17 @@
     el._collapseTEnd = null;
   }
 
-  function collapseSection(el, btn) {
-    // 先固定当前高度，再动画收起到 0
-    el.style.height = el.scrollHeight + 'px';
-    // 强制重排以启动过渡
+  function prepareTransition(el, fromHeight) {
+    el.style.height = fromHeight + 'px';
     void el.offsetHeight;
-    // 动画期间裁剪溢出，避免收起过程闪动
     el.style.overflow = 'hidden';
     el._collapseTEnd && el.removeEventListener('transitionend', el._collapseTEnd);
     el._collapseTEnd = (ev) => onTransitionEnd(ev, el);
     el.addEventListener('transitionend', el._collapseTEnd);
+  }
+
+  function collapseSection(el, btn) {
+    prepareTransition(el, el.scrollHeight);
     el.style.height = '0px';
     el.classList.add('is-collapsed');
     el.setAttribute('aria-hidden', 'true');
@@ -188,17 +189,8 @@
   }
 
   function expandSection(el, btn) {
-    // 从 0 高度开始，动画展开到 scrollHeight
     el.classList.remove('is-collapsed');
-    // 从折叠态开始，计算高度为 0；显式设置为 0
-    el.style.height = '0px';
-    // 强制重排以启动过渡
-    void el.offsetHeight;
-    // 动画期间裁剪溢出，待动画完成后在 onTransitionEnd 里恢复
-    el.style.overflow = 'hidden';
-    el._collapseTEnd && el.removeEventListener('transitionend', el._collapseTEnd);
-    el._collapseTEnd = (ev) => onTransitionEnd(ev, el);
-    el.addEventListener('transitionend', el._collapseTEnd);
+    prepareTransition(el, 0);
     el.style.height = el.scrollHeight + 'px';
     el.setAttribute('aria-hidden', 'false');
     btn.setAttribute('aria-expanded', 'true');
