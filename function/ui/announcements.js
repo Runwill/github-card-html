@@ -2,6 +2,7 @@
   const onReady = (cb)=> document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', cb, {once:true}) : cb();
   const t = (typeof window.t==='function') ? window.t : (k)=>k;
   const $ = (id)=> document.getElementById(id);
+  const h = (tag, cls, text)=> { const e = document.createElement(tag); if(cls) e.className = cls; if(text!==undefined) e.textContent = text; return e; };
   // 前端直读：使用相对路径，不再通过后端基址
 
   let cached = null; let loading = false; let lastError = null;
@@ -55,34 +56,21 @@
     if (!container) return;
     container.innerHTML = '';
     if (!Array.isArray(list) || list.length === 0){
-      const empty = document.createElement('div');
-      empty.className = 'ann-empty';
-      empty.textContent = t('announcements.empty');
-      container.appendChild(empty);
+      container.appendChild(h('div','ann-empty',t('announcements.empty')));
       return;
     }
     const frag = document.createDocumentFragment();
     list.forEach((it)=>{
-      const card = document.createElement('div');
-      card.className = 'ann-card';
+      const card = h('div','ann-card');
       if (it.important) card.classList.add('is-important');
       
-      const title = document.createElement('div');
-      title.className = 'ann-card-title';
-      title.textContent = (it.title || '');
+      const title = h('div','ann-card-title', it.title || '');
       if (it.important) {
-        const badge = document.createElement('span');
-        badge.className = 'ann-badge-important';
-        // Add a star icon for visual emphasis
-        badge.textContent = '★ ' + t('announcements.important', '重要');
-        title.prepend(badge);
+        title.prepend(h('span','ann-badge-important','★ ' + t('announcements.important', '重要')));
       }
 
-      const meta = document.createElement('div');
-      meta.className = 'ann-card-meta';
-      meta.textContent = it.date ? String(it.date) : '';
-      const body = document.createElement('div');
-      body.className = 'ann-card-body';
+      const meta = h('div','ann-card-meta', it.date ? String(it.date) : '');
+      const body = h('div','ann-card-body');
       // 规范结构：changes 数组（字符串或对象）
       if (Array.isArray(it.changes) && it.changes.length) {
         const ul = document.createElement('ul');
@@ -115,14 +103,9 @@
           if (buckets.has(key)) {
             const list = buckets.get(key);
             if (list.length > 0) {
-              const liGroup = document.createElement('li');
-              liGroup.className = 'ann-group';
-              const label = document.createElement('span');
-              label.className = `ann-group-label ann-label-${key}`;
-              label.textContent = key;
-              liGroup.appendChild(label);
-              const subUl = document.createElement('ul');
-              subUl.className = 'ann-sub-list';
+              const liGroup = h('li','ann-group');
+              liGroup.appendChild(h('span',`ann-group-label ann-label-${key}`, key));
+              const subUl = h('ul','ann-sub-list');
               list.forEach(text => {
                 const subLi = document.createElement('li');
                 subLi.innerHTML = text;
@@ -159,10 +142,7 @@
     if (!container) return;
     attachScrollHover(container);
   container.textContent = '';
-  const loadingDiv = document.createElement('div');
-  loadingDiv.className = 'ann-loading';
-  loadingDiv.textContent = '...';
-  container.appendChild(loadingDiv);
+  container.appendChild(h('div','ann-loading','...'));
     try {
       loading = true; lastError = null;
       const data = await fetchAnnouncements();
