@@ -29,8 +29,8 @@
         else {
           createdAtEl.textContent = '-';
           // 尝试异步获取
-          if (M.Core.userService && M.Core.userService.refreshCurrentUserFromServer) {
-            M.Core.userService.refreshCurrentUserFromServer().then(()=>{
+          if (Core.userService && Core.userService.refreshCurrentUserFromServer) {
+            Core.userService.refreshCurrentUserFromServer().then(()=>{
               const n = localStorage.getItem('createdAt');
               if (n) { try { createdAtEl.textContent = new Date(n).toLocaleString(); } catch {} }
             });

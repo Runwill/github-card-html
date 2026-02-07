@@ -77,28 +77,6 @@
     const role = localStorage.getItem('role');
     if (C.approvals && typeof C.approvals.updateVisibilityByRole === 'function') {
       C.approvals.updateVisibilityByRole(role);
-    } else {
-      const approveBtn = $('approve-request-button'); if (approveBtn) approveBtn.style.display = (role === 'admin' || role === 'moderator') ? '' : 'none';
-      const permBtn = $('permissions-manage-button');
-      if (permBtn) {
-        permBtn.style.display = (role === 'admin') ? '' : 'none';
-        permBtn.addEventListener('click', () => {
-          OV?.closeAll?.();
-          try {
-            const a = document.querySelector('#example-tabs a[href="#panel_permissions"]');
-            if (a) a.click();
-            if (typeof window.renderPermissionsPanel === 'function') window.renderPermissionsPanel('');
-          } catch {}
-        });
-      }
-      const tokensTab = qs('a[href="#panel_tokens"]')?.parentElement; const tokensPanel = $('panel_tokens');
-      const canViewTokens = (role === 'admin' || role === 'moderator');
-      if (!canViewTokens) { if (tokensTab) tokensTab.style.display = 'none'; if (tokensPanel) tokensPanel.style.display = 'none'; }
-      else { if (tokensTab) tokensTab.style.display = ''; if (tokensPanel) tokensPanel.style.display = ''; }
-      const permTabEl = qs('a[href="#panel_permissions"]')?.parentElement; const permPanelEl = $('panel_permissions');
-      const canViewPerms = (role === 'admin');
-      if (!canViewPerms) { if (permTabEl) permTabEl.style.display = 'none'; if (permPanelEl) permPanelEl.style.display = 'none'; }
-      else { if (permTabEl) permTabEl.style.display = ''; if (permPanelEl) permPanelEl.style.display = ''; }
     }
 
     // ── 表单 ──
