@@ -2,6 +2,7 @@
 (function(){
   const API = (endpoints && endpoints.base ? endpoints.base() : '').replace(/\/$/, '') + '/api';
   const authHeader = () => ({ 'Authorization': `Bearer ${localStorage.getItem('token')||''}` });
+  const refreshUser = () => { try { const us = window.CardUI && window.CardUI.Manager && window.CardUI.Manager.Core && window.CardUI.Manager.Core.userService; if (us && us.refreshCurrentUserFromServer) us.refreshCurrentUserFromServer(); } catch(_){} };
 
   async function jsonGet(path){
     const resp = await fetch(`${API}${path}`, { headers: authHeader() });
@@ -97,7 +98,7 @@
       row && row.querySelectorAll('button').forEach(b=>b.disabled=true);
       await jsonPost('/avatar/approve', { recordId, action });
       removeApprovalRowFromTrigger(trigger);
-      try { window.MenuModalManager && window.MenuModalManager.refreshCurrentUserFromServer && window.MenuModalManager.refreshCurrentUserFromServer(); } catch(_){ }
+      refreshUser();
       // 自动刷新日志
       try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
     } catch(e){
@@ -114,7 +115,7 @@
       row && row.querySelectorAll('button').forEach(b=>b.disabled=true);
       await jsonPost('/username/approve', { recordId, action });
       removeApprovalRowFromTrigger(trigger);
-      try { window.MenuModalManager && window.MenuModalManager.refreshCurrentUserFromServer && window.MenuModalManager.refreshCurrentUserFromServer(); } catch(_){ }
+      refreshUser();
       // 自动刷新日志
       try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
     } catch(e){
@@ -133,7 +134,7 @@
       // 自动刷新日志
       try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
       removeApprovalRowFromTrigger(trigger);
-      try { window.MenuModalManager && window.MenuModalManager.refreshCurrentUserFromServer && window.MenuModalManager.refreshCurrentUserFromServer(); } catch(_){ }
+      refreshUser();
     } catch(e){
       alert(e.message || '操作失败');
       const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;

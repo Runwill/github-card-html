@@ -8,7 +8,8 @@
   // 折叠/展开动画：复用全局工具
   const { isAnimating, isOpen, openCollapsible, closeCollapsible } = window.CollapsibleAnim;
   // HTML 转义：复用 tokensAdmin.esc
-  const esc = window.tokensAdmin.esc;
+  const T = window.tokensAdmin;
+  const esc = T.esc;
 
   function ensureTokensLogArea() {
     try {
@@ -54,14 +55,13 @@
         try{
           header.querySelector('.js-log-clear')?.addEventListener('click',async ()=>{
             try{
-              const T = window.tokensAdmin || {}; const apiJson = T.apiJson; const getAuth = T.getAuth;
-              const auth = typeof getAuth === 'function' ? getAuth() : { canEdit:false };
-              if (!auth.canEdit) { try{ T.showToast && T.showToast(window.t('common.noPermission')); }catch(_){ } return; }
-              if (typeof apiJson === 'function') {
-                await apiJson('/tokens/logs', { method: 'DELETE', auth: true });
+              const auth = T.getAuth ? T.getAuth() : { canEdit:false };
+              if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
+              if (T.apiJson) {
+                await T.apiJson('/tokens/logs', { method: 'DELETE', auth: true });
               }
               try{ body.innerHTML=''; }catch(_){}
-              try{ (T && T.showToast) ? T.showToast(window.t('tokens.toast.cleared')) : null; }catch(_){ }
+              T.showToast(window.t('tokens.toast.cleared'));
             }catch(e){ alert((e && e.message) || window.t('tokens.error.updateFailed')); }
           });
           header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
@@ -108,14 +108,13 @@
             const entry = btn.closest('.tokens-log__entry');
             if (!entry) return;
             (async () => {
-              const T = window.tokensAdmin || {}; const getAuth = T.getAuth; const auth = typeof getAuth === 'function' ? getAuth() : { canEdit:false };
-              if (!auth.canEdit) { try{ T.showToast && T.showToast(window.t('common.noPermission')); }catch(_){ } return; }
+              const auth = T.getAuth ? T.getAuth() : { canEdit:false };
+              if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
               const id = entry.getAttribute('data-log-id');
               if (id) {
                 try {
-                  const apiJson = T.apiJson;
-                  if (typeof apiJson === 'function') {
-                    await apiJson(`/tokens/logs/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
+                  if (T.apiJson) {
+                    await T.apiJson(`/tokens/logs/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
                   }
                 } catch (e) {
                   alert((e && e.message) || window.t('tokens.error.deleteFailed'));
@@ -123,7 +122,7 @@
                 }
               }
               try { entry.remove(); } catch (_) {}
-              try { (T && T.showToast) ? T.showToast(window.t('tokens.toast.deleted')) : null; } catch (_) {}
+              T.showToast(window.t('tokens.toast.deleted'));
             })();
           });
         }
@@ -349,7 +348,6 @@
       const body = ensureTokensLogArea();
       if(!body) return;
       // 从服务端拉取最新日志
-      const T = window.tokensAdmin || {};
       const fetchTokenLogs = T.fetchTokenLogs;
       (async ()=>{
         try{

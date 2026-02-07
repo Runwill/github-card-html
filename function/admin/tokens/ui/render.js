@@ -247,7 +247,7 @@
       const inlineDel = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
       if(delBtn || inlineDel){
             ev.preventDefault();
-              try{ window.tokensAdmin.showToast && window.tokensAdmin.showToast(window.t('common.noPermission')); }catch(_){ }
+            T.showToast(window.t('common.noPermission'));
           }
         });
       }

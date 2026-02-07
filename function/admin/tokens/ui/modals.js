@@ -73,7 +73,7 @@
         const out= await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: payload } });
         const doc= out && out.doc;
         try{ window.tokensAdmin.pushDocToState(collection, doc); }catch(_){}
-    try{ window.tokensAdmin.logChange && window.tokensAdmin.logChange('create', { collection, id: doc && doc._id, doc }); }catch(_){ }
+    T.logChange('create', { collection, id: doc && doc._id, doc });
   hideCreateModal();
   try{ toast(window.t('tokens.toast.created')); }catch(_){ }
         if(window.renderTokensDashboard) window.renderTokensDashboard(false);
@@ -145,7 +145,7 @@
       try{ next = stripHidden(next); }catch(_){ }
       try{
         const detailed = await window.tokensAdmin.applyObjectEdits(collection, id, orig, next);
-        try{ window.tokensAdmin.logChange && window.tokensAdmin.logChange('save-edits', { collection, id, sets: detailed && detailed.sets, dels: detailed && detailed.dels }); }catch(_){ }
+        T.logChange('save-edits', { collection, id, sets: detailed && detailed.sets, dels: detailed && detailed.dels });
         hideEditModal();
   try{ toast(window.t('status.updated')); }catch(_){ }
         if(window.renderTokensDashboard) window.renderTokensDashboard(false);
@@ -169,7 +169,7 @@
         const out = await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: next } });
         const newDoc = out && out.doc;
         if(newDoc){ try{ window.tokensAdmin.pushDocToState(collection, newDoc); }catch(_){ } }
-        try{ window.tokensAdmin.logChange && window.tokensAdmin.logChange('create', { collection, id: newDoc && newDoc._id, doc: newDoc }); }catch(_){ }
+        T.logChange('create', { collection, id: newDoc && newDoc._id, doc: newDoc });
         hideEditModal();
   try{ toast(window.t('tokens.toast.savedAs')); }catch(_){ }
         if(window.renderTokensDashboard) window.renderTokensDashboard(false);
