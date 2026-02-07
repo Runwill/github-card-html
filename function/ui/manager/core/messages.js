@@ -15,13 +15,7 @@
   }
 
   function toast(msg){
-    try {
-      if (w.tokensAdmin && typeof w.tokensAdmin.showToast === 'function') {
-        w.tokensAdmin.showToast(msg);
-        return;
-      }
-    } catch {}
-    try { w.alert(msg); } catch {}
+    w.showToast(msg);
   }
 
   ns.messages = { showMessage: showMessage, toast: toast };

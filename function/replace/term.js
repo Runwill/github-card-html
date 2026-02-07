@@ -1,7 +1,6 @@
 function replace_term(path, mode, paragraphs = document) {
-    // 返回一个 Promise，便于上层加载进度等待替换完成
-    return new Promise((resolve, reject) => {
-    fetchJsonCached(path).then(term => {
+    // 返回 Promise，供进度条与启动流程感知完成时机
+    return fetchJsonCached(path).then(term => {
         // [Optimization] 使用 Map 提升术语查找性能，便于 MutationObserver 复用
         // key: 术语英文标签名 (大写), value: 术语对象
         const termMap = new Map();
@@ -133,26 +132,13 @@ function replace_term(path, mode, paragraphs = document) {
              }
         };
 
-        if (window.scanAndObserve) {
-            window.scanAndObserve({
-                root: paragraphs,
-                processor: processLogic,
-                dataKey: 'termProcessed', 
-                tagNameMap: termMap
-            });
-        } else {
-            console.warn('scanAndObserve missing in term.js');
-            // Fallback (Simplified)
-            const root = (paragraphs === document) ? document.body : paragraphs;
-            const allElements = root ? root.getElementsByTagName('*') : [];
-            for(let i=0; i<allElements.length; i++) {
-                processLogic(allElements[i]);
-            }
-        }
-
-        // 所有替换与事件绑定完成 (同步部分)
-        resolve();
-    }).catch(reject);
+        // 通用扫描与监听器（replace_common.js 提供）
+        scanAndObserve({
+            root: paragraphs,
+            processor: processLogic,
+            dataKey: 'termProcessed',
+            tagNameMap: termMap
+        });
     });
 }
 

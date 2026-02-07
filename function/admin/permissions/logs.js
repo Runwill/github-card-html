@@ -1,24 +1,7 @@
 (function(){
   // permissions/logs: 在权限页添加用户变更日志，沿用 tokens 日志样式与行为
-
-  const API = (endpoints && endpoints.base ? endpoints.base() : '').replace(/\/$/, '') + '/api';
-  const authHeader = () => ({ 'Authorization': `Bearer ${localStorage.getItem('token')||''}` });
-  async function apiJson(path, options){
-    const r = await fetch(`${API}${path}`, { headers: { 'Content-Type':'application/json', ...authHeader() }, ...(options||{}) });
-    const out = await r.json().catch(()=>({}));
-    if (!r.ok) {
-      if (r.status === 401) {
-        try { console.warn('[perms-log] 401 未授权（可能登录已过期）'); } catch(_){ }
-        try {
-          if (window.CardUI && window.CardUI.Manager && window.CardUI.Manager.Controllers && typeof window.CardUI.Manager.Controllers.session?.handleLogout === 'function') {
-            window.CardUI.Manager.Controllers.session.handleLogout();
-          }
-        } catch(_){ }
-      }
-      throw new Error((out && out.message) || `HTTP ${r.status}`);
-    }
-    return out;
-  }
+  // API 层复用 permissions/api.js 中的 TokensPerm.API
+  const { jsonGet: apiGet, jsonDelete: apiDelete } = window.TokensPerm.API;
 
   const MAX_LOGS = 200;
   // 预置全部已定义的日志类型（即使尚未产生，也可在下拉中选择并查看格式预览）
@@ -161,7 +144,7 @@
           const btn=e.currentTarget; const w=panel.querySelector('.tokens-log__wrap'); if(!w) return; if(isAnimating(w)) return; if(isOpen(w)){ closeCollapsible(w); if(btn){ try{ btn.setAttribute('data-i18n','common.expand'); window.i18n && window.i18n.apply && window.i18n.apply(btn);}catch(_){} btn.classList.remove('is-expanded'); } } else { openCollapsible(w); if(btn){ try{ btn.setAttribute('data-i18n','common.collapse'); window.i18n && window.i18n.apply && window.i18n.apply(btn);}catch(_){} btn.classList.add('is-expanded'); } }
         });
         header.querySelector('.js-log-clear')?.addEventListener('click', async ()=>{
-          try { await apiJson('/user/logs', { method:'DELETE', headers: authHeader() }); body.innerHTML=''; } catch(e){ alert((e&&e.message)||''); }
+          try { await apiDelete('/user/logs'); body.innerHTML=''; } catch(e){ alert((e&&e.message)||''); }
         });
 
         // 绑定筛选事件
@@ -465,7 +448,7 @@
       if (!body) return;
       const qs = buildQuery();
       const url = '/user/logs' + (qs.toString() ? ('?' + qs.toString()) : '');
-      const out = await apiJson(url, { method:'GET', headers: authHeader() });
+      const out = await apiGet(url);
       const list = (out && out.list) || [];
       // 动态填充类型下拉
       try {
@@ -545,7 +528,7 @@
             (async ()=>{
               const id = entry.getAttribute('data-log-id');
               if (id) {
-                try { await apiJson(`/user/logs/${encodeURIComponent(id)}`, { method:'DELETE', headers: authHeader() }); } catch(e){ alert((e && e.message) || ''); return; }
+                try { await apiDelete(`/user/logs/${encodeURIComponent(id)}`); } catch(e){ alert((e && e.message) || ''); return; }
               }
               try { entry.remove(); } catch(_){ }
             })();

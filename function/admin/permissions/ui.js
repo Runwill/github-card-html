@@ -1,30 +1,7 @@
 (function(w){
   const ns = w.TokensPerm = w.TokensPerm || {};
 
-  function showToast(message, type){
-    const forceError = (type === 'error');
-    if (forceError) {
-      try{
-        let container=document.querySelector('.tokens-toast-container');
-        if(!container){ container=document.createElement('div'); container.className='tokens-toast-container'; document.body.appendChild(container); }
-        const toast=document.createElement('div'); toast.className='tokens-toast tokens-toast--error';
-        const NS='http://www.w3.org/2000/svg';
-        const svg=document.createElementNS(NS,'svg'); svg.setAttribute('width','18'); svg.setAttribute('height','18'); svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none'); svg.setAttribute('aria-hidden','true');
-        const path=document.createElementNS(NS,'path'); path.setAttribute('d','M18 6L6 18M6 6l12 12'); path.setAttribute('stroke','currentColor'); path.setAttribute('stroke-width','2.5'); path.setAttribute('stroke-linecap','round'); path.setAttribute('stroke-linejoin','round');
-        svg.appendChild(path); toast.appendChild(svg);
-        toast.appendChild(document.createTextNode(' ' + (message || '错误')));
-        container.appendChild(toast);
-        setTimeout(()=>{ try{ toast.remove(); }catch(_){} if(container && container.children.length===0){ try{ container.remove(); }catch(_){} } }, 2200);
-        return;
-      }catch(_){ }
-    }
-    try { if (w.tokensAdmin && typeof w.tokensAdmin.showToast === 'function') { w.tokensAdmin.showToast(message); return; } } catch(_){ }
-    try {
-      const toast = w.CardUI && w.CardUI.Manager && w.CardUI.Manager.Core && w.CardUI.Manager.Core.messages && w.CardUI.Manager.Core.messages.toast;
-      if (typeof toast === 'function') { toast(message); return; }
-    } catch(_){ }
-    try { alert(message); } catch(_){ }
-  }
+  function showToast(message, type){ w.showToast(message, type); }
 
   function bindPermTooltip(el, permName){
     try {

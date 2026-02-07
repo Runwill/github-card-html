@@ -35,25 +35,12 @@ function replace_card_name(path, paragraphs = document){
         });
     };
 
-    // 使用通用扫描与监听器
-    if (window.scanAndObserve) {
-        window.scanAndObserve({
-            root: paragraphs,
-            processor: processLogic,
-            dataKey: dataKey,
-            tagNameMap: cardMap
-        });
-    } else {
-        console.warn('scanAndObserve not found, falling back to legacy manual loop');
-        // Legacy Fallback (just in case utils load fails)
-        const processNode = (node) => {
-             if (node.dataset[dataKey]) return;
-             processLogic(node);
-             node.dataset[dataKey] = 'true';
-        };
-        card.forEach((info) => {
-             $(paragraphs).find(info.en).each(function(){ processNode(this); });
-        });
-    }
+    // 通用扫描与监听器（replace_common.js 提供）
+    scanAndObserve({
+        root: paragraphs,
+        processor: processLogic,
+        dataKey: dataKey,
+        tagNameMap: cardMap
+    });
   })
 }

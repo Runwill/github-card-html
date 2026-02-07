@@ -43,10 +43,28 @@
     return out;
   }
 
+  async function jsonDelete(path){
+    const r = await fetch(`${API_ROOT}${path}`, { method: 'DELETE', headers: authHeader() });
+    const out = await r.json().catch(()=>({}));
+    if (!r.ok) {
+      if (r.status === 401) {
+        try { console.warn('[permissions/api] 401 未授权（可能登录已过期）'); } catch(_){ }
+        try {
+          if (w.CardUI && w.CardUI.Manager && w.CardUI.Manager.Controllers && typeof w.CardUI.Manager.Controllers.session?.handleLogout === 'function') {
+            w.CardUI.Manager.Controllers.session.handleLogout();
+          }
+        } catch(_){ }
+      }
+      throw new Error((out && out.message) || `HTTP ${r.status}`);
+    }
+    return out;
+  }
+
   ns.API = {
     authHeader,
     jsonGet,
     jsonPost,
+    jsonDelete,
     setPassword(userId, newPassword){ return jsonPost('/user/password/set', { userId, newPassword }); },
     async fetchUsers(search){
       const q = search ? ('?search=' + encodeURIComponent(search)) : '';

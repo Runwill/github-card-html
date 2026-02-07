@@ -58,13 +58,7 @@
   }
 
   function toast(msg){
-    const defaultMsg = window.t('common.copied');
-    if (window.tokensAdmin && typeof window.tokensAdmin.showToast === 'function') {
-      return window.tokensAdmin.showToast(msg || defaultMsg); // 复用词元页 Toast 风格
-    }
-    if (window.showToast) return window.showToast(msg || defaultMsg); // 其它全局实现（若存在）
-    // 简易回退
-    console.log(msg || defaultMsg);
+    window.showToast(msg || window.t('common.copied'));
   }
 
   function collectTextFrom(el){
