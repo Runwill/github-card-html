@@ -1,6 +1,6 @@
 // 页面加载覆盖层：随机文案 + 动态字距 + 进度条时长与完成时机
 // 加载提示语
-const loadingTexts=["多少事 从来急","雖萬被戮 豈有悔哉","書不能盡意 故略陳固陋"]
+const loadingTexts=["多少事 从来急","雖萬被戮 豈有悔哉","書不能盡意 故略陳固陋","輕輕的告訴我 不要喧嘩"]
 
 // 计算动态字间距的函数
 function calculateLetterSpacing(text){ const n=text.replace(/\s/g,'').length, base=1, len=6; return n<=len?base:Math.max(0.3, base*(len/n)) }
