@@ -370,26 +370,9 @@ html { scrollbar-gutter: stable both-edges; }
 }
 .tokens-log .log-row:hover .log-actions,
 .tokens-log .log-row:focus-within .log-actions { opacity: 1; pointer-events: auto; }
-.tokens-log .log-actions .btn-del {
-  pointer-events: auto;
-  border: none;
-  background: transparent;
-  color: #A0AEC0;              /* 与属性删除按钮一致的初始灰色 */
-  padding: 2px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 1;
-  transition: transform 140ms ease, color 140ms ease, background 140ms ease;
-}
-.tokens-log .log-actions .btn-del:hover {
-  color: #E53E3E;              /* 红色强调 */
-  background: rgba(229, 62, 62, 0.08);
-  transform: scale(1.05);
-}
-.tokens-log .log-actions .btn-del:active { transform: scale(0.97); }
 
-.tokens-log .log-actions .btn-copy {
+/* 行内操作按钮公共样式（删除/复制等） */
+.btn-inline-action {
   pointer-events: auto;
   border: none;
   background: transparent;
@@ -401,12 +384,19 @@ html { scrollbar-gutter: stable both-edges; }
   line-height: 1;
   transition: transform 140ms ease, color 140ms ease, background 140ms ease;
 }
-.tokens-log .log-actions .btn-copy:hover {
+.btn-inline-action:hover { transform: scale(1.05); }
+.btn-inline-action:active { transform: scale(0.97); }
+
+/* 删除按钮：红色强调 */
+.btn-inline-action.btn-del:hover {
+  color: #E53E3E;
+  background: rgba(229, 62, 62, 0.08);
+}
+/* 复制按钮：蓝色强调 */
+.btn-inline-action.btn-copy:hover {
   color: #3182CE;
   background: rgba(49, 130, 206, 0.08);
-  transform: scale(1.05);
 }
-.tokens-log .log-actions .btn-copy:active { transform: scale(0.97); }
 
 /* 触屏/无悬浮设备：始终显示操作区，避免“悬浮才出现”的交互缺失 */
 @media (hover: none) {
@@ -474,24 +464,6 @@ html { scrollbar-gutter: stable both-edges; }
   pointer-events: none; /* 默认不挡交互，内部按钮开启 */
 }
 #tokens-content .kv-row:hover .kv-actions { opacity: 1; }
-#tokens-content .kv-row .kv-actions .btn-del {
-  pointer-events: auto;
-  border: none;
-  background: transparent;
-  color: #A0AEC0;
-  padding: 2px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  line-height: 1;
-  transition: transform 140ms ease, color 140ms ease, background 140ms ease;
-}
-#tokens-content .kv-row .kv-actions .btn-del:hover {
-  color: #E53E3E;
-  background: rgba(229, 62, 62, 0.08);
-  transform: scale(1.05);
-}
-#tokens-content .kv-row .kv-actions .btn-del:active { transform: scale(0.97); }
 
 #tokens-content .kv-val:not(.is-editing):hover {
   background: rgba(226, 232, 240, 0.2); /* 轻微悬浮反馈 */

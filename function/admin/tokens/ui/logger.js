@@ -242,7 +242,7 @@
   const pill = (key, cls='')=> `<i class="log-pill ${cls}" data-i18n="${key}"></i>`;
     const code = (txt)=> `<code class="log-code">${esc(txt||'')}</code>`;
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
-    const actions = `<div class="log-actions"><button class="btn-copy" data-i18n="common.copy" data-i18n-attr="aria-label" data-i18n-aria-label="common.copy"></button><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div>`;
+    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy" data-i18n-attr="aria-label" data-i18n-aria-label="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div>`;
     if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
       const msg = (function(){

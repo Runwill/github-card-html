@@ -247,7 +247,7 @@
   }
   const detail = '';
     // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
-    const actions = `<div class="log-actions"><button class="btn-copy" data-i18n="common.copy" data-i18n-attr="aria-label" data-i18n-aria-label="common.copy"></button><button class="btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div>`;
+    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy" data-i18n-attr="aria-label" data-i18n-aria-label="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div>`;
     return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}${actions}</div>`;
     }catch(_){ return ''; }
   }

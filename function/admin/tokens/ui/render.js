@@ -66,7 +66,7 @@
     const isObj=(v)=> v && typeof v==='object' && !Array.isArray(v);
     if(!obj || typeof obj!=='object'){
       const bp=esc(basePath);
-      return `<div class="kv-row" data-path="${bp}"><div class="kv-key">value</div><div class="kv-val" data-path="${bp}" data-type="${typeof obj}" title="单击编辑">${esc(obj)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+      return `<div class="kv-row" data-path="${bp}"><div class="kv-key">value</div><div class="kv-val" data-path="${bp}" data-type="${typeof obj}" title="单击编辑">${esc(obj)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-inline-action btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
     }
     
     // 缩略模式新规则：
@@ -100,7 +100,7 @@
             return `<div class="arr-item">${idxHtml}<div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
           }
           const keyHtml = state.compactMode ? '' : `<div class="kv-key">[${idx}]</div>`;
-          return `<div class="kv-row" data-path="${esc(curPath)}.${idx}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+          return `<div class="kv-row" data-path="${esc(curPath)}.${idx}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-inline-action btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
         }).join('');
         const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
         const emptyHtml = '<div class="kv-row"><div class="kv-key">(空)</div><div class="kv-val"></div></div>';
@@ -113,7 +113,7 @@
         parts.push(`<div class="nest-block"${style}>${titleHtml}<div class="nest-body">${renderKV(v, level+1, accent, curPath)}</div></div>`);
       } else {
         const keyHtml = hideLabel ? '' : `<div class="kv-key">${esc(k)}</div>`;
-        parts.push(`<div class="kv-row" data-path="${esc(curPath)}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="单击编辑">${esc(v)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
+        parts.push(`<div class="kv-row" data-path="${esc(curPath)}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="单击编辑">${esc(v)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-inline-action btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
       }
     }
     return parts.join('');
