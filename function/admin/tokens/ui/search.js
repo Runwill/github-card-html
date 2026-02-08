@@ -22,7 +22,7 @@
         if (parent && !document.getElementById('tokens-compact-toggle')) {
           const tgl = document.createElement('button');
           tgl.id = 'tokens-compact-toggle';
-          try { tgl.className = btn.className || 'btn btn--secondary'; } catch (_) { tgl.className = 'btn btn--secondary'; }
+          try { tgl.className = (btn.className || 'btn btn--secondary') + ' mode-toggle'; } catch (_) { tgl.className = 'btn btn--secondary mode-toggle'; }
           tgl.type = 'button';
           // i18n: 标题通过 data-i18n-attr 绑定
           try {
