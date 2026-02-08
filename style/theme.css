@@ -216,7 +216,10 @@ html.theme-switching *::after {
   border: none !important;
   box-shadow: 0 4px 6px -1px var(--primary-shadow) !important;
 }
-.btn--primary:hover { background-position: 100% 50% !important; }
+.btn--primary:hover {
+  background-position: 100% 50% !important;
+  box-shadow: 0 6px 8px -1px var(--primary-shadow) !important;
+}
 .btn--secondary {
   background: transparent !important;
   color: color-mix(in srgb, var(--text) 86%, var(--bg-end)) !important;
