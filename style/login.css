@@ -87,6 +87,21 @@ body {
     backdrop-filter: blur(12px);
     margin: 0;
 }
-#login-message { color: #4a5568; text-align: center; }
+#login-form input {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+#login-form button {
+    width: 100%;
+    padding: 10px;
+    background: #8698ff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+#login-message { margin-top: 10px; color: #4a5568; text-align: center; }
 #login-message.success { color: #38a169; }
 #login-message.error { color: #e53e3e; }
