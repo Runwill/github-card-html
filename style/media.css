@@ -1,9 +1,16 @@
 /* 响应式样式 */
 #block-under-search { height: 0.5em; }
+
+/* ── 跨断点不变量（从各 @media 中提取） ── */
+.ripple-button { margin-left: -2em; margin-top: -1em; }
+#header .strength_title { font-size: 18px !important; }
+@media (min-width: 1101px) { #block-under-search { height: 1.5em; } }
+@media (min-width: 501px) { #menu-toggle { padding: 8px 12px; } }
+
 @media (max-width: 390px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
-    .ripple-button { padding: 8px 17px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 8px 17px; }
     #header_title { margin-right: 35px; }
     #nav-item { margin: 0 8px 0 0; }
     #menu-toggle {
@@ -15,125 +22,88 @@
 @media (min-width: 391px) and (max-width: 400px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
-    .ripple-button { padding: 8px 17px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 8px 17px; }
     #header_title { margin-right: 40px; }
     #nav-item { margin: 0 10px 0 0; }
     #menu-toggle {
         padding: 8px 10px;
     }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 401px) and (max-width: 500px) {
     html { font-size: 15px; }
     padding { padding-left: 0.8em; padding-right: 0.6em; }
-    .ripple-button { padding: 9px 20px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 9px 20px; }
     #header_title { margin-right: 50px; }
     #nav-item { margin: 0 10px 0 0; }
     #menu-toggle {
         padding: 8px 10px;
     }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 501px) and (max-width: 600px) {
     html { font-size: 15px; }
     padding { padding-left: 1.2em; padding-right: 1.2em; }
-    .ripple-button { padding: 9px 20px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 9px 20px; }
     #header_title { margin-right: 50px; }
     #nav-item { margin: 0 25px 0 0; }
-    #menu-toggle {
-        padding: 8px 12px;
-    }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 601px) and (max-width: 700px) {
     html { font-size: 15px; }
     padding { padding-left: 1.6em; padding-right: 1.6em; }
-    .ripple-button { padding: 9px 20px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 9px 20px; }
     #header_title { margin-right: 50px; }
     #nav-item { margin: 0 25px 0 0; }
-    #menu-toggle {
-        padding: 8px 12px;
-    }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 701px) and (max-width: 800px) {
     html { font-size: 17px; }
     padding { padding-left: 1.8em; padding-right: 1.8em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 50px; }
     #nav-item { margin: 0 25px 0 0; }
-    #menu-toggle {
-        padding: 8px 12px;
-    }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 801px) and (max-width: 900px) {
     html { font-size: 18px; }
     padding { padding-left: 2.0em; padding-right: 2.0em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 25px 0 0; }
-    #menu-toggle {
-        padding: 8px 12px;
-    }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 901px) and (max-width: 1100px) {
     html { font-size: 19px; }
     padding { padding-left: 2.2em; padding-right: 2.2em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 28px 0 0; }
-    #menu-toggle {
-        padding: 8px 12px;
-    }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 1101px) and (max-width: 1200px) {
     html { font-size: 20px; }
     padding { padding-left: 2.4em; padding-right: 2.4em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 30px 0 0; }
-    #menu-toggle {
-        padding: 8px 12px;
-    }
-    #block-under-search { height: 1.5em; }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 1201px) and (max-width: 1400px) {
     html { font-size: 20px; }
     padding { padding-left: 2.6em; padding-right: 2.6em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 30px 0 0; }
-    #menu-toggle {
-        padding: 8px 12px;
-    }
-    #block-under-search { height: 1.5em; }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 @media (min-width: 1401px) {
     html { font-size: 20px; }
     padding { padding-left: 3em; padding-right: 3em; }
-    .ripple-button { padding: 10px 22px; margin-left: -2em; margin-top: -1em; }
+    .ripple-button { padding: 10px 22px; }
     .strength_button { padding: 8px 8px; margin-left: 0.5%; margin-top: 15px; }
     #header_title { margin-right: 75px; }
     #nav-item { margin: 0 30px 0 0; }
-    #menu-toggle {
-        padding: 8px 12px;
-    }
-    #block-under-search { height: 1.5em; }
-    #header .strength_title { font-size: 18px !important; }
 }
 
 /* 头栏标题容器高度固定，避免根字号降低时相对 48px 容器看起来“下沉” */
@@ -142,7 +112,7 @@
     line-height: 48px !important;
 }
 
-/* strength_title 的字号已分发到各断点，保持一致（18px） */
+/* strength_title 字号已提取至顶部全局规则（18px），仅 ≤390 断点覆盖为 16px */
 
 #search-input {
   position: relative;
