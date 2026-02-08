@@ -10,7 +10,6 @@ body { overflow-x: hidden; margin: 0; font-size: .9rem; }
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    user-select: none;
 }
 .ripple-button:focus { outline: none; }
 .ripple-button::-moz-focus-inner { border: 0; }
@@ -42,25 +41,8 @@ pronounName {
 /* 容器和角色相关样式 */
 .container { position: relative; z-index: 2; }
 
-.role_title {
-    font-family: '明朝';
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    writing-mode: vertical-rl;
-    white-space: nowrap;
-    text-align: center;
-    font-size: 5em;
-    opacity: 0;
-    left: -5%;
-    transition: left 1s ease, opacity 1s ease;
-    user-select: none;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.container:hover .role_title { opacity: 0.1; left: 0%; }
-
+/* 角色水印公共样式 */
+.role_title,
 .role_icon {
     position: absolute;
     top: 50%;
@@ -69,10 +51,17 @@ pronounName {
     white-space: nowrap;
     text-align: center;
     opacity: 0;
-    left: 10%;
     transition: left 1s ease, opacity 1s ease;
-    user-select: none;
     pointer-events: none;
+}
+.role_title {
+    font-family: '明朝';
+    font-size: 5em;
+    left: -5%;
+    z-index: 1;
+}
+.role_icon {
+    left: 10%;
     z-index: 0;
 }
 
@@ -156,24 +145,6 @@ h3 { font-size: 1.0rem; }
 
 .animate-in, .visible { will-change: transform, opacity; }
 .animate-in.animation-complete, .visible.animation-complete { will-change: auto; }
-
-.highlight-on-scroll {
-    background: linear-gradient(120deg, transparent 0%, rgba(255, 215, 0, 0.3) 50%, transparent 100%);
-    background-repeat: no-repeat;
-    background-size: 0% 100%;
-    animation: highlight 1s ease-out forwards;
-}
-
-.smart-fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.smart-fade-in.loaded {
-    opacity: 1;
-    transform: translateY(0);
-}
 
 /* 水波按钮微上移，贴齐文本左上角视觉（不影响悬停时的 transform 动画） */
 .ripple-button {

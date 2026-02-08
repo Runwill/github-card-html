@@ -40,4 +40,21 @@ padding padding padding { animation-delay: 0.12s; }
 html { scroll-behavior: smooth; }
 
 ::selection { background: rgba(45, 55, 72, 0.2); color: #2d3748; }
-/* 以下通用动画/无障碍规则已在 style.css 中提供，避免重复定义以减少体积 */
+/* 滚动高亮闪条 */
+.highlight-on-scroll {
+    background: linear-gradient(120deg, transparent 0%, rgba(255, 215, 0, 0.3) 50%, transparent 100%);
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    animation: highlight 1s ease-out forwards;
+}
+
+/* 智能渐入（transition 版，用于非入场动画的懒加载元素） */
+.smart-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.smart-fade-in.loaded {
+    opacity: 1;
+    transform: translateY(0);
+}
