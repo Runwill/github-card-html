@@ -30,8 +30,8 @@
     if(!modal){
       modal=document.createElement('div');
       modal.id='tokens-create-modal';
-      modal.className='modal approve-modal';
-      modal.innerHTML=`<div class="modal-header"><h2 data-i18n="tokens.create.title"></h2></div><div class="modal-form"><div id="tokens-create-hints"></div><textarea id="tokens-create-editor"></textarea><div id="tokens-create-actions" class="tokens-create-actions"><button type="button" class="btn btn--secondary" id="tokens-create-cancel" data-i18n="tokens.create.cancel"></button><button type="button" class="btn btn--primary" id="tokens-create-submit" data-i18n="tokens.create.submit"></button></div></div>`;
+      modal.className='modal tokens-modal';
+      modal.innerHTML=`<div class="modal-header"><h2 data-i18n="tokens.create.title"></h2></div><div class="modal-form"><div id="tokens-create-hints" class="tokens-hints"></div><textarea id="tokens-create-editor" class="tokens-editor"></textarea><div id="tokens-create-actions" class="tokens-actions"><button type="button" class="btn btn--secondary" id="tokens-create-cancel" data-i18n="tokens.create.cancel"></button><button type="button" class="btn btn--primary" id="tokens-create-submit" data-i18n="tokens.create.submit"></button></div></div>`;
       document.body.appendChild(modal);
       backdrop.addEventListener('click', hideCreateModal);
       document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideCreateModal(); });
@@ -109,8 +109,8 @@
     if(!modal){
       modal=document.createElement('div');
       modal.id='tokens-edit-modal';
-      modal.className='modal approve-modal';
-      modal.innerHTML=`<div class=\"modal-header\"><h2 data-i18n=\"tokens.edit.title\"></h2></div><div class=\"modal-form\"><div id=\"tokens-edit-hints\"></div><textarea id=\"tokens-edit-editor\"></textarea><div class=\"tokens-create-actions\"><button type=\"button\" class=\"btn btn--secondary\" id=\"tokens-edit-cancel\" data-i18n=\"tokens.edit.cancel\"></button><button type=\"button\" class=\"btn btn--secondary\" id=\"tokens-edit-saveas\" data-i18n=\"tokens.edit.saveas\"></button><button type=\"button\" class=\"btn btn--primary\" id=\"tokens-edit-submit\" data-i18n=\"tokens.edit.submit\"></button></div></div>`;
+      modal.className='modal tokens-modal';
+      modal.innerHTML=`<div class="modal-header"><h2 data-i18n="tokens.edit.title"></h2></div><div class="modal-form"><div id="tokens-edit-hints" class="tokens-hints"></div><textarea id="tokens-edit-editor" class="tokens-editor"></textarea><div class="tokens-actions"><button type="button" class="btn btn--secondary" id="tokens-edit-cancel" data-i18n="tokens.edit.cancel"></button><button type="button" class="btn btn--secondary" id="tokens-edit-saveas" data-i18n="tokens.edit.saveas"></button><button type="button" class="btn btn--primary" id="tokens-edit-submit" data-i18n="tokens.edit.submit"></button></div></div>`;
       document.body.appendChild(modal);
       backdrop.addEventListener('click', hideEditModal);
       document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideEditModal(); });

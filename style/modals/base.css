@@ -298,3 +298,73 @@ html[data-theme="dark"] .badge.badge-permission {
   border-color: rgba(248, 113, 113, 0.3);
 }
 
+/* =========================================
+   Tokens Modal Shared (create & edit)
+   ========================================= */
+.tokens-modal.modal {
+  max-width: 900px; width: 96%; max-height: 86vh;
+  --tokens-pane-h: 48vh;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+.tokens-modal .modal-header { margin: 0; margin-bottom: 16px; }
+.tokens-modal .modal-form { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+
+/* Hints panel */
+.tokens-hints {
+  font-size: 12px;
+  color: var(--text-muted) !important;
+  background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px;
+  padding: 12px;
+  height: var(--tokens-pane-h); min-height: var(--tokens-pane-h); max-height: var(--tokens-pane-h);
+  overflow: auto;
+  position: sticky; top: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.tokens-hints::-webkit-scrollbar { width: 0; height: 0; }
+.tokens-hints, .tokens-hints * { animation: none !important; }
+.tokens-hints .hints-title { margin-bottom: 8px; font-weight: 600; }
+.tokens-hints .hints-list { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.tokens-hints .hint-row { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 8px; padding: 8px 10px; border-radius: 8px; transition: background 0.2s; }
+.tokens-hints .hint-row:hover { background: color-mix(in srgb, var(--border) 40%, transparent) !important; }
+.tokens-hints .hint-name { color: var(--text) !important; overflow-wrap: anywhere; font-weight: 500; }
+.tokens-hints .hint-type { color: var(--text-subtle) !important; white-space: nowrap; font-size: 11px; }
+
+/* Editor textarea */
+.tokens-editor {
+  width: 100% !important;
+  height: var(--tokens-pane-h) !important; min-height: var(--tokens-pane-h) !important; max-height: var(--tokens-pane-h) !important;
+  border: 1px solid var(--border) !important; border-radius: 12px !important;
+  padding: 16px !important;
+  background: var(--surface) !important; color: var(--text) !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important;
+  font-size: 13px !important; line-height: 1.6 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: box-shadow .2s ease, border-color .2s ease;
+  resize: none; overflow: auto;
+}
+.tokens-editor:focus {
+  border-color: var(--primary-2) !important;
+  box-shadow: 0 0 0 4px var(--primary-ring) !important;
+  background: var(--surface) !important; color: var(--text) !important;
+}
+
+/* Actions bar */
+.tokens-actions {
+  grid-column: 1 / -1;
+  display: flex !important; justify-content: flex-end; gap: 12px;
+  margin-top: 8px; padding-top: 16px;
+  border-top: 1px solid var(--border) !important;
+  position: sticky; bottom: 0;
+  background: inherit !important;
+}
+
+/* Responsive */
+@media (max-width: 860px) {
+  .tokens-modal .modal-form { grid-template-columns: 1fr; }
+  .tokens-modal.modal { --tokens-pane-h: 44vh; }
+  .tokens-hints { position: static; }
+}

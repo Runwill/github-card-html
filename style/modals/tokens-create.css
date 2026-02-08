@@ -1,86 +1,5 @@
-/* Tokens create modal split */
-#tokens-create-backdrop.modal-backdrop { 
-  /* Inherit from base.css or use consistent style */
-  background: rgba(0, 0, 0, 0.4); 
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
+/* Tokens create modal – unique rules (shared styles in base.css .tokens-modal / .tokens-hints / .tokens-editor / .tokens-actions) */
 
-#tokens-create-modal.modal { 
-  max-width: 900px; 
-  width: 96%; 
-  max-height: 86vh; 
-  --tokens-pane-h: 48vh; 
-  /* Ensure consistency with base modal */
-  border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-
-#tokens-create-modal .modal-header { margin: 0; margin-bottom: 16px; }
-#tokens-create-modal .modal-form { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
-
-#tokens-create-hints { 
-  font-size: 12px; 
-  color: var(--text-muted) !important; 
-  background: color-mix(in srgb, var(--surface) 96%, transparent) !important; 
-  border: 1px solid var(--border) !important; 
-  border-radius: 12px; 
-  padding: 12px; 
-  height: var(--tokens-pane-h); 
-  min-height: var(--tokens-pane-h); 
-  max-height: var(--tokens-pane-h); 
-  overflow: auto; 
-  position: sticky; 
-  top: 0; 
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04); 
-}
-#tokens-create-hints { scrollbar-width: none; -ms-overflow-style: none; }
-#tokens-create-hints::-webkit-scrollbar { width: 0; height: 0; }
-#tokens-create-hints, #tokens-create-hints * { animation: none !important; }
-#tokens-create-hints .hints-title { margin-bottom: 8px; font-weight: 600; }
-#tokens-create-hints .hints-list { display: grid; grid-template-columns: 1fr; gap: 6px; }
-#tokens-create-hints .hint-row { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 8px; padding: 8px 10px; border-radius: 8px; transition: background 0.2s; }
-#tokens-create-hints .hint-row:hover { background: color-mix(in srgb, var(--border) 40%, transparent) !important; }
-#tokens-create-hints .hint-name { color: var(--text) !important; overflow-wrap:anywhere; font-weight: 500; }
-#tokens-create-hints .hint-type { color: var(--text-subtle) !important; white-space:nowrap; font-size: 11px; }
-
-#tokens-create-editor { 
-  width:100% !important; 
-  height:var(--tokens-pane-h) !important; 
-  min-height:var(--tokens-pane-h) !important; 
-  max-height:var(--tokens-pane-h) !important; 
-  border:1px solid var(--border) !important; 
-  border-radius:12px !important; 
-  padding:16px !important; 
-  background: var(--surface) !important; 
-  color: var(--text) !important; 
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !important; 
-  font-size:13px !important; 
-  line-height:1.6 !important; 
-  box-shadow:0 1px 2px rgba(0,0,0,0.04); 
-  transition: box-shadow .2s ease, border-color .2s ease; 
-  resize: none; 
-  overflow: auto; 
-}
-#tokens-create-editor:focus { 
-  border-color: var(--primary-2) !important; 
-  box-shadow: 0 0 0 4px var(--primary-ring) !important; 
-  background: var(--surface) !important; 
-  color: var(--text) !important; 
-}
-
-.tokens-create-actions, #tokens-create-modal .modal-form > div:last-child { 
-  grid-column: 1 / -1; 
-  display: flex !important; 
-  justify-content: flex-end; 
-  gap: 12px; 
-  margin-top: 8px; 
-  padding-top: 16px; 
-  border-top: 1px solid var(--border) !important; 
-  position: sticky; 
-  bottom: 0; 
-  background: inherit !important; 
-}
 #tokens-create-cancel { 
   background: transparent; 
   border: 1px solid var(--border); 
@@ -117,9 +36,3 @@
 .tokens-scheme__btn.is-selected .cnt { background: color-mix(in srgb, #fff 22%, transparent) !important; color:#fff !important; }
 .tokens-scheme__btn.is-selected .idx { display:none; }
 .tokens-scheme__btn .idx, .tokens-scheme__btn .cnt, .tokens-scheme__btn .label { position: static !important; transform: none !important; animation: none !important; pointer-events: auto !important; }
-
-@media (max-width: 860px) {
-  #tokens-create-modal .modal-form { grid-template-columns: 1fr; }
-  #tokens-create-modal.modal { --tokens-pane-h: 44vh; }
-  #tokens-create-hints { position: static; }
-}
