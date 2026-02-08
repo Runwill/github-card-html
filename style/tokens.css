@@ -518,10 +518,10 @@ html { scrollbar-gutter: stable both-edges; }
 
 /* 颜色编辑器布局 */
 #tokens-content .kv-val .inline-edit-color {
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
   /* 入场过渡（由 JS 加 is-enter 触发，自下而上） */
   transform-origin: 50% 100%;
   transition: transform 260ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)), opacity 220ms ease-out;
@@ -534,6 +534,9 @@ html { scrollbar-gutter: stable both-edges; }
   border-radius: 6px;
   background: transparent;
   box-shadow: inset 0 0 0 1px var(--picker-border, #CBD5E0);
+  outline: none;
+  cursor: pointer;
+  flex: 0 0 auto;
   transform-origin: center;
   transition: transform 160ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)), box-shadow 180ms ease;
 }
@@ -580,25 +583,6 @@ html { scrollbar-gutter: stable both-edges; }
 }
 #tokens-content .kv-val .inline-edit-color .color-picker.is-pulse {
   animation: pickerPulse 320ms ease-out;
-}
-
-/* 颜色编辑器容器与拾色器样式 */
-#tokens-content .kv-val .inline-edit-color {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-}
-#tokens-content .kv-val .inline-edit-color .color-picker {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  box-shadow: none;
-  outline: none;
-  cursor: pointer;
-  flex: 0 0 auto;
 }
 
 /* 保存中禁用态（可选）：降低不必要的视觉跳变 */
