@@ -254,17 +254,15 @@ html.theme-switching *::after {
 
 
 
+/* 侧边栏通用按钮轻度悬浮反馈（主题自适应）*/
+.sidebar-menu_button { color: var(--text) !important; }
 .sidebar-menu_button:hover {
   background: color-mix(in srgb, var(--text) 8%, transparent) !important;
-  color: var(--text) !important;
 }
 #logout-button:hover {
   background: color-mix(in srgb, var(--danger) 10%, transparent) !important;
   color: color-mix(in srgb, var(--danger) 80%, white) !important;
 }
-/* 侧边栏通用按钮轻度悬浮反馈（主题自适应）*/
-.sidebar-menu_button { color: var(--text) !important; }
-.sidebar-menu_button:hover { background: color-mix(in srgb, var(--text) 8%, transparent) !important; }
 
 /* Tokens 页：容器与卡片/分区 */
 #tokens-summary .type-tile {
