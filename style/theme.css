@@ -289,24 +289,17 @@ html.theme-switching *::after {
   color: var(--text) !important;
 }
 
-/* 将池（panel_character）搜索框主题适配 */
-#panel_character #search-input {
-  background-color: var(--surface) !important; /* 覆盖内联白底 */
-  color: var(--text) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 6px !important;
-}
-#panel_character #search-input::placeholder { color: var(--text-subtle) !important; }
-#panel_character #search-input:focus { border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important; }
-
-/* 技能（panel_skill）搜索框主题适配（与将池一致） */
+/* 将池/技能 搜索框主题适配 */
+#panel_character #search-input,
 #panel_skill #search-input {
   background-color: var(--surface) !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
   border-radius: 6px !important;
 }
+#panel_character #search-input::placeholder,
 #panel_skill #search-input::placeholder { color: var(--text-subtle) !important; }
+#panel_character #search-input:focus,
 #panel_skill #search-input:focus { border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important; }
 
 /* 面板内临时白底块统一随主题 */
