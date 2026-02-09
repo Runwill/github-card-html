@@ -14,10 +14,10 @@
     'sidebar.permissions': '权限',
     'sidebar.theme': '主题',
     'sidebar.logout': '退出',
-  'sidebar.announcements': '更新公告',
-  'sidebar.keySettings': '按键设置',
-  'sidebar.settings': '设置',
-  'sidebar.gameSettings': '对局设置',
+    'sidebar.announcements': '更新公告',
+    'sidebar.keySettings': '按键设置',
+    'sidebar.settings': '设置',
+    'sidebar.gameSettings': '对局设置',
 
     'account.menu.back': '返回',
     'account.menu.info': '名片',
@@ -31,9 +31,9 @@
     'modal.password.update': '更新',
 
     'modal.approvals.title': '审核',
-  'modal.announcements.title': '更新公告',
-  'modal.keySettings.title': '按键设置',
-  'modal.gameSettings.title': '对局设置',
+    'modal.announcements.title': '更新公告',
+    'modal.keySettings.title': '按键设置',
+    'modal.gameSettings.title': '对局设置',
 
     'modal.avatar.title': '头像',
     'modal.avatar.upload': '上传头像',
@@ -47,7 +47,7 @@
     'account.info.userId': '用户ID',
     'account.info.createdAt': '注册时间',
     'account.info.placeholder.intro': '（暂无简介）',
-  'account.info.editUsername': '编辑用户名',
+    'account.info.editUsername': '编辑用户名',
     'account.info.pending': '审核中：',
     'account.info.cancel': '撤回',
 
@@ -81,16 +81,16 @@
 
     // Draft panel
     'draft.input.placeholder': '输入HTML代码',
-  // Common
-  'common.empty': '空',
-  'common.cancel': '取消',
-  'common.save': '保存',
-  'common.expand': '展开',
-  'common.collapse': '收起',
-  'common.delete': '删除',
-  'common.copy': '复制',
-  'common.copied': '已复制',
-  'common.noPermission': '无权限',
+    // Common
+    'common.empty': '空',
+    'common.cancel': '取消',
+    'common.save': '保存',
+    'common.expand': '展开',
+    'common.collapse': '收起',
+    'common.delete': '删除',
+    'common.copy': '复制',
+    'common.copied': '已复制',
+    'common.noPermission': '无权限',
 
     // UI messages / alerts / statuses
     'toast.noRequests': '无申请',
@@ -112,10 +112,10 @@
     'error.networkRevokeFailed': '网络异常，撤回失败',
     'error.parse.json': '服务器返回非 JSON 响应',
     'error.parse.unknown': '无法解析服务器响应',
-  // Announcements
-  'announcements.empty': '暂无公告',
-  'announcements.important': '重要',
-  'announcements.error.loadFailed': '公告加载失败',
+    // Announcements
+    'announcements.empty': '暂无公告',
+    'announcements.important': '重要',
+    'announcements.error.loadFailed': '公告加载失败',
 
     // Error prefixes for developer console messages
     'error.updateIntroFailedPrefix': '更新简介失败：',
@@ -149,9 +149,9 @@
     'role.guest': '访客',
 
     // Permissions badge
-  'perm.badge.multiple': '权限×{count}',
-  'perm.tooltip.prefix': '权限：{name}',
-  'perm.tooltip.仪同三司': '修改账号信息免审核', //修改
+    'perm.badge.multiple': '权限×{count}',
+    'perm.tooltip.prefix': '权限：{name}',
+    'perm.tooltip.仪同三司': '修改账号信息免审核', //修改
     'perm.tooltip.赞拜不名': '允许切换到调试语言'
     ,
     // Login page
@@ -190,10 +190,10 @@
     'sidebar.permissions': 'Permissions',
     'sidebar.theme': 'Theme',
     'sidebar.logout': 'Log out',
-  'sidebar.announcements': 'Updates',
-  'sidebar.keySettings': 'Key Settings',
-  'sidebar.settings': 'Settings',
-  'sidebar.gameSettings': 'Game Settings',
+    'sidebar.announcements': 'Updates',
+    'sidebar.keySettings': 'Key Settings',
+    'sidebar.settings': 'Settings',
+    'sidebar.gameSettings': 'Game Settings',
 
     'account.menu.back': 'Back',
     'account.menu.info': 'Profile',
@@ -207,9 +207,9 @@
     'modal.password.update': 'Update',
 
     'modal.approvals.title': 'Approvals',
-  'modal.announcements.title': 'Updates',
-  'modal.keySettings.title': 'Key Settings',
-  'modal.gameSettings.title': 'Game Settings',
+    'modal.announcements.title': 'Updates',
+    'modal.keySettings.title': 'Key Settings',
+    'modal.gameSettings.title': 'Game Settings',
 
     'modal.avatar.title': 'Avatar',
     'modal.avatar.upload': 'Upload avatar',
@@ -223,7 +223,7 @@
     'account.info.userId': 'User ID',
     'account.info.createdAt': 'Joined',
     'account.info.placeholder.intro': '(No intro yet)',
-  'account.info.editUsername': 'Edit username',
+    'account.info.editUsername': 'Edit username',
     'account.info.pending': 'Pending: ',
     'account.info.cancel': 'Revoke',
 
@@ -257,16 +257,16 @@
 
     // Draft panel
     'draft.input.placeholder': 'Enter HTML code',
-  // Common
-  'common.empty': 'Empty',
-  'common.cancel': 'Cancel',
-  'common.save': 'Save',
-  'common.expand': 'Expand',
-  'common.collapse': 'Collapse',
-  'common.delete': 'Delete',
-  'common.copy': 'Copy',
-  'common.copied': 'Copied',
-  'common.noPermission': 'No permission',
+    // Common
+    'common.empty': 'Empty',
+    'common.cancel': 'Cancel',
+    'common.save': 'Save',
+    'common.expand': 'Expand',
+    'common.collapse': 'Collapse',
+    'common.delete': 'Delete',
+    'common.copy': 'Copy',
+    'common.copied': 'Copied',
+    'common.noPermission': 'No permission',
 
     // UI messages / alerts / statuses
     'toast.noRequests': 'No requests',
@@ -288,10 +288,10 @@
     'error.networkRevokeFailed': 'Network error, revoke failed',
     'error.parse.json': 'Server returned non-JSON response',
     'error.parse.unknown': 'Unable to parse server response',
-  // Announcements
-  'announcements.empty': 'No announcements yet',
-  'announcements.important': 'Important',
-  'announcements.error.loadFailed': 'Failed to load announcements',
+    // Announcements
+    'announcements.empty': 'No announcements yet',
+    'announcements.important': 'Important',
+    'announcements.error.loadFailed': 'Failed to load announcements',
 
     // Error prefixes for developer console messages
     'error.updateIntroFailedPrefix': 'Update intro failed:',
@@ -325,10 +325,10 @@
     'role.guest': 'Guest',
 
     // Permissions badge
-  'perm.badge.multiple': 'Permissions×{count}',
-  'perm.tooltip.prefix': 'Permission: {name}',
-  'perm.tooltip.仪同三司': 'Bypass approval (username/intro/avatar)',
-  'perm.tooltip.赞拜不名': 'Allow switching to Debug language'
+    'perm.badge.multiple': 'Permissions×{count}',
+    'perm.tooltip.prefix': 'Permission: {name}',
+    'perm.tooltip.仪同三司': 'Bypass approval (username/intro/avatar)',
+    'perm.tooltip.赞拜不名': 'Allow switching to Debug language'
     ,
     // Login page
     'login.title': 'Login',
@@ -351,7 +351,7 @@
     'register.failRetry': 'Registration failed, please try again later.'
   };
 
-  // debug 语言：直接返回 key
+    // debug 语言：直接返回 key
   const debug = new Proxy({}, { get: (_, k) => String(k) });
 
   window.I18N_STRINGS = { zh, en, debug };
