@@ -16,7 +16,7 @@
     var oldPassword = (($('oldPassword') && $('oldPassword').value) || '').trim();
     var newPassword = (($('newPassword') && $('newPassword').value) || '').trim();
     var confirmPassword = (($('confirmPassword') && $('confirmPassword').value) || '').trim();
-    var responseMessage = $('responseMessage');
+    var responseMessage = $('response-message');
     if (!id || !token) { showMessage(responseMessage, t('error.noLogin'), 'error'); return; }
     if (!oldPassword || !newPassword || !confirmPassword) { showMessage(responseMessage, t('error.fillAll'), 'error'); return; }
     if (newPassword.length < 6) { showMessage(responseMessage, t('error.pwdMin'), 'error'); return; }

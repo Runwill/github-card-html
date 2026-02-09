@@ -266,7 +266,7 @@ html.theme-switching *::after {
 #tokens-summary .type-tile__value { color: var(--text) !important; }
 
 .tabs.nav[data-tabs],
-#example-tabs {
+#main-tabs {
   /* Foundation tabs 容器继承 Header 背景 */
   background: inherit !important;
 }
@@ -297,7 +297,7 @@ html.theme-switching *::after {
 #panel_skill #search-input:focus { border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important; }
 
 /* 面板内临时白底块统一随主题 */
-#panel_character #div4 { height: 500px; background-color: var(--surface); }
+#panel_character #character-placeholder { height: 500px; background-color: var(--surface); }
 
 /* 草稿面板：继承父级色彩，并对输入框做主题化 */
 #panel_draft,
@@ -306,6 +306,9 @@ html.theme-switching *::after {
 }
 #panel_draft .draftBlock { background: inherit !important; }
 #panel_draft #htmlInput {
+  width: 100%;
+  overflow: hidden;
+  resize: none;
   background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;

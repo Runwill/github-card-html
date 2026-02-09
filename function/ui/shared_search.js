@@ -105,7 +105,7 @@
 
   // 当切换页签时，将同一个搜索框移动过去
   function setupTabSync(){
-    const nav = document.getElementById('example-tabs');
+    const nav = document.getElementById('main-tabs');
     if (!nav) return;
     nav.addEventListener('click', (e)=>{
       const a = e.target.closest('a.title-a');

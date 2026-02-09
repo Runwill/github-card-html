@@ -32,7 +32,7 @@
 
   function bind() {
     // 1) Tab 点击前保存当前 panel 的滚动位置
-    const tabLinks = document.querySelectorAll('#example-tabs a[href^="#panel_"]');
+    const tabLinks = document.querySelectorAll('#main-tabs a[href^="#panel_"]');
     tabLinks.forEach((a) => {
       a.addEventListener('click', function() {
         const currentId = getActivePanelId();
@@ -44,7 +44,7 @@
 
     // 2) Foundation Tabs 切换完成后恢复目标 panel 的滚动位置
     if (window.$ && $.fn && $.fn.foundation) {
-      $(document).on('change.zf.tabs', '#example-tabs', function() {
+      $(document).on('change.zf.tabs', '#main-tabs', function() {
         restoreFor(getActivePanelId());
       });
     }

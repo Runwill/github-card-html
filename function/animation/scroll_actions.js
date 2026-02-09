@@ -18,7 +18,7 @@
   function selectTab(panelId){
     try {
       if (window.$) {
-        $("#example-tabs").foundation('selectTab', panelId, 1)
+        $("#main-tabs").foundation('selectTab', panelId, 1)
       }
     } catch(e) {
       // 忽略 Foundation 不存在的情况

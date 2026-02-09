@@ -5,7 +5,10 @@
       "title": "新增深浅色切换快捷键",
       "changes": [
         "新增：切换深浅色快捷键",
-        "优化：提取左上菜单按钮、武将占位、词元面板、权限面板内联样式至CSS"
+        "优化：提取左上菜单按钮、武将占位、词元面板、权限面板、草稿输入框内联样式至CSS",
+        "优化：语义化重命名 div4→character-placeholder、example-tabs→main-tabs",
+        "优化：统一 responseMessage 为 kebab-case response-message",
+        "优化：提取波纹按钮硬编码RGB颜色为CSS类 button_color_green"
       ]
     },
     {

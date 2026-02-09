@@ -112,8 +112,8 @@
       if (refresh) refresh();
     }
 
-    // 清除 responseMessage
-    var msg = el.querySelector('#responseMessage');
+    // 清除 response-message
+    var msg = el.querySelector('#response-message');
     if (msg) { msg.textContent = ''; msg.className = 'modal-message'; }
   }
 

@@ -4,7 +4,7 @@
   const isAdmin=()=>{ try{ return localStorage.getItem('role')==='admin' }catch(_){ return false } };
 
   Promise.resolve(window.partialsReady).then(()=>{
-    document.querySelectorAll('#example-tabs a.title-a').forEach((a,idx)=>{
+    document.querySelectorAll('#main-tabs a.title-a').forEach((a,idx)=>{
       a.addEventListener('click',e=>{
         const href=a.getAttribute('href')||'';
         if(href==='#panel_tokens'){
@@ -39,7 +39,7 @@
 
         e.preventDefault();
 
-        const tabs = Array.from(document.querySelectorAll('#example-tabs .tabs-title'));
+        const tabs = Array.from(document.querySelectorAll('#main-tabs .tabs-title'));
         const activeIndex = tabs.findIndex(tab => tab.classList.contains('is-active'));
         if(activeIndex === -1) return;
 
