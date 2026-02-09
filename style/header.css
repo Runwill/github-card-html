@@ -30,7 +30,7 @@
     transition: all 0.2s ease;
 }
 
-#title-a {
+#sidebar .title-a {
     text-decoration: none;
     color: #2d3748;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -38,7 +38,7 @@
     padding: 0.2em 0;
 }
 
-#title-a::after {
+#sidebar .title-a::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -50,19 +50,19 @@
     transform: translateX(-50%);
 }
 
-#title-a:hover {
+#sidebar .title-a:hover {
     color: #2d3748;
     transform: translateY(-1px);
 }
 
-#title-a:active {
+#sidebar .title-a:active {
     transform: translateY(0);
     transition-duration: 0.05s;
 }
 
-#title-a:hover::after { width: 100%; }
+#sidebar .title-a:hover::after { width: 100%; }
 
-#title-a:active::after {
+#sidebar .title-a:active::after {
     width: 85%;
     opacity: 0.8;
     transition-duration: 0.05s;
@@ -147,7 +147,7 @@
     padding: 0;
 }
 
-#nav-item {
+#sidebar .tabs-title {
     margin-top: 0;
     display: inline;
 }

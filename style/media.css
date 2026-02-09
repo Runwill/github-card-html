@@ -12,7 +12,7 @@
     padding { padding-left: 0.8em; padding-right: 0.6em; }
     .ripple-button { padding: 8px 17px; }
     #header_title { margin-right: 35px; }
-    #nav-item { margin: 0 8px 0 0; }
+    #sidebar .tabs-title { margin: 0 8px 0 0; }
     #menu-toggle {
         padding: 8px 1px;
     }
@@ -24,7 +24,7 @@
     padding { padding-left: 0.8em; padding-right: 0.6em; }
     .ripple-button { padding: 8px 17px; }
     #header_title { margin-right: 40px; }
-    #nav-item { margin: 0 10px 0 0; }
+    #sidebar .tabs-title { margin: 0 10px 0 0; }
     #menu-toggle {
         padding: 8px 10px;
     }
@@ -35,7 +35,7 @@
     padding { padding-left: 0.8em; padding-right: 0.6em; }
     .ripple-button { padding: 9px 20px; }
     #header_title { margin-right: 50px; }
-    #nav-item { margin: 0 10px 0 0; }
+    #sidebar .tabs-title { margin: 0 10px 0 0; }
     #menu-toggle {
         padding: 8px 10px;
     }
@@ -46,7 +46,7 @@
     padding { padding-left: 1.2em; padding-right: 1.2em; }
     .ripple-button { padding: 9px 20px; }
     #header_title { margin-right: 50px; }
-    #nav-item { margin: 0 25px 0 0; }
+    #sidebar .tabs-title { margin: 0 25px 0 0; }
 }
 
 @media (min-width: 601px) and (max-width: 700px) {
@@ -54,7 +54,7 @@
     padding { padding-left: 1.6em; padding-right: 1.6em; }
     .ripple-button { padding: 9px 20px; }
     #header_title { margin-right: 50px; }
-    #nav-item { margin: 0 25px 0 0; }
+    #sidebar .tabs-title { margin: 0 25px 0 0; }
 }
 
 @media (min-width: 701px) and (max-width: 800px) {
@@ -62,7 +62,7 @@
     padding { padding-left: 1.8em; padding-right: 1.8em; }
     .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 50px; }
-    #nav-item { margin: 0 25px 0 0; }
+    #sidebar .tabs-title { margin: 0 25px 0 0; }
 }
 
 @media (min-width: 801px) and (max-width: 900px) {
@@ -70,7 +70,7 @@
     padding { padding-left: 2.0em; padding-right: 2.0em; }
     .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 75px; }
-    #nav-item { margin: 0 25px 0 0; }
+    #sidebar .tabs-title { margin: 0 25px 0 0; }
 }
 
 @media (min-width: 901px) and (max-width: 1100px) {
@@ -78,7 +78,7 @@
     padding { padding-left: 2.2em; padding-right: 2.2em; }
     .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 75px; }
-    #nav-item { margin: 0 28px 0 0; }
+    #sidebar .tabs-title { margin: 0 28px 0 0; }
 }
 
 @media (min-width: 1101px) and (max-width: 1200px) {
@@ -86,7 +86,7 @@
     padding { padding-left: 2.4em; padding-right: 2.4em; }
     .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 75px; }
-    #nav-item { margin: 0 30px 0 0; }
+    #sidebar .tabs-title { margin: 0 30px 0 0; }
 }
 
 @media (min-width: 1201px) and (max-width: 1400px) {
@@ -94,7 +94,7 @@
     padding { padding-left: 2.6em; padding-right: 2.6em; }
     .ripple-button { padding: 10px 22px; }
     #header_title { margin-right: 75px; }
-    #nav-item { margin: 0 30px 0 0; }
+    #sidebar .tabs-title { margin: 0 30px 0 0; }
 }
 
 @media (min-width: 1401px) {
@@ -103,7 +103,7 @@
     .ripple-button { padding: 10px 22px; }
     .strength_button { padding: 8px 8px; margin-left: 0.5%; margin-top: 15px; }
     #header_title { margin-right: 75px; }
-    #nav-item { margin: 0 30px 0 0; }
+    #sidebar .tabs-title { margin: 0 30px 0 0; }
 }
 
 /* 头栏标题容器高度固定，避免根字号降低时相对 48px 容器看起来“下沉” */

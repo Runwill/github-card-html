@@ -247,8 +247,8 @@ html.theme-switching *::after {
   border-bottom: 1px solid var(--border) !important;
   box-shadow: 0 2px 8px var(--shadow-1), 0 4px 16px color-mix(in srgb, var(--shadow-1) 50%, transparent) !important;
 }
-#title-a { color: var(--text) !important; }
-#title-a::after { background: var(--text) !important; }
+#sidebar .title-a { color: var(--text) !important; }
+#sidebar .title-a::after { background: var(--text) !important; }
 #sidebar { background: inherit !important; }
 #header-avatar { border-color: var(--border) !important; background: var(--surface) !important; box-shadow: 0 2px 8px var(--shadow-1) !important; }
 
