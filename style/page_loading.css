@@ -13,6 +13,12 @@
     backdrop-filter: blur(10px);
 }
 
+#loading-overlay > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #loading-overlay.fade-out {
     opacity: 0;
     backdrop-filter: blur(0px); /* 模糊逐渐消失，页面逐渐清晰 */

@@ -185,6 +185,58 @@
   border: 1px solid var(--toast-err-border, #feb2b2); 
 }
 
+/* Screen-reader only (accessibility) */
+.sr-only {
+  position: absolute;
+  left: -9999px;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+/* Approve modal content */
+#pending-approvals-modal-content {
+  padding: 12px;
+}
+
+/* Settings shared – info row & hint */
+.modal-form > .info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.modal-form > .info-hint {
+  font-size: 12px;
+  color: var(--text-muted, #718096);
+  margin-top: 10px;
+}
+
+.key-bind-btn {
+  min-width: 80px;
+}
+
+.setting-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#game-speed-val {
+  font-size: 13px;
+  color: var(--text-muted, #718096);
+  min-width: 42px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-actions {
+  text-align: right;
+  margin-top: 6px;
+}
+
 /* Common Panel (Sidebar/Menu) */
 .panel {
   position: fixed; top: 50%; left: 50%; 

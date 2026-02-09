@@ -53,6 +53,8 @@
   }
 
   // Animation helpers
+  function isHidden(el) { return w.getComputedStyle(el).display === 'none'; }
+
   function animateShow(el, displayType) {
     if (!el) return;
     el.classList.remove('anim-fade-leave', 'anim-fade-leave-active');
@@ -68,7 +70,7 @@
   }
 
   function animateHide(el, callback) {
-    if (!el || el.style.display === 'none') { if(callback) callback(); return; }
+    if (!el || isHidden(el)) { if(callback) callback(); return; }
     el.classList.remove('anim-fade-enter', 'anim-fade-enter-active');
     el.classList.add('anim-fade-leave');
     void el.offsetWidth; // reflow
@@ -144,7 +146,7 @@
       var span = document.createElement('span'); span.id = 'account-info-intro-pending-inline'; span.textContent = t('account.info.pending') + full; span.title = full;
       var btn = document.createElement('button'); btn.id = 'account-info-intro-cancel-inline'; btn.textContent = t('account.info.cancel'); btn.addEventListener('click', function(){ cancelPendingIntroChange(); });
       container.appendChild(span); container.appendChild(btn); 
-      if (container.style.display === 'none') animateShow(container, 'flex');
+      if (isHidden(container)) animateShow(container, 'flex');
     } catch(_){ var container2 = $('account-info-intro-pending'); if (container2) { animateHide(container2, function(){ container2.innerHTML = ''; }); } }
   }
 
@@ -235,7 +237,7 @@
         if (show) {
           tag.textContent = prefix + data.newUsername;
           tag.dataset.pendingName = data.newUsername;
-          if (tag.style.display === 'none') animateShow(tag, 'inline');
+          if (isHidden(tag)) animateShow(tag, 'inline');
         } else {
           delete tag.dataset.pendingName;
           animateHide(tag, function(){ tag.textContent = ''; });
@@ -244,12 +246,11 @@
       if (cancelBtn) {
         var newBtn = cancelBtn.cloneNode(true);
         // Preserve display state for animation continuity
-        newBtn.style.display = cancelBtn.style.display;
         cancelBtn.replaceWith(newBtn);
         newBtn.addEventListener('click', function(){ cancelPendingUsernameChange(); });
         
         if (show) {
-          if (newBtn.style.display === 'none') animateShow(newBtn, 'inline-flex');
+          if (isHidden(newBtn)) animateShow(newBtn, 'inline-flex');
         } else {
           animateHide(newBtn);
         }

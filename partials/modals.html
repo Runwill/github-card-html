@@ -2,7 +2,7 @@
 
 <!-- 加载动画遮罩 -->
 <div id="loading-overlay">
-  <div style="display: flex; flex-direction: column; align-items: center;">
+  <div>
     <div class="loading-title" id="loading-title"></div>
     <div class="loading-bar-container">
       <div class="loading-bar"></div>
@@ -15,9 +15,9 @@
 
 <!-- 侧边栏菜单（主菜单） -->
 <div id="sidebar-menu" class="panel">
-  <li style="display:flex; align-items:center; gap:10px;">
-    <img id="sidebar-avatar-preview" src="" alt="avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid #e2e8f0; display:none;" />
-    <button id="open-account-menu-button" class="sidebar-menu_button" style="flex:1;" data-i18n="sidebar.account">账号</button>
+  <li class="sidebar-avatar-row">
+    <img id="sidebar-avatar-preview" src="" alt="avatar" />
+    <button id="open-account-menu-button" class="sidebar-menu_button" data-i18n="sidebar.account">账号</button>
   </li>
   <li>
     <button id="approve-request-button" class="sidebar-menu_button" data-i18n="sidebar.approvals">审核</button>
@@ -53,7 +53,7 @@
   </li>
   <li>
     <button id="upload-avatar-button" class="sidebar-menu_button" data-i18n="account.menu.avatar">头像</button>
-    <input type="file" id="upload-avatar-input" accept="image/*" style="display:none" />
+    <input type="file" id="upload-avatar-input" accept="image/*" />
   </li>
 </div>
 
@@ -64,8 +64,7 @@
   <form id="updateForm" class="modal-form">
     <!-- 隐藏的用户名字段：满足浏览器对密码表单可用性的要求（不会影响样式与提交） -->
     <input type="text" id="pwdUsername" name="username" autocomplete="username"
-           aria-hidden="true" tabindex="-1"
-           style="position:absolute;left:-9999px;opacity:0;width:1px;height:1px;pointer-events:none;" />
+           aria-hidden="true" tabindex="-1" class="sr-only" />
     <!-- 旧密码用于验证当前身份，autocomplete 使用 current-password -->
     <input type="password" id="oldPassword" name="oldPassword" data-i18n-attr="placeholder" data-i18n-placeholder="modal.password.old" placeholder="旧密码" required autocomplete="current-password">
     <!-- 新密码与确认新密码，autocomplete 使用 new-password -->
@@ -80,7 +79,7 @@
   <div class="modal-header">
     <h2 data-i18n="modal.approvals.title">审核</h2>
   </div>
-  <div id="pending-approvals-modal-content" style="padding: 12px; display:block;"></div>
+  <div id="pending-approvals-modal-content"></div>
 </div>
 
 <!--（权限管理改为面板，删除弹窗版本以避免 ID 冲突） -->
@@ -91,9 +90,9 @@
     <h2 data-i18n="modal.avatar.title">头像</h2>
   </div>
   <div class="modal-form">
-  <img id="avatar-modal-preview" alt="avatar" style="align-self:center; display:none;">
+  <img id="avatar-modal-preview" alt="avatar">
     <button id="avatar-modal-upload" class="btn btn--primary btn--block" data-i18n="modal.avatar.upload">上传头像</button>
-    <div id="avatar-pending-wrap" style="display:none;">
+    <div id="avatar-pending-wrap">
       <div data-i18n="modal.avatar.pending">审核中</div>
       <img id="avatar-pending-preview" alt="pending">
     </div>
@@ -102,9 +101,9 @@
 </div>
 
 <!-- 头像裁剪弹窗 -->
-<div id="avatar-crop-modal" class="modal" style="max-width: 720px;">
+<div id="avatar-crop-modal" class="modal">
   <div class="modal-header"><h2 data-i18n="modal.crop.title">裁剪头像</h2></div>
-  <div style="padding:12px;">
+  <div class="crop-modal-body">
     <div id="avatar-crop-image-container">
       <img id="avatar-crop-image" alt="crop">
     </div>
@@ -112,7 +111,7 @@
   <button id="avatar-crop-cancel" class="btn" data-i18n="modal.crop.cancel">取消</button>
   <button id="avatar-crop-confirm" class="btn btn--primary" data-i18n="modal.crop.confirm">裁剪并上传</button>
     </div>
-    <div id="avatar-crop-message" class="modal-message" style="margin-top:8px;"></div>
+    <div id="avatar-crop-message" class="modal-message"></div>
   </div>
 </div>
 
@@ -124,8 +123,8 @@
         <div class="account-info__name" id="account-info-username">
           <span id="account-info-username-main"></span>
           <!-- 移除内联颜色/字号/外边距，统一由 CSS 控制（与容器 gap 保持一致） -->
-          <span id="account-info-username-pending-inline" style="display:none;"></span>
-          <button id="account-info-username-cancel-inline" class="btn btn--sm" style="display:none;" data-i18n="account.info.cancel">撤回</button>
+          <span id="account-info-username-pending-inline"></span>
+          <button id="account-info-username-cancel-inline" class="btn btn--sm" data-i18n="account.info.cancel">撤回</button>
         </div>
         <div class="account-info__role"><span class="badge" id="account-info-role"></span></div>
       </div>
@@ -134,7 +133,7 @@
       <div class="info-row"><span class="info-label" data-i18n="account.info.username">用户名</span><span class="info-value" id="account-info-username-text"></span></div>
       <div class="account-info__intro">
         <textarea id="account-info-intro" class="intro-textarea" rows="4" maxlength="500" data-i18n-attr="placeholder" data-i18n-placeholder="account.info.placeholder.intro" placeholder="（暂无简介）"></textarea>
-        <div id="account-info-intro-pending" class="info-hint" style="display:none;"></div>
+        <div id="account-info-intro-pending" class="info-hint"></div>
       </div>
       <div class="account-info__meta">
         <div class="meta-item">
@@ -177,15 +176,15 @@
       <h2 data-i18n="modal.keySettings.title">按键设置</h2>
     </div>
     <div class="modal-form">
-      <div class="info-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div class="info-row">
         <span class="info-label" data-i18n="keySettings.expandAll">展开所有术语</span>
-        <button id="key-bind-expand-all" class="btn btn--sm" style="min-width: 80px;">未设置</button>
+        <button id="key-bind-expand-all" class="btn btn--sm key-bind-btn">未设置</button>
       </div>
-      <div class="info-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div class="info-row">
         <span class="info-label" data-i18n="keySettings.inspect">显示属性</span>
-        <button id="key-bind-inspect" class="btn btn--sm" style="min-width: 80px;">Ctrl</button>
+        <button id="key-bind-inspect" class="btn btn--sm key-bind-btn">Ctrl</button>
       </div>
-      <div class="info-hint" style="font-size: 12px; color: #718096; margin-top: 10px;" data-i18n="keySettings.hint">
+      <div class="info-hint" data-i18n="keySettings.hint">
         按下 Esc 或 Backspace 可清除设置。
       </div>
     </div>
@@ -199,15 +198,15 @@
     </div>
     <div class="modal-form">
       <!-- 时机播放速度 -->
-      <div class="info-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div class="info-row">
         <span class="info-label" data-i18n="gameSettings.playbackSpeed">时机播放速度</span>
-        <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="setting-control">
           <input type="range" id="game-speed-range" class="setting-slider" min="0" max="1000" step="10" value="0">
-          <span id="game-speed-val" style="font-size: 13px; color: #718096; min-width: 42px; text-align: right; font-variant-numeric: tabular-nums;">0ms</span>
+          <span id="game-speed-val">0ms</span>
         </div>
       </div>
       <!-- 拖动惯性 -->
-      <div class="info-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+      <div class="info-row">
         <span class="info-label" data-i18n="gameSettings.dragInertia">拖动惯性</span>
         <div class="arrow-selector" id="inertia-selector">
           <button type="button" class="arrow-btn" id="inertia-prev">‹</button>
@@ -216,7 +215,7 @@
         </div>
       </div>
       <!-- 重置按钮 -->
-      <div style="text-align: right; margin-top: 6px;">
+      <div class="settings-actions">
         <button type="button" id="game-settings-reset" class="btn btn--sm btn--ghost" data-i18n="gameSettings.reset">重置</button>
       </div>
     </div>

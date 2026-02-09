@@ -39,6 +39,30 @@
   color: var(--danger-hover, #c53030) !important;
 }
 
+/* Sidebar avatar row */
+.sidebar-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#sidebar-avatar-preview {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border, #e2e8f0);
+  display: none;
+}
+
+#open-account-menu-button {
+  flex: 1;
+}
+
+#upload-avatar-input {
+  display: none;
+}
+
 @media (max-width: 768px) { 
   #sidebar-menu, #account-menu, #settings-menu { 
     min-width: 200px; 

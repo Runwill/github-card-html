@@ -24,6 +24,8 @@
 }
 
 #avatar-modal-preview {
+  display: none;
+  align-self: center;
   width: 180px; height: 180px; 
   border-radius: 50%; 
   object-fit: cover; 
@@ -40,7 +42,7 @@
 /* Pending Avatar Section */
 #avatar-pending-wrap { 
   margin-top: 12px !important; 
-  display: flex; 
+  display: none; 
   flex-direction: column; 
   align-items: center; 
   gap: 8px;
@@ -70,7 +72,19 @@
 #avatar-modal .modal-message { margin-top: 0; width: 100%; }
 
 /* Cropper Modal Content */
+#avatar-crop-modal {
+  max-width: 720px;
+}
+
 #avatar-crop-modal .modal-header { margin-bottom: 16px; }
+
+.crop-modal-body {
+  padding: 12px;
+}
+
+#avatar-crop-message {
+  margin-top: 8px;
+}
 
 #avatar-crop-image-container {
   width: 100%; 

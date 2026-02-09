@@ -111,7 +111,7 @@
       var resp = await fetch(api('/api/avatar/pending/me?userId=' + encodeURIComponent(userId)));
       if (!resp.ok) throw new Error('load pending failed');
       var data = await resp.json();
-      if (data && data.url) { img.src = abs(data.url); wrap.style.display = ''; }
+      if (data && data.url) { img.src = abs(data.url); wrap.style.display = 'flex'; }
       else { wrap.style.display = 'none'; }
     } catch(_){ var wrap2 = $('avatar-pending-wrap'); if (wrap2) wrap2.style.display = 'none'; }
   }

@@ -80,6 +80,9 @@
 }
 
 /* Pending / Cancel Inline Actions */
+#account-info-username-pending-inline { display: none; }
+#account-info-username-cancel-inline { display: none; }
+
 #account-info-username-pending-inline,
 #account-info-intro-pending-inline {
   font-weight: 500 !important;
@@ -96,7 +99,6 @@
 #account-info-username-cancel-inline,
 #account-info-intro-cancel-inline {
   all: unset;
-  display: inline-flex;
   align-items: center;
   color: var(--danger, #f56565);
   padding: 2px 6px !important;
@@ -116,7 +118,7 @@
 
 /* Intro Pending Wrapper */
 #account-info-intro-pending {
-  display: flex; 
+  display: none; 
   align-items: center;
   gap: 8px;
   color: var(--text-subtle, #a0aec0);
@@ -297,7 +299,6 @@
 /* Animation Fixes for Inline Edit - Smooth Collapse */
 #account-info-username-pending-inline,
 #account-info-username-cancel-inline {
-  display: inline-flex;
   max-width: 300px;
   overflow: hidden;
 }
