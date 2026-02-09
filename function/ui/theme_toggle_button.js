@@ -13,5 +13,6 @@
   }
   const onClick=()=>{ const next=mode()==='dark'?'light':'dark'; window.setTheme?.(next); label(document.getElementById('theme-toggle-button')) }
   const bind=()=>{ const btn=document.getElementById('theme-toggle-button'); if(!btn) return; label(btn); btn.addEventListener('click', onClick); new MutationObserver(()=>label(btn)).observe(document.documentElement,{attributes:true, attributeFilter:['data-theme']}); window.addEventListener('i18n:changed', ()=>label(btn)); }
+  window.ThemeToggle = { toggle: onClick };
   try{ (window.partialsReady||Promise.resolve()).then(bind).catch(bind) }catch(_){ document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', bind) : bind() }
 })()

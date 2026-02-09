@@ -9,7 +9,8 @@
   const ACTIONS = {
       'expand_all_terms': { label: 'Expand All Terms', default: null, btnId: 'key-bind-expand-all' },
       // default: { key: 'Control' } means the key 'Control' itself.
-      'inspect_details': { label: 'Inspect Details (Hold)', default: { key: 'Control' }, btnId: 'key-bind-inspect' }
+      'inspect_details': { label: 'Inspect Details (Hold)', default: { key: 'Control' }, btnId: 'key-bind-inspect' },
+      'toggle_theme': { label: 'Toggle Theme', default: { key: 't' }, btnId: 'key-bind-toggle-theme' }
   };
 
   let bindings = {};
@@ -247,6 +248,10 @@
       if (checkBinding(e, 'expand_all_terms')) {
         e.preventDefault();
         expandAllTerms();
+      }
+      if (checkBinding(e, 'toggle_theme')) {
+        e.preventDefault();
+        if (window.ThemeToggle?.toggle) window.ThemeToggle.toggle();
       }
     });
   }

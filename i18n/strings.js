@@ -53,6 +53,7 @@
 
     'keySettings.expandAll': '展开所有术语',
     'keySettings.inspect': '显示属性',
+    'keySettings.toggleTheme': '切换深浅色',
     'keySettings.notSet': '未设置',
     'keySettings.pressKey': '请按下按键...',
     'keySettings.hint': 'Esc 恢复预设，Backspace 清除绑定。',
@@ -228,6 +229,7 @@
 
     'keySettings.expandAll': 'Expand all terms',
     'keySettings.inspect': 'Show Attributes',
+    'keySettings.toggleTheme': 'Toggle Theme',
     'keySettings.notSet': 'Not set',
     'keySettings.pressKey': 'Press a key...',
     'keySettings.hint': 'Esc to reset default, Backspace to unassign.',
