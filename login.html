@@ -24,7 +24,7 @@
 </head>
 <body>
     <!-- 语言切换按钮（固定在右上角） -->
-    <button id="lang-toggle-button" class="btn btn--secondary" style="position:fixed;top:10px;right:10px;z-index:1000"></button>
+    <button id="lang-toggle-button" class="btn btn--secondary"></button>
 
     <div id="login-container" class="panel">
         <div class="modal-header">
@@ -45,72 +45,6 @@
     <script src="function/api/endpoints.js?v=202512070129"></script>
     <script src="function/ui/lang_toggle_button.js?v=202512070129"></script>
     <script src="function/auth/login.js?v=202512070129"></script>
-        <script>
-            (function(){
-                var PUBLIC_URL = 'http://120.55.7.7:3000';
-                var LOCAL_URL = 'http://localhost:3000';
-                var btn = document.getElementById('backend-toggle');
-                var msg = document.getElementById('login-message');
-
-                function isPublic(u){ return typeof u==='string' && u.indexOf('120.55.7.7')>=0; }
-                function normalize(u){ return String(u||'').replace(/\/$/,''); }
-
-                        function applyStyle(current){
-                    // 复用按钮基础样式，根据状态加上 success(公网=绿) / danger(本地=红) 的配色
-                    btn.classList.remove('btn--primary','btn--secondary','btn--success','btn--danger');
-                    if (isPublic(current)) {
-                        btn.classList.add('btn--success');
-                                // 同步 i18n key，防止后续 i18n.apply 覆盖回“切换后端”
-                                try { btn.setAttribute('data-i18n', 'login.backend.publicSelected'); } catch(_){}
-                                try { btn.textContent = window.t('login.backend.publicSelected'); } catch(_) { btn.textContent = '公网后端 (已选)'; }
-                    } else {
-                        btn.classList.add('btn--danger');
-                                try { btn.setAttribute('data-i18n', 'login.backend.localSelected'); } catch(_){}
-                                try { btn.textContent = window.t('login.backend.localSelected'); } catch(_) { btn.textContent = '本地后端 (已选)'; }
-                    }
-                }
-
-                function currentBase(){ try { return endpoints && endpoints.getBase ? endpoints.getBase() : LOCAL_URL; } catch(e){ return LOCAL_URL; } }
-                function setBase(u){ try { if (endpoints && endpoints.setBase) endpoints.setBase(u); } catch(e){} }
-
-                        function refreshMessage(){
-                            var b = currentBase();
-                            if (msg) {
-                                msg.className = 'modal-message'; // 重置为默认态，清除 error/success 颜色
-                                msg.textContent = window.t('login.backend.currentPrefix', { url: normalize(b) });
-                            }
-                        }
-
-                        function init(){
-                            var b = currentBase();
-                    applyStyle(b);
-                    refreshMessage();
-                }
-
-                if (btn) {
-                    btn.addEventListener('click', function(){
-                        var b = currentBase();
-                        var next = isPublic(b) ? LOCAL_URL : PUBLIC_URL;
-                        setBase(next);
-                        applyStyle(next);
-                        refreshMessage();
-                    });
-                }
-
-                // 初次进入根据 localStorage/endpoints 状态渲染
-                function boot(){
-                    try { if (window.i18n && window.i18n.apply) window.i18n.apply(document); } catch(_){ }
-                    init();
-                    // 语言切换后刷新后端相关文案
-                    try{ window.addEventListener('i18n:changed', function(){ applyStyle(currentBase()); refreshMessage(); }); }catch(_){ }
-                }
-                if (document.readyState === 'loading') {
-                    document.addEventListener('DOMContentLoaded', boot);
-                } else {
-                    // 若 DOMContentLoaded 已触发，直接执行初始化，避免刷新后按钮文案停留在“切换后端”
-                    boot();
-                }
-            })();
-        </script>
+    <script src="function/auth/backend_toggle.js?v=202512070129"></script>
 </body>
 </html>

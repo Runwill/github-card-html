@@ -72,36 +72,15 @@ body {
 }
 .shake { animation: shake 0.5s; }
 
-#login-container { width: 360px; max-width: 92vw; z-index: 8000; }
+#login-container { width: 360px; max-width: 92vw; margin: 0; }
 @media (max-width: 480px) {
     #login-container { width: 92vw; }
 }
 
-#login-container {
-    background: rgba(255,255,255,0.95);
-    border: 1px solid rgba(226,232,240,0.8);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
-    padding: 22px 20px;
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    margin: 0;
+/* 登录页语言切换按钮（固定右上角） */
+#lang-toggle-button {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
 }
-#login-form input {
-    margin-bottom: 10px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-}
-#login-form button {
-    width: 100%;
-    padding: 10px;
-    background: #8698ff;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-#login-message { margin-top: 10px; color: #4a5568; text-align: center; }
-#login-message.success { color: #38a169; }
-#login-message.error { color: #e53e3e; }
