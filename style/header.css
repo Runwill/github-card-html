@@ -103,14 +103,14 @@
 }
 
 .sidebar-menu_button:hover {
-    background: rgba(74, 85, 104, 0.08) !important;
+    background: color-mix(in srgb, var(--text) 8%, transparent) !important;
     transform: translateX(2px);
-    color: #2d3748 !important;
+    color: var(--text) !important;
 }
 
 #logout-button:hover {
-    background: rgba(229, 62, 62, 0.1) !important;
-    color: #c53030 !important;
+    background: color-mix(in srgb, var(--danger) 10%, transparent) !important;
+    color: color-mix(in srgb, var(--danger) 80%, white) !important;
 }
 
 #nav .tabs-title a {
