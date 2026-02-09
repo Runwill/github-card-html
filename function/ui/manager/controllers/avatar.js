@@ -19,6 +19,8 @@
   function openAvatarCropper(event){
     var file = (event && event.target && event.target.files && event.target.files[0]) || null;
     if (!file) return;
+    /* 立即清空 input，使选择同一文件时 change 仍能触发 */
+    if (event.target) event.target.value = '';
     if (!/^image\//i.test(file.type)) { alert(t('alert.selectImage')); return; }
     var img = $('avatar-crop-image');
     var modalId = 'avatar-crop-modal';
