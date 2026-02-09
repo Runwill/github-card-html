@@ -187,6 +187,19 @@ html { scrollbar-gutter: stable both-edges; }
   font-size: 12px;
 }
 
+/* 摘要容器：grid 布局（从内联移出） */
+#tokens-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* 内容容器（从内联移出） */
+#tokens-content {
+  margin-top: 14px;
+}
+
 /* 摘要 tiles：将背景与间距转移至 CSS */
 #tokens-summary .type-tile {
   border: 1px solid #e2e8f0;

@@ -194,3 +194,7 @@
   background: rgba(59, 130, 246, 0.16); /* 蓝色半透明底 */
   border-color: #3B82F6;                /* blue-500 */
 }
+
+/* 权限列表 / 消息容器（从内联移出） */
+#perm-list    { margin-top: 14px; }
+#perm-message { margin-top: 10px; }
