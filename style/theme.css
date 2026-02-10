@@ -184,7 +184,10 @@ html.theme-switching *::after {
 .modal-form input,
 #login-form input,
 #panel_tokens .tokens-input,
-#panel_permissions .tokens-input {
+#panel_permissions .tokens-input,
+.perm-editor input,
+.perm-editor select,
+.intro-textarea {
   border: 1px solid var(--border) !important;
   background: transparent !important;
   color: var(--text) !important;
@@ -194,18 +197,26 @@ html.theme-switching *::after {
 .modal-form input:hover,
 #login-form input:hover,
 #panel_tokens .tokens-input:hover,
-#panel_permissions .tokens-input:hover {
+#panel_permissions .tokens-input:hover,
+.perm-editor input:hover,
+.perm-editor select:hover,
+.intro-textarea:hover {
   background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
   border-color: var(--text-muted) !important;
 }
 
 .modal-form input::placeholder,
 #panel_tokens .tokens-input::placeholder,
-#panel_permissions .tokens-input::placeholder { color: var(--text-subtle) !important; opacity: 0.8; }
+#panel_permissions .tokens-input::placeholder,
+.intro-textarea::placeholder { color: var(--text-subtle) !important; opacity: 0.8; }
 
 .modal-form input:focus,
+#login-form input:focus,
 #panel_tokens .tokens-input:focus,
-#panel_permissions .tokens-input:focus {
+#panel_permissions .tokens-input:focus,
+.perm-editor input:focus,
+.perm-editor select:focus,
+.intro-textarea:focus {
   border-color: var(--primary-2) !important;
   box-shadow: 0 0 0 3px var(--primary-ring) !important;
   background: var(--surface) !important;

@@ -126,14 +126,7 @@
   width: 100%;
   box-sizing: border-box;
 }
-.perm-editor .tokens-input:focus,
-.perm-editor input[type="text"]:focus,
-.perm-editor input[type="password"]:focus,
-.perm-editor input[type="date"]:focus,
-.perm-editor select:focus {
-  border-color: var(--text-subtle) !important;
-  box-shadow: 0 0 0 3px var(--primary-ring) !important; /* 与搜索框一致的柔和焦点环 */
-}
+/* :focus 统一由 theme.css 覆盖，此处不再重复 */
 
 /* 小屏宽度占满 */
 @media (max-width: 480px) {

@@ -40,7 +40,7 @@ html { scrollbar-gutter: stable both-edges; }
   line-height: 1.2;
   transition: border-color .15s ease, box-shadow .15s ease;
 }
-.admin-panel .tokens-input:focus { outline: none; border-color: var(--text-subtle); box-shadow: 0 0 0 3px var(--primary-ring); }
+/* .tokens-input:focus 统一由 theme.css 覆盖 */
 .admin-panel .tokens-input::placeholder { color: var(--text-subtle); }
 .admin-panel .tokens-btn {
   height: 36px;

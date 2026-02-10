@@ -6,11 +6,14 @@ body {
     background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
 }
 
-/* .panel 样式已统一定义在 modals/base.css 与 theme.css 中，此处仅保留登录页动画 */
+/* .panel 动画与基础视觉定义在 modals/base.css，此处覆盖登录页特有值 */
 .panel {
     position: fixed;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%) scale(0.95);
+    padding: 22px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
     z-index: 8000;
     opacity: 0;
     visibility: hidden;
@@ -36,21 +39,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 14px;
-}
-.modal-form input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: rgba(255,255,255,0.9);
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    font-size: 15px;
-}
-.modal-form input:focus {
-    border-color: var(--text-subtle);
-    box-shadow: 0 0 0 3px var(--primary-ring);
-    background: var(--surface);
 }
 .modal-form button { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
 

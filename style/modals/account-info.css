@@ -233,17 +233,7 @@
 
 .intro-textarea::placeholder { color: var(--text-subtle, #a0aec0); opacity: 0.8; }
 
-.intro-textarea:hover {
-  border-color: var(--text-muted, #cbd5e1);
-  background: var(--bg-end, #f8fafc);
-}
-
-.intro-textarea:focus { 
-  outline: none; 
-  border-color: var(--primary-2, #7084ff); 
-  background: var(--surface, #fff);
-  box-shadow: 0 0 0 3px var(--primary-ring, rgba(134,152,255,.15)); 
-}
+/* :hover / :focus 统一由 theme.css 覆盖 */
 
 /* Messages */
 /* Base styles handled by base.css (animation/layout) */
