@@ -275,48 +275,13 @@ body.is-global-dragging #hand-cards-container {
     gap: 8px;
 }
 
-.equip-detail-btn {
-    /* Base: Light Mode (Default) */
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(44, 82, 130, 0.3); /* Dark Blue tint */
-    border-radius: 4px; /* Square with slight roundness */
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 16px; /* Increased slightly for ZhuanShu readability */
-    font-weight: normal; /* ZhuanShu is naturally bold */
-    font-family: '明朝';
-    color: #2c5282; /* Dark Blue for Light Mode */
-    opacity: 0.9;
-    transition: all 0.2s;
-    padding: 0;
-    margin-left: 4px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-}
-
-.equip-detail-btn:hover {
-    opacity: 1;
-    background: rgba(44, 82, 130, 0.1);
-    border-color: #2c5282;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    /* No text shadow in light mode by default for cleanness */
-}
-
-.equip-detail-btn:active {
-    transform: translateY(1px);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-    background: rgba(44, 82, 130, 0.2);
-    border-color: #2c5282; 
-}
-
-/* Judge Button (Yellow/Gold) - Base: Light Mode */
+/* ── Detail Button：装备 / 判定 共用基类 ── */
+.equip-detail-btn,
 .judge-detail-btn {
+    --btn-accent: #718096;
+    --btn-accent-rgb: 113, 128, 150;
     background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(184, 134, 11, 0.3); /* DarkGoldenRod tint */
+    border: 1px solid rgba(var(--btn-accent-rgb), 0.3);
     border-radius: 4px;
     width: 24px;
     height: 24px;
@@ -327,7 +292,7 @@ body.is-global-dragging #hand-cards-container {
     font-size: 16px;
     font-weight: normal;
     font-family: '明朝';
-    color: #B8860B; /* DarkGoldenRod */
+    color: var(--btn-accent);
     opacity: 0.9;
     transition: all 0.2s;
     padding: 0;
@@ -335,60 +300,64 @@ body.is-global-dragging #hand-cards-container {
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
+.equip-detail-btn:hover,
 .judge-detail-btn:hover {
     opacity: 1;
-    background: rgba(184, 134, 11, 0.1);
-    border-color: #B8860B;
+    background: rgba(var(--btn-accent-rgb), 0.1);
+    border-color: var(--btn-accent);
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
+.equip-detail-btn:active,
 .judge-detail-btn:active {
     transform: translateY(1px);
     box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
-    background: rgba(184, 134, 11, 0.2);
-    border-color: #B8860B; 
+    background: rgba(var(--btn-accent-rgb), 0.2);
+    border-color: var(--btn-accent);
 }
 
-/* Dark Mode Adaptation */
-html[data-theme="dark"] .equip-detail-btn {
+/* 装备按钮：蓝色 */
+.equip-detail-btn {
+    --btn-accent: #2c5282;
+    --btn-accent-rgb: 44, 82, 130;
+}
+
+/* 判定按钮：金色 */
+.judge-detail-btn {
+    --btn-accent: #B8860B;
+    --btn-accent-rgb: 184, 134, 11;
+}
+
+/* ── Dark Mode ── */
+html[data-theme="dark"] .equip-detail-btn,
+html[data-theme="dark"] .judge-detail-btn {
     background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(176, 204, 232, 0.3); /* Soft Blue tint */
-    color: #b0cce8; /* Soft Blue */
     box-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
-html[data-theme="dark"] .equip-detail-btn:hover {
-    background: rgba(176, 204, 232, 0.2);
-    border-color: #b0cce8;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    text-shadow: 0 0 5px rgba(176, 204, 232, 0.5);
-}
-
-html[data-theme="dark"] .equip-detail-btn:active {
-    box-shadow: 0 0 1px rgba(0,0,0,0.5);
-    background: rgba(176, 204, 232, 0.3);
-    border-color: #8da3ba; 
+html[data-theme="dark"] .equip-detail-btn {
+    --btn-accent: #b0cce8;
+    --btn-accent-rgb: 176, 204, 232;
 }
 
 html[data-theme="dark"] .judge-detail-btn {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 215, 0, 0.3); /* Gold tint */
-    color: #ffd700; /* Gold */
-    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    --btn-accent: #ffd700;
+    --btn-accent-rgb: 255, 215, 0;
 }
 
+html[data-theme="dark"] .equip-detail-btn:hover,
 html[data-theme="dark"] .judge-detail-btn:hover {
-    background: rgba(255, 215, 0, 0.2);
-    border-color: #ffd700;
+    background: rgba(var(--btn-accent-rgb), 0.2);
+    border-color: var(--btn-accent);
     box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    text-shadow: 0 0 5px rgba(var(--btn-accent-rgb), 0.5);
 }
 
+html[data-theme="dark"] .equip-detail-btn:active,
 html[data-theme="dark"] .judge-detail-btn:active {
     box-shadow: 0 0 1px rgba(0,0,0,0.5);
-    background: rgba(255, 215, 0, 0.3);
-    border-color: #b89600; 
+    background: rgba(var(--btn-accent-rgb), 0.3);
 }
 
 /* Cleanup Legacy Explicit Light Blocks if they existed below */
