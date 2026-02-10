@@ -227,26 +227,43 @@
   margin-top: 6px;
 }
 
-/* Common Panel (Sidebar/Menu) */
+/* Panel 公共基类 */
 .panel {
-  position: fixed; top: 50%; left: 50%; 
+  position: fixed; top: 50%; left: 50%;
   transform: translate(-50%, -48%) scale(0.95);
-  padding: 16px; 
-  border: 1px solid var(--border, rgba(226,232,240,0.8)); 
+  border: 1px solid var(--border, rgba(226,232,240,0.8));
   background: var(--surface-soft, rgba(255,255,255,0.95));
-  backdrop-filter: blur(16px); 
+  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-radius: 16px; 
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  z-index: 8000; 
+  z-index: 8000;
   opacity: 0; visibility: hidden; pointer-events: none;
-  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.2s; 
+}
+.panel.show {
+  opacity: 1; visibility: visible; pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* 菜单面板（侧边栏 / 账号 / 设置） */
+.panel--menu {
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.2s;
   min-width: 240px;
 }
-.panel.show { 
-  opacity: 1; visibility: visible; pointer-events: auto; 
-  transform: translate(-50%, -50%) scale(1); 
-  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s; 
+.panel--menu.show {
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0s;
+}
+
+/* 页面面板（登录页） */
+.panel--page {
+  padding: 22px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+}
+.panel--page.show {
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0s;
 }
 
 /* Responsive */

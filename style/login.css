@@ -6,27 +6,7 @@ body {
     background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
 }
 
-/* .panel 动画与基础视觉定义在 modals/base.css，此处覆盖登录页特有值 */
-.panel {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.95);
-    padding: 22px 20px;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
-    z-index: 8000;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
-}
-.panel.show {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translate(-50%, -50%) scale(1);
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0s;
-}
+/* .panel + .panel--page 样式统一定义在 modals/base.css */
 
 .modal-header { margin-bottom: 12px; }
 .modal-header h2 {
