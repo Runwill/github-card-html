@@ -173,7 +173,7 @@
 }
 
 #account-info-id {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   background: rgba(128, 128, 128, 0.1);
   padding: 1px 6px;
@@ -204,7 +204,7 @@
 }
 
 .account-info__meta .meta-value {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: var(--font-mono);
   color: var(--text-muted, #718096);
 }
 

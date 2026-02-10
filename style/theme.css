@@ -58,6 +58,9 @@
   /* 自定义：代词颜色（浅色主题下稍暗的红） */
   --pronoun-color: #d60000bb;
 
+  /* 等宽字体栈 */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
   /* Active State Text Color (Light Mode) */
   --text-active: var(--primary-3);
 }

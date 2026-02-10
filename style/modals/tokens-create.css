@@ -18,7 +18,7 @@
 /* Variant sample */
 #tokens-create-hints .variant-sample { margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--border); }
 #tokens-create-hints .variant-sample__title { font-weight: 600; color: var(--text) !important; margin-bottom: 8px; }
-#tokens-create-hints .variant-sample__pre { margin:0; padding:10px; background: var(--surface) !important; border:1px solid var(--border) !important; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; font-size:12px; line-height:1.5; white-space: pre-wrap; color: var(--text) !important; }
+#tokens-create-hints .variant-sample__pre { margin:0; padding:10px; background: var(--surface) !important; border:1px solid var(--border) !important; border-radius: 8px; font-family: var(--font-mono); font-size:12px; line-height:1.5; white-space: pre-wrap; color: var(--text) !important; }
 
 /* Segmented scheme buttons */
 .tokens-scheme__group { display:inline-flex; flex-wrap:wrap; gap:8px; }
