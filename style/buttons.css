@@ -12,13 +12,13 @@
   border: 1px solid transparent;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.08s ease, background-position 0.25s ease; 
+  transition: background-color var(--dur-normal) var(--ease-default), color var(--dur-normal) var(--ease-default), border-color var(--dur-normal) var(--ease-default), box-shadow var(--dur-normal) var(--ease-default), transform var(--dur-fast) var(--ease-default), background-position var(--dur-normal) var(--ease-default); 
   will-change: background-position, box-shadow, transform;
 }
 
 .btn:focus {
   outline: none;
-  box-shadow: 0 0 0 3px var(--primary-ring);
+  box-shadow: var(--shadow-ring);
 }
 
 .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }

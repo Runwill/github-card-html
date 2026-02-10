@@ -76,12 +76,6 @@
       if (isColorField) {
         const wrap = document.createElement('div');
         wrap.className = 'inline-edit-color';
-        try {
-          wrap.classList.add('is-enter');
-          requestAnimationFrame(() => {
-            try { wrap.classList.remove('is-enter'); } catch (_) {}
-          });
-        } catch (_) {}
 
         colorPicker = document.createElement('input');
         colorPicker.type = 'color';
@@ -143,12 +137,6 @@
         const ta = document.createElement('textarea');
         ta.value = oldText;
         ta.className = 'inline-edit';
-        try {
-          ta.classList.add('is-enter');
-          requestAnimationFrame(() => {
-            try { ta.classList.remove('is-enter'); } catch (_) {}
-          });
-        } catch (_) {}
         ta.setAttribute('rows', '1');
         ta.setAttribute('wrap', 'soft');
         target.textContent = '';

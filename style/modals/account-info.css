@@ -16,7 +16,7 @@
   object-fit: cover; 
   border: 2px solid var(--surface, #fff); 
   background: var(--surface, #fff); 
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+  box-shadow: var(--shadow-elev-1); 
 }
 
 .account-info__title { 
@@ -43,7 +43,7 @@
 .account-info__name.is-editing { outline: none; }
 
 /* Fix for editable username span */
-#account-info-username-main.is-editable { cursor: text; transition: color 0.2s; }
+#account-info-username-main.is-editable { cursor: text; transition: color var(--dur-normal) var(--ease-default); }
 #account-info-username-main.is-editable:hover { color: var(--primary-2, #7084ff); }
 #account-info-username-main.is-editing { 
   outline: none; 
@@ -108,7 +108,7 @@
   cursor: pointer;
   vertical-align: baseline;
   border-radius: 4px;
-  transition: background 0.2s;
+  transition: background var(--dur-normal) var(--ease-default);
 }
 
 #account-info-username-cancel-inline:hover,
@@ -149,13 +149,13 @@
   background: transparent;
   border-radius: 10px;
   border: 1px solid var(--border, #e2e8f0);
-  transition: all 0.2s ease;
+  transition: all var(--dur-normal) var(--ease-default);
 }
 
 .account-info__body .info-row:hover {
   background: var(--bg-end, #f8fafc);
   border-color: var(--primary-2, #7084ff);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  box-shadow: var(--shadow-subtle-2);
 }
 
 .account-info__body .info-label { 
@@ -227,7 +227,7 @@
   color: var(--text, #2d3748); 
   font-size: 14px; 
   line-height: 1.6; 
-  transition: all 0.2s ease;
+  transition: all var(--dur-normal) var(--ease-default);
   font-family: inherit;
 }
 
@@ -263,7 +263,7 @@
 .anim-fade-enter {
   opacity: 0;
   transform: scale(0.95);
-  transition: opacity 0.2s ease, transform 0.2s ease !important;
+  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default) !important;
 }
 .anim-fade-enter-active {
   opacity: 1;
@@ -273,7 +273,7 @@
 .anim-fade-leave {
   opacity: 1;
   transform: scale(1);
-  transition: opacity 0.2s ease, transform 0.2s ease !important;
+  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default) !important;
 }
 .anim-fade-leave-active {
   opacity: 0;
@@ -295,7 +295,7 @@
 
 #account-info-username-pending-inline.anim-fade-leave,
 #account-info-username-cancel-inline.anim-fade-leave {
-  transition: opacity 0.2s ease, transform 0.2s ease, max-width 0.2s ease, padding 0.2s ease, margin 0.2s ease !important;
+  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default), max-width var(--dur-normal) var(--ease-default), padding var(--dur-normal) var(--ease-default), margin var(--dur-normal) var(--ease-default) !important;
 }
 
 #account-info-username-pending-inline.anim-fade-leave-active,

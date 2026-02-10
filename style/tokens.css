@@ -5,11 +5,20 @@ html { scrollbar-gutter: stable both-edges; }
   /* 兼容旧浏览器：总是保留滚动条空间（可能会一直显示滚动条） */
   html { overflow-y: scroll; }
 }
-/* 动画曲线变量（Material 风格） */
-:root {
-  --ease-standard: cubic-bezier(.4, 0, .2, 1);
-  --ease-decel:    cubic-bezier(0, 0, .2, 1);
-  --ease-accel:    cubic-bezier(.4, 0, 1, 1);
+#panel_tokens {
+  --shadow-tile-hover: var(--shadow-hover-card);
+  --shadow-tile-active: var(--shadow-elev-2-soft), 0 0 0 2px var(--tile-accent-ring);
+  --shadow-tile-ring: 0 0 0 3px var(--tile-accent-ring);
+  --shadow-kv-empty: inset 0 0 0 0px transparent;
+  --shadow-kv-editing: inset 0 0 0 1px var(--text-subtle);
+  --shadow-kv-editing-focus: inset 0 0 0 1px var(--text-muted);
+  --shadow-kv-editing-accent: inset 0 0 0 1px color-mix(in srgb, var(--token-accent) 35%, var(--text-subtle));
+  --shadow-picker: inset 0 0 0 1px var(--picker-border, #CBD5E0);
+  --shadow-picker-hover: inset 0 0 0 1px var(--picker-border, #CBD5E0), 0 0 0 2px color-mix(in srgb, var(--token-accent, #3182CE) 36%, transparent);
+  --shadow-picker-focus: inset 0 0 0 1px var(--picker-border, #A0AEC0), 0 0 0 3px color-mix(in srgb, var(--token-accent, #3182CE) 44%, transparent);
+  --shadow-picker-pulse-0: inset 0 0 0 1px var(--picker-border, #CBD5E0), 0 0 0 0 color-mix(in srgb, var(--token-accent, #3182CE) 40%, transparent);
+  --shadow-picker-pulse-50: inset 0 0 0 1px var(--picker-border, #A0AEC0), 0 0 0 6px color-mix(in srgb, var(--token-accent, #3182CE) 28%, transparent);
+  --shadow-picker-pulse-100: inset 0 0 0 1px var(--picker-border, #CBD5E0), 0 0 0 0 color-mix(in srgb, var(--token-accent, #3182CE) 40%, transparent);
 }
 .admin-panel .tokens-toolbar {
   display: flex;
@@ -38,7 +47,7 @@ html { scrollbar-gutter: stable both-edges; }
   color: var(--text);
   background: var(--surface);
   line-height: 1.2;
-  transition: border-color .15s ease, box-shadow .15s ease;
+  transition: border-color var(--dur-normal) var(--ease-default), box-shadow var(--dur-normal) var(--ease-default);
 }
 /* .tokens-input:focus 统一由 theme.css 覆盖 */
 .admin-panel .tokens-input::placeholder { color: var(--text-subtle); }
@@ -61,17 +70,17 @@ html { scrollbar-gutter: stable both-edges; }
 
 /* 点击后残留的边框：使用 :focus-visible 仅在键盘导航时显示可视焦点 */
 .admin-panel .tokens-btn:focus { outline: none !important; box-shadow: none !important; }
-.admin-panel .tokens-btn:focus-visible { box-shadow: 0 0 0 3px var(--primary-ring) !important; }
+.admin-panel .tokens-btn:focus-visible { box-shadow: var(--shadow-ring) !important; }
 
 /* 详细/刷新按钮也应用相同规则（可能未带 tokens-btn 类时的兜底） */
 .admin-panel .btn:focus { outline: none !important; box-shadow: none !important; }
-.admin-panel .btn:focus-visible { box-shadow: 0 0 0 3px var(--primary-ring) !important; }
+.admin-panel .btn:focus-visible { box-shadow: var(--shadow-ring) !important; }
 
 /* 模式切换按钮：添加过渡并使用 background-color 以启用平滑动画 */
 .admin-panel .mode-toggle {
-  transition: background-color .22s var(--ease-standard),
-              border-color .22s var(--ease-standard),
-              color .2s var(--ease-standard);
+  transition: background-color var(--dur-normal) var(--ease-standard),
+              border-color var(--dur-normal) var(--ease-standard),
+              color var(--dur-normal) var(--ease-standard);
 }
 .admin-panel .mode-toggle.is-active {
   background-color: var(--success) !important;  /* green-400 */
@@ -105,7 +114,7 @@ html { scrollbar-gutter: stable both-edges; }
   border-bottom: 2px solid currentColor;
   transform-origin: 50% 50%;
   opacity: .85;
-  transition: transform .24s var(--ease-standard);
+  transition: transform var(--dur-normal) var(--ease-standard);
 }
 #panel_tokens .expand-btn.is-expanded::before {
   /* 展开后箭头指向上（旋转到 -135° 等效为向上） */
@@ -119,13 +128,13 @@ html { scrollbar-gutter: stable both-edges; }
 #panel_tokens .type-tile {
   cursor: pointer;
   user-select: none;
-  transition: transform .16s var(--ease-standard, ease),
-              box-shadow .2s var(--ease-standard, ease),
-              border-color .2s var(--ease-standard, ease),
-              background-color .2s var(--ease-standard, ease),
-              color .2s var(--ease-standard, ease),
-              filter .18s var(--ease-standard, ease),
-              opacity .18s var(--ease-standard, ease);
+  transition: transform var(--dur-normal) var(--ease-standard),
+              box-shadow var(--dur-normal) var(--ease-standard),
+              border-color var(--dur-normal) var(--ease-standard),
+              background-color var(--dur-normal) var(--ease-standard),
+              color var(--dur-normal) var(--ease-standard),
+              filter var(--dur-normal) var(--ease-standard),
+              opacity var(--dur-normal) var(--ease-standard);
   outline: none;
   position: relative;
   /* 默认强调色（可被各类型覆盖） */
@@ -134,9 +143,9 @@ html { scrollbar-gutter: stable both-edges; }
   --tile-accent-soft: color-mix(in srgb, var(--tile-accent) 38%, white);
   --tile-accent-ring: color-mix(in srgb, var(--tile-accent) 20%, transparent);
 }
-#panel_tokens .type-tile:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0,0,0,0.08); }
-#panel_tokens .type-tile:focus-visible { box-shadow: 0 0 0 3px var(--tile-accent-ring); }
-#panel_tokens .type-tile.is-active { border-color: var(--tile-accent-soft) !important; box-shadow: 0 8px 18px rgba(0,0,0,.08), 0 0 0 2px var(--tile-accent-ring); }
+#panel_tokens .type-tile:hover { transform: translateY(-1px); box-shadow: var(--shadow-tile-hover); }
+#panel_tokens .type-tile:focus-visible { box-shadow: var(--shadow-tile-ring); }
+#panel_tokens .type-tile.is-active { border-color: var(--tile-accent-soft) !important; box-shadow: var(--shadow-tile-active); }
 /* 激活态左侧强调条：通过宽度/透明度过渡出现 */
 #panel_tokens .type-tile::after {
   content: '';
@@ -146,7 +155,7 @@ html { scrollbar-gutter: stable both-edges; }
   opacity: 0;
   background: var(--tile-accent-soft);
   border-radius: 8px 0 0 8px;
-  transition: width .2s var(--ease-standard), opacity .2s var(--ease-standard), background-color .2s var(--ease-standard);
+  transition: width var(--dur-normal) var(--ease-standard), opacity var(--dur-normal) var(--ease-standard), background-color var(--dur-normal) var(--ease-standard);
 }
 #panel_tokens .type-tile.is-active::after { width: 3px; opacity: 1; }
 
@@ -247,12 +256,12 @@ html { scrollbar-gutter: stable both-edges; }
   border-radius: 6px;
   padding: 8px 10px;
   background: var(--token-bg, var(--surface));
-  box-shadow: 0 0 0 rgba(0,0,0,0);
+  box-shadow: var(--shadow-none);
   transform: translateY(6px);
   opacity: 0;
   animation: token-card-in .36s ease both;
   animation-delay: var(--enter-delay, 0ms);
-  transition: box-shadow .2s ease, transform .2s ease;
+  transition: box-shadow var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default);
   position: relative; /* 作为悬浮工具条定位参考 */
   /* 优化：非可视区域跳过绘制，降低主题切换时重绘成本 */
   content-visibility: auto;
@@ -269,7 +278,7 @@ html { scrollbar-gutter: stable both-edges; }
   margin: 0;
   opacity: 0;
   transform: translateY(-4px);
-  transition: opacity .16s ease, transform .16s ease;
+  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default);
   pointer-events: none; /* 默认不接收事件，避免遮挡 */
   z-index: 1; /* 置于卡片内容之上，便于点击 */
 }
@@ -378,7 +387,7 @@ html { scrollbar-gutter: stable both-edges; }
   display: flex;
   gap: 6px;
   opacity: 0;                  /* 默认隐藏，hover 时显现 */
-  transition: opacity .2s ease;
+  transition: opacity var(--dur-normal) var(--ease-default);
   pointer-events: none;        /* 默认不挡交互，内部按钮开启 */
 }
 .tokens-log .log-row:hover .log-actions,
@@ -395,7 +404,7 @@ html { scrollbar-gutter: stable both-edges; }
   cursor: pointer;
   font-size: 12px;
   line-height: 1;
-  transition: transform 140ms ease, color 140ms ease, background 140ms ease;
+  transition: transform var(--dur-fast) var(--ease-default), color var(--dur-fast) var(--ease-default), background var(--dur-fast) var(--ease-default);
 }
 .btn-inline-action:hover { transform: scale(1.05); }
 .btn-inline-action:active { transform: scale(0.97); }
@@ -457,10 +466,10 @@ html { scrollbar-gutter: stable both-edges; }
   padding-right: var(--kv-actions-space, 72px);
   box-sizing: border-box;
   /* 使用内阴影模拟描边，避免 outline/边框引起的抖动与抗锯齿闪烁 */
-  box-shadow: inset 0 0 0 0px transparent;
-  transition: box-shadow .2s var(--ease-standard),
-              background-color .2s var(--ease-standard),
-              color .2s var(--ease-standard);
+  box-shadow: var(--shadow-kv-empty);
+  transition: box-shadow var(--dur-normal) var(--ease-standard),
+              background-color var(--dur-normal) var(--ease-standard),
+              color var(--dur-normal) var(--ease-standard);
   cursor: text; /* 暗示可编辑 */
 }
 
@@ -473,7 +482,7 @@ html { scrollbar-gutter: stable both-edges; }
   display: flex;
   gap: 6px;
   opacity: 0;
-  transition: opacity .2s ease;
+  transition: opacity var(--dur-normal) var(--ease-default);
   pointer-events: none; /* 默认不挡交互，内部按钮开启 */
 }
 #tokens-content .kv-row:hover .kv-actions { opacity: 1; }
@@ -487,46 +496,39 @@ html { scrollbar-gutter: stable both-edges; }
 /* 编辑态：柔和背景 + 内阴影边框（无发光） */
 #tokens-content .kv-val.is-editing {
   background-color: var(--panel-header-bg); /* 柔和浅灰蓝 */
-  box-shadow: inset 0 0 0 1px var(--text-subtle);
+  box-shadow: var(--shadow-kv-editing);
   border-radius: 4px;
 }
 
 /* 聚焦时，仅调整边框颜色 */
 #tokens-content .kv-val.is-editing:focus-within {
-  box-shadow: inset 0 0 0 1px var(--text-muted);
+  box-shadow: var(--shadow-kv-editing-focus);
 }
 
 /* 当卡片带有强调色时，编辑态的描边使用强调色的浅变体 */
 #tokens-content .token-card[style*="--token-accent"] .kv-val.is-editing {
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--token-accent) 35%, var(--text-subtle));
+  box-shadow: var(--shadow-kv-editing-accent);
   background: color-mix(in srgb, var(--token-accent) 8%, var(--panel-header-bg));
 }
 
-/* 内联编辑输入框：占满宽度，无发光，轻微过渡 */
+/* 内联编辑输入框：完全透明，与原文字精确重叠，零偏移 */
 #tokens-content .kv-val .inline-edit {
   width: 100%;
   box-sizing: border-box;
   font: inherit;
-  padding: 4px 2px; /* 由父容器提供可视边框与外间距 */
-  border: none;       /* 移除内层边框，避免出现两个框 */
+  padding: 0;            /* 零内距，与原文字对齐 */
+  margin: 0;
+  border: none;
   border-radius: 0;
   background: transparent;
   color: inherit;
-  box-shadow: none; /* 不要发光 */
+  box-shadow: var(--shadow-none);
   outline: none;
-  resize: none;          /* 禁止拖拽改变大小 */
-  overflow: hidden;      /* 由 JS 自适应高度，隐藏滚动条 */
-  white-space: pre-wrap; /* 保留空格并自动换行 */
+  resize: none;
+  overflow: hidden;
+  white-space: pre-wrap;
   word-break: break-word;
-  /* 通用入场过渡（文本/多行编辑器，自下而上） */
-  transform-origin: 50% 100%;
-  transition: transform 260ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)), opacity 220ms ease-out;
-}
-
-/* 入场初始状态（JS 添加 is-enter，再在下一帧移除以触发过渡） */
-#tokens-content .kv-val .inline-edit.is-enter {
-  opacity: 0;
-  transform: translateY(10px);
+  line-height: inherit;
 }
 
 /* 颜色编辑器布局 */
@@ -535,10 +537,8 @@ html { scrollbar-gutter: stable both-edges; }
   align-items: center;
   gap: 8px;
   width: 100%;
-  /* 入场过渡（由 JS 加 is-enter 触发，自下而上） */
-  transform-origin: 50% 100%;
-  transition: transform 260ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)), opacity 220ms ease-out;
 }
+/* color-picker 入场动画：从无到有平滑淡入 */
 #tokens-content .kv-val .inline-edit-color .color-picker {
   width: 28px;
   height: 28px;
@@ -546,29 +546,23 @@ html { scrollbar-gutter: stable both-edges; }
   border: none;
   border-radius: 6px;
   background: transparent;
-  box-shadow: inset 0 0 0 1px var(--picker-border, #CBD5E0);
+  box-shadow: var(--shadow-picker);
   outline: none;
   cursor: pointer;
   flex: 0 0 auto;
   transform-origin: center;
-  transition: transform 160ms var(--ease-standard, cubic-bezier(0.2, 0, 0, 1)), box-shadow 180ms ease;
-}
-
-/* 入场初始状态，由 JS 添加 is-enter 再移除以触发过渡 */
-#tokens-content .kv-val .inline-edit-color.is-enter {
-  opacity: 0;
-  transform: translateY(10px);
+  transition: transform var(--dur-normal) var(--ease-standard), box-shadow var(--dur-normal) var(--ease-default), opacity var(--dur-normal) var(--ease-default);
 }
 
 /* 悬停/聚焦态：轻微缩放与柔和外环 */
 #tokens-content .kv-val .inline-edit-color .color-picker:hover {
   transform: scale(1.03);
-  box-shadow: inset 0 0 0 1px var(--picker-border, #CBD5E0), 0 0 0 2px color-mix(in srgb, var(--token-accent, #3182CE) 36%, transparent);
+  box-shadow: var(--shadow-picker-hover);
 }
 #tokens-content .kv-val .inline-edit-color .color-picker:focus-visible {
   outline: none;
   transform: scale(1.04);
-  box-shadow: inset 0 0 0 1px var(--picker-border, #A0AEC0), 0 0 0 3px color-mix(in srgb, var(--token-accent, #3182CE) 44%, transparent);
+  box-shadow: var(--shadow-picker-focus);
 }
 #tokens-content .kv-val .inline-edit-color .color-picker:active {
   transform: scale(0.98);
@@ -581,18 +575,17 @@ html { scrollbar-gutter: stable both-edges; }
 
 /* 低动态偏好：关闭多余动效 */
 @media (prefers-reduced-motion: reduce) {
-  #tokens-content .kv-val .inline-edit-color,
-  #tokens-content .kv-val .inline-edit-color .color-picker,
-  #tokens-content .kv-val .inline-edit {
+  #tokens-content .kv-val,
+  #tokens-content .kv-val .inline-edit-color .color-picker {
     transition: none;
   }
 }
 
 /* 轻微脉冲动画（色值改变时短暂高亮） */
 @keyframes pickerPulse {
-  0% { box-shadow: inset 0 0 0 1px var(--picker-border, #CBD5E0), 0 0 0 0 color-mix(in srgb, var(--token-accent, #3182CE) 40%, transparent); }
-  50% { box-shadow: inset 0 0 0 1px var(--picker-border, #A0AEC0), 0 0 0 6px color-mix(in srgb, var(--token-accent, #3182CE) 28%, transparent); }
-  100% { box-shadow: inset 0 0 0 1px var(--picker-border, #CBD5E0), 0 0 0 0 color-mix(in srgb, var(--token-accent, #3182CE) 40%, transparent); }
+  0% { box-shadow: var(--shadow-picker-pulse-0); }
+  50% { box-shadow: var(--shadow-picker-pulse-50); }
+  100% { box-shadow: var(--shadow-picker-pulse-100); }
 }
 #tokens-content .kv-val .inline-edit-color .color-picker.is-pulse {
   animation: pickerPulse 320ms ease-out;
@@ -655,7 +648,7 @@ html { scrollbar-gutter: stable both-edges; }
   height: 0;
   display: none; /* 初始由 JS 控制为 block，再测量 */
   opacity: 0;
-  transition: height .42s var(--ease-standard), opacity .28s var(--ease-standard);
+  transition: height var(--dur-slow) var(--ease-standard), opacity var(--dur-normal) var(--ease-standard);
   will-change: height, opacity;
 }
 .collapsible.is-open {
@@ -669,11 +662,11 @@ html { scrollbar-gutter: stable both-edges; }
 }
 .collapsible.is-opening {
   opacity: 1;
-  transition: height .42s var(--ease-decel), opacity .28s var(--ease-decel);
+  transition: height var(--dur-slow) var(--ease-decel), opacity var(--dur-normal) var(--ease-decel);
 }
 .collapsible.is-closing {
   opacity: 0;
-  transition: height .36s var(--ease-accel), opacity .24s var(--ease-accel);
+  transition: height var(--dur-slow) var(--ease-accel), opacity var(--dur-normal) var(--ease-accel);
 }
 
 @keyframes token-card-in {
@@ -683,7 +676,7 @@ html { scrollbar-gutter: stable both-edges; }
 
 #tokens-content .token-card:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-card-1);
 }
 
 /* 减少动画以避免闪烁（系统偏好） */
@@ -714,7 +707,7 @@ html { scrollbar-gutter: stable both-edges; }
   color: var(--toast-ok-text); /* 深绿字 */
   padding: 8px 12px;
   border-radius: 6px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-card-2);
   font-size: 14px;
   line-height: 1.2;
   display: inline-flex;

@@ -1,5 +1,5 @@
 /* 全局变量和基础样式 */
-:root { --animation-duration: 0.6s; --animation-easing: cubic-bezier(0.4, 0, 0.2, 1); }
+:root { --animation-duration: var(--dur-slower); --animation-easing: var(--ease-standard); }
 * { user-select: none; }
 body { overflow-x: hidden; margin: 0; font-size: .9rem; }
 .hidden { display: none; }
@@ -10,6 +10,7 @@ body { overflow-x: hidden; margin: 0; font-size: .9rem; }
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     -webkit-touch-callout: none;
     -webkit-user-select: none;
+    user-select: none;
 }
 .ripple-button:focus { outline: none; }
 .ripple-button::-moz-focus-inner { border: 0; }
@@ -51,7 +52,7 @@ pronounName {
     white-space: nowrap;
     text-align: center;
     opacity: 0;
-    transition: left 1s ease, opacity 1s ease;
+    transition: left var(--dur-slowest) var(--ease-default), opacity var(--dur-slowest) var(--ease-default);
     pointer-events: none;
 }
 .role_title {
@@ -79,7 +80,7 @@ pronounName {
     position: relative;
     transform: translateX(0);
     /* 仅对 transform/box-shadow/背景边线启用过渡，避免主题变量变动造成全局动画 */
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-left-color 0.2s ease, box-shadow 0.2s ease;
+    transition: transform var(--dur-slow) var(--ease-standard), background-color var(--dur-normal) var(--ease-default), border-left-color var(--dur-normal) var(--ease-default), box-shadow var(--dur-normal) var(--ease-default);
     border-left: 3px solid transparent;
     padding-left: 0;
     /* 降低 will-change 范围，避免持续的合成层开销 */
@@ -115,7 +116,7 @@ h1, h2, h3 {
     font-weight: 900;
     margin-bottom: 0.5rem;
     letter-spacing: 0;
-    transition: letter-spacing 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: letter-spacing var(--dur-slower) var(--ease-standard);
 }
 
 h1 { font-size: 1.5rem; }
@@ -140,7 +141,7 @@ h3 { font-size: 1.0rem; }
 
 .animations-disabled .main {
     transform: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-soft-2);
 }
 
 .animate-in, .visible { will-change: transform, opacity; }
