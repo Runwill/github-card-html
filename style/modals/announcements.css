@@ -4,9 +4,8 @@
   padding: 4px; 
   display: block; 
   max-height: 65vh; 
-  overflow-y: auto; 
-  scrollbar-width: thin;
-  scrollbar-color: var(--text-subtle, #a0aec0) transparent;
+  overflow-y: auto;
+  /* scrollbar → see modals/base.css shared thin scrollbar */
 }
 
 /* Empty and loading states */

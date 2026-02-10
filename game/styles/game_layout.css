@@ -97,17 +97,7 @@
     gap: 15px;
 }
 
-/* Custom Scrollbar for Webkit */
-.game-log-panel::-webkit-scrollbar {
-    width: 6px;
-}
-.game-log-panel::-webkit-scrollbar-track {
-    background: transparent;
-}
-.game-log-panel::-webkit-scrollbar-thumb {
-    background-color: var(--border);
-    border-radius: 3px;
-}
+/* .game-log-panel scrollbar → see modals/base.css shared thin scrollbar */
 
 .game-action-panel {
     display: flex;
