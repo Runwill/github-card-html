@@ -39,7 +39,7 @@ padding padding padding { animation-delay: 0.12s; }
 
 html { scroll-behavior: smooth; }
 
-::selection { background: rgba(45, 55, 72, 0.2); color: #2d3748; }
+::selection { background: color-mix(in srgb, var(--text) 20%, transparent); color: var(--text); }
 /* 滚动高亮闪条 */
 .highlight-on-scroll {
     background: linear-gradient(120deg, transparent 0%, rgba(255, 215, 0, 0.3) 50%, transparent 100%);

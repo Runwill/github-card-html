@@ -35,6 +35,11 @@
 
   --danger:        #f56565;
   --danger-hover:  #e53e3e;
+  --danger-soft-bg:    #FED7D7;
+  --danger-soft-text:  #742A2A;
+  --danger-soft-border:#FEB2B2;
+  --danger-soft-hover-bg: #FEB2B2;
+  --danger-soft-hover-text: #63171B;
 
   /* 组件专用（tokens、toast 等） */
   --token-odd-bg:  #F7FAFC;
@@ -82,6 +87,11 @@ html[data-theme="dark"] {
 
   --danger:        #ef4444; /* red-500 */
   --danger-hover:  #dc2626; /* red-600 */
+  --danger-soft-bg:    rgba(239,68,68,0.15);
+  --danger-soft-text:  #fca5a5;
+  --danger-soft-border:rgba(239,68,68,0.35);
+  --danger-soft-hover-bg: rgba(239,68,68,0.25);
+  --danger-soft-hover-text: #fecaca;
 
   --token-odd-bg:  rgba(148,163,184,0.08); /* 淡石板 */
   --token-even-bg: rgba(148,163,184,0.04);

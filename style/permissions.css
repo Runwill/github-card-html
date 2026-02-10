@@ -52,10 +52,10 @@
 
 /* ===== 权限页内联编辑器（权限清单/修改密码通用容器） ===== */
 .perm-editor {
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px 12px;
-  background: #fff;
+  background: var(--surface);
   /* 打开时上下各留出 8px 间距，避免紧贴上下用户条目 */
   margin: 8px 0;
   /* 过渡动画：展开/收起（与 collapsible.css 行为一致） */
@@ -101,14 +101,14 @@
 .perm-editor--plain input[type="text"]:focus,
 .perm-editor--plain input[type="password"]:focus {
   box-shadow: none !important;
-  border-color: #cbd5e0 !important; /* 只用边框颜色提示焦点 */
+  border-color: var(--text-subtle) !important; /* 只用边框颜色提示焦点 */
 }
 /* 保证每一项容器本身不引入边框/背景 */
 .perm-editor--plain .perm-editor__item { border: none !important; background: transparent !important; }
 .perm-editor__toolbar { display: flex; gap: 8px; margin-bottom: 8px; }
 .perm-editor__list { display: grid; grid-template-columns: 1fr; gap: 8px; max-width: 420px; }
 .perm-editor__item { display: flex; align-items: center; gap: 8px; }
-.perm-editor__item-text { font-size: 14px; color: #2D3748; }
+.perm-editor__item-text { font-size: 14px; color: var(--text); }
 .perm-editor__actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
 
 /* 覆盖 tokens-input 在工具条中的“拼接样式”，在编辑器中应为独立输入框 */
@@ -120,7 +120,7 @@
   height: 32px !important;
   font-size: 14px !important;
   padding: 6px 10px !important;
-  border: 1px solid #e2e8f0 !important;   /* 恢复右边框 */
+  border: 1px solid var(--border) !important;   /* 恢复右边框 */
   border-radius: 6px !important;           /* 独立圆角 */
   outline: none;
   width: 100%;
@@ -131,8 +131,8 @@
 .perm-editor input[type="password"]:focus,
 .perm-editor input[type="date"]:focus,
 .perm-editor select:focus {
-  border-color: #cbd5e0 !important;
-  box-shadow: 0 0 0 3px rgba(66,153,225,0.15) !important; /* 与搜索框一致的柔和焦点环 */
+  border-color: var(--text-subtle) !important;
+  box-shadow: 0 0 0 3px var(--primary-ring) !important; /* 与搜索框一致的柔和焦点环 */
 }
 
 /* 小屏宽度占满 */

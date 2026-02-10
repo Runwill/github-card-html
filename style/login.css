@@ -3,20 +3,14 @@ body {
     min-height: 100vh;
     margin: 0;
     font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
-    background: linear-gradient(135deg, #edf2f7 0%, #f7fafc 100%);
+    background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
 }
 
+/* .panel 样式已统一定义在 modals/base.css 与 theme.css 中，此处仅保留登录页动画 */
 .panel {
     position: fixed;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%) scale(0.95);
-    padding: 22px 20px;
-    border: 1px solid rgba(226,232,240,0.8);
-    background: rgba(255,255,255,0.95);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.08);
     z-index: 8000;
     opacity: 0;
     visibility: hidden;
@@ -35,7 +29,7 @@ body {
 .modal-header h2 {
     margin: 0;
     font-size: 18px;
-    color: #2d3748;
+    color: var(--text);
     font-weight: 600;
 }
 .modal-form {
@@ -46,7 +40,7 @@ body {
 .modal-form input {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
     border-radius: 6px;
     background: rgba(255,255,255,0.9);
     outline: none;
@@ -54,15 +48,15 @@ body {
     font-size: 15px;
 }
 .modal-form input:focus {
-    border-color: #a0aec0;
-    box-shadow: 0 0 0 3px rgba(66,153,225,0.2);
-    background: #fff;
+    border-color: var(--text-subtle);
+    box-shadow: 0 0 0 3px var(--primary-ring);
+    background: var(--surface);
 }
 .modal-form button { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
 
-.modal-message { margin-top: 6px; min-height: 20px; font-size: 14px; text-align: center; color: #4a5568; }
-.modal-message.success { color: #38a169; }
-.modal-message.error { color: #e53e3e; }
+.modal-message { margin-top: 6px; min-height: 20px; font-size: 14px; text-align: center; color: var(--text-muted); }
+.modal-message.success { color: var(--success); }
+.modal-message.error { color: var(--danger); }
 
 @keyframes shake {
     10%, 90% { transform: translate(-50%, -50%) translateX(-1px); }
