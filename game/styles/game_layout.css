@@ -97,7 +97,7 @@
     gap: 15px;
 }
 
-/* .game-log-panel scrollbar → see modals/base.css shared thin scrollbar */
+/* .game-log-panel scrollbar-thin via HTML class */
 
 .game-action-panel {
     display: flex;

@@ -5,7 +5,7 @@
   display: block; 
   max-height: 65vh; 
   overflow-y: auto;
-  /* scrollbar → see modals/base.css shared thin scrollbar */
+  /* scrollbar-thin via HTML class */
 }
 
 /* Empty and loading states */

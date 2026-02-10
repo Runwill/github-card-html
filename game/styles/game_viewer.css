@@ -97,9 +97,8 @@
     /* ADDED: Minimum width ensures drop target exists */
     min-width: 350px; 
     
-    overflow-x: auto; 
-    scrollbar-width: none; 
-    -ms-overflow-style: none;
+    overflow-x: auto;
+    /* scrollbar-hidden via HTML class */
     
     /* Ensure flex items are vertically centered if height > cards */
     /* align-items: center; <--- REMOVED this, reverting alignment logic to default stretch or start */
@@ -165,11 +164,6 @@ body.is-global-dragging .card-grid {
 .card-viewer-modal.modal.closing .modal-content {
     /* Very fast exit */
     animation: cardViewerOut 0.09s ease-in forwards; 
-}
-
-/* Chrome/Webkit Hide Scrollbar */
-.card-grid::-webkit-scrollbar {
-    display: none;
 }
 
 /* 

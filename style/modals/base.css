@@ -38,19 +38,23 @@
     opacity 0.2s ease-out, 
     transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* Spring-like animation */
   pointer-events: none;
-  /* Scrollbar styling */
+  /* Scrollbar styling (Firefox) */
   scrollbar-width: thin;
   scrollbar-color: var(--text-subtle, #a0aec0) transparent;
 }
-/* Shared thin scrollbar (Firefox) — .modal already declares inline above */
-.ann-content, .game-log-panel {
+/* ── Scrollbar utility: thin ── */
+.scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: var(--text-subtle, #a0aec0) transparent;
 }
-/* Shared thin scrollbar (WebKit) */
-.modal::-webkit-scrollbar, .ann-content::-webkit-scrollbar, .game-log-panel::-webkit-scrollbar { width: 6px; }
-.modal::-webkit-scrollbar-track, .ann-content::-webkit-scrollbar-track, .game-log-panel::-webkit-scrollbar-track { background: transparent; }
-.modal::-webkit-scrollbar-thumb, .ann-content::-webkit-scrollbar-thumb, .game-log-panel::-webkit-scrollbar-thumb { background-color: var(--border, #e2e8f0); border-radius: 3px; }
+.modal::-webkit-scrollbar, .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+.modal::-webkit-scrollbar-track, .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+.modal::-webkit-scrollbar-thumb, .scrollbar-thin::-webkit-scrollbar-thumb { background-color: var(--border, #e2e8f0); border-radius: 3px; }
+/* ── Scrollbar utility: hidden ── */
+.scrollbar-hidden {
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.scrollbar-hidden::-webkit-scrollbar { display: none; }
 
 .modal.show {
   opacity: 1; display: block; pointer-events: auto;
@@ -386,9 +390,7 @@ html[data-theme="dark"] .badge.badge-permission {
   overflow: auto;
   position: sticky; top: 0;
   box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-  scrollbar-width: none; -ms-overflow-style: none;
 }
-.tokens-hints::-webkit-scrollbar { width: 0; height: 0; }
 .tokens-hints, .tokens-hints * { animation: none !important; }
 .tokens-hints .hints-title { margin-bottom: 8px; font-weight: 600; }
 .tokens-hints .hints-list { display: grid; grid-template-columns: 1fr; gap: 6px; }

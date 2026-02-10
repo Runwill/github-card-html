@@ -194,7 +194,7 @@
             // Layout: Standard Grid (Hand, Pile, Judge)
             // Note: Escape sourceId just in case, but usually safe for ID attribute if simple chars
             // We use simple string interpolation here.
-            bodyContent = `<div id="card-viewer-grid-${sourceId}" class="card-grid" data-drop-zone="${sourceId}"></div>`;
+            bodyContent = `<div id="card-viewer-grid-${sourceId}" class="card-grid scrollbar-hidden" data-drop-zone="${sourceId}"></div>`;
         }
 
         // Modal Content
