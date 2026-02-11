@@ -1,11 +1,11 @@
 /* Context Menu Styles */
 .custom-context-menu {
     position: fixed;
-    z-index: 20000;
+    z-index: var(--z-ctx-menu);
     background: var(--card-bg, #fff);
     border: 1px solid var(--border-color, #ccc);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
+    border-radius: var(--radius-sm) ;
     padding: 4px 0;
     min-width: 180px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

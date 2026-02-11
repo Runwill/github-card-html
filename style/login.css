@@ -35,8 +35,8 @@ body {
 .shake { animation: shake 0.5s; }
 
 #login-container { width: 360px; max-width: 92vw; margin: 0; }
-#login-container .modal-form input { margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: 3px; }
-#login-container .btn { width: 100%; padding: 10px; border-radius: 3px; border: none; }
+#login-container .modal-form input { margin-bottom: 10px; padding: 8px; border: 1px solid #ccc; border-radius: var(--radius-xs); }
+#login-container .btn { width: 100%; padding: 10px; border-radius: var(--radius-xs); border: none; }
 #login-message:not(:empty) { margin-top: 10px; }
 
 @media (max-width: 480px) {
@@ -48,5 +48,5 @@ body {
     position: fixed;
     top: 10px;
     right: 10px;
-    z-index: 1000;
+    z-index: var(--z-sticky);
 }

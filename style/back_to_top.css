@@ -4,13 +4,13 @@
   right: 16px;
   /* 避让固定页脚，预留空间；同时考虑移动端安全区域 */
   bottom: calc(64px + env(safe-area-inset-bottom, 0px));
-  z-index: 6000; /* 高于 .site-footer 的 5000 */
+  z-index: var(--z-fab);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 9999px;
+  border-radius: var(--radius-pill);
   border: 1px solid rgba(0,0,0,0.08);
   background: rgba(255,255,255,0.9);
   box-shadow: 0 6px 20px rgba(0,0,0,0.12);

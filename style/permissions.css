@@ -23,7 +23,7 @@
   vertical-align: middle;
   margin-top: 0;
   margin-bottom: 0;
-  border-radius: 0 !important;   /* 强制直角，避免被全局按钮样式覆盖 */
+  border-radius: var(--radius-none) !important;   /* 强制直角，避免被全局按钮样式覆盖 */
 }
 
 /* 统一控件高度，保证筛选/重置按钮与筛选条件控件等高 */
@@ -53,7 +53,7 @@
 /* ===== 权限页内联编辑器（权限清单/修改密码通用容器） ===== */
 .perm-editor {
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   padding: 10px 12px;
   background: var(--surface);
   /* 打开时上下各留出 8px 间距，避免紧贴上下用户条目 */
@@ -121,7 +121,7 @@
   font-size: 14px !important;
   padding: 6px 10px !important;
   border: 1px solid var(--border) !important;   /* 恢复右边框 */
-  border-radius: 6px !important;           /* 独立圆角 */
+  border-radius: var(--radius-sm) !important;           /* 独立圆角 */
   outline: none;
   width: 100%;
   box-sizing: border-box;
@@ -173,7 +173,7 @@
   color: #1E3A8A;                      /* 蓝色文本（与 is-blue 语义接近） */
   background: rgba(191, 219, 254, 0.28); /* 浅蓝底 */
   border: 1px dashed #93C5FD;           /* 虚线边框暗示“占位符” */
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   padding: 0 3px;
 }
 

@@ -1,7 +1,7 @@
 /* 加载动画样式 */
 #loading-overlay {
     position: fixed;
-    z-index: 999999;
+    z-index: var(--z-loading);
     top: 0; left: 0; right: 0; bottom: 0;
     /* 主题自适应：轻薄蒙层，沿用 surface 体系 */
     background: linear-gradient(135deg, var(--bg-start) 0%, var(--bg-end) 100%);
@@ -42,7 +42,7 @@
     height: 8px;
     background: color-mix(in srgb, var(--surface) 86%, transparent);
     border: 1px solid var(--border);
-    border-radius: 6px;
+    border-radius: var(--radius-sm) ;
     box-shadow: 0 6px 16px var(--shadow-1);
     overflow: hidden;
     opacity: 0;
@@ -62,7 +62,7 @@
         color-mix(in srgb, var(--primary-1) 95%, var(--surface)) 96%,
         color-mix(in srgb, var(--primary-2) 88%, var(--surface)) 100%
     );
-    border-radius: 6px;
+    border-radius: var(--radius-sm) ;
     transform-origin: left center;
     transform: translateZ(0) scaleX(var(--pb-start, 0));
     animation: loading-progress var(--pb-duration) cubic-bezier(.33,.01,.18,1) var(--pb-delay) forwards;

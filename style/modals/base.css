@@ -6,7 +6,7 @@
   top: 0; left: 0;
   width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.4); /* Slightly darker for better contrast */
-  z-index: 9999;
+  z-index: var(--z-overlay);
   display: none;
   opacity: 0;
   transition: opacity var(--dur-moderate) var(--ease-standard);
@@ -25,11 +25,11 @@
   background: var(--surface, #fff);
   padding: 24px;
   border: 1px solid var(--border, #e2e8f0);
-  border-radius: 16px; /* More rounded corners */
+  border-radius: var(--radius-xl); /* More rounded corners */
   box-shadow: 
     var(--shadow-elev-2),
     0 0 0 1px rgba(0, 0, 0, 0.05); /* Subtle border ring */
-  z-index: 10000;
+  z-index: var(--z-modal);
   max-width: 90vw; max-height: 85vh;
   overflow-y: auto;
   display: none; opacity: 0;
@@ -48,7 +48,7 @@
 }
 .modal::-webkit-scrollbar, .scrollbar-thin::-webkit-scrollbar { width: 6px; }
 .modal::-webkit-scrollbar-track, .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-.modal::-webkit-scrollbar-thumb, .scrollbar-thin::-webkit-scrollbar-thumb { background-color: var(--border, #e2e8f0); border-radius: 3px; }
+.modal::-webkit-scrollbar-thumb, .scrollbar-thin::-webkit-scrollbar-thumb { background-color: var(--border, #e2e8f0); border-radius: var(--radius-xs); }
 /* ── Scrollbar utility: hidden ── */
 .scrollbar-hidden {
   scrollbar-width: none; -ms-overflow-style: none;
@@ -86,7 +86,7 @@
   width: 100%; 
   padding: 12px 16px; 
   border: 1px solid var(--border, #e2e8f0); 
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   box-sizing: border-box; 
   font-size: 15px; 
   line-height: 1.5;
@@ -106,7 +106,7 @@
   background: var(--primary-2, #7084ff);
   color: #fff; 
   border: none; 
-  border-radius: 10px; 
+  border-radius: var(--radius-lg); 
   cursor: pointer; 
   font-size: 15px; 
   font-weight: 600;
@@ -134,7 +134,7 @@
   /* Initial state: collapsed */
   margin-top: 0; 
   padding: 0 16px; 
-  border-radius: 8px; 
+  border-radius: var(--radius-md); 
   text-align: center; 
   font-size: 14px; 
   font-weight: 500; 
@@ -243,7 +243,7 @@
   background: var(--surface-soft, rgba(255,255,255,0.95));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  z-index: 8000;
+  z-index: var(--z-panel);
   opacity: 0; visibility: hidden; pointer-events: none;
 }
 .panel.show {
@@ -254,7 +254,7 @@
 /* 菜单面板（侧边栏 / 账号 / 设置） */
 .panel--menu {
   padding: 16px;
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-elev-3);
   transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-smooth), visibility var(--dur-instant) linear var(--dur-normal);
   min-width: 240px;
@@ -266,7 +266,7 @@
 /* 页面面板（登录页） */
 .panel--page {
   padding: 22px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg) ;
   box-shadow: var(--shadow-soft);
   transition: opacity var(--dur-moderate) var(--ease-default), transform var(--dur-moderate) var(--ease-default), visibility var(--dur-instant) linear var(--dur-moderate);
 }
@@ -280,7 +280,7 @@
     width: calc(100vw - 32px); 
     max-height: calc(100vh - 40px); 
     padding: 20px; 
-    border-radius: 20px; /* Even rounder on mobile */
+    border-radius: var(--radius-2xl); /* Even rounder on mobile */
   }
   .modal-header h2 { font-size: 1.25rem; }
 }
@@ -295,7 +295,7 @@
 .badge { 
   display: inline-block; 
   padding: 2px 8px; 
-  border-radius: 6px; 
+  border-radius: var(--radius-sm) ; 
   font-size: 11px; 
   font-weight: 600; 
   border: 1px solid var(--border, #e2e8f0); 
@@ -371,7 +371,7 @@ html[data-theme="dark"] .badge.badge-permission {
 .tokens-modal.modal {
   max-width: 900px; width: 96%; max-height: 86vh;
   --tokens-pane-h: 48vh;
-  border-radius: 16px;
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-elev-4);
 }
 .tokens-modal .modal-header { margin: 0; margin-bottom: 16px; }
@@ -383,7 +383,7 @@ html[data-theme="dark"] .badge.badge-permission {
   color: var(--text-muted) !important;
   background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 12px;
+  border-radius: var(--radius-lg) ;
   padding: 12px;
   height: var(--tokens-pane-h); min-height: var(--tokens-pane-h); max-height: var(--tokens-pane-h);
   overflow: auto;
@@ -393,7 +393,7 @@ html[data-theme="dark"] .badge.badge-permission {
 .tokens-hints, .tokens-hints * { animation: none !important; }
 .tokens-hints .hints-title { margin-bottom: 8px; font-weight: 600; }
 .tokens-hints .hints-list { display: grid; grid-template-columns: 1fr; gap: 6px; }
-.tokens-hints .hint-row { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 8px; padding: 8px 10px; border-radius: 8px; transition: background var(--dur-normal) var(--ease-default); }
+.tokens-hints .hint-row { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 8px; padding: 8px 10px; border-radius: var(--radius-md); transition: background var(--dur-normal) var(--ease-default); }
 .tokens-hints .hint-row:hover { background: color-mix(in srgb, var(--border) 40%, transparent) !important; }
 .tokens-hints .hint-name { color: var(--text) !important; overflow-wrap: anywhere; font-weight: 500; }
 .tokens-hints .hint-type { color: var(--text-subtle) !important; white-space: nowrap; font-size: 11px; }
@@ -402,7 +402,7 @@ html[data-theme="dark"] .badge.badge-permission {
 .tokens-editor {
   width: 100% !important;
   height: var(--tokens-pane-h) !important; min-height: var(--tokens-pane-h) !important; max-height: var(--tokens-pane-h) !important;
-  border: 1px solid var(--border) !important; border-radius: 12px !important;
+  border: 1px solid var(--border) !important; border-radius: var(--radius-lg) !important;
   padding: 16px !important;
   background: var(--surface) !important; color: var(--text) !important;
   font-family: var(--font-mono) !important;

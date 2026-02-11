@@ -48,7 +48,7 @@
 .game-board-panel {
     background: transparent;
     border: none;
-    border-radius: 0;
+    border-radius: var(--radius-none) ;
     padding: 0;
     box-shadow: none;
     margin-bottom: 20px; 
@@ -81,7 +81,7 @@
     box-sizing: border-box;
     padding: 15px;
     background-color: rgba(128, 128, 128, 0.05);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     border: 2px dashed var(--border);
     transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     transform-origin: center center;
@@ -208,7 +208,7 @@ body.is-global-dragging .deck-slot {
     width: 60px;
     height: 80px;
     border: 2px dashed var(--border);
-    border-radius: 6px;
+    border-radius: var(--radius-sm) ;
     display: flex;
     align-items: center;
     justify-content: center;

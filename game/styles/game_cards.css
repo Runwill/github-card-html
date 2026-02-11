@@ -11,7 +11,7 @@
     flex: 0 0 100px; 
     background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -149,8 +149,8 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     background: var(--surface);
     border: 2px solid var(--primary-1);
     box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    z-index: 10000;
-    border-radius: 8px;
+    z-index: var(--z-modal);
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -168,7 +168,7 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     pointer-events: none;
     cursor: grabbing;
     will-change: transform, left, top, box-shadow;
-    z-index: 10000;
+    z-index: var(--z-modal);
     
     /* Smooth Lift Animation */
     transition: box-shadow 0.25s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.2s;
@@ -228,7 +228,7 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     height: 140px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     display: flex;
     align-items: center;
@@ -264,11 +264,11 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     right: 10px;
     height: 4px;
     background: rgba(0,0,0,0.2);
-    border-radius: 2px;
+    border-radius: var(--radius-xs);
 }
 .inspector-progress-bar {
     height: 100%;
     background: var(--primary);
-    border-radius: 2px;
+    border-radius: var(--radius-xs);
     width: 0%;
 }

@@ -41,7 +41,7 @@
     
     /* Shape & Box */
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg) ;
     margin-right: 6px; /* Changed from margin-left to margin-right */
     margin-left: 0;
     min-width: 24px;
@@ -67,7 +67,7 @@
     color: #FFD700;
     background: rgba(0,0,0,0.5);
     padding: 0 4px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     margin-right: 4px;
 }
 
@@ -101,7 +101,7 @@
     min-width: 18px; /* Slightly tighter than hand count */
     height: 18px;
     padding: 0 4px; 
-    border-radius: 9px; /* Pill shape */
+    border-radius: var(--radius-lg); /* Pill shape */
 
     /* Typography */
     font-family: system-ui, -apple-system, sans-serif;

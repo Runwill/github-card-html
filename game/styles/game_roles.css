@@ -9,7 +9,7 @@
 .role-list-panel {
     flex: 1;
     background: var(--surface);
-    border-radius: 12px;
+    border-radius: var(--radius-lg) ;
     padding: 20px;
     box-shadow: 0 4px 12px var(--shadow-1);
     border: 1px solid var(--border);
@@ -35,7 +35,7 @@
 
 .role-summary {
     padding: 12px 15px;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     background-color: var(--surface);
     border: 1px solid var(--border);
     cursor: pointer;
@@ -70,7 +70,7 @@
     color: var(--danger);
     background: rgba(245, 101, 101, 0.1);
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: var(--radius-lg);
 }
 
 /* Table Layout (Opponents) */
@@ -105,7 +105,7 @@
     flex: 3;
     min-width: 0;
     background: var(--surface);
-    border-radius: 12px;
+    border-radius: var(--radius-lg) ;
     padding: 25px;
     box-shadow: 0 4px 12px var(--shadow-1);
     border: 1px solid var(--border);
@@ -145,7 +145,7 @@
     width: 100px;
     height: 100px;
     flex-shrink: 0;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     box-shadow: 0 2px 4px var(--shadow-2);
 }
 
@@ -153,7 +153,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
 }
 
 html[data-theme="dark"] .char-avatar img.position-avatar {
@@ -188,7 +188,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     color: var(--danger, #f56565);
     border: 1px solid rgba(245, 101, 101, 0.3);
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: var(--radius-lg) ;
     min-width: 32px;
     height: fit-content;
     font-weight: 700;
@@ -243,7 +243,7 @@ body.is-global-dragging #hand-cards-container {
     color: var(--text);
     padding: 6px 16px;
     background: var(--bg-panel);
-    border-radius: 20px;
+    border-radius: var(--radius-2xl);
     border: 1px solid transparent;
     transition: all 0.3s ease;
     display: flex;
@@ -282,7 +282,7 @@ body.is-global-dragging #hand-cards-container {
     --btn-accent-rgb: 113, 128, 150;
     background: rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(var(--btn-accent-rgb), 0.3);
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     width: 24px;
     height: 24px;
     display: flex;

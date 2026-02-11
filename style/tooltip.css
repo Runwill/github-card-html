@@ -1,7 +1,7 @@
 /* Tooltip 重构样式 - 现代极简风格 */
 #lore-tooltip {
     position: absolute;
-    z-index: 10000;
+    z-index: var(--z-modal);
     display: block;
     
     /* 初始状态：隐形、稍微向下偏移、缩小 */
@@ -20,7 +20,7 @@
     background: var(--surface-soft, rgba(255, 255, 255, 0.9));
     color: var(--text, #2d3748);
     border: 1px solid var(--border, rgba(226, 232, 240, 0.8));
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     
     /* 阴影：提升层级感 */
     box-shadow: 

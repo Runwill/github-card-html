@@ -101,6 +101,33 @@
   --ease-accel: cubic-bezier(.4, 0, 1, 1);
   --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 
+  /* 圆角半径 */
+  --radius-none: 0;
+  --radius-xs:   4px;   /* 标签、code、小按钮 */
+  --radius-sm:   6px;   /* 卡片内元素、输入框 */
+  --radius-md:   8px;   /* 通用按钮、面板内区块 */
+  --radius-lg:  12px;   /* 面板、弹窗内区域 */
+  --radius-xl:  16px;   /* 弹窗、菜单面板 */
+  --radius-2xl: 20px;   /* 移动端弹窗 */
+  --radius-pill: 999px; /* 药丸标签 */
+  --radius-full: 50%;   /* 头像、圆形控件 */
+
+  /* z-index 层级表 */
+  --z-base:       0;     /* 水印、背景装饰 */
+  --z-content:    1;     /* 卡片内容微层 */
+  --z-raised:     2;     /* 容器、浮起元素 */
+  --z-highlight:  3;     /* 行高亮条 */
+  --z-header:     4;     /* 顶部导航栏 */
+  --z-sticky:   100;     /* 搜索栏 sticky */
+  --z-footer:  5000;     /* 固定页脚 */
+  --z-fab:     6000;     /* 回到顶部等浮动按钮 */
+  --z-panel:   8000;     /* 面板 */
+  --z-overlay: 9999;     /* 遮罩 */
+  --z-modal:  10000;     /* 弹窗 / 侧边栏 / tooltip */
+  --z-toast:  11000;     /* Toast 通知 */
+  --z-ctx-menu:20000;    /* 右键菜单（game 内，高于 modal） */
+  --z-loading:999999;    /* 加载遮罩（最高层） */
+
   /* Active State Text Color (Light Mode) */
   --text-active: var(--primary-3);
 }
@@ -356,7 +383,7 @@ html.theme-switching *::after {
   background-color: var(--surface) !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 6px !important;
+  border-radius: var(--radius-sm) !important;
 }
 #panel_character #search-input::placeholder,
 #panel_skill #search-input::placeholder { color: var(--text-subtle) !important; }
@@ -379,7 +406,7 @@ html.theme-switching *::after {
   background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
   color: var(--text) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 #panel_draft #htmlInput::placeholder { color: var(--text-subtle) !important; }
 #panel_draft #htmlInput:focus {
@@ -429,10 +456,10 @@ html.theme-switching *::after {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 12px; margin-bottom: 10px;
   border: 1px solid var(--border) !important;
-  border-radius: 6px; background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
+  border-radius: var(--radius-sm); background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
 }
 .approval-left { display: flex; align-items: center; gap: 10px; }
-.approval-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border) !important; background: var(--surface) !important; }
+.approval-img { width: 48px; height: 48px; border-radius: var(--radius-full); object-fit: cover; border: 1px solid var(--border) !important; background: var(--surface) !important; }
 .approval-title { font-weight: 600; color: var(--text) !important; }
 .approval-sub { font-size: 12px; color: var(--text-subtle) !important; }
 .approval-right { display: flex; gap: 8px; }
@@ -469,7 +496,7 @@ html[data-theme="dark"] .badge.badge-permission {
 }
 #panel_permissions .perm-tag {
   display: inline-flex; align-items: center;
-  padding: 2px 8px; border-radius: 999px;
+  padding: 2px 8px; border-radius: var(--radius-pill);
   font-size: 12px; line-height: 1;
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   border: 1px solid var(--border);
@@ -485,7 +512,7 @@ html[data-theme="dark"] .badge.badge-permission {
   margin-top: 8px;
   padding: 12px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--surface) 96%, transparent);
   box-shadow: var(--shadow-perm-editor);
 }
@@ -499,7 +526,7 @@ html[data-theme="dark"] .badge.badge-permission {
   max-height: 220px; overflow: auto; padding-right: 4px;
 }
 #panel_permissions .perm-editor__item {
-  padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px;
+  padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
 }
 #panel_permissions .perm-editor__item input { margin: 0; }

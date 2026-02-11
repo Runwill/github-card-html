@@ -14,7 +14,7 @@
     color: inherit; 
     position: relative;
     padding: 0 1px;
-    border-radius: 3px;
+    border-radius: var(--radius-xs);
     display: inline-block;
 }
 
@@ -84,7 +84,7 @@
 .game-panel {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     padding: 15px;
     box-shadow: var(--shadow-elev-0);
     transition: background-color var(--dur-moderate) var(--ease-default);

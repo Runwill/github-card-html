@@ -6,7 +6,7 @@
     left: 0;
     right: 0;
     top: 0;
-    z-index: 4;
+    z-index: var(--z-header);
     white-space: nowrap;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(8px) saturate(1.1);
@@ -68,7 +68,7 @@
     transition-duration: 0.05s;
 }
 
-#sidebar { background: #fff; padding: 0; z-index: 11; }
+#sidebar { background: #fff; padding: 0; z-index: calc(var(--z-header) + 7); }
 
 #header-avatar {
     position: absolute;
@@ -76,7 +76,7 @@
     right: 12px;
     width: 36px;
     height: 36px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     object-fit: cover;
     border: 1px solid #e2e8f0;
     background: #fff;
@@ -84,7 +84,7 @@
     cursor: pointer;
     display: none;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    z-index: 8010;
+    z-index: calc(var(--z-panel) + 10);
 }
 
 #header-avatar:hover {
@@ -96,7 +96,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    border-radius: 6px;
+    border-radius: var(--radius-sm) ;
     transition: all 0.2s ease;
     color: var(--text, #4a5568);
     font-weight: 500;

@@ -12,7 +12,7 @@
 
 .account-info__avatar { 
   width: 72px; height: 72px; 
-  border-radius: 50%; 
+  border-radius: var(--radius-full); 
   object-fit: cover; 
   border: 2px solid var(--surface, #fff); 
   background: var(--surface, #fff); 
@@ -58,7 +58,7 @@
   border: none; outline: none; background: transparent; padding: 0; margin: 0;
   display: inline-block; vertical-align: baseline;
   width: auto; min-width: 2ch;
-  box-sizing: content-box; appearance: none; -webkit-appearance: none; border-radius: 0; min-height: 0;
+  box-sizing: content-box; appearance: none; -webkit-appearance: none; border-radius: var(--radius-none) ; min-height: 0;
   border-bottom: 2px solid var(--primary-1, #8698ff);
 }
 
@@ -66,7 +66,7 @@
 .account-info__role .badge { 
   font-size: 11px; 
   padding: 2px 8px; 
-  border-radius: 6px; 
+  border-radius: var(--radius-sm) ; 
   text-transform: uppercase; 
   letter-spacing: 0.05em;
 }
@@ -93,7 +93,7 @@
   vertical-align: baseline;
   background: var(--bg-start, #f7fafc);
   padding: 2px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
 }
 
 #account-info-username-cancel-inline,
@@ -107,7 +107,7 @@
   font-weight: 600 !important;
   cursor: pointer;
   vertical-align: baseline;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   transition: background var(--dur-normal) var(--ease-default);
 }
 
@@ -147,7 +147,7 @@
   gap: 16px; 
   padding: 12px 16px; 
   background: transparent;
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border, #e2e8f0);
   transition: all var(--dur-normal) var(--ease-default);
 }
@@ -177,7 +177,7 @@
   font-size: 12px;
   background: rgba(128, 128, 128, 0.1);
   padding: 1px 6px;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   letter-spacing: 0.5px;
   color: var(--text-muted, #718096);
 }
@@ -222,7 +222,7 @@
   resize: vertical; 
   padding: 12px 16px;
   border: 1px solid var(--border, #e2e8f0); 
-  border-radius: 10px; 
+  border-radius: var(--radius-lg); 
   background: transparent;
   color: var(--text, #2d3748); 
   font-size: 14px; 
@@ -249,7 +249,7 @@
   content: "";
   position: absolute; 
   inset: 0; 
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   pointer-events: none;
   /* Flash color based on state */
   background: currentColor; 

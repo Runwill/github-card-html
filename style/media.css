@@ -127,7 +127,7 @@
 }
 #search-input.is-shown { right: 0; }
 .search-container {
-  z-index: 100;
+  z-index: var(--z-sticky);
   top: 10%;
   margin-left: -200px; margin-right: -200px;
   padding-left: 200px; padding-right: 200px;
