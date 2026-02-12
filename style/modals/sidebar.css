@@ -6,7 +6,7 @@
 
 #sidebar-menu li, #account-menu li, #settings-menu li { 
   list-style: none; 
-  margin-bottom: 8px; 
+  margin-bottom: var(--space-sm); 
 }
 #sidebar-menu li:last-child, #account-menu li:last-child, #settings-menu li:last-child { margin-bottom: 0; }
 
@@ -15,7 +15,7 @@
   font-weight: 500 !important; 
   width: 100%; 
   text-align: left; 
-  padding: 12px 16px; 
+  padding: var(--space-lg) var(--space-2xl); 
   border-radius: var(--radius-lg); 
   color: var(--text, #4a5568); 
   background: transparent; 
@@ -24,7 +24,7 @@
   font-size: var(--fs-lg); 
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-md);
 }
 
 .sidebar-menu_button:hover { 
@@ -43,7 +43,7 @@
 .sidebar-avatar-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-md);
 }
 
 #sidebar-avatar-preview {
@@ -123,7 +123,7 @@
 .arrow-selector {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--space-3xs);
 }
 
 .arrow-btn {

@@ -20,7 +20,7 @@
   display: flex; 
   flex-direction: column; 
   align-items: center; 
-  gap: 20px; 
+  gap: var(--space-3xl); 
 }
 
 #avatar-modal-preview {
@@ -41,12 +41,12 @@
 
 /* Pending Avatar Section */
 #avatar-pending-wrap { 
-  margin-top: 12px !important; 
+  margin-top: var(--space-lg) !important; 
   display: none; 
   flex-direction: column; 
   align-items: center; 
-  gap: 8px;
-  padding: 12px;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
   background: var(--bg-start, #f8fafc);
   border-radius: var(--radius-lg) ;
   border: 1px dashed var(--border, #e2e8f0);
@@ -76,14 +76,14 @@
   max-width: 720px;
 }
 
-#avatar-crop-modal .modal-header { margin-bottom: 16px; }
+#avatar-crop-modal .modal-header { margin-bottom: var(--space-2xl); }
 
 .crop-modal-body {
-  padding: 12px;
+  padding: var(--space-lg);
 }
 
 #avatar-crop-message {
-  margin-top: 8px;
+  margin-top: var(--space-sm);
 }
 
 #avatar-crop-image-container {
@@ -102,9 +102,9 @@
 
 #avatar-crop-actions {
   display: flex; 
-  gap: 12px; 
+  gap: var(--space-lg); 
   justify-content: flex-end; 
-  margin-top: 20px;
+  margin-top: var(--space-3xl);
 }
 
 @media (max-width: 480px) {

@@ -10,7 +10,7 @@
     flex: 1;
     background: var(--surface);
     border-radius: var(--radius-lg) ;
-    padding: 20px;
+    padding: var(--space-3xl);
     box-shadow: 0 4px 12px var(--shadow-1);
     border: 1px solid var(--border);
     min-width: 250px;
@@ -24,13 +24,13 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     border-bottom: 2px solid var(--border);
-    padding-bottom: 10px;
+    padding-bottom: var(--space-md);
 }
 
 .role-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--space-md);
 }
 
 .role-summary {
@@ -69,16 +69,16 @@
     font-size: 0.85rem;
     color: var(--danger);
     background: rgba(245, 101, 101, 0.1);
-    padding: 2px 8px;
+    padding: var(--space-3xs) var(--space-sm);
     border-radius: var(--radius-lg);
 }
 
 /* Table Layout (Opponents) */
 .role-table-layout {
     display: flex;
-    gap: 15px;
+    gap: var(--space-2xl);
     overflow-x: auto;
-    padding: 10px 0;
+    padding: var(--space-md) 0;
     align-items: flex-start;
     flex-direction: row-reverse; /* Consolidated to the intended layout */
     justify-content: space-around;
@@ -87,14 +87,14 @@
 .role-column {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--space-md);
     align-items: center;
 }
 
 .role-row {
     display: flex;
     flex-direction: row-reverse;
-    gap: 10px;
+    gap: var(--space-md);
     justify-content: space-around;
     width: 100%;
     flex-wrap: wrap;
@@ -110,7 +110,7 @@
     box-shadow: 0 4px 12px var(--shadow-1);
     border: 1px solid var(--border);
     display: flex;
-    gap: 25px;
+    gap: var(--space-4xl);
     /* Merged Layout */
     flex-direction: row;
     align-items: center;
@@ -119,7 +119,7 @@
 .character-info {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: var(--space-3xl);
     border-bottom: 1px solid var(--border); /* Default fallback */
     /* Table specific overrides merged */
     width: auto;
@@ -128,8 +128,8 @@
     border-bottom: none;
     border-left: 1px solid var(--border);
     padding-bottom: 0;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: var(--space-3xl);
+    padding-right: var(--space-3xl);
 }
 
 /* Responsive adjustment for character info */
@@ -166,7 +166,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
 }
 
 .char-details h3 {
-    margin: 0 0 10px 0;
+    margin: 0 0 var(--space-md) 0;
     color: var(--text);
     font-size: 1.4rem;
     white-space: nowrap;
@@ -174,7 +174,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
 
 .char-stats {
     display: flex;
-    gap: 4px;
+    gap: var(--space-2xs);
     align-items: center;
 }
 
@@ -187,7 +187,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     background-color: rgba(245, 101, 101, 0.15);
     color: var(--danger, #f56565);
     border: 1px solid rgba(245, 101, 101, 0.3);
-    padding: 2px 8px;
+    padding: var(--space-3xs) var(--space-sm);
     border-radius: var(--radius-lg) ;
     min-width: 32px;
     height: fit-content;
@@ -198,7 +198,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: var(--space-2xs);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     box-shadow: 0 2px 4px var(--shadow-1, rgba(0,0,0,0.1));
@@ -212,7 +212,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
 /* Hand Cards Area */
 .player-hand {
     flex: 1;
-    padding-right: 20px;
+    padding-right: var(--space-3xl);
     min-width: 0;
 }
 
@@ -241,7 +241,7 @@ body.is-global-dragging #hand-cards-container {
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--text);
-    padding: 6px 16px;
+    padding: var(--space-xs) var(--space-2xl);
     background: var(--bg-panel);
     border-radius: var(--radius-2xl);
     border: 1px solid transparent;
@@ -272,7 +272,7 @@ body.is-global-dragging #hand-cards-container {
 .char-details .name-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: var(--space-sm);
 }
 
 /* ── Detail Button：装备 / 判定 共用基类 ── */
@@ -296,7 +296,7 @@ body.is-global-dragging #hand-cards-container {
     opacity: 0.9;
     transition: all 0.2s;
     padding: 0;
-    margin-left: 4px;
+    margin-left: var(--space-2xs);
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
@@ -375,7 +375,7 @@ html[data-theme="dark"] .judge-detail-btn:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: var(--space-2xs);
     
     /* Initial Hidden State */
     opacity: 0;

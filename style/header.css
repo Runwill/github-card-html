@@ -152,7 +152,7 @@
 #nav {
     overflow: hidden;
     flex-direction: column;
-    margin: 10px 0 0 0;
+    margin: var(--space-md) 0 0 0;
     list-style: none;
     padding: 0;
 }

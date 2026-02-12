@@ -145,6 +145,18 @@
   --lh-normal:  1.5;  /* 正文段落 */
   --lh-relaxed: 1.6;  /* 舒适阅读：textarea、编辑器 */
 
+  /* 间距阶梯（4px 基础网格） */
+  --space-3xs:  2px;   /* 微间距：border-gap、细分隔 */
+  --space-2xs:  4px;   /* 紧凑：图标间隙、badge 内距 */
+  --space-xs:   6px;   /* 小间距：标签间隙、紧凑列表 */
+  --space-sm:   8px;   /* 基础间距：按钮间隙、卡片内距 */
+  --space-md:  10px;   /* 中等间距：工具栏、表单行 */
+  --space-lg:  12px;   /* 舒适间距：面板内距、分区间隔 */
+  --space-xl:  14px;   /* 较大间距：表单 gap */
+  --space-2xl: 16px;   /* 大间距：modal 内距、网格间隔 */
+  --space-3xl: 20px;   /* 特大间距：区块分隔、布局间隔 */
+  --space-4xl: 24px;   /* 最大间距：modal header 底距 */
+
   /* Active State Text Color (Light Mode) */
   --text-active: var(--primary-3);
 }
@@ -470,19 +482,19 @@ html.theme-switching *::after {
 
 /* 审核窗口列表项（暗色/浅色自适应） */
 .approval-row {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 12px; margin-bottom: 10px;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg);
+  padding: var(--space-lg); margin-bottom: var(--space-md);
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-sm); background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
 }
-.approval-left { display: flex; align-items: center; gap: 10px; }
+.approval-left { display: flex; align-items: center; gap: var(--space-md); }
 .approval-img { width: 48px; height: 48px; border-radius: var(--radius-full); object-fit: cover; border: 1px solid var(--border) !important; background: var(--surface) !important; }
 .approval-title { font-weight: 600; color: var(--text) !important; }
 .approval-sub { font-size: var(--fs-sm); color: var(--text-subtle) !important; }
-.approval-right { display: flex; gap: 8px; }
+.approval-right { display: flex; gap: var(--space-sm); }
 
 /* 空列表提示（遵循主题色） */
-.empty-hint { text-align: center; color: var(--text-subtle) !important; padding: 20px; }
+.empty-hint { text-align: center; color: var(--text-subtle) !important; padding: var(--space-3xl); }
 .empty-hint.error { color: var(--danger) !important; }
 
 /* 计数徽标：背景继承父元素 */
@@ -508,12 +520,12 @@ html[data-theme="dark"] .badge.badge-permission {
 #panel_permissions .perm-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
 }
 #panel_permissions .perm-tag {
   display: inline-flex; align-items: center;
-  padding: 2px 8px; border-radius: var(--radius-pill);
+  padding: var(--space-3xs) var(--space-sm); border-radius: var(--radius-pill);
   font-size: var(--fs-sm); line-height: var(--lh-none);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   border: 1px solid var(--border);
@@ -526,24 +538,24 @@ html[data-theme="dark"] .badge.badge-permission {
 }
 
 #panel_permissions .perm-editor {
-  margin-top: 8px;
-  padding: 12px;
+  margin-top: var(--space-sm);
+  padding: var(--space-lg);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--surface) 96%, transparent);
   box-shadow: var(--shadow-perm-editor);
 }
 #panel_permissions .perm-editor__toolbar {
-  align-items: center; margin-bottom: 10px; flex-wrap: nowrap;
+  align-items: center; margin-bottom: var(--space-md); flex-wrap: nowrap;
 }
 #panel_permissions .perm-editor__toolbar .btn { white-space: nowrap; flex: 0 0 auto; }
 
 #panel_permissions .perm-editor__list {
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  max-height: 220px; overflow: auto; padding-right: 4px;
+  max-height: 220px; overflow: auto; padding-right: var(--space-2xs);
 }
 #panel_permissions .perm-editor__item {
-  padding: 6px 8px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm); border: 1px solid var(--border); border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
 }
 #panel_permissions .perm-editor__item input { margin: 0; }

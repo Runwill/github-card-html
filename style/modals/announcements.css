@@ -1,7 +1,7 @@
 /* Announcements modal styling (Modernized) */
 .ann-modal { max-width: 760px; width: 96%; }
 .ann-content { 
-  padding: 4px; 
+  padding: var(--space-2xs); 
   display: block; 
   max-height: 65vh; 
   overflow-y: auto;
@@ -23,8 +23,8 @@
 .ann-card {
   border: 1px solid var(--border, #e2e8f0); 
   border-radius: var(--radius-lg) ; 
-  padding: 20px; 
-  margin-bottom: 16px;
+  padding: var(--space-3xl); 
+  margin-bottom: var(--space-2xl);
   background: var(--surface, #fff);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
@@ -73,7 +73,7 @@
 .ann-card-title { 
   font-weight: 700; 
   color: var(--text, #0f172a); 
-  margin-bottom: 8px; 
+  margin-bottom: var(--space-sm); 
   font-size: var(--fs-2xl); 
   line-height: 1.3;
 }
@@ -81,10 +81,10 @@
 .ann-card-meta { 
   font-size: var(--fs-base); 
   color: var(--text-subtle, #94a3b8); 
-  margin-bottom: 12px; 
+  margin-bottom: var(--space-lg); 
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-xs);
 }
 
 .ann-card-body { 
@@ -95,11 +95,11 @@
 
 /* Changes list */
 .ann-changes { 
-  padding-left: 20px; 
-  margin: 8px 0 0; 
+  padding-left: var(--space-3xl); 
+  margin: var(--space-sm) 0 0; 
 }
 .ann-changes li { 
-  margin: 6px 0; 
+  margin: var(--space-xs) 0; 
   position: relative;
 }
 
@@ -133,11 +133,11 @@
   align-items: center;
   font-size: var(--fs-sm);
   line-height: 1;
-  padding: 4px 8px;
+  padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--radius-lg) ;
   background: linear-gradient(135deg, #f59e0b, #d97706);
   color: #fff;
-  margin-right: 8px;
+  margin-right: var(--space-sm);
   vertical-align: middle;
   font-weight: 600;
   transform: translateY(-2px);
@@ -163,14 +163,14 @@ html[data-theme="dark"] .ann-card.is-important.is-hovered {
 
 /* Responsive tweaks */
 @media (max-width: 480px){
-  .ann-card { padding: 16px; }
+  .ann-card { padding: var(--space-2xl); }
   .ann-card-title { font-size: var(--fs-xl); }
   .ann-card-body { font-size: var(--fs-md); }
 }
 
 /* Grouping styles */
 .ann-group {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-lg);
   list-style: none;
 }
 .ann-group:last-child { margin-bottom: 0; }
@@ -181,7 +181,7 @@ html[data-theme="dark"] .ann-card.is-important.is-hovered {
   font-weight: 600;
   padding: 1px 8px;
   border-radius: var(--radius-pill);
-  margin-bottom: 4px;
+  margin-bottom: var(--space-2xs);
   line-height: 1.3;
   letter-spacing: 0;
 }
@@ -199,14 +199,14 @@ html[data-theme="dark"] .ann-card.is-important.is-hovered {
 
 .ann-sub-list {
   margin: 0;
-  padding-left: 6px; /* Indent slightly */
+  padding-left: var(--space-xs); /* Indent slightly */
   list-style-type: none;
 }
 
 .ann-sub-list li {
-  margin-bottom: 4px;
+  margin-bottom: var(--space-2xs);
   position: relative;
-  padding-left: 14px;
+  padding-left: var(--space-xl);
 }
 
 .ann-sub-list li::before {

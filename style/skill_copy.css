@@ -20,7 +20,7 @@
   /* 尺寸：对齐 btn--xs */
   font-size: var(--fs-sm) !important;
   line-height: var(--lh-tight) !important;
-  padding: 2px 8px !important;
+  padding: var(--space-3xs) var(--space-sm) !important;
   border-radius: var(--radius-xs) !important;
   min-height: 0 !important;
   /* 配色：对齐 btn--secondary */
@@ -68,7 +68,7 @@ html.ctrl-pressed .skill-copy-btn:focus {
   .skill-copy-btn {
     position: static;
     transform: none;
-    margin-bottom: 4px; /* 与内容分隔 */
+    margin-bottom: var(--space-2xs); /* 与内容分隔 */
     display: none;      /* 不占位 */
   }
 

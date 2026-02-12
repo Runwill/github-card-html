@@ -32,7 +32,7 @@
     position: relative;
     touch-action: none;
     text-align: center;
-    padding: 4px;
+    padding: var(--space-2xs);
     
     /* Essential for ::before layering */
     overflow: hidden; 

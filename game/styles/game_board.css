@@ -23,7 +23,7 @@
     width: 100%;
     min-height: 100%; 
     flex: 1;
-    gap: 15px;
+    gap: var(--space-2xl);
 }
 
 .table-side-col {
@@ -51,7 +51,7 @@
     border-radius: var(--radius-none) ;
     padding: 0;
     box-shadow: none;
-    margin-bottom: 20px; 
+    margin-bottom: var(--space-3xl); 
     /* Centers itself in remaining space */
     margin-top: auto !important;
     margin-bottom: auto !important;
@@ -64,7 +64,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     border-bottom: 2px solid var(--border);
-    padding-bottom: 10px;
+    padding-bottom: var(--space-md);
     margin-bottom: 15px;
 }
 
@@ -74,7 +74,7 @@
 .player-hand .cards-container,
 .game-card-area {
     display: flex;
-    gap: 15px;
+    gap: var(--space-2xl);
     flex-wrap: wrap;
     min-height: 174px; /* Locked height */
     width: 100%;
@@ -90,7 +90,7 @@
 }
 
 .treatment-area-wrappper {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-3xl);
 }
 
 /* Specific override for treatment container */

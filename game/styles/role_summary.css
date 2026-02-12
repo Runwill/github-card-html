@@ -12,7 +12,7 @@
 .role-list-avatar {
     width: 60px !important;
     height: 60px !important;
-    margin-bottom: 4px;
+    margin-bottom: var(--space-2xs);
     position: relative; /* Context for absolute badges */
     overflow: visible; /* Allow badge to pop out */
 }
@@ -40,9 +40,9 @@
     border: 1px solid var(--border, rgba(255,255,255,0.1));
     
     /* Shape & Box */
-    padding: 2px 8px;
+    padding: var(--space-3xs) var(--space-sm);
     border-radius: var(--radius-lg) ;
-    margin-right: 6px; /* Changed from margin-left to margin-right */
+    margin-right: var(--space-xs); /* Changed from margin-left to margin-right */
     margin-left: 0;
     min-width: 24px;
     text-align: center;
@@ -66,9 +66,9 @@
     font-weight: bold;
     color: #FFD700;
     background: rgba(0,0,0,0.5);
-    padding: 0 4px;
+    padding: 0 var(--space-2xs);
     border-radius: var(--radius-xs);
-    margin-right: 4px;
+    margin-right: var(--space-2xs);
 }
 
 .player-stats-row {
@@ -76,7 +76,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    margin-top: 2px;
+    margin-top: var(--space-3xs);
     min-height: 31.5px; /* Prevent layout jump during hover swap */
 }
 
@@ -100,7 +100,7 @@
     /* Layout */
     min-width: 18px; /* Slightly tighter than hand count */
     height: 18px;
-    padding: 0 4px; 
+    padding: 0 var(--space-2xs); 
     border-radius: var(--radius-lg); /* Pill shape */
 
     /* Typography */

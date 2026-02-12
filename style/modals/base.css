@@ -23,7 +23,7 @@
   /* Reduced scale slightly, but keeping transform logic simple for overrides */
   transform: translate(-50%, -48%) scale(0.96); /* Removed !important to allow drag override */
   background: var(--surface, #fff);
-  padding: 24px;
+  padding: var(--space-4xl);
   border: 1px solid var(--border, #e2e8f0);
   border-radius: var(--radius-xl); /* More rounded corners */
   box-shadow: 
@@ -68,7 +68,7 @@
 /* Header */
 .modal-header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 24px; padding-bottom: 0;
+  margin-bottom: var(--space-4xl); padding-bottom: 0;
   border-bottom: none; /* Remove border for cleaner look */
 }
 .modal-header h2 {
@@ -80,11 +80,11 @@
 }
 
 /* Form Elements */
-.modal-form { display: flex; flex-direction: column; gap: 16px; }
+.modal-form { display: flex; flex-direction: column; gap: var(--space-2xl); }
 
 .modal-form input {
   width: 100%; 
-  padding: 12px 16px; 
+  padding: var(--space-lg) var(--space-2xl); 
   border: 1px solid var(--border, #e2e8f0); 
   border-radius: var(--radius-lg);
   box-sizing: border-box; 
@@ -102,7 +102,7 @@
 /* Buttons */
 .modal-form button[type="submit"] {
   width: 100%; 
-  padding: 12px 20px; 
+  padding: var(--space-lg) var(--space-3xl); 
   background: var(--primary-2, #7084ff);
   color: #fff; 
   border: none; 
@@ -133,7 +133,7 @@
 .modal-message { 
   /* Initial state: collapsed */
   margin-top: 0; 
-  padding: 0 16px; 
+  padding: 0 var(--space-2xl); 
   border-radius: var(--radius-md); 
   text-align: center; 
   font-size: var(--fs-md); 
@@ -156,8 +156,8 @@
 
 .modal-message:not(:empty) {
   /* Expanded state */
-  margin-top: 16px;
-  padding: 12px 16px;
+  margin-top: var(--space-2xl);
+  padding: var(--space-lg) var(--space-2xl);
   opacity: 1;
   max-height: 200px; /* Sufficient max-height for content */
   transform: translateY(0);
@@ -195,7 +195,7 @@
 
 /* Approve modal content */
 #pending-approvals-modal-content {
-  padding: 12px;
+  padding: var(--space-lg);
 }
 
 /* Settings shared – info row & hint */
@@ -203,13 +203,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-md);
 }
 
 .modal-form > .info-hint {
   font-size: var(--fs-sm);
   color: var(--text-muted, #718096);
-  margin-top: 10px;
+  margin-top: var(--space-md);
 }
 
 .key-bind-btn {
@@ -219,7 +219,7 @@
 .setting-control {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-md);
 }
 
 #game-speed-val {
@@ -232,7 +232,7 @@
 
 .settings-actions {
   text-align: right;
-  margin-top: 6px;
+  margin-top: var(--space-xs);
 }
 
 /* Panel 公共基类 */
@@ -253,7 +253,7 @@
 
 /* 菜单面板（侧边栏 / 账号 / 设置） */
 .panel--menu {
-  padding: 16px;
+  padding: var(--space-2xl);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-elev-3);
   transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-smooth), visibility var(--dur-instant) linear var(--dur-normal);
@@ -279,7 +279,7 @@
   .modal { 
     width: calc(100vw - 32px); 
     max-height: calc(100vh - 40px); 
-    padding: 20px; 
+    padding: var(--space-3xl); 
     border-radius: var(--radius-2xl); /* Even rounder on mobile */
   }
   .modal-header h2 { font-size: 1.25rem; }
@@ -294,7 +294,7 @@
 /* Badge for role (Restored) */
 .badge { 
   display: inline-block; 
-  padding: 2px 8px; 
+  padding: var(--space-3xs) var(--space-sm); 
   border-radius: var(--radius-sm) ; 
   font-size: var(--fs-xs); 
   font-weight: 600; 
@@ -374,8 +374,8 @@ html[data-theme="dark"] .badge.badge-permission {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-elev-4);
 }
-.tokens-modal .modal-header { margin: 0; margin-bottom: 16px; }
-.tokens-modal .modal-form { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+.tokens-modal .modal-header { margin: 0; margin-bottom: var(--space-2xl); }
+.tokens-modal .modal-form { display: grid; grid-template-columns: 320px 1fr; gap: var(--space-2xl); }
 
 /* Hints panel */
 .tokens-hints {
@@ -384,16 +384,16 @@ html[data-theme="dark"] .badge.badge-permission {
   background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
   border: 1px solid var(--border) !important;
   border-radius: var(--radius-lg) ;
-  padding: 12px;
+  padding: var(--space-lg);
   height: var(--tokens-pane-h); min-height: var(--tokens-pane-h); max-height: var(--tokens-pane-h);
   overflow: auto;
   position: sticky; top: 0;
   box-shadow: var(--shadow-subtle);
 }
 .tokens-hints, .tokens-hints * { animation: none !important; }
-.tokens-hints .hints-title { margin-bottom: 8px; font-weight: 600; }
-.tokens-hints .hints-list { display: grid; grid-template-columns: 1fr; gap: 6px; }
-.tokens-hints .hint-row { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 8px; padding: 8px 10px; border-radius: var(--radius-md); transition: background var(--dur-normal) var(--ease-default); }
+.tokens-hints .hints-title { margin-bottom: var(--space-sm); font-weight: 600; }
+.tokens-hints .hints-list { display: grid; grid-template-columns: 1fr; gap: var(--space-xs); }
+.tokens-hints .hint-row { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); border-radius: var(--radius-md); transition: background var(--dur-normal) var(--ease-default); }
 .tokens-hints .hint-row:hover { background: color-mix(in srgb, var(--border) 40%, transparent) !important; }
 .tokens-hints .hint-name { color: var(--text) !important; overflow-wrap: anywhere; font-weight: 500; }
 .tokens-hints .hint-type { color: var(--text-subtle) !important; white-space: nowrap; font-size: var(--fs-xs); }
@@ -403,7 +403,7 @@ html[data-theme="dark"] .badge.badge-permission {
   width: 100% !important;
   height: var(--tokens-pane-h) !important; min-height: var(--tokens-pane-h) !important; max-height: var(--tokens-pane-h) !important;
   border: 1px solid var(--border) !important; border-radius: var(--radius-lg) !important;
-  padding: 16px !important;
+  padding: var(--space-2xl) !important;
   background: var(--surface) !important; color: var(--text) !important;
   font-family: var(--font-mono) !important;
   font-size: var(--fs-base) !important; line-height: var(--lh-relaxed) !important;
@@ -420,8 +420,8 @@ html[data-theme="dark"] .badge.badge-permission {
 /* Actions bar */
 .tokens-actions {
   grid-column: 1 / -1;
-  display: flex !important; justify-content: flex-end; gap: 12px;
-  margin-top: 8px; padding-top: 16px;
+  display: flex !important; justify-content: flex-end; gap: var(--space-lg);
+  margin-top: var(--space-sm); padding-top: var(--space-2xl);
   border-top: 1px solid var(--border) !important;
   position: sticky; bottom: 0;
   background: inherit !important;

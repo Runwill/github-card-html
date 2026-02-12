@@ -6,7 +6,7 @@
   overflow-x: auto;           /* 空间不足时横向滚动 */
   overflow-y: visible;        /* 允许按钮的下方阴影/边框可见 */
   white-space: nowrap;        /* 文本不换行 */
-  padding-bottom: 2px;        /* 为按钮底部边框/阴影预留空间，避免被父容器裁剪 */
+  padding-bottom: var(--space-3xs);        /* 为按钮底部边框/阴影预留空间，避免被父容器裁剪 */
 }
 
 /* 让筛选条在权限面板中占满可用宽度，避免受 60vw 限制导致出现滚动条 */
@@ -42,22 +42,22 @@
 .tokens-log__filters select {
   height: 32px !important;
   font-size: var(--fs-md) !important;
-  padding-top: 4px !important;
-  padding-bottom: 4px !important;
+  padding-top: var(--space-2xs) !important;
+  padding-bottom: var(--space-2xs) !important;
 }
 
 /* 如果未来需要固定间距，可以按需开启：
-.tokens-log__filters > * + * { margin-left: 6px; }
+.tokens-log__filters > * + * { margin-left: var(--space-xs); }
 */
 
 /* ===== 权限页内联编辑器（权限清单/修改密码通用容器） ===== */
 .perm-editor {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 10px 12px;
+  padding: var(--space-md) var(--space-lg);
   background: var(--surface);
   /* 打开时上下各留出 8px 间距，避免紧贴上下用户条目 */
-  margin: 8px 0;
+  margin: var(--space-sm) 0;
   /* 过渡动画：展开/收起（与 collapsible.css 行为一致） */
   overflow: hidden;                 /* 收起时裁剪内容，避免溢出 */
   height: auto;                     /* 展开后的自然高度 */
@@ -76,7 +76,7 @@
 .perm-editor--plain {
   border: none;           /* 去除外框，避免与输入框边框叠加 */
   background: transparent;
-  padding: 8px 0 0;       /* 上方留一点间距，与上方按钮分隔 */
+  padding: var(--space-sm) 0 0;       /* 上方留一点间距，与上方按钮分隔 */
 }
 /* 收起态（由 JS 切换该类） */
 .perm-editor.is-collapsed {
@@ -105,11 +105,11 @@
 }
 /* 保证每一项容器本身不引入边框/背景 */
 .perm-editor--plain .perm-editor__item { border: none !important; background: transparent !important; }
-.perm-editor__toolbar { display: flex; gap: 8px; margin-bottom: 8px; }
-.perm-editor__list { display: grid; grid-template-columns: 1fr; gap: 8px; max-width: 420px; }
-.perm-editor__item { display: flex; align-items: center; gap: 8px; }
+.perm-editor__toolbar { display: flex; gap: var(--space-sm); margin-bottom: var(--space-sm); }
+.perm-editor__list { display: grid; grid-template-columns: 1fr; gap: var(--space-sm); max-width: 420px; }
+.perm-editor__item { display: flex; align-items: center; gap: var(--space-sm); }
 .perm-editor__item-text { font-size: var(--fs-md); color: var(--text); }
-.perm-editor__actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+.perm-editor__actions { display: flex; gap: var(--space-sm); justify-content: flex-end; margin-top: var(--space-md); }
 
 /* 覆盖 tokens-input 在工具条中的“拼接样式”，在编辑器中应为独立输入框 */
 .perm-editor .tokens-input,
@@ -119,7 +119,7 @@
 .perm-editor select {
   height: 32px !important;
   font-size: var(--fs-md) !important;
-  padding: 6px 10px !important;
+  padding: var(--space-xs) var(--space-md) !important;
   border: 1px solid var(--border) !important;   /* 恢复右边框 */
   border-radius: var(--radius-sm) !important;           /* 独立圆角 */
   outline: none;
@@ -189,5 +189,5 @@
 }
 
 /* 权限列表 / 消息容器（从内联移出） */
-#perm-list    { margin-top: 14px; }
-#perm-message { margin-top: 10px; }
+#perm-list    { margin-top: var(--space-xl); }
+#perm-message { margin-top: var(--space-md); }

@@ -1,12 +1,12 @@
 /* Account info modal - modern card layout with avatar, title and detail list */
-.account-info-modal { padding: 24px; }
+.account-info-modal { padding: var(--space-4xl); }
 
 /* Header Section */
 .account-info__header { 
   display: flex; 
   align-items: center; 
-  gap: 20px; 
-  padding-bottom: 20px; 
+  gap: var(--space-3xl); 
+  padding-bottom: var(--space-3xl); 
   border-bottom: 1px solid var(--border, #e2e8f0); 
 }
 
@@ -22,7 +22,7 @@
 .account-info__title { 
   display: flex; 
   flex-direction: column; 
-  gap: 4px; 
+  gap: var(--space-2xs); 
   min-width: 0; 
   flex: 1;
 }
@@ -33,7 +33,7 @@
   line-height: var(--lh-tight);
   display: flex; 
   align-items: center; 
-  gap: 8px;
+  gap: var(--space-sm);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -50,7 +50,7 @@
   overflow: visible; 
   text-overflow: clip;
   border-bottom: 1px solid var(--primary-2, #7084ff);
-  padding-bottom: 2px;
+  padding-bottom: var(--space-3xs);
 }
 
 .account-info__name-input {
@@ -62,10 +62,10 @@
   border-bottom: 2px solid var(--primary-1, #8698ff);
 }
 
-.account-info__role { display: flex; gap: 6px; flex-wrap: wrap; }
+.account-info__role { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 .account-info__role .badge { 
   font-size: var(--fs-xs); 
-  padding: 2px 8px; 
+  padding: var(--space-3xs) var(--space-sm); 
   border-radius: var(--radius-sm) ; 
   text-transform: uppercase; 
   letter-spacing: 0.05em;
@@ -92,7 +92,7 @@
   line-height: var(--lh-none);
   vertical-align: baseline;
   background: var(--bg-start, #f7fafc);
-  padding: 2px 6px;
+  padding: var(--space-3xs) var(--space-xs);
   border-radius: var(--radius-xs);
 }
 
@@ -101,7 +101,7 @@
   all: unset;
   align-items: center;
   color: var(--danger, #f56565);
-  padding: 2px 6px !important;
+  padding: var(--space-3xs) var(--space-xs) !important;
   line-height: var(--lh-none) !important;
   font-size: 0.75em !important;
   font-weight: 600 !important;
@@ -120,12 +120,12 @@
 #account-info-intro-pending {
   display: none; 
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   color: var(--text-subtle, #a0aec0);
   line-height: var(--lh-none);
   width: 100%;
   flex-wrap: nowrap;
-  margin-top: 4px;
+  margin-top: var(--space-2xs);
 }
 
 #account-info-intro-pending-inline {
@@ -138,14 +138,14 @@
 }
 
 /* Body Section */
-.account-info__body { padding-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+.account-info__body { padding-top: var(--space-3xl); display: flex; flex-direction: column; gap: var(--space-md); }
 
 .account-info__body .info-row { 
   display: flex; 
   align-items: center; 
   justify-content: space-between; 
-  gap: 16px; 
-  padding: 12px 16px; 
+  gap: var(--space-2xl); 
+  padding: var(--space-lg) var(--space-2xl); 
   background: transparent;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border, #e2e8f0);
@@ -188,7 +188,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: var(--space-2xl);
   font-size: var(--fs-sm);
   color: var(--text-subtle, #a0aec0);
 }
@@ -196,7 +196,7 @@
 .account-info__meta .meta-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-xs);
 }
 
 .account-info__meta .meta-label {
@@ -210,17 +210,17 @@
 
 /* Intro Textarea */
 .account-info__intro { 
-  padding-top: 8px; 
+  padding-top: var(--space-sm); 
   display: flex; 
   flex-direction: column; 
-  gap: 8px; 
+  gap: var(--space-sm); 
 }
 
 .intro-textarea {
   width: 100%; 
   min-height: 100px; 
   resize: vertical; 
-  padding: 12px 16px;
+  padding: var(--space-lg) var(--space-2xl);
   border: 1px solid var(--border, #e2e8f0); 
   border-radius: var(--radius-lg); 
   background: transparent;
@@ -281,7 +281,7 @@
 }
 
 @media (max-width: 480px) {
-  .account-info-modal { padding: 20px; }
+  .account-info-modal { padding: var(--space-3xl); }
   .account-info__avatar { width: 60px; height: 60px; }
   .account-info__name { font-size: var(--fs-2xl); }
 }
