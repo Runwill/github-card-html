@@ -18,8 +18,8 @@
   justify-content: center;
   cursor: pointer;
   /* 尺寸：对齐 btn--xs */
-  font-size: 12px !important;
-  line-height: 1.2 !important;
+  font-size: var(--fs-sm) !important;
+  line-height: var(--lh-tight) !important;
   padding: 2px 8px !important;
   border-radius: var(--radius-xs) !important;
   min-height: 0 !important;

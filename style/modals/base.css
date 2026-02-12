@@ -88,8 +88,8 @@
   border: 1px solid var(--border, #e2e8f0); 
   border-radius: var(--radius-lg);
   box-sizing: border-box; 
-  font-size: 15px; 
-  line-height: 1.5;
+  font-size: var(--fs-lg); 
+  line-height: var(--lh-normal);
   transition: all var(--dur-normal) var(--ease-default); 
   background: transparent;
   color: var(--text, #2d3748);
@@ -108,7 +108,7 @@
   border: none; 
   border-radius: var(--radius-lg); 
   cursor: pointer; 
-  font-size: 15px; 
+  font-size: var(--fs-lg); 
   font-weight: 600;
   transition: all var(--dur-normal) var(--ease-standard); 
   box-shadow: var(--shadow-elev-1);
@@ -136,7 +136,7 @@
   padding: 0 16px; 
   border-radius: var(--radius-md); 
   text-align: center; 
-  font-size: 14px; 
+  font-size: var(--fs-md); 
   font-weight: 500; 
   
   opacity: 0; 
@@ -207,7 +207,7 @@
 }
 
 .modal-form > .info-hint {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--text-muted, #718096);
   margin-top: 10px;
 }
@@ -223,7 +223,7 @@
 }
 
 #game-speed-val {
-  font-size: 13px;
+  font-size: var(--fs-base);
   color: var(--text-muted, #718096);
   min-width: 42px;
   text-align: right;
@@ -296,7 +296,7 @@
   display: inline-block; 
   padding: 2px 8px; 
   border-radius: var(--radius-sm) ; 
-  font-size: 11px; 
+  font-size: var(--fs-xs); 
   font-weight: 600; 
   border: 1px solid var(--border, #e2e8f0); 
   color: var(--text, #2d3748); 
@@ -379,7 +379,7 @@ html[data-theme="dark"] .badge.badge-permission {
 
 /* Hints panel */
 .tokens-hints {
-  font-size: 12px;
+  font-size: var(--fs-sm);
   color: var(--text-muted) !important;
   background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
   border: 1px solid var(--border) !important;
@@ -396,7 +396,7 @@ html[data-theme="dark"] .badge.badge-permission {
 .tokens-hints .hint-row { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 8px; padding: 8px 10px; border-radius: var(--radius-md); transition: background var(--dur-normal) var(--ease-default); }
 .tokens-hints .hint-row:hover { background: color-mix(in srgb, var(--border) 40%, transparent) !important; }
 .tokens-hints .hint-name { color: var(--text) !important; overflow-wrap: anywhere; font-weight: 500; }
-.tokens-hints .hint-type { color: var(--text-subtle) !important; white-space: nowrap; font-size: 11px; }
+.tokens-hints .hint-type { color: var(--text-subtle) !important; white-space: nowrap; font-size: var(--fs-xs); }
 
 /* Editor textarea */
 .tokens-editor {
@@ -406,7 +406,7 @@ html[data-theme="dark"] .badge.badge-permission {
   padding: 16px !important;
   background: var(--surface) !important; color: var(--text) !important;
   font-family: var(--font-mono) !important;
-  font-size: 13px !important; line-height: 1.6 !important;
+  font-size: var(--fs-base) !important; line-height: var(--lh-relaxed) !important;
   box-shadow: var(--shadow-subtle);
   transition: box-shadow var(--dur-normal) var(--ease-default), border-color var(--dur-normal) var(--ease-default);
   resize: none; overflow: auto;

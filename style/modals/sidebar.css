@@ -21,7 +21,7 @@
   background: transparent; 
   border: none; 
   cursor: pointer; 
-  font-size: 15px; 
+  font-size: var(--fs-lg); 
   display: flex;
   align-items: center;
   gap: 10px;
@@ -132,7 +132,7 @@
   border: none;
   background: transparent;
   color: var(--text-muted, #718096);
-  font-size: 16px;
+  font-size: var(--fs-xl);
   font-weight: 600;
   cursor: pointer;
   display: flex;
@@ -159,7 +159,7 @@
 .arrow-value {
   min-width: 48px;
   text-align: center;
-  font-size: 13px;
+  font-size: var(--fs-base);
   color: var(--text-muted, #718096);
   user-select: none;
 }

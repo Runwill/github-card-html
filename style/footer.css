@@ -16,7 +16,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  font-size: 13px;
+  font-size: var(--fs-base);
   color: #9aa4b2; /* 较浅的中性灰（原 #4a5568） */
   opacity: 0.4; /* 页脚文字整体 50% 透明度 */
 }

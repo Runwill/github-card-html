@@ -11,7 +11,7 @@ body {
 .modal-header { margin-bottom: 12px; }
 .modal-header h2 {
     margin: 0;
-    font-size: 18px;
+    font-size: var(--fs-2xl);
     color: var(--text);
     font-weight: 600;
 }
@@ -22,7 +22,7 @@ body {
 }
 .modal-form button { transition: background-color var(--dur-normal) var(--ease-default), color var(--dur-normal) var(--ease-default), border-color var(--dur-normal) var(--ease-default); }
 
-.modal-message { margin-top: 6px; min-height: 20px; font-size: 14px; text-align: center; color: var(--text-muted); }
+.modal-message { margin-top: 6px; min-height: 20px; font-size: var(--fs-md); text-align: center; color: var(--text-muted); }
 .modal-message.success { color: var(--success); }
 .modal-message.error { color: var(--danger); }
 

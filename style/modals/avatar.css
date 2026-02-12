@@ -55,7 +55,7 @@
 }
 
 #avatar-pending-wrap div[data-i18n="modal.avatar.pending"] {
-  font-size: 13px; 
+  font-size: var(--fs-base); 
   color: var(--text-subtle, #718096); 
   font-weight: 500;
 }

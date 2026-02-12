@@ -34,14 +34,14 @@
   line-height: 32px !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  font-size: 14px !important;
+  font-size: var(--fs-md) !important;
 }
 .tokens-log__filters input.tokens-input,
 .tokens-log__filters select.tokens-input,
 .tokens-log__filters input,
 .tokens-log__filters select {
   height: 32px !important;
-  font-size: 14px !important;
+  font-size: var(--fs-md) !important;
   padding-top: 4px !important;
   padding-bottom: 4px !important;
 }
@@ -108,7 +108,7 @@
 .perm-editor__toolbar { display: flex; gap: 8px; margin-bottom: 8px; }
 .perm-editor__list { display: grid; grid-template-columns: 1fr; gap: 8px; max-width: 420px; }
 .perm-editor__item { display: flex; align-items: center; gap: 8px; }
-.perm-editor__item-text { font-size: 14px; color: var(--text); }
+.perm-editor__item-text { font-size: var(--fs-md); color: var(--text); }
 .perm-editor__actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
 
 /* 覆盖 tokens-input 在工具条中的“拼接样式”，在编辑器中应为独立输入框 */
@@ -118,7 +118,7 @@
 .perm-editor input[type="date"],
 .perm-editor select {
   height: 32px !important;
-  font-size: 14px !important;
+  font-size: var(--fs-md) !important;
   padding: 6px 10px !important;
   border: 1px solid var(--border) !important;   /* 恢复右边框 */
   border-radius: var(--radius-sm) !important;           /* 独立圆角 */

@@ -107,7 +107,7 @@
     font-family: system-ui, -apple-system, sans-serif;
     font-size: 0.75rem; 
     font-weight: 700;
-    line-height: 1;
+    line-height: var(--lh-none);
     text-shadow: none; /* No shadow needed for this flat style */
 
     display: flex;

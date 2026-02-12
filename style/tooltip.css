@@ -30,9 +30,9 @@
 
     /* 排版 */
     padding: 8px 12px;
-    font-size: 13px;
-    font-weight: 400; /* 正常粗细，不加粗 */
-    line-height: 1.5;
+    font-size: var(--fs-base);
+    font-weight: 400;
+    line-height: var(--lh-normal);
     letter-spacing: 0.01em;
     
     pointer-events: none;
