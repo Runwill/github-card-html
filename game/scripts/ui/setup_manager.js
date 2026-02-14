@@ -51,7 +51,7 @@
         if (!characterCache) {
             try {
                 // 尝试从新接口获取
-                const res = await fetch(window.endpoints.api('/tokens/public-list?collection=character'));
+                const res = await fetch(window.endpoints.api('/api/tokens/public-list?collection=character'));
                 if (res.ok) {
                     characterCache = await res.json();
                 } else {
