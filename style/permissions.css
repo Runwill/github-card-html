@@ -172,7 +172,7 @@
 #panel_permissions #perms-log .fmt-param {
   color: #1E3A8A;                      /* 蓝色文本（与 is-blue 语义接近） */
   background: rgba(191, 219, 254, 0.28); /* 浅蓝底 */
-  border: 1px dashed #93C5FD;           /* 虚线边框暗示“占位符” */
+  border: 1px dashed color-mix(in srgb, var(--primary-1) 60%, transparent);           /* 虚线边框暗示"占位符" */
   border-radius: var(--radius-xs);
   padding: 0 3px;
 }

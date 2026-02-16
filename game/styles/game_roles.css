@@ -39,7 +39,7 @@
     background-color: var(--surface);
     border: 1px solid var(--border);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all var(--dur-normal);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -202,11 +202,11 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     box-shadow: 0 2px 4px var(--shadow-1, rgba(0,0,0,0.1));
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--dur-moderate) var(--ease-standard);
 }
 
 .stat-hp.hp-changed {
-    animation: hp-pulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: hp-pulse var(--dur-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 /* Hand Cards Area */
@@ -242,10 +242,10 @@ body.is-global-dragging #hand-cards-container {
     font-weight: 700;
     color: var(--text);
     padding: var(--space-xs) var(--space-2xl);
-    background: var(--bg-panel);
+    background: var(--surface);
     border-radius: var(--radius-2xl);
     border: 1px solid transparent;
-    transition: all 0.3s ease;
+    transition: all var(--dur-moderate) var(--ease-default);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -294,7 +294,7 @@ body.is-global-dragging #hand-cards-container {
     font-family: '明朝';
     color: var(--btn-accent);
     opacity: 0.9;
-    transition: all 0.2s;
+    transition: all var(--dur-normal);
     padding: 0;
     margin-left: var(--space-2xs);
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
@@ -380,7 +380,7 @@ html[data-theme="dark"] .judge-detail-btn:active {
     /* Initial Hidden State */
     opacity: 0;
     pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--dur-moderate) var(--ease-standard);
     z-index: 5;
 }
 
@@ -420,7 +420,7 @@ html[data-theme="dark"] .judge-detail-btn:active {
 
 /* Ensure Stats have transition properties */
 .player-hp, .player-hand-count, .stat-hp {
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity var(--dur-moderate) ease, transform var(--dur-moderate) var(--ease-default);
     /* Ensure they take up layout space */
     opacity: 1;
     transform: scale(1);

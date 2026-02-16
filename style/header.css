@@ -8,7 +8,7 @@
     top: 0;
     z-index: var(--z-header);
     white-space: nowrap;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--dur-moderate) var(--ease-standard);
     backdrop-filter: blur(8px) saturate(1.1);
     border-bottom: 1px solid rgba(0,0,0,0.06);
     align-items: center;
@@ -27,13 +27,13 @@
     height: 2.4rem;
     line-height: 2.4rem;
     margin-left: 1rem;
-    transition: all 0.2s ease;
+    transition: all var(--dur-normal) var(--ease-default);
 }
 
 #sidebar .title-a {
     text-decoration: none;
     color: #2d3748;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--dur-moderate) var(--ease-standard);
     position: relative;
     padding: 0.2em 0;
 }
@@ -46,7 +46,7 @@
     width: 0;
     height: 2px;
     background: #2d3748;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all var(--dur-moderate) var(--ease-standard);
     transform: translateX(-50%);
 }
 
@@ -57,7 +57,7 @@
 
 #sidebar .title-a:active {
     transform: translateY(0);
-    transition-duration: 0.05s;
+    transition-duration: var(--dur-fast);
 }
 
 #sidebar .title-a:hover::after { width: 100%; }
@@ -65,7 +65,7 @@
 #sidebar .title-a:active::after {
     width: 85%;
     opacity: 0.8;
-    transition-duration: 0.05s;
+    transition-duration: var(--dur-fast);
 }
 
 #sidebar { background: #fff; padding: 0; z-index: calc(var(--z-header) + 7); }
@@ -78,12 +78,12 @@
     height: 36px;
     border-radius: var(--radius-full);
     object-fit: cover;
-    border: 1px solid #e2e8f0;
-    background: #fff;
+    border: 1px solid var(--border);
+    background: var(--surface);
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     cursor: pointer;
     display: none;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform var(--dur-normal) ease, box-shadow var(--dur-normal) var(--ease-default);
     z-index: calc(var(--z-panel) + 10);
 }
 
@@ -97,7 +97,7 @@
     border: none;
     cursor: pointer;
     border-radius: var(--radius-sm) ;
-    transition: all 0.2s ease;
+    transition: all var(--dur-normal) var(--ease-default);
     color: var(--text, #4a5568);
     font-weight: 500;
 }
@@ -124,7 +124,7 @@
 }
 
 #nav .tabs-title a {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all var(--dur-moderate) var(--ease-standard) !important;
     position: relative;
     overflow: hidden;
 }
@@ -137,7 +137,7 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(74, 85, 104, 0.1), transparent);
-    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: left var(--dur-slower) var(--ease-standard);
 }
 
 #nav .tabs-title a:hover::before { left: 100%; }

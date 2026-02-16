@@ -715,7 +715,7 @@ html { scrollbar-gutter: stable both-edges; }
   gap: var(--space-md);
   opacity: 0;
   transform: translateY(-6px);
-  animation: tokens-toast-in .25s ease forwards, tokens-toast-out .2s ease forwards 1.8s; /* 1.8s 后开始淡出 */
+  animation: tokens-toast-in var(--dur-moderate) ease forwards, tokens-toast-out var(--dur-normal) ease forwards 1.8s; /* 1.8s 后开始淡出 */
 }
 .tokens-toast.tokens-toast--error {
   background: var(--toast-err-bg); /* 红底 */

@@ -83,7 +83,7 @@
     background-color: rgba(128, 128, 128, 0.05);
     border-radius: var(--radius-md);
     border: 2px dashed var(--border);
-    transition: background-color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    transition: background-color var(--dur-normal), border-color var(--dur-normal), transform var(--dur-normal), box-shadow var(--dur-normal);
     transform-origin: center center;
     position: relative;
     z-index: 1;
@@ -129,7 +129,7 @@ body.is-global-dragging .deck-slot {
     padding: 0 !important;
     overflow: hidden;
     position: relative;
-    transition: box-shadow 0.2s, background-color 0.2s;
+    transition: box-shadow var(--dur-normal), background-color var(--dur-normal);
 }
 
 /* Hide all except identified top card */
@@ -168,7 +168,7 @@ body.is-global-dragging .deck-slot {
 
 .area-spread .card-placeholder {
     flex-shrink: 0;
-    transition: margin-left 0.1s ease-out;
+    transition: margin-left var(--dur-fast) var(--ease-out);
     margin-left: var(--dynamic-card-margin, 10px);
 }
 .area-spread .card-placeholder:first-child {

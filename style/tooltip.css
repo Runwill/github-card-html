@@ -11,9 +11,9 @@
     
     /* 动画过渡：快速且有弹性 */
     transition: 
-        opacity 0.2s ease,
-        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-        visibility 0s linear 0.2s;
+        opacity var(--dur-normal) var(--ease-default),
+        transform var(--dur-normal) cubic-bezier(0.16, 1, 0.3, 1),
+        visibility 0s linear var(--dur-normal);
     will-change: opacity, transform;
 
     /* 外观：毛玻璃卡片 */
@@ -45,14 +45,18 @@
     backdrop-filter: blur(12px);
 }
 
+/* 方向变体：未显示时的偏移起始位置 */
+#lore-tooltip.from-left:not(.show)   { transform: translateY(6px) translateX(-8px) scale(0.985); }
+#lore-tooltip.from-right:not(.show)  { transform: translateY(6px) translateX( 8px) scale(0.985); }
+
 /* 显示状态 */
 #lore-tooltip.show {
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
     transition: 
-        opacity 0.2s ease,
-        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+        opacity var(--dur-normal) var(--ease-default),
+        transform var(--dur-normal) cubic-bezier(0.16, 1, 0.3, 1),
         visibility 0s linear 0s;
 }
 

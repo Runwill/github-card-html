@@ -27,7 +27,7 @@
 .role-summary.active .char-avatar img {
     border: 2px solid #ffd700; /* Add border only for active state */
     box-shadow: 0 0 10px #ffd700;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: border-color var(--dur-moderate) ease, box-shadow var(--dur-moderate) var(--ease-default);
 }
 
 .player-hand-count {
@@ -120,7 +120,7 @@
     box-shadow: 0 2px 4px var(--shadow-1, rgba(0,0,0,0.1));
 
     /* Animation */
-    animation: judgeBubblePop 0.25s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    animation: judgeBubblePop var(--dur-moderate) cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     transform-origin: center;
     pointer-events: none;
 }
@@ -150,5 +150,5 @@ html[data-theme="light"] .player-judge-count {
 }
 
 .player-judge-count.count-changed {
-    animation: judgeCountPulse 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: judgeCountPulse var(--dur-moderate) cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }

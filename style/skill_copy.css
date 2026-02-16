@@ -9,7 +9,7 @@
   transform: translateY(-50%);
   opacity: 0;
   pointer-events: none; /* 默认不可点，防止误触 */
-  transition: opacity .15s ease;
+  transition: opacity var(--dur-normal) var(--ease-default);
   user-select: none;
   z-index: 2;
   /* 造型对齐 tokens 的“跳转”按钮（等效于 .btn .btn--secondary .btn--xs） */
@@ -28,7 +28,7 @@
   color: var(--text-muted) !important; /* gray-700 */
   border: 1px solid var(--border) !important; /* gray-200 */
   /* 过渡：对齐全局按钮 */
-  transition: opacity .15s ease, background-color .2s ease, color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .08s ease !important;
+  transition: opacity var(--dur-normal) ease, background-color var(--dur-normal) ease, color var(--dur-normal) ease, border-color var(--dur-normal) ease, box-shadow var(--dur-normal) ease, transform .08s var(--ease-default) !important;
 }
 
 /* 悬浮态：对齐 btn--secondary:hover */

@@ -16,13 +16,13 @@ h1, h2, h3, .indent, padding {
 }
 
 h1 { animation-name: fadeInScale; animation-delay: 0s; }
-h2 { animation-name: fadeInUp; animation-delay: 0.05s; }
-h3 { animation-name: fadeInLeft; animation-delay: 0.1s; }
-.indent { animation-name: slideInFromRight; animation-delay: 0.15s; opacity: 0; transform: translateX(50px); }
+h2 { animation-name: fadeInUp; animation-delay: var(--dur-fast); }
+h3 { animation-name: fadeInLeft; animation-delay: var(--dur-fast); }
+.indent { animation-name: slideInFromRight; animation-delay: var(--dur-normal); opacity: 0; transform: translateX(50px); }
 padding { animation-name: fadeInUp; animation-delay: 0.02s; }
 
-.indent .indent { animation-delay: 0.2s; }
-.indent .indent .indent { animation-delay: 0.25s; }
+.indent .indent { animation-delay: var(--dur-normal); }
+.indent .indent .indent { animation-delay: var(--dur-moderate); }
 padding padding { animation-delay: 0.07s; }
 padding padding padding { animation-delay: 0.12s; }
 

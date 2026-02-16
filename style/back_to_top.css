@@ -16,7 +16,7 @@
   box-shadow: 0 6px 20px rgba(0,0,0,0.12);
   color: #334155;
   cursor: pointer;
-  transition: opacity .2s ease, transform .2s ease, background .2s ease, color .2s ease, border-color .2s ease;
+  transition: opacity var(--dur-normal) ease, transform var(--dur-normal) ease, background var(--dur-normal) ease, color var(--dur-normal) ease, border-color var(--dur-normal) var(--ease-default);
   opacity: 0;
   transform: translateY(8px);
   pointer-events: none; /* 隐藏时不占交互 */

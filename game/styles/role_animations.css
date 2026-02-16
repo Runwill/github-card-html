@@ -1,7 +1,7 @@
 
 /* Role Layout Animation */
 .role-moving {
-    animation: roleMoveIn 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    animation: roleMoveIn var(--dur-slower) cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 @keyframes roleMoveIn {

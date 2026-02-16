@@ -20,10 +20,10 @@
     
     /* Expanded Transition for Flip Effect */
     transition: 
-        transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-        box-shadow 0.2s,
-        background 0.3s,
-        color 0.3s;
+        transform var(--dur-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+        box-shadow var(--dur-normal),
+        background var(--dur-moderate),
+        color var(--dur-moderate);
         
     font-size: 0.9rem;
     color: var(--text);
@@ -56,9 +56,9 @@
     transform: scale(0.8); /* Slight zoom in effect validation */
     
     transition: 
-        filter 0.3s ease, 
-        opacity 0.3s ease,
-        transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        filter var(--dur-moderate) ease, 
+        opacity var(--dur-moderate) var(--ease-default),
+        transform var(--dur-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .card-placeholder:hover {
@@ -140,10 +140,6 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     position: relative;
 }
 
-.card-placeholder[data-card-key='CardBack']::after {
-    /* Removed display: none to allow other styles (like Viewer counters) to use ::after */
-}
-
 /* Dragging Ghost/Real Element */
 .drag-ghost {
     background: var(--surface);
@@ -171,7 +167,7 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     z-index: var(--z-modal);
     
     /* Smooth Lift Animation */
-    transition: box-shadow 0.25s cubic-bezier(0.2, 0, 0.2, 1), opacity 0.2s;
+    transition: box-shadow var(--dur-moderate) cubic-bezier(0.2, 0, 0.2, 1), opacity var(--dur-normal);
 }
 
 .dragging-real.lifted {
@@ -196,7 +192,7 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     border-style: solid;
     box-shadow: inset 0 0 20px rgba(var(--primary-rgb), 0.2);
     transform: scale(1.01);
-    transition: all 0.2s ease;
+    transition: all var(--dur-normal) var(--ease-default);
 }
 
 /* =========================================
@@ -217,7 +213,7 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
 
 .board-pile-slot:hover .pile-inspector-overlay {
     display: block;
-    animation: pileInspectorFadeIn 0.2s ease-out;
+    animation: pileInspectorFadeIn var(--dur-normal) ease-out;
 }
 
 .inspector-card {
@@ -238,7 +234,7 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     color: var(--text);
     text-align: center;
     transform-origin: center 200%; 
-    transition: transform 0.1s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+    transition: transform var(--dur-fast) cubic-bezier(0.1, 0.7, 1.0, 0.1);
     will-change: transform;
 }
 

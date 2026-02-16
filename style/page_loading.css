@@ -9,7 +9,7 @@
     align-items: center;
     justify-content: center;
     /* 优化退出：增加模糊过渡，实现“对焦”般的清晰过程 */
-    transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), backdrop-filter 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: opacity 1.2s var(--ease-standard), backdrop-filter 1.2s var(--ease-standard);
     backdrop-filter: blur(10px);
 }
 
@@ -30,7 +30,7 @@
 #loading-overlay.fade-out .loading-title {
     opacity: 0;
     transform: scale(0.98); /* 极微小的退后感，保持稳重 */
-    transition: opacity 0.8s ease, transform 0.8s ease;
+    transition: opacity 0.8s var(--ease-default), transform 0.8s var(--ease-default);
 }
 
 .loading-bar-container {
@@ -46,7 +46,7 @@
     box-shadow: 0 6px 16px var(--shadow-1);
     overflow: hidden;
     opacity: 0;
-    animation: fade-in 0.5s ease-in 0.3s forwards;
+    animation: fade-in var(--dur-slower) ease-in var(--dur-moderate) forwards;
 }
 
 .loading-bar {
@@ -81,7 +81,7 @@
     letter-spacing: 1em;
     font-family: '康熙';
     opacity: 0;
-    animation: fade-in 0.5s ease-in forwards, pulse 2s ease-in-out infinite 1s;
+    animation: fade-in var(--dur-slower) ease-in forwards, pulse 2s ease-in-out infinite 1s;
     transform: translateZ(0);
     will-change: opacity, letter-spacing;
 }

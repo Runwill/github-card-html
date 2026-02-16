@@ -2,17 +2,17 @@
 .custom-context-menu {
     position: fixed;
     z-index: var(--z-ctx-menu);
-    background: var(--card-bg, #fff);
-    border: 1px solid var(--border-color, #ccc);
+    background: var(--surface);
+    border: 1px solid var(--border);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border-radius: var(--radius-sm) ;
     padding: var(--space-2xs) 0;
     min-width: 180px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: var(--fs-md);
-    color: var(--text-color, #333);
+    color: var(--text);
     display: none; /* Hidden by default */
-    animation: fadeIn 0.1s ease-out;
+    animation: fadeIn var(--dur-fast) ease-out;
 }
 
 .custom-context-menu.visible {
@@ -22,9 +22,9 @@
 .context-menu-header {
     padding: var(--space-sm) var(--space-lg);
     font-weight: 600;
-    border-bottom: 1px solid var(--border-color, #eee);
-    background: var(--bg-secondary, #f9f9f9);
-    color: var(--text-secondary, #666);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-start);
+    color: var(--text-muted, #666);
     font-size: var(--fs-sm);
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -35,12 +35,12 @@
     cursor: pointer;
     display: flex;
     align-items: center;
-    transition: background 0.1s;
+    transition: background var(--dur-fast);
 }
 
 .context-menu-item:hover {
-    background: var(--primary-color-light, #e6f7ff);
-    color: var(--primary-color, #1890ff);
+    background: color-mix(in srgb, var(--primary-1) 15%, transparent);
+    color: var(--primary-2);
 }
 
 .context-menu-item .icon {
@@ -52,30 +52,30 @@
 
 .context-menu-separator {
     height: 1px;
-    background: var(--border-color, #eee);
+    background: var(--border);
     margin: var(--space-2xs) 0;
 }
 
 /* Dark Mode Support */
 [data-theme='dark'] .custom-context-menu {
-    background: #2d2d2d;
-    border-color: #444;
-    color: #e0e0e0;
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text);
 }
 
 [data-theme='dark'] .context-menu-header {
-    background: #333;
-    border-bottom-color: #444;
-    color: #aaa;
+    background: var(--bg-start);
+    border-bottom-color: var(--border);
+    color: var(--text-subtle);
 }
 
 [data-theme='dark'] .context-menu-item:hover {
-    background: #3d3d3d;
-    color: #40a9ff;
+    background: color-mix(in srgb, var(--primary-1) 20%, transparent);
+    color: var(--primary-1);
 }
 
 [data-theme='dark'] .context-menu-separator {
-    background: #444;
+    background: var(--border);
 }
 
 @keyframes fadeIn {

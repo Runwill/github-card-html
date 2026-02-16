@@ -66,6 +66,7 @@ pronounName {
     z-index: 0;
 }
 
+.container:hover .role_title { opacity: 0.1; left: 0%; }
 .container:hover .role_icon.dominator { opacity: 0.025; left: 5%; }
 .container:hover .role_icon.not_dominator { opacity: 0.025; left: 4.5%; }
 
@@ -87,8 +88,8 @@ pronounName {
     will-change: transform;
 }
 
-.indent .indent { transition-delay: 0.1s; }
-.indent .indent .indent { transition-delay: 0.2s; }
+.indent .indent { transition-delay: var(--dur-fast); }
+.indent .indent .indent { transition-delay: var(--dur-normal); }
 .indent:not(:hover) { transition-delay: 0s; }
 .indent + .indent { padding-top: 0.6em; }
 

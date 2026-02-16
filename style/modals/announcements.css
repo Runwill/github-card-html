@@ -26,7 +26,7 @@
   padding: var(--space-3xl); 
   margin-bottom: var(--space-2xl);
   background: var(--surface, #fff);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--dur-normal) var(--ease-standard);
   position: relative;
   overflow: hidden;
   z-index: 0; /* Establish stacking context */
@@ -40,7 +40,7 @@
   width: 4px;
   background: var(--primary-2, #7084ff);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--dur-normal) var(--ease-default);
   z-index: 2; /* Above background */
 }
 
@@ -50,7 +50,7 @@
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--dur-normal) var(--ease-default);
   z-index: 0; /* Behind content but above base background */
   pointer-events: none;
 }
@@ -75,7 +75,7 @@
   color: var(--text, #0f172a); 
   margin-bottom: var(--space-sm); 
   font-size: var(--fs-2xl); 
-  line-height: 1.3;
+  line-height: var(--lh-snug);
 }
 
 .ann-card-meta { 
@@ -132,7 +132,7 @@
   display: inline-flex;
   align-items: center;
   font-size: var(--fs-sm);
-  line-height: 1;
+  line-height: var(--lh-none);
   padding: var(--space-2xs) var(--space-sm);
   border-radius: var(--radius-lg) ;
   background: linear-gradient(135deg, #f59e0b, #d97706);
@@ -182,7 +182,7 @@ html[data-theme="dark"] .ann-card.is-important.is-hovered {
   padding: 1px 8px;
   border-radius: var(--radius-pill);
   margin-bottom: var(--space-2xs);
-  line-height: 1.3;
+  line-height: var(--lh-snug);
   letter-spacing: 0;
 }
 

@@ -22,7 +22,7 @@
 
 /* Segmented scheme buttons */
 .tokens-scheme__group { display:inline-flex; flex-wrap:wrap; gap:var(--space-sm); }
-.tokens-scheme__btn { display:inline-flex; align-items:center; gap:var(--space-xs); padding:var(--space-xs) var(--space-md); border:1px solid var(--border) !important; border-radius: var(--radius-md); cursor:pointer; user-select:none; background: var(--surface) !important; color: var(--text) !important; line-height:1.2; white-space:nowrap; transition: all .2s ease; }
+.tokens-scheme__btn { display:inline-flex; align-items:center; gap:var(--space-xs); padding:var(--space-xs) var(--space-md); border:1px solid var(--border) !important; border-radius: var(--radius-md); cursor:pointer; user-select:none; background: var(--surface) !important; color: var(--text) !important; line-height:1.2; white-space:nowrap; transition: all var(--dur-normal) var(--ease-default); }
 .tokens-scheme__btn:hover { background: color-mix(in srgb, var(--surface) 92%, transparent) !important; transform: translateY(-1px); }
 .tokens-scheme__btn:focus { outline:none; box-shadow:0 0 0 3px var(--primary-ring) !important; border-color: var(--primary-2) !important; }
 .tokens-scheme__btn.is-selected { background: linear-gradient(135deg, var(--primary-1) 0%, var(--primary-2) 50%, var(--primary-3) 100%) !important; background-size:200% 200% !important; background-position:0% 50% !important; border:none !important; box-shadow:0 4px 6px -1px var(--primary-shadow) !important; color:#fff !important; }

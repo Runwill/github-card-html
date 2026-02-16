@@ -253,7 +253,7 @@
   pointer-events: none;
   /* Flash color based on state */
   background: currentColor; 
-  animation: account-info-msg-flash-anim 0.5s ease-out;
+  animation: account-info-msg-flash-anim var(--dur-slower) ease-out;
 }
 
 #account-info-message.success.msg-flash::after { background: var(--success, #48bb78); }

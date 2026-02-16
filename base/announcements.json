@@ -1,6 +1,14 @@
 {
   "announcements": [
     {
+      "date": "2026-02-15",
+      "title": "Token化清理",
+      "changes": [
+        "优化：间距语义命名、transition/border/行高 token 化、消除未定义 CSS 变量",
+        "修复：修复变量循环引用、tooltip 方向偏移、登录消息颜色等回归问题"
+      ]
+    },
+    {
       "date": "2026-02-13",
       "title": "公网部署修复",
       "changes": [

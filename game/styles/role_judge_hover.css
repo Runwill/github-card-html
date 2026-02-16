@@ -6,7 +6,7 @@
     background-color: rgba(255, 215, 0, 0.15) !important;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.6) !important;
     transform: scale(1.05); /* Slight pop */
-    transition: all 0.2s ease;
+    transition: all var(--dur-normal) var(--ease-default);
 }
 
 .role-summary.judge-area-active .player-name {

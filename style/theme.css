@@ -51,6 +51,7 @@
   --primary-1: #8698ff;
   --primary-2: #7084ff;
   --primary-3: #5a6cff;
+  --primary-rgb: 112, 132, 255; /* --primary-2 的 RGB 分量，用于 rgba() */
   --primary-ring: rgba(66,153,225,0.20);
   --primary-shadow: rgba(134, 152, 255, 0.25);
 
@@ -142,6 +143,7 @@
   /* 行高阶梯 */
   --lh-none:    1;    /* 紧凑：badge、pill、inline-action */
   --lh-tight:   1.2;  /* 按钮、表单控件 */
+  --lh-snug:    1.3;  /* 略紧：公告标题、标签 */
   --lh-normal:  1.5;  /* 正文段落 */
   --lh-relaxed: 1.6;  /* 舒适阅读：textarea、编辑器 */
 
@@ -181,6 +183,7 @@ html[data-theme="dark"] {
   --primary-1: #5b6cff; /* indigo-500 近似 */
   --primary-2: #4f46e5; /* indigo-600 */
   --primary-3: #4338ca; /* indigo-700 */
+  --primary-rgb: 79, 70, 229; /* --primary-2 的 RGB 分量 */
   --primary-ring: rgba(99,102,241,0.28); /* indigo-500 ring */
   --primary-shadow: rgba(99,102,241,0.30);
 

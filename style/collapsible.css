@@ -14,7 +14,7 @@
   top: 0.15em;
   width: 1em;
   height: 1em;
-  line-height: 1em;
+  line-height: var(--lh-none);
   /* Prevent mobile long-press blue/gray highlight and text selection */
   -webkit-tap-highlight-color: rgba(0,0,0,0);
   -webkit-touch-callout: none;
@@ -24,7 +24,7 @@
 
 .collapsible__chevron {
   display: inline-block;
-  transition: transform 0.18s ease;
+  transition: transform var(--dur-normal) var(--ease-default);
 }
 .collapsible__toggle.is-collapsed .collapsible__chevron {
   transform: rotate(-90deg);
@@ -37,7 +37,7 @@
   display: flow-root;
   height: auto;
   opacity: 1;
-  transition: height 180ms ease, opacity 150ms ease;
+  transition: height var(--dur-normal) ease, opacity var(--dur-normal) var(--ease-default);
   will-change: height, opacity;
 }
 .collapsible__content.is-collapsed {
@@ -68,7 +68,7 @@
 #panel_term h3 > .collapsible__toggle {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.18s ease;
+  transition: opacity var(--dur-normal) var(--ease-default);
 }
 
 #panel_term h2:hover > .collapsible__toggle,

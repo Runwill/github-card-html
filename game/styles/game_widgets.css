@@ -12,7 +12,7 @@
     flex-direction: column; /* Vertical layout */
     align-items: flex-start;
     font-size: 1rem;
-    color: var(--text-secondary);
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 600;
@@ -25,7 +25,7 @@
     display: inline-flex;
     align-items: center;
     opacity: 0;
-    animation: slideInUp 0.3s forwards;
+    animation: slideInUp var(--dur-moderate) forwards;
     font-size: 1rem;
     transition: all var(--dur-moderate) var(--ease-default);
 }
