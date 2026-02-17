@@ -79,55 +79,69 @@
   max-width: 100%;
 }
 
-/* Pending / Cancel Inline Actions */
-#account-info-username-pending-inline { display: none; }
-#account-info-username-cancel-inline { display: none; }
+/* ── Pending Review & Withdraw (username + intro) ── */
 
-#account-info-username-pending-inline,
-#account-info-intro-pending-inline {
-  font-weight: 500 !important;
-  color: var(--text-subtle, #a0aec0);
-  font-size: 0.75em;
-  white-space: nowrap;
-  line-height: var(--lh-none);
-  vertical-align: baseline;
-  background: var(--bg-start, #f7fafc);
-  padding: var(--space-3xs) var(--space-xs);
-  border-radius: var(--radius-xs);
+/* Username: wrapper sits inline after the name, hidden by default */
+#account-info-username-pending-wrap {
+  display: none;
+  align-items: center;
+  gap: var(--space-xs);
+  overflow: hidden;
+  max-width: 280px;
 }
 
+/* Shared pending text style — subtle muted badge, same tone as .badge & .meta-value */
+#account-info-username-pending-inline,
+#account-info-intro-pending-inline {
+  font-size: 0.72em;
+  font-weight: 500;
+  color: var(--text-subtle, #a0aec0);
+  background: var(--bg-start, #f7fafc);
+  padding: var(--space-3xs) var(--space-sm);
+  border-radius: var(--radius-xs);
+  white-space: nowrap;
+  line-height: var(--lh-none);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 20ch;
+  vertical-align: baseline;
+}
+
+/* Shared withdraw button — tiny ghost link style, blends with surrounding text */
 #account-info-username-cancel-inline,
 #account-info-intro-cancel-inline {
   all: unset;
+  display: inline-flex;
   align-items: center;
-  color: var(--danger, #f56565);
-  padding: var(--space-3xs) var(--space-xs) !important;
-  line-height: var(--lh-none) !important;
-  font-size: 0.75em !important;
-  font-weight: 600 !important;
+  font-size: 0.72em;
+  font-weight: 500;
+  color: var(--text-subtle, #a0aec0);
   cursor: pointer;
-  vertical-align: baseline;
+  padding: var(--space-3xs) var(--space-xs);
   border-radius: var(--radius-xs);
-  transition: background var(--dur-normal) var(--ease-default);
+  line-height: var(--lh-none);
+  white-space: nowrap;
+  transition: color var(--dur-normal) var(--ease-default),
+              background var(--dur-normal) var(--ease-default);
 }
 
 #account-info-username-cancel-inline:hover,
 #account-info-intro-cancel-inline:hover {
-  background: rgba(245, 101, 101, 0.1);
+  color: var(--danger, #f56565);
+  background: rgba(245, 101, 101, 0.08);
 }
 
-/* Intro Pending Wrapper */
+/* Intro pending container — sits below textarea, hidden by default */
 #account-info-intro-pending {
-  display: none; 
+  display: none;
   align-items: center;
   gap: var(--space-sm);
-  color: var(--text-subtle, #a0aec0);
-  line-height: var(--lh-none);
   width: 100%;
-  flex-wrap: nowrap;
-  margin-top: var(--space-2xs);
+  line-height: var(--lh-none);
+  margin-top: calc(-1 * var(--space-2xs));
 }
 
+/* Intro pending text — allow truncation */
 #account-info-intro-pending-inline {
   flex: 0 1 auto;
   min-width: 0;
@@ -135,6 +149,14 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: min(70%, 40ch);
+  padding-left: 0;
+  background: transparent;
+}
+
+/* Intro cancel button pushed to right */
+#account-info-intro-cancel-inline {
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 /* Body Section */
@@ -211,6 +233,7 @@
 /* Intro Textarea */
 .account-info__intro { 
   padding-top: var(--space-sm); 
+  padding-bottom: var(--space-md);
   display: flex; 
   flex-direction: column; 
   gap: var(--space-sm); 
@@ -286,24 +309,4 @@
   .account-info__name { font-size: var(--fs-2xl); }
 }
 
-/* Animation Fixes for Inline Edit - Smooth Collapse */
-#account-info-username-pending-inline,
-#account-info-username-cancel-inline {
-  max-width: 300px;
-  overflow: hidden;
-}
 
-#account-info-username-pending-inline.anim-fade-leave,
-#account-info-username-cancel-inline.anim-fade-leave {
-  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default), max-width var(--dur-normal) var(--ease-default), padding var(--dur-normal) var(--ease-default), margin var(--dur-normal) var(--ease-default) !important;
-}
-
-#account-info-username-pending-inline.anim-fade-leave-active,
-#account-info-username-cancel-inline.anim-fade-leave-active {
-  max-width: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  opacity: 0 !important;
-}

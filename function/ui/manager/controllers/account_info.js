@@ -66,7 +66,7 @@
             badge.textContent = p;
             const tipPrefix = t('perm.tooltip.prefix', { name: p });
             const tip = PERM_DESC[p] || tipPrefix;
-            try { badge.setAttribute('data-tooltip', tip); } catch { badge.title = tip; }
+            badge.setAttribute('data-tooltip', tip);
             container.appendChild(badge);
           });
         }

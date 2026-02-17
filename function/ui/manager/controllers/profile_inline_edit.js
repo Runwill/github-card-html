@@ -52,37 +52,34 @@
     }
   }
 
-  // Animation helpers
-  function isHidden(el) { return w.getComputedStyle(el).display === 'none'; }
+  // ── Animation helpers (timeout-based, no transitionend) ──
+  var ANIM_MS = 200; // slightly > --dur-normal (180ms)
+
+  function isHidden(el) { return !el || w.getComputedStyle(el).display === 'none'; }
 
   function animateShow(el, displayType) {
     if (!el) return;
     el.classList.remove('anim-fade-leave', 'anim-fade-leave-active');
-    el.style.display = displayType || '';
     el.classList.add('anim-fade-enter');
-    void el.offsetWidth; // reflow
+    el.style.display = displayType || '';
+    void el.offsetWidth;
     el.classList.add('anim-fade-enter-active');
-    var onEnd = function() {
+    setTimeout(function() {
       el.classList.remove('anim-fade-enter', 'anim-fade-enter-active');
-      el.removeEventListener('transitionend', onEnd);
-    };
-    el.addEventListener('transitionend', onEnd, { once: true });
+    }, ANIM_MS);
   }
 
   function animateHide(el, callback) {
-    if (!el || isHidden(el)) { if(callback) callback(); return; }
+    if (!el || isHidden(el)) { if (callback) callback(); return; }
     el.classList.remove('anim-fade-enter', 'anim-fade-enter-active');
     el.classList.add('anim-fade-leave');
-    void el.offsetWidth; // reflow
+    void el.offsetWidth;
     el.classList.add('anim-fade-leave-active');
-    var onEnd = function() {
+    setTimeout(function() {
       el.style.display = 'none';
       el.classList.remove('anim-fade-leave', 'anim-fade-leave-active');
       if (callback) callback();
-    };
-    el.addEventListener('transitionend', onEnd, { once: true });
-    // Fallback if transition fails or element hidden
-    setTimeout(function(){ if(el.style.display !== 'none') { el.style.display = 'none'; if(callback) callback(); } }, 250);
+    }, ANIM_MS);
   }
 
   function refreshUsernameUI(newName){
@@ -132,22 +129,33 @@
   }
 
   async function loadPendingIntroBadge(){
+    var container = $('account-info-intro-pending');
+    if (!container) return;
     try {
       var id = w.localStorage ? w.localStorage.getItem('id') : '';
       if (!id) return;
-      var container = $('account-info-intro-pending'); if (!container) return;
       var resp = await fetch(api('/api/intro/pending/me?userId=' + encodeURIComponent(id)));
-      if (!resp.ok) { animateHide(container); return; }
+      if (!resp.ok) { animateHide(container, function(){ container.innerHTML = ''; }); return; }
       var data = await resp.json();
-      var show = !!(data && typeof data.newIntro === 'string');
-      if (!show) { animateHide(container, function(){ container.innerHTML = ''; }); return; }
+      if (!(data && typeof data.newIntro === 'string')) {
+        animateHide(container, function(){ container.innerHTML = ''; });
+        return;
+      }
       var full = (data.newIntro || '').replace(/\s+/g, ' ');
       container.innerHTML = '';
-      var span = document.createElement('span'); span.id = 'account-info-intro-pending-inline'; span.textContent = t('account.info.pending') + full; span.title = full;
-      var btn = document.createElement('button'); btn.id = 'account-info-intro-cancel-inline'; btn.textContent = t('account.info.cancel'); btn.addEventListener('click', function(){ cancelPendingIntroChange(); });
-      container.appendChild(span); container.appendChild(btn); 
+      var span = document.createElement('span');
+      span.id = 'account-info-intro-pending-inline';
+      span.textContent = t('account.info.pending') + full;
+      var btn = document.createElement('button');
+      btn.id = 'account-info-intro-cancel-inline';
+      btn.textContent = t('account.info.cancel');
+      btn.onclick = function(){ cancelPendingIntroChange(); };
+      container.appendChild(span);
+      container.appendChild(btn);
       if (isHidden(container)) animateShow(container, 'flex');
-    } catch(_){ var container2 = $('account-info-intro-pending'); if (container2) { animateHide(container2, function(){ container2.innerHTML = ''; }); } }
+    } catch(_){
+      animateHide(container, function(){ container.innerHTML = ''; });
+    }
   }
 
   async function cancelPendingIntroChange(){
@@ -200,7 +208,7 @@
             if (w.localStorage) w.localStorage.setItem('username', newName);
             refreshUsernameUI(newName);
             showFlash('success', t('success.usernameUpdatedImmediate'));
-            try { var tag = $('account-info-username-pending-inline'); if (tag) animateHide(tag, function(){ tag.textContent = ''; }); var btn = $('account-info-username-cancel-inline'); if (btn) animateHide(btn); } catch(_){ }
+            try { var wrap = $('account-info-username-pending-wrap'); if (wrap) animateHide(wrap, function(){ var t2 = $('account-info-username-pending-inline'); if (t2) t2.textContent = ''; }); } catch(_){ }
           } else {
             showFlash('success', t('success.usernameSubmitted'));
             nameEl.textContent = oldName;
@@ -223,37 +231,30 @@
   }
 
   async function loadPendingUsernameBadge(){
+    var wrap = $('account-info-username-pending-wrap');
+    var tag = $('account-info-username-pending-inline');
+    var cancelBtn = $('account-info-username-cancel-inline');
+    if (!wrap || !tag) return;
     try {
       var id = w.localStorage ? w.localStorage.getItem('id') : '';
       if (!id) return;
-      var tag = $('account-info-username-pending-inline');
-      var cancelBtn = $('account-info-username-cancel-inline');
       var resp = await fetch(api('/api/username/pending/me?userId=' + encodeURIComponent(id)));
       if (!resp.ok) return;
       var data = await resp.json();
-      var show = !!(data && data.newUsername);
-      if (tag) {
-        var prefix = t('account.info.pending');
-        if (show) {
-          tag.textContent = prefix + data.newUsername;
-          tag.dataset.pendingName = data.newUsername;
-          if (isHidden(tag)) animateShow(tag, 'inline');
-        } else {
+      if (data && data.newUsername) {
+        // 填充内容
+        tag.textContent = t('account.info.pending') + data.newUsername;
+        tag.dataset.pendingName = data.newUsername;
+        // 绑定撤回按钮（onclick 自然覆盖旧处理器，无需 cloneNode）
+        if (cancelBtn) cancelBtn.onclick = function(){ cancelPendingUsernameChange(); };
+        // 显示
+        if (isHidden(wrap)) animateShow(wrap, 'inline-flex');
+      } else {
+        // 先动画收起，完成后清理文本
+        animateHide(wrap, function(){
+          tag.textContent = '';
           delete tag.dataset.pendingName;
-          animateHide(tag, function(){ tag.textContent = ''; });
-        }
-      }
-      if (cancelBtn) {
-        var newBtn = cancelBtn.cloneNode(true);
-        // Preserve display state for animation continuity
-        cancelBtn.replaceWith(newBtn);
-        newBtn.addEventListener('click', function(){ cancelPendingUsernameChange(); });
-        
-        if (show) {
-          if (isHidden(newBtn)) animateShow(newBtn, 'inline-flex');
-        } else {
-          animateHide(newBtn);
-        }
+        });
       }
     } catch(_){ }
   }

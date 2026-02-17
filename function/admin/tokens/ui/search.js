@@ -24,11 +24,6 @@
           tgl.id = 'tokens-compact-toggle';
           try { tgl.className = (btn.className || 'btn btn--secondary') + ' mode-toggle'; } catch (_) { tgl.className = 'btn btn--secondary mode-toggle'; }
           tgl.type = 'button';
-          // i18n: 标题通过 data-i18n-attr 绑定
-          try {
-            tgl.setAttribute('data-i18n-attr', 'title');
-            tgl.setAttribute('data-i18n-title', 'tokens.mode.toggle.title');
-          } catch(_){}
 
           const sync = () => {
             try {
