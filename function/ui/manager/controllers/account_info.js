@@ -23,6 +23,21 @@
       const nameMainEl = $('account-info-username-main'); const nameTextEl = $('account-info-username-text'); const roleEl = $('account-info-role'); const idEl = $('account-info-id'); const introEl = $('account-info-intro'); const avatarEl = $('account-info-avatar');
       const createdAtEl = $('account-info-createdAt');
       if (nameMainEl) nameMainEl.textContent = name; if (nameTextEl) nameTextEl.textContent = name; if (idEl) idEl.textContent = id;
+      // 点击用户名行复制
+      if (nameTextEl) {
+        var row = nameTextEl.closest('.info-row');
+        if (row && !row.__copyBound) {
+          row.__copyBound = true;
+          row.style.cursor = 'pointer';
+          row.addEventListener('click', function() {
+            var text = nameTextEl.textContent || '';
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(function() {
+              if (window.showToast) window.showToast(t('common.copied'));
+            }).catch(function() {});
+          });
+        }
+      }
       if (createdAtEl) {
         const ca = localStorage.getItem('createdAt');
         if (ca) { try { createdAtEl.textContent = new Date(ca).toLocaleString(); } catch { createdAtEl.textContent = ca; } }

@@ -31,7 +31,15 @@
 
       toast.appendChild(document.createTextNode(' ' + (message || (isError ? '错误' : '操作成功'))));
       container.appendChild(toast);
-      setTimeout(function(){ try{ toast.remove(); }catch(_){} if(container && container.children.length===0){ try{ container.remove(); }catch(_){} } }, 2200);
+      var onEnd = function(e) {
+        if (e.animationName !== 'tokens-toast-collapse') return;
+        toast.removeEventListener('animationend', onEnd);
+        try { toast.remove(); } catch(_){}
+        if (container && container.children.length === 0) { try { container.remove(); } catch(_){} }
+      };
+      toast.addEventListener('animationend', onEnd);
+      // Fallback: remove after all animations complete (~2.6s)
+      setTimeout(function(){ try { toast.remove(); } catch(_){} if(container && container.children.length===0){ try{ container.remove(); }catch(_){} } }, 2600);
     } catch(_){}
   }
 
