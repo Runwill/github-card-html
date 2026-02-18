@@ -82,12 +82,31 @@
 /* ── Pending Review & Withdraw (username + intro) ── */
 
 /* Username: wrapper sits inline after the name, hidden by default */
+/* Username pending wrap — collapse/expand via max-width (inline element) */
 #account-info-username-pending-wrap {
-  display: none;
+  display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
   overflow: hidden;
+  pointer-events: none;
+
+  /* Collapsed state (default) */
+  opacity: 0;
+  max-width: 0;
+  transform: translateX(-4px);
+
+  transition:
+    opacity var(--dur-moderate) var(--ease-default),
+    transform var(--dur-moderate) var(--ease-default),
+    max-width var(--dur-moderate) var(--ease-standard);
+}
+
+/* Expanded state */
+#account-info-username-pending-wrap.is-expanded {
+  opacity: 1;
   max-width: 280px;
+  transform: translateX(0);
+  pointer-events: auto;
 }
 
 /* Shared pending text style — subtle muted badge, same tone as .badge & .meta-value */
@@ -131,14 +150,34 @@
   background: rgba(245, 101, 101, 0.08);
 }
 
-/* Intro pending container — sits below textarea, hidden by default */
+/* Intro pending container — collapse/expand via max-height (like modal-message) */
 #account-info-intro-pending {
-  display: none;
+  display: flex;
   align-items: center;
   gap: var(--space-sm);
   width: 100%;
   line-height: var(--lh-none);
-  margin-top: calc(-1 * var(--space-2xs));
+  margin-top: calc(-1 * var(--space-2xs)); /* static, not transitioned */
+
+  /* Collapsed state (default) */
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transform: translateY(4px);
+  pointer-events: none;
+
+  transition:
+    opacity var(--dur-moderate) var(--ease-default),
+    transform var(--dur-moderate) var(--ease-default),
+    max-height var(--dur-moderate) var(--ease-standard);
+}
+
+/* Expanded state */
+#account-info-intro-pending.is-expanded {
+  opacity: 1;
+  max-height: 60px; /* sufficient for one-line content */
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
 /* Intro pending text — allow truncation */
@@ -282,26 +321,6 @@
 #account-info-message.success.msg-flash::after { background: var(--success, #48bb78); }
 #account-info-message.error.msg-flash::after { background: var(--danger, #f56565); }
 
-/* JS Animation Helpers */
-.anim-fade-enter {
-  opacity: 0;
-  transform: scale(0.95);
-  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default) !important;
-}
-.anim-fade-enter-active {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.anim-fade-leave {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default) !important;
-}
-.anim-fade-leave-active {
-  opacity: 0;
-  transform: scale(0.95);
-}
 
 @media (max-width: 480px) {
   .account-info-modal { padding: var(--space-3xl); }

@@ -182,7 +182,9 @@
              
         if (DragState.currentDropZone !== dropZone) {
             if (DragState.currentDropZone) DragState.currentDropZone.classList.remove('drag-over');
-            if (dropZone) dropZone.classList.add('drag-over');
+            if (dropZone && dropZone.getAttribute('data-drop-zone') === 'hand') {
+                dropZone.classList.add('drag-over');
+            }
             DragState.currentDropZone = dropZone;
         }
         
@@ -263,6 +265,10 @@
         }
 
         let dropZone = DragState.currentDropZone;
+        if (DragState.currentDropZone) {
+            DragState.currentDropZone.classList.remove('drag-over');
+            DragState.currentDropZone = null;
+        }
         if (!dropZone && placeholder) {
             dropZone = placeholder.parentNode;
         }
