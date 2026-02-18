@@ -206,14 +206,12 @@
           // 立刻展开（无动画），以便正确计算滚动位置
           node.classList.remove('is-collapsed')
           node.style.height = 'auto'
-          node.setAttribute('aria-hidden', 'false')
           // 同步更新对应按钮状态（按钮在 wrapper 前一个兄弟节点的 heading 内）
           const heading = node.previousElementSibling
           if (heading) {
             const btn = heading.querySelector && heading.querySelector('.collapsible__toggle')
             if (btn) {
               btn.classList.remove('is-collapsed')
-              btn.setAttribute('aria-expanded', 'true')
             }
           }
         }

@@ -462,6 +462,7 @@ html { scrollbar-gutter: stable both-edges; }
   color: var(--text);
   white-space: pre-wrap;
   word-break: break-all;
+  line-height: var(--lh-tight);
   /* 预留右侧操作区空间，避免长文本与删除按钮重叠 */
   padding-right: var(--kv-actions-space, 72px);
   box-sizing: border-box;
@@ -528,7 +529,9 @@ html { scrollbar-gutter: stable both-edges; }
   overflow: hidden;
   white-space: pre-wrap;
   word-break: break-word;
-  line-height: inherit;
+  line-height: var(--lh-tight);
+  min-height: 0;
+  display: block;
 }
 
 /* 颜色编辑器布局 */

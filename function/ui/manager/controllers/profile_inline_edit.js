@@ -25,7 +25,6 @@
   // 通用保存辅助: fetch + 错误/busy 状态管理
   // state = { saveFailed, lastTried } 会被函数修改
   async function trySave(el, url, body, state, onOk) {
-    el.setAttribute('aria-busy', 'true');
     try {
       var resp = await fetch(api(url), {
         method: 'POST',
@@ -48,7 +47,6 @@
       showFlash('error', t('error.networkRetryLater'));
       state.saveFailed = true;
     } finally {
-      el.removeAttribute('aria-busy');
     }
   }
 
@@ -169,9 +167,9 @@
     var startEdit = function(){
       if (_isEditing) return; _isEditing = true;
       var oldName = nameEl.textContent || '';
-      nameEl.setAttribute('contenteditable', 'true'); nameEl.classList.add('is-editing'); nameEl.setAttribute('role', 'textbox'); nameEl.setAttribute('aria-label', t('account.info.editUsername'));
+      nameEl.setAttribute('contenteditable', 'true'); nameEl.classList.add('is-editing');
       var sel = w.getSelection && w.getSelection(); var range = document.createRange(); range.selectNodeContents(nameEl); if (sel) { sel.removeAllRanges(); sel.addRange(range); } nameEl.focus();
-      var cleanup = function(){ nameEl.removeAttribute('contenteditable'); nameEl.classList.remove('is-editing'); nameEl.removeAttribute('role'); nameEl.removeAttribute('aria-label'); _isEditing = false; };
+      var cleanup = function(){ nameEl.removeAttribute('contenteditable'); nameEl.classList.remove('is-editing'); _isEditing = false; };
 
       var doSave = async function(){
         var newName = (nameEl.textContent || '').trim();

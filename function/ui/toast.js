@@ -21,7 +21,6 @@
       var svg = document.createElementNS(NS, 'svg');
       svg.setAttribute('width','18'); svg.setAttribute('height','18');
       svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none');
-      svg.setAttribute('aria-hidden','true');
       var path = document.createElementNS(NS, 'path');
       path.setAttribute('d', isError ? 'M18 6L6 18M6 6l12 12' : 'M20 6L9 17l-5-5');
       path.setAttribute('stroke','currentColor'); path.setAttribute('stroke-width','2.5');

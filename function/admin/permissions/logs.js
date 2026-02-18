@@ -94,7 +94,7 @@
         panel.className = 'tokens-log';
         const header = document.createElement('div');
         header.className = 'tokens-log__header';
-        header.innerHTML = '<div class="tokens-log__title" data-i18n="permissions.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse" data-i18n-attr="title" data-i18n-title="common.collapse"></button><button class="btn btn--secondary btn--sm js-log-clear" data-i18n="permissions.log.clear" data-i18n-attr="title" data-i18n-title="permissions.log.clear"></button></div>';
+        header.innerHTML = '<div class="tokens-log__title" data-i18n="permissions.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button><button class="btn btn--secondary btn--sm js-log-clear" data-i18n="permissions.log.clear"></button></div>';
         try { window.i18n && window.i18n.apply && window.i18n.apply(header); } catch(_){ }
         const wrap = document.createElement('div');
         wrap.className = 'tokens-log__wrap collapsible is-open';
@@ -130,7 +130,6 @@
         body = document.createElement('div');
         body.id = 'perms-log';
         body.className = 'tokens-log__body';
-        body.setAttribute('aria-live','polite');
         wrap.appendChild(filters);
   // 预览行直接插入到日志体内的首个条目位置，无需单独容器
         wrap.appendChild(body);
@@ -247,7 +246,7 @@
   }
   const detail = '';
     // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
-    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy" data-i18n-attr="aria-label" data-i18n-aria-label="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div>`;
+    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button></div>`;
     return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}${actions}</div>`;
     }catch(_){ return ''; }
   }
@@ -384,7 +383,7 @@
         const full = m[0];
         const name = m[1];
         if (idx > last) html += esc(tmpl.slice(last, idx));
-        html += `<span class="fmt-param" title="${esc(name)}">{${esc(name)}}` + `</span>`;
+        html += `<span class="fmt-param">{${esc(name)}}` + `</span>`;
         last = idx + full.length;
       }
       if (last < tmpl.length) html += esc(tmpl.slice(last));

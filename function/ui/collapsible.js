@@ -74,7 +74,6 @@
     const btn = document.createElement('button');
     btn.className = 'collapsible__toggle';
     btn.type = 'button';
-    btn.setAttribute('aria-expanded', 'true');
   // 添加下拉小三角图标
     const icon = document.createElement('span');
     icon.className = 'collapsible__chevron';
@@ -98,8 +97,6 @@
       content.style.height = '0px';
       content.style.overflow = 'hidden';
       content.classList.add('is-collapsed');
-      content.setAttribute('aria-hidden', 'true');
-      btn.setAttribute('aria-expanded', 'false');
       btn.classList.add('is-collapsed');
     }
 
@@ -183,8 +180,6 @@
     prepareTransition(el, el.scrollHeight);
     el.style.height = '0px';
     el.classList.add('is-collapsed');
-    el.setAttribute('aria-hidden', 'true');
-    btn.setAttribute('aria-expanded', 'false');
     btn.classList.add('is-collapsed');
   }
 
@@ -192,8 +187,6 @@
     el.classList.remove('is-collapsed');
     prepareTransition(el, 0);
     el.style.height = el.scrollHeight + 'px';
-    el.setAttribute('aria-hidden', 'false');
-    btn.setAttribute('aria-expanded', 'true');
     btn.classList.remove('is-collapsed');
   }
 

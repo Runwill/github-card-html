@@ -34,7 +34,6 @@
               // 兜底中文
               tgl.textContent = state.compactMode ? '缩略' : '详细';
             }
-            tgl.setAttribute('aria-pressed', state.compactMode ? 'true' : 'false');
             tgl.classList.toggle('is-active', !!state.compactMode);
           };
 

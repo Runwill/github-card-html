@@ -259,7 +259,7 @@
         roleValue.textContent = '-';
       }
     } catch(_) { roleValue.textContent = (u && u.role) || '-'; }
-  try { meta.classList.add('is-editable'); meta.setAttribute('tabindex', '0'); meta.setAttribute('role', 'button'); meta.setAttribute('data-perm-trigger',''); meta.style.cursor='pointer'; } catch {}
+  try { meta.classList.add('is-editable'); meta.setAttribute('tabindex', '0'); meta.setAttribute('data-perm-trigger',''); meta.style.cursor='pointer'; } catch {}
     /* sub.appendChild(subLabel); */ sub.appendChild(roleValue);
     
     // 注册时间

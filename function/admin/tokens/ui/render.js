@@ -66,7 +66,7 @@
     const isObj=(v)=> v && typeof v==='object' && !Array.isArray(v);
     if(!obj || typeof obj!=='object'){
       const bp=esc(basePath);
-      return `<div class="kv-row" data-path="${bp}"><div class="kv-key">value</div><div class="kv-val" data-path="${bp}" data-type="${typeof obj}" title="单击编辑">${esc(obj)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-inline-action btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+      return `<div class="kv-row" data-path="${bp}"><div class="kv-key">value</div><div class="kv-val" data-path="${bp}" data-type="${typeof obj}">${esc(obj)}</div><div class="kv-actions"><button class="btn-inline-action btn-del">删除</button></div></div>`;
     }
     
     // 缩略模式新规则：
@@ -100,7 +100,7 @@
             return `<div class="arr-item">${idxHtml}<div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
           }
           const keyHtml = state.compactMode ? '' : `<div class="kv-key">[${idx}]</div>`;
-          return `<div class="kv-row" data-path="${esc(curPath)}.${idx}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}" title="单击编辑">${esc(it)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-inline-action btn-del" title="删除" aria-label="删除">删除</button></div></div>`;
+          return `<div class="kv-row" data-path="${esc(curPath)}.${idx}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}">${esc(it)}</div><div class="kv-actions"><button class="btn-inline-action btn-del">删除</button></div></div>`;
         }).join('');
         const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
         const emptyHtml = '<div class="kv-row"><div class="kv-key">(空)</div><div class="kv-val"></div></div>';
@@ -113,7 +113,7 @@
         parts.push(`<div class="nest-block"${style}>${titleHtml}<div class="nest-body">${renderKV(v, level+1, accent, curPath)}</div></div>`);
       } else {
         const keyHtml = hideLabel ? '' : `<div class="kv-key">${esc(k)}</div>`;
-        parts.push(`<div class="kv-row" data-path="${esc(curPath)}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}" title="单击编辑">${esc(v)}</div><div class="kv-actions" role="组" aria-label="字段操作"><button class="btn-inline-action btn-del" title="删除" aria-label="删除">删除</button></div></div>`);
+        parts.push(`<div class="kv-row" data-path="${esc(curPath)}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}">${esc(v)}</div><div class="kv-actions"><button class="btn-inline-action btn-del">删除</button></div></div>`);
       }
     }
     return parts.join('');
@@ -124,10 +124,10 @@
     const col=getAccent(obj);
     const style= col? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"`: '';
     const { canEdit }=getAuth();
-    const toolbar = `<div class="token-card__toolbar" role="工具栏" aria-label="对象操作">
-      <button class="btn btn--secondary btn--xs btn-go-doc" data-i18n="tokens.toolbar.go" data-i18n-attr="title,aria-label" data-i18n-title="tokens.toolbar.go" data-i18n-aria-label="tokens.toolbar.go"></button>
-      <button class="btn btn--secondary btn--xs btn-edit-doc" data-i18n="tokens.toolbar.editDoc" data-i18n-attr="title,aria-label" data-i18n-title="tokens.toolbar.editDoc" data-i18n-aria-label="tokens.toolbar.editDoc"></button>
-      <button class="btn btn--danger btn--xs btn-del-doc${canEdit? '':' is-disabled'}" data-i18n="tokens.toolbar.deleteDoc" data-i18n-attr="title,aria-label" data-i18n-title="tokens.toolbar.deleteDoc" data-i18n-aria-label="tokens.toolbar.deleteDoc"></button>
+    const toolbar = `<div class="token-card__toolbar">
+      <button class="btn btn--secondary btn--xs btn-go-doc" data-i18n="tokens.toolbar.go"></button>
+      <button class="btn btn--secondary btn--xs btn-edit-doc" data-i18n="tokens.toolbar.editDoc"></button>
+      <button class="btn btn--danger btn--xs btn-del-doc${canEdit? '':' is-disabled'}" data-i18n="tokens.toolbar.deleteDoc"></button>
     </div>`;
     return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${toolbar}${innerHtml}</div>`;
   }
@@ -165,7 +165,7 @@
     const shouldPreOpen= ((state.activeType===type) || markedOpen) && total>1;
     const allItemsHtml=(items||[]).map(renderItem).join('');
     const collapsedAreaHtml = (total>1)? '': (allItemsHtml || '<div class="tokens-empty" data-i18n="common.empty"></div>');
-  return `<div class="tokens-section" data-type="${type}"><div class="tokens-section__header"><div class=\"tokens-section__title\"><span data-i18n="${titleKey}"></span> <span class=\"count-badge\">(${total})</span></div><div class=\"tokens-section__ops\"><button class=\"btn btn--secondary btn--sm\" onclick=\"tokensOpenCreate('${type}')\" data-i18n="tokens.section.new"></button>${total>1? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen? ' is-expanded':''}\" aria-expanded=\"${shouldPreOpen? 'true':'false'}\" onclick=\"toggleTokensSection('${id}')\" data-i18n="${shouldPreOpen? 'common.collapse':'common.expand'}"></button>`: ''}</div></div><div id="${id}" data-type="${type}" data-expanded="${shouldPreOpen? '1':'0'}" class="tokens-section__body"><div class="token-list">${collapsedAreaHtml}</div>${total>1? `<div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen? ' is-open':''}\">${allItemsHtml}</div>`: ''}</div></div>`;
+  return `<div class="tokens-section" data-type="${type}"><div class="tokens-section__header"><div class=\"tokens-section__title\"><span data-i18n="${titleKey}"></span> <span class=\"count-badge\">(${total})</span></div><div class=\"tokens-section__ops\"><button class=\"btn btn--secondary btn--sm\" onclick=\"tokensOpenCreate('${type}')\" data-i18n="tokens.section.new"></button>${total>1? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen? ' is-expanded':''}\" onclick=\"toggleTokensSection('${id}')\" data-i18n="${shouldPreOpen? 'common.collapse':'common.expand'}"></button>`: ''}</div></div><div id="${id}" data-type="${type}" data-expanded="${shouldPreOpen? '1':'0'}" class="tokens-section__body"><div class="token-list">${collapsedAreaHtml}</div>${total>1? `<div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen? ' is-open':''}\">${allItemsHtml}</div>`: ''}</div></div>`;
   }
   async function renderTokensDashboard(forceReload=false){
     const summaryEl=document.getElementById('tokens-summary');
@@ -195,11 +195,11 @@
           s2: bucket(allSkills,2)
         };
       }
-  const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', i18nKey:'tokens.summary.termFixed', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', i18nKey:'tokens.summary.termDynamic', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', i18nKey:'tokens.summary.card', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', i18nKey:'tokens.summary.character', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', i18nKey:'tokens.summary.skill', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" role="button" tabindex="0" aria-pressed="${isActive}"><div class="type-tile__label" data-i18n="${t.i18nKey}"></div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); try{ window.i18n && window.i18n.apply && window.i18n.apply(summaryEl); }catch(_){ } summaryEl.__initialized=true; 
+  const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', i18nKey:'tokens.summary.termFixed', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', i18nKey:'tokens.summary.termDynamic', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', i18nKey:'tokens.summary.card', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', i18nKey:'tokens.summary.character', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', i18nKey:'tokens.summary.skill', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" tabindex="0"><div class="type-tile__label" data-i18n="${t.i18nKey}"></div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); try{ window.i18n && window.i18n.apply && window.i18n.apply(summaryEl); }catch(_){ } summaryEl.__initialized=true; 
         // 初次渲染后应用主题色，并绑定主题观察者
         applyTypeTileTheme();
         ensureThemeObserverForTiles();
-      } else { const map=new Map(tiles.map(t=>[t.type,t])); summaryEl.querySelectorAll('.type-tile').forEach(node=>{ const tp=node.getAttribute('data-type'); const conf=map.get(tp); if(!conf) return; const isActive= state.activeType===tp; node.classList.toggle('is-active',!!isActive); node.classList.toggle('is-dim',!!(state.activeType && !isActive)); node.setAttribute('aria-pressed', isActive? 'true':'false'); const valEl=node.querySelector('.type-tile__value'); if(valEl) valEl.textContent=String(conf.value); }); 
+      } else { const map=new Map(tiles.map(t=>[t.type,t])); summaryEl.querySelectorAll('.type-tile').forEach(node=>{ const tp=node.getAttribute('data-type'); const conf=map.get(tp); if(!conf) return; const isActive= state.activeType===tp; node.classList.toggle('is-active',!!isActive); node.classList.toggle('is-dim',!!(state.activeType && !isActive)); const valEl=node.querySelector('.type-tile__value'); if(valEl) valEl.textContent=String(conf.value); }); 
         // 更新统计值后也重新应用（防止列表被重建导致样式丢失）
         applyTypeTileTheme();
       }
@@ -213,7 +213,7 @@
             const header = ev.target && ev.target.closest ? ev.target.closest('.tokens-section__header') : null;
             if(!header) return;
             // 若点在可交互元素上（按钮/链接/表单等），交由原逻辑处理
-            const interactive = ev.target.closest('button, a, input, textarea, select, [role="button"]');
+            const interactive = ev.target.closest('button, a, input, textarea, select');
             if(interactive) return;
             const section = header.closest('.tokens-section');
             if(!section) return;
@@ -264,7 +264,7 @@
       if(!more) return;
       const expanded=root.getAttribute('data-expanded')==='1';
       const transitionMs=400;
-  const setBtn=(isOpen)=>{ if(btn){ try{ btn.setAttribute('data-i18n', isOpen? 'common.collapse':'common.expand'); if(window.i18n && window.i18n.apply) window.i18n.apply(btn); }catch(_){ btn.textContent=isOpen? '收起':'展开'; } btn.setAttribute('aria-expanded', isOpen? 'true':'false'); btn.classList.toggle('is-expanded', isOpen); } };
+  const setBtn=(isOpen)=>{ if(btn){ try{ btn.setAttribute('data-i18n', isOpen? 'common.collapse':'common.expand'); if(window.i18n && window.i18n.apply) window.i18n.apply(btn); }catch(_){ btn.textContent=isOpen? '收起':'展开'; } btn.classList.toggle('is-expanded', isOpen); } };
       const onEnd=(cb)=>{ let called=false; const handler=()=>{ if(called) return; called=true; more.removeEventListener('transitionend',handler); cb&&cb(); }; more.addEventListener('transitionend', handler, { once:true }); setTimeout(handler, transitionMs+50); };
       if(!expanded){
         more.style.display='block';

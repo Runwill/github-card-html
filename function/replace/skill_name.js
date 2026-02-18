@@ -18,7 +18,7 @@
         // Tooltip 单例初始化
         if (!window._loreTooltipAppended) {
             window._loreTooltipAppended = true;
-            $('body').append('<div id="lore-tooltip" aria-hidden="true"></div>');
+            $('body').append('<div id="lore-tooltip"></div>');
         }
         const $tooltip = $('#lore-tooltip');
 
@@ -92,7 +92,6 @@
             
                                     $tooltip
                                       .removeClass('show')
-                                      .attr('aria-hidden', 'true')
                                       .html(loreText)
                                       .css({ visibility: 'hidden', display: 'block', left: '-9999px', top: '-9999px' })
             
@@ -131,10 +130,9 @@
                                       .each(function(){ this.style.removeProperty('opacity'); this.style.removeProperty('transform'); })
                                       .addClass(fromLeft ? 'from-left' : 'from-right')
                                       .addClass('show')
-                                      .attr('aria-hidden', 'false')
                                 })
                                 $node.on('mouseleave', function () {
-                                    $tooltip.removeClass('show from-left from-right').attr('aria-hidden', 'true')
+                                    $tooltip.removeClass('show from-left from-right')
                                 });
                              }
                          }

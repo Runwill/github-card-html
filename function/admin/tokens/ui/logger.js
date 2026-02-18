@@ -45,7 +45,7 @@
 
     const header = document.createElement('div');
     header.className = 'tokens-log__header';
-  header.innerHTML = '<div class="tokens-log__title" data-i18n="tokens.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse" data-i18n-attr="title" data-i18n-title="common.collapse"></button><button class="btn btn--secondary btn--sm js-log-clear" data-i18n="tokens.log.clear" data-i18n-attr="title" data-i18n-title="tokens.log.clear"></button></div>';
+  header.innerHTML = '<div class="tokens-log__title" data-i18n="tokens.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button><button class="btn btn--secondary btn--sm js-log-clear" data-i18n="tokens.log.clear"></button></div>';
     try { if (window.i18n && window.i18n.apply) { window.i18n.apply(header); } } catch (_) {}
 
         // 外包一层可折叠容器，内层保持可滚动
@@ -55,7 +55,6 @@
         body = document.createElement('div');
         body.id = 'tokens-log';
         body.className = 'tokens-log__body';
-        body.setAttribute('aria-live', 'polite');
         wrap.appendChild(body);
 
         panel.appendChild(header);
@@ -242,7 +241,7 @@
   const pill = (key, cls='')=> `<i class="log-pill ${cls}" data-i18n="${key}"></i>`;
     const code = (txt)=> `<code class="log-code">${esc(txt||'')}</code>`;
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
-    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy" data-i18n-attr="aria-label" data-i18n-aria-label="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete" data-i18n-attr="aria-label" data-i18n-aria-label="common.delete"></button></div>`;
+    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button></div>`;
     if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
       const msg = (function(){

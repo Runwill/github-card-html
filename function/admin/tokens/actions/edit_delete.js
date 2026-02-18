@@ -137,7 +137,6 @@
         const ta = document.createElement('textarea');
         ta.value = oldText;
         ta.className = 'inline-edit';
-        ta.setAttribute('rows', '1');
         ta.setAttribute('wrap', 'soft');
         target.textContent = '';
         target.appendChild(ta);
@@ -145,8 +144,9 @@
 
         const autoSize = () => {
           try {
-            ta.style.height = 'auto';
-            ta.style.height = Math.max(24, ta.scrollHeight) + 'px';
+            ta.style.height = '0';
+            ta.style.minHeight = '0';
+            ta.style.height = ta.scrollHeight + 'px';
           } catch (_) {}
         };
         ta.addEventListener('input', autoSize);
