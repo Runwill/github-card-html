@@ -3,146 +3,365 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-
-  <script src="../Foundation-Sites-CSS/js/vendor/jquery.js?v=202512070129"></script>
-
   <title>体力丨4/4</title>
   <style>
+    :root {
+      /* ─ 浅色主题（默认） ─ */
+      --hb-bg: #f7f5f2;
+      --hb-fg: #3a3630;
+      --hb-fg-dim: rgba(58,54,48,0.20);
+      --hb-fg-ghost: rgba(58,54,48,0.08);
+      --hb-danger: rgba(190,42,35,0.60);
+      --hb-danger-dim: rgba(190,42,35,0.16);
+      --hb-danger-ghost: rgba(190,42,35,0.06);
+      --hb-counter: rgba(58,54,48,0.22);
+      --hb-counter-danger: rgba(190,42,35,0.26);
+      --hb-flash-heal: rgba(40,180,70,0.22);
+      --hb-flash-hurt: rgba(220,45,40,0.22);
+      --hb-vignette: rgba(0,0,0,0.04);
+      --ease: cubic-bezier(0.25, 1, 0.5, 1);
+      --dur: 0.45s;
+    }
+    html[data-theme="dark"] {
+      /* ─ 深色主题 ─ */
+      --hb-bg: #0b0b10;
+      --hb-fg: #d4cfc7;
+      --hb-fg-dim: rgba(212,207,199,0.18);
+      --hb-fg-ghost: rgba(212,207,199,0.07);
+      --hb-danger: rgba(200,58,50,0.55);
+      --hb-danger-dim: rgba(200,58,50,0.14);
+      --hb-danger-ghost: rgba(200,58,50,0.06);
+      --hb-counter: rgba(212,207,199,0.18);
+      --hb-counter-danger: rgba(200,58,50,0.22);
+      --hb-flash-heal: rgba(80,210,100,0.16);
+      --hb-flash-hurt: rgba(230,50,45,0.16);
+      --hb-vignette: rgba(0,0,0,0.4);
+      color-scheme: dark;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-        height: 100vh;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        font-family: Arial, sans-serif;
-        line-height: 1;
-        font-size: 20vw;
-        overflow-y: hidden;
+      height: 100vh;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: var(--hb-bg);
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: none;
+      transition: background var(--dur) var(--ease);
+    }
+
+    /* 暗角 */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, transparent 45%, var(--hb-vignette));
+      pointer-events: none;
+      z-index: 1;
+      transition: background var(--dur) var(--ease);
+    }
+
+    /* 顶部计数 */
+    .counter {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      text-align: center;
+      padding: 18px;
+      font: 12px/1 Georgia, 'Songti SC', serif;
+      letter-spacing: 0.5em;
+      color: var(--hb-counter);
+      font-variant-numeric: tabular-nums;
+      z-index: 3;
+      transition: color var(--dur) var(--ease);
+    }
+    .counter.is-danger { color: var(--hb-counter-danger); }
+
+    /* 符号容器 */
+    .health-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-family: Georgia, 'Songti SC', serif;
+      font-size: 18vw;
+      line-height: 1;
+      gap: 0.06em;
+      z-index: 2;
+    }
+
+    /* 单个符号 */
+    .s {
+      transition:
+        color var(--dur) var(--ease),
+        text-shadow var(--dur) var(--ease),
+        transform 0.35s var(--ease);
+    }
+    /* 有血 ○ */
+    .s-f {
+      color: var(--hb-fg);
+      text-shadow: 0 0 20px rgba(0,0,0,0.03);
+    }
+    /* 空位 · */
+    .s-e { color: var(--hb-fg-dim); }
+    /* 溢出 ○ */
+    .s-o { color: var(--hb-fg-ghost); }
+    /* 负数 · */
+    .s-n { color: var(--hb-fg-ghost); }
+
+    /* 危险态 */
+    .health-bar.is-danger .s-f {
+      color: var(--hb-danger);
+      text-shadow: 0 0 20px var(--hb-danger-ghost);
+    }
+    .health-bar.is-danger .s-e { color: var(--hb-danger-dim); }
+
+    /* 首次加载交错入场 */
+    @keyframes sym-in {
+      from { opacity: 0; transform: translateY(6px) scale(0.88); }
+      to   { opacity: 1; transform: none; }
+    }
+    .health-bar.is-entering .s {
+      animation: sym-in 0.5s var(--ease) both;
+    }
+
+    /* 动态增删：入场 */
+    @keyframes sym-enter {
+      from { opacity: 0; transform: scale(0) translateY(4px); max-height: 0; margin-top: -0.02em; }
+      60%  { opacity: 1; transform: scale(1.12) translateY(0); }
+      to   { opacity: 1; transform: none; max-height: 1.2em; margin-top: 0; }
+    }
+    .s.is-enter {
+      animation: sym-enter 0.38s var(--ease) both;
+    }
+
+    /* 动态增删：退场 */
+    @keyframes sym-exit {
+      from { opacity: 1; transform: none; max-height: 1.2em; margin-top: 0; }
+      40%  { opacity: 0; transform: scale(0.6); }
+      to   { opacity: 0; transform: scale(0); max-height: 0; margin-top: -0.02em; }
+    }
+    .s.is-exit {
+      animation: sym-exit 0.32s var(--ease) both;
+      pointer-events: none;
+    }
+
+    /* 滑动反馈 */
+    .flash {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.6s ease-out;
+    }
+    .flash--heal {
+      background: linear-gradient(to top, var(--hb-flash-heal), transparent 55%);
+    }
+    .flash--hurt {
+      background: linear-gradient(to bottom, var(--hb-flash-hurt), transparent 55%);
+    }
+    .flash.is-on {
+      opacity: 1;
+      transition: none;
     }
   </style>
 </head>
 <body>
-    <h1>
-        <div class="health-bar"></div>
-    </h1>
+  <!-- 同步主站主题设置，避免闪白/闪黑 -->
+  <script>
+    ;(function(){
+      var s = localStorage.getItem('theme') || 'system';
+      if (s === 'dark' || (s === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <div class="counter" id="counter">4 / 4</div>
+  <div class="health-bar is-entering" id="health-bar"></div>
+  <div class="flash flash--heal" id="flash-heal"></div>
+  <div class="flash flash--hurt" id="flash-hurt"></div>
 
-    <script>
-        localStorage.setItem('health_point', 4)
-        localStorage.setItem('health_limit', 4)
+  <script>
+    localStorage.setItem('health_point', 4)
+    localStorage.setItem('health_limit', 4)
 
-        let touchStartY = 0  // 记录触摸开始时的垂直位置
-        let touchEndY = 0
-        let lastTouchTime = 0  // 记录最后一次双击的时间
-        let touchCount = 0
+    let touchStartY = 0
+    let touchEndY = 0
+    let lastTouchTime = 0
+    let touchCount = 0
 
-        // 触摸事件的处理
-        document.body.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY // 记录触摸起始位置
-        })
+    // 触摸事件
+    document.body.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY
+    })
 
-        document.body.addEventListener('touchend', (e) => {
-        touchEndY = e.changedTouches[0].clientY // 记录触摸结束位置
-        const currentTime = new Date().getTime()
-        
-        // 检查双击事件
-        if (currentTime - lastTouchTime < 500) {
-            touchCount++
-        } else {
-            touchCount = 1
-        }
-        lastTouchTime = currentTime
+    document.body.addEventListener('touchend', (e) => {
+      touchEndY = e.changedTouches[0].clientY
+      const currentTime = new Date().getTime()
 
-        // 禁止浏览器默认的双击缩放行为
-        e.preventDefault()
+      if (currentTime - lastTouchTime < 500) {
+        touchCount++
+      } else {
+        touchCount = 1
+      }
+      lastTouchTime = currentTime
+      e.preventDefault()
 
-        // 检测滑动方向
-        if (touchEndY < touchStartY - 50) {
-            localStorage.setItem('health_point', localStorage.getItem('health_point') - 1 )
-            health_bar_check()
-            touchCount = 0
-        } else if (touchEndY > touchStartY + 50) {
-            localStorage.setItem('health_point', parseInt(localStorage.getItem('health_point')) + 1 )
-            health_bar_check()
-            touchCount = 0
-        }
-
-        // 检测双击位置
-        if (touchCount === 2) {
-            if (touchStartY < window.innerHeight / 2) {
-                if(localStorage.getItem('health_limit') > 0){
-                    localStorage.setItem('health_limit', localStorage.getItem('health_limit') - 1 )
-                    health_bar_check()
-                }
-            } else {
-                localStorage.setItem('health_limit', parseInt(localStorage.getItem('health_limit')) + 1 )
-                health_bar_check()
-            }
-            touchCount = 0 // 重置双击计数
-        }
-        })
-
-        function health_bar_check(){
-            point = parseInt(localStorage.getItem('health_point'))
-            limit = parseInt(localStorage.getItem('health_limit'))
-            document.title = "体力丨" + point + '/' + limit
-            html = ''
-            if(point < 1){
-                document.querySelector('.health-bar').style.color = 'rgb(255,0,0,0.5)'
-            }else{
-                document.querySelector('.health-bar').style.color = 'rgb(0,0,0,1)'
-            }
-            if(point < limit){
-                if(point <= 0){
-                    for(let i = 0; i < -point; i++)html += '<div style="color: rgba(0,0,0,0.2)">·</div>'
-                    if(limit > 0){
-                        for(let i = 0; i < limit; i++)html += '<div>·</div>'
-                    }
-                }
-                else{
-                    for(let i = 0; i < point; i++)html += '<div>○</div>'
-                    for(let i = 0; i < limit-point; i++)html += '<div>·</div>'
-                }
-            }
-            else{
-                if(point <= 0){
-                    for(let i = 0; i < -point; i++)html += '<div style="color: rgba(0,0,0,0.2)">·</div>'
-                }
-                else{
-                    for(let i = 0; i < limit; i++)html += '<div>○</div>'
-                    for(let i = 0; i < point - limit; i++)html += '<div style="color: rgba(0,0,0,0.2)">○</div>'
-                }
-            }
-
-
-
-            $('.health-bar').html(html)
-
-
-
-
-            const textElement = document.querySelector('.health-bar')
-
-            let fontSize = parseInt(window.getComputedStyle(textElement).fontSize)
-
-            for(let i = 0; i < 5; i++){
-                if (textElement.offsetWidth < window.innerWidth * 0.8 && textElement.offsetHeight < window.innerHeight * 0.8) {
-                    fontSize += 5
-                    textElement.style.fontSize = fontSize + 'px'
-                }else{
-                    break
-                }
-            }
-            for(let i = 0; i < 100; i++){
-                if (textElement.offsetWidth > window.innerWidth * 0.8 || textElement.offsetHeight > window.innerHeight * 0.8) {
-                    fontSize -= 5
-                    textElement.style.fontSize = fontSize + 'px'
-                }else{
-                    break
-                }
-            }
-        }
+      // 滑动：增减体力
+      if (touchEndY < touchStartY - 50) {
+        localStorage.setItem('health_point', localStorage.getItem('health_point') - 1)
+        flash('hurt')
         health_bar_check()
-    </script>
+        touchCount = 0
+      } else if (touchEndY > touchStartY + 50) {
+        localStorage.setItem('health_point', parseInt(localStorage.getItem('health_point')) + 1)
+        flash('heal')
+        health_bar_check()
+        touchCount = 0
+      }
+
+      // 双击：增减上限
+      if (touchCount === 2) {
+        if (touchStartY < window.innerHeight / 2) {
+          if (localStorage.getItem('health_limit') > 0) {
+            localStorage.setItem('health_limit', localStorage.getItem('health_limit') - 1)
+            health_bar_check()
+          }
+        } else {
+          localStorage.setItem('health_limit', parseInt(localStorage.getItem('health_limit')) + 1)
+          health_bar_check()
+        }
+        touchCount = 0
+      }
+    })
+
+    function flash(type) {
+      const el = document.getElementById('flash-' + type)
+      el.classList.add('is-on')
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => el.classList.remove('is-on'))
+      })
+    }
+
+    function health_bar_check() {
+      const point = parseInt(localStorage.getItem('health_point'))
+      const limit = parseInt(localStorage.getItem('health_limit'))
+      const bar = document.getElementById('health-bar')
+      const counter = document.getElementById('counter')
+
+      document.title = '体力丨' + point + '/' + limit
+      counter.textContent = point + ' / ' + limit
+
+      const danger = point < 1
+      bar.classList.toggle('is-danger', danger)
+      counter.classList.toggle('is-danger', danger)
+
+      // 构建符号列表
+      const symbols = []
+      if (point < limit) {
+        if (point <= 0) {
+          for (let i = 0; i < -point; i++) symbols.push({ ch: '·', cls: 's-n' })
+          if (limit > 0) {
+            for (let i = 0; i < limit; i++) symbols.push({ ch: '·', cls: 's-e' })
+          }
+        } else {
+          for (let i = 0; i < point; i++) symbols.push({ ch: '○', cls: 's-f' })
+          for (let i = 0; i < limit - point; i++) symbols.push({ ch: '·', cls: 's-e' })
+        }
+      } else {
+        if (point <= 0) {
+          for (let i = 0; i < -point; i++) symbols.push({ ch: '·', cls: 's-n' })
+        } else {
+          for (let i = 0; i < limit; i++) symbols.push({ ch: '○', cls: 's-f' })
+          for (let i = 0; i < point - limit; i++) symbols.push({ ch: '○', cls: 's-o' })
+        }
+      }
+
+      // DOM 差量更新
+      const entering = bar.classList.contains('is-entering')
+      // 排除正在退场的节点
+      const live = Array.from(bar.children).filter(c => !c.classList.contains('is-exit'))
+      const oldLen = live.length
+      const newLen = symbols.length
+
+      if (entering && oldLen === 0) {
+        // 首次加载：交错入场
+        bar.style.fontSize = ''
+        bar.innerHTML = symbols.map((s, i) =>
+          `<div class="s ${s.cls}" style="animation-delay:${i * 45}ms">${s.ch}</div>`
+        ).join('')
+        setTimeout(() => bar.classList.remove('is-entering'), newLen * 45 + 500)
+      } else if (oldLen === newLen) {
+        // 数量相同：原地更新 + 字符变化脉冲
+        for (let i = 0; i < newLen; i++) {
+          const child = live[i]
+          const charChanged = child.textContent !== symbols[i].ch
+          child.className = 's ' + symbols[i].cls
+          if (charChanged) {
+            child.style.transition = 'none'
+            child.style.transform = 'scale(0.78)'
+            child.textContent = symbols[i].ch
+            child.offsetHeight
+            child.style.transition = ''
+            child.style.transform = ''
+          }
+        }
+      } else if (newLen > oldLen) {
+        // 新增符号：先更新已有的，再追加新的（带入场动画）
+        for (let i = 0; i < oldLen; i++) {
+          const child = live[i]
+          child.className = 's ' + symbols[i].cls
+          if (child.textContent !== symbols[i].ch) child.textContent = symbols[i].ch
+        }
+        for (let i = oldLen; i < newLen; i++) {
+          const div = document.createElement('div')
+          div.className = 's ' + symbols[i].cls + ' is-enter'
+          div.textContent = symbols[i].ch
+          div.style.animationDelay = ((i - oldLen) * 50) + 'ms'
+          bar.appendChild(div)
+          div.addEventListener('animationend', () => {
+            div.classList.remove('is-enter')
+            div.style.animationDelay = ''
+          }, { once: true })
+        }
+      } else {
+        // 减少符号：先更新保留的，再退场多余的
+        for (let i = 0; i < newLen; i++) {
+          const child = live[i]
+          child.className = 's ' + symbols[i].cls
+          if (child.textContent !== symbols[i].ch) child.textContent = symbols[i].ch
+        }
+        const toRemove = live.slice(newLen)
+        toRemove.forEach((child, idx) => {
+          child.className = 's is-exit'
+          child.style.animationDelay = (idx * 40) + 'ms'
+          child.addEventListener('animationend', () => child.remove(), { once: true })
+        })
+      }
+
+      // 自适应字号
+      autoSize(bar)
+    }
+
+    function autoSize(el) {
+      let fs = parseInt(getComputedStyle(el).fontSize)
+      for (let i = 0; i < 5; i++) {
+        if (el.offsetWidth < window.innerWidth * 0.8 && el.offsetHeight < window.innerHeight * 0.8) {
+          fs += 5; el.style.fontSize = fs + 'px'
+        } else break
+      }
+      for (let i = 0; i < 100; i++) {
+        if (el.offsetWidth > window.innerWidth * 0.8 || el.offsetHeight > window.innerHeight * 0.8) {
+          fs -= 5; el.style.fontSize = fs + 'px'
+        } else break
+      }
+    }
+
+    health_bar_check()
+  </script>
 </body>
 </html>
