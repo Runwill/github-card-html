@@ -88,14 +88,17 @@
       flex-direction: column;
       align-items: center;
       font-family: Georgia, 'Songti SC', serif;
-      font-size: 18vw;
+      font-size: 20vw;
       line-height: 1;
-      gap: 0.06em;
+      gap: 0;
       z-index: 2;
+      transition: font-size 0.25s var(--ease);
     }
 
     /* 单个符号 */
     .s {
+      line-height: 0.68;
+      margin-top: -0.02em;
       transition:
         color var(--dur) var(--ease),
         text-shadow var(--dur) var(--ease),
@@ -348,8 +351,10 @@
     }
 
     function autoSize(el) {
+      // 关闭 transition，快速计算目标字号
+      el.style.transition = 'none'
       let fs = parseInt(getComputedStyle(el).fontSize)
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 30; i++) {
         if (el.offsetWidth < window.innerWidth * 0.8 && el.offsetHeight < window.innerHeight * 0.8) {
           fs += 5; el.style.fontSize = fs + 'px'
         } else break
@@ -359,6 +364,14 @@
           fs -= 5; el.style.fontSize = fs + 'px'
         } else break
       }
+      const target = fs
+      // 回退到当前字号，再开启 transition 过渡到目标值
+      if (!el._prevFs) el._prevFs = target
+      el.style.fontSize = el._prevFs + 'px'
+      el.offsetHeight // 强制回流
+      el.style.transition = ''
+      el.style.fontSize = target + 'px'
+      el._prevFs = target
     }
 
     health_bar_check()
