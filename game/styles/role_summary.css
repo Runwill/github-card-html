@@ -23,11 +23,96 @@
     overflow: visible;
 }
 
-/* Reuse game.css .char-avatar styles, just handle active state */
-.role-summary.active .char-avatar img {
-    border: 2px solid #ffd700; /* Add border only for active state */
-    box-shadow: 0 0 10px #ffd700;
-    transition: border-color var(--dur-moderate) ease, box-shadow var(--dur-moderate) var(--ease-default);
+/* ── Current Turn Indicator: Animated ring around avatar ── */
+
+/* Smooth color transition when --turn-ring-color changes */
+:root {
+    transition: --turn-ring-color 0.6s ease;
+}
+
+/* Container needs context for the pseudo ring */
+.char-avatar.is-current-turn {
+    z-index: 1; /* lift above siblings so ring isn't clipped */
+}
+
+/*
+ * Base state for ::after / ::before on ALL .char-avatar
+ * so we can transition from "invisible" → "visible" smoothly.
+ */
+.char-avatar::after,
+.char-avatar::before {
+    content: '';
+    position: absolute;
+    border-radius: var(--radius-full);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    will-change: opacity, transform;
+}
+
+/* ── The spinning gradient ring ── */
+.char-avatar::after {
+    inset: -4px;
+    padding: 3px;
+    /*
+     * Dynamic color from breadcrumbs via --turn-ring-color.
+     * Fixed gradient — rotation via transform (GPU-accelerated).
+     */
+    background: conic-gradient(
+        var(--turn-ring-color, #ffd700)                                          0%,
+        color-mix(in srgb, var(--turn-ring-color, #ffd700) 80%, #fff)            8%,
+        color-mix(in srgb, var(--turn-ring-color, #ffd700) 90%, #000)           14%,
+        transparent 28%,
+        transparent 42%,
+        color-mix(in srgb, var(--turn-ring-color, #ffd700) 50%, #fff)           50%,
+        color-mix(in srgb, var(--turn-ring-color, #ffd700) 85%, #fff)           58%,
+        color-mix(in srgb, var(--turn-ring-color, #ffd700) 90%, #000)           64%,
+        transparent 78%,
+        transparent 92%,
+        var(--turn-ring-color, #ffd700)                                        100%
+    );
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    /* GPU-accelerated rotate — always spinning, no repaint */
+    animation: turnRingSpin 1.8s linear infinite;
+}
+
+/* ── Ambient glow behind the ring ── */
+.char-avatar::before {
+    inset: -6px;
+    background: radial-gradient(circle,
+        color-mix(in srgb, var(--turn-ring-color, #ffd700) 25%, transparent) 0%,
+        transparent 70%);
+    z-index: -1;
+    /* No animation in base — prevents opacity leak on non-turn avatars */
+}
+
+/* ── Activate: fade in ── */
+.char-avatar.is-current-turn::after {
+    opacity: 0.95;
+}
+
+.char-avatar.is-current-turn::before {
+    animation: turnGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes turnRingSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes turnGlowPulse {
+    0%, 100% { opacity: 0.4; }
+    50%      { opacity: 0.8; }
+}
+
+/* Register custom properties so they can be animated / transitioned */
+@property --turn-ring-color {
+    syntax: '<color>';
+    initial-value: #ffd700;
+    inherits: true;
 }
 
 .player-hand-count {

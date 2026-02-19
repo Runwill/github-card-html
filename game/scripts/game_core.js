@@ -90,6 +90,25 @@
         return node;
     }
 
+    /**
+     * 判断当前流程是否处于 Turn (ticking) 节点内部。
+     * 严格匹配面包屑显示逻辑：面包屑过滤掉 'TurnProcess' 等 process 容器，
+     * 只有进入 Turn (ticking) 子节点后才算"在回合中"。
+     * 即 beforeTurnStart / afterTurnFinish 不算在回合内。
+     */
+    function isInTurn() {
+        let node = window.Game.Def.GAME_FLOW;
+        for (let i = 0; i < GameState.flowStack.length; i++) {
+            if (node.children && node.children[GameState.flowStack[i]]) {
+                node = node.children[GameState.flowStack[i]];
+                if (node.name === 'Turn' && node.type === 'ticking') return true;
+            } else {
+                break;
+            }
+        }
+        return false;
+    }
+
     function isInteractive(node) {
         // Currently only 'acting' tick is interactive
         return node.name === 'acting';
@@ -146,6 +165,7 @@
             return player;
         });
         GameState.currentPlayerIndex = 0;
+        GameState.perspectiveIndex = 0;
         GameState.round = 1;
         GameState.isGameRunning = true;
         
@@ -376,6 +396,7 @@
         playCard,
         getCurrentNode,
         getActiveProcesses,
+        isInTurn,
         isInteractive,
         checkAutoAdvance,
         togglePause,

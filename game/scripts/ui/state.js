@@ -5,12 +5,35 @@
 
     /**
      * 获取当前 UI 视角下的"主玩家" (Main Player)
-     * 通常是当前回合行动的玩家 (Current Active Player)，显示在屏幕底部中心。
+     * 由 perspectiveIndex 控制，可手动切换，与回合进程无关。
      */
     window.Game.UI.getMainPlayer = function() {
         const state = window.Game.GameState;
         if (!state || !state.players) return null;
-        // 优先使用当前回合玩家，兜底使用玩家0
+        const idx = (state.perspectiveIndex != null) ? state.perspectiveIndex : 0;
+        return state.players[idx] || state.players[0];
+    };
+
+    /**
+     * 获取当前回合行动的角色（游戏逻辑层）
+     */
+    window.Game.UI.getCurrentTurnPlayer = function() {
+        const state = window.Game.GameState;
+        if (!state || !state.players) return null;
         return state.players[state.currentPlayerIndex] || state.players[0];
+    };
+
+    /**
+     * 切换主视角到指定玩家索引，然后刷新 UI。
+     * @param {number} playerIndex - players 数组中的索引
+     */
+    window.Game.UI.setPerspective = function(playerIndex) {
+        const state = window.Game.GameState;
+        if (!state || !state.players) return;
+        if (playerIndex < 0 || playerIndex >= state.players.length) return;
+        state.perspectiveIndex = playerIndex;
+        if (window.Game.UI.updateUI) {
+            window.Game.UI.updateUI();
+        }
     };
 })();

@@ -109,17 +109,9 @@
                 
                 const GameState = window.Game.GameState;
                 
-                // 获取当前主视角角色 ID
-                // 假设单机模式下，currentPlayerIndex 指向的是底部的“我”
-                // 或者我们应该有一个明确的 "mainPlayerId" 配置？
-                // 目前使用 players[0] 或者 currentPlayerIndex 作为视角？通常 players[0] 是用户自己。
-                // 为了通用性，我们假设 GameState.mainRoleIndex 或者默认为 local player.
-                
-                // [Logic] 目前单机版，玩家控制的角色通常在索引 0 或 match currentPlayerIndex?
-                // 在 setup_manager.js 中，玩家通常初始化为 players[0]。
-                // 让我们假设视角总是 players[0] (底部角色)。
-                
-                const mainPlayer = GameState.players && GameState.players[0]; // 这是一个很强的假设，但在当前单机上下文中成立
+                // 获取当前主视角角色 ID（使用 perspectiveIndex）
+                const perspIdx = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
+                const mainPlayer = GameState.players && GameState.players[perspIdx];
                 
                 if (mainPlayer && card.visibleTo && card.visibleTo.has(mainPlayer.id)) {
                     showBack = false; // 对我可见

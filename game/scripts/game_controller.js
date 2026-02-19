@@ -168,11 +168,11 @@
         // 1. 检查全局区域 Key (pile, discardPile, treatmentArea等)
         if (gs[identifier]) return gs[identifier];
 
-        // 2. 检查特定 Player 关联
-        // 'hand' -> 当前玩家手牌 (Pending: 具体指哪个 ID? 默认主视角)
+        // 'hand' -> 当前视角玩家手牌（perspectiveIndex）
         // 手动模式下通常认为操作者是主视角玩家 (UI底部)
         if (identifier === 'hand') {
-            const p = gs.players && (gs.players[gs.currentPlayerIndex || 0] || gs.players[0]);
+            const perspIdx = (gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
+            const p = gs.players && (gs.players[perspIdx] || gs.players[0]);
             return p ? p.hand : null;
         }
 

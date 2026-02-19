@@ -56,6 +56,7 @@
              
              // 重置索引
              this.state.currentPlayerIndex = 0;
+             this.state.perspectiveIndex = 0;
         }
 
         _distributeCards(config) {

@@ -54,7 +54,8 @@
                 if (!isJudge) {
                     const gs = window.Game.GameState;
                     const isManual = (gs && (gs.mode === 'manual' || gs.mode === 'sandbox'));
-                    const isSelf = (gs && gs.players && gs.players[gs.currentPlayerIndex] === currentRole);
+                    const perspIdx = (gs && gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
+                    const isSelf = (gs && gs.players && gs.players[perspIdx] === currentRole);
                     if (!isManual && !isSelf) forceFaceDown = true;
                 }
 
@@ -276,12 +277,16 @@
 
     /**
      * 渲染自身角色信息 (Self Role Info)
-     * 对应用户操作的当前角色 (UI底部面板)
+     * 对应主视角角色 (perspectiveIndex) (UI底部面板)
      */
     function updateSelfRoleInfo(GameState, GameText) {
-        
-        const selfRole = GameState.players[GameState.currentPlayerIndex];
+        const perspIdx = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
+        const selfRole = GameState.players[perspIdx];
         if (!selfRole) return;
+
+        // 标记主视角角色是否正处于当前回合（仅在流程真正进入 TurnProcess 时才算）
+        const inTurn = window.Game.Core.isInTurn && window.Game.Core.isInTurn();
+        const isTurnOwner = inTurn && (perspIdx === GameState.currentPlayerIndex);
         
         // 绑定自身面板的 Inspector
         const currentPanel = document.querySelector('.current-character-panel');
@@ -316,6 +321,11 @@
                 } else {
                     mainAvatarImg.classList.remove('position-avatar');
                 }
+            }
+            // 当前回合角色：在 .char-avatar 容器上添加旋转光环
+            const mainAvatarWrap = mainAvatarImg.closest('.char-avatar');
+            if (mainAvatarWrap) {
+                mainAvatarWrap.classList.toggle('is-current-turn', isTurnOwner);
             }
         }
         // 名字 (角色/武将)
@@ -540,8 +550,8 @@
         
         if (!containerLeft && !containerTop && !containerRight && !legacyContainer) return;
 
-        // "Main" player is now the Current Active Player (Center of attention)
-        const mainPlayerIndex = GameState.currentPlayerIndex; 
+        // "Main" player is now the Perspective Player (Center of layout)
+        const mainPlayerIndex = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
         const playerCount = GameState.players.length;
 
         GameState.players.forEach((role, index) => {
@@ -707,13 +717,11 @@
             // Attach Hand Inspector Click (Updates data reference)
             setupHandInspector(pEl, role);
             
-            // 激活状态 (当前回合角色)
-            
-            // 激活状态 (当前回合角色)
-            if (index === GameState.currentPlayerIndex) {
-                pEl.classList.add('active');
-            } else {
-                pEl.classList.remove('active');
+            // 当前回合标识：旋转光环加在 .char-avatar 上
+            const avatarWrap = pEl.querySelector('.char-avatar');
+            if (avatarWrap) {
+                const inTurn = window.Game.Core.isInTurn && window.Game.Core.isInTurn();
+                avatarWrap.classList.toggle('is-current-turn', inTurn && index === GameState.currentPlayerIndex);
             }
             
             // 头像 (Avatar)
@@ -879,9 +887,9 @@
                 const id = parseInt(child.id.replace('player-summary-', ''));
                 const playerExists = GameState.players.find(p => p.id === id);
                 
-                // Remove if player doesn't exist OR if this player is now the Main Player (Bottom View)
-                // The Main Player is GameState.players[GameState.currentPlayerIndex]
-                const isMainNow = (GameState.players[GameState.currentPlayerIndex] && GameState.players[GameState.currentPlayerIndex].id === id);
+                // Remove if player doesn't exist OR if this player is now the Perspective Player (Bottom View)
+                const perspIdx = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
+                const isMainNow = (GameState.players[perspIdx] && GameState.players[perspIdx].id === id);
 
                 if (!playerExists || isMainNow) {
                     container.removeChild(child);

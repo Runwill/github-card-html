@@ -7,7 +7,8 @@
     // 游戏状态
     window.Game.GameState = {
         players: [],
-        currentPlayerIndex: 0,
+        currentPlayerIndex: 0,   // 当前回合角色索引（游戏逻辑）
+        perspectiveIndex: 0,     // 主视角角色索引（UI 显示，可手动切换）
         round: 1,
         isGameRunning: false,
         isPaused: false,

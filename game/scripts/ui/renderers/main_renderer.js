@@ -141,6 +141,17 @@
             while (breadcrumbsEl.children.length > displayItems.length) {
                 breadcrumbsEl.removeChild(breadcrumbsEl.lastChild);
             }
+
+            // ── 同步光环颜色：始终使用深色模式颜色（rawColor）──
+            if (displayItems.length > 0) {
+                const lastKey = displayItems[displayItems.length - 1].key;
+                const ringRawColor = window.Game.UI.termColors
+                    ? (window.Game.UI.termColors.get(lastKey) || window.Game.UI.termColors.get(lastKey.toLowerCase()))
+                    : null;
+                if (ringRawColor) {
+                    document.documentElement.style.setProperty('--turn-ring-color', ringRawColor);
+                }
+            }
         }
 
         // 2. 渲染时机徽标
@@ -200,9 +211,9 @@
         let targetArea = null;
         let moveRole = null;
         let animationHint = null;
-        // 修正：当前操作者应与 UI 显示的“主视角角色”一致
-        // 之前硬编码为 players[0]，会导致在 updateSelfRoleInfo 渲染 players[1] 时逻辑错乱
-        const currentPlayer = GameState.players[GameState.currentPlayerIndex] || GameState.players[0];
+        // 修正：当前操作者应与 UI 显示的"主视角角色"一致（perspectiveIndex）
+        const perspIdx = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
+        const currentPlayer = GameState.players[perspIdx] || GameState.players[0];
 
         // 1. 解析 Slot 后缀 (支持 equipArea:slot:0 或 role:1001:equip:slot:0)
         let resolvedTargetId = targetZoneId;

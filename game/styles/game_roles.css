@@ -53,13 +53,7 @@
     border-color: var(--text-subtle);
 }
 
-.role-summary.active {
-    background-color: var(--token-accent-blue);
-    border-color: var(--primary-2);
-    color: var(--text-active);
-    font-weight: 600;
-    box-shadow: 0 2px 4px var(--primary-ring);
-}
+/* (Turn indicator is now on .char-avatar via rotating ring — no card highlight) */
 
 .role-summary .player-name {
     font-size: 0.95rem;

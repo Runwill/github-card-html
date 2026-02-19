@@ -39,6 +39,14 @@
 
         // 动作列表
         actions.forEach(item => {
+            // 分隔线
+            if (!item.action && item.label && item.label.startsWith('───')) {
+                const sep = document.createElement('div');
+                sep.className = 'context-menu-separator';
+                menu.appendChild(sep);
+                return;
+            }
+
             const el = document.createElement('div');
             el.className = 'context-menu-item';
             el.textContent = item.label;
@@ -69,21 +77,40 @@
         let actions = [];
         const isSandbox = window.Game.GameState && window.Game.GameState.mode === 'sandbox';
 
+        // ── 切换视角（始终可用）──
+        const gs = window.Game.GameState;
+        if (gs && gs.players) {
+            const playerIdx = gs.players.indexOf(player);
+            const isCurrentPerspective = (playerIdx === gs.perspectiveIndex);
+            if (playerIdx !== -1 && !isCurrentPerspective) {
+                actions.push({
+                    label: '👁 切换视角到此角色',
+                    action: () => {
+                        if (window.Game.UI.setPerspective) {
+                            window.Game.UI.setPerspective(playerIdx);
+                        }
+                    }
+                });
+            }
+        }
+
         if (isSandbox) {
-            actions = [
+            if (actions.length > 0) actions.push({ label: '───', action: null }); // separator
+            actions.push(
                 { label: '增加 1 点体力', action: () => window.Game.Controller.dispatch('modifyHealth', { roleId: player.id, delta: 1 }) },
                 { label: '减少 1 点体力', action: () => window.Game.Controller.dispatch('modifyHealth', { roleId: player.id, delta: -1 }) },
 
                 { label: '增加 1 点体力上限', action: () => window.Game.Controller.dispatch('modifyMaxHealth', { roleId: player.id, delta: 1 }) },
                 { label: '减少 1 点体力上限', action: () => window.Game.Controller.dispatch('modifyMaxHealth', { roleId: player.id, delta: -1 }) }
-            ];
+            );
         } else {
-            actions = [
+            if (actions.length > 0) actions.push({ label: '───', action: null }); // separator
+            actions.push(
                 { label: '造成 1 点伤害', action: () => window.Game.Core.Events.damage(null, player, 1) },
                 { label: '治疗 1 点体力', action: () => window.Game.Core.Events.cure(null, player, 1) },
                 { label: '回复 1 点体力', action: () => window.Game.Core.Events.recover(player, 1) },
                 { label: '流失 1 点体力', action: () => window.Game.Core.Events.loss(player, 1) }
-            ];
+            );
         }
         
         renderMenu(x, y, player.name, actions);
