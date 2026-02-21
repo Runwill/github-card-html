@@ -44,8 +44,9 @@
     justify-content: space-between;
     align-items: center;
     color: var(--text);
-    /* Merged conflicting properties safely */
-    min-width: 120px;
+    /* Responsive min-width: scales with root font-size so steps follow text sizing;
+       preserves previous maximum of 120px */
+    min-width: clamp(72px, calc(var(--fs-root) * 6), 120px);
 }
 
 .role-summary:hover {
@@ -126,12 +127,16 @@
     padding-right: var(--space-3xl);
 }
 
-/* Responsive adjustment for character info */
-@media (max-width: 768px) {
-    .character-info {
-        flex-direction: column;
-        text-align: center;
-    }
+/* responsive behaviour is handled via tokens in media.css */
+.character-info {
+    flex-direction: var(--character-info-flex, row);
+    text-align: var(--character-info-textalign, left);
+    padding-right: var(--pad-character-info-r, var(--space-3xl));
+    min-width: var(--minw-character-info, 286px);
+}
+
+.player-hand {
+    padding-right: var(--pad-player-hand-r, var(--space-3xl));
 }
 
 .char-avatar {

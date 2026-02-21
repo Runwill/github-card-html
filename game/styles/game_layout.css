@@ -139,6 +139,7 @@
 @media (max-width: 1024px) {
     .game-container {
         flex-direction: column;
+        gap: 0;
     }
     .game-top-section {
         flex-direction: column;
@@ -150,9 +151,37 @@
     .game-log-panel {
         flex-direction: row;
         justify-content: space-between;
+        align-items: center;
+        min-height: unset;
+        gap: var(--space-md);
+        padding: var(--space-sm) 15px;
+    }
+    .game-log-panel .timing-badge {
+        width: auto;
+        flex-shrink: 0;
     }
     .main-perspective-container {
         flex-direction: column;
+    }
+    /* Ensure current-character-panel fills available width when stacked */
+    .main-perspective-container > .current-character-panel {
+        flex: 1 1 100%;
+        width: 100%;
+        max-width: none;
+    }
+    /* Remove padding from action panel on narrow screens to save vertical space */
+    .game-action-panel {
+        padding: 0 !important;
+    }
+
+    /* Compact game-controls for narrower screens */
+    #game-controls {
+        gap: var(--space-sm);
+    }
+    #game-controls .btn {
+        min-width: 96px;
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--fs-sm);
     }
 }
 

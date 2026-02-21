@@ -21,6 +21,10 @@
     min-width: 0;
 }
 
+#game-breadcrumbs {
+    margin: 0;
+}
+
 .breadcrumbs .crumb {
     display: inline-flex;
     align-items: center;
@@ -49,13 +53,17 @@
 #game-controls {
     display: flex;
     flex-direction: row;
-    gap: var(--space-3xl);
+    gap: var(--gamecontrols-gap);
     justify-content: center;
     width: 100%;
 }
 
 #game-controls .btn {
-    min-width: 140px;
+    min-width: var(--gamecontrols-btn-minw);
+    padding: var(--gamecontrols-btn-padding);
+    font-size: var(--gamecontrols-btn-fontsize);
+    min-height: var(--gamecontrols-btn-minh);
+    line-height: var(--gamecontrols-btn-lineheight);
 }
 
 /* Empty Area Watermark */

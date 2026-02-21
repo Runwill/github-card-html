@@ -11,26 +11,50 @@
   --pad-content-l:     0.8em;     /* 正文区左内距 */
   --pad-content-r:     0.6em;     /* 正文区右内距 */
   --pad-ripple:        8px 17px;  /* 波纹按钮内距 */
-  --pad-menu-toggle:   8px 1px;   /* 菜单开关内距 */
-  --mr-header-title:   35px;      /* 顶栏标题右外距 */
+  --pad-menu-toggle:   0px 0px;   /* 菜单开关内距 */
+  --pad-header-r:      50px;      /* 顶栏右内距，移动端默认 */
+  --ml-header-title:   0.6rem;      /* 顶栏标题左外距 */
+  --mr-header-title:   33px;      /* 顶栏标题右外距 */
   --mr-sidebar-tab:    8px;       /* 侧栏标签右外距 */
   --h-search-gap:      0.5em;     /* 搜索栏下方留白 */
 }
 
 /* ── 逐断点递增覆盖（仅修改变化的 token） ── */
-@media (min-width: 391px) {
+
+@media (min-width: 401px) {
+  :root {
+    --pad-ripple:      9px 20px;
+  }
+}
+
+@media (min-width: 421px) {
   :root {
     --fs-strength-title: 18px;
-    --pad-menu-toggle:   8px 10px;
+    --ml-header-title:   0.7em;
+    --mr-header-title:   38px;
+    --mr-sidebar-tab:    9px;
+  }
+}
+
+@media (min-width: 451px) {
+  :root {
     --mr-header-title:   40px;
     --mr-sidebar-tab:    10px;
   }
 }
 
-@media (min-width: 401px) {
+@media (min-width: 461px) {
   :root {
-    --pad-ripple:      9px 20px;
-    --mr-header-title: 50px;
+    --pad-menu-toggle:   0px 4px;
+    --mr-header-title:   40px;
+  }
+}
+
+@media (min-width: 481px) {
+  :root {
+    --pad-menu-toggle: 6px 6px;
+    --ml-header-title: 0.95em;
+    --mr-header-title: 47px;
   }
 }
 
@@ -38,15 +62,40 @@
   :root {
     --pad-content-l:   1.2em;
     --pad-content-r:   1.2em;
+    --pad-menu-toggle: 6px 8px;
+    --ml-header-title: 1rem;
+    --mr-sidebar-tab:  14px;
+  }
+}
+
+@media (min-width: 511px) {
+  :root {
+    --mr-sidebar-tab:  15px;
+  }
+}
+
+@media (min-width: 521px) {
+  :root {
+    --mr-sidebar-tab:  17px;
+  }
+}
+
+@media (min-width: 551px) {
+  :root {
+    --pad-content-l:   1.2em;
+    --pad-content-r:   1.2em;
     --pad-menu-toggle: 8px 12px;
-    --mr-sidebar-tab:  25px;
+    --mr-header-title: 50px;
+    --mr-sidebar-tab:  18px;
   }
 }
 
 @media (min-width: 601px) {
   :root {
-    --pad-content-l: 1.6em;
-    --pad-content-r: 1.6em;
+    --fs-root:       16px;
+    --pad-content-l: 1.7em;
+    --pad-content-r: 1.7em;
+    --mr-header-title: 55px;
   }
 }
 
@@ -56,6 +105,7 @@
     --pad-content-l: 1.8em;
     --pad-content-r: 1.8em;
     --pad-ripple:    10px 22px;
+    --mr-header-title: 60px;
   }
 }
 
@@ -64,7 +114,7 @@
     --fs-root:         18px;
     --pad-content-l:   2.0em;
     --pad-content-r:   2.0em;
-    --mr-header-title: 75px;
+    --mr-header-title: 65px;
   }
 }
 
@@ -73,7 +123,8 @@
     --fs-root:        19px;
     --pad-content-l:  2.2em;
     --pad-content-r:  2.2em;
-    --mr-sidebar-tab: 28px;
+    --mr-header-title: 75px;
+    --mr-sidebar-tab: 27px;
   }
 }
 
@@ -110,6 +161,60 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 #header_title { margin-right: var(--mr-header-title); }
 #sidebar .tabs-title { margin: 0 var(--mr-sidebar-tab) 0 0; }
 #menu-toggle { padding: var(--pad-menu-toggle); }
+
+/* game_controls 响应式设置（控制按钮） */
+:root {
+  --gamecontrols-gap: var(--space-3xl);            /* 控件行间距 */
+  --gamecontrols-btn-minw: 140px;                  /* 按钮最小宽度 */
+  --gamecontrols-btn-padding: var(--space-sm) var(--space-md); /* 按钮内距 */
+  --gamecontrols-btn-fontsize: var(--fs-md);       /* 按钮文字大小 */
+  --gamecontrols-btn-minh: 0;                      /* 按钮最小高度 */
+  --gamecontrols-btn-lineheight: normal;           /* 按钮行高 */
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --gamecontrols-gap: var(--space-sm);
+    --gamecontrols-btn-minw: 96px;
+    --gamecontrols-btn-padding: var(--space-sm) var(--space-md);
+    --gamecontrols-btn-fontsize: var(--fs-sm);
+    --gamecontrols-btn-minh: 36px;
+    --gamecontrols-btn-lineheight: 1.2;
+  }
+}
+
+/* game_roles 响应式设置（角色信息面板、手牌） */
+
+/* 可在其它断点中再修改 --role-avatar-size */
+:root {
+  --role-avatar-size: 60px;      /* 头像默认尺寸，可被断点覆盖 */
+}
+
+:root {
+  --character-info-flex: row;               /* 信息区排列方向 */
+  --character-info-textalign: left;         /* 信息区文字对齐 */
+  --pad-character-info-r: var(--space-3xl); /* 信息区右内距 */
+  --pad-player-hand-r: var(--space-3xl);    /* 手牌区右内距 */
+  --minw-character-info: 286px;             /* 信息区最低宽度 */
+}
+
+/* 平板及以下宽度覆盖 */
+@media (max-width: 768px) {
+  :root {
+    --character-info-flex: column;
+    --character-info-textalign: center;
+    --pad-character-info-r: 0;
+    --pad-player-hand-r: 0;
+  }
+}
+
+/* 小桌面下放宽信息区最小宽度 */
+@media (max-width: 1024px) {
+  :root {
+    --minw-character-info: 180px;
+    --role-avatar-size: 50px;      /* 小桌面时缩小头像 */
+  }
+}
 
 /* ≥ 1401 独有（仅此断点出现，不提取为 token） */
 @media (min-width: 1401px) {

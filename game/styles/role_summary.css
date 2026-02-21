@@ -10,11 +10,13 @@
 
 /* Override .char-avatar size for role list */
 .role-list-avatar {
-    width: 60px !important;
-    height: 60px !important;
+    /* 尺寸由 media.css 中的 --role-avatar-size 控制 */
+    width: var(--role-avatar-size) !important;
+    height: var(--role-avatar-size) !important;
     margin-bottom: var(--space-2xs);
     position: relative; /* Context for absolute badges */
     overflow: visible; /* Allow badge to pop out */
+    transition: width 120ms var(--ease-default), height 120ms var(--ease-default);
 }
 
 /* Also ensure main view avatar has context */
