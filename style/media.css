@@ -17,6 +17,9 @@
   --mr-header-title:   33px;      /* 顶栏标题右外距 */
   --mr-sidebar-tab:    8px;       /* 侧栏标签右外距 */
   --h-search-gap:      0.5em;     /* 搜索栏下方留白 */
+  --header-avatar-size: 36px;     /* 顶栏头像尺寸 */
+  --mt-strength-title: 0.45em;    /* 强度按钮上外距 */
+  --mb-strength-title: 0;         /* 强度按钮下外距 */
 }
 
 /* ── 逐断点递增覆盖（仅修改变化的 token） ── */
@@ -161,6 +164,8 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 #header_title { margin-right: var(--mr-header-title); }
 #sidebar .tabs-title { margin: 0 var(--mr-sidebar-tab) 0 0; }
 #menu-toggle { padding: var(--pad-menu-toggle); }
+#header-avatar { width: var(--header-avatar-size); height: var(--header-avatar-size); }
+.strength_title { margin-top: var(--mt-strength-title); margin-bottom: var(--mb-strength-title); }
 
 /* game_controls 响应式设置（控制按钮） */
 :root {
