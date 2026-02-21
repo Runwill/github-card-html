@@ -26,8 +26,6 @@
 #header_title {
     flex-grow: 1;
     font-size: .9rem;
-    height: 2.4rem;
-    line-height: 2.4rem;
     margin-left: var(--ml-header-title);
     transition: all var(--dur-normal) var(--ease-default);
 }

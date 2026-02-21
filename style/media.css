@@ -17,7 +17,7 @@
   --mr-header-title:   33px;      /* 顶栏标题右外距 */
   --mr-sidebar-tab:    8px;       /* 侧栏标签右外距 */
   --h-search-gap:      0.5em;     /* 搜索栏下方留白 */
-  --header-avatar-size: 36px;     /* 顶栏头像尺寸 */
+  --header-avatar-size: 30px;     /* 顶栏头像尺寸 */
   --mt-strength-title: 0.45em;    /* 强度按钮上外距 */
   --mb-strength-title: 0;         /* 强度按钮下外距 */
 }
@@ -27,6 +27,11 @@
 @media (min-width: 401px) {
   :root {
     --pad-ripple:      9px 20px;
+  }
+}
+@media (min-width: 411px) {
+  :root {
+    --header-avatar-size: 36px;
   }
 }
 
@@ -161,7 +166,12 @@ html { font-size: var(--fs-root); }
 #block-under-search { height: var(--h-search-gap); }
 .ripple-button { margin-left: -2em; margin-top: -1em; padding: var(--pad-ripple); }
 padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r); }
-#header_title { margin-right: var(--mr-header-title); }
+#header_title {
+    margin-right: var(--mr-header-title);
+    /* default height, moved from header.css */
+    height: 2.4rem;
+    line-height: 2.4rem;
+}
 #sidebar .tabs-title { margin: 0 var(--mr-sidebar-tab) 0 0; }
 #menu-toggle { padding: var(--pad-menu-toggle); }
 #header-avatar { width: var(--header-avatar-size); height: var(--header-avatar-size); }
