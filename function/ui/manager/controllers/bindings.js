@@ -79,6 +79,16 @@
       C.approvals.updateVisibilityByRole(role);
     }
 
+    // ── 视口尺寸显示 ──
+    const vpDisplay = $('viewport-size-display');
+    if (vpDisplay) {
+      const updateVP = () => {
+        vpDisplay.textContent = window.innerWidth + ' × ' + window.innerHeight;
+      };
+      updateVP();
+      window.addEventListener('resize', updateVP);
+    }
+
     // ── 表单 ──
     $('updateForm')?.addEventListener('submit', (e) => C.accountUpdateForm?.handleUpdateFormSubmit?.(e));
   }

@@ -27,6 +27,14 @@ padding padding { animation-delay: 0.07s; }
 padding padding padding { animation-delay: 0.12s; }
 
 .animate-in { animation-play-state: running; }
+
+/* 动画完成后脱离 fill-mode 依赖，防止主题切换时 CSS 变量重算导致动画重置、元素回到 opacity:0 */
+.animate-done {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    animation: none !important;
+}
+
 .fade-in-on-scroll.visible { opacity: 1; transform: translateY(0); }
 
 .button, .wave {

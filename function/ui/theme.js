@@ -6,7 +6,13 @@
     if(t==='light') return root.removeAttribute('data-theme')
     media.matches ? root.setAttribute('data-theme','dark') : root.removeAttribute('data-theme')
   }
+  /* 主题切换前：标记所有已完成入场动画的元素，防止 CSS 变量重算导致
+     animation-fill-mode 失效、元素回到 opacity:0（文本消失）*/
+  const freezeAnimated=()=>{
+    document.querySelectorAll('.animate-in:not(.animate-done)').forEach(el=>el.classList.add('animate-done'))
+  }
   const fade=t=>{
+    freezeAnimated()
     // 优先使用 View Transitions API (Chromium 111+)，提供极其流畅的全页颜色交叉淡入淡出
     if (document.startViewTransition) {
       document.startViewTransition(() => apply(t));

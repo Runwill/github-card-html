@@ -8,7 +8,24 @@
   list-style: none; 
   margin-bottom: var(--space-sm); 
 }
-#sidebar-menu li:last-child, #account-menu li:last-child, #settings-menu li:last-child { margin-bottom: 0; }
+#sidebar-menu li:last-child, #account-menu li:last-child, #settings-menu li:last-of-type { margin-bottom: 0; }
+
+.settings-menu__viewport-info {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(-1.8em - var(--space-sm));
+  font-size: var(--fs-xs, 0.75rem);
+  color: var(--text-muted, #999);
+  opacity: 0.6;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: text;
+}
+/* 浅色模式下视窗尺寸文字改用接近白色的 token */
+html:not([data-theme="dark"]) .settings-menu__viewport-info {
+  color: var(--bg-end);
+}
 
 .sidebar-menu_button { 
   transition: all var(--dur-normal) var(--ease-standard) !important; 

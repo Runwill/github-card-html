@@ -157,7 +157,9 @@
         // 2. 渲染时机徽标
         if (timingBadgeEl) {
             const currentNode = window.Game.Core.getCurrentNode();
-            if (currentNode) {
+            // 跳过 process 容器节点（如 GameProcess, RoundProcess, TurnProcess），
+            // 它们没有对应的文本模板，只是流程树的结构节点
+            if (currentNode && currentNode.type !== 'process') {
                 // 渲染内容
                 const renderKey = currentNode.name;
                 

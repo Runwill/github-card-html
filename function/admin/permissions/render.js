@@ -326,8 +326,9 @@
     editor.appendChild(toolbar); editor.appendChild(list); editor.appendChild(actions);
     block.appendChild(editor);
 
-    // 密码编辑器
+    // 密码编辑器（用 <form> 包裹以满足浏览器 DOM 规范要求）
     const pwdEditor = makeEl('div', 'perm-editor perm-editor--plain'); pwdEditor.style.display='none'; pwdEditor.classList.add('is-collapsed');
+    const pwdForm = document.createElement('form'); pwdForm.autocomplete='off'; pwdForm.addEventListener('submit', e => e.preventDefault());
     const pwdList = makeEl('div', 'perm-editor__list');
     const rowNew = makeEl('div', 'perm-editor__item');
     const inputNew = document.createElement('input'); inputNew.type='password'; inputNew.className='tokens-input'; inputNew.autocomplete='new-password'; inputNew.placeholder = t('modal.password.new','新密码'); rowNew.appendChild(inputNew);
@@ -340,7 +341,8 @@
     setI18nAttr(btnPwdCancel, 'common.cancel', t('common.cancel','取消'));
     setI18nAttr(btnPwdSave, 'common.save', t('common.save','保存'));
     pwdActions.appendChild(btnPwdCancel); pwdActions.appendChild(btnPwdSave);
-    pwdEditor.appendChild(pwdList); pwdEditor.appendChild(pwdActions);
+    pwdForm.appendChild(pwdList); pwdForm.appendChild(pwdActions);
+    pwdEditor.appendChild(pwdForm);
     block.appendChild(pwdEditor);
 
     // 角色编辑器

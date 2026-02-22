@@ -31,6 +31,9 @@ class TextAnimationController {
     startAnimations() {
         document.querySelectorAll('h1, h2, h3, .indent, padding').forEach(element => {
             element.classList.add('animate-in');
+            element.addEventListener('animationend', () => {
+                element.classList.add('animate-done');
+            }, { once: true });
         });
     }
 
