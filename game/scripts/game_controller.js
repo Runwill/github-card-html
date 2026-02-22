@@ -272,6 +272,11 @@
                         currentEngine.modifyMaxHealth(payload.roleId, payload.delta);
                     }
                 }
+
+                // Online sync: broadcast action to other room members
+                if (window.Game.Online && window.Game.Online.SyncManager) {
+                    try { window.Game.Online.SyncManager.interceptDispatch(actionType, payload); } catch(e) { console.warn('[Online] sync error', e); }
+                }
             }
         } else {
             // 自动/流程模式

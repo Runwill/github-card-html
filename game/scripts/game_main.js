@@ -28,6 +28,16 @@
         if (window.Game.Setup && window.Game.Setup.init) {
             window.Game.Setup.init();
         }
+
+        // Initialize Online Room modules if available
+        if (window.Game.Online) {
+            if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.init) {
+                window.Game.Online.SyncManager.init();
+            }
+            if (window.Game.Online.RoomUI && window.Game.Online.RoomUI.init) {
+                window.Game.Online.RoomUI.init();
+            }
+        }
         
         // Load saved game settings (speed, inertia)
         if (window.KeySettings && window.KeySettings.loadGameSettings) {

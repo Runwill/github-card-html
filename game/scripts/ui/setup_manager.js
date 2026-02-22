@@ -176,7 +176,13 @@
 
         // 获取模式预设
         const modeSelect = document.getElementById('setup-mode-select');
-        const mode = modeSelect ? modeSelect.value : 'auto';
+        let mode = modeSelect ? modeSelect.value : 'auto';
+
+        // Online: force sandbox mode
+        const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
+        if (isOnline) {
+            mode = 'sandbox';
+        }
 
         // 隐藏设置面板
         hideSetupPanel();
@@ -188,10 +194,23 @@
         // if (main) main.classList.remove('hidden');
 
         // 开始游戏
+        const gameConfig = { mode: mode, players: playersConfig, deck: deck };
         if (window.Game.Controller && window.Game.Controller.startGame) {
-            window.Game.Controller.startGame({ mode: mode, players: playersConfig, deck: deck });
+            window.Game.Controller.startGame(gameConfig);
         } else if (window.Game.Core && window.Game.Core.startGame) {
             window.Game.Core.startGame({ players: playersConfig, deck: deck });
+        }
+
+        // Online: broadcast game start to room members
+        if (isOnline && window.Game.Online) {
+            try {
+                const syncMgr = window.Game.Online.SyncManager;
+                const client = window.Game.Online.RoomClient;
+                if (syncMgr && client) {
+                    const serializedState = syncMgr.serializeGameState();
+                    client.notifyGameStart(gameConfig, serializedState);
+                }
+            } catch(e) { console.warn('[Online] game start broadcast error', e); }
         }
     }
 

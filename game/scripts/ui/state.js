@@ -32,6 +32,12 @@
         if (!state || !state.players) return;
         if (playerIndex < 0 || playerIndex >= state.players.length) return;
         state.perspectiveIndex = playerIndex;
+
+        // Online: broadcast perspective change to room
+        if (window.Game.Online && window.Game.Online.SyncManager) {
+            try { window.Game.Online.SyncManager.broadcastPerspectiveChange(playerIndex); } catch(e) { console.warn('[Online] perspective sync error', e); }
+        }
+
         if (window.Game.UI.updateUI) {
             window.Game.UI.updateUI();
         }

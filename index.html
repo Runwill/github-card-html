@@ -48,6 +48,7 @@
     <link rel="stylesheet" type="text/css" href="game/styles/game_viewer.css?v=202512070129">
     <link rel="stylesheet" type="text/css" href="game/styles/role_judge_hover.css?v=202512070129">
     <link rel="stylesheet" type="text/css" href="game/styles/context_menu.css">
+    <link rel="stylesheet" type="text/css" href="game/styles/online.css">
     <link rel="icon" href="data:;base64,=">
     <!-- 预加载首屏字体（康熙）：若未在样式中使用会产生警告，当前未直接使用，先移除预加载以避免控制台噪声 -->
     <!-- <link rel="preload" as="font" href="source/康熙字典体.TTF?v=202512070129" type="font/ttf" crossorigin> -->
@@ -116,6 +117,7 @@
     <script src="function/admin/permissions/render.js?v=202512070129"></script>
     <script src="function/admin/permissions/init.js?v=202512070129"></script>
     <script src="function/admin/permissions/logs.js?v=202512070129"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="game/scripts/game_def.js"></script>
     <script src="game/scripts/core/utils.js"></script>
     <script src="game/scripts/core/models.js"></script>
@@ -145,6 +147,10 @@
     <script src="game/scripts/ui/card_viewer.js"></script>
     <script src="game/scripts/ui/setup_manager.js"></script>
     <script src="game/scripts/ui/main.js"></script>
+    <!-- Online Room Modules -->
+    <script src="game/scripts/online/room_client.js"></script>
+    <script src="game/scripts/online/sync_manager.js"></script>
+    <script src="game/scripts/online/room_ui.js"></script>
     <script src="game/scripts/game_main.js"></script>
     <script src="game/scripts/ui/inspector.js"></script>
     <script src="function/ui/tooltip.js?v=202512070129"></script>

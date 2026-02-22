@@ -1,0 +1,309 @@
+/* ==========================================================================
+   Online Room Styles
+   - Online Room Panel (Lobby & In-Room)
+   - Viewer Labels on Avatars
+   - Status Indicators
+   ========================================================================== */
+
+/* ── Online Room Panel ─────────────────────────────────────────────────── */
+
+#online-room-ui {
+    background: var(--surface, rgba(0,0,0,0.5));
+    border: 1px solid var(--border, #444);
+    border-radius: var(--radius-lg, 8px);
+    padding: var(--space-3xl, 20px);
+    margin-bottom: var(--space-2xl, 16px);
+    color: var(--text, #eee);
+}
+
+.online-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl, 14px);
+    border-bottom: 2px solid var(--border, #444);
+    padding-bottom: var(--space-md, 8px);
+}
+
+.online-panel-header h4 {
+    margin: 0;
+    color: var(--text-muted, #aaa);
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ── Status Badge ──────────────────────────────────────────────────────── */
+
+.online-status {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: var(--radius-sm, 4px);
+    background: var(--surface, #333);
+    color: var(--text-muted, #999);
+    transition: background var(--dur-normal, .2s), color var(--dur-normal, .2s);
+}
+
+.online-status.connected {
+    background: #1e7e34;
+    color: #fff;
+}
+
+.online-status.error {
+    background: #c0392b;
+    color: #fff;
+}
+
+/* ── Create Row ────────────────────────────────────────────────────────── */
+
+.online-create-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md, 8px);
+    margin-bottom: var(--space-lg, 12px);
+    flex-wrap: wrap;
+}
+
+.online-create-row .input-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 0;
+    flex: 1 1 200px;
+}
+
+.online-create-row .input-group-label {
+    background: var(--border, #555);
+    color: var(--text, #eee);
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm, 4px) 0 0 var(--radius-sm, 4px);
+    white-space: nowrap;
+}
+
+.online-create-row .input-group-field {
+    border: 1px solid var(--border, #555);
+    background: var(--surface, #222);
+    color: var(--text, #eee);
+    padding: 6px 10px;
+    border-radius: 0 var(--radius-sm, 4px) var(--radius-sm, 4px) 0;
+    font-size: 0.85rem;
+    outline: none;
+    flex: 1;
+}
+
+.online-create-row .input-group-field:focus {
+    border-color: var(--accent, #5dade2);
+}
+
+/* ── Room List ─────────────────────────────────────────────────────────── */
+
+.online-room-list-header {
+    font-size: 0.8rem;
+    color: var(--text-muted, #999);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--space-sm, 6px);
+}
+
+.online-room-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid var(--border, #444);
+    border-radius: var(--radius-md, 6px);
+    background: var(--bg-start, #111);
+    padding: var(--space-sm, 4px);
+}
+
+.room-empty {
+    text-align: center;
+    color: var(--text-muted, #666);
+    font-size: 0.85rem;
+    padding: var(--space-xl, 14px);
+}
+
+.room-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm, 4px);
+    transition: background var(--dur-fast, .1s);
+    cursor: default;
+}
+
+.room-item:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.room-item .room-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.room-item .room-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md, 8px);
+    font-size: 0.8rem;
+    color: var(--text-muted, #999);
+}
+
+.room-item .room-meta .badge {
+    padding: 1px 6px;
+    border-radius: var(--radius-xs, 3px);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.room-item .room-meta .badge.gaming {
+    background: #e67e22;
+    color: #fff;
+}
+
+.room-item .room-meta .badge.waiting {
+    background: #2ecc71;
+    color: #fff;
+}
+
+.room-item .btn-join-room {
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    border-radius: var(--radius-sm, 4px);
+    background: var(--accent, #5dade2);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: opacity var(--dur-fast, .1s);
+}
+
+.room-item .btn-join-room:hover {
+    opacity: 0.85;
+}
+
+/* ── In-Room View ──────────────────────────────────────────────────────── */
+
+.online-room-info {
+    font-size: 0.9rem;
+    margin-bottom: var(--space-md, 8px);
+}
+
+.room-user-count-wrap {
+    color: var(--text-muted, #999);
+    font-size: 0.8rem;
+}
+
+.online-user-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md, 8px);
+    padding: var(--space-md, 8px) 0;
+}
+
+.room-user {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm, 4px);
+    background: rgba(255,255,255,0.08);
+    font-size: 0.8rem;
+    color: var(--text, #eee);
+}
+
+.room-user.is-host::before {
+    content: '★';
+    color: #f1c40f;
+    font-size: 0.75rem;
+}
+
+.room-user.is-self {
+    border: 1px solid var(--accent, #5dade2);
+}
+
+.online-hint {
+    margin-top: var(--space-lg, 12px);
+    padding: 8px 12px;
+    background: rgba(93, 173, 226, 0.12);
+    border-left: 3px solid var(--accent, #5dade2);
+    border-radius: var(--radius-sm, 4px);
+    font-size: 0.8rem;
+    color: var(--text-muted, #aaa);
+    line-height: 1.5;
+}
+
+/* ── Viewer Labels on Avatars ──────────────────────────────────────────── */
+
+.online-viewer-label {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75);
+    color: #5dade2;
+    font-size: 0.65rem;
+    padding: 1px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+    text-align: center;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    animation: viewerLabelFadeIn 0.25s ease;
+}
+
+@keyframes viewerLabelFadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Ensure avatar containers support absolute positioning for labels */
+.char-avatar {
+    position: relative;
+}
+
+/* ── Buttons helpers ───────────────────────────────────────────────────── */
+
+.btn--accent {
+    background: var(--accent, #5dade2);
+    color: #fff;
+    border: none;
+}
+.btn--accent:hover {
+    opacity: 0.88;
+}
+
+.btn--sm {
+    padding: 4px 12px;
+    font-size: 0.8rem;
+}
+
+.btn--danger {
+    background: #c0392b;
+    color: #fff;
+    border: none;
+}
+.btn--danger:hover {
+    opacity: 0.88;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+    .online-create-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .online-room-list {
+        max-height: 150px;
+    }
+    .online-viewer-label {
+        font-size: 0.55rem;
+        padding: 1px 4px;
+        top: -18px;
+    }
+}

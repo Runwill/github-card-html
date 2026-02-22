@@ -276,6 +276,44 @@
     }
 
     /**
+     * 更新角色头像上方的在线用户名标签
+     * @param {HTMLElement} avatarContainer - .char-avatar 容器元素
+     * @param {number} playerIndex - 玩家索引（用于查询观察者）
+     */
+    function updateViewerLabels(avatarContainer, playerIndex) {
+        if (!avatarContainer) return;
+        
+        const gs = window.Game.GameState;
+        if (!gs || !gs.onlineMode) {
+            // 非在线模式，隐藏标签
+            const existing = avatarContainer.querySelector('.online-viewer-label');
+            if (existing) existing.style.display = 'none';
+            return;
+        }
+        
+        // 获取观察此角色的用户名列表
+        const SyncManager = window.Game.Online && window.Game.Online.SyncManager;
+        const viewers = SyncManager ? SyncManager.getViewersForPlayer(playerIndex) : [];
+
+        let label = avatarContainer.querySelector('.online-viewer-label');
+        if (!label) {
+            label = document.createElement('div');
+            label.className = 'online-viewer-label';
+            avatarContainer.appendChild(label);
+        }
+
+        if (viewers.length > 0) {
+            const text = viewers.join(', ');
+            if (label.textContent !== text) {
+                label.textContent = text;
+            }
+            label.style.display = '';
+        } else {
+            label.style.display = 'none';
+        }
+    }
+
+    /**
      * 渲染自身角色信息 (Self Role Info)
      * 对应主视角角色 (perspectiveIndex) (UI底部面板)
      */
@@ -326,6 +364,8 @@
             const mainAvatarWrap = mainAvatarImg.closest('.char-avatar');
             if (mainAvatarWrap) {
                 mainAvatarWrap.classList.toggle('is-current-turn', isTurnOwner);
+                // === 在线模式：显示观察此角色的用户名 ===
+                updateViewerLabels(mainAvatarWrap, perspIdx);
             }
         }
         // 名字 (角色/武将)
@@ -663,6 +703,12 @@
                 judgeCountSpan.style.display = 'none'; // Default hidden
                 avatarContainer.appendChild(judgeCountSpan);
 
+                // === 在线模式：观察者名称容器 ===
+                const viewerLabel = document.createElement('div');
+                viewerLabel.className = 'online-viewer-label';
+                viewerLabel.style.display = 'none';
+                avatarContainer.appendChild(viewerLabel);
+
                 pEl.appendChild(avatarContainer);
 
                 const nameSpan = document.createElement('span');
@@ -722,6 +768,8 @@
             if (avatarWrap) {
                 const inTurn = window.Game.Core.isInTurn && window.Game.Core.isInTurn();
                 avatarWrap.classList.toggle('is-current-turn', inTurn && index === GameState.currentPlayerIndex);
+                // === 在线模式：显示观察此角色的用户名 ===
+                updateViewerLabels(avatarWrap, index);
             }
             
             // 头像 (Avatar)
