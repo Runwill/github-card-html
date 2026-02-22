@@ -20,12 +20,7 @@
     function init() {
         const onlineBtn = document.getElementById('btn-show-online');
         if (onlineBtn) {
-            onlineBtn.addEventListener('click', showOnlinePanel);
-        }
-
-        const backBtn = document.getElementById('btn-online-back');
-        if (backBtn) {
-            backBtn.addEventListener('click', hideOnlinePanel);
+            onlineBtn.addEventListener('click', toggleOnlinePanel);
         }
 
         const createBtn = document.getElementById('btn-create-room');
@@ -57,6 +52,18 @@
     /**
      * 显示在线房间面板
      */
+    /**
+     * 切换在线面板（打开/关闭）
+     */
+    function toggleOnlinePanel() {
+        const cur = window.Game.UI.getCurrentView ? window.Game.UI.getCurrentView() : 'none';
+        if (cur === 'online') {
+            hideOnlinePanel();
+            return;
+        }
+        showOnlinePanel();
+    }
+
     async function showOnlinePanel() {
         // 切换到在线房间视图（互斥隐藏其他视图）
         if (window.Game.UI.switchGameView) {
@@ -198,6 +205,11 @@
             // 标记在线模式
             if (window.Game.GameState) window.Game.GameState.onlineMode = true;
 
+            // 初始化 SyncManager 的 perspectives 数据
+            if (currentRoom.perspectives && window.Game.Online.SyncManager) {
+                window.Game.Online.SyncManager.onPerspectivesChanged(currentRoom.perspectives);
+            }
+
             showInRoom();
             renderRoomInfo();
             setStatus(t('online.roomCreated'));
@@ -220,6 +232,11 @@
 
             // 标记在线模式
             if (window.Game.GameState) window.Game.GameState.onlineMode = true;
+
+            // 初始化 SyncManager 的 perspectives 数据
+            if (currentRoom.perspectives && window.Game.Online.SyncManager) {
+                window.Game.Online.SyncManager.onPerspectivesChanged(currentRoom.perspectives);
+            }
 
             showInRoom();
             renderRoomInfo();

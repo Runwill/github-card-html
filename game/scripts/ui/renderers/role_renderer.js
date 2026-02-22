@@ -285,9 +285,9 @@
         
         const gs = window.Game.GameState;
         if (!gs || !gs.onlineMode) {
-            // 非在线模式，隐藏标签
-            const existing = avatarContainer.querySelector('.online-viewer-label');
-            if (existing) existing.style.display = 'none';
+            // 非在线模式，移除标签容器
+            const existing = avatarContainer.querySelector('.online-viewer-labels');
+            if (existing) existing.remove();
             return;
         }
         
@@ -295,21 +295,26 @@
         const SyncManager = window.Game.Online && window.Game.Online.SyncManager;
         const viewers = SyncManager ? SyncManager.getViewersForPlayer(playerIndex) : [];
 
-        let label = avatarContainer.querySelector('.online-viewer-label');
-        if (!label) {
-            label = document.createElement('div');
-            label.className = 'online-viewer-label';
-            avatarContainer.appendChild(label);
+        let container = avatarContainer.querySelector('.online-viewer-labels');
+
+        if (viewers.length === 0) {
+            if (container) container.remove();
+            return;
         }
 
-        if (viewers.length > 0) {
-            const text = viewers.join(', ');
-            if (label.textContent !== text) {
-                label.textContent = text;
-            }
-            label.style.display = '';
-        } else {
-            label.style.display = 'none';
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'online-viewer-labels';
+            avatarContainer.appendChild(container);
+        }
+
+        // 竖排显示所有用户名，每人一个标签
+        const key = viewers.join('|');
+        if (container.dataset.viewerKey !== key) {
+            container.dataset.viewerKey = key;
+            container.innerHTML = viewers.map(name =>
+                `<span class="online-viewer-label">${name}</span>`
+            ).join('');
         }
     }
 

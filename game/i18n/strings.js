@@ -12,9 +12,12 @@
         'game.playCard': '使用/打出牌',
 
         // Online Room
+        'online.room': '在线房间',
         'online.title': '在线房间',
         'online.roomId': '房间ID',
         'online.create': '创建房间',
+        'online.creating': '创建中…',
+        'online.joining': '加入中…',
         'online.refresh': '刷新',
         'online.roomList': '房间列表',
         'online.noRooms': '暂无房间',
@@ -54,9 +57,12 @@
         'game.playCard': 'Use/Play Card',
 
         // Online Room
+        'online.room': 'Online Room',
         'online.title': 'Online Room',
         'online.roomId': 'Room ID',
         'online.create': 'Create',
+        'online.creating': 'Creating…',
+        'online.joining': 'Joining…',
         'online.refresh': 'Refresh',
         'online.roomList': 'Room List',
         'online.noRooms': 'No rooms available',

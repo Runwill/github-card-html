@@ -1,9 +1,7 @@
 /* ==========================================================================
-   Online Room Styles
-   - Game View Containers (mutual exclusion)
-   - Online Room Panel (Lobby & In-Room)
-   - Viewer Labels on Avatars
-   - Status Indicators
+   Online & Setup Panel Styles
+   Uses theme variables (--surface, --border, --text, --primary-*, etc.)
+   for consistent light/dark theme support.
    ========================================================================== */
 
 /* ── Game View Containers ──────────────────────────────────────────────── */
@@ -18,52 +16,142 @@
     display: none !important;
 }
 
+/* Play view: flex-row to place sidebar on the right */
+#game-view-play {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-3xl);
+    align-items: stretch;
+}
+
+/* ── Setup Panel ───────────────────────────────────────────────────────── */
+
+.setup-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3xl);
+    box-shadow: var(--shadow-elev-1);
+    color: var(--text);
+}
+
+.setup-panel .row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xl);
+    flex-wrap: wrap;
+}
+
+.setup-panel .input-group {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 0;
+}
+
+.setup-panel .input-group-label {
+    background: var(--panel-header-bg);
+    color: var(--text-muted);
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--fs-base);
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    white-space: nowrap;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.setup-panel .input-group-field,
+.setup-panel select {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: var(--fs-md);
+    outline: none;
+    transition: border-color var(--dur-normal) var(--ease-default),
+                box-shadow var(--dur-normal) var(--ease-default);
+}
+
+.setup-panel .input-group-field:focus,
+.setup-panel select:focus {
+    border-color: var(--primary-2);
+    box-shadow: var(--shadow-ring);
+}
+
+.setup-panel #setup-players-list {
+    margin-top: var(--space-2xl);
+}
+
+.setup-panel #setup-players-list .row {
+    gap: 0;
+}
+
+.setup-panel #setup-players-list .prefix {
+    font-size: var(--fs-base);
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.setup-panel #setup-players-list select {
+    border-radius: var(--radius-sm);
+    width: 100%;
+}
+
+.setup-actions {
+    margin-top: var(--space-2xl);
+}
+
 /* ── Online Room Panel ─────────────────────────────────────────────────── */
 
 #online-room-ui {
-    background: var(--surface, rgba(0,0,0,0.5));
-    border: 1px solid var(--border, #444);
-    border-radius: var(--radius-lg, 8px);
-    padding: var(--space-3xl, 20px);
-    margin-bottom: var(--space-2xl, 16px);
-    color: var(--text, #eee);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3xl);
+    box-shadow: var(--shadow-elev-1);
+    color: var(--text);
 }
 
 .online-panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--space-xl, 14px);
-    border-bottom: 2px solid var(--border, #444);
-    padding-bottom: var(--space-md, 8px);
+    margin-bottom: var(--space-xl);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: var(--space-md);
 }
 
 .online-panel-header h4 {
     margin: 0;
-    color: var(--text-muted, #aaa);
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    color: var(--text);
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 /* ── Status Badge ──────────────────────────────────────────────────────── */
 
 .online-status {
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: var(--radius-sm, 4px);
-    background: var(--surface, #333);
-    color: var(--text-muted, #999);
-    transition: background var(--dur-normal, .2s), color var(--dur-normal, .2s);
+    font-size: var(--fs-sm);
+    padding: var(--space-2xs) var(--space-md);
+    border-radius: var(--radius-pill);
+    background: var(--panel-header-bg);
+    color: var(--text-subtle);
+    font-weight: 600;
+    transition: background var(--dur-normal) var(--ease-default),
+                color var(--dur-normal) var(--ease-default);
 }
 
 .online-status.connected {
-    background: #1e7e34;
+    background: var(--success);
     color: #fff;
 }
 
 .online-status.error {
-    background: #c0392b;
+    background: var(--danger);
     color: #fff;
 }
 
@@ -72,8 +160,8 @@
 .online-create-row {
     display: flex;
     align-items: center;
-    gap: var(--space-md, 8px);
-    margin-bottom: var(--space-lg, 12px);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
     flex-wrap: wrap;
 }
 
@@ -86,192 +174,248 @@
 }
 
 .online-create-row .input-group-label {
-    background: var(--border, #555);
-    color: var(--text, #eee);
-    padding: 6px 10px;
-    font-size: 0.85rem;
-    border-radius: var(--radius-sm, 4px) 0 0 var(--radius-sm, 4px);
+    background: var(--panel-header-bg);
+    color: var(--text-muted);
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--fs-base);
+    font-weight: 600;
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
     white-space: nowrap;
 }
 
 .online-create-row .input-group-field {
-    border: 1px solid var(--border, #555);
-    background: var(--surface, #222);
-    color: var(--text, #eee);
-    padding: 6px 10px;
-    border-radius: 0 var(--radius-sm, 4px) var(--radius-sm, 4px) 0;
-    font-size: 0.85rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: var(--fs-md);
     outline: none;
     flex: 1;
+    transition: border-color var(--dur-normal) var(--ease-default),
+                box-shadow var(--dur-normal) var(--ease-default);
 }
 
 .online-create-row .input-group-field:focus {
-    border-color: var(--accent, #5dade2);
+    border-color: var(--primary-2);
+    box-shadow: var(--shadow-ring);
 }
 
 /* ── Room List ─────────────────────────────────────────────────────────── */
 
 .online-room-list-header {
-    font-size: 0.8rem;
-    color: var(--text-muted, #999);
+    font-size: var(--fs-sm);
+    color: var(--text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: var(--space-sm, 6px);
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
 }
 
 .online-room-list {
     max-height: 200px;
     overflow-y: auto;
-    border: 1px solid var(--border, #444);
-    border-radius: var(--radius-md, 6px);
-    background: var(--bg-start, #111);
-    padding: var(--space-sm, 4px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-start);
+    padding: var(--space-2xs);
 }
 
 .room-empty {
     text-align: center;
-    color: var(--text-muted, #666);
-    font-size: 0.85rem;
-    padding: var(--space-xl, 14px);
+    color: var(--text-subtle);
+    font-size: var(--fs-base);
+    padding: var(--space-2xl);
 }
 
 .room-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
-    border-radius: var(--radius-sm, 4px);
-    transition: background var(--dur-fast, .1s);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-sm);
+    transition: background var(--dur-fast) var(--ease-default);
     cursor: default;
 }
 
+.room-item + .room-item {
+    border-top: 1px solid var(--border);
+}
+
 .room-item:hover {
-    background: rgba(255,255,255,0.05);
+    background: var(--panel-header-bg);
 }
 
-.room-item .room-name {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.room-item .room-meta {
+.room-item-info {
     display: flex;
     align-items: center;
-    gap: var(--space-md, 8px);
-    font-size: 0.8rem;
-    color: var(--text-muted, #999);
+    gap: var(--space-md);
+    min-width: 0;
 }
 
-.room-item .room-meta .badge {
-    padding: 1px 6px;
-    border-radius: var(--radius-xs, 3px);
-    font-size: 0.7rem;
+.room-item-name {
     font-weight: 600;
-    text-transform: uppercase;
+    font-size: var(--fs-base);
+    color: var(--text);
 }
 
-.room-item .room-meta .badge.gaming {
-    background: #e67e22;
-    color: #fff;
+.room-item-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
 }
 
-.room-item .room-meta .badge.waiting {
-    background: #2ecc71;
-    color: #fff;
+.room-item-users {
+    font-size: var(--fs-sm);
+    color: var(--text-subtle);
+}
+
+.room-item-tag {
+    padding: var(--space-2xs) var(--space-sm);
+    border-radius: var(--radius-xs);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+}
+
+.room-item-tag.gaming {
+    background: rgba(var(--primary-rgb), 0.15);
+    color: var(--primary-1);
+}
+
+.room-item-tag.waiting {
+    background: color-mix(in srgb, var(--success) 15%, transparent);
+    color: var(--success);
 }
 
 .room-item .btn-join-room {
-    padding: 3px 10px;
-    font-size: 0.75rem;
-    border-radius: var(--radius-sm, 4px);
-    background: var(--accent, #5dade2);
+    padding: var(--space-2xs) var(--space-lg);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    background: var(--primary-2);
     color: #fff;
     border: none;
     cursor: pointer;
-    transition: opacity var(--dur-fast, .1s);
+    transition: background var(--dur-fast) var(--ease-default),
+                box-shadow var(--dur-fast) var(--ease-default);
 }
 
 .room-item .btn-join-room:hover {
-    opacity: 0.85;
+    background: var(--primary-3);
+    box-shadow: var(--shadow-primary-1);
 }
 
 /* ── In-Room View ──────────────────────────────────────────────────────── */
 
 .online-room-info {
-    font-size: 0.9rem;
-    margin-bottom: var(--space-md, 8px);
+    font-size: var(--fs-md);
+    color: var(--text);
+    margin-bottom: var(--space-sm);
 }
 
 .room-user-count-wrap {
-    color: var(--text-muted, #999);
-    font-size: 0.8rem;
+    color: var(--text-subtle);
+    font-size: var(--fs-base);
 }
 
 .online-user-list {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-md, 8px);
-    padding: var(--space-md, 8px) 0;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
 }
 
 .room-user {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: var(--radius-sm, 4px);
-    background: rgba(255,255,255,0.08);
-    font-size: 0.8rem;
-    color: var(--text, #eee);
+    gap: var(--space-2xs);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-sm);
+    background: var(--panel-header-bg);
+    border: 1px solid var(--border);
+    font-size: var(--fs-base);
+    color: var(--text);
+    transition: border-color var(--dur-fast) var(--ease-default);
 }
 
-.room-user.is-host::before {
-    content: '★';
-    color: #f1c40f;
-    font-size: 0.75rem;
+.room-user-badge {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    padding: 0 var(--space-2xs);
+    border-radius: var(--radius-xs);
+    line-height: var(--lh-tight);
 }
 
-.room-user.is-self {
-    border: 1px solid var(--accent, #5dade2);
+.room-user-badge.host {
+    background: color-mix(in srgb, var(--success) 15%, transparent);
+    color: var(--success);
+}
+
+.room-user-badge.self {
+    background: rgba(var(--primary-rgb), 0.15);
+    color: var(--primary-1);
+}
+
+.room-user-self {
+    border-color: var(--primary-2);
+    box-shadow: var(--shadow-ring);
 }
 
 .online-hint {
-    margin-top: var(--space-lg, 12px);
-    padding: 8px 12px;
-    background: rgba(93, 173, 226, 0.12);
-    border-left: 3px solid var(--accent, #5dade2);
-    border-radius: var(--radius-sm, 4px);
-    font-size: 0.8rem;
-    color: var(--text-muted, #aaa);
-    line-height: 1.5;
+    margin-top: var(--space-lg);
+    padding: var(--space-md) var(--space-xl);
+    background: rgba(var(--primary-rgb), 0.08);
+    border-left: 3px solid var(--primary-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-base);
+    color: var(--text-muted);
+    line-height: var(--lh-normal);
+}
+
+.online-actions {
+    margin-top: var(--space-lg);
 }
 
 /* ── Viewer Labels on Avatars ──────────────────────────────────────────── */
 
-.online-viewer-label {
+.online-viewer-labels {
     position: absolute;
-    top: -22px;
+    bottom: 100%;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.75);
-    color: #5dade2;
-    font-size: 0.65rem;
-    padding: 1px 6px;
-    border-radius: 3px;
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
     pointer-events: none;
     z-index: 10;
+    margin-bottom: var(--space-2xs);
+}
+
+.online-viewer-label {
+    background: var(--surface);
+    color: var(--primary-1);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    padding: 1px var(--space-xs);
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-subtle);
+    white-space: nowrap;
     text-align: center;
     max-width: 120px;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.4;
-    animation: viewerLabelFadeIn 0.25s ease;
+    line-height: var(--lh-tight);
+    animation: viewerLabelFadeIn 0.2s var(--ease-decel);
 }
 
 @keyframes viewerLabelFadeIn {
-    from { opacity: 0; transform: translateX(-50%) translateY(4px); }
-    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    from { opacity: 0; transform: translateY(3px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Ensure avatar containers support absolute positioning for labels */
@@ -279,34 +423,26 @@
     position: relative;
 }
 
-/* ── Buttons helpers ───────────────────────────────────────────────────── */
+/* ── Button helpers ────────────────────────────────────────────────────── */
 
-.btn--accent {
-    background: var(--accent, #5dade2);
-    color: #fff;
-    border: none;
-}
-.btn--accent:hover {
-    opacity: 0.88;
-}
-
-.btn--sm {
-    padding: 4px 12px;
-    font-size: 0.8rem;
-}
-
-.btn--danger {
-    background: #c0392b;
-    color: #fff;
-    border: none;
-}
-.btn--danger:hover {
-    opacity: 0.88;
-}
+/* btn--accent: now handled by theme.css for consistency */
 
 /* ── Responsive ────────────────────────────────────────────────────────── */
 
+@media (max-width: 1024px) {
+    #game-view-play {
+        flex-direction: column;
+    }
+}
+
 @media (max-width: 600px) {
+    .setup-panel,
+    #online-room-ui {
+        padding: var(--space-lg);
+    }
+    .setup-panel .row {
+        gap: var(--space-sm);
+    }
     .online-create-row {
         flex-direction: column;
         align-items: stretch;
@@ -314,9 +450,11 @@
     .online-room-list {
         max-height: 150px;
     }
+    .online-viewer-labels {
+        margin-bottom: 2px;
+    }
     .online-viewer-label {
-        font-size: 0.55rem;
-        padding: 1px 4px;
-        top: -18px;
+        font-size: 9px;
+        padding: 1px var(--space-2xs);
     }
 }

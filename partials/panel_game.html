@@ -5,11 +5,11 @@
 
             <!-- ====== VIEW: Setup Panel ====== -->
             <div id="game-view-setup" class="game-view hidden">
-                <div id="game-setup-ui" class="game-panel" style="border: 1px solid #444; padding: 15px; background: rgba(0,0,0,0.5);">
+                <div id="game-setup-ui" class="game-panel setup-panel">
                     <div class="row">
                          <div class="input-group">
                             <span class="input-group-label" data-i18n="game.setup.playerCount">Role Count</span>
-                            <select id="setup-player-count-select" class="input-group-field" style="width: auto;">
+                            <select id="setup-player-count-select" class="input-group-field">
                                 <option value="2">2</option>
                                 <option value="3">3</option>
                                 <option value="4" selected>4</option>
@@ -17,18 +17,18 @@
                                 <option value="8">8</option>
                             </select>
                          </div>
-                         <div class="input-group" style="margin-left: 20px;">
+                         <div class="input-group">
                             <span class="input-group-label" data-i18n="game.setup.cardPreset">Card Preset</span>
-                            <select id="setup-card-preset-select" class="input-group-field" style="width: auto;">
+                            <select id="setup-card-preset-select" class="input-group-field">
                                 <option value="standard">Standard</option>
                                 <option value="80sha80shan">80 Sha 80 Shan</option>
                             </select>
                          </div>
                          
                          <!-- NEW: Mode Selection -->
-                         <div class="input-group" style="margin-left: 20px;">
+                         <div class="input-group">
                             <span class="input-group-label">Game Mode</span>
-                            <select id="setup-mode-select" class="input-group-field" style="width: auto;">
+                            <select id="setup-mode-select" class="input-group-field">
                                 <option value="auto">Auto (Flow)</option>
                                 <option value="sandbox">Sandbox (Manual)</option>
                             </select>
@@ -37,16 +37,15 @@
                     <div id="setup-players-list">
                         <!-- Dynamic Inputs -->
                     </div>
-                    <div class="text-center" style="margin-top: 15px;">
+                    <div class="text-center setup-actions">
                         <button id="btn-confirm-setup" class="btn btn--success" data-i18n="game.setup.start">Start Game</button>
-                        <button id="btn-cancel-setup" class="btn btn--secondary" data-i18n="common.cancel">Cancel</button>
                     </div>
                 </div>
             </div>
 
             <!-- ====== VIEW: Online Room Panel ====== -->
             <div id="game-view-online" class="game-view hidden">
-                <div id="online-room-ui" class="game-panel" style="border: 1px solid #444; padding: 15px; background: rgba(0,0,0,0.5);">
+                <div id="online-room-ui" class="game-panel">
                     <div class="online-panel-header">
                         <h4 data-i18n="online.title">在线房间</h4>
                         <span id="online-status" class="online-status"></span>
@@ -57,7 +56,7 @@
                         <div class="online-create-row">
                             <div class="input-group">
                                 <span class="input-group-label" data-i18n="online.roomId">房间ID</span>
-                                <input type="text" id="input-room-id" class="input-group-field" placeholder="输入房间名" maxlength="20" style="width: auto; min-width: 150px;">
+                                <input type="text" id="input-room-id" class="input-group-field" placeholder="输入房间名" maxlength="20">
                             </div>
                             <button id="btn-create-room" class="btn btn--success btn--sm" data-i18n="online.create">创建房间</button>
                             <button id="btn-refresh-rooms" class="btn btn--secondary btn--sm" data-i18n="online.refresh">刷新</button>
@@ -77,15 +76,13 @@
                             <span class="room-user-count-wrap">(<span id="room-user-count">0</span> <span data-i18n="online.players">人</span>)</span>
                         </div>
                         <div id="room-user-list" class="online-user-list"></div>
-                        <div class="text-center" style="margin-top: 10px;">
+                        <div class="text-center online-actions">
                             <button id="btn-leave-room" class="btn btn--danger btn--sm" data-i18n="online.leave">离开房间</button>
                         </div>
                         <div class="online-hint" data-i18n="online.sandboxHint">在线模式下固定为 Sandbox 模式，请通过「游戏设置」选择武将和牌堆后开始游戏。</div>
                     </div>
 
-                    <div class="text-center" style="margin-top: 10px;">
-                        <button id="btn-online-back" class="btn btn--secondary btn--sm" data-i18n="common.cancel">返回</button>
-                    </div>
+
                 </div>
             </div>
 

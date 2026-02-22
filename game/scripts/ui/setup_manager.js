@@ -8,24 +8,15 @@
         const setupBtn = document.getElementById('btn-show-setup');
         const startBtn = document.getElementById('btn-start-game');
         
-        // 绑定“游戏设置”按钮
+        // 绑定"游戏设置"按钮（点击切换：再次点击=取消）
         if (setupBtn) {
-            setupBtn.addEventListener('click', showSetupPanel);
-        } else if (startBtn) {
-            // 如果没有单独的 SetUp 按钮，暂时劫持 Start Game 按钮
-            // 但我们的 panel_game.html 修改应该已经添加了 btn-show-setup
-            // 保持兼容性：如果页面没刷新导致旧DOM存在
+            setupBtn.addEventListener('click', toggleSetupPanel);
         }
 
-        // 绑定“确认开始”按钮
+        // 绑定"确认开始"按钮
         const confirmBtn = document.getElementById('btn-confirm-setup');
         if (confirmBtn) {
             confirmBtn.addEventListener('click', confirmSetup);
-        }
-
-        const cancelBtn = document.getElementById('btn-cancel-setup');
-        if (cancelBtn) {
-            cancelBtn.addEventListener('click', hideSetupPanel);
         }
 
         const countSelect = document.getElementById('setup-player-count-select');
@@ -34,6 +25,18 @@
                 renderPlayerSlots(parseInt(e.target.value));
             });
         }
+    }
+
+    /**
+     * 切换设置面板（打开/关闭）
+     */
+    function toggleSetupPanel() {
+        const cur = window.Game.UI.getCurrentView ? window.Game.UI.getCurrentView() : 'none';
+        if (cur === 'setup') {
+            hideSetupPanel();
+            return;
+        }
+        showSetupPanel();
     }
 
     async function showSetupPanel() {
