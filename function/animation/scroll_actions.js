@@ -13,7 +13,7 @@
     if (!op) return;
     try { op.settle && op.settle.cancel(); } catch(_) {}
     try { op.removeOverlay && op.removeOverlay(); } catch(_) {}
-    window.scrollTo({ top: window.scrollY, behavior: 'auto' });
+    window.scrollTo({ top: window.scrollY, left: 0, behavior: 'instant' });
   }
   function selectTab(panelId){
     try {
@@ -49,6 +49,45 @@
       }
     } catch(e) { /* 忽略 */ }
     return 48 // 默认向下偏移 48 像素
+  }
+
+  // 解析最大滚动距离上限：优先 opts.maxScrollDistance，其次 CSS 变量 --max-scroll-distance（支持 px/vh），否则默认 2×视口高度
+  function resolveMaxScrollDistance(opts){
+    if (opts && typeof opts.maxScrollDistance === 'number' && Number.isFinite(opts.maxScrollDistance)) return opts.maxScrollDistance
+    try {
+      const raw = getComputedStyle(document.documentElement).getPropertyValue('--max-scroll-distance').trim()
+      if (raw) {
+        if (raw.endsWith('px')) return parseFloat(raw)
+        if (raw.endsWith('vh')) return (window.innerHeight || document.documentElement.clientHeight) * (parseFloat(raw) / 100)
+        const num = parseFloat(raw)
+        if (Number.isFinite(num)) return num
+      }
+    } catch(e) { /* 忽略 */ }
+    const vh = window.innerHeight || document.documentElement.clientHeight
+    return vh * 4  // 默认 4 倍视口高度
+  }
+
+  // 带距离上限的滚动：若距离超过上限，先瞬移至上限距离处，再平滑滚动剩余距离
+  function cappedScrollTo(targetY, behavior){
+    behavior = behavior || 'smooth'
+    targetY = Math.max(0, targetY)
+    const currentY = window.scrollY || window.pageYOffset || 0
+    const maxDist = resolveMaxScrollDistance()
+    const distance = Math.abs(targetY - currentY)
+    if (distance > maxDist) {
+      const jumpY = (targetY > currentY)
+        ? (targetY - maxDist)   // 向下滚：跳到目标上方 maxDist 处
+        : (targetY + maxDist)   // 向上滚：跳到目标下方 maxDist 处
+      const safeJump = Math.max(0, jumpY)
+      // 必须用 behavior:'instant' 覆盖 CSS 的 scroll-behavior:smooth
+      window.scrollTo({ top: safeJump, left: 0, behavior: 'instant' })
+      // 等一帧让浏览器完成瞬移后的绘制，避免平板端未栅格化瓦片闪烁黑屏
+      requestAnimationFrame(function(){
+        window.scrollTo({ top: targetY, behavior: behavior })
+      })
+      return
+    }
+    window.scrollTo({ top: targetY, behavior: behavior })
   }
 
   // 监听滚动结束（无进一步滚动的静默期）后回调
@@ -114,7 +153,8 @@
   }
 
   // 执行滚动：默认改为居中；若需顶部对齐，可传 opts.center === false
-  function performScroll(targetElem, opts){
+  // switching 为 true 时（跨面板跳转），应用滚动距离上限
+  function performScroll(targetElem, opts, switching){
     if (!targetElem) return
     const behavior = (opts && opts.behavior) || 'smooth'
     const center = (opts && Object.prototype.hasOwnProperty.call(opts, 'center')) ? !!opts.center : true
@@ -122,10 +162,20 @@
       // 居中滚动
       const bias = resolveCenterBias(opts)
       const top = centerOffsetFor(targetElem, bias)
-      window.scrollTo({ top, behavior })
+      if (switching) {
+        cappedScrollTo(top, behavior)
+      } else {
+        window.scrollTo({ top, behavior })
+      }
     } else {
       // 顶部对齐（仅在显式 center:false 时）
-      try { targetElem.scrollIntoView({ behavior }) } catch(e) { targetElem.scrollIntoView() }
+      if (switching) {
+        const rect = targetElem.getBoundingClientRect()
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
+        cappedScrollTo(rect.top + scrollTop, behavior)
+      } else {
+        try { targetElem.scrollIntoView({ behavior }) } catch(e) { targetElem.scrollIntoView() }
+      }
     }
   }
 
@@ -167,13 +217,18 @@
 
     // 2. 切换 Tab (并判断是否跨面板)
     const switching = panelId ? !isPanelActive(panelId) : false
+    // 跨面板时设置标记，告知 panel_scroll_memory 跳过恢复（后续由 performScroll 接管滚动）
+    if (switching) window.__scrollActionActive = true
     selectTab(panelId)
+    if (switching) window.__scrollActionActive = false
 
     // 3. 展开路径上的折叠区域
     try { expandCollapsibleAncestorsIfNeeded(scrollTarget) } catch(_) {}
 
-    // 4. 执行滚动
-    performScroll(scrollTarget, opts)
+    // 强制浏览器重排布局，确保新面板已完成渲染，后续滚动能正确生效
+    void document.documentElement.scrollHeight
+    // 4. 执行滚动（跨面板时启用距离上限）
+    performScroll(scrollTarget, opts, switching)
 
     // 5. 调度高亮
     scheduleRowHighlight(scrollTarget, panelId, switching, opts)
@@ -255,6 +310,7 @@
     scrollToTagAndFlash,
     scrollToClassWithCenter,
     cancel: cancelCurrentOp,
+    cappedScrollTo,
   }
 
   // 监听活动 panel 变化：若与当前操作目标不一致，则取消当前操作
