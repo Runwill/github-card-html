@@ -177,19 +177,10 @@
             // 设置在线模式标记
             gs.onlineMode = true;
 
-            // 显示游戏面板
-            const btn = document.getElementById('btn-start-game');
-            if (btn) btn.classList.add('hidden');
-            const main = document.getElementById('game-main-area');
-            if (main) main.classList.remove('hidden');
-            const board = document.getElementById('game-board-panel');
-            if (board) board.classList.remove('hidden');
-            const table = document.getElementById('game-table-panel');
-            if (table) table.classList.remove('hidden');
-
-            // 隐藏在线面板
-            const onlinePanel = document.getElementById('online-room-ui');
-            if (onlinePanel) onlinePanel.classList.add('hidden');
+            // 切换到对局视图（隐藏设置/在线面板，显示对局内容）
+            if (window.Game.UI.switchGameView) {
+                window.Game.UI.switchGameView('play');
+            }
 
             // 更新 UI
             if (window.Game.UI && window.Game.UI.updateUI) {

@@ -37,15 +37,10 @@
     }
 
     async function showSetupPanel() {
-        const panel = document.getElementById('game-setup-ui');
-        const board = document.getElementById('game-board-panel');
-        const main = document.getElementById('game-main-area');
-        const table = document.getElementById('game-table-panel');
-        
-        if (panel) panel.classList.remove('hidden');
-        if (board) board.classList.add('hidden');
-        if (main) main.classList.add('hidden');
-        if (table) table.classList.add('hidden');
+        // 切换到设置视图（互斥隐藏其他视图）
+        if (window.Game.UI.switchGameView) {
+            window.Game.UI.switchGameView('setup');
+        }
 
         // 加载武将数据
         if (!characterCache) {
@@ -71,8 +66,10 @@
     }
 
     function hideSetupPanel() {
-        const panel = document.getElementById('game-setup-ui');
-        if (panel) panel.classList.add('hidden');
+        // 恢复到之前的视图（如果对局在进行中则回到对局）
+        if (window.Game.UI.restorePreviousView) {
+            window.Game.UI.restorePreviousView();
+        }
     }
 
     function renderPlayerSlots(count) {

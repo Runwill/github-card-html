@@ -1,9 +1,22 @@
 /* ==========================================================================
    Online Room Styles
+   - Game View Containers (mutual exclusion)
    - Online Room Panel (Lobby & In-Room)
    - Viewer Labels on Avatars
    - Status Indicators
    ========================================================================== */
+
+/* ── Game View Containers ──────────────────────────────────────────────── */
+
+.game-view {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+}
+
+.game-view.hidden {
+    display: none !important;
+}
 
 /* ── Online Room Panel ─────────────────────────────────────────────────── */
 

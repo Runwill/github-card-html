@@ -179,17 +179,10 @@
              node = node.children[0];
         } 
 
-        const btn = document.getElementById('btn-start-game');
-        if (btn) btn.classList.add('hidden');
-        
-        const main = document.getElementById('game-main-area');
-        if (main) main.classList.remove('hidden');
-        
-        const board = document.getElementById('game-board-panel');
-        if (board) board.classList.remove('hidden');
-
-        const table = document.getElementById('game-table-panel');
-        if (table) table.classList.remove('hidden');
+        // 切换到对局视图
+        if (window.Game.UI.switchGameView) {
+            window.Game.UI.switchGameView('play');
+        }
 
         if (window.Game.UI && window.Game.UI.updateUI) {
             window.Game.UI.updateUI();

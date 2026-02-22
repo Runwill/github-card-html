@@ -58,11 +58,10 @@
      * 显示在线房间面板
      */
     async function showOnlinePanel() {
-        const panel = document.getElementById('online-room-ui');
-        const setupPanel = document.getElementById('game-setup-ui');
-
-        if (panel) panel.classList.remove('hidden');
-        if (setupPanel) setupPanel.classList.add('hidden');
+        // 切换到在线房间视图（互斥隐藏其他视图）
+        if (window.Game.UI.switchGameView) {
+            window.Game.UI.switchGameView('online');
+        }
 
         // 显示大厅，隐藏房间内视图
         showLobby();
@@ -83,8 +82,10 @@
      * 隐藏在线房间面板
      */
     function hideOnlinePanel() {
-        const panel = document.getElementById('online-room-ui');
-        if (panel) panel.classList.add('hidden');
+        // 恢复到之前的视图（如果对局在进行中则回到对局）
+        if (window.Game.UI.restorePreviousView) {
+            window.Game.UI.restorePreviousView();
+        }
         if (refreshTimer) {
             clearInterval(refreshTimer);
             refreshTimer = null;

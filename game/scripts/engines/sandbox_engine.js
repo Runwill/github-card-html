@@ -15,18 +15,10 @@
             this._setupPlayers(config);
             this._distributeCards(config);
             
-            // --- UI 可见性处理 ---
-            const btn = document.getElementById('btn-start-game');
-            if (btn) btn.classList.add('hidden');
-            
-            const main = document.getElementById('game-main-area');
-            if (main) main.classList.remove('hidden');
-            
-            const board = document.getElementById('game-board-panel');
-            if (board) board.classList.remove('hidden');
-
-            const table = document.getElementById('game-table-panel');
-            if (table) table.classList.remove('hidden');
+            // --- UI 可见性处理：切换到对局视图 ---
+            if (window.Game.UI.switchGameView) {
+                window.Game.UI.switchGameView('play');
+            }
             // -------------------------------
             
             // 在沙盒中，所有区域都可以视为开放或由此用户管理
