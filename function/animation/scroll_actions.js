@@ -311,6 +311,7 @@
     scrollToClassWithCenter,
     cancel: cancelCurrentOp,
     cappedScrollTo,
+    resolveMaxScrollDistance,
   }
 
   // 监听活动 panel 变化：若与当前操作目标不一致，则取消当前操作
