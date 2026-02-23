@@ -157,6 +157,13 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%);
 }
 
+/* Remote Move Arc-Flight Ghost */
+.card-move-ghost {
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+    opacity: 1;
+    border-color: var(--primary-1);
+}
+
 .dragging-real {
     /* Initial Drag State (Before Lift) - Matches the resting card */
     box-shadow: 0 2px 5px var(--shadow-1) !important; /* Force match initial state */

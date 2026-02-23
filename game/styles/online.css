@@ -389,7 +389,8 @@
 
 .online-viewer-label {
     background: var(--surface);
-    color: var(--primary-1);
+    /* make badge text lighter than normal text */
+    color: var(--text-subtle);
     font-size: var(--fs-xs);
     font-weight: 600;
     padding: 1px var(--space-xs);

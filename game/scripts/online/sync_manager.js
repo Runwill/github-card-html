@@ -225,21 +225,50 @@
 
         try {
             const { actionType, payload } = data;
+            const Animator = window.Game.UI && window.Game.UI.CardMoveAnimator;
 
             if (actionType === 'moveCard') {
-                // 远程移动卡牌
-                applyRemoteMove(payload);
-            } else if (actionType === 'modifyHealth') {
-                applyRemoteHealthChange(payload);
-            } else if (actionType === 'modifyMaxHealth') {
-                applyRemoteMaxHealthChange(payload);
-            } else if (actionType === 'fullSync') {
-                applyFullState(payload.gameState);
-            }
+                // ── 动画快照：在修改数据之前记录牌的当前 DOM 位置 ──
+                let animPayload = null;
+                if (Animator) {
+                    const card = findCardById(payload.cardId);
+                    const fromAreaPath = card && card.lyingArea ? getAreaPath(card.lyingArea) : null;
+                    animPayload = {
+                        cardId: payload.cardId,
+                        fromAreaPath: fromAreaPath,
+                        toAreaPath: payload.toAreaPath,
+                        position: payload.position
+                    };
+                    Animator.snapshotBeforeMove(animPayload);
+                }
 
-            // 更新 UI
-            if (window.Game.UI && window.Game.UI.updateUI) {
-                window.Game.UI.updateUI();
+                // 远程移动卡牌（修改数据模型）
+                applyRemoteMove(payload);
+
+                // 更新 UI
+                if (window.Game.UI && window.Game.UI.updateUI) {
+                    window.Game.UI.updateUI();
+                }
+
+                // ── 动画播放：在 UI 更新后播放弧形飞行 + FLIP 动画 ──
+                if (Animator && animPayload) {
+                    requestAnimationFrame(() => {
+                        Animator.animateAfterMove(animPayload);
+                    });
+                }
+            } else {
+                if (actionType === 'modifyHealth') {
+                    applyRemoteHealthChange(payload);
+                } else if (actionType === 'modifyMaxHealth') {
+                    applyRemoteMaxHealthChange(payload);
+                } else if (actionType === 'fullSync') {
+                    applyFullState(payload.gameState);
+                }
+
+                // 更新 UI
+                if (window.Game.UI && window.Game.UI.updateUI) {
+                    window.Game.UI.updateUI();
+                }
             }
         } finally {
             isApplyingRemote = false;

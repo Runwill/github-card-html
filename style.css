@@ -1,6 +1,10 @@
 /* 全局变量和基础样式 */
 :root { --animation-duration: var(--dur-slower); --animation-easing: var(--ease-standard); }
-* { user-select: none; }
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
 body { overflow-x: hidden; margin: 0; font-size: .9rem; }
 .hidden { display: none; }
 
