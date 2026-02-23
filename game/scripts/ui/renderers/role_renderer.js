@@ -329,7 +329,9 @@
 
         // 标记主视角角色是否正处于当前回合（仅在流程真正进入 TurnProcess 时才算）
         const inTurn = window.Game.Core.isInTurn && window.Game.Core.isInTurn();
-        const isTurnOwner = inTurn && (perspIdx === GameState.currentPlayerIndex);
+        // 沙盒模式：支持手动设置的当前回合角色
+        const sandboxTurn = (GameState.mode === 'sandbox' && GameState.sandboxTurnIndex != null && GameState.sandboxTurnIndex >= 0);
+        const isTurnOwner = (inTurn && perspIdx === GameState.currentPlayerIndex) || (sandboxTurn && perspIdx === GameState.sandboxTurnIndex);
         
         // 绑定自身面板的 Inspector
         const currentPanel = document.querySelector('.current-character-panel');
@@ -772,7 +774,9 @@
             const avatarWrap = pEl.querySelector('.char-avatar');
             if (avatarWrap) {
                 const inTurn = window.Game.Core.isInTurn && window.Game.Core.isInTurn();
-                avatarWrap.classList.toggle('is-current-turn', inTurn && index === GameState.currentPlayerIndex);
+                // 沙盒模式：支持手动设置的当前回合角色
+                const sandboxTurn = (GameState.mode === 'sandbox' && GameState.sandboxTurnIndex != null && GameState.sandboxTurnIndex >= 0);
+                avatarWrap.classList.toggle('is-current-turn', (inTurn && index === GameState.currentPlayerIndex) || (sandboxTurn && index === GameState.sandboxTurnIndex));
                 // === 在线模式：显示观察此角色的用户名 ===
                 updateViewerLabels(avatarWrap, index);
             }

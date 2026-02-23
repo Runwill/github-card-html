@@ -57,11 +57,11 @@
 /* (Turn indicator is now on .char-avatar via rotating ring — no card highlight) */
 
 .role-summary .player-name {
-    font-size: 0.95rem;
+    font-size: var(--role-summary-name-fs, 0.95rem);
 }
 
 .role-summary .player-hp {
-    font-size: 0.85rem;
+    font-size: var(--role-summary-badge-fs, 0.85rem);
     color: var(--danger);
     background: rgba(245, 101, 101, 0.1);
     padding: var(--space-3xs) var(--space-sm);

@@ -43,6 +43,10 @@
         // Ignore clicks on buttons (likely interactions, or opening other windows)
         if (e.target.closest('button') || e.target.tagName === 'BUTTON') return;
 
+        // 拖拽期间的合成 click 事件（pointerdown 在 viewer 内，pointerup 在 viewer 外）
+        // 会导致 target 不在 .card-viewer-modal 内，但不应关闭 viewer
+        if (document.body.classList.contains('is-global-dragging')) return;
+
         const now = Date.now();
         const viewers = Object.values(window.Game.UI.viewers);
         
@@ -365,6 +369,11 @@
              if (window.Game.UI.viewers[sourceId]) delete window.Game.UI.viewers[sourceId];
              if (scrollRafId) cancelAnimationFrame(scrollRafId);
              if (dragCleanup) dragCleanup();
+             
+             // 立即清除旧 modal/子元素的 ID，防止用户快速重新打开时 ID 冲突
+             // （旧 modal 在关闭动画期间仍在 DOM 中，新 modal 创建的同名 ID 会被 getElementById 找到旧的）
+             modal.removeAttribute('id');
+             modal.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
              
              modal.classList.add('closing');
              const onAnimEnd = () => {

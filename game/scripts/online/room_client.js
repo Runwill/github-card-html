@@ -94,6 +94,13 @@
             // 服务器事件监听
             socket.on('room:user-joined', (data) => emit('userJoined', data));
             socket.on('room:user-left', (data) => emit('userLeft', data));
+            socket.on('room:dissolved', (data) => {
+                // 房间被房主解散
+                if (currentRoomId === data.roomId) {
+                    currentRoomId = null;
+                }
+                emit('roomDissolved', data);
+            });
             socket.on('room:perspectives-updated', (data) => emit('perspectivesUpdated', data));
             socket.on('room:config-updated', (data) => emit('configUpdated', data));
             socket.on('room:game-started', (data) => emit('gameStarted', data));
@@ -181,6 +188,30 @@
     }
 
     /**
+     * 解散房间（房主专用）
+     */
+    function dissolveRoom(roomId) {
+        return new Promise((resolve, reject) => {
+            if (!socket || !socket.connected) {
+                reject(new Error('未连接到服务器'));
+                return;
+            }
+
+            socket.emit('room:dissolve', { roomId }, (response) => {
+                if (response.success) {
+                    // 如果自己在这个房间，清除 currentRoomId
+                    if (currentRoomId === roomId) {
+                        currentRoomId = null;
+                    }
+                    resolve(response);
+                } else {
+                    reject(new Error(response.error || '解散房间失败'));
+                }
+            });
+        });
+    }
+
+    /**
      * 获取房间列表
      */
     function listRooms() {
@@ -254,6 +285,7 @@
         createRoom,
         joinRoom,
         leaveRoom,
+        dissolveRoom,
         listRooms,
         setPerspective,
         broadcastAction,

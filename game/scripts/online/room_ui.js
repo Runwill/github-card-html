@@ -28,6 +28,17 @@
             createBtn.addEventListener('click', handleCreateRoom);
         }
 
+        // 回车键 = 点击创建房间
+        const roomInput = document.getElementById('input-room-id');
+        if (roomInput) {
+            roomInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleCreateRoom();
+                }
+            });
+        }
+
         const refreshBtn = document.getElementById('btn-refresh-rooms');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', refreshRoomList);
@@ -46,6 +57,7 @@
             client.on('perspectivesUpdated', onPerspectivesUpdated);
             client.on('gameStarted', onRemoteGameStarted);
             client.on('disconnected', onDisconnected);
+            client.on('roomDissolved', onRoomDissolved);
         }
     }
 
@@ -157,8 +169,14 @@
             return;
         }
 
-        list.innerHTML = rooms.map(room => `
-            <div class="room-item" data-room-id="${room.id}">
+        const myId = localStorage.getItem('id');
+        const myCurrentRoomId = Client() ? Client().currentRoomId : null;
+
+        list.innerHTML = rooms.map(room => {
+            const isCurrent = myCurrentRoomId && room.id === myCurrentRoomId;
+            const isHost = myId && room.host === myId;
+            return `
+            <div class="room-item${isCurrent ? ' is-current' : ''}" data-room-id="${escapeHtml(room.id)}">
                 <div class="room-item-info">
                     <span class="room-item-name">${escapeHtml(room.id)}</span>
                     <span class="room-item-status">
@@ -166,15 +184,26 @@
                         ${room.gameStarted ? `<span class="room-item-tag gaming">${t('online.gaming')}</span>` : `<span class="room-item-tag waiting">${t('online.waiting')}</span>`}
                     </span>
                 </div>
-                <button class="btn btn--sm btn--primary btn-join-room">${t('online.join')}</button>
-            </div>
-        `).join('');
+                <div class="room-item-actions">
+                    ${isHost ? `<button class="btn btn--sm btn--danger btn-dissolve-room">${t('online.dissolve')}</button>` : ''}
+                    <button class="btn btn--sm btn--primary btn-join-room">${t('online.join')}</button>
+                </div>
+            </div>`;
+        }).join('');
 
         // 绑定加入按钮
         list.querySelectorAll('.btn-join-room').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const roomId = e.target.closest('.room-item').dataset.roomId;
                 handleJoinRoom(roomId);
+            });
+        });
+
+        // 绑定解散按钮
+        list.querySelectorAll('.btn-dissolve-room').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const roomId = e.target.closest('.room-item').dataset.roomId;
+                handleDissolveRoom(roomId);
             });
         });
     }
@@ -195,6 +224,12 @@
         if (!client || !client.isConnected) {
             setStatus(t('online.notConnected'), 'error');
             return;
+        }
+
+        // 如果已经在某个房间里，先离开
+        if (currentRoom) {
+            try { await client.leaveRoom(); } catch (_) { /* ignore */ }
+            currentRoom = null;
         }
 
         try {
@@ -225,6 +260,12 @@
         const client = Client();
         if (!client || !client.isConnected) return;
 
+        // 如果已经在某个房间里，先离开
+        if (currentRoom) {
+            try { await client.leaveRoom(); } catch (_) { /* ignore */ }
+            currentRoom = null;
+        }
+
         try {
             setStatus(t('online.joining'));
             const result = await client.joinRoom(roomId);
@@ -250,6 +291,30 @@
                     result.gameState
                 );
             }
+        } catch (e) {
+            setStatus(e.message, 'error');
+        }
+    }
+
+    /**
+     * 解散房间（房主专用）
+     */
+    async function handleDissolveRoom(roomId) {
+        const client = Client();
+        if (!client || !client.isConnected) return;
+
+        try {
+            await client.dissolveRoom(roomId);
+            // 如果自己正在这个房间里，清除状态
+            if (currentRoom && currentRoom.id === roomId) {
+                currentRoom = null;
+                if (window.Game.GameState) {
+                    window.Game.GameState.onlineMode = false;
+                }
+                showLobby();
+            }
+            setStatus(t('online.roomDissolved'));
+            refreshRoomList();
         } catch (e) {
             setStatus(e.message, 'error');
         }
@@ -348,6 +413,19 @@
 
     function onDisconnected(data) {
         setStatus(t('online.disconnected'), 'error');
+    }
+
+    function onRoomDissolved(data) {
+        // 被房主解散的房间 — 回到大厅
+        if (currentRoom && currentRoom.id === data.roomId) {
+            currentRoom = null;
+            if (window.Game.GameState) {
+                window.Game.GameState.onlineMode = false;
+            }
+            showLobby();
+        }
+        setStatus(t('online.roomDissolved'));
+        refreshRoomList();
     }
 
     // ===== 工具函数 =====

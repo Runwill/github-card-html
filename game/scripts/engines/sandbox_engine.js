@@ -49,6 +49,7 @@
              // 重置索引
              this.state.currentPlayerIndex = 0;
              this.state.perspectiveIndex = 0;
+             this.state.sandboxTurnIndex = -1;  // -1 = 无手动指定的回合角色
         }
 
         _distributeCards(config) {

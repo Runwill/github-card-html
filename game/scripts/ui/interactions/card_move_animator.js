@@ -19,7 +19,9 @@
 
     // ─── 配置 ────────────────────────────────────────────────────────────
     const CONFIG = {
-        arcDuration: 420,        // ms – 弧形飞行时长
+        arcSpeed: 0.9,           // px/ms – 弧形飞行恒定速度
+        arcDurationMin: 200,     // ms – 最短飞行时间
+        arcDurationMax: 700,     // ms – 最长飞行时间
         layoutDuration: 280,     // ms – 周围牌的 FLIP 过渡
         arcBulge: 0.28,          // 弧线凸出系数（弦长的百分比），< 0.5 保证 < 1/4 圆弧
         ghostZIndex: '100001',
@@ -136,10 +138,16 @@
 
         let cardRect = null;
 
+        let cardAppearance = null; // { innerHTML, dataCardKey }
+
         if (fromContainer && fromAreaObj) {
             const el = findCardElement(fromContainer, cardId, fromAreaObj);
             if (el) {
                 cardRect = el.getBoundingClientRect();
+                cardAppearance = {
+                    innerHTML: el.innerHTML,
+                    dataCardKey: el.getAttribute('data-card-key') || ''
+                };
             }
         }
 
@@ -149,9 +157,15 @@
             if (anchor) cardRect = anchor.getBoundingClientRect();
         }
 
+        // 如果没能从源 DOM 获取外观，默认显示牌背
+        if (!cardAppearance) {
+            cardAppearance = { innerHTML: '', dataCardKey: 'CardBack' };
+        }
+
         _snapshot[cardId] = {
             rect: cardRect,
-            areaPath: fromAreaPath
+            areaPath: fromAreaPath,
+            appearance: cardAppearance
         };
 
         // ── 布局快照：记录受影响区域中所有牌的当前位置 ──
@@ -183,8 +197,24 @@
 
         // ── 目标位置 ──
         let targetRect = null;
+        let prevStackCard = null; // 堆叠区域底下需要临时显示的卡
         const toContainer = getContainerForArea(toAreaPath);
         const toAreaObj = _resolveAreaLocal(toAreaPath);
+        const isToStacked = toContainer && toContainer.classList.contains('area-stacked');
+
+        // ── 强制跳过 spread 容器内的 margin 过渡，获取最终布局位置 ──
+        const _spreadTransitionEls = [];
+        [toContainer, getContainerForArea(snap.areaPath)].forEach(c => {
+            if (!c || !c.classList.contains('area-spread')) return;
+            const cards = c.querySelectorAll('.card-placeholder');
+            cards.forEach(card => {
+                _spreadTransitionEls.push({ el: card, prev: card.style.transition });
+                card.style.transition = 'none';
+            });
+        });
+        if (_spreadTransitionEls.length) {
+            void (toContainer || document.body).offsetHeight; // force reflow
+        }
 
         if (toContainer && toAreaObj) {
             const targetEl = findCardElement(toContainer, cardId, toAreaObj);
@@ -194,6 +224,15 @@
                 targetEl.style.visibility = 'hidden';
                 // 标记以便恢复
                 targetEl._animRestore = true;
+
+                // ── 堆叠区域：强制显示下方的牌，防止牌堆变空白 ──
+                if (isToStacked) {
+                    const prev = targetEl.previousElementSibling;
+                    if (prev && prev.classList.contains('card-placeholder')) {
+                        prev.style.display = 'flex';
+                        prevStackCard = prev;
+                    }
+                }
             }
         }
 
@@ -204,10 +243,22 @@
 
         if (!targetRect) { _cleanup(); return; }
 
-        // ── 创建飞行幽灵 ──
-        _animateArcFlight(snap.rect, targetRect, cardId, toAreaPath);
+        // 来源端堆叠区域：updateUI 后 CSS 已自动将 is-top-card 切换到新顶牌，
+        // 无需额外操作。
 
-        // ── 布局 FLIP 动画 ──
+        // ── 恢复 spread 容器内的过渡 ──
+        if (_spreadTransitionEls.length) {
+            requestAnimationFrame(() => {
+                _spreadTransitionEls.forEach(({ el, prev }) => {
+                    el.style.transition = prev;
+                });
+            });
+        }
+
+        // ── 创建飞行幽灵 ──
+        _animateArcFlight(snap.rect, targetRect, cardId, toAreaPath, prevStackCard);
+
+        // ── 布局 FLIP 动画（仅对非堆叠区域有意义）──
         _animateLayoutShift();
 
         _cleanup();
@@ -219,7 +270,32 @@
      * 在 from → to 之间创建一个幽灵元素（克隆牌面），沿二次贝塞尔弧线飞行。
      * 曲线控制点垂直于连线方向偏移，偏移量 = 弦长 * arcBulge，保证弧度 < 90°。
      */
-    function _animateArcFlight(fromRect, toRect, cardId, toAreaPath) {
+    function _animateArcFlight(fromRect, toRect, cardId, toAreaPath, prevStackCard) {
+        // ── 确定 ghost 外观 ──
+        // 规则：移动前或移动后对主视角可见 → 显示牌名；否则显示牌背
+        const snap = _snapshot && _snapshot[cardId];
+        const sourceAppearance = snap && snap.appearance;
+
+        // 移动后目标元素的外观（updateUI 已执行）
+        let targetAppearance = null;
+        const toContainer = getContainerForArea(toAreaPath);
+        const toAreaObj = _resolveAreaLocal(toAreaPath);
+        if (toContainer && toAreaObj) {
+            const tEl = findCardElement(toContainer, cardId, toAreaObj);
+            if (tEl) {
+                const key = tEl.getAttribute('data-card-key');
+                if (key && key !== 'CardBack') {
+                    targetAppearance = { innerHTML: tEl.innerHTML, dataCardKey: key };
+                }
+            }
+        }
+
+        // 只要任一端可见就用牌面，否则牌背
+        const srcFace = sourceAppearance && sourceAppearance.dataCardKey && sourceAppearance.dataCardKey !== 'CardBack';
+        const finalAppearance = srcFace ? sourceAppearance
+            : targetAppearance ? targetAppearance
+            : (sourceAppearance || { innerHTML: '', dataCardKey: 'CardBack' });
+
         // 创建幽灵
         const ghost = document.createElement('div');
         ghost.className = 'card-placeholder card-move-ghost';
@@ -234,17 +310,9 @@
             transition: none;
             margin: 0;
         `;
-        // 尝试从目标位置复制外观
-        const toContainer = getContainerForArea(toAreaPath);
-        const toAreaObj = _resolveAreaLocal(toAreaPath);
-        if (toContainer && toAreaObj) {
-            const targetEl = findCardElement(toContainer, cardId, toAreaObj);
-            if (targetEl) {
-                const key = targetEl.getAttribute('data-card-key');
-                if (key) ghost.setAttribute('data-card-key', key);
-                ghost.innerHTML = targetEl.innerHTML;
-            }
-        }
+
+        ghost.setAttribute('data-card-key', finalAppearance.dataCardKey || 'CardBack');
+        ghost.innerHTML = finalAppearance.innerHTML || '';
 
         document.body.appendChild(ghost);
 
@@ -268,10 +336,14 @@
         const tw = toRect.width;
         const th = toRect.height;
 
+        // 根据弦长计算飞行时间（恒定速度），并 clamp 到合理范围
+        const arcDuration = Math.min(CONFIG.arcDurationMax,
+            Math.max(CONFIG.arcDurationMin, chord / CONFIG.arcSpeed));
+
         const startTime = performance.now();
 
         function tick(now) {
-            let t = (now - startTime) / CONFIG.arcDuration;
+            let t = (now - startTime) / arcDuration;
             if (t > 1) t = 1;
 
             // ease-in-out (smoothstep)
@@ -299,6 +371,10 @@
                 requestAnimationFrame(tick);
             } else {
                 ghost.remove();
+                // 恢复堆叠区域下方牌的默认显示
+                if (prevStackCard) {
+                    prevStackCard.style.display = '';
+                }
                 // 恢复目标元素可见
                 _restoreTarget(cardId, toAreaPath);
             }
@@ -334,6 +410,9 @@
         Object.keys(_layoutSnapshot).forEach(areaPath => {
             const container = getContainerForArea(areaPath);
             if (!container) return;
+
+            // 堆叠区域内所有卡片 position:absolute 重叠，FLIP 无意义，跳过
+            if (container.classList.contains('area-stacked')) return;
 
             const snapped = _layoutSnapshot[areaPath]; // [{el, rect}]
             if (!snapped || !snapped.length) return;

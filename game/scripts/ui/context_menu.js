@@ -77,7 +77,7 @@
         let actions = [];
         const isSandbox = window.Game.GameState && window.Game.GameState.mode === 'sandbox';
 
-        // ── 切换视角（始终可用）──
+        // ── 视角 / 回合角色（始终可用）──
         const gs = window.Game.GameState;
         if (gs && gs.players) {
             const playerIdx = gs.players.indexOf(player);
@@ -91,6 +91,46 @@
                         }
                     }
                 });
+            }
+
+            // ── 沙盒模式：设为/取消当前回合角色（紧跟视角切换）──
+            if (isSandbox && playerIdx !== -1) {
+                const isSandboxTurn = (gs.sandboxTurnIndex === playerIdx);
+                if (!isSandboxTurn) {
+                    actions.push({
+                        label: '设为当前回合角色',
+                        action: () => {
+                            gs.sandboxTurnIndex = playerIdx;
+                            document.documentElement.style.setProperty('--turn-ring-color', '#48bb78');
+                            // 广播到其他客戶端
+                            if (gs.onlineMode) {
+                                const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
+                                if (SyncMgr && SyncMgr.interceptDispatch) {
+                                    SyncMgr.interceptDispatch('setSandboxTurn', { playerIndex: playerIdx });
+                                }
+                            }
+                            if (window.Game.UI && window.Game.UI.updateUI) {
+                                window.Game.UI.updateUI();
+                            }
+                        }
+                    });
+                } else {
+                    actions.push({
+                        label: '取消当前回合角色',
+                        action: () => {
+                            gs.sandboxTurnIndex = -1;
+                            if (gs.onlineMode) {
+                                const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
+                                if (SyncMgr && SyncMgr.interceptDispatch) {
+                                    SyncMgr.interceptDispatch('setSandboxTurn', { playerIndex: -1 });
+                                }
+                            }
+                            if (window.Game.UI && window.Game.UI.updateUI) {
+                                window.Game.UI.updateUI();
+                            }
+                        }
+                    });
+                }
             }
         }
 

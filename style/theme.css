@@ -363,14 +363,20 @@ html.theme-switching *::after {
 .btn--danger { background: var(--danger) !important; color: #fff !important; border: none !important; }
 .btn--danger:hover { background: var(--danger-hover) !important; }
 .btn--accent {
-  background: var(--primary-2) !important;
+  background: linear-gradient(135deg, #38b2ac 0%, #319795 50%, #2c7a7b 100%) !important;
+  background-size: 200% 200% !important;
+  background-position: 0% 50% !important;
   color: #fff !important;
   border: none !important;
-  box-shadow: var(--shadow-primary-1) !important;
+  box-shadow: 0 4px 6px -1px rgba(49,151,149,0.30) !important;
+}
+html[data-theme="dark"] .btn--accent {
+  background: linear-gradient(135deg, #2c7a7b 0%, #285e61 50%, #234e52 100%) !important;
+  box-shadow: 0 4px 6px -1px rgba(44,122,123,0.35) !important;
 }
 .btn--accent:hover {
-  background: var(--primary-3) !important;
-  box-shadow: var(--shadow-primary-2) !important;
+  background-position: 100% 50% !important;
+  box-shadow: 0 6px 8px -1px rgba(49,151,149,0.40) !important;
   transform: translateY(-1px);
 }
 .btn--accent:active { transform: translateY(0.5px); }

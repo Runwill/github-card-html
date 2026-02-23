@@ -174,6 +174,15 @@
         const loop = () => {
             if (!el.isConnected) return; 
 
+            // 防御：动画目标已从 DOM 移除（例如 CardViewer 关闭导致 modal 整体被删除），
+            // 此时 getBoundingClientRect 返回 {0,0,0,0}，导致 ghost 飞往屏幕左上角。
+            // 立即结束动画并触发回调，确保 isRenderingSuspended 不会卡死。
+            if (placeholder && !placeholder.isConnected) {
+                el.remove();
+                if (onComplete) onComplete();
+                return;
+            }
+
             // --- 鲁棒的视觉收敛 ---
             const targetRect = placeholder.getBoundingClientRect();
             const currentRect = el.getBoundingClientRect();

@@ -5,7 +5,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 5px;
+    padding: var(--role-summary-pad, 5px);
 }
 
 /* Override .char-avatar size for role list */
@@ -118,7 +118,7 @@
 }
 
 .player-hand-count {
-    font-size: 0.85rem;
+    font-size: var(--role-summary-badge-fs, 0.85rem);
     font-weight: 700;
     
     /* Modern Adaptive Colors */
@@ -131,7 +131,7 @@
     border-radius: var(--radius-lg) ;
     margin-right: var(--space-xs); /* Changed from margin-left to margin-right */
     margin-left: 0;
-    min-width: 24px;
+    min-width: var(--role-summary-badge-minw, 24px);
     text-align: center;
     
     /* Modern Effects (Matched with .stat-hp) */
@@ -164,7 +164,7 @@
     align-items: center;
     justify-content: center;
     margin-top: var(--space-3xs);
-    min-height: 31.5px; /* Prevent layout jump during hover swap */
+    min-height: var(--role-summary-stats-minh, 31.5px); /* Prevent layout jump during hover swap */
 }
 
 /* Judge Area Card Count Badge (Matches HP Style) */

@@ -159,9 +159,8 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
 
 /* Remote Move Arc-Flight Ghost */
 .card-move-ghost {
-    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
     opacity: 1;
-    border-color: var(--primary-1);
 }
 
 .dragging-real {

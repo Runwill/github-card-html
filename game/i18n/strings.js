@@ -41,7 +41,9 @@
         'online.hasLeft': ' 离开了房间',
         'online.back': '返回',
         'online.enterRoomId': '请输入房间ID',
-        'online.notConnected': '未连接到服务器'
+        'online.notConnected': '未连接到服务器',
+        'online.dissolve': '解散',
+        'online.roomDissolved': '房间已解散'
     };
 
     const en = {
@@ -86,7 +88,9 @@
         'online.hasLeft': ' left the room',
         'online.back': 'Back',
         'online.enterRoomId': 'Enter Room ID',
-        'online.notConnected': 'Not connected to server'
+        'online.notConnected': 'Not connected to server',
+        'online.dissolve': 'Dissolve',
+        'online.roomDissolved': 'Room has been dissolved'
     };
 
     if (window.I18N_STRINGS) {

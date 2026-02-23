@@ -243,6 +243,7 @@
         
         DragState.currentDropZone?.classList.remove('drag-over');
         DragState.currentDropZone = null;
+        document.body.classList.remove('is-global-dragging');
         DragState.dragElement = null;
         DragState.isDragging = false;
         if(DragState.rafId) cancelAnimationFrame(DragState.rafId);

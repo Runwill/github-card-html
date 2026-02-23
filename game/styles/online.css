@@ -282,6 +282,22 @@
     color: var(--success);
 }
 
+/* 当前所在房间高亮 */
+.room-item.is-current {
+    background: color-mix(in srgb, var(--success) 10%, transparent);
+    border-left: 3px solid var(--success);
+}
+.room-item.is-current .room-item-name {
+    color: var(--success);
+}
+
+.room-item-actions {
+    display: flex;
+    gap: var(--space-xs);
+    align-items: center;
+    flex-shrink: 0;
+}
+
 .room-item .btn-join-room {
     padding: var(--space-2xs) var(--space-lg);
     font-size: var(--fs-sm);
@@ -298,6 +314,23 @@
 .room-item .btn-join-room:hover {
     background: var(--primary-3);
     box-shadow: var(--shadow-primary-1);
+}
+
+.room-item .btn-dissolve-room {
+    padding: var(--space-2xs) var(--space-sm);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    background: var(--danger, #e53e3e);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-default),
+                box-shadow var(--dur-fast) var(--ease-default);
+}
+
+.room-item .btn-dissolve-room:hover {
+    background: color-mix(in srgb, var(--danger, #e53e3e) 85%, #000);
 }
 
 /* ── In-Room View ──────────────────────────────────────────────────────── */

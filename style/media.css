@@ -224,7 +224,12 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 
 /* 可在其它断点中再修改 --role-avatar-size */
 :root {
-  --role-avatar-size: 60px;      /* 头像默认尺寸，可被断点覆盖 */
+  --role-avatar-size: 60px;           /* 头像默认尺寸，可被断点覆盖 */
+  --role-summary-pad: 5px;            /* 摘要卡内距 */
+  --role-summary-name-fs: 0.95rem;    /* 摘要角色名字号 */
+  --role-summary-stats-minh: 31.5px;  /* 状态行最小高度 */
+  --role-summary-badge-fs: 0.85rem;   /* HP/手牌数徽章字号 */
+  --role-summary-badge-minw: 24px;    /* 手牌数徽章最小宽 */
 }
 
 :root {
@@ -249,7 +254,9 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 @media (max-width: 1024px) {
   :root {
     --minw-character-info: 180px;
-    --role-avatar-size: 50px;      /* 小桌面时缩小头像 */
+    --role-avatar-size: 50px;           /* 小桌面时缩小头像 */
+    --role-summary-pad: 4px;
+    --role-summary-stats-minh: 28px;
   }
 }
 

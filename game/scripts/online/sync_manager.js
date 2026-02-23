@@ -42,6 +42,7 @@
             isGameRunning: gs.isGameRunning,
             isPaused: gs.isPaused,
             currentPlayerIndex: gs.currentPlayerIndex,
+            sandboxTurnIndex: gs.sandboxTurnIndex != null ? gs.sandboxTurnIndex : -1,
             round: gs.round,
             players: gs.players.map(p => serializePlayer(p)),
             pile: serializeArea(gs.pile),
@@ -119,6 +120,10 @@
             gs.isGameRunning = stateData.isGameRunning;
             gs.isPaused = stateData.isPaused;
             gs.currentPlayerIndex = stateData.currentPlayerIndex;
+            gs.sandboxTurnIndex = stateData.sandboxTurnIndex != null ? stateData.sandboxTurnIndex : -1;
+            if (gs.sandboxTurnIndex >= 0) {
+                document.documentElement.style.setProperty('--turn-ring-color', '#48bb78');
+            }
             gs.round = stateData.round;
             gs.flowStack = stateData.flowStack || [];
             gs.eventStack = stateData.eventStack || [];
@@ -263,6 +268,14 @@
                     applyRemoteMaxHealthChange(payload);
                 } else if (actionType === 'fullSync') {
                     applyFullState(payload.gameState);
+                } else if (actionType === 'setSandboxTurn') {
+                    const gs = window.Game.GameState;
+                    if (gs) {
+                        gs.sandboxTurnIndex = payload.playerIndex;
+                        if (payload.playerIndex >= 0) {
+                            document.documentElement.style.setProperty('--turn-ring-color', '#48bb78');
+                        }
+                    }
                 }
 
                 // 更新 UI
@@ -471,6 +484,10 @@
             client.broadcastAction('modifyMaxHealth', {
                 roleId: payload.roleId,
                 delta: payload.delta
+            });
+        } else if (actionType === 'setSandboxTurn') {
+            client.broadcastAction('setSandboxTurn', {
+                playerIndex: payload.playerIndex
             });
         }
     }
