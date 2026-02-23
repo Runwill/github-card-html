@@ -2,11 +2,10 @@
 .tokens-log__filters {
   display: flex;
   align-items: center;
-  flex-wrap: nowrap;          /* 单行显示，避免换行导致的错位 */
-  overflow-x: auto;           /* 空间不足时横向滚动 */
-  overflow-y: visible;        /* 允许按钮的下方阴影/边框可见 */
-  white-space: nowrap;        /* 文本不换行 */
-  padding-bottom: var(--space-3xs);        /* 为按钮底部边框/阴影预留空间，避免被父容器裁剪 */
+  flex-wrap: wrap;             /* 空间不足时换行，避免横向滚动条裁切下拉菜单 */
+  gap: var(--space-2xs) 0;     /* 换行时行间留一点间距 */
+  overflow: visible;           /* 允许子元素（下拉菜单）溢出 */
+  padding-bottom: var(--space-3xs);        /* 为按钮底部边框/阴影预留空间 */
 }
 
 /* 让筛选条在权限面板中占满可用宽度，避免受 60vw 限制导致出现滚动条 */

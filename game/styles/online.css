@@ -42,62 +42,82 @@
     flex-wrap: wrap;
 }
 
-.setup-panel .input-group {
+.game-panel .input-group {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 0;
     margin: 0;
 }
 
-.setup-panel .input-group-label {
-    background: var(--panel-header-bg);
-    color: var(--text-muted);
+.game-panel .input-group-label {
+    background: transparent;
+    color: color-mix(in srgb, var(--text) 86%, var(--bg-end));
     padding: var(--space-sm) var(--space-lg);
     font-size: var(--fs-base);
     border: 1px solid var(--border);
     border-right: none;
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
     white-space: nowrap;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.3px;
+    line-height: normal;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
 }
 
-.setup-panel .input-group-field,
-.setup-panel select {
+.game-panel .input-group-field,
+.game-panel .input-group select {
     border: 1px solid var(--border);
-    background: var(--surface);
+    background: transparent;
     color: var(--text);
     padding: var(--space-sm) var(--space-lg);
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    font-size: var(--fs-md);
+    font-size: var(--fs-base);
     outline: none;
-    transition: border-color var(--dur-normal) var(--ease-default),
-                box-shadow var(--dur-normal) var(--ease-default);
+    transition: all var(--dur-normal) var(--ease-default);
+    box-sizing: border-box;
 }
 
-.setup-panel .input-group-field:focus,
-.setup-panel select:focus {
+.game-panel .input-group-field:hover,
+.game-panel .input-group select:hover {
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border-color: var(--text-muted);
+}
+
+.game-panel .input-group-field:focus,
+.game-panel .input-group select:focus {
     border-color: var(--primary-2);
     box-shadow: var(--shadow-ring);
+    background: var(--surface);
+}
+
+/* Setup panel top row: inline input-groups */
+.setup-panel > .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+.setup-panel > .row > .input-group {
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .setup-panel #setup-players-list {
     margin-top: var(--space-2xl);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
 }
 
-.setup-panel #setup-players-list .row {
-    gap: 0;
+.setup-panel #setup-players-list .input-group {
+    flex: 1 1 calc(50% - var(--space-md));
+    min-width: 200px;
 }
 
-.setup-panel #setup-players-list .prefix {
-    font-size: var(--fs-base);
-    color: var(--text-muted);
-    font-weight: 600;
-}
-
-.setup-panel #setup-players-list select {
-    border-radius: var(--radius-sm);
-    width: 100%;
+.setup-panel #setup-players-list .input-group-label {
+    min-width: 60px;
+    justify-content: center;
 }
 
 .setup-actions {
@@ -167,41 +187,13 @@
 
 .online-create-row .input-group {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     gap: 0;
     margin: 0;
     flex: 1 1 200px;
 }
 
-.online-create-row .input-group-label {
-    background: var(--panel-header-bg);
-    color: var(--text-muted);
-    padding: var(--space-sm) var(--space-lg);
-    font-size: var(--fs-base);
-    font-weight: 600;
-    border: 1px solid var(--border);
-    border-right: none;
-    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-    white-space: nowrap;
-}
-
-.online-create-row .input-group-field {
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    padding: var(--space-sm) var(--space-lg);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    font-size: var(--fs-md);
-    outline: none;
-    flex: 1;
-    transition: border-color var(--dur-normal) var(--ease-default),
-                box-shadow var(--dur-normal) var(--ease-default);
-}
-
-.online-create-row .input-group-field:focus {
-    border-color: var(--primary-2);
-    box-shadow: var(--shadow-ring);
-}
+/* input-group-label / field in online-create-row: inherit from .game-panel rules */
 
 /* ── Room List ─────────────────────────────────────────────────────────── */
 

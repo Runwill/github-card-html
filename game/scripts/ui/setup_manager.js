@@ -81,28 +81,22 @@
         list.innerHTML = '';
 
         for (let i = 0; i < count; i++) {
-            const row = document.createElement('div');
-            row.className = 'row collapse';
-            row.style.marginBottom = '10px';
+            const group = document.createElement('div');
+            group.className = 'input-group';
 
-            const colLabel = document.createElement('div');
-            colLabel.className = 'small-4 columns';
-            // User requested terminology change: Player -> Role
-            colLabel.innerHTML = `<span class="prefix">Role ${i + 1}</span>`;
-            
-            const colSelect = document.createElement('div');
-            colSelect.className = 'small-8 columns';
-            
+            const label = document.createElement('span');
+            label.className = 'input-group-label';
+            label.textContent = `Role ${i + 1}`;
+
             const select = document.createElement('select');
-            select.className = 'setup-char-select';
+            select.className = 'input-group-field setup-char-select';
             select.dataset.playerIndex = i;
             
             // 填充选项
             if (characterCache && characterCache.length) {
                 characterCache.forEach(char => {
                     const opt = document.createElement('option');
-                    opt.value = char.id || char._id; // Prefer numeric ID if available
-                    // 保存所有数据到 dataset 或 内存映射，这里简单存 JSON
+                    opt.value = char.id || char._id;
                     opt.dataset.charData = JSON.stringify(char);
                     opt.textContent = `${char.name} (HP:${char.health})`;
                     select.appendChild(opt);
@@ -118,10 +112,14 @@
                 select.selectedIndex = i % select.options.length;
             }
 
-            colSelect.appendChild(select);
-            row.appendChild(colLabel);
-            row.appendChild(colSelect);
-            list.appendChild(row);
+            group.appendChild(label);
+            group.appendChild(select);
+            list.appendChild(group);
+        }
+
+        // Wrap dynamic selects with custom dropdown component
+        if (window.CustomSelect) {
+            window.CustomSelect.init(list);
         }
     }
 

@@ -24,6 +24,11 @@
             });
         }
         
+        // Initialize Custom Select dropdowns for static selects
+        if (window.CustomSelect) {
+            window.CustomSelect.init(document.querySelector('.game-panel'));
+        }
+
         // Initialize Setup Manager if available
         if (window.Game.Setup && window.Game.Setup.init) {
             window.Game.Setup.init();

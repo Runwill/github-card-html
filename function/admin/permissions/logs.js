@@ -172,6 +172,9 @@
             });
           });
         });
+
+        // Wrap filter selects with themed custom dropdown
+        try { if (window.CustomSelect) window.CustomSelect.init(filters); } catch(_){ }
       }
       if (body) body.__ready = true;
       return body || null;
