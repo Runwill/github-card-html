@@ -316,6 +316,24 @@
     box-shadow: var(--shadow-primary-1);
 }
 
+.room-item .btn-enter-room {
+    padding: var(--space-2xs) var(--space-lg);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    background: var(--success, #38a169);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-default),
+                box-shadow var(--dur-fast) var(--ease-default);
+}
+
+.room-item .btn-enter-room:hover {
+    background: color-mix(in srgb, var(--success, #38a169) 85%, #000);
+    box-shadow: 0 2px 8px rgba(56, 161, 105, 0.3);
+}
+
 .room-item .btn-dissolve-room {
     padding: var(--space-2xs) var(--space-sm);
     font-size: var(--fs-sm);

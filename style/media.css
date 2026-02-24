@@ -222,14 +222,64 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 
 /* game_roles 响应式设置（角色信息面板、手牌） */
 
-/* 可在其它断点中再修改 --role-avatar-size */
+/* ── 摘要角色 token 默认值（最小屏） ── */
 :root {
-  --role-avatar-size: 60px;           /* 头像默认尺寸，可被断点覆盖 */
-  --role-summary-pad: 5px;            /* 摘要卡内距 */
-  --role-summary-name-fs: 0.95rem;    /* 摘要角色名字号 */
-  --role-summary-stats-minh: 31.5px;  /* 状态行最小高度 */
-  --role-summary-badge-fs: 0.85rem;   /* HP/手牌数徽章字号 */
-  --role-summary-badge-minw: 24px;    /* 手牌数徽章最小宽 */
+  --role-avatar-size: 36px;           /* 头像尺寸 */
+  --role-summary-pad: 3px;            /* 摘要卡内距 */
+  --role-summary-name-fs: 11px;       /* 摘要角色名字号 */
+  --role-summary-stats-minh: 24px;    /* 状态行最小高度 */
+  --role-summary-badge-fs: 10px;      /* HP/手牌数徽章字号 */
+  --role-summary-badge-minw: 20px;    /* 手牌数徽章最小宽 */
+}
+
+/* ── 摘要角色分级（min-width + min-height 并列条件） ── */
+
+/* 级别 1：小手机横屏 / 小平板竖屏 */
+@media (min-width: 480px) and (min-height: 400px) {
+  :root {
+    --role-avatar-size: 42px;
+    --role-summary-pad: 4px;
+    --role-summary-name-fs: 12px;
+    --role-summary-stats-minh: 26px;
+    --role-summary-badge-fs: 11px;
+    --role-summary-badge-minw: 22px;
+  }
+}
+
+/* 级别 2：平板竖屏 / 小桌面 */
+@media (min-width: 768px) and (min-height: 500px) {
+  :root {
+    --role-avatar-size: 50px;
+    --role-summary-pad: 5px;
+    --role-summary-name-fs: 13px;
+    --role-summary-stats-minh: 28px;
+    --role-summary-badge-fs: 12px;
+    --role-summary-badge-minw: 24px;
+  }
+}
+
+/* 级别 3：标准桌面 */
+@media (min-width: 1024px) and (min-height: 600px) {
+  :root {
+    --role-avatar-size: 56px;
+    --role-summary-pad: 5px;
+    --role-summary-name-fs: 14px;
+    --role-summary-stats-minh: 30px;
+    --role-summary-badge-fs: 13px;
+    --role-summary-badge-minw: 24px;
+  }
+}
+
+/* 级别 4：大桌面 */
+@media (min-width: 1280px) and (min-height: 700px) {
+  :root {
+    --role-avatar-size: 60px;
+    --role-summary-pad: 5px;
+    --role-summary-name-fs: 15px;
+    --role-summary-stats-minh: 31.5px;
+    --role-summary-badge-fs: 14px;
+    --role-summary-badge-minw: 24px;
+  }
 }
 
 :root {
@@ -254,9 +304,6 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 @media (max-width: 1024px) {
   :root {
     --minw-character-info: 180px;
-    --role-avatar-size: 50px;           /* 小桌面时缩小头像 */
-    --role-summary-pad: 4px;
-    --role-summary-stats-minh: 28px;
   }
 }
 

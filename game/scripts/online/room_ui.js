@@ -49,6 +49,11 @@
             leaveBtn.addEventListener('click', handleLeaveRoom);
         }
 
+        const backBtn = document.getElementById('btn-back-lobby');
+        if (backBtn) {
+            backBtn.addEventListener('click', handleBackToLobby);
+        }
+
         // 注册事件回调
         const client = Client();
         if (client) {
@@ -82,15 +87,21 @@
             window.Game.UI.switchGameView('online');
         }
 
-        // 显示大厅，隐藏房间内视图
-        showLobby();
-
         setStatus(t('online.connecting'));
 
         try {
             const client = Client();
             await client.connect();
             setStatus(t('online.connected'));
+
+            // 优先进入当前所在的房间，否则显示大厅
+            if (currentRoom) {
+                showInRoom();
+                renderRoomInfo();
+            } else {
+                showLobby();
+            }
+
             await refreshRoomList();
         } catch (e) {
             setStatus(t('online.connectFailed') + ': ' + e.message, 'error');
@@ -175,6 +186,9 @@
         list.innerHTML = rooms.map(room => {
             const isCurrent = myCurrentRoomId && room.id === myCurrentRoomId;
             const isHost = myId && room.host === myId;
+            // 已在此房间：显示"进入"按钮（不同样式）；否则显示"加入"
+            const joinBtnClass = isCurrent ? 'btn btn--sm btn--accent btn-enter-room' : 'btn btn--sm btn--primary btn-join-room';
+            const joinBtnText = isCurrent ? t('online.enter') : t('online.join');
             return `
             <div class="room-item${isCurrent ? ' is-current' : ''}" data-room-id="${escapeHtml(room.id)}">
                 <div class="room-item-info">
@@ -186,7 +200,7 @@
                 </div>
                 <div class="room-item-actions">
                     ${isHost ? `<button class="btn btn--sm btn--danger btn-dissolve-room">${t('online.dissolve')}</button>` : ''}
-                    <button class="btn btn--sm btn--primary btn-join-room">${t('online.join')}</button>
+                    <button class="${joinBtnClass}">${joinBtnText}</button>
                 </div>
             </div>`;
         }).join('');
@@ -196,6 +210,14 @@
             btn.addEventListener('click', (e) => {
                 const roomId = e.target.closest('.room-item').dataset.roomId;
                 handleJoinRoom(roomId);
+            });
+        });
+
+        // 绑定进入按钮（已在房间中，直接切换到房间内视图）
+        list.querySelectorAll('.btn-enter-room').forEach(btn => {
+            btn.addEventListener('click', () => {
+                showInRoom();
+                renderRoomInfo();
             });
         });
 
@@ -318,6 +340,14 @@
         } catch (e) {
             setStatus(e.message, 'error');
         }
+    }
+
+    /**
+     * 返回大厅（不离开房间）
+     */
+    function handleBackToLobby() {
+        showLobby();
+        refreshRoomList();
     }
 
     /**
