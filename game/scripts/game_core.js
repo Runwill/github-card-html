@@ -10,7 +10,7 @@
 
 
     const Settings = {
-        autoRunDelay: 50 // 默认 50ms
+        autoRunDelay: 0 // 默认 0ms
     };
 
     let recursionDepth = 0;
@@ -168,7 +168,15 @@
         GameState.perspectiveIndex = 0;
         GameState.round = 1;
         GameState.isGameRunning = true;
+        GameState.isPaused = false;
+        GameState.eventStack = [];
         
+        // 清空日志面板 DOM
+        const breadcrumbsEl = document.getElementById('game-breadcrumbs');
+        if (breadcrumbsEl) breadcrumbsEl.innerHTML = '';
+        const timingBadgeEl = document.getElementById('game-timing-badge');
+        if (timingBadgeEl) timingBadgeEl.innerHTML = '';
+
         // Initialize Flow Stack to point to the first leaf node
         // Root is RoundProcess -> beforeRoundStart
         GameState.flowStack = [];

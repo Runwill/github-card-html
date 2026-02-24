@@ -30,7 +30,7 @@
     };
 
     const DRAG_CONFIG = {
-        lerpFactor: 0.25, // 越高 = 响应越快
+        lerpFactor: 0.15, // 越高 = 响应越快（中等惯性）
         maxTilt: 12,      
         tiltFactor: 0.4,
         swapAnimationDuration: 200 // 毫秒

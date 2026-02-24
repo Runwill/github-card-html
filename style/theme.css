@@ -348,6 +348,16 @@ html.theme-switching *::after {
   background-position: 100% 50% !important;
   box-shadow: var(--shadow-primary-2) !important;
 }
+/* 双状态：激活时白底有色字 */
+.btn--primary.is-active {
+  background: var(--surface, #fff) !important;
+  color: var(--primary-2) !important;
+  border: 1.5px solid var(--primary-2) !important;
+  box-shadow: none !important;
+}
+.btn--primary.is-active:hover {
+  background: color-mix(in srgb, var(--primary-1) 10%, var(--surface, #fff)) !important;
+}
 .btn--secondary {
   background: transparent !important;
   color: color-mix(in srgb, var(--text) 86%, var(--bg-end)) !important;
@@ -380,6 +390,16 @@ html[data-theme="dark"] .btn--accent {
   transform: translateY(-1px);
 }
 .btn--accent:active { transform: translateY(0.5px); }
+/* 双状态：激活时白底有色字 */
+.btn--accent.is-active {
+  background: var(--surface, #fff) !important;
+  color: #2c7a7b !important;
+  border: 1.5px solid #2c7a7b !important;
+  box-shadow: none !important;
+}
+.btn--accent.is-active:hover {
+  background: color-mix(in srgb, #38b2ac 10%, var(--surface, #fff)) !important;
+}
 .btn:disabled {
   background: color-mix(in srgb, var(--border) 70%, transparent) !important;
   color: var(--text-subtle) !important;

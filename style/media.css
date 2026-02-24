@@ -251,9 +251,9 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
   :root {
     --role-avatar-size: 50px;
     --role-summary-pad: 5px;
-    --role-summary-name-fs: 13px;
+    --role-summary-name-fs: 14px;
     --role-summary-stats-minh: 28px;
-    --role-summary-badge-fs: 12px;
+    --role-summary-badge-fs: 13px;
     --role-summary-badge-minw: 24px;
   }
 }
@@ -263,21 +263,21 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
   :root {
     --role-avatar-size: 56px;
     --role-summary-pad: 5px;
-    --role-summary-name-fs: 14px;
+    --role-summary-name-fs: 16px;
     --role-summary-stats-minh: 30px;
-    --role-summary-badge-fs: 13px;
+    --role-summary-badge-fs: 15px;
     --role-summary-badge-minw: 24px;
   }
 }
 
-/* 级别 4：大桌面 */
+/* 级别 4：大桌面（≈原始值：0.95rem×20px=19px, 0.85rem×20px=17px） */
 @media (min-width: 1280px) and (min-height: 700px) {
   :root {
     --role-avatar-size: 60px;
     --role-summary-pad: 5px;
-    --role-summary-name-fs: 15px;
+    --role-summary-name-fs: 19px;
     --role-summary-stats-minh: 31.5px;
-    --role-summary-badge-fs: 14px;
+    --role-summary-badge-fs: 17px;
     --role-summary-badge-minw: 24px;
   }
 }

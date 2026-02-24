@@ -10,8 +10,18 @@
         init(config) {
             console.log("[Sandbox] Initializing Manual Mode...");
             this.state.isGameRunning = true;
+            this.state.isPaused = false;
             this.state.mode = 'sandbox';
+            this.state.round = 1;
+            this.state.flowStack = [];
+            this.state.eventStack = [];
             
+            // 清空日志面板 DOM
+            const breadcrumbsEl = document.getElementById('game-breadcrumbs');
+            if (breadcrumbsEl) breadcrumbsEl.innerHTML = '';
+            const timingBadgeEl = document.getElementById('game-timing-badge');
+            if (timingBadgeEl) timingBadgeEl.innerHTML = '';
+
             this._setupPlayers(config);
             this._distributeCards(config);
             
@@ -60,6 +70,7 @@
              // 重置牌组
              this.state.pile = new Area('pile', Area.Configs.Pile);
              this.state.discardPile = new Area('discardPile', Area.Configs.DiscardPile);
+             this.state.treatmentArea = new Area('treatmentArea', Area.Configs.TreatmentArea);
              
              // 填充牌组 
              if (config && config.deck && Array.isArray(config.deck) && config.deck.length > 0) {

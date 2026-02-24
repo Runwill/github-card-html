@@ -25,6 +25,14 @@
         'game-main-area'
     ];
 
+    /**
+     * 按钮 ID 与视图名的映射（用于切换 active 状态）
+     */
+    const VIEW_BTN_MAP = {
+        setup:  'btn-show-setup',
+        online: 'btn-show-online'
+    };
+
     let currentView = 'none';
     let previousView = 'none';
 
@@ -39,6 +47,18 @@
         Object.values(VIEW_IDS).forEach(id => {
             const el = document.getElementById(id);
             if (el) el.classList.add('hidden');
+        });
+
+        // 更新按钮 active 状态
+        Object.entries(VIEW_BTN_MAP).forEach(([view, btnId]) => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                if (view === viewName) {
+                    btn.classList.add('is-active');
+                } else {
+                    btn.classList.remove('is-active');
+                }
+            }
         });
 
         // 如果不是 play 视图，隐藏对局相关元素
