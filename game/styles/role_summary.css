@@ -209,7 +209,8 @@
     /* Animation */
     animation: judgeBubblePop var(--dur-moderate) cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
     transform-origin: center;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 /* Theme Adaptation */
@@ -238,4 +239,98 @@ html[data-theme="light"] .player-judge-count {
 
 .player-judge-count.count-changed {
     animation: judgeCountPulse var(--dur-moderate) cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ── Spectator Role Summary ──────────────────────────────────────────── */
+
+/* ── Equipment Name Tags ─────────────────────────────────────────────── */
+
+.player-equip-names {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.equip-name-tag {
+    font-size: var(--fs-2xs, 10px);
+    line-height: 1.2;
+    padding: 0 2px;
+    color: var(--text-subtle, #888);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
+}
+
+/* Main view equip names */
+.character-info .player-equip-names {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    margin-left: 0;
+    margin-top: var(--space-2xs, 4px);
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 2px;
+    max-width: 120px;
+    pointer-events: auto;
+}
+
+.character-info .equip-name-tag {
+    max-width: 80px;
+    font-size: var(--fs-xs, 11px);
+}
+
+.role-summary--spectator {
+    z-index: 20;
+    opacity: 0.55;
+    filter: grayscale(0.3);
+    pointer-events: auto;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.role-summary--spectator:hover {
+    opacity: 0.85;
+    filter: grayscale(0);
+}
+
+/* Enter animation */
+.role-summary--spectator.spectator-enter {
+    animation: spectatorEnter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Exit animation */
+.role-summary--spectator.spectator-exit {
+    animation: spectatorExit 0.3s ease forwards;
+}
+
+@keyframes spectatorEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(8px);
+    }
+    to {
+        opacity: 0.55;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes spectatorExit {
+    from {
+        opacity: 0.55;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.8) translateY(8px);
+    }
 }

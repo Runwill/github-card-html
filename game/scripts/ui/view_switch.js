@@ -98,15 +98,12 @@
 
     /**
      * 恢复到上一个视图（用于取消操作）
-     * 如果上一个视图就是当前视图或 'none'，则检测游戏是否在进行中
+     * 关闭面板后：有对局 → 回到对局；否则 → 全部隐藏
      */
     function restorePreviousView() {
-        // 如果有对局在进行，优先恢复到对局视图
         const gs = window.Game.GameState;
         if (gs && gs.isGameRunning) {
             switchGameView('play');
-        } else if (previousView && previousView !== currentView) {
-            switchGameView(previousView);
         } else {
             switchGameView('none');
         }

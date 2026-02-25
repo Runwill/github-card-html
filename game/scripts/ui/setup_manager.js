@@ -4,6 +4,12 @@
 
     let characterCache = null;
 
+    /** i18n helper */
+    function t(key) { return (window.i18n && window.i18n.t) ? window.i18n.t(key) : key; }
+
+    /** Current mode value: 'auto' or 'sandbox' */
+    let currentMode = 'sandbox';
+
     function init() {
         const setupBtn = document.getElementById('btn-show-setup');
         const startBtn = document.getElementById('btn-start-game');
@@ -25,6 +31,84 @@
                 renderPlayerSlots(parseInt(e.target.value));
             });
         }
+
+        // 自动时机 click-toggle
+        const modeToggle = document.getElementById('setup-mode-toggle');
+        if (modeToggle) {
+            modeToggle.addEventListener('click', () => {
+                // 在线房间内锁定为"否"，不可切换
+                const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
+                if (isOnline) return;
+                if (modeToggle.classList.contains('is-locked')) return;
+
+                if (currentMode === 'sandbox') {
+                    currentMode = 'auto';
+                    modeToggle.dataset.value = 'auto';
+                    modeToggle.textContent = t('game.setup.autoTimingYes');
+                    modeToggle.classList.add('is-active');
+                } else {
+                    currentMode = 'sandbox';
+                    modeToggle.dataset.value = 'sandbox';
+                    modeToggle.textContent = t('game.setup.autoTimingNo');
+                    modeToggle.classList.remove('is-active');
+                }
+                // 更新座位数选项
+                updateSeatCountOptions();
+            });
+        }
+
+        // 允许旁观 click-toggle
+        const spectateToggle = document.getElementById('setup-allow-spectate-toggle');
+        if (spectateToggle) {
+            spectateToggle.addEventListener('click', () => {
+                const newVal = spectateToggle.dataset.value !== 'true';
+                spectateToggle.dataset.value = String(newVal);
+                spectateToggle.textContent = newVal ? '是' : '否';
+                spectateToggle.classList.toggle('is-active', newVal);
+
+                // 广播到房间
+                if (window.Game.Online && window.Game.Online.RoomUI) {
+                    const roomUI = window.Game.Online.RoomUI;
+                    if (roomUI.currentRoom) {
+                        roomUI.currentRoom.allowSpectate = newVal;
+                    }
+                    const client = window.Game.Online.RoomClient;
+                    if (client && client.isConnected) {
+                        client.updateRoomOption('allowSpectate', newVal);
+                    }
+                    roomUI.renderRoomInfo();
+                }
+            });
+        }
+    }
+
+    /**
+     * 根据当前模式更新座位数下拉选项
+     * 否(sandbox) → 1-10, 是(auto) → 2-10
+     */
+    function updateSeatCountOptions() {
+        const countSelect = document.getElementById('setup-player-count-select');
+        if (!countSelect) return;
+        const prevValue = parseInt(countSelect.value) || 4;
+        const min = (currentMode === 'auto') ? 2 : 1;
+        const max = 10;
+
+        countSelect.innerHTML = '';
+        for (let i = min; i <= max; i++) {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = i;
+            countSelect.appendChild(opt);
+        }
+
+        // 保持之前选择值（如果仍然有效），否则选第一个有效值
+        if (prevValue >= min && prevValue <= max) {
+            countSelect.value = prevValue;
+        } else {
+            countSelect.value = min;
+        }
+
+        renderPlayerSlots(parseInt(countSelect.value));
     }
 
     /**
@@ -44,6 +128,50 @@
         if (window.Game.UI.switchGameView) {
             window.Game.UI.switchGameView('setup');
         }
+
+        // 面板可见后重新计算 CustomSelect 选项字体缩放
+        if (window.CustomSelect) window.CustomSelect.refreshAll();
+
+        // 在线模式检测
+        const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
+        const modeToggle = document.getElementById('setup-mode-toggle');
+
+        // 在线模式下锁定自动时机为"否"
+        if (isOnline && modeToggle) {
+            currentMode = 'sandbox';
+            modeToggle.dataset.value = 'sandbox';
+            modeToggle.textContent = t('game.setup.autoTimingNo');
+            modeToggle.classList.remove('is-active');
+            modeToggle.classList.add('is-locked');
+        } else if (modeToggle) {
+            modeToggle.classList.remove('is-locked');
+        }
+
+        // 允许旁观 toggle: 仅在线 + 房主 + 在自己房间时显示
+        const spectateGroup = document.getElementById('setup-allow-spectate-group');
+        if (spectateGroup) {
+            let showSpectate = false;
+            if (isOnline && window.Game.Online && window.Game.Online.RoomUI) {
+                const roomUI = window.Game.Online.RoomUI;
+                const room = roomUI.currentRoom;
+                if (room) {
+                    const myId = localStorage.getItem('id');
+                    showSpectate = (room.host === myId);
+                    // 同步当前值
+                    const toggle = document.getElementById('setup-allow-spectate-toggle');
+                    if (toggle) {
+                        const allowed = room.allowSpectate !== false;
+                        toggle.dataset.value = String(allowed);
+                        toggle.textContent = allowed ? '是' : '否';
+                        toggle.classList.toggle('is-active', allowed);
+                    }
+                }
+            }
+            spectateGroup.classList.toggle('hidden', !showSpectate);
+        }
+
+        // 更新座位数选项
+        updateSeatCountOptions();
 
         // 加载武将数据
         if (!characterCache) {
@@ -172,11 +300,10 @@
         const preset = presetSelect ? presetSelect.value : 'standard';
         const deck = generateDeck(preset);
 
-        // 获取模式预设
-        const modeSelect = document.getElementById('setup-mode-select');
-        let mode = modeSelect ? modeSelect.value : 'auto';
+        // 获取模式预设 (from toggle state)
+        let mode = currentMode; // 'auto' or 'sandbox'
 
-        // Online: force sandbox mode
+        // Online: force sandbox mode (自动时机 = 否)
         const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
         if (isOnline) {
             mode = 'sandbox';

@@ -299,6 +299,7 @@
         // 创建幽灵
         const ghost = document.createElement('div');
         ghost.className = 'card-placeholder card-move-ghost';
+        // 起始位置：用 transform 直接定位到源卡牌位置，避免在 (0,0) 闪烁
         ghost.style.cssText = `
             position: fixed;
             left: 0; top: 0;
@@ -309,6 +310,7 @@
             will-change: transform, opacity;
             transition: none;
             margin: 0;
+            transform: translate(${fromRect.left}px, ${fromRect.top}px);
         `;
 
         ghost.setAttribute('data-card-key', finalAppearance.dataCardKey || 'CardBack');
@@ -319,8 +321,8 @@
         // 起点 / 终点中心
         const sx = fromRect.left + fromRect.width / 2;
         const sy = fromRect.top + fromRect.height / 2;
-        const ex = toRect.left + toRect.width / 2;
-        const ey = toRect.top + toRect.height / 2;
+        let ex = toRect.left + toRect.width / 2;
+        let ey = toRect.top + toRect.height / 2;
 
         // 弧线控制点：垂直于 start→end 向量，偏移 bulge*chordLength
         const dx = ex - sx, dy = ey - sy;
@@ -329,22 +331,52 @@
         // 法向量（左手边 = 向上/左弯）
         const nx = -dy / (chord || 1);
         const ny = dx / (chord || 1);
-        const cx = (sx + ex) / 2 + nx * bulge;
-        const cy = (sy + ey) / 2 + ny * bulge;
+        let cx = (sx + ex) / 2 + nx * bulge;
+        let cy = (sy + ey) / 2 + ny * bulge;
 
         // 目标尺寸
-        const tw = toRect.width;
-        const th = toRect.height;
+        let tw = toRect.width;
+        let th = toRect.height;
 
         // 根据弦长计算飞行时间（恒定速度），并 clamp 到合理范围
         const arcDuration = Math.min(CONFIG.arcDurationMax,
             Math.max(CONFIG.arcDurationMin, chord / CONFIG.arcSpeed));
 
         const startTime = performance.now();
+        let endpointCorrected = false;
 
         function tick(now) {
             let t = (now - startTime) / arcDuration;
             if (t > 1) t = 1;
+
+            // 首帧校正：重新读取目标卡牌位置，修正因布局延迟产生的偏差
+            if (!endpointCorrected) {
+                endpointCorrected = true;
+                const toContainer2 = getContainerForArea(toAreaPath);
+                const toAreaObj2 = _resolveAreaLocal(toAreaPath);
+                if (toContainer2 && toAreaObj2) {
+                    const liveEl = findCardElement(toContainer2, cardId, toAreaObj2);
+                    if (liveEl) {
+                        const liveRect = liveEl.getBoundingClientRect();
+                        const newEx = liveRect.left + liveRect.width / 2;
+                        const newEy = liveRect.top + liveRect.height / 2;
+                        if (Math.abs(newEx - ex) > 1 || Math.abs(newEy - ey) > 1) {
+                            ex = newEx;
+                            ey = newEy;
+                            tw = liveRect.width;
+                            th = liveRect.height;
+                            // 重新计算控制点
+                            const dx2 = ex - sx, dy2 = ey - sy;
+                            const chord2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
+                            const bulge2 = chord2 * CONFIG.arcBulge;
+                            const nx2 = -dy2 / (chord2 || 1);
+                            const ny2 = dx2 / (chord2 || 1);
+                            cx = (sx + ex) / 2 + nx2 * bulge2;
+                            cy = (sy + ey) / 2 + ny2 * bulge2;
+                        }
+                    }
+                }
+            }
 
             // ease-in-out (smoothstep)
             const e = t * t * (3 - 2 * t);

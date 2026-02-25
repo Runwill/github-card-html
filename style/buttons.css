@@ -26,8 +26,8 @@
 .btn--block { width: 100%; }
 
 /* 变体交互反馈（颜色由 theme.css 统一管理） */
-.btn--primary:hover { transform: translateY(-1px); }
-.btn--primary:active, .btn--secondary:active { transform: translateY(0.5px); }
+.btn--primary:hover, .btn--accent:hover, .btn--success:hover, .btn--danger:hover { transform: translateY(-1px); }
+.btn--primary:active, .btn--secondary:active, .btn--accent:active, .btn--success:active, .btn--danger:active { transform: translateY(0.5px); }
 
 
 /* 统一“禁用样式/悬浮”——用于只读用户下的可点提示（不屏蔽点击，以便弹 toast） */

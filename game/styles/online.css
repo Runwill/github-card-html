@@ -92,15 +92,30 @@
     background: var(--surface);
 }
 
-/* Setup panel top row: inline input-groups */
+/* Setup panel rows: inline input-groups, not stretched */
 .setup-panel > .row {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+.setup-panel > .row:last-of-type {
+    margin-bottom: 0;
 }
 .setup-panel > .row > .input-group {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
+    width: auto;          /* override Foundation .input-group { width:100% } */
+    margin-bottom: 0;     /* override Foundation .input-group { margin-bottom:1rem } */
+}
+
+/* 座位数选择框：适中宽度 */
+.setup-panel .input-group:has(#setup-player-count-select) {
+    min-width: 140px;
+}
+/* 牌堆预设选择框：更宽，文字较长 */
+.setup-panel .input-group:has(#setup-card-preset-select) {
+    min-width: 210px;
 }
 
 .setup-panel #setup-players-list {
@@ -122,6 +137,44 @@
 
 .setup-actions {
     margin-top: var(--space-2xl);
+}
+
+/* ── Click Toggle (用于自动时机/允许旁观等 是/否 切换) ──────────────────── */
+/* 样式与 .input-group-field (select) 保持一致 */
+
+.setup-click-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted, #999);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important; /* override Foundation :last-child reset */
+    font-size: var(--fs-base);
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--dur-normal) var(--ease-default);
+    box-sizing: border-box;
+}
+
+.setup-click-toggle:hover:not(.is-locked) {
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border-color: var(--text-muted);
+}
+
+.setup-click-toggle.is-active {
+    background: rgba(var(--success-rgb, 34, 197, 94), 0.12);
+    color: var(--success, #22c55e);
+    border-color: rgba(var(--success-rgb, 34, 197, 94), 0.4);
+}
+
+.setup-click-toggle.is-locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /* ── Online Room Panel ─────────────────────────────────────────────────── */
@@ -282,6 +335,12 @@
     color: var(--success);
 }
 
+.room-item-tag.no-spectate {
+    background: transparent;
+    color: var(--text-muted);
+    opacity: 0.55;
+}
+
 /* 当前所在房间高亮 */
 .room-item.is-current {
     background: color-mix(in srgb, var(--success) 10%, transparent);
@@ -298,58 +357,9 @@
     flex-shrink: 0;
 }
 
-.room-item .btn-join-room {
-    padding: var(--space-2xs) var(--space-lg);
-    font-size: var(--fs-sm);
-    font-weight: 600;
-    border-radius: var(--radius-sm);
-    background: var(--primary-2);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-default),
-                box-shadow var(--dur-fast) var(--ease-default);
-}
-
-.room-item .btn-join-room:hover {
-    background: var(--primary-3);
-    box-shadow: var(--shadow-primary-1);
-}
-
-.room-item .btn-enter-room {
-    padding: var(--space-2xs) var(--space-lg);
-    font-size: var(--fs-sm);
-    font-weight: 600;
-    border-radius: var(--radius-sm);
-    background: var(--success, #38a169);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-default),
-                box-shadow var(--dur-fast) var(--ease-default);
-}
-
-.room-item .btn-enter-room:hover {
-    background: color-mix(in srgb, var(--success, #38a169) 85%, #000);
-    box-shadow: 0 2px 8px rgba(56, 161, 105, 0.3);
-}
-
-.room-item .btn-dissolve-room {
-    padding: var(--space-2xs) var(--space-sm);
-    font-size: var(--fs-sm);
-    font-weight: 600;
-    border-radius: var(--radius-sm);
-    background: var(--danger, #e53e3e);
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-default),
-                box-shadow var(--dur-fast) var(--ease-default);
-}
-
-.room-item .btn-dissolve-room:hover {
-    background: color-mix(in srgb, var(--danger, #e53e3e) 85%, #000);
-}
+/* 房间列表按钮已统一使用 .btn .btn--sm .btn--{variant} 系统，
+   仅保留与上下文相关的微调 */
+.room-item-actions .btn { font-weight: 600; }
 
 /* ── In-Room View ──────────────────────────────────────────────────────── */
 
@@ -402,6 +412,23 @@
     color: var(--primary-1);
 }
 
+.room-user-badge.spectator {
+    background: color-mix(in srgb, var(--warning, #f0ad4e) 15%, transparent);
+    color: var(--warning, #f0ad4e);
+}
+
+/* 旁观者在房间用户列表中灰化 */
+.room-user-spectating {
+    opacity: 0.5;
+    filter: grayscale(0.4);
+}
+
+.room-user-spectate-icon {
+    font-size: 1em;
+    opacity: 0.7;
+    line-height: 1;
+}
+
 .room-user-self {
     border-color: var(--primary-2);
     box-shadow: var(--shadow-ring);
@@ -418,8 +445,44 @@
     line-height: var(--lh-normal);
 }
 
+.online-hint--warn {
+    background: rgba(var(--danger-rgb, 239, 68, 68), 0.08);
+    border-left-color: var(--danger, #ef4444);
+    color: var(--danger, #ef4444);
+}
+
 .online-actions {
     margin-top: var(--space-lg);
+}
+
+/* Spectate button active state */
+#btn-spectate.is-active {
+    background: rgba(var(--success-rgb, 34, 197, 94), 0.2);
+    color: var(--success, #22c55e);
+    border-color: rgba(var(--success-rgb, 34, 197, 94), 0.4);
+}
+
+/* ── Room Options (allow spectate toggle, etc.) ────────────────────────── */
+
+.online-room-options {
+    margin-top: var(--space-md);
+    display: flex;
+    gap: var(--space-md);
+    align-items: center;
+}
+
+.online-toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--fs-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+}
+
+.online-toggle-label input[type="checkbox"] {
+    accent-color: var(--primary-2);
 }
 
 /* ── Viewer Labels on Avatars ──────────────────────────────────────────── */
@@ -434,7 +497,7 @@
     align-items: center;
     gap: 2px;
     pointer-events: none;
-    z-index: 10;
+    z-index: 20;
     margin-bottom: var(--space-2xs);
 }
 
@@ -455,6 +518,33 @@
     text-overflow: ellipsis;
     line-height: var(--lh-tight);
     animation: viewerLabelFadeIn 0.2s var(--ease-decel);
+}
+
+/* Spectator-specific name plate styling */
+.online-viewer-label.is-spectator {
+    opacity: 0.55;
+    font-style: italic;
+    border-style: dashed;
+    animation: spectatorLabelEnter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.online-viewer-label.is-spectator::before {
+    content: '👁 ';
+    font-style: normal;
+}
+
+.online-viewer-label.spectator-leaving {
+    animation: spectatorLabelExit 0.3s ease forwards;
+}
+
+@keyframes spectatorLabelEnter {
+    from { opacity: 0; transform: scale(0.85) translateY(4px); }
+    to   { opacity: 0.6; transform: scale(1) translateY(0); }
+}
+
+@keyframes spectatorLabelExit {
+    from { opacity: 0.6; transform: scale(1) translateY(0); }
+    to   { opacity: 0; transform: scale(0.85) translateY(4px); }
 }
 
 @keyframes viewerLabelFadeIn {

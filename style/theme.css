@@ -334,9 +334,18 @@ html.theme-switching *::after {
 #panel_permissions .tokens-btn { border-color: var(--border) !important; }
 #panel_tokens #tokens-compact-toggle { border-color: var(--border) !important; }
 
-/* 按钮系统 */
+/* ═══ 按钮系统 ═══════════════════════════════════════════════════════════
+   架构：buttons.css → 结构/布局/尺寸/交互反馈
+         theme.css   → 色彩/主题/变体
+   每个填充变体声明 --_btn-accent（主色）和可选 --_btn-accent-soft（柔和色），
+   统一的 .btn.is-active 规则自动完成"填充 → 描边"反转，明暗模式通用。
+*/
 .btn { color: var(--text) }
+
+/* ── Primary（主色渐变） ── */
 .btn--primary {
+  --_btn-accent: var(--primary-2);
+  --_btn-accent-soft: var(--primary-1);
   background: linear-gradient(135deg, var(--primary-1) 0%, var(--primary-2) 50%, var(--primary-3) 100%) !important;
   background-size: 200% 200% !important;
   background-position: 0% 50% !important;
@@ -348,17 +357,10 @@ html.theme-switching *::after {
   background-position: 100% 50% !important;
   box-shadow: var(--shadow-primary-2) !important;
 }
-/* 双状态：激活时白底有色字 */
-.btn--primary.is-active {
-  background: var(--surface, #fff) !important;
-  color: var(--primary-2) !important;
-  border: 1.5px solid var(--primary-2) !important;
-  box-shadow: none !important;
-}
-.btn--primary.is-active:hover {
-  background: color-mix(in srgb, var(--primary-1) 10%, var(--surface, #fff)) !important;
-}
+
+/* ── Secondary（透明底描边） ── */
 .btn--secondary {
+  --_btn-accent: var(--primary-2);
   background: transparent !important;
   color: color-mix(in srgb, var(--text) 86%, var(--bg-end)) !important;
   border-color: var(--border) !important;
@@ -368,11 +370,25 @@ html.theme-switching *::after {
   border-color: color-mix(in srgb, var(--border) 80%, transparent) !important;
   color: var(--primary-2) !important;
 }
-.btn--success { background: var(--success) !important; color: #fff !important; border: none !important; }
+
+/* ── Success（绿色实底） ── */
+.btn--success {
+  --_btn-accent: var(--success);
+  background: var(--success) !important; color: #fff !important; border: none !important;
+}
 .btn--success:hover { background: var(--success-hover) !important; }
-.btn--danger { background: var(--danger) !important; color: #fff !important; border: none !important; }
+
+/* ── Danger（红色实底） ── */
+.btn--danger {
+  --_btn-accent: var(--danger);
+  background: var(--danger) !important; color: #fff !important; border: none !important;
+}
 .btn--danger:hover { background: var(--danger-hover) !important; }
+
+/* ── Accent（青绿渐变） ── */
 .btn--accent {
+  --_btn-accent: #38b2ac;
+  --_btn-accent-soft: #38b2ac;
   background: linear-gradient(135deg, #38b2ac 0%, #319795 50%, #2c7a7b 100%) !important;
   background-size: 200% 200% !important;
   background-position: 0% 50% !important;
@@ -387,19 +403,36 @@ html[data-theme="dark"] .btn--accent {
 .btn--accent:hover {
   background-position: 100% 50% !important;
   box-shadow: 0 6px 8px -1px rgba(49,151,149,0.40) !important;
-  transform: translateY(-1px);
 }
-.btn--accent:active { transform: translateY(0.5px); }
-/* 双状态：激活时白底有色字 */
-.btn--accent.is-active {
-  background: var(--surface, #fff) !important;
-  color: #2c7a7b !important;
-  border: 1.5px solid #2c7a7b !important;
+
+/* ── Ghost（透明无边框，用于次要操作如"重置"） ── */
+.btn--ghost {
+  --_btn-accent: var(--text-muted);
+  background: transparent !important;
+  color: var(--text-muted) !important;
+  border: 1px solid transparent !important;
   box-shadow: none !important;
 }
-.btn--accent.is-active:hover {
-  background: color-mix(in srgb, #38b2ac 10%, var(--surface, #fff)) !important;
+.btn--ghost:hover {
+  background: color-mix(in srgb, var(--border) 30%, transparent) !important;
+  color: var(--text) !important;
 }
+
+/* ── 双状态通用：激活时透明底 + 有色字 + 边框（明暗模式通用） ── */
+/* 需要 html[data-theme="dark"] 前缀以打赢深色模式变体的特异性 */
+.btn.is-active,
+html[data-theme="dark"] .btn.is-active {
+  background: transparent !important;
+  color: var(--_btn-accent) !important;
+  border: 1.5px solid var(--_btn-accent) !important;
+  box-shadow: none !important;
+}
+.btn.is-active:hover,
+html[data-theme="dark"] .btn.is-active:hover {
+  background: color-mix(in srgb, var(--_btn-accent-soft, var(--_btn-accent)) 10%, transparent) !important;
+}
+
+/* ── Disabled（统一禁用色） ── */
 .btn:disabled {
   background: color-mix(in srgb, var(--border) 70%, transparent) !important;
   color: var(--text-subtle) !important;

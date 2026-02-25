@@ -166,6 +166,26 @@
             // 使用标准化 SafeRender 替代手动 data-card-key 检查
             window.Game.UI.safeRender(cardEl, htmlContent, renderName);
 
+            // ── 处理区：显示移动者角色名 ──
+            // 仅在沙盒/手动模式下，处理区的牌显示上次移动者名称
+            if (dropZoneId === 'treatmentArea' && card._lastMoveBy) {
+                let moverLabel = cardEl.querySelector('.card-mover-label');
+                const moverInfo = card._lastMoveBy;
+                const moverHTML = GameText.render('Character', { id: moverInfo.characterId, name: moverInfo.name });
+                const moverKey = `mover:${moverInfo.id}:${moverInfo.name}`;
+                
+                if (!moverLabel) {
+                    moverLabel = document.createElement('div');
+                    moverLabel.className = 'card-mover-label';
+                    cardEl.appendChild(moverLabel);
+                }
+                window.Game.UI.safeRender(moverLabel, moverHTML, moverKey);
+            } else {
+                // 不在处理区或无移动者信息时移除标签
+                const existingLabel = cardEl.querySelector('.card-mover-label');
+                if (existingLabel) existingLabel.remove();
+            }
+
             // 兼容 CSS: game_cards.css 依赖 [data-card-key='CardBack'] 选择器来显示牌背
             // 因此必须同步 data-card-key 属性
             if (cardEl.getAttribute('data-card-key') !== renderName) {

@@ -377,6 +377,7 @@
                 const startRect = (options && options.startRect) ? options.startRect : null;
                 const cardHTML = (options && options.cardHTML) ? options.cardHTML : null;
                 const dragElement = (options && options.dragElement) ? options.dragElement : null;
+                const isDrag = !!(options && options.isDrag);
 
                 window.Game.Controller.dispatch('move', {
                     moveRole, 
@@ -386,6 +387,7 @@
                     fromArea: sourceArea, 
                     fromIndex: sourceIndex, 
                     callbacks,
+                    isDrag, // 标记来自拖拽，跳过 CardMoveAnimator
                     startRect,
                     animationHint, // 显式传递动画目标线索
                     cardHTML, // 显式传递卡牌外观

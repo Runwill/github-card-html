@@ -103,6 +103,7 @@
             });
             socket.on('room:perspectives-updated', (data) => emit('perspectivesUpdated', data));
             socket.on('room:config-updated', (data) => emit('configUpdated', data));
+            socket.on('room:option-updated', (data) => emit('roomOptionUpdated', data));
             socket.on('room:game-started', (data) => emit('gameStarted', data));
             socket.on('game:action', (data) => emit('gameAction', data));
             socket.on('game:state-updated', (data) => emit('stateUpdated', data));
@@ -268,6 +269,14 @@
     }
 
     /**
+     * 更新房间选项（如允许旁观）
+     */
+    function updateRoomOption(key, value) {
+        if (!socket || !socket.connected || !currentRoomId) return;
+        socket.emit('room:update-option', { key, value });
+    }
+
+    /**
      * 更新游戏配置
      */
     function updateConfig(config) {
@@ -291,6 +300,7 @@
         broadcastAction,
         syncFullState,
         notifyGameStart,
+        updateRoomOption,
         updateConfig,
         getUserInfo,
         on,

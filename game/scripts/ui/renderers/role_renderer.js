@@ -309,11 +309,11 @@
         }
 
         // 竖排显示所有用户名，每人一个标签
-        const key = viewers.join('|');
+        const key = viewers.map(v => `${v.username}:${v.spectating ? 's' : 'p'}`).join('|');
         if (container.dataset.viewerKey !== key) {
             container.dataset.viewerKey = key;
-            container.innerHTML = viewers.map(name =>
-                `<span class="online-viewer-label">${name}</span>`
+            container.innerHTML = viewers.map(v =>
+                `<span class="online-viewer-label${v.spectating ? ' is-spectator' : ''}">${v.username}</span>`
             ).join('');
         }
     }
@@ -458,6 +458,31 @@
                     judgeCountEl = document.createElement('span');
                     judgeCountEl.id = 'char-judge-count';
                     judgeCountEl.className = 'player-judge-count';
+                    // Click on judge badge opens judge area viewer (main view)
+                    judgeCountEl.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const gs = window.Game.GameState;
+                        if (!gs) return;
+                        const perspIdx = (gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
+                        const role = gs.players && gs.players[perspIdx];
+                        if (!role || !role.judgeArea) return;
+                        const GT = window.Game.UI.GameText;
+                        const titleSuffix = GT ? GT.render('judgeArea') : 'Judge Area';
+                        const title = `${role.name} ${titleSuffix}`;
+                        const sourceId = `role-judge:${role.id}`;
+                        const cards = role.judgeArea.cards || [];
+                        let charNameKey = role.character;
+                        if (Array.isArray(charNameKey) && charNameKey.length > 0) charNameKey = charNameKey[0];
+                        if (!charNameKey) charNameKey = role.name;
+                        let ownerNameHtml = charNameKey;
+                        if (GT) ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
+                        const openOptions = { forceFaceDown: false, ownerName: ownerNameHtml, areaName: titleSuffix };
+                        if (window.Game.UI.toggleCardViewer) {
+                            window.Game.UI.toggleCardViewer(title, cards, sourceId, openOptions);
+                        } else if (window.Game.UI.openCardViewer) {
+                            window.Game.UI.openCardViewer(title, cards, sourceId, openOptions);
+                        }
+                    });
                     charImg.parentElement.appendChild(judgeCountEl);
                 }
 
@@ -530,6 +555,34 @@
                     window.Game.UI.showContextMenu(e.clientX, e.clientY, selfRole);
                 }
             };
+
+            // 主视角装备区卡牌名称
+            let mainEquipNames = charInfoPanel.querySelector('.player-equip-names');
+            if (!mainEquipNames) {
+                mainEquipNames = document.createElement('div');
+                mainEquipNames.className = 'player-equip-names';
+                charInfoPanel.appendChild(mainEquipNames);
+            }
+            if (selfRole.equipSlots) {
+                const eNames = selfRole.equipSlots
+                    .map(slot => (slot.cards && slot.cards.length > 0) ? slot.cards[0].name : null)
+                    .filter(Boolean);
+                const eKey = eNames.join(',');
+                if (mainEquipNames.dataset.equipKey !== eKey) {
+                    mainEquipNames.dataset.equipKey = eKey;
+                    if (eNames.length > 0) {
+                        mainEquipNames.innerHTML = eNames.map(n => {
+                            const GT = GameText || window.Game.UI.GameText;
+                            const rendered = GT ? GT.render(n) : n;
+                            return `<span class="equip-name-tag">${rendered}</span>`;
+                        }).join('');
+                        mainEquipNames.style.display = '';
+                    } else {
+                        mainEquipNames.innerHTML = '';
+                        mainEquipNames.style.display = 'none';
+                    }
+                }
+            }
         }
 
         // 区域（手牌）
@@ -708,6 +761,28 @@
                 const judgeCountSpan = document.createElement('span');
                 judgeCountSpan.className = 'player-judge-count';
                 judgeCountSpan.style.display = 'none'; // Default hidden
+                // Click on judge badge opens judge area viewer
+                judgeCountSpan.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const role = pEl._role;
+                    if (!role) return;
+                    const GT = window.Game.UI.GameText;
+                    const titleSuffix = GT ? GT.render('judgeArea') : 'Judge Area';
+                    const title = `${role.name} ${titleSuffix}`;
+                    const sourceId = `role-judge:${role.id}`;
+                    const cards = (role.judgeArea && role.judgeArea.cards) || [];
+                    let charNameKey = role.character;
+                    if (Array.isArray(charNameKey) && charNameKey.length > 0) charNameKey = charNameKey[0];
+                    if (!charNameKey) charNameKey = role.name;
+                    let ownerNameHtml = charNameKey;
+                    if (GT) ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
+                    const openOptions = { forceFaceDown: false, ownerName: ownerNameHtml, areaName: titleSuffix };
+                    if (window.Game.UI.toggleCardViewer) {
+                        window.Game.UI.toggleCardViewer(title, cards, sourceId, openOptions);
+                    } else if (window.Game.UI.openCardViewer) {
+                        window.Game.UI.openCardViewer(title, cards, sourceId, openOptions);
+                    }
+                });
                 avatarContainer.appendChild(judgeCountSpan);
 
                 // === 在线模式：观察者名称容器 ===
@@ -717,6 +792,11 @@
                 avatarContainer.appendChild(viewerLabel);
 
                 pEl.appendChild(avatarContainer);
+
+                // Equipment names overlay (positioned beside avatar via CSS)
+                const equipNamesEl = document.createElement('div');
+                equipNamesEl.className = 'player-equip-names';
+                avatarContainer.appendChild(equipNamesEl);
 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'player-name';
@@ -769,6 +849,7 @@
             
             // Attach Hand Inspector Click (Updates data reference)
             setupHandInspector(pEl, role);
+            pEl._role = role; // Store role reference for judge badge click
             
             // 当前回合标识：旋转光环加在 .char-avatar 上
             const avatarWrap = pEl.querySelector('.char-avatar');
@@ -927,6 +1008,29 @@
                 }
             }
             
+            // 装备区卡牌名称（显示在头像旁）
+            const equipNamesEl = pEl.querySelector('.player-equip-names');
+            if (equipNamesEl && role.equipSlots) {
+                const equipNames = role.equipSlots
+                    .map(slot => (slot.cards && slot.cards.length > 0) ? slot.cards[0].name : null)
+                    .filter(Boolean);
+                const equipKey = equipNames.join(',');
+                if (equipNamesEl.dataset.equipKey !== equipKey) {
+                    equipNamesEl.dataset.equipKey = equipKey;
+                    if (equipNames.length > 0) {
+                        equipNamesEl.innerHTML = equipNames.map(n => {
+                            const GT = GameText || window.Game.UI.GameText;
+                            const rendered = GT ? GT.render(n) : n;
+                            return `<span class="equip-name-tag">${rendered}</span>`;
+                        }).join('');
+                        equipNamesEl.style.display = '';
+                    } else {
+                        equipNamesEl.innerHTML = '';
+                        equipNamesEl.style.display = 'none';
+                    }
+                }
+            }
+
             // 右键菜单
             pEl.oncontextmenu = (e) => {
                 e.preventDefault();

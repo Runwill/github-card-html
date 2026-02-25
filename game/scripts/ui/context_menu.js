@@ -162,11 +162,11 @@
         
         // 动作配置
         const targetConfigs = [
-            { key: 'pile', label: '置入牌堆顶' },
-            { key: 'discardPile', label: '置入弃牌堆顶' },
-            { key: 'treatmentArea', label: '置入处理区' },
-            { roleKey: 'hand', label: '置入手牌' },
-            { roleKey: 'equipArea', label: '置入装备区' },
+            { key: 'pile', label: '置于牌堆顶' },
+            { key: 'discardPile', label: '置于弃牌堆顶' },
+            { key: 'treatmentArea', label: '置于处理区' },
+            { roleKey: 'hand', label: '置于手牌' },
+            { roleKey: 'judgeArea', label: '置于判定区' },
         ];
 
         targetConfigs.forEach(conf => {

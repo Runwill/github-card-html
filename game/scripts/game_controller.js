@@ -19,6 +19,11 @@
         currentMode = mode; // 启动：更新全局状态以匹配配置
         
         window.Game.GameState.isGameRunning = false; // 先重置状态
+
+        // 清空移动日志
+        if (window.Game.UI.MoveLog) {
+            window.Game.UI.MoveLog.clear();
+        }
         
         if (mode === 'manual' || mode === 'sandbox') {
             if (!window.Game.Engines || !window.Game.Engines.SandboxEngine) {
@@ -193,6 +198,34 @@
         return null;
     };
 
+    // 辅助函数：获取区域路径（用于 CardMoveAnimator）
+    const getAreaPath = (area) => {
+        // 优先使用 SyncManager 的方法
+        const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
+        if (SyncMgr && SyncMgr.getAreaPath) return SyncMgr.getAreaPath(area);
+        
+        // 本地回退
+        if (!area) return null;
+        const gs = window.Game.GameState;
+        if (!gs) return null;
+        if (area === gs.pile) return 'pile';
+        if (area === gs.discardPile) return 'discardPile';
+        if (area === gs.treatmentArea) return 'treatmentArea';
+        if (gs.players) {
+            for (let i = 0; i < gs.players.length; i++) {
+                const p = gs.players[i];
+                if (area === p.hand) return `player:${i}:hand`;
+                if (area === p.judgeArea) return `player:${i}:judgeArea`;
+                if (p.equipSlots) {
+                    for (let j = 0; j < p.equipSlots.length; j++) {
+                        if (area === p.equipSlots[j]) return `player:${i}:equip:${j}`;
+                    }
+                }
+            }
+        }
+        return area.name || null;
+    };
+
     // UI 动作的统一调度方法
     function dispatch(actionType, payload) {
         // --- 动作链 ---
@@ -216,20 +249,34 @@
              payload.fromArea = findCardSource(payload.card);
         }
 
-        // 捕获动画开始状态
-        let startRect = payload.startRect; // 优先使用直接传递的 startRect (例如来自 interactions.js 的值传递)
-        
-        if (!startRect && payload.element) {
-            startRect = payload.element.getBoundingClientRect();
-            // console.log(`[Animation] Captured startRect from element for ${actionType}:`, startRect);
+        // ── CardMoveAnimator 快照准备 ──
+        // 跳过拖拽产生的移动（拖拽有自己的动画系统）
+        const Animator = window.Game.UI && window.Game.UI.CardMoveAnimator;
+        let animPayload = null;
+        const isDragMove = !!(payload.isDrag || payload.dragElement || payload.startRect);
+
+        if (actionType === 'move' && Animator && payload.card && payload.toArea && !isDragMove) {
+            const card = payload.card;
+            const cardId = (typeof card === 'object') ? card.id : card;
+            const fromAreaObj = payload.fromArea || findCardSource(card);
+            const toAreaObj = resolveArea(payload.toArea);
+            const fromAreaPath = getAreaPath(fromAreaObj);
+            const toAreaPath = getAreaPath(toAreaObj);
+
+            if (cardId && (fromAreaPath || toAreaPath)) {
+                animPayload = { cardId, fromAreaPath, toAreaPath, position: payload.position };
+                Animator.snapshotBeforeMove(animPayload);
+            }
         }
 
-        // 包装执行以在之后触发动画
-        const triggerAnimation = () => {
-             // console.log("[Animation] Triggering animation...", { startRect, toArea: payload.toArea, card: payload.card });
-             if(startRect && payload.toArea) {
-                 performFlipAnimation(startRect, payload.toArea, payload.card, payload.animationHint, payload.cardHTML, payload.dragElement);
-             }
+        // ── 动画触发辅助 ──
+        const triggerCardMoveAnimation = () => {
+            if (window.Game.UI && window.Game.UI.updateUI) window.Game.UI.updateUI();
+            if (Animator && animPayload) {
+                requestAnimationFrame(() => {
+                    Animator.animateAfterMove(animPayload);
+                });
+            }
         };
 
         if (currentMode === 'manual' || currentMode === 'sandbox') {
@@ -244,8 +291,27 @@
                     const sourceArea = payload.fromArea || resolveArea(payload.fromArea);
 
                     if (targetArea) {
+                        // ── 记录移动者信息到卡牌 (用于处理区显示) ──
+                        if (payload.card && typeof payload.card === 'object' && payload.moveRole) {
+                            payload.card._lastMoveBy = {
+                                id: payload.moveRole.id,
+                                characterId: payload.moveRole.characterId,
+                                name: payload.moveRole.name
+                            };
+                        }
+
                         currentEngine.moveCard(payload.card, targetArea, payload.position - 1, sourceArea); 
                         
+                        // ── 移动日志 ──
+                        if (window.Game.UI.MoveLog) {
+                            window.Game.UI.MoveLog.logMove({
+                                moveRole: payload.moveRole,
+                                card: payload.card,
+                                fromAreaPath: getAreaPath(sourceArea),
+                                toAreaPath: getAreaPath(targetArea)
+                            });
+                        }
+
                         // 触发 UI 回调
                         if (payload.callbacks) {
                             if (typeof payload.callbacks.onMoveExecuted === 'function') {
@@ -256,8 +322,8 @@
                             }, 50); 
                         }
                         
-                        // 触发动画
-                        triggerAnimation();
+                        // 触发 CardMoveAnimator 动画（统一动画路径）
+                        triggerCardMoveAnimation();
                     } else {
                         console.warn("[Controller] Manual Move Skipped: Invalid target area", payload.toArea);
                     }
@@ -281,11 +347,31 @@
         } else {
             // 自动/流程模式
              if (actionType === 'move') {
+                 // ── 记录移动者信息到卡牌 (用于处理区显示) ──
+                 if (payload.card && typeof payload.card === 'object' && payload.moveRole) {
+                     payload.card._lastMoveBy = {
+                         id: payload.moveRole.id,
+                         characterId: payload.moveRole.characterId,
+                         name: payload.moveRole.name
+                     };
+                 }
+
                  // 转发给核心事件
                  
+                 // ── 移动日志 ──
+                 if (window.Game.UI.MoveLog) {
+                     const fromAreaObj = payload.fromArea || (payload.card && payload.card.lyingArea);
+                     const toAreaObj = resolveArea(payload.toArea);
+                     window.Game.UI.MoveLog.logMove({
+                         moveRole: payload.moveRole,
+                         card: payload.card,
+                         fromAreaPath: getAreaPath(fromAreaObj),
+                         toAreaPath: getAreaPath(toAreaObj)
+                     });
+                 }
+
                  // 注入动画回调
                  let callbacks = payload.callbacks || {};
-                 // 确保我们要处理 callbacks 只是一个函数的情况（虽然在我们的用法中不太可能）
                  if (typeof callbacks === 'function') {
                      const oldCb = callbacks;
                      callbacks = { onComplete: oldCb };
@@ -295,19 +381,9 @@
                  callbacks.onMoveExecuted = (ctx) => {
                      if (originalOnMove) originalOnMove(ctx);
                      
-                     // 强制 UI 更新以确保 DOM 为动画准备就绪
-                     // 注意：updateUI 通常包含同步 DOM 操作
-                     if (window.Game.UI && window.Game.UI.updateUI) window.Game.UI.updateUI();
-
-                     // 优化：移除 setTimeout 以消除闪烁
-                     // 使用 requestAnimationFrame 确保在浏览器重绘之前执行动画逻辑 (隐藏 targetEl)
-                     requestAnimationFrame(() => {
-                        triggerAnimation(); 
-                     });
+                     // 触发 CardMoveAnimator 动画（统一动画路径）
+                     triggerCardMoveAnimation();
                  };
-                 
-                 // 重构 payload.callbacks 逻辑处理如果它为空的情况
-                 // 但是 Events.move 签名需要对象
                  
                  window.Game.Core.Events.move(
                      payload.moveRole,

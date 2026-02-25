@@ -9,6 +9,7 @@
     const Client = () => window.Game.Online.RoomClient;
     let currentRoom = null;
     let refreshTimer = null;
+    let isSpectating = false;
 
     function t(key) {
         return (window.i18n && window.i18n.t) ? window.i18n.t(key) : key;
@@ -54,12 +55,18 @@
             backBtn.addEventListener('click', handleBackToLobby);
         }
 
+        const spectateBtn = document.getElementById('btn-spectate');
+        if (spectateBtn) {
+            spectateBtn.addEventListener('click', handleToggleSpectate);
+        }
+
         // 注册事件回调
         const client = Client();
         if (client) {
             client.on('userJoined', onUserJoined);
             client.on('userLeft', onUserLeft);
             client.on('perspectivesUpdated', onPerspectivesUpdated);
+            client.on('roomOptionUpdated', onRoomOptionUpdated);
             client.on('gameStarted', onRemoteGameStarted);
             client.on('disconnected', onDisconnected);
             client.on('roomDissolved', onRoomDissolved);
@@ -187,8 +194,9 @@
             const isCurrent = myCurrentRoomId && room.id === myCurrentRoomId;
             const isHost = myId && room.host === myId;
             // 已在此房间：显示"进入"按钮（不同样式）；否则显示"加入"
-            const joinBtnClass = isCurrent ? 'btn btn--sm btn--accent btn-enter-room' : 'btn btn--sm btn--primary btn-join-room';
+            const joinBtnClass = isCurrent ? 'btn btn--sm btn--success btn-enter-room' : 'btn btn--sm btn--primary btn-join-room';
             const joinBtnText = isCurrent ? t('online.enter') : t('online.join');
+            const noSpectate = room.allowSpectate === false;
             return `
             <div class="room-item${isCurrent ? ' is-current' : ''}" data-room-id="${escapeHtml(room.id)}">
                 <div class="room-item-info">
@@ -196,6 +204,7 @@
                     <span class="room-item-status">
                         <span class="room-item-users">${room.userCount} ${t('online.players')}</span>
                         ${room.gameStarted ? `<span class="room-item-tag gaming">${t('online.gaming')}</span>` : `<span class="room-item-tag waiting">${t('online.waiting')}</span>`}
+                        ${noSpectate ? `<span class="room-item-tag no-spectate">禁止旁观</span>` : ''}
                     </span>
                 </div>
                 <div class="room-item-actions">
@@ -371,6 +380,43 @@
     }
 
     /**
+     * 切换旁观模式
+     */
+    function handleToggleSpectate() {
+        isSpectating = !isSpectating;
+        if (window.Game.GameState) {
+            window.Game.GameState.isSpectating = isSpectating;
+        }
+
+        // 立即更新本地房间数据中的旁观状态
+        if (currentRoom && currentRoom.users) {
+            const myId = localStorage.getItem('id');
+            if (myId && currentRoom.users[myId]) {
+                currentRoom.users[myId].spectating = isSpectating;
+            }
+        }
+
+        // 更新本地 perspectives 中的旁观标记（使 viewer label 渲染旁观样式）
+        const SyncManager = window.Game.Online && window.Game.Online.SyncManager;
+        if (SyncManager && SyncManager.updateLocalSpectating) {
+            SyncManager.updateLocalSpectating(isSpectating);
+        }
+
+        // 广播旁观状态给房间
+        const client = Client();
+        if (client && client.isConnected) {
+            client.broadcastAction('spectateToggle', { spectating: isSpectating });
+        }
+
+        renderRoomInfo();
+        // 刷新游戏 UI 以更新头像上的 viewer label
+        if (window.Game.UI && window.Game.UI.updateUI) {
+            window.Game.UI.updateUI();
+        }
+    }
+
+    /**
+
      * 渲染房间内信息
      */
     function renderRoomInfo() {
@@ -378,6 +424,31 @@
 
         const nameEl = document.getElementById('current-room-name');
         if (nameEl) nameEl.textContent = currentRoom.id;
+
+        // 更新旁观按钮可见性
+        const spectateBtn = document.getElementById('btn-spectate');
+        if (spectateBtn) {
+            const allowSpectate = currentRoom.allowSpectate !== false; // default true
+            if (allowSpectate) {
+                spectateBtn.classList.remove('hidden');
+                spectateBtn.textContent = isSpectating ? t('online.cancelSpectate') : t('online.spectate');
+                spectateBtn.classList.toggle('is-active', isSpectating);
+            } else {
+                spectateBtn.classList.add('hidden');
+                // 如果旁观被关闭，重置旁观状态
+                if (isSpectating) {
+                    isSpectating = false;
+                    if (window.Game.GameState) window.Game.GameState.isSpectating = false;
+                }
+            }
+        }
+
+        // 房间内禁止旁观提示
+        const noSpectateHint = document.getElementById('room-no-spectate-hint');
+        if (noSpectateHint) {
+            const allowed = currentRoom.allowSpectate !== false;
+            noSpectateHint.classList.toggle('hidden', allowed);
+        }
 
         renderUserList();
     }
@@ -394,10 +465,11 @@
         const myId = localStorage.getItem('id');
 
         container.innerHTML = Object.entries(users).map(([userId, info]) => `
-            <div class="room-user ${userId === myId ? 'room-user-self' : ''}">
+            <div class="room-user ${userId === myId ? 'room-user-self' : ''} ${info.spectating ? 'room-user-spectating' : ''}">
                 <span class="room-user-name">${escapeHtml(info.username)}</span>
                 ${userId === currentRoom.host ? `<span class="room-user-badge host">${t('online.host')}</span>` : ''}
                 ${userId === myId ? `<span class="room-user-badge self">${t('online.you')}</span>` : ''}
+                ${info.spectating ? `<span class="room-user-spectate-icon" title="${t('online.spectating')}">👁</span>` : ''}
             </div>
         `).join('');
 
@@ -432,6 +504,21 @@
         if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.onPerspectivesChanged) {
             window.Game.Online.SyncManager.onPerspectivesChanged(data.perspectives);
         }
+    }
+
+    function onRoomOptionUpdated(data) {
+        if (!currentRoom) return;
+        if (data.key === 'allowSpectate') {
+            currentRoom.allowSpectate = data.value;
+            // 同步设置面板上的 toggle 状态
+            const toggle = document.getElementById('setup-allow-spectate-toggle');
+            if (toggle) {
+                toggle.dataset.value = String(!!data.value);
+                toggle.textContent = data.value ? '是' : '否';
+                toggle.classList.toggle('is-active', !!data.value);
+            }
+        }
+        renderRoomInfo();
     }
 
     function onRemoteGameStarted(data) {
@@ -476,7 +563,9 @@
         refreshRoomList,
         setStatus,
         get currentRoom() { return currentRoom; },
-        set currentRoom(v) { currentRoom = v; }
+        set currentRoom(v) { currentRoom = v; },
+        get isSpectating() { return isSpectating; },
+        set isSpectating(v) { isSpectating = v; }
     };
 
 })();

@@ -99,6 +99,46 @@
 
 /* .game-log-panel scrollbar-thin via HTML class */
 
+/* Move Log */
+.move-log {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 280px;
+    overflow-y: auto;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--text-muted);
+}
+
+.move-log:empty {
+    display: none;
+}
+
+.move-log-entry {
+    padding: 3px 6px;
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--surface) 60%, transparent);
+    word-break: break-word;
+}
+
+.move-log-entry:hover {
+    background: color-mix(in srgb, var(--surface) 90%, transparent);
+}
+
+.move-log-mover {
+    font-weight: 600;
+}
+
+.move-log-card {
+    font-weight: 500;
+}
+
+.move-log-from,
+.move-log-to {
+    opacity: 0.8;
+}
+
 .game-action-panel {
     display: flex;
     justify-content: center;
@@ -159,6 +199,9 @@
     .game-log-panel .timing-badge {
         width: auto;
         flex-shrink: 0;
+    }
+    .game-log-panel .move-log {
+        display: none; /* 窄屏下隐藏移动日志 */
     }
     .main-perspective-container {
         flex-direction: column;

@@ -8,7 +8,7 @@
                 <div id="game-setup-ui" class="game-panel setup-panel">
                     <div class="row">
                          <div class="input-group">
-                            <span class="input-group-label" data-i18n="game.setup.playerCount">Role Count</span>
+                            <span class="input-group-label" data-i18n="game.setup.playerCount">座位数</span>
                             <select id="setup-player-count-select" class="input-group-field">
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -17,21 +17,25 @@
                                 <option value="8">8</option>
                             </select>
                          </div>
+                         <!-- Allow Spectate Toggle (only visible for host in room) -->
+                         <div class="input-group hidden" id="setup-allow-spectate-group">
+                            <span class="input-group-label" data-i18n="online.allowSpectate">允许旁观</span>
+                            <span id="setup-allow-spectate-toggle" class="setup-click-toggle is-active" data-value="true">是</span>
+                         </div>
+                    </div>
+                    <div class="row">
                          <div class="input-group">
                             <span class="input-group-label" data-i18n="game.setup.cardPreset">Card Preset</span>
                             <select id="setup-card-preset-select" class="input-group-field">
-                                <option value="standard">Standard</option>
-                                <option value="80sha80shan">80 Sha 80 Shan</option>
+                                <option value="standard" data-i18n="game.setup.preset.standard">Standard</option>
+                                <option value="80sha80shan" data-i18n="game.setup.preset.80sha80shan">80 Sha 80 Shan</option>
                             </select>
                          </div>
                          
-                         <!-- NEW: Mode Selection -->
+                         <!-- Mode Toggle (click to switch) -->
                          <div class="input-group">
-                            <span class="input-group-label">Game Mode</span>
-                            <select id="setup-mode-select" class="input-group-field">
-                                <option value="auto">Auto (Flow)</option>
-                                <option value="sandbox">Sandbox (Manual)</option>
-                            </select>
+                            <span class="input-group-label" data-i18n="game.setup.autoTiming">自动时机</span>
+                            <span id="setup-mode-toggle" class="setup-click-toggle" data-value="sandbox" data-i18n="game.setup.autoTimingNo">否</span>
                          </div>
                     </div>
                     <div id="setup-players-list">
@@ -77,9 +81,11 @@
                         </div>
                         <div id="room-user-list" class="online-user-list"></div>
                         <div class="text-center online-actions">
+                            <button id="btn-spectate" class="btn btn--secondary btn--sm hidden" data-i18n="online.spectate">旁观</button>
                             <button id="btn-back-lobby" class="btn btn--secondary btn--sm" data-i18n="online.backToLobby">返回大厅</button>
                             <button id="btn-leave-room" class="btn btn--danger btn--sm" data-i18n="online.leave">离开房间</button>
                         </div>
+                        <div id="room-no-spectate-hint" class="online-hint online-hint--warn hidden">🚫 该房间禁止旁观</div>
                         <div class="online-hint" data-i18n="online.sandboxHint">在线模式下固定为 Sandbox 模式，请通过「游戏设置」选择武将和牌堆后开始游戏。</div>
                     </div>
 
@@ -149,6 +155,7 @@
                 <div class="game-panel game-log-panel scrollbar-thin">
                     <div id="game-timing-badge" class="timing-badge"></div>
                     <div id="game-breadcrumbs" class="breadcrumbs"></div>
+                    <div id="game-move-log" class="move-log scrollbar-thin"></div>
                 </div>
             </div>
 

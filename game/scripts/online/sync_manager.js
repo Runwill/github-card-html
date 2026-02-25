@@ -250,6 +250,27 @@
                 // 远程移动卡牌（修改数据模型）
                 applyRemoteMove(payload);
 
+                // ── 记录移动者信息到卡牌 + 移动日志 ──
+                if (payload.moveRole) {
+                    const card = findCardById(payload.cardId);
+                    if (card) {
+                        card._lastMoveBy = {
+                            id: payload.moveRole.id,
+                            characterId: payload.moveRole.characterId,
+                            name: payload.moveRole.name
+                        };
+                    }
+                    if (window.Game.UI.MoveLog) {
+                        const fromPath = animPayload ? animPayload.fromAreaPath : null;
+                        window.Game.UI.MoveLog.logMove({
+                            moveRole: payload.moveRole,
+                            card: findCardById(payload.cardId),
+                            fromAreaPath: fromPath,
+                            toAreaPath: payload.toAreaPath
+                        });
+                    }
+                }
+
                 // 更新 UI
                 if (window.Game.UI && window.Game.UI.updateUI) {
                     window.Game.UI.updateUI();
@@ -275,6 +296,30 @@
                         if (payload.playerIndex >= 0) {
                             document.documentElement.style.setProperty('--turn-ring-color', '#48bb78');
                         }
+                    }
+                } else if (actionType === 'spectateToggle') {
+                    // 远程用户切换了旁观状态 → 更新 perspectives 中的 spectating 标记
+                    const fromUserId = data.from && data.from.userId;
+                    if (fromUserId && perspectives) {
+                        for (const idx in perspectives) {
+                            const arr = perspectives[idx];
+                            if (Array.isArray(arr)) {
+                                const viewer = arr.find(v => v.userId === fromUserId);
+                                if (viewer) {
+                                    viewer.spectating = !!payload.spectating;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    // 同步房间用户列表数据
+                    if (window.Game.Online && window.Game.Online.RoomUI) {
+                        const roomUI = window.Game.Online.RoomUI;
+                        if (roomUI.currentRoom && roomUI.currentRoom.users && data.from) {
+                            const ru = roomUI.currentRoom.users[data.from.userId];
+                            if (ru) ru.spectating = !!payload.spectating;
+                        }
+                        roomUI.renderRoomInfo();
                     }
                 }
 
@@ -470,10 +515,16 @@
         if (!client || !client.isConnected || !client.currentRoomId) return;
 
         if (actionType === 'move' && payload.card) {
+            const moveRoleData = payload.moveRole ? {
+                id: payload.moveRole.id,
+                characterId: payload.moveRole.characterId,
+                name: payload.moveRole.name
+            } : null;
             client.broadcastAction('moveCard', {
                 cardId: payload.card.id,
                 toAreaPath: getAreaPath(resolveLocalArea(payload.toArea)),
-                position: payload.position || -1
+                position: payload.position || -1,
+                moveRole: moveRoleData
             });
         } else if (actionType === 'modifyHealth') {
             client.broadcastAction('modifyHealth', {
@@ -536,7 +587,27 @@
         if (!perspectives) return [];
         const viewers = perspectives[playerIndex];
         if (!viewers || !Array.isArray(viewers)) return [];
-        return viewers.map(v => v.username);
+        return viewers.map(v => ({ username: v.username, spectating: !!v.spectating }));
+    }
+
+    /**
+     * 更新本地用户在 perspectives 中的旁观标记，使 viewer label 能正确渲染旁观样式。
+     * 仅修改本机 perspectives 数据（广播由调用方负责）。
+     */
+    function updateLocalSpectating(isSpectating) {
+        if (!perspectives) return;
+        const myId = localStorage.getItem('id');
+        if (!myId) return;
+        for (const idx in perspectives) {
+            const arr = perspectives[idx];
+            if (Array.isArray(arr)) {
+                const viewer = arr.find(v => v.userId === myId);
+                if (viewer) {
+                    viewer.spectating = !!isSpectating;
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -558,6 +629,7 @@
         interceptDispatch,
         broadcastPerspectiveChange,
         getViewersForPlayer,
+        updateLocalSpectating,
         pushFullState,
         onPerspectivesChanged,
         onRemoteGameStart,

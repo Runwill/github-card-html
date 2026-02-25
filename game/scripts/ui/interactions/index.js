@@ -303,7 +303,7 @@
             let isAnimationFinished = false;
             
             const useRemoteAnimation = !acceptPlaceholder;
-            let options = {};
+            let options = { isDrag: true };
             
             if (useRemoteAnimation && el) {
                 options.startRect = el.getBoundingClientRect();
