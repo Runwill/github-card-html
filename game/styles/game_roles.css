@@ -258,9 +258,8 @@ body.is-global-dragging #hand-cards-container {
     box-sizing: border-box;
 }
 
-.timing-badge:empty::before {
-    content: "\00a0";
-    visibility: hidden;
+.timing-badge:empty {
+    display: none;
 }
 
 .timing-badge .term-click {

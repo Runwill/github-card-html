@@ -226,6 +226,25 @@
         return area.name || null;
     };
 
+    /**
+     * 获取包含位置信息的区域路径（仅用于移动日志）
+     * 在基础路径后附加卡牌索引，如 pile:3, discardPile:0, treatmentArea:2, player:0:hand:4
+     */
+    const getAreaPathForLog = (area, card) => {
+        const basePath = getAreaPath(area);
+        if (!card || !area) return basePath;
+
+        // 尝试从 area.cards 中查找卡牌索引
+        const cards = area.cards || area;
+        if (Array.isArray(cards)) {
+            const idx = cards.indexOf(card);
+            if (idx >= 0) return basePath + ':' + idx;
+            // 卡牌尚未插入 → 预测为末尾位置
+            return basePath + ':' + cards.length;
+        }
+        return basePath;
+    };
+
     // UI 动作的统一调度方法
     function dispatch(actionType, payload) {
         // --- 动作链 ---
@@ -300,15 +319,27 @@
                             };
                         }
 
+                        // 在移动前捕获可见性快照和来源路径
+                        const preVis = payload.card ? payload.card.visibility : 0;
+                        const preVisibleTo = payload.card && payload.card.visibleTo ? [...payload.card.visibleTo] : [];
+                        const fromAreaPath = getAreaPathForLog(sourceArea, payload.card);
+
                         currentEngine.moveCard(payload.card, targetArea, payload.position - 1, sourceArea); 
                         
+                        // 移动后捕获目标路径（含位置信息）
+                        const toAreaPath = getAreaPathForLog(targetArea, payload.card);
+
                         // ── 移动日志 ──
                         if (window.Game.UI.MoveLog) {
                             window.Game.UI.MoveLog.logMove({
                                 moveRole: payload.moveRole,
                                 card: payload.card,
-                                fromAreaPath: getAreaPath(sourceArea),
-                                toAreaPath: getAreaPath(targetArea)
+                                fromAreaPath,
+                                toAreaPath,
+                                cardVisibility: preVis,
+                                cardVisibleTo: preVisibleTo,
+                                toForOrAgainst: targetArea.forOrAgainst != null ? targetArea.forOrAgainst : 0,
+                                toOwnerId: targetArea.owner ? targetArea.owner.id : null
                             });
                         }
 
@@ -356,44 +387,119 @@
                      };
                  }
 
-                 // 转发给核心事件
-                 
-                 // ── 移动日志 ──
-                 if (window.Game.UI.MoveLog) {
-                     const fromAreaObj = payload.fromArea || (payload.card && payload.card.lyingArea);
-                     const toAreaObj = resolveArea(payload.toArea);
-                     window.Game.UI.MoveLog.logMove({
-                         moveRole: payload.moveRole,
-                         card: payload.card,
-                         fromAreaPath: getAreaPath(fromAreaObj),
-                         toAreaPath: getAreaPath(toAreaObj)
-                     });
-                 }
+                 if (isDragMove) {
+                     // ── 拖拽移动：使用同步路径，避免事件栈时序导致的重复动画 ──
+                     // 拖拽操作应和沙盒模式一样同步执行，确保动画逻辑一致
+                     const targetArea = resolveArea(payload.toArea);
+                     const sourceArea = payload.fromArea || findCardSource(payload.card);
 
-                 // 注入动画回调
-                 let callbacks = payload.callbacks || {};
-                 if (typeof callbacks === 'function') {
-                     const oldCb = callbacks;
-                     callbacks = { onComplete: oldCb };
-                 }
+                     if (targetArea && payload.card) {
+                         const card = payload.card;
 
-                 const originalOnMove = callbacks.onMoveExecuted;
-                 callbacks.onMoveExecuted = (ctx) => {
-                     if (originalOnMove) originalOnMove(ctx);
+                         // 捕获移动前可见性快照
+                         const preVis = card.visibility;
+                         const preVisibleTo = card.visibleTo ? [...card.visibleTo] : [];
+                         const fromAreaPath = getAreaPathForLog(sourceArea, card);
+
+                         // 直接同步移动卡牌（不走事件栈）
+                         const fromArea = sourceArea || card.lyingArea;
+                         if (fromArea) {
+                             const idx = fromArea.cards.indexOf(card);
+                             if (idx > -1) fromArea.cards.splice(idx, 1);
+                         }
+                         const insertIdx = Math.max(0, (payload.position || 1) - 1);
+                         if (insertIdx < targetArea.cards.length) {
+                             targetArea.cards.splice(insertIdx, 0, card);
+                         } else {
+                             targetArea.cards.push(card);
+                         }
+                         card.lyingArea = targetArea;
+
+                         // 更新可见性（与 Events.move whenPlaced 逻辑一致）
+                         if (targetArea.forOrAgainst !== undefined) {
+                             card.visibility = targetArea.forOrAgainst;
+                         }
+                         card.visibleTo = new Set();
+                         if (targetArea.owner && targetArea.owner.id !== undefined) {
+                             card.visibleTo.add(targetArea.owner.id);
+                         }
+
+                         const toAreaPath = getAreaPathForLog(targetArea, card);
+
+                         // ── 移动日志 ──
+                         if (window.Game.UI.MoveLog) {
+                             window.Game.UI.MoveLog.logMove({
+                                 moveRole: payload.moveRole,
+                                 card: card,
+                                 fromAreaPath,
+                                 toAreaPath,
+                                 cardVisibility: preVis,
+                                 cardVisibleTo: preVisibleTo,
+                                 toForOrAgainst: targetArea.forOrAgainst != null ? targetArea.forOrAgainst : 0,
+                                 toOwnerId: targetArea.owner ? targetArea.owner.id : null
+                             });
+                         }
+
+                         // 触发 UI 回调（与沙盒模式一致）
+                         if (payload.callbacks) {
+                             if (typeof payload.callbacks.onMoveExecuted === 'function') {
+                                 payload.callbacks.onMoveExecuted();
+                             }
+                             setTimeout(() => {
+                                 if (typeof payload.callbacks.onComplete === 'function') payload.callbacks.onComplete();
+                             }, 50);
+                         }
+
+                         triggerCardMoveAnimation();
+                     }
+                 } else {
+                     // ── 非拖拽移动：走事件栈 ──
+
+                     // 捕获移动前可见性快照
+                     const preVis = payload.card ? payload.card.visibility : 0;
+                     const preVisibleTo = payload.card && payload.card.visibleTo ? [...payload.card.visibleTo] : [];
+
+                     // ── 移动日志 ──
+                     if (window.Game.UI.MoveLog) {
+                         const fromAreaObj = payload.fromArea || (payload.card && payload.card.lyingArea);
+                         const toAreaObj = resolveArea(payload.toArea);
+                         window.Game.UI.MoveLog.logMove({
+                             moveRole: payload.moveRole,
+                             card: payload.card,
+                             fromAreaPath: getAreaPathForLog(fromAreaObj, payload.card),
+                             toAreaPath: getAreaPathForLog(toAreaObj, payload.card),
+                             cardVisibility: preVis,
+                             cardVisibleTo: preVisibleTo,
+                             toForOrAgainst: toAreaObj ? (toAreaObj.forOrAgainst != null ? toAreaObj.forOrAgainst : 0) : 0,
+                             toOwnerId: toAreaObj && toAreaObj.owner ? toAreaObj.owner.id : null
+                         });
+                     }
+
+                     // 注入动画回调
+                     let callbacks = payload.callbacks || {};
+                     if (typeof callbacks === 'function') {
+                         const oldCb = callbacks;
+                         callbacks = { onComplete: oldCb };
+                     }
+
+                     const originalOnMove = callbacks.onMoveExecuted;
+                     callbacks.onMoveExecuted = (ctx) => {
+                         if (originalOnMove) originalOnMove(ctx);
+                         
+                         // 触发 CardMoveAnimator 动画（统一动画路径）
+                         triggerCardMoveAnimation();
+                     };
                      
-                     // 触发 CardMoveAnimator 动画（统一动画路径）
-                     triggerCardMoveAnimation();
-                 };
-                 
-                 window.Game.Core.Events.move(
-                     payload.moveRole,
-                     payload.card,
-                     payload.toArea,
-                     payload.position,
-                     payload.fromArea,
-                     payload.fromIndex,
-                     callbacks
-                 );
+                     window.Game.Core.Events.move(
+                         payload.moveRole,
+                         payload.card,
+                         payload.toArea,
+                         payload.position,
+                         payload.fromArea,
+                         payload.fromIndex,
+                         callbacks
+                     );
+                 }
              }
         }
     }

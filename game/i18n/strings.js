@@ -11,16 +11,6 @@
         'game.setup.preset.80sha80shan': '80杀80闪',
         'game.setup.start': '确认开始',
         'game.pause': '暂停游戏',
-
-        // Move Log - Area Names
-        'game.area.pile': '牌堆',
-        'game.area.discardPile': '弃牌堆',
-        'game.area.treatmentArea': '处理区',
-        'game.area.hand': '{name}的手牌',
-        'game.area.judgeArea': '{name}的判定区',
-        'game.area.equip': '{name}的装备区',
-        'game.area.unknown': '未知区域',
-        'game.moveLog.entry': '{mover} 将 {card} 从 {from} 移至 {to}',
         'game.resume': '恢复游戏',
         'game.endTurn': '结束回合',
         'game.nextStep': '下一步',
@@ -80,16 +70,6 @@
         'game.setup.preset.80sha80shan': '80 Sha 80 Shan',
         'game.setup.start': 'Confirm Start',
         'game.pause': 'Pause Game',
-
-        // Move Log - Area Names
-        'game.area.pile': 'Draw Pile',
-        'game.area.discardPile': 'Discard Pile',
-        'game.area.treatmentArea': 'Treatment Area',
-        'game.area.hand': "{name}'s Hand",
-        'game.area.judgeArea': "{name}'s Judge Area",
-        'game.area.equip': "{name}'s Equip",
-        'game.area.unknown': 'Unknown',
-        'game.moveLog.entry': '{mover} moved {card} from {from} to {to}',
         'game.resume': 'Resume Game',
         'game.endTurn': 'End Turn',
         'game.nextStep': 'Next Step',

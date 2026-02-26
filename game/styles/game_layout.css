@@ -97,6 +97,10 @@
     gap: var(--space-2xl);
 }
 
+.game-log-panel .breadcrumbs:empty {
+    display: none;
+}
+
 /* .game-log-panel scrollbar-thin via HTML class */
 
 /* Move Log */
@@ -132,6 +136,12 @@
 
 .move-log-card {
     font-weight: 500;
+}
+
+.move-log-hidden-card {
+    font-weight: 500;
+    opacity: 0.5;
+    font-style: italic;
 }
 
 .move-log-from,
@@ -201,7 +211,12 @@
         flex-shrink: 0;
     }
     .game-log-panel .move-log {
-        display: none; /* 窄屏下隐藏移动日志 */
+        flex-direction: column;
+        overflow-y: auto;
+        max-height: 45px;
+        gap: 2px;
+        flex: 1;
+        min-width: 0;
     }
     .main-perspective-container {
         flex-direction: column;

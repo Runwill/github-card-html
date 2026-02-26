@@ -235,8 +235,13 @@
             if (actionType === 'moveCard') {
                 // ── 动画快照：在修改数据之前记录牌的当前 DOM 位置 ──
                 let animPayload = null;
+                const card = findCardById(payload.cardId);
+
+                // 捕获移动前可见性快照
+                const preVis = card ? card.visibility : 0;
+                const preVisibleTo = card && card.visibleTo ? [...card.visibleTo] : [];
+
                 if (Animator) {
-                    const card = findCardById(payload.cardId);
                     const fromAreaPath = card && card.lyingArea ? getAreaPath(card.lyingArea) : null;
                     animPayload = {
                         cardId: payload.cardId,
@@ -247,14 +252,14 @@
                     Animator.snapshotBeforeMove(animPayload);
                 }
 
-                // 远程移动卡牌（修改数据模型）
+                // 远程移动卡牌（修改数据模型 + 更新可见性）
                 applyRemoteMove(payload);
 
                 // ── 记录移动者信息到卡牌 + 移动日志 ──
                 if (payload.moveRole) {
-                    const card = findCardById(payload.cardId);
-                    if (card) {
-                        card._lastMoveBy = {
+                    const movedCard = findCardById(payload.cardId);
+                    if (movedCard) {
+                        movedCard._lastMoveBy = {
                             id: payload.moveRole.id,
                             characterId: payload.moveRole.characterId,
                             name: payload.moveRole.name
@@ -262,11 +267,16 @@
                     }
                     if (window.Game.UI.MoveLog) {
                         const fromPath = animPayload ? animPayload.fromAreaPath : null;
+                        const toArea = movedCard ? movedCard.lyingArea : null;
                         window.Game.UI.MoveLog.logMove({
                             moveRole: payload.moveRole,
-                            card: findCardById(payload.cardId),
+                            card: movedCard,
                             fromAreaPath: fromPath,
-                            toAreaPath: payload.toAreaPath
+                            toAreaPath: payload.toAreaPath,
+                            cardVisibility: preVis,
+                            cardVisibleTo: preVisibleTo,
+                            toForOrAgainst: toArea ? (toArea.forOrAgainst != null ? toArea.forOrAgainst : 0) : 0,
+                            toOwnerId: toArea && toArea.owner ? toArea.owner.id : null
                         });
                     }
                 }
@@ -365,6 +375,15 @@
             toArea.cards.push(card);
         }
         card.lyingArea = toArea;
+
+        // 更新可见性（与 Events.move whenPlaced 逻辑一致）
+        if (toArea.forOrAgainst !== undefined) {
+            card.visibility = toArea.forOrAgainst;
+        }
+        card.visibleTo = new Set();
+        if (toArea.owner && toArea.owner.id !== undefined) {
+            card.visibleTo.add(toArea.owner.id);
+        }
     }
 
     function applyRemoteHealthChange(payload) {

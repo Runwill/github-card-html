@@ -200,6 +200,11 @@
         if (window.Game.UI.updateAllViewers) {
             window.Game.UI.updateAllViewers();
         }
+
+        // 8. 刷新移动日志（视角切换时重新渲染以更新可见性显示）
+        if (window.Game.UI.MoveLog && window.Game.UI.MoveLog.renderLog) {
+            window.Game.UI.MoveLog.renderLog();
+        }
     }
 
     // 导出

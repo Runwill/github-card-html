@@ -82,11 +82,30 @@
              }
              
              shuffle(this.state.pile.cards);
+
+             // 初始化牌堆卡牌的可见性和区域引用
+             this.state.pile.cards.forEach(c => {
+                 if (c && typeof c === 'object') {
+                     c.lyingArea = this.state.pile;
+                     c.visibility = this.state.pile.forOrAgainst !== undefined ? this.state.pile.forOrAgainst : 1;
+                     c.visibleTo = new Set();
+                 }
+             });
              
              // 初始抽牌 (可选的沙盒设置，或许从空手牌开始?)
              // Let's give them 4 cards to start playing with
              this.state.players.forEach(player => {
                  player.drawCards(this.state.pile, 4);
+                 // 修正抽到手牌的可见性：手牌对持有者可见
+                 player.hand.cards.forEach(c => {
+                     if (c && typeof c === 'object') {
+                         c.visibility = player.hand.forOrAgainst !== undefined ? player.hand.forOrAgainst : 1;
+                         c.visibleTo = new Set();
+                         if (player.id !== undefined) {
+                             c.visibleTo.add(player.id);
+                         }
+                     }
+                 });
              });
         }
 
@@ -126,9 +145,18 @@
                  toArea.cards.push(card);
              }
              
-             // 3. Update linkage
+             // 3. Update linkage & visibility
              if (typeof card === 'object') {
                 card.lyingArea = toArea;
+
+                // 根据目标区域更新可见性（与 Events.move whenPlaced 逻辑一致）
+                if (toArea.forOrAgainst !== undefined) {
+                    card.visibility = toArea.forOrAgainst;
+                }
+                card.visibleTo = new Set();
+                if (toArea.owner && toArea.owner.id !== undefined) {
+                    card.visibleTo.add(toArea.owner.id);
+                }
              }
              
              console.log(`[Sandbox] Moved card ${card.name || card} to ${toArea.name}`);

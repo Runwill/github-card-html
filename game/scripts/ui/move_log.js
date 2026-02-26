@@ -14,38 +14,102 @@
     let logEntries = [];
 
     /**
-     * 将区域路径转换为可读文本 (i18n)
+     * 将区域路径转换为包含动态术语标签的 HTML
+     * 使用 GameText 渲染区域名和角色名，使其拥有动态术语系统的悬浮/点击交互
      */
-    function getAreaDisplayName(areaPath) {
-        const t = window.i18n ? window.i18n.t.bind(window.i18n) : (k) => k;
-        const gs = window.Game.GameState;
+    function getAreaDisplayHTML(areaPath) {
+        const GameText = window.Game.UI.GameText;
 
-        if (!areaPath) return t('game.area.unknown');
+        if (!areaPath) return '<span class="move-log-unknown">???</span>';
 
-        if (areaPath === 'pile') return t('game.area.pile');
-        if (areaPath === 'discardPile') return t('game.area.discardPile');
-        if (areaPath === 'treatmentArea') return t('game.area.treatmentArea');
+        // 辅助：生成位置标签 HTML
+        const posHTML = (n) => '<span class="move-log-pos">第' + (n + 1) + '张</span>';
 
-        // player:X:hand, player:X:judgeArea, player:X:equip:Y
+        // 装备槽索引 → 术语映射
+        const EQUIP_SLOT_TERMS = ['weaponSlot', 'armorSlot', 'defensiveSlot', 'offensiveSlot'];
+
+        // ── 全局区域：pile:N, discardPile:N, treatmentArea:N ──
+        const globalMatch = areaPath.match(/^(pile|discardPile|treatmentArea)(?::(\d+))?$/);
+        if (globalMatch) {
+            const areaHTML = GameText.render(globalMatch[1]);
+            if (globalMatch[2] != null) {
+                return areaHTML + posHTML(parseInt(globalMatch[2]));
+            }
+            return areaHTML;
+        }
+
+        // ── 玩家区域：player:X:subArea 或 player:X:subArea:N ──
         const playerMatch = areaPath.match(/^player:(\d+):(.+)$/);
-        if (playerMatch && gs && gs.players) {
+        if (playerMatch && GameText) {
             const playerIdx = parseInt(playerMatch[1]);
-            const subArea = playerMatch[2];
-            const player = gs.players[playerIdx];
-            const playerName = player ? player.name : `P${playerIdx + 1}`;
+            const rest = playerMatch[2]; // hand:3, judgeArea:1, equip:2
+            const gs = window.Game.GameState;
+            const player = gs && gs.players ? gs.players[playerIdx] : null;
+            const playerNameHTML = player
+                ? GameText.render('Character', { id: player.characterId, name: player.name })
+                : `P${playerIdx + 1}`;
 
-            if (subArea === 'hand') {
-                return t('game.area.hand').replace('{name}', playerName);
+            let areaTermHTML = '';
+            let posStr = '';
+
+            // hand 或 hand:N
+            const handMatch = rest.match(/^hand(?::(\d+))?$/);
+            if (handMatch) {
+                areaTermHTML = GameText.render('hand');
+                if (handMatch[1] != null) posStr = posHTML(parseInt(handMatch[1]));
             }
-            if (subArea === 'judgeArea') {
-                return t('game.area.judgeArea').replace('{name}', playerName);
+
+            // judgeArea 或 judgeArea:N
+            const judgeMatch = !handMatch && rest.match(/^judgeArea(?::(\d+))?$/);
+            if (judgeMatch) {
+                areaTermHTML = GameText.render('judgeArea');
+                if (judgeMatch[1] != null) posStr = posHTML(parseInt(judgeMatch[1]));
             }
-            if (subArea.startsWith('equip')) {
-                return t('game.area.equip').replace('{name}', playerName);
+
+            // equip:slotIdx 或 equip:slotIdx:N（slotIdx 本身就是位置，无需额外标注）
+            const equipMatch = !handMatch && !judgeMatch && rest.match(/^equip:(\d+)/);
+            if (equipMatch) {
+                const slotIdx = parseInt(equipMatch[1]);
+                const termKey = EQUIP_SLOT_TERMS[slotIdx] || 'equipArea';
+                areaTermHTML = GameText.render(termKey);
+            }
+
+            if (areaTermHTML) {
+                return playerNameHTML + areaTermHTML + posStr;
             }
         }
 
         return areaPath;
+    }
+
+    // 记录上一次渲染使用的视角索引，用于检测视角切换触发全量重渲染
+    let _lastPerspective = -1;
+
+    /**
+     * 判断某条日志中的卡牌对当前视角是否可见
+     * 规则：如果移动前可见 或 移动后可见，就显示真名；否则隐藏
+     */
+    function isCardVisibleToPerspective(entry) {
+        const gs = window.Game.GameState;
+        if (!gs) return true; // 无状态时默认显示
+
+        const perspIdx = gs.perspectiveIndex != null ? gs.perspectiveIndex : 0;
+        const perspPlayer = gs.players && gs.players[perspIdx];
+        if (!perspPlayer) return true;
+
+        const myId = perspPlayer.id;
+
+        // 移动前：卡牌是否对我可见
+        // visibility 0 → 公开(所有人可见); 1 → 私有(仅 visibleTo 中的角色可见)
+        const beforeVisible = (entry.cardVisibility === 0) ||
+            (entry.cardVisibleTo && entry.cardVisibleTo.includes(myId));
+
+        // 移动后：目标区域是否对我可见
+        // forOrAgainst 0 → 公开; 1 → 私有(仅 owner 可见)
+        const afterVisible = (entry.toForOrAgainst === 0) ||
+            (entry.toOwnerId === myId);
+
+        return beforeVisible || afterVisible;
     }
 
     /**
@@ -55,6 +119,10 @@
      * @param {object} params.card - Card 对象
      * @param {string} params.fromAreaPath - 来源区域路径
      * @param {string} params.toAreaPath - 目标区域路径
+     * @param {number} [params.cardVisibility] - 移动前卡牌 visibility (0=公开, 1=私有)
+     * @param {number[]} [params.cardVisibleTo] - 移动前 visibleTo 角色 ID 数组
+     * @param {number} [params.toForOrAgainst] - 目标区域 forOrAgainst (0=公开, 1=私有)
+     * @param {number|null} [params.toOwnerId] - 目标区域 owner ID
      */
     function logMove(params) {
         const { moveRole, card, fromAreaPath, toAreaPath } = params;
@@ -76,7 +144,12 @@
             moverId: moveRole ? moveRole.id : null,
             cardName: card ? (card.name || card.key || 'unknown') : 'unknown',
             fromAreaPath,
-            toAreaPath
+            toAreaPath,
+            // 可见性快照 —— 用于按视角过滤卡牌名称
+            cardVisibility: params.cardVisibility != null ? params.cardVisibility : (card ? card.visibility : 0),
+            cardVisibleTo: params.cardVisibleTo || (card && card.visibleTo ? [...card.visibleTo] : []),
+            toForOrAgainst: params.toForOrAgainst != null ? params.toForOrAgainst : 0,
+            toOwnerId: params.toOwnerId != null ? params.toOwnerId : null
         };
 
         logEntries.push(entry);
@@ -91,6 +164,7 @@
 
     /**
      * 渲染日志到 DOM
+     * 视角变更时自动全量重渲染以更新卡牌可见性显示
      */
     function renderLog() {
         const container = document.getElementById('game-move-log');
@@ -99,30 +173,28 @@
         const GameText = window.Game.UI.GameText;
         if (!GameText) return;
 
-        // 增量渲染：只添加新条目
-        const existingCount = container.children.length;
-        const startIdx = Math.max(0, logEntries.length - MAX_LOG_ENTRIES);
+        const gs = window.Game.GameState;
+        const curPersp = gs ? (gs.perspectiveIndex != null ? gs.perspectiveIndex : 0) : 0;
+        const perspChanged = (curPersp !== _lastPerspective);
+        _lastPerspective = curPersp;
 
-        // 如果现有条目数与预期不符，全量重渲染
-        if (existingCount !== logEntries.length - (logEntries.length - existingCount < 50 ? logEntries.length - existingCount : 0)) {
-            // 简单的全量渲染策略（性能足够 for ≤200 条）
+        const existingCount = container.children.length;
+
+        // 视角变化 或 条目数不匹配 → 全量重渲染
+        if (perspChanged || existingCount !== logEntries.length) {
             const fragment = document.createDocumentFragment();
-            
             logEntries.forEach(entry => {
                 fragment.appendChild(createLogEntry(entry, GameText));
             });
-
             container.innerHTML = '';
             container.appendChild(fragment);
-        } else {
-            // 追加新条目
-            for (let i = existingCount; i < logEntries.length; i++) {
-                container.appendChild(createLogEntry(logEntries[i], GameText));
-            }
         }
+        // 否则不变（新条目已由上面的 count mismatch 路径处理）
 
-        // 自动滚动到底部
-        container.scrollTop = container.scrollHeight;
+        // 自动滚动到最新条目
+        requestAnimationFrame(() => {
+            container.scrollTop = container.scrollHeight;
+        });
     }
 
     /**
@@ -140,16 +212,20 @@
             moverHTML = '<span class="move-log-unknown">???</span>';
         }
 
-        const cardHTML = GameText.render(entry.cardName);
-        const fromText = getAreaDisplayName(entry.fromAreaPath);
-        const toText = getAreaDisplayName(entry.toAreaPath);
+        // 根据可见性决定是否显示真实卡牌名
+        const showRealCard = isCardVisibleToPerspective(entry);
+        const cardHTML = showRealCard
+            ? GameText.render(entry.cardName)
+            : '<span class="move-log-hidden-card">🂠</span>';
+        const fromHTML = getAreaDisplayHTML(entry.fromAreaPath);
+        const toHTML = getAreaDisplayHTML(entry.toAreaPath);
 
         el.innerHTML = 
             '<span class="move-log-mover">' + moverHTML + '</span>' +
             ' <span class="move-log-card">' + cardHTML + '</span> ' +
-            '<span class="move-log-from">' + fromText + '</span>' +
+            '<span class="move-log-from">' + fromHTML + '</span>' +
             ' → ' +
-            '<span class="move-log-to">' + toText + '</span>';
+            '<span class="move-log-to">' + toHTML + '</span>';
 
         return el;
     }
@@ -159,6 +235,7 @@
      */
     function clear() {
         logEntries = [];
+        _lastPerspective = -1;
         const container = document.getElementById('game-move-log');
         if (container) container.innerHTML = '';
     }

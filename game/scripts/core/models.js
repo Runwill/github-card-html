@@ -215,10 +215,7 @@
 
 })();
 
-// Ensure Hand always has visibility=0 initially if not set
-(function() {
-    if (window.Game && window.Game.Models && window.Game.Models.Area && window.Game.Models.Area.Configs && window.Game.Models.Area.Configs.Hand) {
-        window.Game.Models.Area.Configs.Hand.forOrAgainst = 0;
-    }
-})();
+// Hand 区域默认 forOrAgainst = 1（私有/背面）
+// 牌进入手牌后，card.visibility = 1，且 visibleTo 仅包含拥有者
+// 这确保了在线多人游戏中，其他玩家看不到你的手牌
 
