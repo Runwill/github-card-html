@@ -5,10 +5,18 @@
     // 布局计算器：自动调整平铺区域的 margin 以防止换行
     function updateSpreadLayouts() {
         const containers = document.querySelectorAll('.area-spread');
+        // 读取当前牌宽（跟随 media.css --card-w 响应式变化）
+        const rootCardW = parseFloat(
+            getComputedStyle(document.documentElement).getPropertyValue('--card-w')
+        ) || 100;
+
         containers.forEach(container => {
             const width = container.clientWidth;
-            // 考虑 Padding (左右各 15px)
-            const contentWidth = width - 30; 
+            // 考虑 Padding（由容器 CSS 决定）
+            const cs = getComputedStyle(container);
+            const padL = parseFloat(cs.paddingLeft) || 0;
+            const padR = parseFloat(cs.paddingRight) || 0;
+            const contentWidth = width - padL - padR;
             
             const cards = Array.from(container.children).filter(c => 
                 c.classList.contains('card-placeholder') && 
@@ -21,7 +29,7 @@
                 return;
             }
 
-            const cardWidth = 100; // 标准卡牌宽度
+            const cardWidth = rootCardW; // 跟随 --card-w 变量
             const maxGap = 10; // 默认间距
             
             // W = w + (n-1)(w + margin)

@@ -216,7 +216,7 @@
         const showRealCard = isCardVisibleToPerspective(entry);
         const cardHTML = showRealCard
             ? GameText.render(entry.cardName)
-            : '<span class="move-log-hidden-card">🂠</span>';
+            : '<span class="move-log-hidden-card"></span>';
         const fromHTML = getAreaDisplayHTML(entry.fromAreaPath);
         const toHTML = getAreaDisplayHTML(entry.toAreaPath);
 

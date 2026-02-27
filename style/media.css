@@ -225,11 +225,15 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 /* ── 摘要角色 token 默认值（最小屏） ── */
 :root {
   --role-avatar-size: 36px;           /* 头像尺寸 */
-  --role-summary-pad: 3px;            /* 摘要卡内距 */
+  --role-summary-pad: 3px 4px;        /* 摘要卡内距（上下 左右） */
   --role-summary-name-fs: 11px;       /* 摘要角色名字号 */
   --role-summary-stats-minh: 24px;    /* 状态行最小高度 */
   --role-summary-badge-fs: 10px;      /* HP/手牌数徽章字号 */
   --role-summary-badge-minw: 20px;    /* 手牌数徽章最小宽 */
+  --main-avatar-size: 60px;           /* 主视角头像尺寸 */
+  --main-char-name-fs: 1rem;          /* 主视角名字号 */
+  --main-char-name-mb: var(--space-xs); /* 主视角名下边距 */
+  --table-side-col-minw: 90px;        /* 桌面左右列最小宽度 */
 }
 
 /* ── 摘要角色分级（min-width + min-height 并列条件） ── */
@@ -238,11 +242,15 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 @media (min-width: 480px) and (min-height: 400px) {
   :root {
     --role-avatar-size: 42px;
-    --role-summary-pad: 4px;
+    --role-summary-pad: 4px 5px;
     --role-summary-name-fs: 12px;
     --role-summary-stats-minh: 26px;
     --role-summary-badge-fs: 11px;
     --role-summary-badge-minw: 22px;
+    --main-avatar-size: 70px;
+    --main-char-name-fs: 1.1rem;
+    --main-char-name-mb: var(--space-sm);
+    --table-side-col-minw: 100px;
   }
 }
 
@@ -250,11 +258,15 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 @media (min-width: 768px) and (min-height: 500px) {
   :root {
     --role-avatar-size: 50px;
-    --role-summary-pad: 5px;
+    --role-summary-pad: 7px 9px;
     --role-summary-name-fs: 14px;
     --role-summary-stats-minh: 28px;
     --role-summary-badge-fs: 13px;
     --role-summary-badge-minw: 24px;
+    --main-avatar-size: 80px;
+    --main-char-name-fs: 1.2rem;
+    --main-char-name-mb: var(--space-md);
+    --table-side-col-minw: 120px;
   }
 }
 
@@ -262,11 +274,15 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 @media (min-width: 1024px) and (min-height: 600px) {
   :root {
     --role-avatar-size: 56px;
-    --role-summary-pad: 5px;
+    --role-summary-pad: 9px 12px;
     --role-summary-name-fs: 16px;
     --role-summary-stats-minh: 30px;
     --role-summary-badge-fs: 15px;
     --role-summary-badge-minw: 24px;
+    --main-avatar-size: 90px;
+    --main-char-name-fs: 1.3rem;
+    --main-char-name-mb: var(--space-md);
+    --table-side-col-minw: 130px;
   }
 }
 
@@ -274,29 +290,64 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 @media (min-width: 1280px) and (min-height: 700px) {
   :root {
     --role-avatar-size: 60px;
-    --role-summary-pad: 5px;
+    --role-summary-pad: 12px 20px;
     --role-summary-name-fs: 19px;
     --role-summary-stats-minh: 31.5px;
     --role-summary-badge-fs: 17px;
     --role-summary-badge-minw: 24px;
+    --main-avatar-size: 100px;
+    --main-char-name-fs: 1.4rem;
+    --main-char-name-mb: var(--space-md);
+    --table-side-col-minw: 140px;
+  }
+}
+
+/* game_cards 响应式设置（牌尺寸） */
+
+/* ── 牌尺寸 token 默认值（最小屏） ── */
+:root {
+  --card-w: 70px;             /* 牌宽 */
+  --card-h: 98px;             /* 牌高（宽×1.4） */
+}
+
+/* 级别 1：小手机横屏 / 小平板竖屏 */
+@media (min-width: 480px) and (min-height: 400px) {
+  :root {
+    --card-w: 80px;
+    --card-h: 112px;
+  }
+}
+
+/* 级别 2：平板竖屏 / 小桌面 */
+@media (min-width: 768px) and (min-height: 500px) {
+  :root {
+    --card-w: 90px;
+    --card-h: 126px;
+  }
+}
+
+/* 级别 3：标准桌面 */
+@media (min-width: 1024px) {
+  :root {
+    --card-w: 100px;
+    --card-h: 140px;
   }
 }
 
 :root {
   --character-info-flex: row;               /* 信息区排列方向 */
   --character-info-textalign: left;         /* 信息区文字对齐 */
+  --character-info-gap: var(--space-3xl);   /* 头像与详情间距 */
   --pad-character-info-r: var(--space-3xl); /* 信息区右内距 */
   --pad-player-hand-r: var(--space-3xl);    /* 手牌区右内距 */
   --minw-character-info: 286px;             /* 信息区最低宽度 */
+  --pad-current-panel: 25px;               /* 当前角色面板内距 */
 }
 
-/* 平板及以下宽度覆盖 */
-@media (max-width: 768px) {
+
+@media (max-width: 1024px) {
   :root {
-    --character-info-flex: column;
-    --character-info-textalign: center;
-    --pad-character-info-r: 0;
-    --pad-player-hand-r: 0;
+    --main-char-name-mb: var(--space-xs);
   }
 }
 
@@ -304,6 +355,40 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 @media (max-width: 1024px) {
   :root {
     --minw-character-info: 180px;
+    --pad-current-panel: 15px;
+  }
+}
+
+/* 中等宽度覆盖（头像间距缩小） */
+@media (max-width: 800px) {
+  :root {
+    --character-info-gap: var(--space-xl);
+    --main-char-name-mb: var(--space-3xs);
+  }
+}
+
+/* 平板及以下宽度覆盖 */
+@media (max-width: 768px) {
+  :root {
+    --character-info-flex: column;
+    --character-info-textalign: center;
+    --character-info-gap: var(--space-2xs);
+    --main-char-name-mb: 0px;
+    --pad-character-info-r: 0;
+    --pad-player-hand-r: 0;
+    --minw-character-info: 150px;
+  }
+}
+
+@media (max-width: 700px) {
+  :root {
+    --minw-character-info: 130px;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --minw-character-info: 120px;
   }
 }
 

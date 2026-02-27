@@ -30,7 +30,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center; 
-    min-width: 140px;
+    min-width: var(--table-side-col-minw, 140px);
     padding-top: 0; 
 }
 
@@ -76,7 +76,7 @@
     display: flex;
     gap: var(--space-2xl);
     flex-wrap: wrap;
-    min-height: 174px; /* Locked height */
+    min-height: calc(var(--card-h, 140px) + 34px); /* card-h + padding×2 + border×2 */
     width: 100%;
     box-sizing: border-box;
     padding: 15px;
@@ -148,7 +148,7 @@ body.is-global-dragging .deck-slot {
 .area-stacked {
     display: block !important; 
     height: 100% !important;
-    min-height: 174px;
+    min-height: calc(var(--card-h, 140px) + 34px);
     padding: 0 !important;
     overflow: hidden;
     position: relative;

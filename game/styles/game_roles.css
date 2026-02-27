@@ -34,7 +34,7 @@
 }
 
 .role-summary {
-    padding: 12px 15px;
+    padding: var(--role-summary-pad, 12px 15px);
     border-radius: var(--radius-md);
     background-color: var(--surface);
     border: 1px solid var(--border);
@@ -44,9 +44,6 @@
     justify-content: space-between;
     align-items: center;
     color: var(--text);
-    /* Responsive min-width: scales with root font-size so steps follow text sizing;
-       preserves previous maximum of 120px */
-    min-width: clamp(72px, calc(var(--fs-root) * 6), 120px);
 }
 
 .role-summary:hover {
@@ -58,6 +55,9 @@
 
 .role-summary .player-name {
     font-size: var(--role-summary-name-fs, 13px);
+    white-space: nowrap;
+    max-width: 100%;              /* 不超出父容器 */
+    /* 不参与撑宽容器：绝对定位让兄弟元素决定宽度 */
 }
 
 .role-summary .player-hp {
@@ -101,7 +101,7 @@
     min-width: 0;
     background: var(--surface);
     border-radius: var(--radius-lg) ;
-    padding: 25px;
+    padding: var(--pad-current-panel, 25px);
     box-shadow: 0 4px 12px var(--shadow-1);
     border: 1px solid var(--border);
     display: flex;
@@ -114,7 +114,7 @@
 .character-info {
     display: flex;
     align-items: center;
-    gap: var(--space-3xl);
+    gap: var(--character-info-gap, var(--space-3xl));
     border-bottom: 1px solid var(--border); /* Default fallback */
     /* Table specific overrides merged */
     width: auto;
@@ -141,8 +141,8 @@
 
 .char-avatar {
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: var(--main-avatar-size, 100px);
+    height: var(--main-avatar-size, 100px);
     flex-shrink: 0;
     border-radius: var(--radius-full);
     box-shadow: 0 2px 4px var(--shadow-2);
@@ -165,9 +165,9 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
 }
 
 .char-details h3 {
-    margin: 0 0 var(--space-md) 0;
+    margin: 0 0 var(--main-char-name-mb, var(--space-md)) 0;
     color: var(--text);
-    font-size: 1.4rem;
+    font-size: var(--main-char-name-fs, 1.4rem);
     white-space: nowrap;
 }
 
@@ -188,10 +188,10 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     border: 1px solid rgba(245, 101, 101, 0.3);
     padding: var(--space-3xs) var(--space-sm);
     border-radius: var(--radius-lg) ;
-    min-width: 32px;
+    min-width: var(--role-summary-badge-minw, 24px);
     height: fit-content;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: var(--role-summary-badge-fs, 0.85rem);
     font-variant-numeric: tabular-nums;
     letter-spacing: 0.5px;
     display: inline-flex;
@@ -211,7 +211,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
 /* Hand Cards Area */
 .player-hand {
     flex: 1;
-    padding-right: var(--space-3xl);
+    padding-right: var(--pad-player-hand-r, var(--space-3xl));
     min-width: 0;
 }
 

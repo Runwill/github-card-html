@@ -23,7 +23,7 @@
     /* Stability Fix: Use explicit width instead of fit-content to prevent 
        overflow scrolling on the viewport when card lists are huge. */
     width: fit-content; /* Changed from 90vw to fit-content to allow shrinking */
-    min-width: 140px; /* Minimum width to fit at least one card + padding */
+    min-width: calc(var(--card-w, 100px) + 40px); /* Minimum width to fit at least one card + padding */
     max-width: 90vw; /* Cap at 90vw */
     
     /* height: 80vh;  <-- Removed fixed height */
@@ -92,7 +92,7 @@
     padding: var(--space-md); /* Reverted to 10px */
     
     width: 100%; 
-    min-height: 160px; /* Reverted to 160px */
+    min-height: calc(var(--card-h, 140px) + 20px); /* card-h + padding */
     
     /* ADDED: Minimum width ensures drop target exists */
     min-width: 350px; 
@@ -200,8 +200,8 @@ body.is-global-dragging .card-grid {
 .card-grid .card-placeholder {
     position: relative;
     /* Removed transform: none !important to allow drag-sort animations */
-    width: 100px;
-    height: 140px;
+    width: var(--card-w, 100px);
+    height: var(--card-h, 140px);
     margin: 0;
     flex-shrink: 0; 
 }
@@ -266,8 +266,8 @@ body.is-global-dragging .card-grid {
 /* The interactive wrapper/drop zone background */
 .equip-slot-wrapper {
     position: relative;
-    width: 100px;
-    height: 140px;
+    width: var(--card-w, 100px);
+    height: var(--card-h, 140px);
     border: 2px dashed var(--border);
     border-radius: var(--radius-md);
     background: rgba(0,0,0,0.05); /* Background is now on wrapper */

@@ -6,9 +6,9 @@
    ========================================================================== */
 
 .card-placeholder {
-    width: 100px;
-    height: 140px;
-    flex: 0 0 100px; 
+    width: var(--card-w, 100px);
+    height: var(--card-h, 140px);
+    flex: 0 0 var(--card-w, 100px); 
     background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);

@@ -398,6 +398,8 @@ html.theme-switching *::after {
 }
 html[data-theme="dark"] .btn--accent {
   background: linear-gradient(135deg, #2c7a7b 0%, #285e61 50%, #234e52 100%) !important;
+  background-size: 200% 200% !important;
+  background-position: 0% 50% !important;
   box-shadow: 0 4px 6px -1px rgba(44,122,123,0.35) !important;
 }
 .btn--accent:hover {

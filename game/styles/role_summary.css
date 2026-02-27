@@ -5,7 +5,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: var(--role-summary-pad, 5px);
+    padding: var(--role-summary-pad, 12px 15px);
 }
 
 /* Override .char-avatar size for role list */

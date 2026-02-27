@@ -3,6 +3,49 @@
     window.Game.UI = window.Game.UI || {};
 
     /**
+     * 自动缩小 .player-name 字号，使其不会成为撑宽 .role-summary 的最宽元素。
+     * - 先重置到 CSS 变量定义的基准字号
+     * - 测量siblings（头像容器、stats行）的自然宽度
+     * - 如果名字比最宽的sibling还宽，按比例缩小 font-size
+     * - 最小不低于 8px，不省略文本
+     * @param {HTMLElement} nameEl - .player-name 元素
+     */
+    function fitSummaryName(nameEl) {
+        if (!nameEl) return;
+        const summary = nameEl.closest('.role-summary');
+        if (!summary) return;
+
+        // 重置到 CSS 基准字号
+        nameEl.style.fontSize = '';
+
+        // 获取基准字号
+        const baseFontSize = parseFloat(getComputedStyle(nameEl).fontSize);
+        if (!baseFontSize || baseFontSize <= 0) return;
+
+        // 测量 siblings 的宽度（排除 name 自身）
+        let maxSiblingWidth = 0;
+        for (const child of summary.children) {
+            if (child === nameEl) continue;
+            // 只看可见子元素
+            if (child.offsetWidth > 0) {
+                maxSiblingWidth = Math.max(maxSiblingWidth, child.scrollWidth);
+            }
+        }
+
+        // 如果没有 sibling 或 sibling 宽度为 0，不处理
+        if (maxSiblingWidth <= 0) return;
+
+        // 测量名字的自然宽度
+        const nameWidth = nameEl.scrollWidth;
+        if (nameWidth <= maxSiblingWidth) return;  // 名字没超过，无需缩
+
+        // 按比例缩小
+        const MIN_FONT_SIZE = 8;
+        let newSize = Math.max(MIN_FONT_SIZE, baseFontSize * (maxSiblingWidth / nameWidth));
+        nameEl.style.fontSize = newSize + 'px';
+    }
+
+    /**
      * 设置手牌检视器 (Hand Inspector)
      * 类似 PileInspector，允许点击角色头像/摘要查看其手牌
      */
@@ -663,10 +706,12 @@
             if (diff === 0) return;
 
             // Determine Target Container
+            // 2-3 players: all opponents go to top row
+            // 4+ players: diff===1 → right, diff===playerCount-1 → left, others → top
             let targetContainer = legacyContainer;
             if (!targetContainer) {
-                if (diff === 1) targetContainer = containerRight;
-                else if (diff === playerCount - 1) targetContainer = containerLeft;
+                if (playerCount >= 4 && diff === 1) targetContainer = containerRight;
+                else if (playerCount >= 4 && diff === playerCount - 1) targetContainer = containerLeft;
                 else targetContainer = containerTop;
             }
 
@@ -889,6 +934,7 @@
                 const newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
                 nameSpan.innerHTML = newNameHtml;
                 nameSpan.setAttribute('data-render-key', renderKey);
+                fitSummaryName(nameSpan);
             }
             
             // 判定区牌数 (Judge Count) - 右上角角标
@@ -1067,6 +1113,15 @@
     window.Game.UI.updateCharacterInfo = updateSelfRoleInfo; 
     window.Game.UI.renderOtherRoles = renderRoleList;
     window.Game.UI.renderOtherPlayers = renderRoleList;
+
+    // 窗口尺寸变化时重新适配所有摘要角色名
+    let _fitResizeTimer = null;
+    window.addEventListener('resize', () => {
+        clearTimeout(_fitResizeTimer);
+        _fitResizeTimer = setTimeout(() => {
+            document.querySelectorAll('.role-summary .player-name').forEach(fitSummaryName);
+        }, 150);
+    });
 })();
 
 
