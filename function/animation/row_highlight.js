@@ -2,10 +2,20 @@
 (function(global){
   function highlightRowAtElement(elem, opts){
     if (!elem) return function(){}
-    const rect = elem.getBoundingClientRect()
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
-    const elemTop = rect.top + scrollTop
-    let height = Math.max(24, elem.offsetHeight || Math.ceil(rect.height) || 24)
+
+    // ── 计算位置：强制横屏模式下用 offsetTop 链，避免 getBoundingClientRect 坐标系错位 ──
+    var flScroll = document.getElementById('fl-scroll')
+    var elemTop, container
+    if (flScroll && window.__flOffsetTopTo) {
+      elemTop = window.__flOffsetTopTo(elem, flScroll)
+      container = flScroll
+    } else {
+      const rect = elem.getBoundingClientRect()
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
+      elemTop = rect.top + scrollTop
+      container = document.body
+    }
+    let height = Math.max(24, elem.offsetHeight || 24)
 
     // 颜色与时长（可通过 opts 覆写）
     const baseColor = (opts && opts.rowColor) || '#2196f3' // 透明主题蓝
@@ -32,7 +42,7 @@
       transition: fadeIn ? `opacity ${fadeIn}ms ease-out` : 'none'
     })
 
-    document.body.appendChild(overlay)
+    container.appendChild(overlay)
 
     // 触发淡入
     void overlay.offsetHeight

@@ -5,6 +5,12 @@
     const UI = window.Game.UI;
     const getLayoutRect = UI.getLayoutRect; // Import from global
 
+    // 强制横屏坐标转换辅助
+    function _flR(rect) {
+        if (window.__flTransformRect) return window.__flTransformRect(rect);
+        return rect;
+    }
+
     function getSortableSelector(el) {
         return el.getAttribute('data-item-selector') || '.card-placeholder';
     }
@@ -33,7 +39,7 @@
         
         const snapshot = new Map();
         affected.forEach(el => {
-            const r = el.getBoundingClientRect();
+            const r = _flR(el.getBoundingClientRect());
             snapshot.set(el, { left: r.left, top: r.top });
         });
         
@@ -58,7 +64,7 @@
             const start = snapshot.get(el);
             if (!start) return;
             
-            const rect = el.getBoundingClientRect(); 
+            const rect = _flR(el.getBoundingClientRect()); 
             const dx = start.left - rect.left;
             const dy = start.top - rect.top;
             
@@ -136,7 +142,7 @@
         let moveTarget = null; // null = append
 
         if (hoverItem && hoverItem.parentNode === dropZone) {
-            const rect = getLayoutRect(hoverItem);
+            const rect = _flR(getLayoutRect(hoverItem));
             
             const midX = rect.left + rect.width / 2;
             const midY = rect.top + rect.height / 2;
@@ -171,7 +177,7 @@
                  let closest = null;
 
                  items.forEach(item => {
-                     const r = getLayoutRect(item);
+                     const r = _flR(getLayoutRect(item));
                      const cx = r.left + r.width / 2;
                      const cy = r.top + r.height / 2;
                      const dist = (mouseX - cx) ** 2 + (mouseY - cy) ** 2;
@@ -182,7 +188,7 @@
                  });
 
                  if (closest) {
-                     const rect = getLayoutRect(closest);
+                     const rect = _flR(getLayoutRect(closest));
                      const midX = rect.left + rect.width / 2;
                      
                      let isAfter = mouseX > midX;

@@ -35,6 +35,18 @@
         tiltFactor: 0.4,
         swapAnimationDuration: 200 // 毫秒
     };
+
+    // ── 强制横屏坐标转换辅助 ─────────────────────
+    // 将物理触摸坐标（clientX/Y）转为视觉坐标
+    function _flPt(x, y) {
+        if (window.__flTransformPoint) return window.__flTransformPoint(x, y);
+        return { x: x, y: y };
+    }
+    // 将物理 BoundingClientRect 转为视觉矩形
+    function _flR(rect) {
+        if (window.__flTransformRect) return window.__flTransformRect(rect);
+        return rect;
+    }
     
     // Bind to Global for Split Modules
     window.Game.UI.DragState = DragState;
@@ -81,8 +93,9 @@
 
         DragState.dragSource = { data, sourceArea, sourceIndex };
         DragState.dragElement = el; 
-        DragState.startX = e.clientX;
-        DragState.startY = e.clientY;
+        const p = _flPt(e.clientX, e.clientY);
+        DragState.startX = p.x;
+        DragState.startY = p.y;
         DragState.isDragging = false; 
 
         document.addEventListener('pointermove', handlePointerMove);
@@ -97,18 +110,20 @@
         document.body.classList.add('is-global-dragging');
         
         const originalEl = DragState.dragElement;
-        const rect = originalEl.getBoundingClientRect();
+        const physRect = originalEl.getBoundingClientRect();
+        const rect = _flR(physRect);
         
-        // Use Module: Create Ghost
-        const dragClone = window.Game.UI.DragAnimation.createGhost(originalEl, rect, { zIndex: '99999' });
+        // Use Module: Create Ghost (receives physical rect, converts internally)
+        const dragClone = window.Game.UI.DragAnimation.createGhost(originalEl, physRect, { zIndex: '99999' });
 
         // Remove ID
         dragClone.id = '';
         
+        const p = _flPt(e.clientX, e.clientY);
         DragState.initialX = rect.left;
         DragState.initialY = rect.top;
-        DragState.offsetX = e.clientX - rect.left;
-        DragState.offsetY = e.clientY - rect.top;
+        DragState.offsetX = p.x - rect.left;
+        DragState.offsetY = p.y - rect.top;
         
         // Hide Original
         originalEl.style.visibility = 'hidden';
@@ -136,7 +151,7 @@
             }
         }
 
-        const calibrationRect = dragClone.getBoundingClientRect();
+        const calibrationRect = _flR(dragClone.getBoundingClientRect());
         const driftX = calibrationRect.left - rect.left;
         const driftY = calibrationRect.top - rect.top;
         
@@ -158,7 +173,8 @@
 
     function handlePointerMove(e) {
         if (!DragState.isDragging) {
-            const dist = Math.hypot(e.clientX - DragState.startX, e.clientY - DragState.startY);
+            const p = _flPt(e.clientX, e.clientY);
+            const dist = Math.hypot(p.x - DragState.startX, p.y - DragState.startY);
             if (dist > 5) { 
                 startDrag(e);
             }
@@ -167,8 +183,9 @@
 
         e.preventDefault();
         
-        const outcomeX = e.clientX - DragState.offsetX;
-        const outcomeY = e.clientY - DragState.offsetY;
+        const vp = _flPt(e.clientX, e.clientY);
+        const outcomeX = vp.x - DragState.offsetX;
+        const outcomeY = vp.y - DragState.offsetY;
         
         DragState.targetX = outcomeX - DragState.initialX;
         DragState.targetY = outcomeY - DragState.initialY;
@@ -177,6 +194,7 @@
             DragState.dragElement.style.pointerEvents = 'none';
         }
 
+        // elementFromPoint 使用物理坐标（浏览器 API 接受物理坐标）
         const targetEl = document.elementFromPoint(e.clientX, e.clientY);
         const dropZone = targetEl ? targetEl.closest('[data-drop-zone]') : null;
              
@@ -192,7 +210,7 @@
              const acceptPlaceholder = dropZone.getAttribute('data-accept-placeholder') !== 'false';
              
              if (acceptPlaceholder) {
-                 window.Game.UI.DragSorting.updatePlaceholderPosition(dropZone, targetEl, e.clientX, e.clientY);
+                 window.Game.UI.DragSorting.updatePlaceholderPosition(dropZone, targetEl, vp.x, vp.y);
              } 
              else if (DragState.placeholderElement) {
                  if (DragState.placeholderElement.parentNode !== dropZone) {
@@ -228,13 +246,14 @@
             el.removeEventListener('pointerup', handlePointerUp);
             el.removeEventListener('pointercancel', handlePointerUp);
             
-            if (el.parentNode === document.body && DragState.placeholderElement && DragState.placeholderElement.parentNode) {
+            const isGhost = el.classList.contains('dragging-real');
+            if (isGhost && DragState.placeholderElement && DragState.placeholderElement.parentNode) {
                  const placeholder = DragState.placeholderElement;
                  if (window.Game.UI.DragAnimation) {
                      window.Game.UI.DragAnimation.animateDropToPlaceholder(el, placeholder, () => {});
                  }
                  DragState.placeholderElement = null; 
-            } else if (el.parentNode === document.body) {
+            } else if (isGhost) {
                 el.remove();
             } else {
                 el.classList.remove('draggable-item'); 

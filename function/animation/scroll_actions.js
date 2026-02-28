@@ -27,11 +27,22 @@
 
   // 计算元素居中的滚动位置，可附加偏移（默认稍微下移）
   function centerOffsetFor(elem, bias = 0){
-    const rect = elem.getBoundingClientRect()
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
-    const elemTop = rect.top + scrollTop
-    const elemHeight = elem.offsetHeight || rect.height
-    const winH = window.innerHeight || document.documentElement.clientHeight
+    var flScroll = document.getElementById('fl-scroll')
+    var elemTop, elemHeight, winH
+
+    if (flScroll && window.__flOffsetTopTo) {
+      // 强制横屏：getBoundingClientRect 返回旋转后的屏幕坐标，不可用
+      // 改用 offsetTop 链计算元素在滚动容器中的绝对位置
+      elemTop = window.__flOffsetTopTo(elem, flScroll)
+      elemHeight = elem.offsetHeight
+      winH = flScroll.clientHeight
+    } else {
+      const rect = elem.getBoundingClientRect()
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
+      elemTop = rect.top + scrollTop
+      elemHeight = elem.offsetHeight || rect.height
+      winH = window.innerHeight || document.documentElement.clientHeight
+    }
     return Math.max(0, elemTop - (winH/2) + (elemHeight/2) + (Number.isFinite(bias) ? bias : 0))
   }
 

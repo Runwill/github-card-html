@@ -4,6 +4,12 @@
     
     const UI = window.Game.UI;
 
+    // 强制横屏坐标转换辅助
+    function _flR(rect) {
+        if (window.__flTransformRect) return window.__flTransformRect(rect);
+        return rect;
+    }
+
     function startAnimationLoop() {
         const DragState = UI.DragState;
         const DRAG_CONFIG = UI.DragConfig;
@@ -57,12 +63,20 @@
 
         const defaultZIndex = '100000'; // High enough to be above Modals (11000)
 
+        // 强制横屏模式：将物理坐标矩形转为视觉坐标，追加到 #fl-rotate
+        let posRect = rect;
+        let appendTarget = document.body;
+        if (window.__flRotate && window.__flTransformRect) {
+            posRect = window.__flTransformRect(rect);
+            appendTarget = window.__flRotate;
+        }
+
         ghost.classList.add('dragging-real');
         ghost.style.position = 'fixed';
-        ghost.style.left = `${rect.left}px`;
-        ghost.style.top = `${rect.top}px`;
-        ghost.style.width = `${rect.width}px`;
-        ghost.style.height = `${rect.height}px`;
+        ghost.style.left = `${posRect.left}px`;
+        ghost.style.top = `${posRect.top}px`;
+        ghost.style.width = `${posRect.width}px`;
+        ghost.style.height = `${posRect.height}px`;
         ghost.style.margin = '0';
         ghost.style.zIndex = options.zIndex || defaultZIndex;
         ghost.style.pointerEvents = 'none';
@@ -74,7 +88,7 @@
         // Remove ID to avoid duplicates
         ghost.removeAttribute('id');
 
-        document.body.appendChild(ghost);
+        appendTarget.appendChild(ghost);
 
         // Animate Lift: Apply 'lifted' class after a brief delay to trigger CSS transition
         requestAnimationFrame(() => {
@@ -127,8 +141,8 @@
              cssY = 0;
         }
 
-        let cssW = parseFloat(el.style.width) || el.getBoundingClientRect().width;
-        let cssH = parseFloat(el.style.height) || el.getBoundingClientRect().height;
+        let cssW = parseFloat(el.style.width) || _flR(el.getBoundingClientRect()).width;
+        let cssH = parseFloat(el.style.height) || _flR(el.getBoundingClientRect()).height;
         
         // 提取当前旋转
         let curRot = 0;
@@ -184,8 +198,8 @@
             }
 
             // --- 鲁棒的视觉收敛 ---
-            const targetRect = placeholder.getBoundingClientRect();
-            const currentRect = el.getBoundingClientRect();
+            const targetRect = _flR(placeholder.getBoundingClientRect());
+            const currentRect = _flR(el.getBoundingClientRect());
             
             let targetXStr, targetYStr, targetWStr, targetHStr;
 
