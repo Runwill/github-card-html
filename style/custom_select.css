@@ -233,8 +233,9 @@
 /* ── Inside tokens-log__filters (permissions log filter bar) ───────── */
 
 .tokens-log__filters .custom-select {
-    flex: 0 1 auto;
-    min-width: 160px;
+    flex: 1 1 60px;
+    min-width: 60px;
+    max-width: 160px;
 }
 
 .tokens-log__filters .custom-select .custom-select__trigger {

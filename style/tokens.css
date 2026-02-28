@@ -199,7 +199,7 @@ html { scrollbar-gutter: stable both-edges; }
 /* 摘要容器：grid 布局（从内联移出） */
 #tokens-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
   gap: var(--space-md);
   margin-top: var(--space-lg);
 }

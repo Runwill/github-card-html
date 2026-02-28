@@ -27,8 +27,10 @@
 #panel_game {
     padding: 15px;
     background-color: var(--bg-start);
-    /* 100vh - Header(~60) - Footer(~40) - Safety Buffer(~60) = ~160px */
-    height: calc(100vh - 160px) !important; 
+    /* 高度由 flex 链自动计算：body(100dvh) → #main-content-row → .columns → .tabs-content → 此处
+       不使用魔数，避免 header 高度随平板/标签栏换行变化导致溢出。
+       overflow:hidden 在 flex 上下文中等效 min-height:0，允许面板收缩以适应可用空间。 */
+    min-height: 0;
     box-sizing: border-box;
     overflow: hidden !important; 
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -165,8 +167,8 @@
     width: 100%;
     flex-shrink: 0;
     padding-top: 5px;
-    padding-bottom: var(--space-3xl); 
-    margin-bottom: var(--space-3xl);
+    padding-bottom: var(--space-3xl);
+    margin-bottom: var(--space-3xl); /* 为 fixed footer 留出防遮挡间距 */
 }
 
 .game-main-area {
@@ -197,6 +199,11 @@
     .game-layout-sidebar {
         width: 100%;
         order: -1;
+    }
+    /* 平板：允许底部区域收缩以适应更小的可见视口 */
+    .game-bottom-section {
+        flex-shrink: 1;
+        padding-bottom: var(--space-sm);
     }
     .game-log-panel {
         flex-direction: row;

@@ -229,7 +229,8 @@ html[data-theme="dark"] {
 /* 全局背景与文字 */
 html, body { color: var(--text); }
 /* 让 html/body 覆盖满屏，避免短页面时出现“页面下方另一块底色” */
-html, body { min-height: 100vh; }/* 防止触屏设备（iPad 等）水平滑动到溢出区域（搜索栏等元素使用负偏移隐藏）
+/* dvh 优先：平板浏览器 100vh 含地址栏/工具栏后面的区域，比可见区域大，导致产生滚动 */
+html, body { min-height: 100vh; min-height: 100dvh; }/* 防止触屏设备（iPad 等）水平滑动到溢出区域（搜索栏等元素使用负偏移隐藏）
    使用 clip 而非 hidden：clip 不会创建滚动容器，不影响 position:sticky */
 html, body { overflow-x: clip; }/* 使用 Flex 布局确保内容区域撑满剩余高度 */
 body { display: flex; flex-direction: column; }

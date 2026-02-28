@@ -235,7 +235,7 @@
     align-items: center;
     gap: var(--space-sm);
     margin-bottom: var(--space-lg);
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .online-create-row .input-group {
@@ -243,7 +243,13 @@
     align-items: stretch;
     gap: 0;
     margin: 0;
-    flex: 1 1 200px;
+    flex: 1 1 0;
+    min-width: 80px;
+}
+
+.online-create-row .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 /* input-group-label / field in online-create-row: inherit from .game-panel rules */
@@ -578,8 +584,7 @@
         gap: var(--space-sm);
     }
     .online-create-row {
-        flex-direction: column;
-        align-items: stretch;
+        flex-wrap: nowrap;
     }
     .online-room-list {
         max-height: 150px;

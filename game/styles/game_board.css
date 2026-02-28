@@ -216,11 +216,6 @@ body.is-global-dragging .deck-slot {
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-/* Ensure absolute centering logic is robust */
-.deck-slot.area-stacked > .card-placeholder.is-top-card {
-    /* No transformation needed beyond the base absolute rule */
-}
-
 /* Empty State Placeholder */
 .deck-slot:empty::after {
     content: 'EMPTY';

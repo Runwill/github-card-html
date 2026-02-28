@@ -2,8 +2,8 @@
 .tokens-log__filters {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;             /* 空间不足时换行，避免横向滚动条裁切下拉菜单 */
-  gap: var(--space-2xs) 0;     /* 换行时行间留一点间距 */
+  flex-wrap: nowrap;             /* 不换行，子控件自动收缩 */
+  gap: 0;
   overflow: visible;           /* 允许子元素（下拉菜单）溢出 */
   padding-bottom: var(--space-3xs);        /* 为按钮底部边框/阴影预留空间 */
 }
@@ -43,6 +43,15 @@
   font-size: var(--fs-md) !important;
   padding-top: var(--space-2xs) !important;
   padding-bottom: var(--space-2xs) !important;
+  min-width: 0 !important;
+  flex: 1 1 60px !important;          /* 大幅降低 flex-basis，避免过早换行 */
+}
+
+/* 筛选/重置按钮也缩小最小宽度 */
+.tokens-log__filters .btn,
+.tokens-log__filters .tokens-btn {
+  min-width: 0 !important;
+  flex: 0 0 auto !important;          /* 按钮不伸缩，按内容宽度显示 */
 }
 
 /* 如果未来需要固定间距，可以按需开启：

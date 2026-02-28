@@ -254,8 +254,8 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
   }
 }
 
-/* 级别 2：平板竖屏 / 小桌面 */
-@media (min-width: 768px) and (min-height: 500px) {
+/* 级别 2：平板竖屏 / 小桌面（高度也需≥750） */
+@media (min-width: 768px) and (min-height: 750px) {
   :root {
     --role-avatar-size: 50px;
     --role-summary-pad: 7px 9px;
@@ -270,8 +270,8 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
   }
 }
 
-/* 级别 3：标准桌面 */
-@media (min-width: 1024px) and (min-height: 600px) {
+/* 级别 3：标准桌面（宽>1180 且 高≥750） */
+@media (min-width: 1181px) and (min-height: 750px) {
   :root {
     --role-avatar-size: 56px;
     --role-summary-pad: 9px 12px;
@@ -287,7 +287,7 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 }
 
 /* 级别 4：大桌面（≈原始值：0.95rem×20px=19px, 0.85rem×20px=17px） */
-@media (min-width: 1280px) and (min-height: 700px) {
+@media (min-width: 1280px) and (min-height: 750px) {
   :root {
     --role-avatar-size: 60px;
     --role-summary-pad: 12px 20px;
@@ -318,24 +318,59 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
   }
 }
 
-/* 级别 2：平板竖屏 / 小桌面 */
-@media (min-width: 768px) and (min-height: 500px) {
+/* 级别 2：平板竖屏 / 小桌面（高度也需≥750） */
+@media (min-width: 768px) and (min-height: 750px) {
   :root {
     --card-w: 90px;
     --card-h: 126px;
   }
 }
 
-/* 级别 3：标准桌面 */
-@media (min-width: 1024px) {
+/* 级别 3：标准桌面（宽>1180 且 高≥750） */
+@media (min-width: 1181px) and (min-height: 750px) {
   :root {
     --card-w: 100px;
     --card-h: 140px;
   }
 }
 
+/* 紧凑视口覆盖：高度<400 或 宽度≤480（手机竖屏 / 强制横屏后视觉高度小） */
+@media (max-height: 399px), (max-width: 480px) {
+  :root {
+    --card-w: 50px;
+    --card-h: 70px;
+  }
+}
+
+/* 紧凑视口覆盖：高度<400 或 宽度≤480 时缩小摘要角色 */
+@media (max-height: 399px), (max-width: 480px) {
+  :root {
+    --role-avatar-size: 26px;
+    --role-summary-pad: 2px 3px;
+    --role-summary-name-fs: 9px;
+    --role-summary-stats-minh: 18px;
+    --role-summary-badge-fs: 8px;
+    --role-summary-badge-minw: 16px;
+    --main-avatar-size: 40px;
+    --main-char-name-fs: 0.85rem;
+    --main-char-name-mb: var(--space-3xs);
+    --table-side-col-minw: 70px;
+  }
+}
+
+/* 紧凑视口覆盖：高度<400 或 宽度≤480 时缩小控制按钮 */
+@media (max-height: 399px), (max-width: 480px) {
+  :root {
+    --gamecontrols-gap: var(--space-xs);
+    --gamecontrols-btn-minw: 60px;
+    --gamecontrols-btn-padding: var(--space-3xs) var(--space-xs);
+    --gamecontrols-btn-fontsize: var(--fs-xs);
+    --gamecontrols-btn-minh: 26px;
+    --gamecontrols-btn-lineheight: 1.1;
+  }
+}
+
 :root {
-  --character-info-flex: row;               /* 信息区排列方向 */
   --character-info-textalign: left;         /* 信息区文字对齐 */
   --character-info-gap: var(--space-3xl);   /* 头像与详情间距 */
   --pad-character-info-r: var(--space-3xl); /* 信息区右内距 */
