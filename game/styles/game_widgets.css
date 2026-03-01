@@ -73,7 +73,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 0;
-    font-size: 2.5rem;
+    font-size: var(--area-watermark-fs);
     font-weight: 900;
     color: var(--text);
     opacity: 0.1;

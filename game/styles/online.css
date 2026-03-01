@@ -20,7 +20,7 @@
 #game-view-play {
     display: flex;
     flex-direction: row;
-    gap: var(--space-3xl);
+    gap: var(--play-view-gap);
     align-items: stretch;
 }
 

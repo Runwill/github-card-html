@@ -127,7 +127,7 @@
     border: 1px solid var(--border, rgba(255,255,255,0.1));
     
     /* Shape & Box */
-    padding: var(--space-3xs) var(--space-sm);
+    padding: var(--role-badge-pad-v) var(--role-badge-pad-h);
     border-radius: var(--radius-lg) ;
     margin-right: var(--space-xs); /* Changed from margin-left to margin-right */
     margin-left: 0;
@@ -163,7 +163,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    margin-top: var(--space-3xs);
+    margin-top: var(--player-stats-row-mt, var(--space-3xs));
     min-height: var(--role-summary-stats-minh, 31.5px); /* Prevent layout jump during hover swap */
 }
 

@@ -7,7 +7,7 @@
 
 .game-table-panel {
     width: 100%;
-    min-height: 120px;
+    min-height: var(--table-panel-minh, 120px);
     background: rgba(0, 0, 0, 0.2); 
     border-bottom: 1px solid var(--border);
     flex: 1;
@@ -76,10 +76,10 @@
     display: flex;
     gap: var(--space-2xl);
     flex-wrap: wrap;
-    min-height: calc(var(--card-h, 140px) + 34px); /* card-h + padding×2 + border×2 */
+    min-height: calc(var(--card-h, 140px) + var(--cards-container-pad, 15px) * 2 + 4px); /* card-h + padding×2 + border×2 */
     width: 100%;
     box-sizing: border-box;
-    padding: 15px;
+    padding: var(--cards-container-pad, 15px);
     background-color: rgba(128, 128, 128, 0.05);
     border-radius: var(--radius-md);
     border: 2px dashed var(--border);
@@ -112,7 +112,7 @@
     left: 0;
     right: 0;
     text-align: center;
-    font-size: 10px;
+    font-size: var(--card-mover-label-fs, 10px);
     line-height: 1.2;
     opacity: 0.45;
     white-space: nowrap;
@@ -148,7 +148,7 @@ body.is-global-dragging .deck-slot {
 .area-stacked {
     display: block !important; 
     height: 100% !important;
-    min-height: calc(var(--card-h, 140px) + 34px);
+    min-height: calc(var(--card-h, 140px) + var(--cards-container-pad, 15px) * 2 + 4px);
     padding: 0 !important;
     overflow: hidden;
     position: relative;

@@ -8,7 +8,7 @@
    the default container styling from the wrapper.
 */
 .card-viewer-modal.modal {
-    padding: var(--space-3xl) !important;
+    padding: var(--viewer-modal-pad, var(--space-3xl)) !important;
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -16,6 +16,7 @@
     max-height: none !important;
     overflow: visible !important; /* Allow dragged content to go outside */
     pointer-events: none; /* Allow clicking through the empty parts of the wrapper */
+    z-index: var(--z-panel) !important; /* Below sidebar/modal overlay */
 }
 
 /* Modal Specific Overrides */
@@ -53,7 +54,7 @@
 .card-viewer-modal .modal-body {
     flex: 1;
     overflow: hidden; /* Prevent native scroll on wrapper */
-    padding: var(--space-3xl); /* Reverted to 20px per user request */
+    padding: var(--viewer-body-pad, var(--space-3xl)); /* Reverted to 20px per user request */
     background: transparent;
     display: flex;
     align-items: center;
@@ -255,8 +256,8 @@ body.is-global-dragging .card-grid {
 .equipment-slots-container {
     display: flex;
     flex-wrap: wrap; /* Allow wrapping if small screen */
-    gap: var(--space-3xl);
-    padding: 30px;
+    gap: var(--equip-slots-gap, var(--space-3xl));
+    padding: var(--equip-slots-pad, 30px);
     justify-content: center;
     width: 100%;
 }

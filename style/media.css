@@ -230,10 +230,44 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
   --role-summary-stats-minh: 24px;    /* 状态行最小高度 */
   --role-summary-badge-fs: 10px;      /* HP/手牌数徽章字号 */
   --role-summary-badge-minw: 20px;    /* 手牌数徽章最小宽 */
+  --role-badge-pad-v: var(--space-3xs);  /* 徽章上下内距 */
+  --role-badge-pad-h: var(--space-sm);   /* 徽章左右内距 */
   --main-avatar-size: 60px;           /* 主视角头像尺寸 */
   --main-char-name-fs: 1rem;          /* 主视角名字号 */
   --main-char-name-mb: var(--space-xs); /* 主视角名下边距 */
   --table-side-col-minw: 90px;        /* 桌面左右列最小宽度 */
+  --board-area-row-minh: 140px;       /* 牌堆/治疗区行最小高度 */
+  --table-panel-minh: 120px;          /* 桌面面板最小高度 */
+  --log-panel-pad: var(--space-sm) 15px; /* 日志面板内距 */
+  --play-view-gap: var(--space-3xl);  /* game-view-play 间距 */
+  --top-section-pad-b: var(--space-md); /* game-top-section 下内距 */
+  --detail-btn-size: 24px;            /* 判定/装备按钮尺寸 */
+  --detail-btn-fs: var(--fs-xl);      /* 判定/装备按钮字号 */
+  --summary-detail-btn-size: 24px;    /* 摘要判定/装备按钮尺寸 */
+  --summary-detail-btn-fs: var(--fs-md); /* 摘要判定/装备按钮字号 */
+  --area-watermark-fs: 2.5rem;        /* 区域水印字号 */
+  --card-mover-label-fs: 10px;        /* 处理区角色名字号 */
+  --move-log-fs: 11px;                /* 移动记录字号 */
+  --cards-container-pad: 15px;        /* 牌容器内距 */
+  --bottom-section-pt: 5px;           /* 底部区域上内距 */
+  --bottom-section-pb: var(--space-3xl); /* 底部区域下内距 */
+  --bottom-section-mb: var(--space-3xl); /* 底部区域下外距（footer防遮挡） */
+  --bottom-section-gap: var(--space-2xl); /* 底部区域子元素间距 */
+  --move-log-maxh: 45px;              /* 移动记录最大高度（≤ 1024px 生效） */
+  --panel-game-pad: 15px;             /* 游戏面板内距 */
+  --pad-current-panel: 25px;          /* 主视角面板内距 */
+  --equip-slots-gap: var(--space-3xl); /* 装备槽间距 */
+  --equip-slots-pad: 30px;            /* 装备槽容器内距 */
+  --player-hand-h4-mb: 15px;          /* 手牌标题下边距 */
+  --pad-character-info-l: var(--space-3xl); /* 角色信息左内距 */
+  --move-log-entry-pad: 3px 6px;      /* 移动记录条目内距 */
+}
+
+/* 小桌面下缩小面板内距 */
+@media (max-width: 1024px) {
+  :root {
+    --pad-current-panel: 15px;
+  }
 }
 
 /* ── 摘要角色分级（min-width + min-height 并列条件） ── */
@@ -345,28 +379,61 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 /* 紧凑视口覆盖：高度<400 或 宽度≤480 时缩小摘要角色 */
 @media (max-height: 399px), (max-width: 480px) {
   :root {
-    --role-avatar-size: 26px;
-    --role-summary-pad: 2px 3px;
-    --role-summary-name-fs: 9px;
-    --role-summary-stats-minh: 18px;
-    --role-summary-badge-fs: 8px;
-    --role-summary-badge-minw: 16px;
-    --main-avatar-size: 40px;
-    --main-char-name-fs: 0.85rem;
-    --main-char-name-mb: var(--space-3xs);
+    --role-avatar-size: 22px;
+    --role-summary-pad: 1px 2px;
+    --role-summary-name-fs: 8px;
+    --role-summary-stats-minh: 16px;
+    --role-summary-badge-fs: 7px;
+    --role-summary-badge-minw: 14px;
+    --role-badge-pad-v: 0px;
+    --role-badge-pad-h: 2px;
+    --main-avatar-size: 36px;
+    --main-char-name-fs: 0.8rem;
+    --main-char-name-mb: 0px;
     --table-side-col-minw: 70px;
+    --board-area-row-minh: 80px;
+    --table-panel-minh: 70px;
+    --log-panel-pad: 2px 6px;
+    --play-view-gap: 4px;
+    --top-section-pad-b: 0px;
+    --detail-btn-size: 18px;
+    --detail-btn-fs: var(--fs-sm);
+    --summary-detail-btn-size: 16px;
+    --summary-detail-btn-fs: var(--fs-xs);
+    --area-watermark-fs: 1.2rem;
+    --card-mover-label-fs: 7px;
+    --move-log-fs: 8px;
+    --cards-container-pad: 2px;
+    --pad-current-panel: 5px;
+    --bottom-section-pt: 0px;
+    --bottom-section-pb: var(--space-3xs);
+    --bottom-section-mb: var(--space-sm);
+    --bottom-section-gap: var(--space-xs);
+    --move-log-maxh: 16px;
+    --panel-game-pad: 4px;
+    --equip-slots-gap: var(--space-xs);
+    --equip-slots-pad: 6px;
+    --player-hand-h4-mb: 4px;
+    --pad-character-info-l: var(--space-xs);
+    --move-log-entry-pad: 1px 4px;
+    --main-avatar-size: 32px;
+    --player-hand-h4-display: none;
+    --player-stats-row-mt: 0px;
+    --viewer-modal-pad: var(--space-xs);
+    --viewer-body-pad: var(--space-xs);
   }
 }
 
 /* 紧凑视口覆盖：高度<400 或 宽度≤480 时缩小控制按钮 */
 @media (max-height: 399px), (max-width: 480px) {
   :root {
-    --gamecontrols-gap: var(--space-xs);
-    --gamecontrols-btn-minw: 60px;
-    --gamecontrols-btn-padding: var(--space-3xs) var(--space-xs);
-    --gamecontrols-btn-fontsize: var(--fs-xs);
-    --gamecontrols-btn-minh: 26px;
-    --gamecontrols-btn-lineheight: 1.1;
+    --gamecontrols-gap: var(--space-md);
+    --gamecontrols-btn-minw: 40px;
+    --gamecontrols-btn-padding: 2px var(--space-3xs);
+    --gamecontrols-btn-fontsize: 9px;
+    --gamecontrols-btn-minh: 20px;
+    --gamecontrols-btn-lineheight: 1;
+    --char-stats-minh: 20px;
   }
 }
 
@@ -376,7 +443,6 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
   --pad-character-info-r: var(--space-3xl); /* 信息区右内距 */
   --pad-player-hand-r: var(--space-3xl);    /* 手牌区右内距 */
   --minw-character-info: 286px;             /* 信息区最低宽度 */
-  --pad-current-panel: 25px;               /* 当前角色面板内距 */
 }
 
 
@@ -390,7 +456,6 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 @media (max-width: 1024px) {
   :root {
     --minw-character-info: 180px;
-    --pad-current-panel: 15px;
   }
 }
 
@@ -412,12 +477,23 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
     --pad-character-info-r: 0;
     --pad-player-hand-r: 0;
     --minw-character-info: 150px;
+    /* 列模式下：徽章居中，按钮组居中 */
+    --char-stats-justify: center;
+    --stats-btn-left: 50%;
+    --stats-btn-x-offset: -50%;
+    --name-row-justify: center;
   }
 }
 
 @media (max-width: 700px) {
   :root {
     --minw-character-info: 130px;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --minw-character-info: 120px;
   }
 }
 
