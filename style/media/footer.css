@@ -1,0 +1,20 @@
+/* ═══════════════════════════════════════════════════════════
+   响应式 — 页脚（footer）
+   Token 驱动，消费于 style/footer.css
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 默认值 ── */
+:root {
+  --footer-fs: var(--fs-base);              /* 页脚字号 */
+  --footer-pad: var(--space-sm) var(--space-lg); /* 页脚内距 */
+  --footer-gap: var(--space-md);            /* 页脚元素间距 */
+}
+
+/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
+@media (max-height: 399px), (max-width: 480px) {
+  :root {
+    --footer-fs: 10px;
+    --footer-pad: 2px var(--space-xs);
+    --footer-gap: var(--space-xs);
+  }
+}

@@ -118,13 +118,12 @@
     --main-avatar-size: 36px;
     --main-char-name-fs: 0.8rem;
     --main-char-name-mb: 0px;
-    --play-view-gap: 4px;
+    --play-view-gap: 8px;
     --top-section-pad-b: 0px;
     --detail-btn-size: 18px;
     --detail-btn-fs: var(--fs-sm);
     --pad-current-panel: 5px;
     --bottom-section-pt: 0px;
-    --bottom-section-pb: var(--space-3xs);
     --bottom-section-mb: var(--space-sm);
     --bottom-section-gap: var(--space-xs);
     --panel-game-pad: 4px;

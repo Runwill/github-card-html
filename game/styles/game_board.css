@@ -51,10 +51,17 @@
     border-radius: var(--radius-none) ;
     padding: 0;
     box-shadow: none;
-    margin-bottom: var(--space-3xl); 
-    /* Centers itself in remaining space */
-    margin-top: auto !important;
-    margin-bottom: auto !important;
+    margin: 0;
+    /* 撑满 table-center-col 剩余空间，让牌堆/处理区有更多展示空间 */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 牌堆行撑满 board-panel 剩余高度 */
+.board-area-row {
+    flex: 1;
+    align-items: stretch !important; /* 覆盖 inline align-items:flex-start，让子元素垂直撑满 */
 }
 
 .game-board-panel h3 {
@@ -99,7 +106,9 @@
     border: none !important;
     box-shadow: none !important;
     pointer-events: none; /* Allow clicks to pass through to watermark */
+    justify-content: center;
 }
+
 
 .treatment-container > * {
     pointer-events: auto;
@@ -184,7 +193,7 @@ body.is-global-dragging .deck-slot {
     overflow-x: visible;
     overflow-y: visible; 
     gap: 0 !important;
-    align-items: flex-start;
+    align-items: center;
     min-width: 0;
     max-width: 100%;
 }

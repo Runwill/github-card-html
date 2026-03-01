@@ -11,12 +11,12 @@
 .site-footer .footer-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--footer-pad);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-md);
-  font-size: var(--fs-base);
+  gap: var(--footer-gap);
+  font-size: var(--footer-fs);
   color: #9aa4b2; /* 较浅的中性灰（原 #4a5568） */
   opacity: 0.4; /* 页脚文字整体 50% 透明度 */
 }
@@ -35,7 +35,7 @@
 }
 
 @media (max-width: 480px) {
-  .site-footer .footer-inner { flex-wrap: wrap; gap: var(--space-xs); padding: var(--space-sm); }
+  .site-footer .footer-inner { flex-wrap: wrap; gap: var(--space-xs); padding: var(--footer-pad); }
 }
 
 /* 深色主题适配（若 theme.js 切换 data-theme="dark"） */

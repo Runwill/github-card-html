@@ -41,8 +41,10 @@ html.force-landscape #fl-scroll {
   overscroll-behavior-y: contain;
   touch-action: none;           /* 交由 JS 手动处理触摸滚动（旋转后浏览器无法识别正确轴） */
   box-sizing: border-box;
-  /* 底部留白给固定底栏 */
-  padding-bottom: 48px;
+  /* 延续 body 的 flex 链：body → #fl-scroll → #main-content-row(flex:1) → ... → #panel_game
+     使游戏面板能通过 flex:1 自动撑满剩余高度 */
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── 蒙版铺满 #fl-rotate ── */
