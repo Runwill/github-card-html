@@ -1,0 +1,18 @@
+/* ═══════════════════════════════════════════════════════════
+   响应式 — 处理区 / 牌堆 / 弃牌堆外显
+   Token 驱动，消费于 game_cards.css / viewer 等
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 默认值（最小屏） ── */
+:root {
+  --card-mover-label-fs: 10px;        /* 处理区角色名字号 */
+}
+
+/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
+@media (max-height: 399px), (max-width: 480px) {
+  :root {
+    --card-mover-label-fs: 7px;
+    --viewer-modal-pad: var(--space-xs);
+    --viewer-body-pad: var(--space-xs);
+  }
+}

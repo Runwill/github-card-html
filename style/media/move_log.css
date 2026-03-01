@@ -1,0 +1,29 @@
+/* ═══════════════════════════════════════════════════════════
+   响应式 — 移动记录条目
+   Token 驱动，消费于 game_layout.css .move-log 等
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 默认值（最小屏） ── */
+:root {
+  --log-panel-pad: var(--space-sm) 15px; /* 日志面板内距 */
+  --move-log-fs: 11px;                /* 移动记录字号 */
+  --move-log-maxh: 280px;              /* 移动记录固定高度（≤1024px 由覆盖缩小） */
+  --move-log-entry-pad: 3px 6px;      /* 移动记录条目内距 */
+}
+
+/* ── 小桌面 / 平板 ── */
+@media (max-width: 1024px) {
+  :root {
+    --move-log-maxh: 45px;
+  }
+}
+
+/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
+@media (max-height: 399px), (max-width: 480px) {
+  :root {
+    --log-panel-pad: 2px 6px;
+    --move-log-fs: 8px;
+    --move-log-maxh: 16px;
+    --move-log-entry-pad: 1px 4px;
+  }
+}

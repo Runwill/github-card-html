@@ -1,0 +1,44 @@
+/* ═══════════════════════════════════════════════════════════
+   响应式 — 牌尺寸 / 牌容器
+   Token 驱动，消费于 game_cards.css 等
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 默认值（最小屏） ── */
+:root {
+  --card-w: 70px;             /* 牌宽 */
+  --card-h: 98px;             /* 牌高（宽×1.4） */
+  --cards-container-pad: 15px; /* 牌容器内距 */
+}
+
+/* ── 级别 1：小手机横屏 / 小平板竖屏 ── */
+@media (min-width: 480px) and (min-height: 400px) {
+  :root {
+    --card-w: 80px;
+    --card-h: 112px;
+  }
+}
+
+/* ── 级别 2：平板竖屏 / 小桌面（高度也需≥750） ── */
+@media (min-width: 768px) and (min-height: 750px) {
+  :root {
+    --card-w: 90px;
+    --card-h: 126px;
+  }
+}
+
+/* ── 级别 3：标准桌面（宽>1180 且 高≥750） ── */
+@media (min-width: 1181px) and (min-height: 750px) {
+  :root {
+    --card-w: 100px;
+    --card-h: 140px;
+  }
+}
+
+/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
+@media (max-height: 399px), (max-width: 480px) {
+  :root {
+    --card-w: 50px;
+    --card-h: 70px;
+    --cards-container-pad: 2px;
+  }
+}

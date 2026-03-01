@@ -1,0 +1,83 @@
+/* ═══════════════════════════════════════════════════════════
+   响应式 — 摘要角色信息
+   Token 驱动，消费于 game/styles/game_roles.css 等
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── 默认值（最小屏） ── */
+:root {
+  --role-avatar-size: 36px;           /* 头像尺寸 */
+  --role-summary-pad: 3px 4px;        /* 摘要卡内距（上下 左右） */
+  --role-summary-name-fs: 11px;       /* 摘要角色名字号 */
+  --role-summary-stats-minh: 24px;    /* 状态行最小高度 */
+  --role-summary-badge-fs: 10px;      /* HP/手牌数徽章字号 */
+  --role-summary-badge-minw: 20px;    /* 手牌数徽章最小宽 */
+  --role-badge-pad-v: var(--space-3xs);  /* 徽章上下内距 */
+  --role-badge-pad-h: var(--space-sm);   /* 徽章左右内距 */
+  --summary-detail-btn-size: 24px;    /* 摘要判定/装备按钮尺寸 */
+  --summary-detail-btn-fs: var(--fs-md); /* 摘要判定/装备按钮字号 */
+}
+
+/* ── 级别 1：小手机横屏 / 小平板竖屏 ── */
+@media (min-width: 480px) and (min-height: 400px) {
+  :root {
+    --role-avatar-size: 42px;
+    --role-summary-pad: 4px 5px;
+    --role-summary-name-fs: 12px;
+    --role-summary-stats-minh: 26px;
+    --role-summary-badge-fs: 11px;
+    --role-summary-badge-minw: 22px;
+  }
+}
+
+/* ── 级别 2：平板竖屏 / 小桌面（高度也需≥750） ── */
+@media (min-width: 768px) and (min-height: 750px) {
+  :root {
+    --role-avatar-size: 50px;
+    --role-summary-pad: 7px 9px;
+    --role-summary-name-fs: 14px;
+    --role-summary-stats-minh: 28px;
+    --role-summary-badge-fs: 13px;
+    --role-summary-badge-minw: 24px;
+  }
+}
+
+/* ── 级别 3：标准桌面（宽>1180 且 高≥750） ── */
+@media (min-width: 1181px) and (min-height: 750px) {
+  :root {
+    --role-avatar-size: 56px;
+    --role-summary-pad: 9px 12px;
+    --role-summary-name-fs: 16px;
+    --role-summary-stats-minh: 30px;
+    --role-summary-badge-fs: 15px;
+    --role-summary-badge-minw: 24px;
+  }
+}
+
+/* ── 级别 4：大桌面 ── */
+@media (min-width: 1280px) and (min-height: 750px) {
+  :root {
+    --role-avatar-size: 60px;
+    --role-summary-pad: 12px 20px;
+    --role-summary-name-fs: 19px;
+    --role-summary-stats-minh: 31.5px;
+    --role-summary-badge-fs: 17px;
+    --role-summary-badge-minw: 24px;
+  }
+}
+
+/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
+@media (max-height: 399px), (max-width: 480px) {
+  :root {
+    --role-avatar-size: 22px;
+    --role-summary-pad: 1px 2px;
+    --role-summary-name-fs: 8px;
+    --role-summary-stats-minh: 16px;
+    --role-summary-badge-fs: 7px;
+    --role-summary-badge-minw: 14px;
+    --role-badge-pad-v: 0px;
+    --role-badge-pad-h: 2px;
+    --summary-detail-btn-size: 16px;
+    --summary-detail-btn-fs: var(--fs-xs);
+    --char-stats-minh: 20px;
+  }
+}
