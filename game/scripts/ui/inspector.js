@@ -94,6 +94,21 @@
                 html[data-theme="dark"] #game-inspector-tooltip strong span {
                     color: #aaa;
                 }
+
+                /* Elegant Mode Overrides */
+                html[data-theme="elegant"] #game-inspector-tooltip {
+                    background-color: rgba(11, 17, 21, 0.95);
+                    color: #d3ad6b;
+                    border: 1px solid rgba(211, 173, 107, 0.3);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+                }
+                html[data-theme="elegant"] #game-inspector-tooltip strong {
+                    color: #e0e0e0;
+                    border-bottom-color: rgba(211, 173, 107, 0.25);
+                }
+                html[data-theme="elegant"] #game-inspector-tooltip strong span {
+                    color: rgba(224, 224, 224, 0.6);
+                }
             `;
             document.head.appendChild(style);
         },

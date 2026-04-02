@@ -19,7 +19,7 @@
     // 辅助函数：获取自适应颜色
     function getAdaptiveColor(color) {
         if (!color) return null;
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const isDark = ['dark','elegant'].includes(document.documentElement.getAttribute('data-theme'));
         if (!isDark && window.ColorUtils && typeof window.ColorUtils.invertColor === 'function') {
             try {
                 return window.ColorUtils.invertColor(color, { mode: 'luma', output: 'auto' });

@@ -86,8 +86,8 @@
     will-change: opacity, letter-spacing;
 }
 
-/* 日间模式：恢复原始进度条配色；夜间保持当前主题渐变 */
-html:not([data-theme="dark"]) .loading-bar {
+/* 日间模式：恢复原始进度条配色；夜间/典雅保持当前主题渐变 */
+html:not([data-theme="dark"]):not([data-theme="elegant"]) .loading-bar {
     background: linear-gradient(90deg, #3f3f3f 0%, #ecead8 10%, #ecead8 98%, #c0bb8c 100%) !important;
 }
 

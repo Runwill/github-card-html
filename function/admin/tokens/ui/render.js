@@ -17,7 +17,8 @@
   });
 
   function isDarkTheme(){
-    return document.documentElement.getAttribute('data-theme') === 'dark';
+    const t = document.documentElement.getAttribute('data-theme');
+    return t === 'dark' || t === 'elegant';
   }
 
   // 根据当前主题为 #tokens-summary 内的 .type-tile 应用背景色；深色时反转亮度

@@ -70,6 +70,7 @@
 
     'theme.toggle.toLight': '切换为浅色',
     'theme.toggle.toDark': '切换为深色',
+    'theme.toggle.toElegant': '切换为典雅',
 
     'lang.button.label': '语言：{lang}',
     'lang.name.zh': '中文',
@@ -246,6 +247,7 @@
 
     'theme.toggle.toLight': 'Switch to light',
     'theme.toggle.toDark': 'Switch to dark',
+    'theme.toggle.toElegant': 'Switch to elegant',
 
     'lang.button.label': 'Language: {lang}',
     'lang.name.zh': '中文',

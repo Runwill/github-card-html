@@ -11,6 +11,38 @@ const HIGHLIGHT_CONFIG = {
 }
 
 /**
+ * 典雅主题辅助：将颜色混入 20% 金色 (#d3ad6b)，使高亮带有暖金色调
+ * 支持 hex / rgb / rgba 输入，输出保持原格式
+ */
+function _blendWithGold(color) {
+    try {
+        const ratio = 0.2 // 金色混入比例
+        const gold = { r: 211, g: 173, b: 107 }
+        let r, g, b, a = 1, isRgba = false
+        if (color.startsWith('rgba')) {
+            const m = color.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)/)
+            if (!m) return color
+            r = +m[1]; g = +m[2]; b = +m[3]; a = m[4] != null ? +m[4] : 1; isRgba = true
+        } else if (color.startsWith('rgb')) {
+            const m = color.match(/rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/)
+            if (!m) return color
+            r = +m[1]; g = +m[2]; b = +m[3]
+        } else if (color.startsWith('#')) {
+            const hex = color.length === 4
+                ? color[1]+color[1]+color[2]+color[2]+color[3]+color[3]
+                : color.slice(1,7)
+            r = parseInt(hex.slice(0,2),16); g = parseInt(hex.slice(2,4),16); b = parseInt(hex.slice(4,6),16)
+            if (color.length === 9) a = parseInt(color.slice(7,9),16) / 255
+        } else { return color }
+        r = Math.round(r * (1 - ratio) + gold.r * ratio)
+        g = Math.round(g * (1 - ratio) + gold.g * ratio)
+        b = Math.round(b * (1 - ratio) + gold.b * ratio)
+        if (isRgba || a < 1) return `rgba(${r},${g},${b},${a})`
+        return `rgb(${r},${g},${b})`
+    } catch(_) { return color }
+}
+
+/**
  * 全局高亮注册表
  * 用于追踪当前活跃的高亮元素，并在元素被移除DOM时强制执行清理逻辑
  */
@@ -53,9 +85,14 @@ if (window.MutationObserver) {
 function applyHighlight(selector, color) {
     // 在暗色模式反转亮度（依赖 ColorUtils），未加载则保持原色
     try {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+        const theme = document.documentElement.getAttribute('data-theme')
+        const isDark = theme === 'dark' || theme === 'elegant'
         if (isDark && color && window.ColorUtils && typeof window.ColorUtils.invertColor === 'function') {
             color = window.ColorUtils.invertColor(color, { mode: 'luma', output: 'auto' })
+            // 典雅主题：将反转后的颜色混入金色调，使高亮与主题和谐
+            if (theme === 'elegant') {
+                color = _blendWithGold(color)
+            }
         }
     } catch (e) { /* 忽略安全失败，继续使用原色 */ }
 

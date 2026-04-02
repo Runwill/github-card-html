@@ -23,7 +23,7 @@
   user-select: text;
 }
 /* 浅色模式下视窗尺寸文字改用接近白色的 token */
-html:not([data-theme="dark"]) .settings-menu__viewport-info {
+html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewport-info {
   color: var(--bg-end);
 }
 
