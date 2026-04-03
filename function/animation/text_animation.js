@@ -6,6 +6,7 @@ class TextAnimationController {
             rootMargin: '0px 0px -100px 0px',
             threshold: 0.1
         };
+        this.observer = null;
         this.init();
     }
 
@@ -13,6 +14,7 @@ class TextAnimationController {
         this.assignAnimationIndexes();
         this.setupInitialAnimations();
         this.setupScrollAnimations();
+        this.listenTabSwitch();
     }
 
     assignAnimationIndexes() {
@@ -38,7 +40,7 @@ class TextAnimationController {
     }
 
     setupScrollAnimations() {
-        const observer = new IntersectionObserver((entries) => {
+        this.observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
@@ -49,7 +51,7 @@ class TextAnimationController {
 
         document.querySelectorAll('.scroll, .indent, padding').forEach(el => {
             el.classList.add('fade-in-on-scroll');
-            observer.observe(el);
+            this.observer.observe(el);
         });
     }
 
@@ -57,6 +59,65 @@ class TextAnimationController {
         parent.querySelectorAll('h1, h2, h3, .indent, padding').forEach((child, index) => {
             setTimeout(() => child.classList.add('visible'), index * 100);
         });
+    }
+
+    // 重播指定面板内的文本入场动画
+    replayAnimations(panel) {
+        if (!panel) return;
+        const sel = 'h1, h2, h3, .indent, padding';
+        const targets = panel.querySelectorAll(sel);
+        if (!targets.length) return;
+
+        // 1) 移除动画状态类
+        targets.forEach(el => {
+            el.classList.remove('animate-in', 'animate-done', 'visible');
+        });
+        // 滚动元素也重置
+        panel.querySelectorAll('.scroll, .indent, padding').forEach(el => {
+            el.classList.remove('visible');
+        });
+
+        // 2) 强制回流，让浏览器识别状态重置
+        void panel.offsetWidth;
+
+        // 3) 重新分配动画索引并触发动画
+        targets.forEach((el, index) => {
+            el.style.setProperty('--index', index);
+            el.classList.add('animate-in');
+            el.addEventListener('animationend', () => {
+                el.classList.add('animate-done');
+            }, { once: true });
+        });
+
+        // 4) 重新观察滚动元素
+        if (this.observer) {
+            panel.querySelectorAll('.scroll, .indent, padding').forEach(el => {
+                this.observer.unobserve(el);
+                this.observer.observe(el);
+            });
+        }
+    }
+
+    // 监听 tab 切换，对新激活面板重播动画
+    listenTabSwitch() {
+        const hook = () => {
+            document.querySelectorAll('#main-tabs a[href^="#panel_"]').forEach(a => {
+                a.addEventListener('click', () => {
+                    const href = a.getAttribute('href') || '';
+                    const panel = document.querySelector(href);
+                    if (panel) {
+                        // 延迟一帧确保 Foundation 已完成面板切换（display 从 none 变为 block）
+                        requestAnimationFrame(() => this.replayAnimations(panel));
+                    }
+                }, { passive: true });
+            });
+        };
+        // 等 partials 加载完毕再绑定
+        if (window.partialsReady && window.partialsReady.then) {
+            window.partialsReady.then(hook).catch(hook);
+        } else {
+            hook();
+        }
     }
 
 }

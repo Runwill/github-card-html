@@ -82,6 +82,23 @@ html.force-landscape .panel {
   max-height: 90% !important;
 }
 
+/* ── 侧边栏菜单：横屏高度紧凑 ── */
+html.force-landscape .panel--menu {
+  padding: var(--space-sm) var(--space-lg);
+  max-height: 80% !important;
+  overflow-y: auto;
+}
+html.force-landscape #sidebar-menu li,
+html.force-landscape #account-menu li,
+html.force-landscape #settings-menu li {
+  margin-bottom: var(--space-2xs);
+}
+html.force-landscape .sidebar-menu_button {
+  padding: var(--space-xs) var(--space-lg);
+  font-size: var(--fs-md);
+  gap: var(--space-xs);
+}
+
 /* ── 底栏：fixed → 在 #fl-rotate 中等同 absolute，bottom:0 贴到视口底部 ── */
 html.force-landscape .site-footer {
   z-index: 100;

@@ -18,7 +18,9 @@
     let height = Math.max(24, elem.offsetHeight || 24)
 
     // 颜色与时长（可通过 opts 覆写）
-    const baseColor = (opts && opts.rowColor) || '#2196f3' // 透明主题蓝
+    const theme = document.documentElement.dataset.theme
+    const defaultColor = theme === 'elegant' ? '#d3ad6b' : '#2196f3'
+    const baseColor = (opts && opts.rowColor) || defaultColor
   const alpha = (opts && typeof opts.rowAlpha === 'number') ? opts.rowAlpha : 0.1
     const rgba = `rgba(${parseInt(baseColor.slice(1,3),16)}, ${parseInt(baseColor.slice(3,5),16)}, ${parseInt(baseColor.slice(5,7),16)}, ${alpha})`
     const prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
