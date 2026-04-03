@@ -5,9 +5,16 @@ class WaveButtonManager {
         document.addEventListener('click', this.handleClick.bind(this), true);
     }
 
+    isElegantTheme() {
+        return document.documentElement.dataset.theme === 'elegant';
+    }
+
     handleClick(event) {
     const button = event.target.closest('.ripple-button');
         if (button) {
+            if (this.isElegantTheme()) {
+                return;
+            }
             // 立即创建波纹效果，不等待DOM检查
             this.createRipple(event, button);
         }

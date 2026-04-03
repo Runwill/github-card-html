@@ -721,7 +721,7 @@ html[data-theme="elegant"]::after {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 100%);
+    radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.2) 100%);
 }
 html[data-theme="elegant"]::before {
   content: '';
@@ -843,16 +843,6 @@ html[data-theme="elegant"] .modal-header {
 html[data-theme="elegant"] .modal-header h2 {
   color: var(--primary-1) !important;
   letter-spacing: 3px;
-}
-
-/* 典雅主题：容器卡片金色光晕 */
-html[data-theme="elegant"] .container {
-  border: 1px solid rgba(211, 173, 107, 0.12);
-  box-shadow: 0 0 30px rgba(0,0,0,0.4);
-}
-html[data-theme="elegant"] .container:hover {
-  border-color: rgba(211, 173, 107, 0.25);
-  box-shadow: 0 0 40px rgba(211, 173, 107, 0.06);
 }
 
 /* 典雅主题：深色时武将图标可见度 */

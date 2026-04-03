@@ -30,15 +30,15 @@
 
     /* 排版 */
     padding: var(--space-sm) var(--space-lg);
-    font-size: var(--fs-base);
+    font-size: clamp(15px, 0.85rem + 0.22vw, 18px);
     font-weight: 400;
-    line-height: var(--lh-normal);
+    line-height: 1.6;
     letter-spacing: 0.01em;
     
     pointer-events: none;
-    white-space: pre-wrap; /* 允许换行 */
-    max-width: 280px; /* 限制最大宽度，防止过长 */
-    word-break: break-word;
+    white-space: nowrap; /* 单行完整显示 */
+    inline-size: max-content; /* 按内容自动宽度 */
+    max-inline-size: none;
 
     /* 模糊滤镜 */
     -webkit-backdrop-filter: blur(12px);
@@ -67,6 +67,14 @@ html[data-theme="dark"] #lore-tooltip {
         0 10px 15px -3px rgba(0, 0, 0, 0.3), 
         0 4px 6px -2px rgba(0, 0, 0, 0.2),
         0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* 手机：字号与内边距收敛，提升可读性且避免拥挤 */
+@media (max-width: 640px) {
+    #lore-tooltip {
+        padding: var(--space-sm) var(--space-md);
+        font-size: clamp(14px, 0.82rem + 0.12vw, 16px);
+    }
 }
 
 /* 减少运动时的模糊感 */
