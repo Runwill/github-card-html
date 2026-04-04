@@ -82,5 +82,6 @@
     // 由于行内含其它按钮/图标，直接使用整行 innerText，并按空白压缩
     const text = collectTextFrom(row);
     await copyText(text);
+    btn.blur(); // 释放焦点，避免 Ctrl 再按时仍显示此按钮
   });
 })();

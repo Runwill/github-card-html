@@ -32,7 +32,9 @@
 }
 
 /* 悬浮态：对齐 btn--secondary:hover */
+/* 修正：必须保留 -50% 垂直居中基准，覆盖 btn--danger:hover 的 translateY(-1px) */
 .skill-copy-btn:hover {
+  transform: translateY(calc(-50% - 1px));
   background-color: color-mix(in srgb, var(--surface) 92%, transparent) !important; /* gray-50 */
   border-color: color-mix(in srgb, var(--border) 80%, transparent) !important;     /* gray-300 */
   color: var(--text) !important;            /* 改为普通文本色，去掉变蓝 */
@@ -55,8 +57,7 @@ html.ctrl-pressed .skill-copy-btn {
 }
 /* hover 行或按钮自身时再显示 */
 html.ctrl-pressed .skill-row:hover .skill-copy-btn,
-html.ctrl-pressed .skill-copy-btn:hover,
-html.ctrl-pressed .skill-copy-btn:focus {
+html.ctrl-pressed .skill-copy-btn:hover {
   opacity: 1;
 }
 
@@ -74,8 +75,7 @@ html.ctrl-pressed .skill-copy-btn:focus {
 
   /* 按下 Ctrl 且 hover/聚焦时显示并占位（内联弹性布局） */
   html.ctrl-pressed .skill-row:hover .skill-copy-btn,
-  html.ctrl-pressed .skill-copy-btn:hover,
-  html.ctrl-pressed .skill-copy-btn:focus {
+  html.ctrl-pressed .skill-copy-btn:hover {
     display: inline-flex;
   }
 

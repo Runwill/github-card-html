@@ -1,6 +1,6 @@
 // admin/time_fmt
 // 共享时间格式化工具：解析、绝对/相对格式化、locale 推断
-// 消费者：tokens/ui/logger.js、permissions/logs.js
+// 消费者：tokens/ui/logger.js、permissions/logs/logs.js
 (function(){
   function parseTimeValue(v){
     try{

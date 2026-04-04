@@ -24,7 +24,7 @@ function CharacterSkillReplace(character, skill) {
             // 在每行开头插入隐藏的复制按钮（在按下 Ctrl 时显示）
             // 行容器为 <pronounScope>，用于事件委托与文本收集
             // 移除 data-tooltip/title，不显示悬浮提示
-              return `<pronounScope class="skill-row"><button class="btn btn--danger btn--sm skill-copy-btn" type="button">${window.t('common.copy')}</button><skillQuote class="bold"><skillQuoteLeft></skillQuoteLeft><characterSkillElement class="${s.name} scroll"></characterSkillElement><skillQuoteRight></skillQuoteRight></skillQuote>${s.content || ''}${roles}</pronounScope><br><br>`
+              return `<pronounScope class="skill-row"><button class="btn btn--secondary btn--sm skill-copy-btn" type="button">${window.t('common.copy')}</button><skillQuote class="bold"><skillQuoteLeft></skillQuoteLeft><characterSkillElement class="${s.name} scroll"></characterSkillElement><skillQuoteRight></skillQuoteRight></skillQuote>${s.content || ''}${roles}</pronounScope><br><br>`
         }).join('')
     $('.standardCharacterSkillsBlock').html(html)
     // 渲染后若搜索框有关键字，应用技能筛选

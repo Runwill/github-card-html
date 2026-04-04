@@ -1,5 +1,5 @@
 ((w)=>{
-  // permissions/render — 内容渲染: 用户权限块 + 主渲染入口
+  // permissions/render/render_content — 内容渲染: 用户权限块 + 主渲染入口
   // 动效与绑定在 render.js 中，通过 TokensPerm._RenderUI 共享
   const ns = w.TokensPerm;
   const S = ns.state;

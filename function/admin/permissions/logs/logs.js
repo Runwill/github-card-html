@@ -1,5 +1,5 @@
 (function(){
-  // permissions/logs: 在权限页添加用户变更日志，沿用 tokens 日志样式与行为
+  // permissions/logs/logs: 在权限页添加用户变更日志，沿用 tokens 日志样式与行为
   // API 层复用 permissions/api.js 中的 TokensPerm.API
   const { jsonGet: apiGet, jsonDelete: apiDelete } = window.TokensPerm.API;
 

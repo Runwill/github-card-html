@@ -1,6 +1,6 @@
 // admin/log_utils
 // 日志面板共享工具：复制、删除、悬浮时间切换
-// 消费者：tokens/ui/logger.js、permissions/logs.js
+// 消费者：tokens/ui/logger.js、permissions/logs/logs.js
 (function(){
   const { formatRel, formatAbsForLang } = window.TimeFmt;
 
