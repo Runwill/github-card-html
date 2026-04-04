@@ -1,0 +1,179 @@
+/* ==========================================================================
+   Online & Setup Panel Styles
+   Uses theme variables (--surface, --border, --text, --primary-*, etc.)
+   for consistent light/dark theme support.
+   ========================================================================== */
+
+/* ── Game View Containers ──────────────────────────────────────────────── */
+
+.game-view {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+}
+
+.game-view.hidden {
+    display: none !important;
+}
+
+/* Play view: flex-row to place sidebar on the right */
+#game-view-play {
+    display: flex;
+    flex-direction: row;
+    gap: var(--play-view-gap);
+    align-items: stretch;
+}
+
+/* ── Setup Panel ───────────────────────────────────────────────────────── */
+
+.setup-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3xl);
+    box-shadow: var(--shadow-elev-1);
+    color: var(--text);
+}
+
+.setup-panel .row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3xl);
+    flex-wrap: wrap;
+}
+
+.game-panel .input-group {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 0;
+}
+
+.game-panel .input-group-label {
+    background: transparent;
+    color: color-mix(in srgb, var(--text) 86%, var(--bg-end));
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--fs-base);
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    white-space: nowrap;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    line-height: normal;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.game-panel .input-group-field,
+.game-panel .input-group select {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: var(--fs-base);
+    outline: none;
+    transition: all var(--dur-normal) var(--ease-default);
+    box-sizing: border-box;
+}
+
+.game-panel .input-group-field:hover,
+.game-panel .input-group select:hover {
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border-color: var(--text-muted);
+}
+
+.game-panel .input-group-field:focus,
+.game-panel .input-group select:focus {
+    border-color: var(--primary-2);
+    box-shadow: var(--shadow-ring);
+    background: var(--surface);
+}
+
+/* Setup panel rows: inline input-groups, not stretched */
+.setup-panel > .row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+.setup-panel > .row:last-of-type {
+    margin-bottom: 0;
+}
+.setup-panel > .row > .input-group {
+    flex: 0 1 auto;
+    min-width: 0;
+    width: auto;          /* override Foundation .input-group { width:100% } */
+    margin-bottom: 0;     /* override Foundation .input-group { margin-bottom:1rem } */
+}
+
+/* 座位数选择框：适中宽度 */
+.setup-panel .input-group:has(#setup-player-count-select) {
+    min-width: 140px;
+}
+/* 牌堆预设选择框：更宽，文字较长 */
+.setup-panel .input-group:has(#setup-card-preset-select) {
+    min-width: 210px;
+}
+
+.setup-panel #setup-players-list {
+    margin-top: var(--space-2xl);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.setup-panel #setup-players-list .input-group {
+    flex: 1 1 calc(50% - var(--space-md));
+    min-width: 200px;
+}
+
+.setup-panel #setup-players-list .input-group-label {
+    min-width: 60px;
+    justify-content: center;
+}
+
+.setup-actions {
+    margin-top: var(--space-2xl);
+}
+
+/* ── Click Toggle (用于自动时机/允许旁观等 是/否 切换) ──────────────────── */
+/* 样式与 .input-group-field (select) 保持一致 */
+
+.setup-click-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted, #999);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important; /* override Foundation :last-child reset */
+    font-size: var(--fs-base);
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: all var(--dur-normal) var(--ease-default);
+    box-sizing: border-box;
+}
+
+.setup-click-toggle:hover:not(.is-locked) {
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border-color: var(--text-muted);
+}
+
+.setup-click-toggle.is-active {
+    background: rgba(var(--success-rgb, 34, 197, 94), 0.12);
+    color: var(--success, #22c55e);
+    border-color: rgba(var(--success-rgb, 34, 197, 94), 0.4);
+}
+
+.setup-click-toggle.is-locked {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+

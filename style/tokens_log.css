@@ -1,0 +1,412 @@
+/* 变更日志 Panel（现代样式） */
+.tokens-log { margin-top: var(--space-xl); border: 1px solid var(--log-border); border-radius: var(--radius-md); overflow: hidden; background: var(--log-bg); }
+.tokens-log__header { display:flex; align-items:center; justify-content: space-between; gap:var(--space-sm); padding:var(--space-sm) var(--space-lg); background:var(--log-header-bg); border-bottom:1px solid var(--log-border); }
+.tokens-log__title { font-weight: 600; color:var(--text); }
+.tokens-log__ctrls { display:flex; gap:var(--space-xs); }
+.tokens-log__body { max-height: 260px; overflow: auto; padding: var(--space-sm) var(--space-lg); font-size: var(--fs-base); }
+.tokens-log__body {
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-subtle) transparent; /* thumb color | track color */
+}
+/* WebKit (Chromium/Edge/Safari) */
+.tokens-log__body::-webkit-scrollbar { width: 8px; height: 8px; }
+.tokens-log__body::-webkit-scrollbar-track { background: transparent; }
+.tokens-log__body::-webkit-scrollbar-thumb {
+  background-color: var(--text-subtle); /* gray-300 */
+  border-radius: var(--radius-md);
+  border: 2px solid transparent; /* 细边留白，避免过粗 */
+  background-clip: content-box;
+}
+.tokens-log__body:hover::-webkit-scrollbar-thumb { background-color: var(--text-muted); /* gray-400 hover 提示 */ }
+
+/* 深色主题适配 */
+[data-theme="dark"] .tokens-log__body { scrollbar-color: var(--text-muted) transparent; }
+[data-theme="dark"] .tokens-log__body::-webkit-scrollbar-thumb { background-color: var(--text-muted); }
+[data-theme="dark"] .tokens-log__body:hover::-webkit-scrollbar-thumb { background-color: var(--text-subtle); }
+.tokens-log.is-collapsed .tokens-log__body { display: none; }
+.tokens-log__entry { padding:var(--space-xs) 0; border-bottom: 1px dashed var(--border); }
+.tokens-log__entry:last-child { border-bottom: none; }
+.tokens-log .log-row { display:flex; flex-wrap: wrap; align-items: baseline; gap:var(--space-sm); color:var(--text); }
+.tokens-log .log-time { color:var(--text-subtle); font-variant: tabular-nums; }
+.tokens-log .log-pill { display:inline-block; padding:var(--space-3xs) var(--space-xs); border-radius: var(--radius-pill); font-size:var(--fs-sm); line-height:var(--lh-none); border:1px solid transparent; }
+.tokens-log .log-pill,
+.tokens-log .log-ctx,
+.tokens-log .log-msg,
+.tokens-log .log-path,
+.tokens-log .log-val { font-style: normal; }
+.tokens-log .log-pill.is-green { background:#ECFDF5; color:#065F46; border-color:#A7F3D0; }
+.tokens-log .log-pill.is-red { background:#FEF2F2; color:#7F1D1D; border-color:#FECACA; }
+.tokens-log .log-pill.is-blue { background:#EFF6FF; color:#1E3A8A; border-color:#BFDBFE; }
+.tokens-log .log-pill.is-indigo { background:#EEF2FF; color:#3730A3; border-color:#C7D2FE; }
+.tokens-log .log-ctx { color:var(--text-muted); }
+.tokens-log .log-path { color:#2B6CB0; }
+.tokens-log code.log-code { background:var(--panel-header-bg); border:1px solid var(--border); border-radius: var(--radius-xs); padding:1px 4px; font-family: var(--font-mono); font-size:var(--fs-sm); color:var(--text); }
+.tokens-log .log-val { color:var(--text); }
+.tokens-log .log-sub { padding-left: 22px; margin-top: 3px; color:var(--text-muted); }
+.tokens-log .log-sub.is-del { color:#7F1D1D; }
+
+/* 日志行右侧操作区：与字段行删除按钮风格保持一致 */
+.tokens-log .log-row { position: relative; }
+.tokens-log .log-actions {
+  margin-left: auto;           /* 将操作区推到最右侧 */
+  display: flex;
+  gap: var(--space-xs);
+  opacity: 0;                  /* 默认隐藏，hover 时显现 */
+  transition: opacity var(--dur-normal) var(--ease-default);
+  pointer-events: none;        /* 默认不挡交互，内部按钮开启 */
+}
+.tokens-log .log-row:hover .log-actions,
+.tokens-log .log-row:focus-within .log-actions { opacity: 1; pointer-events: auto; }
+
+/* 行内操作按钮公共样式（删除/复制等） */
+.btn-inline-action {
+  pointer-events: auto;
+  border: none;
+  background: transparent;
+  color: var(--text-subtle);
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-none);
+  transition: transform var(--dur-fast) var(--ease-default), color var(--dur-fast) var(--ease-default), background var(--dur-fast) var(--ease-default);
+}
+.btn-inline-action:hover { transform: scale(1.05); }
+.btn-inline-action:active { transform: scale(0.97); }
+
+/* 删除按钮：红色强调 */
+.btn-inline-action.btn-del:hover {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+}
+/* 复制按钮：蓝色强调 */
+.btn-inline-action.btn-copy:hover {
+  color: var(--primary-2);
+  background: color-mix(in srgb, var(--primary-2) 8%, transparent);
+}
+
+/* 触屏/无悬浮设备：始终显示操作区，避免“悬浮才出现”的交互缺失 */
+@media (hover: none) {
+  .tokens-log .log-actions { opacity: 1; pointer-events: auto; }
+}
+
+#tokens-content .kv-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0;
+  border-bottom: 1px dashed var(--border);
+  position: relative; /* 供行内操作按钮绝对定位 */
+}
+
+/* 响应式优化：缩短 kv-key 列，避免小屏下键名后留白过长 */
+@media (max-width: 1024px) {
+  #tokens-content .kv-row { grid-template-columns: 140px 1fr; }
+}
+@media (max-width: 768px) {
+  /* 使用自适应最小宽 + 百分比上限，让短键名不占太多空白 */
+  #tokens-content .kv-row { grid-template-columns: minmax(96px, 38%) 1fr; }
+}
+@media (max-width: 480px) {
+  /* 极窄屏进一步压缩键名列，并减少右侧操作区预留 */
+  #tokens-content .kv-row { grid-template-columns: minmax(80px, 44%) 1fr; }
+  #tokens-content .kv-val { --kv-actions-space: 56px; }
+}
+
+#tokens-content .kv-row:last-child {
+  border-bottom: none;
+}
+
+#tokens-content .kv-key {
+  color: var(--text-muted);
+  font-weight: 600;
+  word-break: break-all;
+}
+
+#tokens-content .kv-val {
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: var(--lh-tight);
+  /* 预留右侧操作区空间，避免长文本与删除按钮重叠 */
+  padding-right: var(--kv-actions-space, 72px);
+  box-sizing: border-box;
+  /* 使用内阴影模拟描边，避免 outline/边框引起的抖动与抗锯齿闪烁 */
+  box-shadow: var(--shadow-kv-empty);
+  transition: box-shadow var(--dur-normal) var(--ease-standard),
+              background-color var(--dur-normal) var(--ease-standard),
+              color var(--dur-normal) var(--ease-standard);
+  cursor: text; /* 暗示可编辑 */
+}
+
+/* 行内操作容器（删除等） */
+#tokens-content .kv-row .kv-actions {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: var(--space-xs);
+  opacity: 0;
+  transition: opacity var(--dur-normal) var(--ease-default);
+  pointer-events: none; /* 默认不挡交互，内部按钮开启 */
+}
+#tokens-content .kv-row:hover .kv-actions { opacity: 1; }
+
+#tokens-content .kv-val:not(.is-editing):hover {
+  background: color-mix(in srgb, var(--border) 20%, transparent); /* 轻微悬浮反馈 */
+}
+/* Ctrl 状态下禁用字段编辑交互，避免挡住删除对象入口 */
+.ctrl-down #tokens-content .kv-val { pointer-events: none; }
+
+/* 编辑态：柔和背景 + 内阴影边框（无发光） */
+#tokens-content .kv-val.is-editing {
+  background-color: var(--panel-header-bg); /* 柔和浅灰蓝 */
+  box-shadow: var(--shadow-kv-editing);
+  border-radius: var(--radius-xs);
+}
+
+/* 聚焦时，仅调整边框颜色 */
+#tokens-content .kv-val.is-editing:focus-within {
+  box-shadow: var(--shadow-kv-editing-focus);
+}
+
+/* 当卡片带有强调色时，编辑态的描边使用强调色的浅变体 */
+#tokens-content .token-card[style*="--token-accent"] .kv-val.is-editing {
+  box-shadow: var(--shadow-kv-editing-accent);
+  background: color-mix(in srgb, var(--token-accent) 8%, var(--panel-header-bg));
+}
+
+/* 内联编辑输入框：完全透明，与原文字精确重叠，零偏移 */
+#tokens-content .kv-val .inline-edit {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  padding: 0;            /* 零内距，与原文字对齐 */
+  margin: 0;
+  border: none;
+  border-radius: var(--radius-none) ;
+  background: transparent;
+  color: inherit;
+  box-shadow: var(--shadow-none);
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: var(--lh-tight);
+  min-height: 0;
+  display: block;
+}
+
+/* 颜色编辑器布局 */
+#tokens-content .kv-val .inline-edit-color {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+}
+/* color-picker 入场动画：从无到有平滑淡入 */
+#tokens-content .kv-val .inline-edit-color .color-picker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm) ;
+  background: transparent;
+  box-shadow: var(--shadow-picker);
+  outline: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transform-origin: center;
+  transition: transform var(--dur-normal) var(--ease-standard), box-shadow var(--dur-normal) var(--ease-default), opacity var(--dur-normal) var(--ease-default);
+}
+
+/* 悬停/聚焦态：轻微缩放与柔和外环 */
+#tokens-content .kv-val .inline-edit-color .color-picker:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-picker-hover);
+}
+#tokens-content .kv-val .inline-edit-color .color-picker:focus-visible {
+  outline: none;
+  transform: scale(1.04);
+  box-shadow: var(--shadow-picker-focus);
+}
+#tokens-content .kv-val .inline-edit-color .color-picker:active {
+  transform: scale(0.98);
+}
+
+/* 与文本框对齐的高度基线 */
+#tokens-content .kv-val .inline-edit-color .inline-edit {
+  min-height: 28px;
+}
+
+/* 低动态偏好：关闭多余动效 */
+@media (prefers-reduced-motion: reduce) {
+  #tokens-content .kv-val,
+  #tokens-content .kv-val .inline-edit-color .color-picker {
+    transition: none;
+  }
+}
+
+/* 轻微脉冲动画（色值改变时短暂高亮） */
+@keyframes pickerPulse {
+  0% { box-shadow: var(--shadow-picker-pulse-0); }
+  50% { box-shadow: var(--shadow-picker-pulse-50); }
+  100% { box-shadow: var(--shadow-picker-pulse-100); }
+}
+#tokens-content .kv-val .inline-edit-color .color-picker.is-pulse {
+  animation: pickerPulse 320ms ease-out;
+}
+
+/* 保存中禁用态（可选）：降低不必要的视觉跳变 */
+#tokens-content .kv-val.is-saving .inline-edit {
+  opacity: .7;
+  cursor: progress;
+}
+
+#tokens-content pre.token-json {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--text);
+}
+
+#tokens-content .nest-block {
+  border-left: 3px solid var(--token-accent);
+  padding-left: var(--space-md);
+  margin: var(--space-sm) 0;
+}
+
+#tokens-content .nest-title {
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: var(--fs-base);
+  margin-bottom: var(--space-xs);
+}
+
+#tokens-content .nest-body {
+  margin-left: 0;
+}
+
+#tokens-content .arr-item {
+  margin: var(--space-xs) 0;
+}
+
+#tokens-content .arr-index {
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  margin-bottom: var(--space-2xs);
+}
+
+/* 深色模式下 .nest-title / .arr-index 已通过 var(--text-muted) 自动适配 */
+
+/* 确保数组项容器不重置变量，从而不会阻断继承 */
+#tokens-content .arr-item,
+#tokens-content .nest-body {
+  background: inherit;
+}
+
+/* 交互与动画 */
+.collapsible {
+  overflow: hidden;
+  height: 0;
+  display: none; /* 初始由 JS 控制为 block，再测量 */
+  opacity: 0;
+  transition: height var(--dur-slow) var(--ease-standard), opacity var(--dur-normal) var(--ease-standard);
+  will-change: height, opacity;
+}
+.collapsible.is-open {
+  display: block;
+  height: auto;
+  opacity: 1;
+}
+.collapsible.is-opening,
+.collapsible.is-closing {
+  display: block;
+}
+.collapsible.is-opening {
+  opacity: 1;
+  transition: height var(--dur-slow) var(--ease-decel), opacity var(--dur-normal) var(--ease-decel);
+}
+.collapsible.is-closing {
+  opacity: 0;
+  transition: height var(--dur-slow) var(--ease-accel), opacity var(--dur-normal) var(--ease-accel);
+}
+
+@keyframes token-card-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#tokens-content .token-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card-1);
+}
+
+/* 减少动画以避免闪烁（系统偏好） */
+@media (prefers-reduced-motion: reduce) {
+  #tokens-content .token-card { animation: none !important; transform: none !important; }
+  .tokens-toast { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* 词元页更新成功后的绿色 Toast 提示 */
+.tokens-toast-container {
+  position: fixed;
+  top: 14%; /* 页面中上 */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  pointer-events: none; /* 不阻挡页面点击 */
+  width: auto;
+  max-width: min(90vw, 560px);
+}
+.tokens-toast {
+  pointer-events: auto;
+  background: var(--toast-ok-bg); /* 绿底（默认成功态） */
+  border: 1px solid var(--toast-ok-border); /* 绿边 */
+  color: var(--toast-ok-text); /* 深绿字 */
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-sm) ;
+  box-shadow: var(--shadow-card-2);
+  font-size: var(--fs-md);
+  line-height: var(--lh-tight);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-md);
+  opacity: 0;
+  max-height: 80px;
+  overflow: hidden;
+  transform: translateY(-6px);
+  animation: tokens-toast-in var(--dur-moderate) ease forwards,
+             tokens-toast-fade-out var(--dur-normal) ease forwards 1.8s,
+             tokens-toast-collapse 200ms cubic-bezier(0.55, 0, 0.1, 1) forwards calc(1.8s + var(--dur-normal));
+}
+.tokens-toast.tokens-toast--error {
+  background: var(--toast-err-bg); /* 红底 */
+  border-color: var(--toast-err-border); /* 红边 */
+  color: var(--toast-err-text); /* 深红字 */
+}
+/* 明确的 SVG 勾/叉图标 */
+/* inline SVG 图标样式（无额外 span） */
+.tokens-toast > svg { flex: 0 0 auto; display: inline-block; color: currentColor; }
+.tokens-toast.tokens-toast--error > svg { color: var(--toast-err-icon); }
+@keyframes tokens-toast-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes tokens-toast-fade-out {
+  to { opacity: 0; transform: translateY(-6px); }
+}
+@keyframes tokens-toast-collapse {
+  from { max-height: 80px; padding: var(--space-sm) var(--space-lg); margin-bottom: 0; border-width: 1px; }
+  to { max-height: 0; padding: 0 var(--space-lg); margin-bottom: calc(-1 * var(--space-sm)); border-width: 0; }
+}

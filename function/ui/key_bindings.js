@@ -1,9 +1,6 @@
 (function () {
   const STORAGE_KEY = 'user_key_bindings';
-  const STORAGE_KEY_SPEED = 'card_game_speed_setting';
-  const STORAGE_KEY_INERTIA = 'card_game_inertia_setting';
   const KEY_SETTINGS_BUTTON_ID = 'key-settings-button';
-  const GAME_SETTINGS_BUTTON_ID = 'game-settings-button';
   
   // Actions Definition
   const ACTIONS = {
@@ -80,12 +77,8 @@
       return;
     }
 
-    // We allow modifier keys to be bound directly for 'inspect_details'.
-    // e.key for Alt is "Alt", for Control is "Control".
     const binding = {
       key: e.key
-      // Note: We are not storing ctrlKey/altKey state flags, just the primary key pressed.
-      // This is a simplified "Single Key" binding system.
     };
 
     bindings[recordingAction] = binding;
@@ -118,7 +111,6 @@
   }
 
   function cancelRecording(e) {
-    // If clicking the button itself, let the click handler handle it (stop vs start)
     if (recordingAction) {
         const conf = ACTIONS[recordingAction];
         if (e.target.id === conf.btnId) return;
@@ -136,7 +128,6 @@
     
     if (!(e instanceof KeyboardEvent)) return false;
 
-    // Strict matching for trigger: The key pressed MUST be the bound key.
     return e.key.toLowerCase() === bind.key.toLowerCase();
   }
   
@@ -151,17 +142,11 @@
 
       const targetKey = bind.key.toLowerCase();
 
-      // IF the bound key IS a modifier (Alt, Control, Shift, Meta),
-      // we can check the modifier flags on ANY event (Mouse or Keyboard).
       if (targetKey === 'alt') return e.altKey;
       if (targetKey === 'control') return e.ctrlKey;
       if (targetKey === 'shift') return e.shiftKey;
       if (targetKey === 'meta') return e.metaKey;
 
-      // If it's a regular key (e.g. "Space" or "A"), we can only check it if
-      // 1. This is a KeyboardEvent and e.key matches.
-      // 2. We don't really know if "A" is held during a MouseEvent without tracking global state.
-      //    For now, we only support modifier keys for MouseEvent checks.
       if (e instanceof KeyboardEvent) {
           return e.key.toLowerCase() === targetKey;
       }
@@ -185,25 +170,11 @@
       const keySettingsBtn = document.getElementById(KEY_SETTINGS_BUTTON_ID);
       if (keySettingsBtn) {
         keySettingsBtn.addEventListener('click', () => {
-          // 导航栈会自动隐藏 settings-menu 并保留在栈中
           var OV = window.CardUI?.Manager?.Controllers?.overlay;
           if (OV) {
             OV.open('key-settings-modal');
           }
           updateUI();
-        });
-      }
-      
-      // === Game Settings Modal ===
-      const gameSettingsBtn = document.getElementById(GAME_SETTINGS_BUTTON_ID);
-      if (gameSettingsBtn) {
-        gameSettingsBtn.addEventListener('click', () => {
-          // 导航栈会自动隐藏 settings-menu 并保留在栈中
-          var OV = window.CardUI?.Manager?.Controllers?.overlay;
-          if (OV) {
-            OV.open('game-settings-modal');
-          }
-          initGameSettingsUI();
         });
       }
 
@@ -212,7 +183,6 @@
           const conf = ACTIONS[action];
           const btn = document.getElementById(conf.btnId);
           if (btn) {
-              // Clone to remove old listeners
               const newBtn = btn.cloneNode(true);
               btn.parentNode.replaceChild(newBtn, btn);
               
@@ -227,9 +197,6 @@
               });
           }
       });
-      
-      // Initialize game settings controls
-      initGameSettingsUI();
     };
 
     if (window.partialsReady) {
@@ -256,119 +223,11 @@
     });
   }
   
-  // === Game Settings Functions ===
-  
-  // 惯性选项配置（轻左重右）
-  const INERTIA_OPTIONS = [
-    { value: 1.0, label: '即时' },
-    { value: 0.8, label: '灵敏' },
-    { value: 0.5, label: '轻盈' },
-    { value: 0.25, label: '中等' },
-    { value: 0.15, label: '较重' },
-    { value: 0.1, label: '非常重' }
-  ];
-  
-  const DEFAULT_SPEED = 0;
-  const DEFAULT_INERTIA_INDEX = 3; // 默认中等
-  let currentInertiaIndex = DEFAULT_INERTIA_INDEX;
-
-  // 替换元素并绑定新监听器（消除 cloneNode 样板）
-  function rebind(id, event, handler) {
-    const el = document.getElementById(id);
-    if (!el) return null;
-    const fresh = el.cloneNode(true);
-    el.parentNode.replaceChild(fresh, el);
-    fresh.addEventListener(event, handler);
-    return fresh;
-  }
-
-  // 应用速度值到 UI + 存储 + 控制器
-  function applySpeed(val) {
-    const range = document.getElementById('game-speed-range');
-    const display = document.getElementById('game-speed-val');
-    if (range) range.value = val;
-    if (display) display.textContent = `${val}ms`;
-    localStorage.setItem(STORAGE_KEY_SPEED, val);
-    if (window.Game?.Controller?.setSpeed) window.Game.Controller.setSpeed(val);
-  }
-
-  function applyInertiaConfig(lerpFactor) {
-    if (window.Game?.UI?.DragConfig) {
-      window.Game.UI.DragConfig.lerpFactor = lerpFactor;
-      console.log(`[Settings] Drag Inertia set to ${lerpFactor}`);
-    }
-  }
-
-  function saveAndApplyInertia() {
-    updateInertiaDisplay();
-    const opt = INERTIA_OPTIONS[currentInertiaIndex];
-    if (opt) {
-      localStorage.setItem(STORAGE_KEY_INERTIA, opt.value);
-      applyInertiaConfig(opt.value);
-    }
-  }
-
-  function updateInertiaDisplay() {
-    const inertiaValue = document.getElementById('inertia-value');
-    const inertiaPrev = document.getElementById('inertia-prev');
-    const inertiaNext = document.getElementById('inertia-next');
-    if (inertiaValue && INERTIA_OPTIONS[currentInertiaIndex]) {
-      inertiaValue.textContent = INERTIA_OPTIONS[currentInertiaIndex].label;
-    }
-    if (inertiaPrev) inertiaPrev.disabled = currentInertiaIndex <= 0;
-    if (inertiaNext) inertiaNext.disabled = currentInertiaIndex >= INERTIA_OPTIONS.length - 1;
-  }
-
-  function loadInertiaIndex() {
-    const saved = localStorage.getItem(STORAGE_KEY_INERTIA);
-    if (saved !== null) {
-      const idx = INERTIA_OPTIONS.findIndex(opt => opt.value === parseFloat(saved));
-      if (idx !== -1) currentInertiaIndex = idx;
-    }
-  }
-  
-  function initGameSettingsUI() {
-    // === Speed Slider ===
-    const savedSpeed = localStorage.getItem(STORAGE_KEY_SPEED);
-    if (savedSpeed !== null) applySpeed(parseInt(savedSpeed, 10));
-
-    rebind('game-speed-range', 'input', (e) => applySpeed(parseInt(e.target.value, 10)));
-
-    // === Inertia Arrow Selector ===
-    loadInertiaIndex();
-    updateInertiaDisplay();
-
-    rebind('inertia-prev', 'click', () => {
-      if (currentInertiaIndex > 0) { currentInertiaIndex--; saveAndApplyInertia(); }
-    });
-    rebind('inertia-next', 'click', () => {
-      if (currentInertiaIndex < INERTIA_OPTIONS.length - 1) { currentInertiaIndex++; saveAndApplyInertia(); }
-    });
-
-    // === Reset Button ===
-    rebind('game-settings-reset', 'click', () => {
-      applySpeed(DEFAULT_SPEED);
-      currentInertiaIndex = DEFAULT_INERTIA_INDEX;
-      saveAndApplyInertia();
-    });
-  }
-  
-  function loadGameSettings() {
-    const savedSpeed = localStorage.getItem(STORAGE_KEY_SPEED);
-    if (savedSpeed !== null) {
-      const val = parseInt(savedSpeed, 10);
-      if (!isNaN(val) && window.Game?.Controller?.setSpeed) window.Game.Controller.setSpeed(val);
-    }
-    const savedInertia = localStorage.getItem(STORAGE_KEY_INERTIA);
-    if (savedInertia !== null) applyInertiaConfig(parseFloat(savedInertia));
-  }
-  
   // Expose API
   window.KeySettings = {
       isActionActive,
-      checkBinding, // Expose for triggers
-      ACTIONS,
-      loadGameSettings // Expose for game to call on start
+      checkBinding,
+      ACTIONS
   };
 
   init();
