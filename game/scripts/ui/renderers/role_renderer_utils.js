@@ -183,44 +183,46 @@
     }
 
     /**
+     * 打开判定区查看器（共用逻辑，供 setupJudgeButton / judge badge 等复用）
+     */
+    function openJudgeViewer(role) {
+        if (!role || !role.judgeArea) return;
+        const GT = window.Game.UI.GameText;
+        const titleSuffix = GT ? GT.render('judgeArea') : 'Judge Area';
+        const title = `${role.name} ${titleSuffix}`;
+        const sourceId = `role-judge:${role.id}`;
+        const cards = role.judgeArea.cards || [];
+
+        let charNameKey = role.character;
+        if (Array.isArray(charNameKey) && charNameKey.length > 0) charNameKey = charNameKey[0];
+        if (!charNameKey) charNameKey = role.name;
+
+        let ownerNameHtml = charNameKey;
+        if (GT) {
+            ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
+        }
+
+        const openOptions = { 
+            forceFaceDown: false,
+            ownerName: ownerNameHtml,
+            areaName: titleSuffix
+        };
+
+        if (window.Game.UI.toggleCardViewer) {
+            window.Game.UI.toggleCardViewer(title, cards, sourceId, openOptions);
+        } else if (window.Game.UI.openCardViewer) {
+            window.Game.UI.openCardViewer(title, cards, sourceId, openOptions);
+        }
+    }
+
+    /**
      * Binds click event to a judge button to open the judge area viewer
      */
     function setupJudgeButton(btn, role, GameText) {
         if (!btn || !role) return;
-        
         btn.onclick = (e) => {
             e.stopPropagation();
-
-            const areaKey = 'judgeArea';
-            if (!role[areaKey]) return;
-
-            const GT = GameText || window.Game.UI.GameText;
-            const titleSuffix = GT ? GT.render('judgeArea') : 'Judge Area';
-            const title = `${role.name} ${titleSuffix}`;
-            const prefix = 'role-judge:';
-            const sourceId = `${prefix}${role.id}`;
-            const cards = role[areaKey].cards || [];
-
-            let charNameKey = role.character;
-            if (Array.isArray(charNameKey) && charNameKey.length > 0) charNameKey = charNameKey[0];
-            if (!charNameKey) charNameKey = role.name;
-
-            let ownerNameHtml = charNameKey;
-            if (GT) {
-                ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
-            }
-
-            const openOptions = { 
-                forceFaceDown: false,
-                ownerName: ownerNameHtml,
-                areaName: titleSuffix
-            };
-
-            if (window.Game.UI.toggleCardViewer) {
-                window.Game.UI.toggleCardViewer(title, cards, sourceId, openOptions);
-            } else if (window.Game.UI.openCardViewer) {
-                window.Game.UI.openCardViewer(title, cards, sourceId, openOptions);
-            }
+            openJudgeViewer(role);
         };
     }
 
@@ -314,7 +316,8 @@
         resolveAvatarUrl,
         setupJudgeButton,
         setupEquipmentButton,
-        updateViewerLabels
+        updateViewerLabels,
+        openJudgeViewer
     };
 
     // 窗口尺寸变化时重新适配所有摘要角色名

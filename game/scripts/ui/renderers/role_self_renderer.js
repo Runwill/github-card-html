@@ -1,5 +1,5 @@
 (function() {
-    const { setupHandInspector, resolveAvatarUrl, setupJudgeButton, setupEquipmentButton, updateViewerLabels } = window.Game.UI._RoleUtils;
+    const { setupHandInspector, resolveAvatarUrl, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
 
     /**
      * 渲染自身角色信息 (Self Role Info)
@@ -121,25 +121,9 @@
                         e.stopPropagation();
                         const gs = window.Game.GameState;
                         if (!gs) return;
-                        const perspIdx = (gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
-                        const role = gs.players && gs.players[perspIdx];
-                        if (!role || !role.judgeArea) return;
-                        const GT = window.Game.UI.GameText;
-                        const titleSuffix = GT ? GT.render('judgeArea') : 'Judge Area';
-                        const title = `${role.name} ${titleSuffix}`;
-                        const sourceId = `role-judge:${role.id}`;
-                        const cards = role.judgeArea.cards || [];
-                        let charNameKey = role.character;
-                        if (Array.isArray(charNameKey) && charNameKey.length > 0) charNameKey = charNameKey[0];
-                        if (!charNameKey) charNameKey = role.name;
-                        let ownerNameHtml = charNameKey;
-                        if (GT) ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
-                        const openOptions = { forceFaceDown: false, ownerName: ownerNameHtml, areaName: titleSuffix };
-                        if (window.Game.UI.toggleCardViewer) {
-                            window.Game.UI.toggleCardViewer(title, cards, sourceId, openOptions);
-                        } else if (window.Game.UI.openCardViewer) {
-                            window.Game.UI.openCardViewer(title, cards, sourceId, openOptions);
-                        }
+                        const pIdx = (gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
+                        const role = gs.players && gs.players[pIdx];
+                        if (role) openJudgeViewer(role);
                     });
                     charImg.parentElement.appendChild(judgeCountEl);
                 }
