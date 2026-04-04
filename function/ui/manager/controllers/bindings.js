@@ -40,6 +40,7 @@
     $('account-menu-back')?.addEventListener('click', () => OV?.back?.());
     $('settings-button')?.addEventListener('click', () => OV?.open?.('settings-menu'));
     $('settings-menu-back')?.addEventListener('click', () => OV?.back?.());
+    $('help-button')?.addEventListener('click', () => window.openHelpPanel?.());
 
     // ── 弹窗打开按钮 ──
     $('update-account-button')?.addEventListener('click', () => OV?.open?.('update-account-modal'));

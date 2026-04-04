@@ -83,8 +83,10 @@
   /* 自定义：代词颜色（浅色主题下稍暗的红） */
   --pronoun-color: #d60000bb;
 
-  /* 等宽字体栈 */
+  /* 等宽字体栈（浅色主题） */
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  /* 键帽字体（默认继承等宽；典雅主题覆盖为衬线） */
+  --font-kbd: var(--font-mono);
 
   /* 过渡时长与缓动 */
   --dur-instant: 0ms;    /* 瞬切：visibility/border 开关 */

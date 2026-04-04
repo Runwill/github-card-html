@@ -1,0 +1,133 @@
+/* 上下文帮助浮层 */
+.help-popover {
+  position: fixed;
+  bottom: var(--space-lg);
+  right: var(--space-lg);
+  width: min(380px, calc(100vw - 2 * var(--space-lg)));
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity var(--dur-normal) var(--ease-default),
+              transform var(--dur-normal) var(--ease-default);
+}
+.help-popover.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* 标题栏 */
+.help-popover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.help-popover__title {
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text);
+}
+.help-popover__close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0 var(--space-2xs);
+  transition: color var(--dur-fast) var(--ease-default);
+}
+.help-popover__close:hover {
+  color: var(--text);
+}
+
+/* 内容区 */
+.help-popover__body {
+  overflow-y: auto;
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+}
+
+/* 提示行 */
+.help-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  padding: var(--space-2xs) 0;
+}
+.help-keys {
+  flex-shrink: 0;
+  display: flex;
+  gap: var(--space-3xs);
+}
+.help-keys kbd {
+  display: inline-block;
+  padding: var(--space-3xs) var(--space-xs);
+  font-size: var(--fs-sm);
+  font-family: var(--font-kbd, var(--font-mono));
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 85%, var(--text) 15%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+  min-width: 1.8em;
+  text-align: center;
+}
+.help-desc {
+  color: var(--text);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-normal);
+}
+
+/* 分隔线（通用提示） */
+.help-popover__separator {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-top: var(--space-sm);
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-2xs);
+  border-top: 1px solid var(--border);
+}
+
+/* 空态 */
+.help-popover__empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: var(--space-lg) 0;
+  font-size: var(--fs-sm);
+}
+
+/* 底部提示 */
+.help-popover__hint {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--fs-xs);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  text-align: center;
+}
+
+/* 小屏 */
+@media (max-width: 640px) {
+  .help-popover {
+    bottom: var(--space-sm);
+    right: var(--space-sm);
+    width: calc(100vw - 2 * var(--space-sm));
+    max-height: 55vh;
+  }
+  .help-row { flex-direction: column; gap: var(--space-3xs); }
+}

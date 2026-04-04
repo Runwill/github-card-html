@@ -55,6 +55,7 @@ html[data-theme="elegant"] {
 
   --text-active: var(--primary-1);
   --pronoun-color: #d3ad6b;
+  --font-kbd: "PingFang SC", "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", serif;
 
   color-scheme: dark;
 }
