@@ -3,10 +3,10 @@
 (function(){
   'use strict';
   var w = window;
-  var dom = (w.CardUI.Manager.Core.dom) || {};
-  var $ = dom.$ || function(id){ return document.getElementById(id); };
-  var qs = dom.qs || function(s){ return document.querySelector(s); };
-  var api = dom.api || function(u){ return u; };
+  var dom = w.CardUI.Manager.Core.dom;
+  var $ = dom.$;
+  var qs = dom.qs;
+  var api = dom.api;
 
   async function onApproveClick(){
     var token = (w.localStorage && w.localStorage.getItem('token')) || '';

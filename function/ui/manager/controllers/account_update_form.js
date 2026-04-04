@@ -3,11 +3,11 @@
 (function(){
   'use strict';
   var w = window;
-  var dom = (w.CardUI.Manager.Core.dom) || {};
-  var messages = (w.CardUI.Manager.Core.messages) || {};
-  var $ = dom.$ || function(id){ return document.getElementById(id); };
-  var api = dom.api || function(u){ return u; };
-  var showMessage = messages.showMessage || function(el, msg, type){ if(el){ el.textContent = msg; el.className = 'modal-message ' + (type||''); } };
+  var dom = w.CardUI.Manager.Core.dom;
+  var messages = w.CardUI.Manager.Core.messages;
+  var $ = dom.$;
+  var api = dom.api;
+  var showMessage = messages.showMessage;
 
   async function handleUpdateFormSubmit(event){
     event.preventDefault();

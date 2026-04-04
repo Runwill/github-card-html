@@ -3,16 +3,16 @@
 (function(){
   'use strict';
   var w = window;
-  var dom = (w.CardUI.Manager.Core.dom) || {};
-  var errors = (w.CardUI.Manager.Core.errors) || {};
-  var messages = (w.CardUI.Manager.Core.messages) || {};
+  var dom = w.CardUI.Manager.Core.dom;
+  var errors = w.CardUI.Manager.Core.errors;
+  var messages = w.CardUI.Manager.Core.messages;
 
-  var $ = dom.$ || function(id){ return document.getElementById(id); };
-  var abs = dom.abs || function(u){ return u; };
-  var api = dom.api || function(u){ return u; };
-  var resolveAvatarUrl = dom.resolveAvatarUrl || function(u){ return u || ''; };
-  var showMessage = messages.showMessage || function(el, msg, type){ if(el){ el.textContent = msg; el.className = 'modal-message ' + (type||''); } };
-  var parseErrorResponse = errors.parseErrorResponse || (async function(resp){ try{ var d = await resp.clone().json(); return { message: (d && d.message) || '', data: d }; } catch(_){ return { message: 'error', data: null }; }});
+  var $ = dom.$;
+  var abs = dom.abs;
+  var api = dom.api;
+  var resolveAvatarUrl = dom.resolveAvatarUrl;
+  var showMessage = messages.showMessage;
+  var parseErrorResponse = errors.parseErrorResponse;
 
   var cropper = null;
 

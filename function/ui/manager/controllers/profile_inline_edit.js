@@ -3,11 +3,11 @@
 (function(){
   'use strict';
   var w = window;
-  var dom = (w.CardUI.Manager.Core.dom) || {};
-  var messages = (w.CardUI.Manager.Core.messages) || {};
+  var dom = w.CardUI.Manager.Core.dom;
+  var messages = w.CardUI.Manager.Core.messages;
 
-  var $ = dom.$ || function(id){ return document.getElementById(id); };
-  var api = dom.api || function(u){ return u; };
+  var $ = dom.$;
+  var api = dom.api;
 
   // 共享 flash message 辅助
   function showFlash(type, text){

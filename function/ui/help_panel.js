@@ -24,7 +24,13 @@
     'account-menu': 'help.overlay.account',
     'settings-menu': 'help.overlay.settings',
     'key-settings-modal': 'help.overlay.keySettings',
-    'game-settings-modal': 'help.overlay.gameSettings'
+    'game-settings-modal': 'help.overlay.gameSettings',
+    'update-account-modal': 'help.overlay.password',
+    'approve-user-modal': 'help.overlay.approve',
+    'avatar-modal': 'help.overlay.avatar',
+    'avatar-crop-modal': 'help.overlay.crop',
+    'account-info-modal': 'help.overlay.accountInfo',
+    'announcements-modal': 'help.overlay.announcements'
   };
 
   // Game 面板子视图 → i18n key

@@ -189,7 +189,9 @@
         _syncLabel(ctx);
 
         // Auto-shrink any option text that overflows the dropdown width
-        _fitOptionTexts(ctx);
+        if (window._CustomSelectFit) {
+            window._CustomSelectFit.fitOptionTexts(ctx.dropdown, OPEN_CLASS);
+        }
     }
 
     function _syncLabel(ctx) {
@@ -212,71 +214,6 @@
         // Fire native change event so existing listeners work
         sel.dispatchEvent(new Event('change', { bubbles: true }));
         _syncLabel(ctx);
-    }
-
-    /**
-     * Auto-shrink font-size on dropdown option items that overflow.
-     * Two-pass: first find the smallest needed size, then apply it to ALL options
-     * so they appear uniform.
-     */
-    function _fitOptionTexts(ctx) {
-        const { dropdown } = ctx;
-        const items = Array.from(dropdown.children);
-        if (!items.length) return;
-        // Temporarily show dropdown off-screen for measurement
-        const wasOpen = dropdown.parentElement.classList.contains(OPEN_CLASS);
-        if (!wasOpen) {
-            dropdown.style.cssText = 'opacity:0;visibility:hidden;display:block;position:absolute;pointer-events:none;';
-        }
-        requestAnimationFrame(() => {
-            const MIN_SIZE = 9; // px minimum
-            // Get content width: subtract scrollbar and padding from dropdown
-            const dropStyle = getComputedStyle(dropdown);
-            const dropPadL = parseFloat(dropStyle.paddingLeft) || 0;
-            const dropPadR = parseFloat(dropStyle.paddingRight) || 0;
-            // scrollbarWidth = offsetWidth - clientWidth (clientWidth already excludes scrollbar)
-            const contentW = dropdown.clientWidth - dropPadL - dropPadR;
-            if (contentW <= 0) { _cleanup(); return; }
-
-            // Pass 1: find the smallest font-size needed across all items
-            let globalMin = Infinity;
-            items.forEach(item => {
-                item.style.fontSize = ''; // reset
-                item.style.whiteSpace = 'nowrap';
-                const style = getComputedStyle(item);
-                const padH = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-                const mrgH = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-                const availW = contentW - mrgH;
-                let curSize = parseFloat(style.fontSize);
-                // Use a hidden measurement span to get true text width
-                const textW = _measureTextWidth(item.textContent, curSize, style.fontFamily, style.fontWeight);
-                let w = textW + padH;
-                while (w > availW && curSize > MIN_SIZE) {
-                    curSize -= 0.5;
-                    w = _measureTextWidth(item.textContent, curSize, style.fontFamily, style.fontWeight) + padH;
-                }
-                if (curSize < globalMin) globalMin = curSize;
-            });
-
-            // Pass 2: apply the smallest size to ALL options for uniformity
-            if (globalMin < Infinity) {
-                items.forEach(item => {
-                    item.style.fontSize = globalMin + 'px';
-                });
-            }
-            _cleanup();
-        });
-        function _cleanup() {
-            if (!wasOpen) dropdown.style.cssText = '';
-        }
-    }
-
-    /** Measure text width using a temporary canvas (cached). */
-    let _measureCanvas = null;
-    function _measureTextWidth(text, fontSize, fontFamily, fontWeight) {
-        if (!_measureCanvas) _measureCanvas = document.createElement('canvas').getContext('2d');
-        _measureCanvas.font = (fontWeight || '') + ' ' + fontSize + 'px ' + (fontFamily || 'sans-serif');
-        return _measureCanvas.measureText(text).width;
     }
 
     function _toggle(ctx) {

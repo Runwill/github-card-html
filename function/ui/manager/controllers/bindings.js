@@ -3,11 +3,11 @@
   'use strict';
   const Core = window.CardUI.Manager.Core;
   const C = window.CardUI.Manager.Controllers;
-  const dom = Core.dom || {};
-  const $ = dom.$ || ((id)=>document.getElementById(id));
-  const qs = dom.qs || ((s)=>document.querySelector(s));
-  const resolveAvatarUrl = dom.resolveAvatarUrl || (u=>u||'');
-  const userService = Core.userService || {};
+  const dom = Core.dom;
+  const $ = dom.$;
+  const qs = dom.qs;
+  const resolveAvatarUrl = dom.resolveAvatarUrl;
+  const userService = Core.userService;
 
   function init(){
     const OV = C.overlay; // 统一覆盖层系统

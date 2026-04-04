@@ -1,7 +1,78 @@
 # ARCHITECTURE.md — card-html 前端项目架构文档
 
-> **最后更新**: 2026-04-04
+> **最后更新**: 2026-04-05
 > **适用对象**: AI Agent、新开发者快速定位代码
+> **帮助数据源**: `base/help.json` + `i18n/strings.js` 为用户可见的功能速查内容
+
+---
+
+## 0. ⚠️ AI Agent 必读提醒
+
+> 以下是本项目中容易被忽略的**全局特殊机制**，请在修改任何内容前先了解。
+
+### 0.1 动态 HTML 替换系统（全局 MutationObserver）
+
+`function/replace/` 下的 5 个替换模块通过 `MutationObserver` **持续扫描整个 `document`**，将自定义 XML 标签替换为带样式的交互元素：
+
+| 模块 | 自定义标签示例 | 替换效果 |
+|---|---|---|
+| `term.js` | `<round>`, `<currentRound>` 等术语标签 | 中文文本 + 主题色 + 折叠交互 |
+| `card_name.js` | `<ATTACK>`, `<DODGE>` 等卡牌标签名 | 卡牌中文名 + 类型着色（基本牌绿/锦囊橙） |
+| `character_name.js` | `<characterName class="characterID{id}">` | 角色中文名 + 高亮 + 双击跳转 |
+| `skill_name.js` | `<characterSkillElement class="{name}...">` | 技能中文名 + 高亮 + 双击跳转 |
+| `decompress.js` | 压缩标签（从 `base/compression.json`） | 解压为带前后缀 HTML 的完整内容 |
+
+**所有替换后的标签都支持**：悬停高亮 + 双击跳转到对应面板定义处。
+
+**⚠️ 关键区分**：`skill_name.js` 中的 **Lore Tooltip（典故引言浮层）仅在将池面板（panel_character）生效**——判定依据是 class 中包含 `LoreCharacterID{id}` 格式。技能面板（panel_skill）的 `<characterSkillElement>` 不含此格式，因此没有 Lore Tooltip。
+
+### 0.2 Foundation CSS 硬编码覆盖
+
+Foundation Sites CSS（`Foundation-Sites-CSS/css/foundation.css`）对部分元素有强制样式，例如：
+- `kbd { color: #0a0a0a; font-family: Consolas, monospace }` → 本项目用 `.help-keys kbd` 的 `color: var(--text)` 和 `font-family: var(--font-kbd)` 覆盖
+- 其他可能的覆盖还有 `label`, `table`, `button` 等基础元素
+
+**⚠️ 新增带基础标签的样式时**，务必检查 Foundation 是否有硬编码值需要覆盖。
+
+### 0.3 异步加载时序
+
+```
+页面加载 → include_loader.js 扫描 [data-include] → fetch partials → 注入 DOM
+          → window.partialsReady (Promise) resolve
+          → Foundation 初始化 → 术语/名称替换启动
+          → window.replacementsReady (Promise) resolve
+```
+
+**⚠️ 所有依赖 DOM 的模块必须等待 `window.partialsReady`**。依赖替换结果的逻辑须等 `window.replacementsReady`。
+
+### 0.4 Overlay 栈导航系统
+
+所有菜单和弹窗**统一**通过 `CardUI.Manager.Controllers.overlay` 管理，使用**栈式导航**：
+- `overlay.open(panelId)` / `overlay.back()` / `overlay.closeAll()`
+- `overlay.current()` 获取栈顶面板 ID
+- `overlay.isAnyOpen()` 检查是否有覆盖层打开
+- 11 个已注册面板：`sidebar-menu`, `account-menu`, `settings-menu`, `update-account-modal`, `approve-user-modal`, `avatar-modal`, `avatar-crop-modal`, `account-info-modal`, `announcements-modal`, `key-settings-modal`, `game-settings-modal`
+
+**⚠️ 新增弹窗/菜单时**，必须在 `controllers/overlay.js` 的 `PANELS` 中注册，否则无法通过统一导航打开。
+
+### 0.5 帮助系统（功能速查）
+
+用户按 `?` 键或从设置菜单打开上下文帮助面板（`function/ui/help_panel.js`）。帮助内容来自 `base/help.json`，文本引用 `i18n/strings.js` 中的翻译键。帮助面板会根据当前上下文自动切换内容：
+- **Overlay 优先**：若有覆盖层打开，显示该覆盖层的帮助
+- **面板次之**：无覆盖层时，显示当前 Tab 面板的帮助
+- **Game 特殊**：对局面板细分为 `setup` / `online` / `play` 三个子视图
+
+**⚠️ 新增面板功能或弹窗时**，需同步更新 `help.json`、`help_panel.js` 的映射表、`i18n/strings.js` 的翻译文本。
+
+### 0.6 i18n 国际化
+
+所有用户可见文本必须使用 i18n 键，通过 `window.t(key)` 或 `data-i18n` 属性翻译。词典分布在 4 个文件中（见第 6 节）。切换语言后触发 `i18n:changed` 事件。
+
+### 0.7 主题系统 CSS 变量
+
+所有颜色、阴影、字体等**必须通过 CSS 变量**（`--bg-start`, `--surface`, `--text`, `--primary-2` 等）引用，禁止硬编码颜色值。特殊变量：
+- `--font-mono`：等宽字体栈（全主题统一）
+- `--font-kbd`：键盘标签字体（默认等于 `--font-mono`，典雅主题覆盖为衬线体）
 
 ---
 
@@ -238,6 +309,7 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `theme.js` | 主题初始化（`<head>` 最先加载）：读取 `localStorage('theme')`、设置 `data-theme`、View Transitions | `window.setTheme()` |
 | `theme_toggle_button.js` | 主题切换按钮（light→dark→elegant→light） | `window.ThemeToggle` |
 | `force_landscape.js` | 手机竖屏强制横屏：检测触屏+窄屏条件、创建 `#fl-rotate` / `#fl-scroll` 旋转容器 | `window.__flTransformRect()`, `window.__flOffsetTopTo()`, `html.force-landscape` |
+| `touch_scroll.js` | 旋转容器触摸滚动：在 transform 父元素内恢复触摸滚动+惯性 | `window.TouchScrollManager`（`install`） |
 | `color_utils.js` | 颜色工具：解析/反转/混合（支持 hex/rgb/hsl） | `window.ColorUtils` |
 | `include_loader.js` | `data-include` 局部模板加载器：扫描→fetch→替换→移除占位 | `window.partialsReady`（Promise） |
 | `toast.js` | 全局 Toast 通知（成功/错误，自动消失） | `window.showToast()` |
@@ -245,12 +317,14 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `event_bindings.js` | 全局按钮事件绑定（strength、pronoun、include 等切换按钮） | IIFE 内部 |
 | `tooltip.js` | 轻量级悬浮提示管理器（`data-tooltip` 属性触发） | IIFE 内部 |
 | `custom_select.js` | 原生 `<select>` → 主题化自定义下拉组件 | `window.CustomSelect`（`init`, `wrap`, `refresh`, `refreshAll`） |
+| `custom_select_fit.js` | 下拉选项文字自适应缩小工具（Canvas 测量+统一字号） | `window._CustomSelectFit`（`fitOptionTexts`, `measureTextWidth`） |
 | `shared_search.js` | 将池/技能面板共享搜索框 | IIFE 内部 |
 | `draft_panel.js` | 草稿面板：HTML 编辑+预览（带术语替换） | `window.draftPanel` |
 | `announcements.js` | 更新公告弹窗：读取 `base/announcements.json`、卡片渲染 | IIFE 内部 |
 | `skill_copy.js` | 技能行 Ctrl+复制按钮（仅 admin/moderator） | IIFE 内部 |
 | `back_to_top.js` | 回到顶部按钮 | IIFE 内部 |
 | `collapsible.js` | 程序面板标题折叠（H1/H2/H3 层级） | IIFE 内部 |
+| `collapsible_transition.js` | 折叠/展开 CSS height 过渡动画工具 | `window.CollapsibleTransition`（`expand`, `collapse`） |
 | `key_bindings.js` | 快捷键设置系统：自定义绑定、录制、持久化 | `window.KeySettings` |
 | `game_settings.js` | 对局设置弹窗：速度滑块、拖拽惯性滑块 | IIFE 内部 |
 | `lang_toggle_button.js` | 语言切换按钮 | IIFE 内部 |
@@ -298,7 +372,6 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `diff.js` | 词元差异比较 | `window.tokensAdmin` |
 | `schema.js` | 词元结构/校验 | `window.tokensAdmin` |
 | `ui/search.js` | 搜索过滤 | `window.tokensAdmin` |
-| `ui/toast.js` | 词元专属 Toast | `window.tokensAdmin` |
 | `ui/render.js` | 词元列表渲染 | `window.tokensAdmin` |
 | `ui/logger.js` | 词元操作日志 | `window.tokensAdmin` |
 | `ui/modals.js` | 创建/编辑弹窗 | `window.tokensAdmin` |
@@ -564,6 +637,9 @@ window.CollapsibleAnim               # 折叠动画
 window.TimeFmt                       # 时间格式化
 window.LogUtils                      # 日志工具
 window.CustomSelect                  # 自定义下拉
+window._CustomSelectFit              # 下拉选项文字自适应
+window.TouchScrollManager            # 旋转容器触摸滚动
+window.CollapsibleTransition         # 折叠/展开过渡动画
 window.KeySettings                   # 快捷键设置
 window.ThemeToggle                   # 主题切换
 window.scrollActions                 # 滚动工具
@@ -599,6 +675,11 @@ window.replacementsReady             # 术语替换完成 Promise
 - `role_renderer_utils.js` + `role_self_renderer.js` + `role_list_renderer.js`（`Game.UI._RoleUtils`）
 - `permissions/render/render.js` + `render_content.js`（`TokensPerm._RenderUI`）
 - `permissions/logs/logs.js` + `logs_data.js`（`TokensPerm._LogsUI`）
+
+**使用独立工具模块模式的文件对**（工具文件先加载、主文件通过 `window` 引用）：
+- `custom_select_fit.js` → `custom_select.js`（`_CustomSelectFit`）
+- `touch_scroll.js` → `force_landscape.js`（`TouchScrollManager`）
+- `collapsible_transition.js` → `collapsible.js`（`CollapsibleTransition`）
 
 ### 8.3 事件系统 (`game/scripts/core/events.js`)
 
@@ -738,3 +819,270 @@ app_bootstrap.js
 4. **触发**: 在 `function/ui/manager/controllers/bindings.js` 中绑定触发按钮 → `overlay.open('your-modal-id')`
 5. **样式**: 在 `style/modals/` 下添加专用样式文件
 6. **加载**: 在 `index.html` 中添加 `<link>` 和 `<script>` 引用
+7. **帮助**: 在 `base/help.json` 的 `overlays` 中添加该面板的帮助条目
+8. **帮助映射**: 在 `function/ui/help_panel.js` 的 `OVERLAY_TITLE_KEY` 中添加 `'your-modal-id': 'help.overlay.yourModal'`
+9. **i18n**: 在 `i18n/strings.js` 中添加帮助标题和描述的翻译键
+
+---
+
+## 10. 用户功能速查（与帮助系统同步）
+
+> 以下内容与 `base/help.json` + `i18n/strings.js` 中的帮助文本对应。每个功能区域列出：用户可见行为、实现文件、技术细节。
+
+### 10.1 全局功能
+
+| 操作 | 用户行为 | 实现文件 |
+|---|---|---|
+| `?` 键 | 打开/关闭当前上下文的功能速查帮助 | `function/ui/help_panel.js` + `base/help.json` |
+| `T` 键 | 快速切换主题（浅色 → 深色 → 典雅） | `function/ui/theme_toggle_button.js` |
+| 导航栏滚轮 | 滚动鼠标滚轮快速切换 Tab 面板 | `function/ui/tabs.js` |
+| ☰ / 头像按钮 | 打开侧边栏菜单 | `function/ui/manager/controllers/bindings.js` |
+| 动态标签（全局） | 术语/卡牌名/角色名/技能名标签悬停高亮，双击跳转定义处 | `function/replace/*.js`（MutationObserver 全局生效） |
+
+### 10.2 侧边栏菜单 (`sidebar-menu`)
+
+**导航路径**: ☰ 按钮 → 侧边栏 → 各子项
+
+| 菜单项 | 用户行为 | 跳转目标 |
+|---|---|---|
+| 账号 → | 打开账号子菜单（名片/密码/头像） | `account-menu` overlay |
+| 设置 → | 打开设置子菜单（按键设置/对局设置/功能速查） | `settings-menu` overlay |
+| 审核 | 查看并审批待审核的用户注册申请 | `approve-user-modal` overlay |
+| 更新公告 | 查看版本更新公告 | `announcements-modal` overlay |
+| 主题 / 语言 | 直接切换深浅色主题或界面语言 | 就地切换，无新 overlay |
+| 退出 | 退出当前账号，跳转到登录页 | `controllers/session.js` |
+
+**实现**: `partials/modals.html`（侧边栏 DOM）→ `controllers/bindings.js`（事件绑定）→ `controllers/overlay.js`（导航）
+
+### 10.3 账号子菜单 (`account-menu`)
+
+| 菜单项 | 用户行为 | 跳转目标 |
+|---|---|---|
+| 名片 | 查看或编辑用户名片（头像/用户名/简介） | `account-info-modal` |
+| 密码 | 修改登录密码（需输入旧密码验证） | `update-account-modal` |
+| 头像 | 上传新头像并裁剪；需管理员审核后生效 | `avatar-modal` |
+
+### 10.4 设置子菜单 (`settings-menu`)
+
+| 菜单项 | 用户行为 | 跳转目标 |
+|---|---|---|
+| 按键设置 | 自定义快捷键绑定（展开术语/检查属性/切换主题） | `key-settings-modal` |
+| 对局设置 | 调整对局时机播放速度和拖动惯性 | `game-settings-modal` |
+| 功能速查 | 打开帮助面板 | `help_panel.js` toggleHelp() |
+
+### 10.5 弹窗功能详览
+
+#### 修改密码 (`update-account-modal`)
+
+| UI 元素 | 用户行为 |
+|---|---|
+| 旧密码 | 输入当前密码验证身份 |
+| 新密码 / 确认 | 输入新密码（至少 6 位）并再次确认 |
+| 更新按钮 | 提交后自动跳转到登录页重新登录 |
+
+**实现**: `controllers/account_update_form.js` → `PUT /api/change-password`
+**样式**: `style/modals/base.css`
+
+#### 审核管理 (`approve-user-modal`)
+
+| UI 元素 | 用户行为 |
+|---|---|
+| 注册审核 | 查看待审核的新用户注册申请，逐个批准或拒绝 |
+| 头像审核 | 查看用户提交的新头像，批准或拒绝 |
+| 用户名/简介 | 审核用户名或个人简介的变更申请 |
+| 权限限制 | 仅管理员 (admin) 和版主 (moderator) 可查看 |
+
+**实现**: `controllers/approvals.js` + `function/admin/approvals.js` → `GET /api/pending-users`, `GET /api/avatar/pending`, `GET /api/username/pending`, `GET /api/intro/pending`
+
+#### 头像管理 (`avatar-modal`)
+
+| UI 元素 | 用户行为 |
+|---|---|
+| 当前头像 | 显示当前已生效的头像 |
+| 上传头像 | 点击选择图片文件，进入裁剪流程 |
+| 审核中 | 如有待审核头像，在下方显示预览 |
+
+**实现**: `controllers/avatar.js` → 选择文件后打开 `avatar-crop-modal`
+**样式**: `style/modals/avatar.css`
+
+#### 裁剪头像 (`avatar-crop-modal`)
+
+| UI 元素 | 用户行为 |
+|---|---|
+| 拖拽 / 滚轮 | 拖拽移动图片、滚轮缩放，裁剪框固定 1:1 比例 |
+| 裁剪并上传 | 按当前选区裁剪为 512×512 图片并上传；需管理员审核 |
+| 取消 | 取消裁剪，返回头像管理 |
+
+**实现**: `controllers/avatar.js`（Cropper.js `viewMode: 1, aspectRatio: 1, dragMode: 'move'`）→ `POST /api/upload/avatar`（FormData）
+**输出**: 512×512 PNG
+
+#### 账号名片 (`account-info-modal`)
+
+| UI 元素 | 用户行为 |
+|---|---|
+| 头像 / 角色 | 显示头像、用户名、角色徽章（管理员/版主/用户/访客） |
+| 用户名 | 点击编辑图标可修改用户名（最多 12 字符）；变更需审核 |
+| 个人简介 | 点击简介区域可编辑个人简介（最多 500 字符）；变更需审核 |
+| 点击用户名行 | 复制用户名到剪贴板 |
+| 权限徽章 | 特殊权限以徽章形式显示在角色旁（如仪同三司 = 免审核） |
+
+**实现**: `controllers/account_info.js` + `controllers/profile_inline_edit.js`（行内编辑用户名/简介）
+**数据源**: `localStorage`（登录时缓存的用户数据）
+**样式**: `style/modals/account-info.css`
+
+#### 更新公告 (`announcements-modal`)
+
+| UI 元素 | 用户行为 |
+|---|---|
+| 公告卡片 | 每条公告显示为卡片，包含标题、日期和变更列表 |
+| 分类标签 | 变更自动分为"新增""优化""修复"三类 |
+| 重要标记 | 带 ★ 标记的公告为重要更新 |
+
+**实现**: `function/ui/announcements.js` → `fetch('base/announcements.json')`
+**数据**: `base/announcements.json`（`{ title, date, important, changes[] }`）
+**样式**: `style/modals/announcements.css`
+
+#### 按键设置 (`key-settings-modal`)
+
+| UI 元素 | 用户行为 |
+|---|---|
+| 展开所有术语 | 设置一键展开全部折叠术语的快捷键 |
+| 显示属性 | 设置长按显示属性面板的快捷键（默认 Ctrl） |
+| 切换深浅色 | 设置切换深浅色主题的快捷键（默认 T） |
+| Esc / Backspace | Esc 恢复默认按键，Backspace 清除绑定 |
+
+**实现**: `function/ui/key_bindings.js`（`ACTIONS` 对象定义可绑定操作）→ `localStorage` 持久化
+
+#### 对局设置 (`game-settings-modal`)
+
+| UI 元素 | 用户行为 |
+|---|---|
+| 时机速度 | 控制对局时机推进速度（0 为最快，范围 0-1000ms） |
+| 拖动惯性 | 调整拖动手牌的惯性手感（6 档：即时/灵敏/轻盈/中等/较重/非常重） |
+| 重置 | 恢复所有设置到默认值 |
+
+**实现**: `function/ui/game_settings.js` → `localStorage` 持久化
+
+### 10.6 Tab 面板功能
+
+#### 程序面板 (`panel_term`)
+
+| 操作 | 用户行为 |
+|---|---|
+| ▾ 三角按钮 | 点击标题前的三角按钮，折叠/展开该章节内容；状态自动保存 |
+| 展开所有术语 | 在按键设置中绑定快捷键，可一键展开所有折叠的术语 |
+| 动态标签 | 术语、卡牌名、角色名等标签悬停高亮，双击跳转到对应面板定义处 |
+
+**实现**: `function/ui/collapsible.js`（折叠）+ `function/replace/*.js`（动态标签）
+**内容源**: `partials/panel_term.html`（静态 HTML + 自定义 XML 标签）
+
+#### 技能面板 (`panel_skill`)
+
+| 操作 | 用户行为 |
+|---|---|
+| 搜索框 | 输入关键词实时过滤技能列表 |
+| Ctrl (按住) | 按住 Ctrl 后悬停技能行，出现复制按钮，点击复制整行文本 |
+| 动态标签 | 描述中的术语、卡牌名、角色名标签同样支持悬停高亮与双击跳转 |
+
+**实现**: `function/ui/shared_search.js` + `function/ui/skill_copy.js` + `function/summon/standard_character_skills_block.js`
+
+#### 牌库面板 (`panel_card`)
+
+| 操作 | 用户行为 |
+|---|---|
+| 动态标签 | 卡牌名按类型着色（基本牌绿 / 锦囊牌橙），描述中的术语、角色名标签悬停高亮，双击跳转 |
+
+**内容源**: `partials/panel_card.html`
+
+#### 将池面板 (`panel_character`)
+
+| 操作 | 用户行为 |
+|---|---|
+| 搜索框 | 输入关键词实时过滤武将列表 |
+| 技能名悬停 | 悬停武将的技能名，显示该武将专属的典故引言浮层（Lore Tooltip） |
+| 动态标签 | 描述中的术语、卡牌名、技能名标签支持悬停高亮与双击跳转 |
+
+**实现**: `function/ui/shared_search.js` + `function/summon/standard_characters_block.js` + `function/replace/skill_name.js`（Lore Tooltip）
+
+**⚠️ Lore Tooltip 仅在此面板生效**——判定依据是 `<characterSkillElement>` 的 class 中包含 `LoreCharacterID{id}` 格式。
+
+#### 草稿面板 (`panel_draft`)
+
+| 操作 | 用户行为 |
+|---|---|
+| 输入区 | 在输入区编写 HTML 代码，右侧实时预览渲染结果 |
+| 自动替换 | 预览中的自定义标签（术语/武将名/技能名/卡牌名）会被自动替换为带样式的元素 |
+| 自动保存 | 输入内容自动保存到本地，刷新页面后恢复 |
+
+**实现**: `function/ui/draft_panel.js`
+
+#### 词元面板 (`panel_tokens`，仅 admin)
+
+| 操作 | 用户行为 |
+|---|---|
+| 搜索框 | 搜索框输入关键词可实时过滤词元列表 |
+| 刷新 | 点击刷新按钮重新从服务器加载词元数据 |
+| 缩略/详细 | 点击按钮切换显示模式，缩略模式隐藏英文名、颜色标签、序号 |
+| 点击值 | 点击词元的属性值可行内编辑；颜色字段会出现取色器 |
+| 跳转按钮 | 点击跳转按钮可跳转到对应面板的术语/牌/武将/技能位置 |
+| 日志面板 | 展开底部日志面板查看词元变更历史 |
+
+**实现**: `function/admin/tokens/`（完整子模块：state/api/data/diff/schema/ui/actions）
+
+#### 权限面板 (`panel_permissions`，仅 admin)
+
+| 操作 | 用户行为 |
+|---|---|
+| 搜索框 | 搜索框按用户名或 ID 过滤用户列表 |
+| 部分/完全 | 切换部分/完全模式，控制权限编辑界面的显示范围 |
+| 用户条目 | 点击用户条目展开权限编辑（角色/密码/权限项） |
+| 日志 | 展开日志面板查看权限变更记录 |
+
+**实现**: `function/admin/permissions/`（完整子模块：ui/constants/api/render/logs）
+
+#### 对局面板 (`panel_game`)
+
+对局面板有三个互斥子视图，由 `Game.UI.switchGameView()` 管理：
+
+**通用按钮**:
+| 操作 | 用户行为 |
+|---|---|
+| 设置 | 切换设置面板，配置座位数、牌堆预设和对局模式 |
+| 在线 | 切换在线房间面板，创建或加入多人房间 |
+
+**设置视图 (`setup`)**:
+| 操作 | 用户行为 |
+|---|---|
+| 座位数 | 选择参与游戏的座位数（2/3/4/5/8） |
+| 牌堆预设 | 选择牌堆预设方案（如标准牌堆等） |
+| 模式切换 | 沙盒模式手动控制回合，自动模式按流程推进；在线对局锁定为沙盒 |
+| 旁观开关 | 允许或禁止旁观者加入房间（仅房主可见） |
+| 开始游戏 | 配置完成后点击开始游戏进入对局 |
+
+**在线视图 (`online`)**:
+| 操作 | 用户行为 |
+|---|---|
+| 创建房间 | 输入房间名创建房间，或回车快速创建 |
+| 房间列表 | 刷新查看可加入的房间列表，点击即可加入 |
+| 旁观 / 离开 | 在房间内可选择旁观（如允许）或离开 |
+
+**对局视图 (`play`)**:
+| 操作 | 用户行为 |
+|---|---|
+| 拖拽手牌 | 拖拽手牌到其他区域完成出牌；支持惯性和飞行动画 |
+| 右键 | 右键点击卡牌、角色或区域打开快捷菜单 |
+| 检查键 (按住) | 按住检查键（默认 Ctrl）悬停卡牌/角色/区域查看详细属性 |
+| 角色摘要 | 点击角色摘要展开查看技能列表、装备区和血量状态 |
+| 时机/日志 | 侧边栏显示当前时机标签、流程面包屑和操作日志 |
+
+**实现**: `game/scripts/`（完整子系统，详见第 4.2 节）
+
+### 10.7 登录页 (`login.html`)
+
+| 操作 | 用户行为 |
+|---|---|
+| 登录 | 输入用户名和密码登录 |
+| 注册 | 输入用户名和密码注册新账号 |
+| 切换后端 | 在公网后端和本地后端之间切换 |
+
+**实现**: `function/auth/login.js` + `function/auth/backend_toggle.js`

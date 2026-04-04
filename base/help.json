@@ -33,6 +33,39 @@
     "game-settings-modal": [
       { "keys": ["时机速度"], "desc": "help.gameset.speed" },
       { "keys": ["拖动惯性"], "desc": "help.gameset.inertia" }
+    ],
+    "update-account-modal": [
+      { "keys": ["旧密码"], "desc": "help.password.old" },
+      { "keys": ["新密码 / 确认"], "desc": "help.password.new" },
+      { "keys": ["更新"], "desc": "help.password.submit" }
+    ],
+    "approve-user-modal": [
+      { "keys": ["注册审核"], "desc": "help.approve.register" },
+      { "keys": ["头像审核"], "desc": "help.approve.avatar" },
+      { "keys": ["用户名/简介"], "desc": "help.approve.profile" },
+      { "keys": ["仅管理员"], "desc": "help.approve.role" }
+    ],
+    "avatar-modal": [
+      { "keys": ["当前头像"], "desc": "help.avatar.preview" },
+      { "keys": ["上传头像"], "desc": "help.avatar.upload" },
+      { "keys": ["审核中"], "desc": "help.avatar.pending" }
+    ],
+    "avatar-crop-modal": [
+      { "keys": ["拖拽 / 滚轮"], "desc": "help.crop.move" },
+      { "keys": ["裁剪并上传"], "desc": "help.crop.confirm" },
+      { "keys": ["取消"], "desc": "help.crop.cancel" }
+    ],
+    "account-info-modal": [
+      { "keys": ["头像 / 角色"], "desc": "help.info.header" },
+      { "keys": ["用户名"], "desc": "help.info.username" },
+      { "keys": ["个人简介"], "desc": "help.info.intro" },
+      { "keys": ["点击用户名行"], "desc": "help.info.copy" },
+      { "keys": ["权限徽章"], "desc": "help.info.permissions" }
+    ],
+    "announcements-modal": [
+      { "keys": ["公告卡片"], "desc": "help.announce.card" },
+      { "keys": ["分类标签"], "desc": "help.announce.category" },
+      { "keys": ["重要标记"], "desc": "help.announce.important" }
     ]
   },
   "panels": {

@@ -3,9 +3,9 @@
 (function(){
   'use strict';
   var w = window;
-  var dom = w.CardUI.Manager.Core.dom || {};
-  var userService = w.CardUI.Manager.Core.userService || {};
-  var $ = dom.$ || function(id){ return document.getElementById(id); };
+  var dom = w.CardUI.Manager.Core.dom;
+  var userService = w.CardUI.Manager.Core.userService;
+  var $ = dom.$;
 
   // ─── 配置 ───
   // 每个可打开的面板/弹窗在这里注册

@@ -3,10 +3,10 @@
   'use strict';
   const Core = window.CardUI.Manager.Core;
   const Ctrls = window.CardUI.Manager.Controllers;
-  const dom = Core.dom || {};
-  const $ = dom.$ || ((id)=>document.getElementById(id));
-  const qs = dom.qs || ((s)=>document.querySelector(s));
-  const resolveAvatarUrl = dom.resolveAvatarUrl || (u=>u||'');
+  const dom = Core.dom;
+  const $ = dom.$;
+  const qs = dom.qs;
+  const resolveAvatarUrl = dom.resolveAvatarUrl;
 
   const t = (typeof window.t === 'function') ? window.t : (k)=>k;
 
