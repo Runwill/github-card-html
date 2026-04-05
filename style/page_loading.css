@@ -91,7 +91,7 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    margin-top: 22px;
+    margin-top: 10px;
     font-size: 11px;
     color: color-mix(in srgb, var(--text) 30%, transparent);
     letter-spacing: 0.05em;

@@ -6,7 +6,6 @@
 /* ── 响应式 token 默认值（最小屏 ≤ 390px） ── */
 :root {
   --fs-root:           13.5px;      /* html 根字号 */
-  --fs-strength-title: 15px;      /* 武将称号水印字号 */
   --pad-content-l:     0.8em;     /* 正文区左内距 */
   --pad-content-r:     0.6em;     /* 正文区右内距 */
   --pad-ripple:        8px 17px;  /* 波纹按钮内距 */
@@ -17,8 +16,6 @@
   --h-search-gap:      0.5em;     /* 搜索栏下方留白 */
   --header-avatar-size: 28px;     /* 顶栏头像尺寸 */
   --h-header-title:    38px;      /* 顶栏标题容器高度 */
-  --mt-strength-title: 0.45em;    /* 强度按钮上外距 */
-  --mb-strength-title: 0;         /* 强度按钮下外距 */
 }
 
 /* ── 逐断点递增覆盖（仅修改变化的 token） ── */
@@ -43,7 +40,6 @@
 
 @media (min-width: 406px) {
   :root {
-    --fs-strength-title: 16px;
     --ml-header-title:   0.6rem;
     --mr-header-title:   33px;
   }
@@ -51,7 +47,6 @@
 
 @media (min-width: 421px) {
   :root {
-    --fs-strength-title: 18px;
     --ml-header-title:   0.7em;
     --mr-header-title:   38px;
     --mr-sidebar-tab:    9px;
@@ -178,15 +173,15 @@
 
 /* ── 选择器（只写一次，消费上面的 token） ── */
 html { font-size: var(--fs-root); }
-#header .strength_title { font-size: var(--fs-strength-title) !important; }
+#header .strength_title { font-size: calc(var(--h-header-title) * 0.44) !important; }
 #block-under-search { height: var(--h-search-gap); }
 .ripple-button { margin-left: -2em; margin-top: -1em; padding: var(--pad-ripple); }
 padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r); }
-#header_title { margin-right: var(--mr-header-title); }
+/* 0.739 = 字号比 0.44 × (左距 0.3 + 字宽 1 + 右距 0.38)，抵消 strength_title 真实布局宽度 */
+#header_title { margin-right: calc(var(--mr-header-title) - var(--h-header-title) * 0.739); }
 #sidebar .tabs-title { margin: 0 var(--mr-sidebar-tab) 0 0; }
 #menu-toggle { padding: var(--pad-menu-toggle); }
 #header-avatar { width: var(--header-avatar-size); height: var(--header-avatar-size); top: calc((100% - var(--header-avatar-size)) / 2); right: 8px; }
-.strength_title { margin-top: var(--mt-strength-title); margin-bottom: var(--mb-strength-title); }
 
 /* ≥ 1401 独有（仅此断点出现，不提取为 token） */
 @media (min-width: 1401px) {

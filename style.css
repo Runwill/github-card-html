@@ -21,12 +21,16 @@ body { overflow-x: hidden; margin: 0; font-size: .9rem; }
 
 /* 标题和特殊元素样式 */
 .strength_title {
-    display: inline;
-    line-height: 1.8em;
-    letter-spacing: -4px;
-    font-family: '古隶';
-    position: absolute;
+    line-height: 1;
+    letter-spacing: -0.5em;
+    font-family: '隶书';
     writing-mode: vertical-rl;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    margin: 0 0.38em 0 0.3em;
+    overflow: hidden;
+    transform: translateY(0.1em);
 }
 
 pronounName {
@@ -80,7 +84,7 @@ pronounName {
 /* 缩进和布局样式 */
 .indent {
     text-indent: 20px;
-    line-height: 1.9em;
+    line-height: var(--indent-lh, 1.9em);
     position: relative;
     transform: translateX(0);
     /* 仅对 transform/box-shadow/背景边线启用过渡，避免主题变量变动造成全局动画 */
@@ -94,12 +98,12 @@ pronounName {
 .indent .indent { transition-delay: var(--dur-fast); }
 .indent .indent .indent { transition-delay: var(--dur-normal); }
 .indent:not(:hover) { transition-delay: 0s; }
-.indent + .indent { padding-top: 0.6em; }
+.indent + .indent { padding-top: var(--indent-gap, 0.6em); }
 
-padding { display: block; padding-bottom: 1.2em; }
-.h { font-size: .9rem; padding-top: 0.75em; padding-bottom: 0.75em; }
+padding { display: block; padding-bottom: var(--pad-block, 1.2em); }
+.h { font-size: .9rem; padding-top: var(--h-pad-y, 0.75em); padding-bottom: var(--h-pad-y, 0.75em); }
 .bold { font-weight: bold; }
-.scroll { scroll-margin-top: 70px; }
+.scroll { scroll-margin-top: var(--scroll-snap, 70px); }
 
 lore {
     color: gray;
@@ -118,7 +122,7 @@ lore {
 /* 标题样式 */
 h1, h2, h3 {
     font-weight: 900;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--heading-mb, 0.5rem);
     letter-spacing: 0;
     transition: letter-spacing var(--dur-slower) var(--ease-standard);
 }

@@ -1,4 +1,4 @@
-const STRENGTH_NAMES = ['太平','升平','衰乱'];
+const STRENGTH_NAMES = ['太平','升平','衰亂'];
 function check_strength(){
     document.querySelectorAll('.strength_title').forEach(
         element => {

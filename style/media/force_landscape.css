@@ -38,16 +38,37 @@ html.force-landscape #fl-scroll {
   flex-direction: column;
 }
 
+/* ── 头栏 / 内容 token 校正 ──
+   force-landscape 下 CSS 视口宽度仍是手机竖屏尺寸（~371px），
+   但布局宽度实际为手机高度（~675px），需要将 token 上调到
+   与实际可用宽度匹配的档位；同时纵向仅 ~371px，收紧垂直尺寸。 */
+html.force-landscape {
+  /* 头栏横向 */
+  --pad-menu-toggle: 4px 8px;
+  --ml-header-title: 0.85em;
+  --mr-header-title: 42px;
+  --mr-sidebar-tab: 13px;
+  --pad-content-l: 1.0em;
+  --pad-content-r: 0.8em;
+  /* 头栏纵向 */
+  --h-header-title: 34px;
+  --h-search-gap: 0.3em;
+  /* 内容区紧凑（消费于 style.css 中已有选择器） */
+  --indent-lh: 1.6em;
+  --indent-gap: 0.25em;
+  --pad-block: 0.6em;
+  --h-pad-y: 0.35em;
+  --heading-mb: 0.25rem;
+  --scroll-snap: 42px;
+}
+
 /* ── 全屏铺满层（蒙版 / 加载遮罩 / Foundation 弹窗） ── */
 html.force-landscape .modal-backdrop,
 html.force-landscape #loading-overlay,
 html.force-landscape .reveal-overlay {
+  inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: auto !important;
-  bottom: auto !important;
 }
 
 /* ── 加载进度条（横屏宽度充裕，适当加宽） ── */
@@ -74,6 +95,9 @@ html.force-landscape .panel {
 html.force-landscape .panel--menu {
   padding: var(--space-xs) var(--space-lg);
   max-height: 86% !important;
+}
+html.force-landscape #sidebar-menu,
+html.force-landscape #account-menu {
   overflow-y: auto;
 }
 html.force-landscape #sidebar-menu li,
@@ -104,3 +128,14 @@ html.force-landscape #row-highlight-overlay {
   left: 0 !important;
   right: 0 !important;
 }
+
+/* ── 词元页紧凑（摘要卡片 + 列表减少纵向占用） ── */
+html.force-landscape #tokens-summary { gap: var(--space-sm); margin-top: var(--space-sm); }
+html.force-landscape #tokens-summary .type-tile { padding: var(--space-xs); }
+html.force-landscape #tokens-summary .type-tile__value { font-size: var(--fs-2xl); }
+html.force-landscape #tokens-content { margin-top: var(--space-sm); }
+html.force-landscape .tokens-section { margin-top: var(--space-sm); }
+html.force-landscape .tokens-section__header { padding: var(--space-xs) var(--space-md); }
+html.force-landscape .tokens-section__body { padding: var(--space-xs) var(--space-md); }
+html.force-landscape #tokens-content .token-card { padding: var(--space-xs) var(--space-sm); }
+html.force-landscape .admin-panel .tokens-toolbar { gap: var(--space-sm); }
