@@ -4,7 +4,8 @@
 .skill-row { position: relative; }
 .skill-copy-btn {
   position: absolute;
-  left: -48px; /* 行首偏左，避免遮挡正文 */
+  left: auto;
+  right: calc(100% + 8px); /* 贴靠在行首外侧，随按钮自身宽度自适应 */
   top: 50%;
   transform: translateY(-50%);
   opacity: 0;

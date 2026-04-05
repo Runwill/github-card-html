@@ -11,14 +11,11 @@
   --pad-content-r:     0.6em;     /* 正文区右内距 */
   --pad-ripple:        8px 17px;  /* 波纹按钮内距 */
   --pad-menu-toggle:   0px 0px;   /* 菜单开关内距 */
-  --pad-header-r:      32px;      /* 顶栏右内距，移动端默认 */
   --ml-header-title:   0.5rem;      /* 顶栏标题左外距 */
   --mr-header-title:   30px;      /* 顶栏标题右外距 */
   --mr-sidebar-tab:    8px;       /* 侧栏标签右外距 */
   --h-search-gap:      0.5em;     /* 搜索栏下方留白 */
   --header-avatar-size: 28px;     /* 顶栏头像尺寸 */
-  --top-header-avatar: 6px;       /* 顶栏头像距顶部 */
-  --right-header-avatar: 5px;    /* 顶栏头像距右侧 */
   --h-header-title:    38px;      /* 顶栏标题容器高度 */
   --mt-strength-title: 0.45em;    /* 强度按钮上外距 */
   --mb-strength-title: 0;         /* 强度按钮下外距 */
@@ -29,9 +26,7 @@
 @media (min-width: 381px) {
   :root {
     --fs-root:           14px;  
-    --pad-header-r:      43px;
     --header-avatar-size: 30px;
-    --right-header-avatar: 8px;
     --h-header-title:    40px;
   }
 }
@@ -49,22 +44,17 @@
 @media (min-width: 406px) {
   :root {
     --fs-strength-title: 16px;
-    --pad-header-r:      46px;
     --ml-header-title:   0.6rem;
     --mr-header-title:   33px;
-    --right-header-avatar: 10px;
   }
 }
 
 @media (min-width: 421px) {
   :root {
     --fs-strength-title: 18px;
-    --pad-header-r:      50px;
     --ml-header-title:   0.7em;
     --mr-header-title:   38px;
     --mr-sidebar-tab:    9px;
-    --top-header-avatar: 7px;
-    --right-header-avatar: 12px;
     --header-avatar-size: 36px;
     --h-header-title:    48px;
   }
@@ -195,7 +185,7 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 #header_title { margin-right: var(--mr-header-title); }
 #sidebar .tabs-title { margin: 0 var(--mr-sidebar-tab) 0 0; }
 #menu-toggle { padding: var(--pad-menu-toggle); }
-#header-avatar { width: var(--header-avatar-size); height: var(--header-avatar-size); top: var(--top-header-avatar); right: var(--right-header-avatar); }
+#header-avatar { width: var(--header-avatar-size); height: var(--header-avatar-size); top: calc((100% - var(--header-avatar-size)) / 2); right: 8px; }
 .strength_title { margin-top: var(--mt-strength-title); margin-bottom: var(--mb-strength-title); }
 
 /* ≥ 1401 独有（仅此断点出现，不提取为 token） */
@@ -218,9 +208,13 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
 }
 #search-input.is-shown { right: 0; }
 .search-container {
+  /* 单一变量驱动扩展区，避免负外边距与内边距双硬编码耦合 */
+  --search-shell-gutter: clamp(96px, 22vw, 200px);
   z-index: var(--z-sticky);
   top: 10%;
-  margin-left: -200px; margin-right: -200px;
-  padding-left: 200px; padding-right: 200px;
+  margin-left: calc(var(--search-shell-gutter) * -1);
+  margin-right: calc(var(--search-shell-gutter) * -1);
+  padding-left: var(--search-shell-gutter);
+  padding-right: var(--search-shell-gutter);
   position: sticky;
 }

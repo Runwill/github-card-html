@@ -93,25 +93,23 @@
 
 #tokens-content .kv-row {
   display: grid;
-  grid-template-columns: 160px 1fr;
+  grid-template-columns: 160px minmax(0, 1fr) auto;
   gap: var(--space-sm);
   padding: var(--space-xs) 0;
   border-bottom: 1px dashed var(--border);
-  position: relative; /* 供行内操作按钮绝对定位 */
 }
 
 /* 响应式优化：缩短 kv-key 列，避免小屏下键名后留白过长 */
 @media (max-width: 1024px) {
-  #tokens-content .kv-row { grid-template-columns: 140px 1fr; }
+  #tokens-content .kv-row { grid-template-columns: 140px minmax(0, 1fr) auto; }
 }
 @media (max-width: 768px) {
   /* 使用自适应最小宽 + 百分比上限，让短键名不占太多空白 */
-  #tokens-content .kv-row { grid-template-columns: minmax(96px, 38%) 1fr; }
+  #tokens-content .kv-row { grid-template-columns: minmax(96px, 38%) minmax(0, 1fr) auto; }
 }
 @media (max-width: 480px) {
-  /* 极窄屏进一步压缩键名列，并减少右侧操作区预留 */
-  #tokens-content .kv-row { grid-template-columns: minmax(80px, 44%) 1fr; }
-  #tokens-content .kv-val { --kv-actions-space: 56px; }
+  /* 极窄屏进一步压缩键名列 */
+  #tokens-content .kv-row { grid-template-columns: minmax(80px, 44%) minmax(0, 1fr) auto; }
 }
 
 #tokens-content .kv-row:last-child {
@@ -129,8 +127,7 @@
   white-space: pre-wrap;
   word-break: break-all;
   line-height: var(--lh-tight);
-  /* 预留右侧操作区空间，避免长文本与删除按钮重叠 */
-  padding-right: var(--kv-actions-space, 72px);
+  padding-right: 0;
   box-sizing: border-box;
   /* 使用内阴影模拟描边，避免 outline/边框引起的抖动与抗锯齿闪烁 */
   box-shadow: var(--shadow-kv-empty);
@@ -142,10 +139,8 @@
 
 /* 行内操作容器（删除等） */
 #tokens-content .kv-row .kv-actions {
-  position: absolute;
-  right: 6px;
-  top: 50%;
-  transform: translateY(-50%);
+  position: static;
+  align-self: center;
   display: flex;
   gap: var(--space-xs);
   opacity: 0;

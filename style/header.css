@@ -12,7 +12,7 @@
     backdrop-filter: blur(8px) saturate(1.1);
     border-bottom: 1px solid rgba(0,0,0,0.06);
     align-items: center;
-    padding-right: var(--pad-header-r);
+    padding-right: calc(var(--header-avatar-size) + 8px);
     position: sticky;
 }
 
