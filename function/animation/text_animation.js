@@ -105,7 +105,8 @@ class TextAnimationController {
                 a.addEventListener('click', () => {
                     const href = a.getAttribute('href') || '';
                     const panel = document.querySelector(href);
-                    if (panel) {
+                    // 若面板已处于激活状态（重复点击同一 tab），跳过动画重播
+                    if (panel && !panel.classList.contains('is-active')) {
                         // 延迟一帧确保 Foundation 已完成面板切换（display 从 none 变为 block）
                         requestAnimationFrame(() => this.replayAnimations(panel));
                     }

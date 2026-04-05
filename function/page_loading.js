@@ -44,7 +44,20 @@ function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 // domReady/resourcesReady/fontsReady/replacementsReady：四条件满足且 canComplete=true 时触发完成
 let domReady=false, resourcesReady=false, fontsReady=false, replacementsReady=false, canComplete=false, completionStarted=false
 
-// 检查是否可以完成进度条
+// 状态描述：进度条停留超过一定时间后显示当前等待项
+let statusTimer=null
+function updateStatus(){
+    const el=document.getElementById('loading-status'); if(!el) return
+    if(completionStarted){ el.classList.remove('is-visible'); return }
+    const pending=[]
+    if(!domReady) pending.push('DOM')
+    if(!resourcesReady) pending.push('资源')
+    if(!fontsReady) pending.push('字体')
+    if(!replacementsReady) pending.push('数据')
+    if(pending.length){ el.textContent='等待: '+pending.join(' / '); el.classList.add('is-visible') }
+    else { el.classList.remove('is-visible') }
+}
+function scheduleStatus(){ if(!statusTimer) statusTimer=setTimeout(updateStatus, 4000) }
 
 // 平滑完成进度条
 function completeProgressBar(){
@@ -60,13 +73,13 @@ function completeProgressBar(){
 // 开始检查完成条件的循环
 function startCompletionCheck(){ canComplete=true; attemptCompletion() }
 
-function attemptCompletion(){ if(!canComplete || completionStarted) return; if(domReady && resourcesReady && fontsReady && replacementsReady) completeProgressBar() }
+function attemptCompletion(){ updateStatus(); if(!canComplete || completionStarted) return; if(domReady && resourcesReady && fontsReady && replacementsReady) completeProgressBar() }
 
 // DOM加载完成
-document.addEventListener('DOMContentLoaded', ()=>{ domReady=true; attemptCompletion() })
+document.addEventListener('DOMContentLoaded', ()=>{ domReady=true; scheduleStatus(); attemptCompletion() })
 
 // 所有资源加载完成
-window.addEventListener('load', ()=>{ resourcesReady=true; attemptCompletion() })
+window.addEventListener('load', ()=>{ resourcesReady=true; scheduleStatus(); attemptCompletion() })
 
 // 名称 / 术语等替换完成（由 app_bootstrap.js 暴露）
 ;(function(){
