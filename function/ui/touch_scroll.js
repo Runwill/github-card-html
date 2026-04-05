@@ -1,14 +1,4 @@
-/**
- * TouchScrollManager — 旋转容器内手动触摸滚动
- *
- * 部分手机浏览器在 transform 父元素内不支持原生触摸滚动，
- * 此模块提供基于 touchstart/touchmove/touchend 的手动滚动实现，
- * 含惯性滚动（momentum）。
- *
- * 由 force_landscape.js 在创建 #fl-scroll 后调用。
- *
- * IIFE 模块，挂载到 window.TouchScrollManager
- */
+/** TouchScrollManager — transform 容器内手动触摸滚动（含惯性）。由 force_landscape.js 调用。 */
 ;(function () {
   'use strict';
 

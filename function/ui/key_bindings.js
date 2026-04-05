@@ -159,7 +159,6 @@
     if (!panel) return;
     const toggles = panel.querySelectorAll('.collapsible__toggle.is-collapsed');
     toggles.forEach(btn => btn.click());
-    if(toggles.length > 0) console.log(`Expanded ${toggles.length} terms.`);
   }
 
   function init() {

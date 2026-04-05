@@ -40,7 +40,6 @@
   function applyInertiaConfig(lerpFactor) {
     if (window.Game?.UI?.DragConfig) {
       window.Game.UI.DragConfig.lerpFactor = lerpFactor;
-      console.log(`[Settings] Drag Inertia set to ${lerpFactor}`);
     }
   }
 

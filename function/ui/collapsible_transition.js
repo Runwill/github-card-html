@@ -1,14 +1,4 @@
-/**
- * CollapsibleTransition — 折叠/展开过渡动画工具
- *
- * 提供 CSS height 过渡驱动的 expand/collapse 函数。
- * 展开完成后将 height 恢复为 auto 以适配内容动态变化。
- * 配合 .is-collapsed class 使用（区别于 admin/collapsible_anim.js 的 .is-open 模式）。
- *
- * 由 collapsible.js 调用。
- *
- * IIFE 模块，挂载到 window.CollapsibleTransition
- */
+/** CollapsibleTransition — CSS height 过渡驱动的折叠/展开动画。由 collapsible.js 调用。 */
 ;(function () {
   'use strict';
 

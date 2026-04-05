@@ -1,11 +1,4 @@
-/**
- * CustomSelect 文字自适应工具
- *
- * 在下拉选项文本溢出容器宽度时，自动统一缩小所有选项的字号。
- * 由 custom_select.js 在构建选项时调用。
- *
- * IIFE 模块，挂载到 window._CustomSelectFit
- */
+/** CustomSelect 文字自适应 — 选项溢出时统一缩小字号。由 custom_select.js 调用。 */
 ;(function () {
     'use strict';
 

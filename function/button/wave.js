@@ -25,7 +25,6 @@ class WaveButtonManager {
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
 
-        // 计算最大扩散半径，确保覆盖整个按钮
         const d=(a,b)=>a*a+b*b;
         const maxRadius = Math.sqrt(Math.max(
             d(x, y),
@@ -34,13 +33,11 @@ class WaveButtonManager {
             d(rect.width - x, rect.height - y)
         ));
 
-        // 获取按钮的主题色调
     const rippleColor = this.getRippleColor(window.getComputedStyle(button));
 
         const ripple = document.createElement('span');
         ripple.className = 'wave-ripple';
 
-        // 使用CSS变量和transform优化性能，减少动画时长提高响应速度
         ripple.style.cssText = `
             left: ${x}px;
             top: ${y}px;
@@ -56,7 +53,6 @@ class WaveButtonManager {
             animation: waveRipple 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         `;
 
-        // 确保按钮有相对定位和溢出隐藏
         if (getComputedStyle(button).position === 'static') {
             button.style.position = 'relative';
         }
@@ -65,7 +61,6 @@ class WaveButtonManager {
         button.appendChild(ripple);
         this.activeRipples.add(ripple);
 
-        // 清理机制：优先依赖动画结束事件，备用超时兜底
         const remove = () => this.removeRipple(ripple);
         ripple.addEventListener('animationend', remove, { once: true });
         setTimeout(() => { if (this.activeRipples.has(ripple)) remove(); }, 400);
