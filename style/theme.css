@@ -239,7 +239,7 @@ body { display: flex; flex-direction: column; }
 #main-content-row { flex: 1; display: flex; flex-direction: column; }
 #main-content-row > .columns { flex: 1; display: flex; flex-direction: column; }
 .tabs-content { flex: 1; display: flex; flex-direction: column; }
-.tabs-panel.is-active { flex: 1; }
+.tabs-panel.is-active { flex: 1; overflow-x: clip; }
 
 /* 同步 html 与 body 的背景，避免某些浏览器在 body 不满屏时显示不同底色 */
 /* 简写中包含 --bg-end 作为 background-color 兆底，避免平板端快速滚动时未栅格化区域显示黑色 */

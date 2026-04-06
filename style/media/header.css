@@ -14,7 +14,7 @@
   --mr-header-title:   30px;      /* 顶栏标题右外距 */
   --mr-sidebar-tab:    8px;       /* 侧栏标签右外距 */
   --h-search-gap:      0.5em;     /* 搜索栏下方留白 */
-  --header-avatar-size: 28px;     /* 顶栏头像尺寸 */
+  --header-avatar-size: calc(var(--h-header-title) * 0.75); /* 头像跟随头栏高度 */
   --h-header-title:    38px;      /* 顶栏标题容器高度 */
 }
 
@@ -23,7 +23,6 @@
 @media (min-width: 381px) {
   :root {
     --fs-root:           14px;  
-    --header-avatar-size: 30px;
     --h-header-title:    40px;
   }
 }
@@ -33,7 +32,6 @@
     --pad-ripple:      9px 20px;
     
     --fs-root:           15px;  
-    --header-avatar-size: 33px;
     --h-header-title:    44px;
   }
 }
@@ -50,7 +48,6 @@
     --ml-header-title:   0.7em;
     --mr-header-title:   38px;
     --mr-sidebar-tab:    9px;
-    --header-avatar-size: 36px;
     --h-header-title:    48px;
   }
 }
@@ -206,7 +203,7 @@ padding { padding-left: var(--pad-content-l); padding-right: var(--pad-content-r
   /* 单一变量驱动扩展区，避免负外边距与内边距双硬编码耦合 */
   --search-shell-gutter: clamp(96px, 22vw, 200px);
   z-index: var(--z-sticky);
-  top: 10%;
+  top: var(--search-sticky-top, 10%);
   margin-left: calc(var(--search-shell-gutter) * -1);
   margin-right: calc(var(--search-shell-gutter) * -1);
   padding-left: var(--search-shell-gutter);

@@ -60,6 +60,8 @@ html.force-landscape {
   --h-pad-y: 0.35em;
   --heading-mb: 0.25rem;
   --scroll-snap: 42px;
+  /* 检索框：横屏视口矮，10% 只有 37px 约等于头栏高，提高到 16% 保持视觉间距 */
+  --search-sticky-top: 16%;
 }
 
 /* ── 全屏铺满层（蒙版 / 加载遮罩 / Foundation 弹窗） ── */
