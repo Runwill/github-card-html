@@ -239,12 +239,12 @@
 }
 
 .tokens-log__filters .custom-select .custom-select__trigger {
-    height: var(--tokens-filter-h, 32px) !important;
-    font-size: var(--tp-fs-md, var(--fs-md)) !important;
+    height: 32px !important;
+    font-size: var(--fs-md) !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     border-radius: var(--radius-none) !important;
-    line-height: var(--tokens-filter-h, 32px);
+    line-height: 32px;
 }
 
 /* ── Responsive ────────────────────────────────────────────────────── */

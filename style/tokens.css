@@ -24,27 +24,26 @@ html { scrollbar-gutter: stable both-edges; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: var(--tokens-toolbar-wrap, nowrap);
-  gap: var(--tokens-toolbar-gap, var(--space-lg));
+  gap: var(--space-lg);
 }
 
 .admin-panel .tokens-toolbar h2 {
   margin: 0;
 }
 
-.admin-panel .toolbar-actions { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: nowrap; width: var(--toolbar-actions-w, auto); }
+.admin-panel .toolbar-actions { display: flex; align-items: center; gap: var(--space-sm); flex-wrap: nowrap; }
 
 /* 统一输入组（搜索+刷新） */
-.admin-panel .tokens-input-group { display: inline-flex; align-items: stretch; max-width: var(--tokens-input-group-max-w, 60vw); }
+.admin-panel .tokens-input-group { display: inline-flex; align-items: stretch; max-width: 60vw; }
 .admin-panel .tokens-input {
-  height: var(--tokens-input-h, 36px);
-  min-width: var(--tokens-input-min-w, 180px);
-  flex: 1 1 var(--tokens-input-basis, 240px);
-  padding: var(--tokens-input-py, var(--space-sm)) var(--tokens-input-px, var(--space-md));
+  height: 36px;
+  min-width: 180px;
+  flex: 1 1 240px;
+  padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--border);
   border-right: none; /* 与按钮合并 */
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-  font-size: var(--tp-fs-md, var(--fs-md));
+  font-size: var(--fs-md);
   color: var(--text);
   background: var(--surface);
   line-height: var(--lh-tight);
@@ -53,13 +52,13 @@ html { scrollbar-gutter: stable both-edges; }
 /* .tokens-input:focus 统一由 theme.css 覆盖 */
 .admin-panel .tokens-input::placeholder { color: var(--text-subtle); }
 .admin-panel .tokens-btn {
-  height: var(--tokens-input-h, 36px);
-  padding: 0 var(--tokens-btn-px, var(--space-lg)) !important;
+  height: 36px;
+  padding: 0 var(--space-lg) !important;
   /* 默认按钮造型（单个按钮时也能圆角） */
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important;
   border: 1px solid var(--border) !important;
   border-left: none !important;
-  font-size: var(--tp-fs-md, var(--fs-md)) !important;
+  font-size: var(--fs-md) !important;
   line-height: var(--lh-tight) !important;
   display: inline-flex;
   align-items: center;
@@ -180,15 +179,10 @@ html { scrollbar-gutter: stable both-edges; }
 
 /* 当容器极窄时，允许整组换行，但刷新按钮与文字保持一行 */
 @media (max-width: 480px) {
-  :root {
-    --tokens-toolbar-wrap: wrap;
-    --tokens-toolbar-gap: var(--space-sm);
-    --toolbar-actions-w: 100%;
-    --tokens-input-group-max-w: none;
-    --tokens-input-min-w: 120px;
-    --tokens-input-basis: auto;
-  }
-  .admin-panel .tokens-input-group { width: 100%; }
+  .admin-panel .tokens-toolbar { flex-wrap: wrap; gap: var(--space-sm); }
+  .admin-panel .toolbar-actions { width: 100%; }
+  .admin-panel .tokens-input-group { width: 100%; max-width: none; }
+  .admin-panel .tokens-input { flex: 1 1 auto; min-width: 120px; }
 }
 #tokens-content .count-badge {
   animation: none !important;
@@ -199,30 +193,30 @@ html { scrollbar-gutter: stable both-edges; }
   vertical-align: baseline;
   line-height: var(--lh-none);
   margin-left: var(--space-2xs);
-  font-size: var(--tp-fs-sm, var(--fs-sm));
+  font-size: var(--fs-sm);
 }
 
 /* 摘要容器：grid 布局（从内联移出） */
 #tokens-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
-  gap: var(--tokens-summary-gap, var(--space-md));
-  margin-top: var(--tokens-summary-mt, var(--space-lg));
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
 }
 
 /* 内容容器（从内联移出） */
 #tokens-content {
-  margin-top: var(--tokens-content-mt, var(--space-xl));
+  margin-top: var(--space-xl);
 }
 
 /* 摘要 tiles：将背景与间距转移至 CSS */
 #tokens-summary .type-tile {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: var(--tokens-tile-pad, var(--space-md));
+  padding: var(--space-md);
 }
-#tokens-summary .type-tile__label { font-size: var(--tp-fs-sm, var(--fs-sm)); color: var(--text-muted); }
-#tokens-summary .type-tile__value { font-weight: 700; font-size: var(--tokens-tile-value-fs, var(--fs-4xl)); color: var(--text); }
+#tokens-summary .type-tile__label { font-size: var(--fs-sm); color: var(--text-muted); }
+#tokens-summary .type-tile__value { font-weight: 700; font-size: var(--fs-4xl); color: var(--text); }
 /* 类型背景色（从原内联移出） */
 #tokens-summary .type-tile[data-type="term-fixed"]   { background-color: #EDF2F7; }
 #tokens-summary .type-tile[data-type="term-dynamic"] { background-color: #E6FFFA; }
@@ -234,19 +228,19 @@ html { scrollbar-gutter: stable both-edges; }
 .tokens-section {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  margin-top: var(--tokens-section-mt, var(--space-lg));
+  margin-top: var(--space-lg);
 }
 .tokens-section__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--tokens-section-header-pad, var(--space-md) var(--space-lg));
+  padding: var(--space-md) var(--space-lg);
   background: var(--panel-header-bg);
   border-bottom: 1px solid var(--border);
 }
 .tokens-section__title { font-weight: 600; color: var(--text); }
 .tokens-section__ops { display: flex; align-items: center; gap: var(--space-sm); }
-.tokens-section__body { padding: var(--tokens-section-body-pad, var(--space-md) var(--space-lg)); }
+.tokens-section__body { padding: var(--space-md) var(--space-lg); }
 .tokens-section__more { margin-top: var(--space-sm); }
 .tokens-empty { color: var(--text-subtle); }
 
@@ -260,7 +254,7 @@ html { scrollbar-gutter: stable both-edges; }
   border: 1px solid var(--border);
   border-left: 3px solid var(--token-accent, var(--border));
   border-radius: var(--radius-sm) ;
-  padding: var(--tokens-card-pad, var(--space-sm) var(--space-md));
+  padding: var(--space-sm) var(--space-md);
   background: var(--token-bg, var(--surface));
   box-shadow: var(--shadow-none);
   transform: translateY(6px);
@@ -300,7 +294,7 @@ html { scrollbar-gutter: stable both-edges; }
 /* 按住 Ctrl 时隐藏属性删除按钮，仅保留整对象删除入口 */
 .ctrl-down #tokens-content .kv-row .kv-actions { display: none !important; }
 #tokens-content .btn--xs {
-  font-size: var(--tp-fs-sm, var(--fs-sm));
+  font-size: var(--fs-sm);
   padding: var(--space-3xs) var(--space-sm);
   line-height: var(--lh-tight);
   border-radius: var(--radius-xs);

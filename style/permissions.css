@@ -29,18 +29,18 @@
 .tokens-log__filters * { box-sizing: border-box; }
 .tokens-log__filters .btn,
 .tokens-log__filters .tokens-btn {
-  height: var(--tokens-filter-h, 32px) !important;
-  line-height: var(--tokens-filter-h, 32px) !important;
+  height: 32px !important;
+  line-height: 32px !important;
   padding-top: 0 !important;
   padding-bottom: 0 !important;
-  font-size: var(--tp-fs-md, var(--fs-md)) !important;
+  font-size: var(--fs-md) !important;
 }
 .tokens-log__filters input.tokens-input,
 .tokens-log__filters select.tokens-input,
 .tokens-log__filters input,
 .tokens-log__filters select {
-  height: var(--tokens-filter-h, 32px) !important;
-  font-size: var(--tp-fs-md, var(--fs-md)) !important;
+  height: 32px !important;
+  font-size: var(--fs-md) !important;
   padding-top: var(--space-2xs) !important;
   padding-bottom: var(--space-2xs) !important;
   min-width: 0 !important;
@@ -116,7 +116,7 @@
 .perm-editor__toolbar { display: flex; gap: var(--space-sm); margin-bottom: var(--space-sm); }
 .perm-editor__list { display: grid; grid-template-columns: 1fr; gap: var(--space-sm); max-width: 420px; }
 .perm-editor__item { display: flex; align-items: center; gap: var(--space-sm); }
-.perm-editor__item-text { font-size: var(--tp-fs-md, var(--fs-md)); color: var(--text); }
+.perm-editor__item-text { font-size: var(--fs-md); color: var(--text); }
 .perm-editor__actions { display: flex; gap: var(--space-sm); justify-content: flex-end; margin-top: var(--space-md); }
 
 /* 覆盖 tokens-input 在工具条中的“拼接样式”，在编辑器中应为独立输入框 */
@@ -125,9 +125,9 @@
 .perm-editor input[type="password"],
 .perm-editor input[type="date"],
 .perm-editor select {
-  height: var(--tokens-filter-h, 32px) !important;
-  font-size: var(--tp-fs-md, var(--fs-md)) !important;
-  padding: var(--tokens-input-py, var(--space-xs)) var(--tokens-input-px, var(--space-md)) !important;
+  height: 32px !important;
+  font-size: var(--fs-md) !important;
+  padding: var(--space-xs) var(--space-md) !important;
   border: 1px solid var(--border) !important;   /* 恢复右边框 */
   border-radius: var(--radius-sm) !important;           /* 独立圆角 */
   outline: none;
