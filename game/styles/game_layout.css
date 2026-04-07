@@ -196,9 +196,6 @@
         order: -1;
     }
     /* 平板：允许底部区域收缩以适应更小的可见视口 */
-    .game-bottom-section {
-        flex-shrink: 1;
-    }
     .game-log-panel {
         flex-direction: row;
         justify-content: space-between;

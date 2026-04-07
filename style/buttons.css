@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   position: relative; /* 供禁用提示气泡定位 */
-  padding: var(--space-lg) var(--space-2xl);
+  padding: var(--btn-py, var(--space-lg)) var(--btn-px, var(--space-2xl));
   border-radius: var(--radius-md); /* 与 modal 按钮一致 */
   font-size: var(--fs-lg);
   font-weight: 500;
@@ -46,7 +46,7 @@
 
 /* 小尺寸按钮（列表内使用） */
 .btn--sm {
-  padding: var(--space-xs) var(--space-lg) !important;
+  padding: var(--btn-sm-py, var(--space-xs)) var(--btn-sm-px, var(--space-lg)) !important;
   font-size: var(--fs-base) !important;
   border-radius: var(--radius-sm) !important;
 }

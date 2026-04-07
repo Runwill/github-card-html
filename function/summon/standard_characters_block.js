@@ -27,7 +27,7 @@ function CharacterReplace(character, skill) {
         if (!c) continue
         const iconPath = 'source/' + c.position + (c.dominator ? '_君主' : '') + '.png'
         out += `<characterParagraph class='characterParagraph'><div class='container'><div class='role_title'>${c.title || ''}</div>`
-        out += `<div class='role_icon${c.dominator ? ' dominator' : ' not_dominator'} role_icon--mask' style="width:300px;height:300px;-webkit-mask-image:url('${iconPath}');mask-image:url('${iconPath}');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;"></div><padding><h3>${id} <characterName class="characterID${id} scroll"></characterName> `
+        out += `<div class='role_icon${c.dominator ? ' dominator' : ' not_dominator'} role_icon--mask' style="-webkit-mask-image:url('${iconPath}');mask-image:url('${iconPath}');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;"></div><padding><h3>${id} <characterName class="characterID${id} scroll"></characterName> `
         out += "<health epithet='2' style='font-size: 1.3em;letter-spacing: -2px;'></health>".repeat(c.health || 0)
         out += '</h3>'
 

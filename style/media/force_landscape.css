@@ -62,6 +62,32 @@ html.force-landscape {
   --scroll-snap: 42px;
   /* 检索框：横屏视口矮，10% 只有 37px 约等于头栏高，提高到 16% 保持视觉间距 */
   --search-sticky-top: 16%;
+  /* ── 词元页紧凑（视觉高度仅 ~371px，全面收紧纵向占用） ── */
+  --tokens-toolbar-wrap: nowrap;       /* 视觉宽 ~675px，不需要换行 */
+  --toolbar-actions-w: auto;
+  --tokens-input-h: 22px;
+  --tokens-filter-h: 20px;
+  --tokens-input-py: 2px;
+  --tokens-input-min-w: 60px;
+  --tokens-input-basis: 90px;
+  --tokens-input-group-max-w: 40vh;    /* CSS vh ≈ 视觉宽 675px → 40vh ≈ 270px */
+  --tokens-summary-gap: var(--space-2xs);
+  --tokens-summary-mt: var(--space-2xs);
+  --tokens-tile-pad: var(--space-2xs) var(--space-sm);
+  --tokens-tile-value-fs: 14px;
+  --tokens-content-mt: var(--space-2xs);
+  --tokens-section-mt: var(--space-2xs);
+  --tokens-section-header-pad: var(--space-2xs) var(--space-sm);
+  --tokens-section-body-pad: var(--space-2xs) var(--space-sm);
+  --tokens-card-pad: var(--space-3xs) var(--space-xs);
+  --tokens-toolbar-gap: var(--space-xs);
+  /* ── 权限页紧凑 ── */
+  --approval-row-pad: var(--space-2xs) clamp(6px, 1.78vh, 12px); /* 纵紧凑 横跟行宽(CSS vh=视觉宽≈675px) */
+  --approval-row-mb: var(--space-2xs);
+  --approval-row-gap: var(--space-xs);
+  --approval-img-size: 28px;
+  /* ── 字号紧凑（视觉高度 ~371px，clamp 的 vh 参照仍为 ~675px 偏大） ── */
+  --tp-fs-sm: 9px;
 }
 
 /* ── 全屏铺满层（蒙版 / 加载遮罩 / Foundation 弹窗） ── */
@@ -130,14 +156,3 @@ html.force-landscape #row-highlight-overlay {
   left: 0 !important;
   right: 0 !important;
 }
-
-/* ── 词元页紧凑（摘要卡片 + 列表减少纵向占用） ── */
-html.force-landscape #tokens-summary { gap: var(--space-sm); margin-top: var(--space-sm); }
-html.force-landscape #tokens-summary .type-tile { padding: var(--space-xs); }
-html.force-landscape #tokens-summary .type-tile__value { font-size: var(--fs-2xl); }
-html.force-landscape #tokens-content { margin-top: var(--space-sm); }
-html.force-landscape .tokens-section { margin-top: var(--space-sm); }
-html.force-landscape .tokens-section__header { padding: var(--space-xs) var(--space-md); }
-html.force-landscape .tokens-section__body { padding: var(--space-xs) var(--space-md); }
-html.force-landscape #tokens-content .token-card { padding: var(--space-xs) var(--space-sm); }
-html.force-landscape .admin-panel .tokens-toolbar { gap: var(--space-sm); }

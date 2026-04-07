@@ -1,5 +1,10 @@
 /* 全局变量和基础样式 */
-:root { --animation-duration: var(--dur-slower); --animation-easing: var(--ease-standard); }
+:root {
+  --animation-duration: var(--dur-slower);
+  --animation-easing: var(--ease-standard);
+  /* 将池水印：根据视口高度缩放，1738×978 标准下 300px / 5em */
+  --role-icon-size: clamp(150px, 30.7vh, 300px);
+}
 * {
     user-select: none;
     -webkit-user-select: none;
@@ -64,11 +69,13 @@ pronounName {
 }
 .role_title {
     font-family: '明朝';
-    font-size: 5em;
+    font-size: clamp(2.5em, 8.2vh, 5em);
     left: -5%;
     z-index: 1;
 }
 .role_icon {
+    width: var(--role-icon-size);
+    height: var(--role-icon-size);
     left: 10%;
     z-index: 0;
 }
