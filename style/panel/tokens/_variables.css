@@ -11,16 +11,16 @@
 
 :root {
   /* -- 词元面板共享字号 --------------------------------- */
-  --tp-fs-sm:    clamp(10px, 1.266vh, 14px);   /* 基准 12px ← 辅助文本、badge、log pill */
-  --tp-fs-base:  clamp(10px, 1.371vh, 15px);   /* 基准 13px ← 日志正文、code */
-  --tp-fs-md:    clamp(11px, 1.477vh, 16px);   /* 基准 14px ← 显式 var(--fs-md) 元素（input、btn） */
-  --tp-fs-2xl:   clamp(13px, 1.899vh, 20px);   /* 基准 18px ← body 继承（0.9rem × --fs-root 20px）*/
-  --tp-fs-4xl:   clamp(16px, 2.321vh, 26px);   /* 基准 22px ← 统计数字 */
+  --tp-fs-sm:    clamp(8px, 1.266vh, 14px);    /* 基准 12px ← 辅助文本、badge、log pill */
+  --tp-fs-base:  clamp(8px, 1.371vh, 15px);    /* 基准 13px ← 日志正文、code */
+  --tp-fs-md:    clamp(9px, 1.477vh, 16px);    /* 基准 14px ← 显式 var(--fs-md) 元素（input、btn） */
+  --tp-fs-2xl:   clamp(10px, 1.899vh, 20px);   /* 基准 18px ← body 继承（0.9rem × --fs-root 20px）*/
+  --tp-fs-4xl:   clamp(12px, 2.321vh, 26px);   /* 基准 22px ← 统计数字 */
 
   /* -- 需要独立于字号的尺寸 ----------------------------- */
-  --tokens-input-h:     clamp(24px, 3.797vh, 40px);    /* 输入框 / 按钮固定高度 */
-  --tokens-kv-key-w:    clamp(80px, 8.368vw, 180px);   /* 键值对键名列宽（横向 → vw） */
-  --tokens-log-max-h:   clamp(140px, 27.426vh, 300px); /* 日志面板最大高度 */
+  --tokens-input-h:     clamp(20px, 3.797vh, 40px);    /* 输入框 / 按钮固定高度 */
+  --tokens-kv-key-w:    clamp(60px, 8.368vw, 180px);   /* 键值对键名列宽（横向 → vw） */
+  --tokens-log-max-h:   clamp(100px, 27.426vh, 300px); /* 日志面板最大高度 */
 }
 
 /* -- force-landscape：vh↔vw 互换 -------------------------
@@ -31,14 +31,24 @@
  */
 html.force-landscape {
   /* 字号 & 纵向尺寸：视觉高度 = 物理宽 → vw */
-  --tp-fs-sm:         clamp(10px, 1.266vw, 14px);
-  --tp-fs-base:       clamp(10px, 1.371vw, 15px);
-  --tp-fs-md:         clamp(11px, 1.477vw, 16px);
-  --tp-fs-2xl:        clamp(13px, 1.899vw, 20px);
-  --tp-fs-4xl:        clamp(16px, 2.321vw, 26px);
-  --tokens-input-h:   clamp(24px, 3.797vw, 40px);
-  --tokens-log-max-h: clamp(140px, 27.426vw, 300px);
+  --tp-fs-sm:         clamp(8px, 1.266vw, 14px);
+  --tp-fs-base:       clamp(8px, 1.371vw, 15px);
+  --tp-fs-md:         clamp(9px, 1.477vw, 16px);
+  --tp-fs-2xl:        clamp(10px, 1.899vw, 20px);
+  --tp-fs-4xl:        clamp(12px, 2.321vw, 26px);
+  --tokens-input-h:   clamp(20px, 3.797vw, 40px);
+  --tokens-log-max-h: clamp(100px, 27.426vw, 300px);
 
   /* 横向尺寸：视觉宽度 = 物理高 → vh */
-  --tokens-kv-key-w:  clamp(80px, 8.368vh, 180px);
+  --tokens-kv-key-w:  clamp(60px, 8.368vh, 180px);
+}
+
+/* -- 全局 .btn--sm 集成 -----------------------------------
+ * buttons.css .btn--sm 使用静态 --fs-base (13px) + 固定 --space 内距，
+ * 此处替换为动态 token + em，使词元面板内的按钮跟随 vh 缩放。
+ */
+#panel_tokens .btn--sm,
+#panel_permissions .btn--sm {
+  font-size: var(--tp-fs-base, 13px) !important;
+  padding: 0.462em 0.923em !important;   /* 6/13, 12/13 */
 }

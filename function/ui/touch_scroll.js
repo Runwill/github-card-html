@@ -70,6 +70,14 @@
         momentumRaf = null;
       }
     }
+
+    // 鼠标滚轮：旋转 90° 后物理纵向（deltaY）对应视觉横向，需要交换
+    scrollEl.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      // 物理向下滚（deltaY>0）在旋转后应向视觉下方滚→scrollTop 增大
+      // 物理向右滚（deltaX>0）也映射到 scrollTop
+      scrollEl.scrollTop += e.deltaX - e.deltaY;
+    }, { passive: false });
   }
 
   window.TouchScrollManager = { install: install };

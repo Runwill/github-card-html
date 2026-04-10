@@ -1,0 +1,145 @@
+/* style/panel/permissions/editor.css -- 权限页行内编辑器
+ *
+ * ── .perm-editor ─────────────────────────────────────────
+ * 位置：.approval-row > .perm-editor
+ * 字号继承：.approval-row 18px（--tp-fs-2xl）
+ * 间距单位：em（基于继承 18px）
+ *
+ * 向下传递：
+ *   → .perm-editor__toolbar       字号：继承 18px；gap ← em
+ *   → .perm-editor__list          字号：继承 18px；grid gap ← em
+ *     → .perm-editor__item        字号：继承 18px
+ *       → .perm-editor__item-text 字号 ← --tp-fs-base (13px)
+ *   → .perm-editor__actions       字号：继承 18px
+ *   → .tokens-input / input       字号 ← --tp-fs-md (14px) [toolbar.css]
+ *
+ * 合并自：
+ *   · permissions.css  .perm-editor 基础规则
+ *   · theme.css        #panel_permissions .perm-editor* 覆盖
+ *
+ * 已移除：
+ *   × height: 32px !important  → 由 --tokens-input-h 接管
+ *   × font-size: var(--fs-md)  → 由 --tp-fs-md 接管
+ *   × @media (max-width: 480px) → clamp() 自动处理
+ * ─────────────────────────────────────────────────────── */
+
+/* ── 编辑器容器 ────────────────────────────────────────── */
+#panel_permissions .perm-editor {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.667em;                 /* 12/18 */
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  box-shadow: var(--shadow-perm-editor);
+  margin: 0.444em 0;                /* 8/18 */
+  overflow: hidden;
+  height: auto;
+  opacity: 1;
+  transition: height var(--dur-normal) var(--ease-default),
+              opacity var(--dur-normal) var(--ease-default),
+              transform var(--dur-normal) var(--ease-default),
+              padding-top var(--dur-normal) var(--ease-default),
+              padding-bottom var(--dur-normal) var(--ease-default),
+              margin-top var(--dur-normal) var(--ease-default),
+              margin-bottom var(--dur-normal) var(--ease-default),
+              border-width var(--dur-normal) var(--ease-default);
+  will-change: height, opacity, transform, padding, margin, border-width;
+}
+
+/* 精简变体（修改密码等） */
+#panel_permissions .perm-editor--plain {
+  border: none;
+  background: transparent;
+  padding: 0.444em 0 0;             /* 8/18 */
+  box-shadow: none;
+}
+
+/* 收起态 */
+#panel_permissions .perm-editor.is-collapsed {
+  height: 0 !important;
+  opacity: 0 !important;
+  transform: translateY(-0.222em);   /* 4/18 */
+  pointer-events: none;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-width: 0 !important;
+}
+
+/* ── 精简模式焦点 ──────────────────────────────────────── */
+#panel_permissions .perm-editor--plain .tokens-input,
+#panel_permissions .perm-editor--plain input[type="text"],
+#panel_permissions .perm-editor--plain input[type="password"] {
+  box-shadow: none !important;
+}
+#panel_permissions .perm-editor--plain .tokens-input:focus,
+#panel_permissions .perm-editor--plain input[type="text"]:focus,
+#panel_permissions .perm-editor--plain input[type="password"]:focus {
+  box-shadow: none !important;
+  border-color: var(--text-subtle) !important;
+}
+
+/* 精简模式下项目无边框 */
+#panel_permissions .perm-editor--plain .perm-editor__item {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* ── 工具栏 ────────────────────────────────────────────── */
+#panel_permissions .perm-editor__toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 0.444em;                     /* 8/18 */
+  margin-bottom: 0.556em;           /* 10/18 */
+}
+#panel_permissions .perm-editor__toolbar .btn {
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+/* ── 权限清单网格 ──────────────────────────────────────── */
+#panel_permissions .perm-editor__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10em, 1fr)); /* 180/18 */
+  gap: 0.444em;                     /* 8/18 */
+  max-height: 12.222em;             /* 220/18 */
+  overflow: auto;
+  padding-right: 0.222em;           /* 4/18 */
+}
+
+/* ── 单个权限项 ────────────────────────────────────────── */
+#panel_permissions .perm-editor__item {
+  display: flex;
+  align-items: center;
+  gap: 0.444em;                     /* 8/18 */
+  padding: 0.333em 0.444em;         /* 6/18, 8/18 */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+#panel_permissions .perm-editor__item input { margin: 0; }
+#panel_permissions .perm-editor__item-text {
+  font-size: var(--tp-fs-base, 13px);
+  color: var(--text);
+}
+
+/* ── 操作区 ────────────────────────────────────────────── */
+#panel_permissions .perm-editor__actions {
+  display: flex;
+  gap: 0.444em;                     /* 8/18 */
+  justify-content: flex-end;
+  margin-top: 0.556em;              /* 10/18 */
+}
+
+/* ── 编辑器内独立输入框（覆盖 toolbar.css 的拼接外观） ── */
+#panel_permissions .perm-editor .tokens-input,
+#panel_permissions .perm-editor input[type="text"],
+#panel_permissions .perm-editor input[type="password"],
+#panel_permissions .perm-editor input[type="date"],
+#panel_permissions .perm-editor select {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}

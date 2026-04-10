@@ -37,9 +37,6 @@
     // 注册时间
     if (u.createdAt) {
       const dateSpan = makeEl('span', 'approval-sub__date');
-      dateSpan.style.marginLeft = '10px';
-      dateSpan.style.fontSize = '12px';
-      dateSpan.style.color = '#a0aec0';
       try { dateSpan.textContent = new Date(u.createdAt).toLocaleString(); } catch { dateSpan.textContent = u.createdAt; }
       sub.appendChild(dateSpan);
     }

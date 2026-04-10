@@ -130,14 +130,3 @@ html.force-landscape #row-highlight-overlay {
   left: 0 !important;
   right: 0 !important;
 }
-
-/* ── 词元页紧凑（摘要卡片 + 列表减少纵向占用） ── */
-html.force-landscape #tokens-summary { gap: var(--space-sm); margin-top: var(--space-sm); }
-html.force-landscape #tokens-summary .type-tile { padding: var(--space-xs); }
-html.force-landscape #tokens-summary .type-tile__value { font-size: var(--fs-2xl); }
-html.force-landscape #tokens-content { margin-top: var(--space-sm); }
-html.force-landscape .tokens-section { margin-top: var(--space-sm); }
-html.force-landscape .tokens-section__header { padding: var(--space-xs) var(--space-md); }
-html.force-landscape .tokens-section__body { padding: var(--space-xs) var(--space-md); }
-html.force-landscape #tokens-content .token-card { padding: var(--space-xs) var(--space-sm); }
-html.force-landscape .admin-panel .tokens-toolbar { gap: var(--space-sm); }

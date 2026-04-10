@@ -14,8 +14,12 @@
 
     /**
      * Auto-shrink font-size on dropdown option items that overflow.
-     * Two-pass: first find the smallest needed size, then apply it to ALL options
-     * so they appear uniform.
+     * Two-pass: first binary-search the smallest needed size (0.1px precision),
+     * then apply it to ALL options for uniformity.
+     *
+     * padding 若为 em 单位会随字号同步缩小，算法通过 padRatio 模拟；
+     * 若为 px 则 padRatio 仅在 origSize 时准确，缩小后略偏乐观，
+     * TOLERANCE 补偿 canvas 测量与 DOM 的误差以及该偏差。
      *
      * @param {HTMLElement} dropdown  - The dropdown container element
      * @param {string}      openClass - CSS class indicating the dropdown is open
@@ -31,36 +35,49 @@
         }
 
         requestAnimationFrame(function () {
-            // Get content width: subtract scrollbar and padding from dropdown
             var dropStyle = getComputedStyle(dropdown);
             var dropPadL = parseFloat(dropStyle.paddingLeft) || 0;
             var dropPadR = parseFloat(dropStyle.paddingRight) || 0;
             var contentW = dropdown.clientWidth - dropPadL - dropPadR;
             if (contentW <= 0) { _cleanup(); return; }
 
-            // Pass 1: find the smallest font-size needed across all items
+            var TOLERANCE = 1;           // px — canvas/DOM 误差余量
+            var PRECISION = 0.1;         // px — 二分搜索精度
+            var MAX_ITER  = 20;          // 最多迭代次数
+
+            // Pass 1: binary-search the smallest needed font-size
             var globalMin = Infinity;
             items.forEach(function (item) {
-                item.style.fontSize = ''; // reset
+                item.style.fontSize = '';
                 item.style.whiteSpace = 'nowrap';
                 var style = getComputedStyle(item);
-                var padH = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-                var mrgH = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-                var availW = contentW - mrgH;
-                var curSize = parseFloat(style.fontSize);
-                var textW = measureTextWidth(item.textContent, curSize, style.fontFamily, style.fontWeight);
-                var w = textW + padH;
-                while (w > availW && curSize > MIN_SIZE) {
-                    curSize -= 0.5;
-                    w = measureTextWidth(item.textContent, curSize, style.fontFamily, style.fontWeight) + padH;
+                var origSize = parseFloat(style.fontSize);
+                var padH = (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0);
+                var mrgH = (parseFloat(style.marginLeft) || 0) + (parseFloat(style.marginRight) || 0);
+                var availW = contentW - mrgH - TOLERANCE;
+
+                var textW = measureTextWidth(item.textContent, origSize, style.fontFamily, style.fontWeight);
+                if (textW + padH <= availW) {
+                    if (origSize < globalMin) globalMin = origSize;
+                    return;
                 }
-                if (curSize < globalMin) globalMin = curSize;
+
+                // Binary search: largest font-size where text + padding <= availW
+                var lo = MIN_SIZE, hi = origSize;
+                for (var i = 0; i < MAX_ITER && hi - lo > PRECISION; i++) {
+                    var mid = (lo + hi) / 2;
+                    var w = measureTextWidth(item.textContent, mid, style.fontFamily, style.fontWeight) + padH;
+                    if (w <= availW) lo = mid;
+                    else hi = mid;
+                }
+                if (lo < globalMin) globalMin = lo;
             });
 
-            // Pass 2: apply the smallest size to ALL options for uniformity
+            // Pass 2: apply uniform size (rounded to 0.1px)
             if (globalMin < Infinity) {
+                var rounded = Math.round(globalMin * 10) / 10;
                 items.forEach(function (item) {
-                    item.style.fontSize = globalMin + 'px';
+                    item.style.fontSize = rounded + 'px';
                 });
             }
             _cleanup();

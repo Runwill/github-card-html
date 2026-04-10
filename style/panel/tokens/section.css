@@ -2,7 +2,7 @@
  *
  * ── .tokens-section ──────────────────────────────────────
  * 尺寸继承链：
- *   字号     ← --tp-fs-2xl (vh)，clamp(13px, 1.899vh, 20px)
+ *   字号     ← --tp-fs-2xl (vh)，clamp(10px, 1.899vh, 20px)
  *            基准 18px = body 继承（0.9rem × --fs-root 20px）
  *   margin   ← em（字号），0.667em = 12/18
  *   高度     ← auto（由内容撑开）
@@ -11,6 +11,7 @@
  *   → .tokens-section__header   字号：继承 18px；内距 ← em
  *     → .tokens-section__title  字号：继承；font-weight: 600
  *     → .tokens-section__ops    字号：继承；gap ← 0.444em
+ *       → .btn--sm              字号 ← --tp-fs-base (13px) [_variables.css 集成]；内距 ← em
  *   → .tokens-section__body     字号：继承；内距 ← em
  *     → .token-card             （见 card.css）
  *   → .tokens-section__more     margin ← em

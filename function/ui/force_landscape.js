@@ -13,7 +13,7 @@
 
   /* ── 配置 ─────────────────────────────────────── */
   var MQ =
-    '(orientation: portrait) and (pointer: coarse) and (hover: none)' +
+    '(orientation: portrait) and (pointer: coarse)' +
     ' and (max-width: 768px) and (max-height: 950px)';
 
   /** 留在 #fl-rotate 但不在 #fl-scroll 中的固定层选择器 */

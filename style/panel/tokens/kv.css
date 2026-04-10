@@ -3,7 +3,7 @@
  * ── .kv-row ──────────────────────────────────────────────
  * 尺寸继承链：
  *   字号     ← 继承 .token-card (--tp-fs-2xl, 18px)
- *   列宽     ← --tokens-kv-key-w (vw)，clamp(80px, 8.368vw, 180px)
+ *   列宽     ← --tokens-kv-key-w (vw)，clamp(60px, 8.368vw, 180px)
  *   gap      ← em（字号），0.444em = 8/18
  *   padding  ← em（字号），0.333em = 6/18
  *   高度     ← auto（由内容撑开）

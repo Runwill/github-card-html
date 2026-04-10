@@ -348,7 +348,7 @@ card-html/
 
 ### 3.1 全局样式 (`style/`)
 
-> **⚠️ 迁移提示**：下表为迁移前的文件结构。词元面板相关样式（`tokens.css`、`tokens_log.css`）将按 `REFACTOR_DYNAMIC_CSS.md` §2 拆分至 `style/panel/tokens/`，迁移完成后此处将同步更新。
+> **✅ 迁移完成**：词元面板样式（原 `tokens.css`、`tokens_log.css`）已拆分至 `style/panel/tokens/`；权限面板样式（原 `permissions.css`）已拆分至 `style/panel/permissions/`。详见 `REFACTOR_DYNAMIC_CSS.md`。
 
 | 文件 | 职责 |
 |---|---|
@@ -360,9 +360,18 @@ card-html/
 | `style/footer.css` | 底部固定栏 |
 | `style/buttons.css` | 统一按钮样式（`.btn--primary`、`.btn--secondary` 等） |
 | `style/animations.css` | 文本入场动画（`.animate-in`） |
-| `style/tokens.css` | 词元面板样式 |
-| `style/tokens_log.css` | 词元/权限日志面板样式 |
-| `style/permissions.css` | 权限管理面板样式 |
+| `style/panel/tokens/_variables.css` | 词元面板动态 token（clamp + force-landscape） |
+| `style/panel/tokens/toolbar.css` | 词元面板顶部工具栏 |
+| `style/panel/tokens/summary.css` | 词元面板摘要统计卡片 |
+| `style/panel/tokens/section.css` | 词元面板分区容器 |
+| `style/panel/tokens/card.css` | 词元卡片 |
+| `style/panel/tokens/kv.css` | 键值对行 + 内联编辑 |
+| `style/panel/tokens/nest.css` | 嵌套结构 |
+| `style/panel/tokens/log.css` | 变更日志面板 |
+| `style/panel/tokens/animation.css` | 词元页动画（card-in、collapsible、toast） |
+| `style/panel/permissions/filters.css` | 权限页日志筛选条 |
+| `style/panel/permissions/editor.css` | 权限页行内编辑器 |
+| `style/panel/permissions/rows.css` | 权限页用户行、标签、过渡、参数高亮 |
 | `style/collapsible.css` | 折叠/展开动画（`.collapsible`、`.is-open`） |
 | `style/row_highlight.css` | 行高亮条覆盖层 |
 | `style/term_button.css` | 术语按钮样式 |
@@ -525,7 +534,7 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `event_bindings.js` | 全局按钮事件绑定（strength、pronoun、include 等切换按钮） | IIFE 内部 |
 | `tooltip.js` | 轻量级悬浮提示管理器（`data-tooltip` 属性触发） | IIFE 内部 |
 | `custom_select.js` | 原生 `<select>` → 主题化自定义下拉组件 | `window.CustomSelect`（`init`, `wrap`, `refresh`, `refreshAll`） |
-| `custom_select_fit.js` | 下拉选项文字自适应缩小工具（Canvas 测量+统一字号） | `window._CustomSelectFit`（`fitOptionTexts`, `measureTextWidth`） |
+| `custom_select_fit.js` | 下拉选项文字自适应缩小工具（Canvas 测量+二分搜索精确拟合） | `window._CustomSelectFit`（`fitOptionTexts`, `measureTextWidth`） |
 | `shared_search.js` | 将池/技能面板共享搜索框 | IIFE 内部 |
 | `draft_panel.js` | 草稿面板：HTML 编辑+预览（带术语替换） | `window.draftPanel` |
 | `announcements.js` | 更新公告弹窗：读取 `base/announcements.json`、卡片渲染 | IIFE 内部 |

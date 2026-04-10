@@ -4,7 +4,7 @@
  * 尺寸继承链：
  *   字号     ← 继承 body (18px)
  *   内距     ← em（字号）
- *   最大高度 ← --tokens-log-max-h (vh)，clamp(140px, 27.426vh, 300px)
+ *   最大高度 ← --tokens-log-max-h (vh)，clamp(100px, 27.426vh, 300px)
  *   高度     ← auto（由内容撑开，max-height 限制）
  *
  * 向下传递：

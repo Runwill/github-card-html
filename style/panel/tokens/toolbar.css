@@ -2,7 +2,7 @@
  *
  * ── .tokens-toolbar ──────────────────────────────────────
  * 尺寸继承链：
- *   字号     ← --tp-fs-2xl (vh)，clamp(13px, 1.899vh, 20px)
+ *   字号     ← --tp-fs-2xl (vh)，clamp(10px, 1.899vh, 20px)
  *            基准 18px = body 继承（0.9rem × --fs-root 20px）
  *   gap      ← em（字号），0.667em = 12/18
  *   高度     ← auto（由子元素撑开）
@@ -15,7 +15,7 @@
  *     → .tokens-btn           字号 ← --tp-fs-md (14px)；高度 ← token；内距 ← em
  *   → .mode-toggle            字号：继承 18px
  *   → .tokens-refresh         字号：继承 18px
- *   → .expand-btn             字号 ← btn--sm (13px)；内距 ← em
+ *   → .expand-btn             字号 ← --tp-fs-base (13px) [_variables.css 集成]；内距 ← em
  * ─────────────────────────────────────────────────────── */
 
 .admin-panel .tokens-toolbar {
@@ -105,13 +105,13 @@
 /* 展开 / 收起按钮 */
 #panel_tokens .expand-btn {
   position: relative;
-  padding-left: 2.154em !important; /* 28/13，基于 btn--sm 字号 13px；!important 覆盖 btn--sm 的 padding shorthand */
+  padding-left: 2.154em !important; /* 28/13，基于 --tp-fs-base 13px；!important 覆盖 btn--sm 的 padding shorthand */
   white-space: nowrap;
 }
 #panel_tokens .expand-btn::before {
   content: '';
   position: absolute;
-  left: 0.769em;           /* 10/13 — btn--sm 字号 13px */
+  left: 0.769em;           /* 10/13 — --tp-fs-base 13px */
   top: 50%;
   transform: translateY(-50%) rotate(45deg);
   width: 0.769em;          /* 10/13 */
@@ -128,10 +128,3 @@
 
 /* 刷新按钮在窄屏保持不被压缩 */
 .admin-panel .tokens-refresh { white-space: nowrap; flex: 0 0 auto; }
-
-/* 极窄屏：允许 toolbar 换行（保留布局形态规则，非尺寸断点） */
-@media (max-width: 480px) {
-  .admin-panel .tokens-toolbar { flex-wrap: wrap; }
-  .admin-panel .toolbar-actions { width: 100%; }
-  .admin-panel .tokens-input-group { width: 100%; max-width: none; }
-}

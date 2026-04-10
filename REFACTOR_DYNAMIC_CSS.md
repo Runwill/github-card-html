@@ -1,7 +1,7 @@
 # CSS 动态视口缩放重构计划
 
 > **创建日期**: 2026-04-08
-> **最后更新**: 2026-04-08
+> **最后更新**: 2026-04-09
 > **目标**: 将全站静态像素 + 媒体查询断点系统迁移为级联缩放模型，减少冗余断点代码，实现连续自适应布局
 > **基准窗口**: 1912 * 948（`innerWidth * innerHeight`），即 ARCHITECTURE.md 0.13 所定义的 100% 参考
 
@@ -42,34 +42,38 @@
 
 #### 具体示例
 
-以 `tokens-section__header` 为例（基准窗口 1912x948 下 padding 10px 12px、字号 14px）：
+以 `tokens-section` 为例（基准窗口 1912x948 下 body 字号 18px、padding 10px 12px）：
 
 ```css
+.tokens-section {
+  /* 字号 ← 窗口高度 (vh)，基准 18px / 948 = 1.899vh */
+  font-size: clamp(10px, 1.899vh, 20px);
+  margin-top: 0.667em;              /* 12/18 */
+}
 .tokens-section__header {
-  /* 字号 ← 窗口高度 (vh)，基准 14px / 948 = 1.477vh */
-  font-size: clamp(11px, 1.477vh, 16px);
-  /* 内距 ← 字号 (em)，基准 10/14 = 0.714em, 12/14 = 0.857em */
-  padding: 0.714em 0.857em;
+  /* 内距 ← 字号 (em)，基准 10/18 = 0.556em, 12/18 = 0.667em */
+  padding: 0.556em 0.667em;
 }
 ```
 
-效果链：窗口变小 → `1.477vh` 变小 → 字号变小 → `0.714em` 跟着变小 → 整个 header 等比缩小。只需定义一条 `clamp()` + 一条 `em`，**无需任何 `@media` 断点**。
+效果链：窗口变小 → `1.899vh` 变小 → 字号变小 → `0.556em` 跟着变小 → 整个 section 等比缩小。只需定义一条 `clamp()` + 一条 `em`，**无需任何 `@media` 断点**。
 
 子元素自动继承：
 
 ```css
-.tokens-section__title { font-weight: 600; }           /* 继承 header 字号 */
-.tokens-section__ops   { gap: 0.5em; }                  /* 间距跟随继承的字号 */
-.tokens-section__ops .btn { padding: 0.25em 0.5em; }    /* 按钮内距跟随自身字号 */
+.tokens-section__title { font-weight: 600; }           /* 继承 section 字号 */
+.tokens-section__ops   { gap: 0.444em; }                /* 间距跟随继承的字号 */
 ```
+
+全局 `.btn--sm` 按钮在面板内由 `_variables.css` 统一纳入级联体系——见 §4.5.2。
 
 #### 换算公式
 
-| 方向 | 公式 | 示例（基准 14px 字号） |
+| 方向 | 公式 | 示例（基准 18px 字号） |
 |---|---|---|
-| 纵向 (vh) | `基准px / 948 * 100` | `14 / 948 * 100 = 1.477vh` |
-| 横向 (vw) | `基准px / 1912 * 100` | `14 / 1912 * 100 = 0.732vw` |
-| em 换算 | `目标px / 当前font-size` | `10px / 14px = 0.714em` |
+| 纵向 (vh) | `基准px / 948 * 100` | `18 / 948 * 100 = 1.899vh` |
+| 横向 (vw) | `基准px / 1912 * 100` | `160 / 1912 * 100 = 8.368vw` |
+| em 换算 | `目标px / 当前font-size` | `10px / 18px = 0.556em` |
 
 在 1912x948 窗口下，`clamp()` 的中间值精确等于原始像素值，**视觉零差异**。
 
@@ -109,9 +113,10 @@ style/
 |   |   +-- log.css                #     (8) tokens-log（变更日志面板）
 |   |   +-- animation.css          #     (9) 词元页动画（card-in、collapsible、toast）
 |   |
-|   +-- permissions/               #   权限面板（未来，结构同上）
-|       +-- _variables.css
-|       +-- ...
+|   +-- permissions/               #   权限面板（✅ 已完成，复用 tokens/_variables.css token）
+|       +-- filters.css            #     日志筛选条
+|       +-- editor.css             #     行内编辑器
+|       +-- rows.css               #     用户行、标签、过渡、参数高亮
 |
 +-- modal/                         # 【未来】弹窗样式（从 style/modals/ 迁移）
 |   +-- base.css
@@ -173,13 +178,13 @@ style/
 
 ## 3. 词元页迁移详细规划
 
-### 3.1 当前词元页样式文件
+### 3.1 迁移前的词元页样式文件（已删除）
 
-| 文件 | 行数 | 包含的媒体查询 |
-|---|---|---|
-| `style/tokens.css` | 307 | `@media (max-width: 480px)` - toolbar 换行 |
-| `style/tokens_log.css` | 372 | `@media (max-width: 1024px/768px/480px)` - kv-row 列宽适配 |
-| **合计** | **679** | **4 个断点块** |
+| 文件 | 行数 | 包含的媒体查询 | 状态 |
+|---|---|---|---|
+| `style/tokens.css` | 307 | `@media (max-width: 480px)` - toolbar 换行 | ✅ 已删除 |
+| `style/tokens_log.css` | 372 | `@media (max-width: 1024px/768px/480px)` - kv-row 列宽适配 | ✅ 已删除 |
+| **合计** | **679** | **4 个断点块** | ✅ 已迁移至 `style/panel/tokens/` |
 
 ### 3.2 级联缩放 token 设计（1912x948 基准）
 
@@ -190,17 +195,15 @@ style/
 | token | 基准 px | clamp 定义 | 消费者 |
 |---|---|---|---|
 | **共享字号** | | | |
-| `--tp-fs-sm` | 12px | `clamp(10px, 1.266vh, 14px)` | tile label, btn--xs, log-pill |
-| `--tp-fs-base` | 13px | `clamp(10px, 1.371vh, 15px)` | log body, code |
-| `--tp-fs-md` | 14px | `clamp(11px, 1.477vh, 16px)` | 显式 var(--fs-md) 元素（input、btn） |
-| `--tp-fs-2xl` | 18px | `clamp(13px, 1.899vh, 20px)` | body 继承容器（toolbar、section、card） |
-| `--tp-fs-md` | 14px | `clamp(11px, 1.477vh, 16px)` | 显式 var(--fs-md) 元素（input、btn） |
-| `--tp-fs-2xl` | 18px | `clamp(13px, 1.899vh, 20px)` | body 继承 (0.9rem×--fs-root=18px@ref) |
-| `--tp-fs-4xl` | 22px | `clamp(16px, 2.321vh, 26px)` | tile value 大号数字 |
+| `--tp-fs-sm` | 12px | `clamp(8px, 1.266vh, 14px)` | tile label, btn--xs, log-pill |
+| `--tp-fs-base` | 13px | `clamp(8px, 1.371vh, 15px)` | log body, code, btn--sm 集成 |
+| `--tp-fs-md` | 14px | `clamp(9px, 1.477vh, 16px)` | 显式 var(--fs-md) 元素（input、btn、toast） |
+| `--tp-fs-2xl` | 18px | `clamp(10px, 1.899vh, 20px)` | body 继承容器（toolbar、section、summary、card） |
+| `--tp-fs-4xl` | 22px | `clamp(12px, 2.321vh, 26px)` | tile value 大号数字 |
 | **容器级** | | | |
-| `--tokens-input-h` | 36px | `clamp(24px, 3.797vh, 40px)` | .tokens-input / .tokens-btn 高度 |
-| `--tokens-kv-key-w` | 160px | `clamp(80px, 8.368vw, 180px)` | kv-row 键名列宽（横向 -> vw） |
-| `--tokens-log-max-h` | 260px | `clamp(140px, 27.426vh, 300px)` | log body 最大高度 |
+| `--tokens-input-h` | 36px | `clamp(20px, 3.797vh, 40px)` | .tokens-input / .tokens-btn 高度 |
+| `--tokens-kv-key-w` | 160px | `clamp(60px, 8.368vw, 180px)` | kv-row 键名列宽（横向 → vw） |
+| `--tokens-log-max-h` | 260px | `clamp(100px, 27.426vh, 300px)` | log body 最大高度 |
 
 > **注意**：padding、gap、margin 等不再定义为独立 token，而是在消费者中直接用 `em`。em 的分母是元素**自身**的 computed font-size，不是父元素的。
 
@@ -267,15 +270,16 @@ style/
  */
 :root {
   /* -- 词元面板共享字号 ------------------------------ */
-  --tp-fs-sm:    clamp(10px, 1.266vh, 14px);   /* 基准 12px <- 辅助文本 */
-  --tp-fs-base:  clamp(10px, 1.371vh, 15px);   /* 基准 13px <- 日志正文 */
-  --tp-fs-md:    clamp(11px, 1.477vh, 16px);   /* 基准 14px <- 主要文本 */
-  --tp-fs-4xl:   clamp(16px, 2.321vh, 26px);   /* 基准 22px <- 统计数字 */
+  --tp-fs-sm:    clamp(8px, 1.266vh, 14px);    /* 基准 12px <- 辅助文本 */
+  --tp-fs-base:  clamp(8px, 1.371vh, 15px);    /* 基准 13px <- 日志正文 */
+  --tp-fs-md:    clamp(9px, 1.477vh, 16px);    /* 基准 14px <- 主要文本 */
+  --tp-fs-2xl:   clamp(10px, 1.899vh, 20px);   /* 基准 18px <- body 继承容器 */
+  --tp-fs-4xl:   clamp(12px, 2.321vh, 26px);   /* 基准 22px <- 统计数字 */
 
   /* -- 需要独立于字号的尺寸 -------------------------- */
-  --tokens-input-h:     clamp(24px, 3.797vh, 40px);    /* 输入框/按钮固定高度 */
-  --tokens-kv-key-w:    clamp(80px, 8.368vw, 180px);   /* 键值对键名列宽 */
-  --tokens-log-max-h:   clamp(140px, 27.426vh, 300px); /* 日志面板最大高度 */
+  --tokens-input-h:     clamp(20px, 3.797vh, 40px);    /* 输入框/按钮固定高度 */
+  --tokens-kv-key-w:    clamp(60px, 8.368vw, 180px);   /* 键值对键名列宽 */
+  --tokens-log-max-h:   clamp(100px, 27.426vh, 300px); /* 日志面板最大高度 */
 }
 
 /* -- force-landscape：vh↔vw 互换 ---------------------
@@ -286,19 +290,30 @@ style/
  */
 html.force-landscape {
   /* 字号 & 纵向尺寸：视觉高度 = 物理宽 → vw */
-  --tp-fs-sm:        clamp(10px, 1.266vw, 14px);
-  --tp-fs-base:      clamp(10px, 1.371vw, 15px);
-  --tp-fs-md:        clamp(11px, 1.477vw, 16px);
-  --tp-fs-4xl:       clamp(16px, 2.321vw, 26px);
-  --tokens-input-h:  clamp(24px, 3.797vw, 40px);
-  --tokens-log-max-h:clamp(140px, 27.426vw, 300px);
+  --tp-fs-sm:        clamp(8px, 1.266vw, 14px);
+  --tp-fs-base:      clamp(8px, 1.371vw, 15px);
+  --tp-fs-md:        clamp(9px, 1.477vw, 16px);
+  --tp-fs-2xl:       clamp(10px, 1.899vw, 20px);
+  --tp-fs-4xl:       clamp(12px, 2.321vw, 26px);
+  --tokens-input-h:  clamp(20px, 3.797vw, 40px);
+  --tokens-log-max-h:clamp(100px, 27.426vw, 300px);
 
   /* 横向尺寸：视觉宽度 = 物理高 → vh */
-  --tokens-kv-key-w: clamp(80px, 8.368vh, 180px);
+  --tokens-kv-key-w: clamp(60px, 8.368vh, 180px);
+}
+
+/* -- 全局 .btn--sm 集成 ------------------------------
+ * buttons.css .btn--sm 使用静态 --fs-base(13px)+固定内距，
+ * 此处替换为动态 token+em，使面板内按钮跟随 vh 缩放
+ */
+#panel_tokens .btn--sm,
+#panel_permissions .btn--sm {
+  font-size: var(--tp-fs-base, 13px) !important;
+  padding: 0.462em 0.923em !important;   /* 6/13, 12/13 */
 }
 ```
 
-> 对比原方案：从 ~25 个 token 精简至 **7 个 token**。所有 padding/gap/margin 改用 `em`，在组件文件中就地声明。
+> 对比原方案：从 ~25 个 token 精简至 **8 个 token**。所有 padding/gap/margin 改用 `em`，在组件文件中就地声明。`.btn--sm` 集成规则同时覆盖词元楼和权限面板内的全局按钮。
 
 #### Phase 2: 拆分 `tokens.css` + `tokens_log.css` -> 组件文件
 
@@ -424,13 +439,62 @@ html.force-landscape {
 
 ---
 
+## 4.5 迁移后优化记录
+
+> 以下为迁移完成后根据实际测试反馈所做的调整。
+
+### 4.5.1 clamp min 值下调（改善小视口缩放）
+
+初版 min 值偏高，导致在 ≤675vh 窗口时所有字号 token 均命中 min 下限（CLAMPED），丧失连续缩放能力。将 min 值全面下调：
+
+| token | 旧 min | 新 min | 理由 |
+|---|---|---|---|
+| `--tp-fs-sm` | 10px | 8px | 小视口下辅助文字仍需缩小 |
+| `--tp-fs-base` | 10px | 8px | 日志正文 / btn--sm 需跟随缩放 |
+| `--tp-fs-md` | 11px | 9px | 输入框文字最低可读尺寸 |
+| `--tp-fs-2xl` | 13px | 10px | 容器字号驱动全局 em，必须保持动态 |
+| `--tp-fs-4xl` | 16px | 12px | 统计数字仍需缩小 |
+| `--tokens-input-h` | 24px | 20px | 触控最小可点击高度 |
+| `--tokens-kv-key-w` | 80px | 60px | 键名列在窄屏下可压缩 |
+| `--tokens-log-max-h` | 140px | 100px | 日志面板在小视口下占比需更小 |
+
+调整后，在 675vh 窗口下 5 个字号 token 全部处于 DYNAMIC 状态（高于 min、低于 max）。
+
+### 4.5.2 全局 `.btn--sm` 集成
+
+**问题**：`buttons.css` 的 `.btn--sm` 使用 `font-size: var(--fs-base) !important`（静态 13px）和 `padding: var(--space-xs) var(--space-lg) !important`（固定 6px 12px）。在词元面板和权限面板内，`.btn--sm` 按钮脱离了 vh 级联缩放，导致按钮区域在小视口下不缩小。
+
+**修复**：在 `_variables.css` 添加面板级作用域覆盖：
+
+```css
+#panel_tokens .btn--sm,
+#panel_permissions .btn--sm {
+  font-size: var(--tp-fs-base, 13px) !important;  /* 13px@ref，动态 */
+  padding: 0.462em 0.923em !important;             /* 6/13, 12/13 */
+}
+```
+
+- 在 1912×948 基准下：`--tp-fs-base` = 13px → 与原 `--fs-base` 完全一致（零差异）
+- 在小视口下：`--tp-fs-base` 随 vh 连续缩放 → padding 的 em 值同步缩小
+- `expand-btn` 的 `padding-left: 2.154em` 和 `::before` 伪元素均基于 em，自动适配
+
+### 4.5.3 `force_landscape.css` 固定覆盖清理
+
+移除了 `style/media/force_landscape.css` 中 9 行针对词元页元素的固定像素覆盖（font-size、padding、height 等），改由 `_variables.css` 的 `html.force-landscape` token 块统一控制 vh↔vw 互换。
+
+### 4.5.4 toolbar 480px 媒体查询删除
+
+移除了 `toolbar.css` 中的 `@media (max-width: 480px)` 断点块。搜索栏的 `flex-wrap: wrap` + em 间距已自动适配窄屏布局，无需断点触发。
+
+---
+
 ## 5. 后续迁移路线图
 
 词元页验证通过后，按以下优先级迁移其他页面/组件：
 
 | 优先级 | 页面/组件 | 预计文件夹 | 说明 |
 |---|---|---|---|
-| P1 | 权限页 | `style/panel/permissions/` | 与词元页共享 log 组件，token 可复用 |
+| ~~P1~~ | ~~权限页~~ | `style/panel/permissions/` | ✅ 已完成（复用 `--tp-*` token，无独立 `_variables.css`） |
 | P2 | 头栏 + 底栏 | `style/header/`, `style/footer/` | 全局可见，影响面最大 |
 | P3 | 弹窗系统 | `style/modal/` | 从 `style/modals/` 迁移，内部按组件拆分 |
 | P4 | 对局页 | `game/styles/` | 体量最大，最后迁移 |

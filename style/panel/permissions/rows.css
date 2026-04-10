@@ -1,0 +1,129 @@
+/* style/panel/permissions/rows.css -- 权限页用户行 & 辅助
+ *
+ * ── #panel_permissions .approval-row ─────────────────────
+ * 基础 .approval-row 定义在 theme.css（审批/权限共用）。
+ * 此文件为 #panel_permissions 提供动态字号 + em 间距，
+ * 使权限面板内的行条目跟随 vh 缩放。
+ *
+ * 字号继承链：
+ *   html --fs-root → body 0.9rem = 18px
+ *   .approval-row → font-size: var(--tp-fs-2xl, 18px)
+ *     → .approval-sub   → font-size: var(--tp-fs-sm, 12px)
+ *       → .approval-sub__date → 继承 12px
+ *     → .perm-tag        → font-size: var(--tp-fs-sm, 12px)
+ *     → .perm-editor     → 继承 18px → editor.css
+ *
+ * 合并自：
+ *   · permissions.css  行过渡动画 / fmt-param / #perm-list
+ *   · theme.css        perm-tags / perm-tag / btn.is-loading
+ * ─────────────────────────────────────────────────────── */
+
+/* ── 用户行（动态间距覆盖） ─────────────────────────────── */
+#panel_permissions .approval-row {
+  font-size: var(--tp-fs-2xl, 18px);
+  gap: 0.667em;                     /* 12/18 */
+  padding: 0.667em;                 /* 12/18 */
+  margin-bottom: 0.556em;           /* 10/18 */
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+#panel_permissions .approval-left {
+  gap: 0.556em;                     /* 10/18 */
+}
+#panel_permissions .approval-img {
+  width: 2.667em;                   /* 48/18 */
+  height: 2.667em;
+}
+#panel_permissions .approval-sub {
+  font-size: var(--tp-fs-sm, 12px);
+}
+#panel_permissions .approval-right {
+  gap: 0.444em;                     /* 8/18 */
+}
+
+/* 注册时间（替代 JS 内联样式）
+ * 旧 JS 硬编码 #a0aec0；亮色主题恰等于 --text-subtle，暗色主题不同。
+ * 保留原值以保持两端一致视觉。 */
+#panel_permissions .approval-sub__date {
+  margin-left: 0.833em;             /* 10/12 */
+  color: #a0aec0;
+}
+
+/* ── 权限标签 ──────────────────────────────────────────── */
+#panel_permissions .perm-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.333em;                     /* 6/18 */
+  margin-top: 0.333em;              /* 6/18 */
+}
+#panel_permissions .perm-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.167em 0.667em;         /* 2/12, 8/12 — 基于自身 12px */
+  border-radius: var(--radius-pill);
+  font-size: var(--tp-fs-sm, 12px);
+  line-height: var(--lh-none);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+#panel_permissions .perm-tag--more {
+  color: var(--primary-2);
+  background: color-mix(in srgb, var(--primary-2) 8%, transparent);
+  border-color: color-mix(in srgb, var(--primary-2) 35%, var(--border));
+}
+
+/* ── 行进出场过渡 ──────────────────────────────────────── */
+#panel_permissions .approval-row.perm-row-exit {
+  opacity: 0;
+  transform: translateY(-0.167em);   /* 3/18 */
+  transition: opacity var(--dur-normal) var(--ease-smooth),
+              transform var(--dur-normal) var(--ease-smooth);
+  pointer-events: none;
+}
+#panel_permissions .approval-row.perm-row-enter {
+  opacity: 0;
+  transform: translateY(0.222em);    /* 4/18 */
+}
+#panel_permissions .approval-row.perm-row-enter.perm-row-enter-active {
+  opacity: 1;
+  transform: none;
+  transition: opacity var(--dur-normal) var(--ease-smooth),
+              transform var(--dur-normal) var(--ease-smooth);
+}
+
+/* 减少动态效果 */
+@media (prefers-reduced-motion: reduce) {
+  #panel_permissions .approval-row,
+  #panel_permissions .approval-row.perm-row-exit,
+  #panel_permissions .approval-row.perm-row-enter.perm-row-enter-active {
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ── 日志参数高亮 ──────────────────────────────────────── */
+#panel_permissions #perms-log .fmt-param {
+  color: #1E3A8A;
+  background: rgba(191, 219, 254, 0.28);
+  border: 1px dashed color-mix(in srgb, var(--primary-1) 60%, transparent);
+  border-radius: var(--radius-xs);
+  padding: 0 0.231em;               /* 3/13 — 基于 log body 13px */
+}
+[data-theme="dark"] #panel_permissions #perms-log .fmt-param {
+  color: #93C5FD;
+  background: rgba(59, 130, 246, 0.16);
+  border-color: #3B82F6;
+}
+
+/* ── 容器外边距 ────────────────────────────────────────── */
+#perm-list    { margin-top: 0.778em; /* 14/18 */ }
+#perm-message { margin-top: 0.556em; /* 10/18 */ }
+
+/* ── 加载态按钮 ────────────────────────────────────────── */
+#panel_permissions .btn.is-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
