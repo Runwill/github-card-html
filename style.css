@@ -2,8 +2,8 @@
 :root {
   --animation-duration: var(--dur-slower);
   --animation-easing: var(--ease-standard);
-  /* 将池水印：根据视口高度缩放，1738×978 标准下 300px / 5em */
-  --role-icon-size: clamp(150px, 30.7vh, 300px);
+  /* 将池水印：根据视口高度缩放，1912×948 标准下 300px / 5em */
+  --role-icon-size: clamp(150px, 31.646vh, 300px);
 }
 * {
     user-select: none;

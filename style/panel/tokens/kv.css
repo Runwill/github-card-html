@@ -1,0 +1,200 @@
+/* style/panel/tokens/kv.css -- 键值对行 + 内联编辑
+ *
+ * ── .kv-row ──────────────────────────────────────────────
+ * 尺寸继承链：
+ *   字号     ← 继承 .token-card (--tp-fs-2xl, 18px)
+ *   列宽     ← --tokens-kv-key-w (vw)，clamp(80px, 8.368vw, 180px)
+ *   gap      ← em（字号），0.444em = 8/18
+ *   padding  ← em（字号），0.333em = 6/18
+ *   高度     ← auto（由内容撑开）
+ *
+ * 向下传递：
+ *   → .kv-key         字号：继承；宽度 ← grid 列定义
+ *   → .kv-val          字号：继承
+ *     → .inline-edit   字号：inherit（font: inherit）
+ *     → .color-picker  28px 固定尺寸（不走级联）
+ *   → .kv-actions      字号：继承；gap ← em
+ *
+ * 特殊尺寸：
+ *   键名列宽 ← --tokens-kv-key-w (vw)，不走字号级联
+ * ─────────────────────────────────────────────────────── */
+
+/* 词元面板级 shadow 变量 — kv 编辑相关 */
+#panel_tokens {
+  --shadow-kv-empty: inset 0 0 0 0px transparent;
+  --shadow-kv-editing: inset 0 0 0 1px var(--text-subtle);
+  --shadow-kv-editing-focus: inset 0 0 0 1px var(--text-muted);
+  --shadow-kv-editing-accent: inset 0 0 0 1px color-mix(in srgb, var(--token-accent) 35%, var(--text-subtle));
+  --shadow-picker: inset 0 0 0 1px var(--picker-border, #CBD5E0);
+  --shadow-picker-hover: inset 0 0 0 1px var(--picker-border, #CBD5E0), 0 0 0 2px color-mix(in srgb, var(--token-accent, #3182CE) 36%, transparent);
+  --shadow-picker-focus: inset 0 0 0 1px var(--picker-border, #A0AEC0), 0 0 0 3px color-mix(in srgb, var(--token-accent, #3182CE) 44%, transparent);
+  --shadow-picker-pulse-0: inset 0 0 0 1px var(--picker-border, #CBD5E0), 0 0 0 0 color-mix(in srgb, var(--token-accent, #3182CE) 40%, transparent);
+  --shadow-picker-pulse-50: inset 0 0 0 1px var(--picker-border, #A0AEC0), 0 0 0 6px color-mix(in srgb, var(--token-accent, #3182CE) 28%, transparent);
+  --shadow-picker-pulse-100: inset 0 0 0 1px var(--picker-border, #CBD5E0), 0 0 0 0 color-mix(in srgb, var(--token-accent, #3182CE) 40%, transparent);
+}
+
+#tokens-content .kv-row {
+  display: grid;
+  grid-template-columns: var(--tokens-kv-key-w, 160px) minmax(0, 1fr) auto;
+  gap: 0.444em;                /* 8/18 */
+  padding: 0.333em 0;         /* 6/18 0 */
+  border-bottom: 1px dashed var(--border);
+}
+
+/* 断点删除：原 @media(max-width:1024/768/480px) 对 kv-row 列宽的覆盖
+ * 由 --tokens-kv-key-w 的 clamp(80px, 8.368vw, 180px) 连续适配 */
+
+#tokens-content .kv-row:last-child { border-bottom: none; }
+
+#tokens-content .kv-key {
+  color: var(--text-muted);
+  font-weight: 600;
+  word-break: break-all;
+}
+
+#tokens-content .kv-val {
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: var(--lh-tight);
+  padding-right: 0;
+  box-sizing: border-box;
+  box-shadow: var(--shadow-kv-empty);
+  transition: box-shadow var(--dur-normal) var(--ease-standard),
+              background-color var(--dur-normal) var(--ease-standard),
+              color var(--dur-normal) var(--ease-standard);
+  cursor: text;
+}
+
+/* 行内操作（删除等） */
+#tokens-content .kv-row .kv-actions {
+  position: static;
+  align-self: center;
+  display: flex;
+  gap: 0.333em;                /* 6/18 */
+  opacity: 0;
+  transition: opacity var(--dur-normal) var(--ease-default);
+  pointer-events: none;
+}
+#tokens-content .kv-row:hover .kv-actions { opacity: 1; }
+
+#tokens-content .kv-val:not(.is-editing):hover {
+  background: color-mix(in srgb, var(--border) 20%, transparent);
+}
+/* Ctrl 态下禁用字段编辑交互 */
+.ctrl-down #tokens-content .kv-val { pointer-events: none; }
+
+/* 编辑态 */
+#tokens-content .kv-val.is-editing {
+  background-color: var(--panel-header-bg);
+  box-shadow: var(--shadow-kv-editing);
+  border-radius: var(--radius-xs);
+}
+#tokens-content .kv-val.is-editing:focus-within {
+  box-shadow: var(--shadow-kv-editing-focus);
+}
+/* 强调色编辑态 */
+#tokens-content .token-card[style*="--token-accent"] .kv-val.is-editing {
+  box-shadow: var(--shadow-kv-editing-accent);
+  background: color-mix(in srgb, var(--token-accent) 8%, var(--panel-header-bg));
+}
+
+/* 内联编辑输入框 */
+#tokens-content .kv-val .inline-edit {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: var(--radius-none);
+  background: transparent;
+  color: inherit;
+  box-shadow: var(--shadow-none);
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: var(--lh-tight);
+  min-height: 0;
+  display: block;
+}
+
+/* 颜色编辑器布局 */
+#tokens-content .kv-val .inline-edit-color {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.444em;                /* 8/18 */
+  width: 100%;
+}
+
+#tokens-content .kv-val .inline-edit-color .color-picker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  box-shadow: var(--shadow-picker);
+  outline: none;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transform-origin: center;
+  transition: transform var(--dur-normal) var(--ease-standard),
+              box-shadow var(--dur-normal) var(--ease-default),
+              opacity var(--dur-normal) var(--ease-default);
+}
+
+#tokens-content .kv-val .inline-edit-color .color-picker:hover {
+  transform: scale(1.03);
+  box-shadow: var(--shadow-picker-hover);
+}
+#tokens-content .kv-val .inline-edit-color .color-picker:focus-visible {
+  outline: none;
+  transform: scale(1.04);
+  box-shadow: var(--shadow-picker-focus);
+}
+#tokens-content .kv-val .inline-edit-color .color-picker:active {
+  transform: scale(0.98);
+}
+
+/* 与文本框对齐 */
+#tokens-content .kv-val .inline-edit-color .inline-edit {
+  min-height: 28px;
+}
+
+/* 低动态偏好 */
+@media (prefers-reduced-motion: reduce) {
+  #tokens-content .kv-val,
+  #tokens-content .kv-val .inline-edit-color .color-picker {
+    transition: none;
+  }
+}
+
+/* 色值改变脉冲 */
+@keyframes pickerPulse {
+  0%   { box-shadow: var(--shadow-picker-pulse-0); }
+  50%  { box-shadow: var(--shadow-picker-pulse-50); }
+  100% { box-shadow: var(--shadow-picker-pulse-100); }
+}
+#tokens-content .kv-val .inline-edit-color .color-picker.is-pulse {
+  animation: pickerPulse 320ms ease-out;
+}
+
+/* 保存中禁用态 */
+#tokens-content .kv-val.is-saving .inline-edit {
+  opacity: .7;
+  cursor: progress;
+}
+
+/* JSON 预览 */
+#tokens-content pre.token-json {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--font-mono);
+  font-size: var(--tp-fs-sm, 12px);
+  color: var(--text);
+}

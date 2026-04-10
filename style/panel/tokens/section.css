@@ -1,0 +1,40 @@
+/* style/panel/tokens/section.css -- 词元面板分区容器
+ *
+ * ── .tokens-section ──────────────────────────────────────
+ * 尺寸继承链：
+ *   字号     ← --tp-fs-2xl (vh)，clamp(13px, 1.899vh, 20px)
+ *            基准 18px = body 继承（0.9rem × --fs-root 20px）
+ *   margin   ← em（字号），0.667em = 12/18
+ *   高度     ← auto（由内容撑开）
+ *
+ * 向下传递：
+ *   → .tokens-section__header   字号：继承 18px；内距 ← em
+ *     → .tokens-section__title  字号：继承；font-weight: 600
+ *     → .tokens-section__ops    字号：继承；gap ← 0.444em
+ *   → .tokens-section__body     字号：继承；内距 ← em
+ *     → .token-card             （见 card.css）
+ *   → .tokens-section__more     margin ← em
+ *   → .tokens-empty             字号：继承
+ * ─────────────────────────────────────────────────────── */
+
+.tokens-section {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--tp-fs-2xl, 18px);
+  margin-top: 0.667em;          /* 12/18 */
+}
+
+.tokens-section__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.556em 0.667em;    /* 10/18, 12/18 */
+  background: var(--panel-header-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.tokens-section__title { font-weight: 600; color: var(--text); }
+.tokens-section__ops { display: flex; align-items: center; gap: 0.444em; /* 8/18 */ }
+.tokens-section__body { padding: 0.556em 0.667em; /* 10/18, 12/18 */ }
+.tokens-section__more { margin-top: 0.444em; /* 8/18 */ }
+.tokens-empty { color: var(--text-subtle); }

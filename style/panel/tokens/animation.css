@@ -1,0 +1,115 @@
+/* style/panel/tokens/animation.css -- 词元页动画与 Toast
+ *
+ * 本文件不定义尺寸继承链，仅包含 @keyframes、collapsible 交互、
+ * hover 动效、减少动画偏好、Toast 弹出。
+ * ─────────────────────────────────────────────────────── */
+
+/* scrollbar-gutter：防止纵向滚动条出现 / 消失导致布局抖动 */
+html { scrollbar-gutter: stable both-edges; }
+@supports not (scrollbar-gutter: stable) {
+  html { overflow-y: scroll; }
+}
+
+/* ---------- 折叠 / 展开 ---------- */
+.collapsible {
+  overflow: hidden;
+  height: 0;
+  display: none;
+  opacity: 0;
+  transition: height var(--dur-slow) var(--ease-standard),
+              opacity var(--dur-normal) var(--ease-standard);
+  will-change: height, opacity;
+}
+.collapsible.is-open {
+  display: block;
+  height: auto;
+  opacity: 1;
+}
+.collapsible.is-opening,
+.collapsible.is-closing { display: block; }
+.collapsible.is-opening {
+  opacity: 1;
+  transition: height var(--dur-slow) var(--ease-decel),
+              opacity var(--dur-normal) var(--ease-decel);
+}
+.collapsible.is-closing {
+  opacity: 0;
+  transition: height var(--dur-slow) var(--ease-accel),
+              opacity var(--dur-normal) var(--ease-accel);
+}
+
+/* ---------- 卡片入场 ---------- */
+@keyframes token-card-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+#tokens-content .token-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card-1);
+}
+
+/* ---------- 减少动画 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  #tokens-content .token-card { animation: none !important; transform: none !important; }
+  .tokens-toast { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* ---------- Toast ---------- */
+.tokens-toast-container {
+  position: fixed;
+  top: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.444em;                /* 8/18 — 容器继承 body 18px */
+  pointer-events: none;
+  width: auto;
+  max-width: min(90vw, 560px);
+}
+
+.tokens-toast {
+  pointer-events: auto;
+  background: var(--toast-ok-bg);
+  border: 1px solid var(--toast-ok-border);
+  color: var(--toast-ok-text);
+  padding: 0.571em 0.857em;   /* 8/14, 12/14 */
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card-2);
+  font-size: var(--tp-fs-md, 14px);
+  line-height: var(--lh-tight);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.714em;                /* 10/14 */
+  opacity: 0;
+  max-height: 80px;
+  overflow: hidden;
+  transform: translateY(-6px);
+  animation: tokens-toast-in var(--dur-moderate) ease forwards,
+             tokens-toast-fade-out var(--dur-normal) ease forwards 1.8s,
+             tokens-toast-collapse 200ms cubic-bezier(0.55, 0, 0.1, 1) forwards calc(1.8s + var(--dur-normal));
+}
+
+.tokens-toast.tokens-toast--error {
+  background: var(--toast-err-bg);
+  border-color: var(--toast-err-border);
+  color: var(--toast-err-text);
+}
+
+.tokens-toast > svg { flex: 0 0 auto; display: inline-block; color: currentColor; }
+.tokens-toast.tokens-toast--error > svg { color: var(--toast-err-icon); }
+
+@keyframes tokens-toast-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes tokens-toast-fade-out {
+  to { opacity: 0; transform: translateY(-6px); }
+}
+@keyframes tokens-toast-collapse {
+  from { max-height: 80px; padding: 0.571em 0.857em; margin-bottom: 0; border-width: 1px; }
+  to   { max-height: 0; padding: 0 0.857em; margin-bottom: -0.571em; border-width: 0; }
+}

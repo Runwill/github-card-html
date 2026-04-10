@@ -1,0 +1,137 @@
+/* style/panel/tokens/toolbar.css -- 词元面板顶部工具栏
+ *
+ * ── .tokens-toolbar ──────────────────────────────────────
+ * 尺寸继承链：
+ *   字号     ← --tp-fs-2xl (vh)，clamp(13px, 1.899vh, 20px)
+ *            基准 18px = body 继承（0.9rem × --fs-root 20px）
+ *   gap      ← em（字号），0.667em = 12/18
+ *   高度     ← auto（由子元素撑开）
+ *
+ * 向下传递：
+ *   → h2                      字号：rem 规则（1.2rem = 24px@ref）
+ *   → .toolbar-actions        字号：继承 18px；gap ← 0.444em
+ *   → .tokens-input-group     字号：继承 18px
+ *     → .tokens-input         字号 ← --tp-fs-md (14px)；高度 ← token；内距 ← em
+ *     → .tokens-btn           字号 ← --tp-fs-md (14px)；高度 ← token；内距 ← em
+ *   → .mode-toggle            字号：继承 18px
+ *   → .tokens-refresh         字号：继承 18px
+ *   → .expand-btn             字号 ← btn--sm (13px)；内距 ← em
+ * ─────────────────────────────────────────────────────── */
+
+.admin-panel .tokens-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--tp-fs-2xl, 18px);
+  gap: 0.667em;             /* 12/18 */
+}
+
+.admin-panel .tokens-toolbar h2 {
+  margin: 0;
+}
+
+.admin-panel .toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.444em;             /* 8/18 */
+  flex-wrap: nowrap;
+}
+
+/* 统一输入组（搜索 + 刷新） */
+.admin-panel .tokens-input-group {
+  display: inline-flex;
+  align-items: stretch;
+  max-width: 60vw;
+}
+
+.admin-panel .tokens-input {
+  height: var(--tokens-input-h, 36px);
+  flex: 1 1 17.143em;       /* 240/14，基于自身 14px 字号 */
+  padding: 0.571em 0.714em; /* 8/14, 10/14 */
+  border: 1px solid var(--border);
+  border-right: none;       /* 与按钮合并 */
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  font-size: var(--tp-fs-md, 14px);
+  color: var(--text);
+  background: var(--surface);
+  line-height: var(--lh-tight);
+  transition: border-color var(--dur-normal) var(--ease-default),
+              box-shadow var(--dur-normal) var(--ease-default);
+}
+
+.admin-panel .tokens-input::placeholder { color: var(--text-subtle); }
+
+.admin-panel .tokens-btn {
+  height: var(--tokens-input-h, 36px);
+  padding: 0 0.857em;      /* 0 12/14 */
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  border: 1px solid var(--border);
+  border-left: none;
+  font-size: var(--tp-fs-md, 14px);
+  line-height: var(--lh-tight);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 输入组内的相邻按钮做成"分段"连接 */
+.admin-panel .tokens-input-group .tokens-btn { border-radius: var(--radius-none); }
+.admin-panel .tokens-input-group .tokens-btn:last-of-type { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.admin-panel .tokens-input-group .tokens-btn + .tokens-btn { border-left: none; }
+
+/* 聚焦：仅键盘导航时显示可视焦点 */
+.admin-panel .tokens-btn:focus { outline: none; box-shadow: none; }
+.admin-panel .tokens-btn:focus-visible { box-shadow: var(--shadow-ring); }
+.admin-panel .btn:focus { outline: none; box-shadow: none; }
+.admin-panel .btn:focus-visible { box-shadow: var(--shadow-ring); }
+
+/* 模式切换按钮 */
+.admin-panel .mode-toggle {
+  transition: background-color var(--dur-normal) var(--ease-standard),
+              border-color var(--dur-normal) var(--ease-standard),
+              color var(--dur-normal) var(--ease-standard);
+}
+.admin-panel .mode-toggle.is-active {
+  background-color: var(--success);
+  border-color: var(--success-hover);
+  color: #FFFFFF;
+}
+.admin-panel .mode-toggle.is-active:hover,
+.admin-panel .mode-toggle.is-active:focus-visible {
+  background-color: var(--success-hover);
+  border-color: #2F855A;
+  color: #FFFFFF;
+}
+
+/* 展开 / 收起按钮 */
+#panel_tokens .expand-btn {
+  position: relative;
+  padding-left: 2.154em !important; /* 28/13，基于 btn--sm 字号 13px；!important 覆盖 btn--sm 的 padding shorthand */
+  white-space: nowrap;
+}
+#panel_tokens .expand-btn::before {
+  content: '';
+  position: absolute;
+  left: 0.769em;           /* 10/13 — btn--sm 字号 13px */
+  top: 50%;
+  transform: translateY(-50%) rotate(45deg);
+  width: 0.769em;          /* 10/13 */
+  height: 0.769em;         /* 10/13 */
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform-origin: 50% 50%;
+  opacity: .85;
+  transition: transform var(--dur-normal) var(--ease-standard);
+}
+#panel_tokens .expand-btn.is-expanded::before {
+  transform: translateY(-50%) rotate(-135deg);
+}
+
+/* 刷新按钮在窄屏保持不被压缩 */
+.admin-panel .tokens-refresh { white-space: nowrap; flex: 0 0 auto; }
+
+/* 极窄屏：允许 toolbar 换行（保留布局形态规则，非尺寸断点） */
+@media (max-width: 480px) {
+  .admin-panel .tokens-toolbar { flex-wrap: wrap; }
+  .admin-panel .toolbar-actions { width: 100%; }
+  .admin-panel .tokens-input-group { width: 100%; max-width: none; }
+}

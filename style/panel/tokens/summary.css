@@ -1,0 +1,128 @@
+/* style/panel/tokens/summary.css -- 词元面板摘要统计卡片
+ *
+ * ── #tokens-summary ──────────────────────────────────────
+ * 尺寸继承链：
+ *   字号     ← --tp-fs-2xl (vh)，基准 18px = body 继承
+ *   gap      ← em（字号），0.556em = 10/18
+ *   margin   ← em（字号），0.667em = 12/18
+ *   高度     ← auto（由内容撑开）
+ *
+ * 向下传递：
+ *   → .type-tile              字号：继承 18px
+ *     → .type-tile__label     字号 ← --tp-fs-sm (12px)
+ *     → .type-tile__value     字号 ← --tp-fs-4xl (22px)
+ *   → .count-badge            字号 ← --tp-fs-sm (12px)
+ * ─────────────────────────────────────────────────────── */
+
+/* 词元面板级 shadow 变量（必须定义在 #panel_tokens 作用域） */
+#panel_tokens {
+  --shadow-tile-hover: var(--shadow-hover-card);
+  --shadow-tile-active: var(--shadow-elev-2-soft), 0 0 0 2px var(--tile-accent-ring);
+  --shadow-tile-ring: 0 0 0 3px var(--tile-accent-ring);
+}
+
+#tokens-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10px, 1fr));
+  font-size: var(--tp-fs-2xl, 18px);
+  gap: 0.556em;               /* 10/18 */
+  margin-top: 0.667em;        /* 12/18 */
+}
+
+#tokens-content {
+  margin-top: 0.778em;        /* 14/18，元素继承 body 18px */
+}
+
+#tokens-content .count-badge {
+  animation: none;
+  transition: none;
+  transform: none;
+  position: static;
+  display: inline-block;
+  vertical-align: baseline;
+  line-height: var(--lh-none);
+  margin-left: 0.333em;       /* 4/12 — 基于自身 --tp-fs-sm 12px */
+  font-size: var(--tp-fs-sm, 12px);
+}
+
+/* 摘要卡片 */
+#tokens-summary .type-tile {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.556em;           /* 10/18 */
+}
+#tokens-summary .type-tile__label {
+  font-size: var(--tp-fs-sm, 12px);
+  color: var(--text-muted);
+}
+#tokens-summary .type-tile__value {
+  font-weight: 700;
+  font-size: var(--tp-fs-4xl, 22px);
+  color: var(--text);
+}
+
+/* 类型背景色 */
+#tokens-summary .type-tile[data-type="term-fixed"]   { background-color: #EDF2F7; }
+#tokens-summary .type-tile[data-type="term-dynamic"] { background-color: #E6FFFA; }
+#tokens-summary .type-tile[data-type="card"]         { background-color: #FEF3C7; }
+#tokens-summary .type-tile[data-type="character"]    { background-color: #E9D8FD; }
+#tokens-summary .type-tile[data-type="skill"]        { background-color: #C6F6D5; }
+
+/* 类型筛选卡片：可点击 + 激活样式 */
+#panel_tokens .type-tile {
+  cursor: pointer;
+  user-select: none;
+  transition: transform var(--dur-normal) var(--ease-standard),
+              box-shadow var(--dur-normal) var(--ease-standard),
+              border-color var(--dur-normal) var(--ease-standard),
+              background-color var(--dur-normal) var(--ease-standard),
+              color var(--dur-normal) var(--ease-standard),
+              filter var(--dur-normal) var(--ease-standard),
+              opacity var(--dur-normal) var(--ease-standard);
+  outline: none;
+  position: relative;
+  --tile-accent: #718096;
+  --tile-accent-soft: color-mix(in srgb, var(--tile-accent) 38%, white);
+  --tile-accent-ring: color-mix(in srgb, var(--tile-accent) 20%, transparent);
+}
+#panel_tokens .type-tile:hover { transform: translateY(-1px); box-shadow: var(--shadow-tile-hover); }
+#panel_tokens .type-tile:focus-visible { box-shadow: var(--shadow-tile-ring); }
+#panel_tokens .type-tile.is-active { border-color: var(--tile-accent-soft); box-shadow: var(--shadow-tile-active); }
+
+/* 激活态左侧强调条 */
+#panel_tokens .type-tile::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  opacity: 0;
+  background: var(--tile-accent-soft);
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  transition: width var(--dur-normal) var(--ease-standard),
+              opacity var(--dur-normal) var(--ease-standard),
+              background-color var(--dur-normal) var(--ease-standard);
+}
+#panel_tokens .type-tile.is-active::after { width: 3px; opacity: 1; }
+
+/* 灰化显示 */
+#panel_tokens .type-tile.is-dim {
+  filter: grayscale(0.6) saturate(0.6);
+  opacity: 0.45;
+}
+#panel_tokens .type-tile.is-dim:hover,
+#panel_tokens .type-tile.is-dim:focus-visible {
+  opacity: 0.65;
+  filter: grayscale(0.4) saturate(0.75);
+}
+
+/* 各类型强调色 */
+#panel_tokens .type-tile[data-type="term-fixed"]    { --tile-accent: #A0AEC0; }
+#panel_tokens .type-tile[data-type="term-dynamic"]  { --tile-accent: #81E6D9; }
+#panel_tokens .type-tile[data-type="card"]          { --tile-accent: #F6E05E; }
+#panel_tokens .type-tile[data-type="character"]     { --tile-accent: #B794F4; }
+#panel_tokens .type-tile[data-type="skill"]         { --tile-accent: #9AE6B4; }
+
+/* 列表状态提示 */
+.tokens-status { grid-column: 1 / -1; }
+.tokens-status--loading { color: var(--text-muted); }
+.tokens-status--error { color: var(--danger); }

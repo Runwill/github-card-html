@@ -1,0 +1,179 @@
+/* style/panel/tokens/log.css -- 变更日志面板
+ *
+ * ── .tokens-log ──────────────────────────────────────────
+ * 尺寸继承链：
+ *   字号     ← 继承 body (18px)
+ *   内距     ← em（字号）
+ *   最大高度 ← --tokens-log-max-h (vh)，clamp(140px, 27.426vh, 300px)
+ *   高度     ← auto（由内容撑开，max-height 限制）
+ *
+ * 向下传递：
+ *   → .tokens-log__header     字号 ← --tp-fs-2xl (18px)
+ *     → .tokens-log__title    字号：继承 header
+ *     → .tokens-log__ctrls    字号：继承；gap ← em
+ *   → .tokens-log__body       字号 ← --tp-fs-base (13px)；max-h ← token
+ *     → .tokens-log__entry    字号：继承 13px
+ *       → .log-row            字号：继承 13px
+ *         → .log-time         字号：继承
+ *         → .log-pill         字号 ← --tp-fs-sm (12px)
+ *         → .log-code         字号 ← --tp-fs-sm (12px)
+ *         → .log-actions      字号：继承 13px
+ *       → .log-sub            字号：继承 13px
+ *
+ * 特殊尺寸：
+ *   .tokens-log__body max-height ← --tokens-log-max-h（vh，不走字号级联）
+ * ─────────────────────────────────────────────────────── */
+
+.tokens-log {
+  margin-top: 0.778em;         /* 14/18 — 继承 body 18px */
+  border: 1px solid var(--log-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--log-bg);
+}
+
+.tokens-log__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.444em;                /* 8/18 */
+  font-size: var(--tp-fs-2xl, 18px);
+  padding: 0.444em 0.667em;   /* 8/18, 12/18 */
+  background: var(--log-header-bg);
+  border-bottom: 1px solid var(--log-border);
+}
+
+.tokens-log__title { font-weight: 600; color: var(--text); }
+.tokens-log__ctrls { display: flex; gap: 0.333em; /* 6/18 */ }
+
+.tokens-log__body {
+  max-height: var(--tokens-log-max-h, 260px);
+  overflow: auto;
+  padding: 0.615em 0.923em;   /* 8/13, 12/13 — 基于 --tp-fs-base */
+  font-size: var(--tp-fs-base, 13px);
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--text-subtle) transparent;
+}
+
+/* WebKit scrollbar */
+.tokens-log__body::-webkit-scrollbar { width: 8px; height: 8px; }
+.tokens-log__body::-webkit-scrollbar-track { background: transparent; }
+.tokens-log__body::-webkit-scrollbar-thumb {
+  background-color: var(--text-subtle);
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.tokens-log__body:hover::-webkit-scrollbar-thumb { background-color: var(--text-muted); }
+
+/* 深色主题适配 */
+[data-theme="dark"] .tokens-log__body { scrollbar-color: var(--text-muted) transparent; }
+[data-theme="dark"] .tokens-log__body::-webkit-scrollbar-thumb { background-color: var(--text-muted); }
+[data-theme="dark"] .tokens-log__body:hover::-webkit-scrollbar-thumb { background-color: var(--text-subtle); }
+
+.tokens-log.is-collapsed .tokens-log__body { display: none; }
+
+.tokens-log__entry {
+  padding: 0.462em 0;         /* 6/13 0 */
+  border-bottom: 1px dashed var(--border);
+}
+.tokens-log__entry:last-child { border-bottom: none; }
+
+.tokens-log .log-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.615em;                /* 8/13 */
+  color: var(--text);
+  position: relative;
+}
+
+.tokens-log .log-time { color: var(--text-subtle); font-variant: tabular-nums; }
+
+.tokens-log .log-pill {
+  display: inline-block;
+  padding: 0.167em 0.5em;     /* 2/12, 6/12 — 基于自身 --tp-fs-sm 12px */
+  border-radius: var(--radius-pill);
+  font-size: var(--tp-fs-sm, 12px);
+  line-height: var(--lh-none);
+  border: 1px solid transparent;
+}
+.tokens-log .log-pill,
+.tokens-log .log-ctx,
+.tokens-log .log-msg,
+.tokens-log .log-path,
+.tokens-log .log-val { font-style: normal; }
+
+/* pill 颜色变体 */
+.tokens-log .log-pill.is-green  { background: #ECFDF5; color: #065F46; border-color: #A7F3D0; }
+.tokens-log .log-pill.is-red    { background: #FEF2F2; color: #7F1D1D; border-color: #FECACA; }
+.tokens-log .log-pill.is-blue   { background: #EFF6FF; color: #1E3A8A; border-color: #BFDBFE; }
+.tokens-log .log-pill.is-indigo { background: #EEF2FF; color: #3730A3; border-color: #C7D2FE; }
+
+.tokens-log .log-ctx { color: var(--text-muted); }
+.tokens-log .log-path { color: #2B6CB0; }
+
+.tokens-log code.log-code {
+  background: var(--panel-header-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 1px 0.333em;       /* 1px 4/12 — 基于自身 --tp-fs-sm 12px */
+  font-family: var(--font-mono);
+  font-size: var(--tp-fs-sm, 12px);
+  color: var(--text);
+}
+
+.tokens-log .log-val { color: var(--text); }
+
+.tokens-log .log-sub {
+  padding-left: 1.692em;      /* 22/13 */
+  margin-top: 0.231em;        /* 3/13 */
+  color: var(--text-muted);
+}
+.tokens-log .log-sub.is-del { color: #7F1D1D; }
+
+/* 日志行操作区 */
+.tokens-log .log-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.462em;                /* 6/13 */
+  opacity: 0;
+  transition: opacity var(--dur-normal) var(--ease-default);
+  pointer-events: none;
+}
+.tokens-log .log-row:hover .log-actions,
+.tokens-log .log-row:focus-within .log-actions { opacity: 1; pointer-events: auto; }
+
+/* 行内操作按钮 */
+.btn-inline-action {
+  pointer-events: auto;
+  border: none;
+  background: transparent;
+  color: var(--text-subtle);
+  padding: 0.167em 0.5em;     /* 2/12, 6/12 — 基于自身 --tp-fs-sm 12px */
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  font-size: var(--tp-fs-sm, 12px);
+  line-height: var(--lh-none);
+  transition: transform var(--dur-fast) var(--ease-default),
+              color var(--dur-fast) var(--ease-default),
+              background var(--dur-fast) var(--ease-default);
+}
+.btn-inline-action:hover { transform: scale(1.05); }
+.btn-inline-action:active { transform: scale(0.97); }
+
+.btn-inline-action.btn-del:hover {
+  color: var(--danger);
+  background: color-mix(in srgb, var(--danger) 8%, transparent);
+}
+.btn-inline-action.btn-copy:hover {
+  color: var(--primary-2);
+  background: color-mix(in srgb, var(--primary-2) 8%, transparent);
+}
+
+/* 触屏设备：始终显示操作区 */
+@media (hover: none) {
+  .tokens-log .log-actions { opacity: 1; pointer-events: auto; }
+}
