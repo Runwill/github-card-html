@@ -124,8 +124,10 @@ style/
 |   +-- announcements.css
 |   +-- ...
 |
-+-- header.css                     # 头栏 - 后续迁移
-+-- footer.css                     # 底栏 - 后续迁移
++-- header/                        # 头栏（✅ 已完成：全 vw，无 vh，0 断点）
+|   +-- _variables.css             #     --fs-root(vw) / --hdr-pad(vw) + 内联 vw clamp + FL 互换 + 选择器
++-- header.css                     # 头栏静态样式（颜色、阴影、过渡）
++-- footer.css                     # 底栏 - 已足够精简（1 断点），无需迁移
 +-- buttons.css                    # 按钮 - 后续迁移
 +-- ... (其他全局样式保留)
 |
@@ -140,6 +142,8 @@ style/
 
 | 前缀 | 作用域 | 示例 |
 |---|---|---|
+| `--fs-root` | 全站 html 字号 | `clamp(13.5px, calc(12.14px + 0.714vw), 20px)` |
+| `--hdr-*` | 头栏专属 | `--hdr-pad`, `--hdr-search-gap`（无 `--hdr-h`，高度用 rem） |
 | `--tp-fs-*` | 词元面板共享字号 | `--tp-fs-md`, `--tp-fs-sm` |
 | `--tokens-toolbar-*` | toolbar 组件专属 | `--tokens-toolbar-fs` |
 | `--tokens-summary-*` | summary grid 专属 | `--tokens-summary-val-fs` |
@@ -495,7 +499,7 @@ html.force-landscape {
 | 优先级 | 页面/组件 | 预计文件夹 | 说明 |
 |---|---|---|---|
 | ~~P1~~ | ~~权限页~~ | `style/panel/permissions/` | ✅ 已完成（复用 `--tp-*` token，无独立 `_variables.css`） |
-| P2 | 头栏 + 底栏 | `style/header/`, `style/footer/` | 全局可见，影响面最大 |
+| ~~P2~~ | ~~头栏 + 底栏~~ | `style/header/_variables.css` | ✅ 已完成：全 vw/rem 缩放（无 vh），0 断点；标签间距/标题补偿用内联 vw clamp；底栏已足够精简无需迁移 |
 | P3 | 弹窗系统 | `style/modal/` | 从 `style/modals/` 迁移，内部按组件拆分 |
 | P4 | 对局页 | `game/styles/` | 体量最大，最后迁移 |
 | P5 | 全局 token 升级 | `style/theme.css` | 将 `--fs-*` 本身改为 `clamp()`，全站受益 |

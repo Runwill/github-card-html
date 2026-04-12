@@ -1,0 +1,118 @@
+/* style/header/_variables.css -- 头栏动态 token
+ *
+ * 级联缩放模型（全 vw，无 vh）：
+ *   窗口 (vw) → --fs-root → rem → 头栏高度 / 头像 / 力量标题 / 间距
+ *   窗口 (vw) → --hdr-pad → <padding> 元素水平留白
+ *   窗口 (vw) → 内联 clamp → 标签间距 / 标题补偿 margin
+ *
+ * 基准窗口：1912 × 948
+ * 换算：横向 px / 20 = rem（基于 --fs-root 最大值 20px）
+ *
+ * 所有属性仅跟随窗口宽度（vw / rem）一致缩放，
+ * 不使用 vh，彻底消除 vh/vw 维度割裂。
+ */
+
+/* ── token 定义 ──────────────────────────────── */
+:root {
+  /* 全站根字号（横向→vw） */
+  --fs-root: clamp(13.5px, calc(12.14px + 0.714vw), 20px);
+  /* 基准 20px @ 1912vw | 动态范围：190~1101px */
+
+  /* 内容水平留白（横向→vw，em 护栏） */
+  --hdr-pad: clamp(0.8em, 3.136vw, 3em);
+  /* 基准 54px（3em × body 18px）@ 1912vw；em 跟随消费元素字号 */
+}
+
+/* ── force-landscape：vw↔vh 互换 ──────────────
+ * CSS 视口 371×675（物理）→ 视觉布局 675×371
+ * rem / vw clamp 自动跟随 CSS 宽度（371px），无需覆盖；
+ * 仅 --hdr-pad 需要 vw→vh 互换。
+ */
+html.force-landscape {
+  --hdr-pad:           clamp(0.8em, 3.136vh, 3em);     /* vw→vh */
+  --hdr-search-gap:    0.3em;                           /* 极端垂直压缩 */
+  --search-sticky-top: 16%;
+}
+
+/* ── 选择器 ──────────────────────────────────
+ *
+ * 继承链：
+ *   html font-size ← --fs-root (vw clamp)
+ *   全站 rem       ← html font-size
+ *   头栏尺寸       ← rem（一致 vw 缩放）
+ *   <padding>      ← --hdr-pad (vw clamp)
+ */
+html { font-size: var(--fs-root); }
+
+#header_title {
+  height: 2.4rem;                                        /* 48/20 */
+  line-height: 2.4rem;
+}
+
+#header .strength_title {
+  font-size: 1.056rem !important;                        /* 21.12/20 */
+  /* 0.38em = style.css 原始内距；1.976rem = 旧 mr-header-title(75) − h(48)*0.739 */
+  margin-right: calc(0.38em + clamp(0px, calc(8.23vw - 34.6px), 1.976rem));
+}
+
+#header-avatar {
+  width:  1.8rem;                                        /* 36/20 */
+  height: 1.8rem;
+  top:    calc((100% - 1.8rem) / 2);
+  right:  0.4rem;                                        /* 8/20 */
+}
+
+#sidebar .tabs-title {
+  margin: 0 clamp(8px, 2.542vw, 1.5rem) 0 0;            /* 8→30px */
+}
+
+#menu-toggle { padding: 0.4rem 0.6rem; }                 /* 8/20, 12/20 */
+
+#block-under-search {
+  /* 默认 1.5rem（30px）；FL 覆盖 --hdr-search-gap: 0.3em */
+  height: var(--hdr-search-gap, 1.5rem);
+}
+
+.ripple-button {
+  margin-left: -2em;
+  margin-top: -1em;
+  padding: 0.5rem 1.1rem;                                /* 10/20, 22/20 */
+}
+
+padding {
+  padding-left:  var(--hdr-pad);
+  padding-right: var(--hdr-pad);
+}
+
+.strength_button {
+  padding: 0.4rem;                                        /* 8/20 */
+  margin-left: 0.5%;
+  margin-top: 0.75rem;                                    /* 15/20 */
+}
+
+/* ── 搜索容器 ────────────────────────────────── */
+#search-input {
+  position: relative;
+  right: -95%;
+  transition: right var(--dur-slowest) var(--ease-default),
+              transform var(--dur-normal) var(--ease-default),
+              box-shadow var(--dur-normal) var(--ease-default);
+  transform: translateY(0) scale(1);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+#search-input.is-lifted {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+}
+#search-input.is-shown { right: 0; }
+
+.search-container {
+  --search-shell-gutter: clamp(96px, 22vw, 200px);
+  z-index: var(--z-sticky);
+  top: var(--search-sticky-top, 10%);
+  margin-left:  calc(var(--search-shell-gutter) * -1);
+  margin-right: calc(var(--search-shell-gutter) * -1);
+  padding-left:  var(--search-shell-gutter);
+  padding-right: var(--search-shell-gutter);
+  position: sticky;
+}

@@ -38,21 +38,10 @@ html.force-landscape #fl-scroll {
   flex-direction: column;
 }
 
-/* ── 头栏 / 内容 token 校正 ──
-   force-landscape 下 CSS 视口宽度仍是手机竖屏尺寸（~371px），
-   但布局宽度实际为手机高度（~675px），需要将 token 上调到
-   与实际可用宽度匹配的档位；同时纵向仅 ~371px，收紧垂直尺寸。 */
+/* ── 内容区 token 校正 ──
+   头栏 token 已迁移至 style/header/_variables.css 的 FL 块。
+   此处仅保留内容区紧凑化覆盖。 */
 html.force-landscape {
-  /* 头栏横向 */
-  --pad-menu-toggle: 4px 8px;
-  --ml-header-title: 0.85em;
-  --mr-header-title: 42px;
-  --mr-sidebar-tab: 13px;
-  --pad-content-l: 1.0em;
-  --pad-content-r: 0.8em;
-  /* 头栏纵向 */
-  --h-header-title: 34px;
-  --h-search-gap: 0.3em;
   /* 内容区紧凑（消费于 style.css 中已有选择器） */
   --indent-lh: 1.6em;
   --indent-gap: 0.25em;
@@ -60,8 +49,6 @@ html.force-landscape {
   --h-pad-y: 0.35em;
   --heading-mb: 0.25rem;
   --scroll-snap: 42px;
-  /* 检索框：横屏视口矮，10% 只有 37px 约等于头栏高，提高到 16% 保持视觉间距 */
-  --search-sticky-top: 16%;
 }
 
 /* ── 全屏铺满层（蒙版 / 加载遮罩 / Foundation 弹窗） ── */

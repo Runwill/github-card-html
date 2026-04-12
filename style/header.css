@@ -12,11 +12,9 @@
     backdrop-filter: blur(8px) saturate(1.1);
     border-bottom: 1px solid rgba(0,0,0,0.06);
     align-items: center;
-    padding-right: calc(var(--header-avatar-size) + 8px);
+    padding-right: 2.2rem;
     position: sticky;
 }
-
-/* header padding is driven by responsive token in media.css */
 
 #header:hover {
     box-shadow: 0 4px 12px rgba(0,0,0,0.12), 0 8px 24px rgba(0,0,0,0.08);
@@ -28,7 +26,7 @@
     flex-grow: 1;
     align-items: center;
     font-size: .9rem;
-    margin-left: var(--ml-header-title);
+    margin-left: 1rem;
     transition: all var(--dur-normal) var(--ease-default);
 }
 
