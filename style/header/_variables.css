@@ -30,8 +30,6 @@
  */
 html.force-landscape {
   --hdr-pad:           clamp(0.8em, 3.136vh, 3em);     /* vw→vh */
-  --hdr-search-gap:    0.3em;                           /* 极端垂直压缩 */
-  --search-sticky-top: 16%;
 }
 
 /* ── 选择器 ──────────────────────────────────
@@ -52,7 +50,7 @@ html { font-size: var(--fs-root); }
 #header .strength_title {
   font-size: 1.056rem !important;                        /* 21.12/20 */
   /* 0.38em = style.css 原始内距；1.976rem = 旧 mr-header-title(75) − h(48)*0.739 */
-  margin-right: calc(0.38em + clamp(0px, calc(8.23vw - 34.6px), 1.976rem));
+  margin-right: calc(0.38em + clamp(4px, calc(8.23vw - 34.6px), 1.976rem));
 }
 
 #header-avatar {
@@ -66,11 +64,10 @@ html { font-size: var(--fs-root); }
   margin: 0 clamp(8px, 2.542vw, 1.5rem) 0 0;            /* 8→30px */
 }
 
-#menu-toggle { padding: 0.4rem 0.6rem; }                 /* 8/20, 12/20 */
+#menu-toggle { padding: 0.4rem clamp(4px, 0.627vw, 0.6rem); } /* 8/20, 4→12px@1912 */
 
 #block-under-search {
-  /* 默认 1.5rem（30px）；FL 覆盖 --hdr-search-gap: 0.3em */
-  height: var(--hdr-search-gap, 1.5rem);
+  height: 1.5rem;                                        /* 30/20 */
 }
 
 .ripple-button {
@@ -109,7 +106,7 @@ padding {
 .search-container {
   --search-shell-gutter: clamp(96px, 22vw, 200px);
   z-index: var(--z-sticky);
-  top: var(--search-sticky-top, 10%);
+  top: 10%;
   margin-left:  calc(var(--search-shell-gutter) * -1);
   margin-right: calc(var(--search-shell-gutter) * -1);
   padding-left:  var(--search-shell-gutter);

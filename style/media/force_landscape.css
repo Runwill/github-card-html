@@ -38,19 +38,6 @@ html.force-landscape #fl-scroll {
   flex-direction: column;
 }
 
-/* ── 内容区 token 校正 ──
-   头栏 token 已迁移至 style/header/_variables.css 的 FL 块。
-   此处仅保留内容区紧凑化覆盖。 */
-html.force-landscape {
-  /* 内容区紧凑（消费于 style.css 中已有选择器） */
-  --indent-lh: 1.6em;
-  --indent-gap: 0.25em;
-  --pad-block: 0.6em;
-  --h-pad-y: 0.35em;
-  --heading-mb: 0.25rem;
-  --scroll-snap: 42px;
-}
-
 /* ── 全屏铺满层（蒙版 / 加载遮罩 / Foundation 弹窗） ── */
 html.force-landscape .modal-backdrop,
 html.force-landscape #loading-overlay,
