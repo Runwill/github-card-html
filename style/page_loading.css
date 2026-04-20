@@ -18,6 +18,7 @@
     flex-direction: column;
     align-items: center;
     position: relative;
+    width: 100%;
 }
 
 #loading-overlay.fade-out {
@@ -35,11 +36,11 @@
 }
 
 .loading-bar-container {
-    width: 39vw;
+    width: 39%;
     /* 保证进度条在小屏下也不会太短，可按需调大或通过 CSS 变量覆盖 */
-    min-width: var(--pb-min-width, 260px);
-    /* 可选上限，防止超宽屏过长（保留现有 39vw 主导宽度） */
-    max-width: 86vw;
+    min-width: min(260px, 82%);
+    /* 可选上限，防止超宽屏过长 */
+    max-width: 86%;
     height: 8px;
     background: color-mix(in srgb, var(--surface) 86%, transparent);
     border: 1px solid var(--border);

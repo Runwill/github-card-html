@@ -47,56 +47,9 @@ html.force-landscape .reveal-overlay {
   height: 100% !important;
 }
 
-/* ── 加载进度条（横屏宽度充裕，适当加宽） ── */
-html.force-landscape .loading-bar-container {
-  width: 50% !important;
-  max-width: 88% !important;
-  min-width: min(280px, 82%) !important;
-}
-
-/* ── 弹窗（横屏高度紧张，缩窄宽度、放大高度、收紧内距） ── */
-html.force-landscape .modal {
-  max-width: 72% !important;
-  max-height: 88% !important;
-  padding: var(--space-2xl) !important;
-}
-
-/* ── 面板 ── */
-html.force-landscape .panel {
-  max-width: 64% !important;
-  max-height: 92% !important;
-}
-
-/* ── 侧边栏菜单（纵向紧凑、保证触控热区） ── */
-html.force-landscape .panel--menu {
-  padding: var(--space-xs) var(--space-lg);
-  max-height: 86% !important;
-}
-html.force-landscape #sidebar-menu,
-html.force-landscape #account-menu {
-  overflow-y: auto;
-}
-html.force-landscape #sidebar-menu li,
-html.force-landscape #account-menu li,
-html.force-landscape #settings-menu li {
-  margin-bottom: 1px;
-}
-html.force-landscape .sidebar-menu_button {
-  padding: var(--space-2xs) var(--space-md);
-  font-size: var(--fs-base);
-  gap: var(--space-2xs);
-  min-height: 36px;
-}
-
 /* ── 底栏 ── */
 html.force-landscape .site-footer {
   z-index: 100;
-}
-
-/* ── 回到顶部 ── */
-html.force-landscape .back-to-top {
-  right: 12px !important;
-  bottom: 48px !important;
 }
 
 /* ── 行高亮 ── */

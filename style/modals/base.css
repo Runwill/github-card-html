@@ -22,14 +22,14 @@
   /* Reduced scale slightly, but keeping transform logic simple for overrides */
   transform: translate(-50%, -48%) scale(0.96); /* Removed !important to allow drag override */
   background: var(--surface, #fff);
-  padding: var(--space-4xl);
+  padding: clamp(var(--space-2xl, 16px), 2.532vh, var(--space-4xl, 24px));
   border: 1px solid var(--border, #e2e8f0);
   border-radius: var(--radius-xl); /* More rounded corners */
   box-shadow: 
     var(--shadow-elev-2),
     0 0 0 1px rgba(0, 0, 0, 0.05); /* Subtle border ring */
   z-index: var(--z-modal);
-  max-width: 90vw; max-height: 85vh;
+  max-width: 90%; max-height: 85%;
   overflow-y: auto;
   display: none; opacity: 0;
   transition: 
@@ -243,6 +243,8 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   z-index: var(--z-panel);
+  max-width: 92%; max-height: 92%;
+  overflow-y: auto;
   opacity: 0; visibility: hidden; pointer-events: none;
 }
 .panel.show {
@@ -252,11 +254,13 @@
 
 /* 菜单面板（侧边栏 / 账号 / 设置） */
 .panel--menu {
-  padding: var(--space-2xl);
+  padding: clamp(6px, calc(3.66vh - 18.7px), var(--space-2xl, 16px))
+          clamp(12px, 1.688vh, var(--space-2xl, 16px));
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-elev-3);
   transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-smooth), visibility var(--dur-instant) linear var(--dur-normal);
   min-width: 240px;
+  max-height: 86%;
 }
 .panel--menu.show {
   transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-smooth), visibility var(--dur-instant) linear var(--dur-instant);
@@ -276,8 +280,8 @@
 /* Responsive */
 @media (max-width: 640px) {
   .modal { 
-    width: calc(100vw - 32px); 
-    max-height: calc(100vh - 40px); 
+    width: calc(100% - 32px); 
+    max-height: calc(100% - 40px); 
     padding: var(--space-3xl); 
     border-radius: var(--radius-2xl); /* Even rounder on mobile */
   }
