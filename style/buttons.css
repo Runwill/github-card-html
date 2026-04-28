@@ -58,7 +58,7 @@
 button,
 .btn,
 .tokens-btn,
-.sidebar-menu_button,
+.menu__button,
 .button,
 .wave {
   -webkit-touch-callout: none;      /* 禁用 iOS 长按呼出菜单 */
@@ -69,7 +69,7 @@ button,
 button *,
 .btn *,
 .tokens-btn *,
-.sidebar-menu_button *,
+.menu__button *,
 .button *,
 .wave * {
   -webkit-touch-callout: none;

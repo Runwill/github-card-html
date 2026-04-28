@@ -49,8 +49,12 @@ html { font-size: var(--fs-root); }
 
 #header .strength_title {
   font-size: 1.056rem !important;                        /* 21.12/20 */
-  /* 0.38em = style.css 原始内距；1.976rem = 旧 mr-header-title(75) − h(48)*0.739 */
-  margin-right: calc(0.38em + clamp(4px, calc(8.23vw - 34.6px), 1.976rem));
+  /* margin-right 均衡原选择器留白与标题右侧间距
+   * 0.38em 保留原 style.css 内距扣减；clamp 以纯 vw 表达，取消原补偿 calc 耦合式
+   * 参考映射：@1912 ≈ 39.5px (1.976rem)、@768 ≈ 15.9px、下限 0.2rem (≈4px)
+   *   原公式：clamp(4px, calc(8.23vw - 34.6px), 1.976rem)  — 补偿耦合，违反 ARCH §0.12 #1
+   *   新公式：clamp(0.2rem, 2.066vw, 1.976rem)              — 纯线性依赖 vw */
+  margin-right: calc(0.38em + clamp(0.2rem, 2.066vw, 1.976rem));
 }
 
 #header-avatar {

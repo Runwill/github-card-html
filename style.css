@@ -49,7 +49,7 @@ pronounName {
                  1px -1px 0 rgb(255, 215, 0, 0.1), -1px 1px 0 rgb(255, 215, 0, 0.1);
 }
 
-.sidebar-menu_button { background: none; border: none; padding: var(--space-lg) var(--space-2xl); font-size: var(--fs-lg); }
+/* .menu__button 完整样式在 style/menu/panel.css；变量在 style/menu/_variables.css 统一维护 */
 
 /* 容器和角色相关样式 */
 .container { position: relative; z-index: 2; }

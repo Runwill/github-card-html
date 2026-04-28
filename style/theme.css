@@ -458,8 +458,8 @@ html[data-theme="dark"] .btn.is-active:hover {
 
 
 
-/* 侧边栏通用按钮文字色（主题自适应）*/
-.sidebar-menu_button { color: var(--text) !important; }
+/* 菜单按钮文字色（主题自适应，作用于侧边栏/账号/设置三菜单）*/
+.menu__button { color: var(--text) !important; }
 
 /* Tokens 页：容器与卡片/分区 */
 #tokens-summary .type-tile {

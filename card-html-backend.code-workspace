@@ -8,6 +8,7 @@
         }
     ],
     "settings": {
-        "liveServer.settings.multiRootWorkspaceName": "card-html"
+        "liveServer.settings.multiRootWorkspaceName": "card-html",
+        "powershell.cwd": "card-html"
     }
 }

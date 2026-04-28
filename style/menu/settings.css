@@ -1,19 +1,23 @@
-/* Sidebar menus – z-index override (shared layout in base.css .panel) */
+/* style/menu/settings.css — 设置菜单专属样式
+ *
+ * 作用域：仅 #settings-menu 及其内部表单控件
+ *
+ * 包含：
+ *   - 容器溢出覆盖     #settings-menu { overflow: visible }
+ *   - 视窗尺寸提示     .settings-menu__viewport-info
+ *   - 滑块            .setting-slider
+ *   - 箭头选择器       .arrow-selector / .arrow-btn / .arrow-value
+ *
+ * 通用菜单容器/按钮见 panel.css；侧边栏专属见 sidebar.css。
+ */
 
-#sidebar-menu, #account-menu, #settings-menu {
-  z-index: var(--z-modal);
+/* 设置菜单内项数量固定且底部需外露 viewport-info（绝对定位 bottom 为负值），
+   覆盖 .panel 基类的 overflow-y: auto，避免裁剪 */
+#settings-menu {
+  overflow: visible;
 }
 
-#sidebar-menu, #account-menu {
-  overflow-y: auto;
-}
-
-#sidebar-menu li, #account-menu li, #settings-menu li { 
-  list-style: none; 
-  margin-bottom: clamp(1px, calc(2.56vh - 16.3px), var(--space-sm, 8px)); 
-}
-#sidebar-menu li:last-child, #account-menu li:last-child, #settings-menu li:last-of-type { margin-bottom: 0; }
-
+/* 视窗尺寸提示（绝对定位于设置菜单底部下方） */
 .settings-menu__viewport-info {
   position: absolute;
   left: 50%;
@@ -31,72 +35,9 @@ html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewpo
   color: var(--bg-end);
 }
 
-.sidebar-menu_button { 
-  transition: all var(--dur-normal) var(--ease-standard) !important; 
-  font-weight: 500 !important; 
-  width: 100%; 
-  text-align: left; 
-  padding: 0.8em 1.067em; 
-  border-radius: var(--radius-lg); 
-  color: var(--text, #4a5568); 
-  background: transparent; 
-  border: none; 
-  cursor: pointer; 
-  font-size: clamp(var(--fs-base, 13px), 1.582vh, var(--fs-lg, 15px)); 
-  display: flex;
-  align-items: center;
-  gap: 0.667em;
-  min-height: 2.4em;
-}
-
-.sidebar-menu_button:hover { 
-  background-color: var(--bg-start, #f7fafc) !important; 
-  transform: translateX(4px); 
-  color: var(--primary-2, #7084ff) !important;
-}
-
-#logout-button { color: var(--danger, #e53e3e); }
-#logout-button:hover { 
-  background-color: color-mix(in srgb, var(--danger) 10%, transparent) !important; 
-  color: var(--danger-hover, #c53030) !important;
-}
-
-/* Sidebar avatar row */
-.sidebar-avatar-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-}
-
-#sidebar-avatar-preview {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  object-fit: cover;
-  border: 1px solid var(--border, #e2e8f0);
-  display: none;
-}
-
-#open-account-menu-button {
-  flex: 1;
-}
-
-#upload-avatar-input {
-  display: none;
-}
-
-@media (max-width: 768px) { 
-  #sidebar-menu, #account-menu, #settings-menu { 
-    min-width: 200px; 
-    margin: 0; 
-  } 
-}
-
 /* =========================================
-   Game Settings Styles
+   Slider
    ========================================= */
-
-/* Slider */
 .setting-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -141,7 +82,9 @@ html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewpo
   border-radius: var(--radius-xs);
 }
 
-/* Arrow Selector */
+/* =========================================
+   Arrow Selector
+   ========================================= */
 .arrow-selector {
   display: flex;
   align-items: center;
@@ -161,7 +104,7 @@ html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewpo
   align-items: center;
   justify-content: center;
   transition: all var(--dur-normal) var(--ease-default);
-  border-radius: var(--radius-sm) ;
+  border-radius: var(--radius-sm);
 }
 
 .arrow-btn:hover:not(:disabled) {

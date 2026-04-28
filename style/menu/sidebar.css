@@ -1,0 +1,39 @@
+/* style/menu/sidebar.css — 侧边栏菜单专属样式
+ *
+ * 作用域：仅 #sidebar-menu 的特殊条目（头像行 + 上传控件）
+ *
+ * 包含：
+ *   - 头像行           .sidebar-avatar-row（首项，含头像预览圈 + 账号入口按钮）
+ *   - 头像预览圈       #sidebar-avatar-preview
+ *   - 账号按钮拉伸     #open-account-menu-button
+ *   - 上传控件隐藏     #upload-avatar-input
+ *
+ * 通用菜单容器/按钮见 panel.css；设置菜单专属见 settings.css。
+ *
+ * 缩放：字号 <- --menu-fs-btn（与同列 .menu__button 同步）
+ *       gap / 头像尺寸 <- em（0.667em = 10/15、2.133em = 32/15）
+ */
+
+.sidebar-avatar-row {
+  display: flex;
+  align-items: center;
+  font-size: var(--menu-fs-btn, var(--fs-lg, 15px));
+  gap: 0.667em;
+}
+
+#sidebar-avatar-preview {
+  width: var(--menu-avatar, 2.133em);
+  height: var(--menu-avatar, 2.133em);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 1px solid var(--border, #e2e8f0);
+  display: none;
+}
+
+#open-account-menu-button {
+  flex: 1;
+}
+
+#upload-avatar-input {
+  display: none;
+}

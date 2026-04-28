@@ -252,19 +252,9 @@
   transform: translate(-50%, -50%) scale(1);
 }
 
-/* 菜单面板（侧边栏 / 账号 / 设置） */
-.panel--menu {
-  padding: clamp(6px, calc(3.66vh - 18.7px), var(--space-2xl, 16px))
-          clamp(12px, 1.688vh, var(--space-2xl, 16px));
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-elev-3);
-  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-smooth), visibility var(--dur-instant) linear var(--dur-normal);
-  min-width: 240px;
-  max-height: 86%;
-}
-.panel--menu.show {
-  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-smooth), visibility var(--dur-instant) linear var(--dur-instant);
-}
+/* 菜单面板（侧边栏 / 账号 / 设置）
+ * ～～ .panel--menu 已迁出到 style/menu/sidebar.css ～～
+ * modals/ 仅保留通用弹窗与 .panel 基类。菜单专用变量 / 面板与子部件均在 style/menu/ 。 */
 
 /* 页面面板（登录页） */
 .panel--page {

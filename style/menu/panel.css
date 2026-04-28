@@ -1,0 +1,90 @@
+/* style/menu/panel.css — 菜单系列共用层
+ *
+ * 适用三个菜单：#sidebar-menu / #account-menu / #settings-menu
+ *
+ * 包含：
+ *   - 菜单面板容器  .panel--menu      （内距/宽度 token 化）
+ *   - 菜单项布局    li / 间距          （--menu-item-gap，vh）
+ *   - 菜单项按钮    .menu__button     （字号 vh、padding/gap em 级联）
+ *
+ * 仅保留三菜单共用的样式；侧边栏专属在 sidebar.css，设置菜单专属在 settings.css。
+ *
+ * 命名说明：原 .sidebar-menu_button 因实际同时用于三菜单，命名误导，
+ *           已重命名为 .menu__button（BEM 风格，与 .menu__avatar / .menu__viewport-info 一致）。
+ */
+
+#sidebar-menu, #account-menu, #settings-menu {
+  z-index: var(--z-modal);
+}
+
+/* 菜单面板容器（原位于 modals/base.css，迁出以与 modals 解耦）
+ * padding / min-width 由 _variables.css 的 --menu-pad-* / --menu-min-w 提供
+ * （vh/vw 连续缩放，force-landscape 自动互换） */
+.panel--menu {
+  padding: var(--menu-pad-y, 16px) var(--menu-pad-x, 16px);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-elev-3);
+  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-smooth), visibility var(--dur-instant) linear var(--dur-normal);
+  min-width: var(--menu-min-w, 240px);
+  max-height: 86%;
+}
+.panel--menu.show {
+  transition: opacity var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-smooth), visibility var(--dur-instant) linear var(--dur-instant);
+}
+
+#sidebar-menu, #account-menu {
+  overflow-y: auto;
+}
+
+/* 菜单项 — 间距 token 化 */
+#sidebar-menu li,
+#account-menu li,
+#settings-menu li {
+  list-style: none;
+  margin-bottom: var(--menu-item-gap, 8px);
+}
+#sidebar-menu li:last-child,
+#account-menu li:last-child,
+#settings-menu li:last-of-type {
+  margin-bottom: 0;
+}
+
+/* .menu__button -----------------------------------
+ * 字号 <- --menu-fs-btn (vh)，基准 15px @948
+ * padding/gap/min-height <- em（按 15px 基准换算）
+ *   0.8em   = 12/15  纵向内距
+ *   1.067em = 16/15  横向内距
+ *   0.667em = 10/15  图标-文本 gap
+ *   2.4em   = 36/15  最小高度
+ * -------------------------------------------------- */
+.menu__button {
+  transition: all var(--dur-normal) var(--ease-standard) !important;
+  font-weight: 500 !important;
+  width: 100%;
+  text-align: left;
+  padding: 0.8em 1.067em;
+  border-radius: var(--radius-lg);
+  color: var(--text, #4a5568);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: var(--menu-fs-btn, var(--fs-lg, 15px));
+  display: flex;
+  align-items: center;
+  gap: 0.667em;
+  min-height: 2.4em;
+}
+
+.menu__button:hover {
+  background-color: var(--bg-start, #f7fafc) !important;
+  transform: translateX(4px);
+  color: var(--primary-2, #7084ff) !important;
+}
+
+#logout-button {
+  color: var(--danger, #e53e3e);
+}
+#logout-button:hover {
+  background-color: color-mix(in srgb, var(--danger) 10%, transparent) !important;
+  color: var(--danger-hover, #c53030) !important;
+}
