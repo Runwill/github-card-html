@@ -8,16 +8,13 @@
  *   - 菜单项按钮    .menu__button     （字号 vh、padding/gap em 级联）
  *
  * 仅保留三菜单共用的样式；侧边栏专属在 sidebar.css，设置菜单专属在 settings.css。
- *
- * 命名说明：原 .sidebar-menu_button 因实际同时用于三菜单，命名误导，
- *           已重命名为 .menu__button（BEM 风格，与 .menu__avatar / .menu__viewport-info 一致）。
  */
 
 #sidebar-menu, #account-menu, #settings-menu {
   z-index: var(--z-modal);
 }
 
-/* 菜单面板容器（原位于 modals/base.css，迁出以与 modals 解耦）
+/* 菜单面板容器
  * padding / min-width 由 _variables.css 的 --menu-pad-* / --menu-min-w 提供
  * （vh/vw 连续缩放，force-landscape 自动互换） */
 .panel--menu {

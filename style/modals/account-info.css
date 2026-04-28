@@ -1,39 +1,42 @@
 /* Account info modal - modern card layout with avatar, title and detail list */
-.account-info-modal { padding: var(--space-4xl); }
+.account-info-modal {
+  font-size: var(--modal-fs-md, var(--fs-md));
+  padding: 1.714em; /* 24/14 */
+}
 
 /* Header Section */
-.account-info__header { 
-  display: flex; 
-  align-items: center; 
-  gap: var(--space-3xl); 
-  padding-bottom: var(--space-3xl); 
-  border-bottom: 1px solid var(--border, #e2e8f0); 
+.account-info__header {
+  display: flex;
+  align-items: center;
+  gap: 1.429em;
+  padding-bottom: 1.429em;
+  border-bottom: 1px solid var(--border, #e2e8f0);
 }
 
-.account-info__avatar { 
-  width: 72px; height: 72px; 
-  border-radius: var(--radius-full); 
-  object-fit: cover; 
-  border: 2px solid var(--surface, #fff); 
-  background: var(--surface, #fff); 
-  box-shadow: var(--shadow-elev-1); 
+.account-info__avatar {
+  width: var(--account-avatar-size, 72px); height: var(--account-avatar-size, 72px);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--surface, #fff);
+  background: var(--surface, #fff);
+  box-shadow: var(--shadow-elev-1);
 }
 
-.account-info__title { 
-  display: flex; 
-  flex-direction: column; 
-  gap: var(--space-2xs); 
-  min-width: 0; 
+.account-info__title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.286em;
+  min-width: 0;
   flex: 1;
 }
 
 .account-info__name {
-  font-size: var(--fs-3xl);
+  font-size: 1.429em; /* 20/14 */
   color: var(--text, #2d3748);
   line-height: var(--lh-tight);
-  display: flex; 
-  align-items: center; 
-  gap: var(--space-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -45,12 +48,12 @@
 /* Fix for editable username span */
 #account-info-username-main.is-editable { cursor: text; transition: color var(--dur-normal) var(--ease-default); }
 #account-info-username-main.is-editable:hover { color: var(--primary-2, #7084ff); }
-#account-info-username-main.is-editing { 
-  outline: none; 
-  overflow: visible; 
+#account-info-username-main.is-editing {
+  outline: none;
+  overflow: visible;
   text-overflow: clip;
   border-bottom: 1px solid var(--primary-2, #7084ff);
-  padding-bottom: var(--space-3xs);
+  padding-bottom: 0.143em;
 }
 
 .account-info__name-input {
@@ -62,19 +65,19 @@
   border-bottom: 2px solid var(--primary-1, #8698ff);
 }
 
-.account-info__role { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
-.account-info__role .badge { 
-  font-size: var(--fs-xs); 
-  padding: var(--space-3xs) var(--space-sm); 
-  border-radius: var(--radius-sm) ; 
-  text-transform: uppercase; 
-  letter-spacing: 0.05em;
+.account-info__role { display: flex; gap: 0.429em; flex-wrap: wrap; }
+.account-info__role .badge {
+  font-size: 0.786em; /* 11/14 */
+  padding: 0.182em 0.727em;
+  border-radius: var(--radius-sm) ;
+  text-transform: uppercase;
+  letter-spacing: 0;
 }
 
 /* Username Text */
 #account-info-username-main {
   font-weight: 500;
-  flex: 0 1 auto; 
+  flex: 0 1 auto;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block;
   max-width: 100%;
 }
@@ -86,7 +89,7 @@
 #account-info-username-pending-wrap {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 0.429em;
   overflow: hidden;
   pointer-events: none;
 
@@ -104,7 +107,7 @@
 /* Expanded state */
 #account-info-username-pending-wrap.is-expanded {
   opacity: 1;
-  max-width: 280px;
+  max-width: 20em;
   transform: translateX(0);
   pointer-events: auto;
 }
@@ -116,7 +119,7 @@
   font-weight: 500;
   color: var(--text-subtle, #a0aec0);
   background: var(--bg-start, #f7fafc);
-  padding: var(--space-3xs) var(--space-sm);
+  padding: 0.143em 0.571em;
   border-radius: var(--radius-xs);
   white-space: nowrap;
   line-height: var(--lh-none);
@@ -136,7 +139,7 @@
   font-weight: 500;
   color: var(--text-subtle, #a0aec0);
   cursor: pointer;
-  padding: var(--space-3xs) var(--space-xs);
+  padding: 0.143em 0.429em;
   border-radius: var(--radius-xs);
   line-height: var(--lh-none);
   white-space: nowrap;
@@ -154,10 +157,10 @@
 #account-info-intro-pending {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: 0.571em;
   width: 100%;
   line-height: var(--lh-none);
-  margin-top: calc(-1 * var(--space-2xs)); /* static, not transitioned */
+  margin-top: -0.286em; /* static, not transitioned */
 
   /* Collapsed state (default) */
   opacity: 0;
@@ -175,7 +178,7 @@
 /* Expanded state */
 #account-info-intro-pending.is-expanded {
   opacity: 1;
-  max-height: 60px; /* sufficient for one-line content */
+  max-height: 4.286em; /* sufficient for one-line content */
   transform: translateY(0);
   pointer-events: auto;
 }
@@ -199,14 +202,14 @@
 }
 
 /* Body Section */
-.account-info__body { padding-top: var(--space-3xl); display: flex; flex-direction: column; gap: var(--space-md); }
+.account-info__body { padding-top: 1.429em; display: flex; flex-direction: column; gap: 0.714em; }
 
-.account-info__body .info-row { 
-  display: flex; 
-  align-items: center; 
-  justify-content: space-between; 
-  gap: var(--space-2xl); 
-  padding: var(--space-lg) var(--space-2xl); 
+.account-info__body .info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.143em;
+  padding: 0.857em 1.143em;
   background: transparent;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border, #e2e8f0);
@@ -219,27 +222,27 @@
   box-shadow: var(--shadow-subtle-2);
 }
 
-.account-info__body .info-label { 
-  color: var(--text-muted, #718096); 
-  font-size: var(--fs-base); 
+.account-info__body .info-label {
+  color: var(--text-muted, #718096);
+  font-size: 0.929em; /* 13/14 */
   font-weight: 500;
 }
-.account-info__body .info-value { 
-  color: var(--text, #2d3748); 
-  font-weight: 500; 
-  font-size: var(--fs-md); 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
+.account-info__body .info-value {
+  color: var(--text, #2d3748);
+  font-weight: 500;
+  font-size: inherit;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #account-info-id {
   font-family: var(--font-mono);
-  font-size: var(--fs-sm);
+  font-size: 0.857em; /* 12/14 */
   background: rgba(128, 128, 128, 0.1);
-  padding: 1px 6px;
+  padding: 0.083em 0.5em;
   border-radius: var(--radius-xs);
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
   color: var(--text-muted, #718096);
 }
 
@@ -249,15 +252,15 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-2xl);
-  font-size: var(--fs-sm);
+  gap: 1.143em;
+  font-size: 0.857em;
   color: var(--text-subtle, #a0aec0);
 }
 
 .account-info__meta .meta-item {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 0.5em;
 }
 
 .account-info__meta .meta-label {
@@ -270,25 +273,25 @@
 }
 
 /* Intro Textarea */
-.account-info__intro { 
-  padding-top: var(--space-sm); 
-  padding-bottom: var(--space-md);
-  display: flex; 
-  flex-direction: column; 
-  gap: var(--space-sm); 
+.account-info__intro {
+  padding-top: 0.571em;
+  padding-bottom: 0.714em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.571em;
 }
 
 .intro-textarea {
-  width: 100%; 
-  min-height: 100px; 
-  resize: vertical; 
-  padding: var(--space-lg) var(--space-2xl);
-  border: 1px solid var(--border, #e2e8f0); 
-  border-radius: var(--radius-lg); 
+  width: 100%;
+  min-height: var(--account-intro-min-h, 100px);
+  resize: vertical;
+  padding: 0.857em 1.143em;
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-lg);
   background: transparent;
-  color: var(--text, #2d3748); 
-  font-size: var(--fs-md); 
-  line-height: var(--lh-relaxed); 
+  color: var(--text, #2d3748);
+  font-size: inherit;
+  line-height: var(--lh-relaxed);
   transition: all var(--dur-normal) var(--ease-default);
   font-family: inherit;
 }
@@ -309,23 +312,15 @@
 
 #account-info-message.msg-flash::after {
   content: "";
-  position: absolute; 
-  inset: 0; 
+  position: absolute;
+  inset: 0;
   border-radius: var(--radius-md);
   pointer-events: none;
   /* Flash color based on state */
-  background: currentColor; 
+  background: currentColor;
   animation: account-info-msg-flash-anim var(--dur-slower) ease-out;
 }
 
 #account-info-message.success.msg-flash::after { background: var(--success, #48bb78); }
 #account-info-message.error.msg-flash::after { background: var(--danger, #f56565); }
-
-
-@media (max-width: 480px) {
-  .account-info-modal { padding: var(--space-3xl); }
-  .account-info__avatar { width: 60px; height: 60px; }
-  .account-info__name { font-size: var(--fs-2xl); }
-}
-
 

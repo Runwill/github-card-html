@@ -2,7 +2,7 @@
 
 /* Edit hints: slightly larger text + explicit title color */
 #tokens-edit-hints {
-  font-size: 12.5px;
+  font-size: var(--modal-fs-sm, 12px);
   line-height: var(--lh-normal);
 }
 #tokens-edit-hints .hints-title {

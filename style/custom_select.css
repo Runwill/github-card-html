@@ -110,12 +110,12 @@
     top: calc(100% + var(--space-2xs));
     left: 0;
     right: 0;
-    z-index: var(--z-dropdown, 100);
+    z-index: var(--z-dropdown, 10001);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-elev-2);
-    max-height: 220px;
+    max-height: var(--custom-select-dropdown-max-h, 220px);
     overflow-y: auto;
     overflow-x: hidden;
     padding: var(--space-2xs) 0;
@@ -245,15 +245,4 @@
     padding-bottom: 0 !important;
     border-radius: var(--radius-none) !important;
     line-height: 32px;
-}
-
-/* ── Responsive ────────────────────────────────────────────────────── */
-
-@media (max-width: 600px) {
-    .custom-select__dropdown {
-        max-height: 180px;
-    }
-    .custom-select__option {
-        padding: var(--space-sm) var(--space-md);
-    }
 }

@@ -3,22 +3,10 @@
  * 涉及组件：
  *   .panel--menu                                  菜单面板容器
  *   #sidebar-menu / #account-menu / #settings-menu 三个菜单弹层
- *   .menu__button                                 菜单项按钮（原 .sidebar-menu_button）
+ *   .menu__button                                 菜单项按钮
  *
  * 基准窗口：1912 * 948（参见 ARCHITECTURE.md §0.13）
  * 级联模型：窗口(vh) -> 字号 -> em(内距/间距)
- *
- * 与原硬编码公式的对照：
- *   --menu-pad-y  原 clamp(6px, calc(3.66vh - 18.7px), 16px)  -> clamp(6px, 1.688vh, 16px)
- *   --menu-pad-x  原 clamp(12px, 1.688vh, 16px)               -> 同上
- *   --menu-item-gap 原 clamp(1px, calc(2.56vh - 16.3px), 8px) -> clamp(1px, 0.844vh, 8px)
- *   --menu-fs-btn   原 clamp(--fs-base, 1.582vh, --fs-lg)     -> clamp(10px, 1.582vh, 16px)
- *   --menu-min-w    原 .panel--menu { min-width: 240px } 静态  -> clamp(160px, 12.55vw, 280px)
- *   --menu-avatar   原 #sidebar-avatar-preview { 32px } 静态    -> 2.133em（跟随 --menu-fs-btn）
- *
- * 在 1912×948 基准下所有 token 与原公式视觉一致。
- * 原公式的 calc(... - 16.3px) 补偿项会随 force-landscape 失效；
- * 新公式纯 vh/vw，可在 .force-landscape 块中整体互换。
  */
 :root {
   /* 采用「偏置 + 半斜率」形式：948 基准与原一致，但中高段衰减度减半

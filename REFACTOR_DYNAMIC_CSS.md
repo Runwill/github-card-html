@@ -567,17 +567,18 @@ html.force-landscape {
 
 ---
 
-## 8. 弹窗 / 菜单约束矩阵（Step 0 审计产物）
+## 8. 弹窗 / 菜单迁移前审计快照（历史）
 
 > **审计日期**: 2026-04-22
-> **审计范围**: `style/modals/`、`style/media/force_landscape.css`、`style/header/`、`style/custom_select.css`
-> **目的**: 在动手迁移弹窗/菜单系统前，先把"约束来源"穷举清楚，避免迁移过程中被多重覆盖反复打回。
+> **状态**: P3-A ~ P3-F 已于 2026-04-28 完成；当前完成状态见 §9。
+> **审计范围**: 迁移前的 `style/modals/`、`style/media/force_landscape.css`、`style/header/`、`style/custom_select.css`
+> **目的**: 保留迁移前的"约束来源"和决策依据，便于追溯；本节不再作为当前实现说明。
 
 ### 8.1 组件约束矩阵
 
-下表列出所有弹窗 / 菜单组件的关键约束。"混合度"指 vh / vw / px / em 在同一组件内混用的程度，是迁移难度的主要指标。
+下表列出迁移前所有弹窗 / 菜单组件的关键约束。"混合度"指 vh / vw / px / em 在同一组件内混用的程度，是迁移难度的主要指标。
 
-| 组件 | 主文件 | 容器尺寸 | 字号来源 | 内距单位 | 媒体断点 | FL 覆盖 | 混合度 |
+| 组件 | 迁移前位置 | 容器尺寸 | 字号来源 | 内距单位 | 媒体断点 | FL 覆盖 | 混合度 |
 |---|---|---|---|---|---|---|---|
 | `.modal` 基础 | [base.css L19+](card-html/style/modals/base.css) | max-w 90% / max-h 85% | `--fs-*` 静态 | `clamp(2.532vh)` + `--space-*` | 640px | backdrop only | 中 |
 | `.update-modal` | [base.css L63](card-html/style/modals/base.css) | max-w 400px | 继承 | 继承 | -- | -- | 低 |
@@ -589,14 +590,14 @@ html.force-landscape {
 | `.account-info-modal` | [account-info.css](card-html/style/modals/account-info.css) | 继承 .modal | `--fs-3xl` 等 | `--space-*` | 480px | -- | 中 |
 | `.help-popover` | [help.css L1+](card-html/style/modals/help.css) | `min(380px, calc(100vw - …))` | `--fs-*` | `--space-*` | 640px | -- | 低 |
 | `.panel--menu` | [base.css L256+](card-html/style/modals/base.css) | min-w 240px / max-h 86% | -- | **`clamp(6px, calc(3.66vh - 18.7px), 16px)`** | -- | ❌ 无 | **极高** |
-| `#sidebar-menu` 等 | [sidebar.css L3+](card-html/style/modals/sidebar.css) | -- | -- | item gap **`clamp(1px, calc(2.56vh - 16.3px), 8px)`** | 768px | ❌ 无 | **极高** |
-| `.sidebar-menu_button` | [sidebar.css L34+](card-html/style/modals/sidebar.css) | -- | **`clamp(--fs-base, 1.582vh, --fs-lg)`** | em（0.8 / 1.067 / 0.667） | -- | ❌ 无 | 高 |
+| `#sidebar-menu` 等 | 旧侧边栏菜单样式 | -- | -- | item gap **`clamp(1px, calc(2.56vh - 16.3px), 8px)`** | 768px | ❌ 无 | **极高** |
+| 菜单按钮 | 旧侧边栏菜单样式 | -- | **`clamp(--fs-base, 1.582vh, --fs-lg)`** | em（0.8 / 1.067 / 0.667） | -- | ❌ 无 | 高 |
 | `.custom-select__dropdown` | [custom_select.css L108+](card-html/style/custom_select.css) | max-h **220px** 硬编码 | `--fs-*` | `--space-*` | 600px | -- | 低 |
 | `#menu-toggle` | [header/_variables.css L67](card-html/style/header/_variables.css) | -- | -- | `0.4rem clamp(4px, 0.627vw, 0.6rem)` | -- | ✅ vw 链路 | 低 |
 
 ### 8.2 五大约束冲突热点
 
-> 这些是迁移时**必须先解决**的"打架点"，否则任何 token 化都会被其他来源覆盖回去。
+> 这些是迁移前识别出的"打架点"，保留用于解释后续改动来源。
 
 #### 🔴 #1 `.panel--menu` 的复合 vh 计算式
 
@@ -617,7 +618,7 @@ margin-bottom: clamp(1px, calc(2.56vh - 16.3px), var(--space-sm, 8px));
 - **问题**: 同 #1，硬编码补偿无法迁移。
 - **应对**: 改为基于菜单按钮 em 的间距（`gap: 0.4em` 之类），随菜单字号缩放。
 
-#### 🔴 #3 `.sidebar-menu_button` 字号用 vh、padding 用 em（基准混乱）
+#### 🔴 #3 菜单按钮字号用 vh、padding 用 em（基准混乱）
 
 ```css
 font-size: clamp(var(--fs-base, 13px), 1.582vh, var(--fs-lg, 15px));
@@ -641,19 +642,19 @@ padding: 0.8em 1.067em;
 
 ### 8.3 force-landscape 缺口
 
-当前 [force_landscape.css](card-html/style/media/force_landscape.css) 只覆盖了 `.modal-backdrop`（铺满视口），**对菜单类零覆盖**。这意味着：
+迁移前 [force_landscape.css](card-html/style/media/force_landscape.css) 只覆盖了 `.modal-backdrop`（铺满视口），**对菜单类零覆盖**。这意味着：
 
 - `.panel--menu` 的 vh 在 FL 模式下指向"视觉宽度"——如果 padding 公式没有同时翻转，会出现视觉拥挤。
 - `#sidebar-menu` 的 vh 间距同理。
 
 **应对原则**（参见 §0.12 反模式）：不在 force_landscape.css 里加新的覆盖选择器，而是把菜单的尺寸 token 化进 `_variables.css`，在 `html.force-landscape {}` 块里 vh↔vw 互换。
 
-### 8.4 迁移分组（建议执行顺序）
+### 8.4 迁移分组（历史执行顺序）
 
 | 优先级 | 组别 | 组件 | 进入条件 | 主要工作 |
 |---|---|---|---|---|
-| **P3-A** | 简单（试点） | `.help-popover`、`.modal-message` (toast)、role badges | 立即可做 | 把 `min(380px, calc(100vw - …))` 等混合单位收敛到 `--help-w` 等独立 token；建立 `style/modal/_variables.css` |
-| **P3-B** | 菜单系列 | `.panel--menu`、`#sidebar-menu`、`#account-menu`、`#settings-menu`、`.sidebar-menu_button` | P3-A 完成、确认 token 命名前缀 `--menu-*` | 拆解热点 #1 #2 #3；新建 `style/menu/_variables.css` + 各组件文件；FL 块用 vh↔vw 互换 |
+| **P3-A** | 简单（试点） | `.help-popover`、`.modal-message` (toast)、role badges | 立即可做 | 把 `min(380px, calc(100vw - …))` 等混合单位收敛到 `--help-w` 等独立 token；建立 `style/modals/_variables.css` |
+| **P3-B** | 菜单系列 | `.panel--menu`、`#sidebar-menu`、`#account-menu`、`#settings-menu`、菜单按钮 | P3-A 完成、确认 token 命名前缀 `--menu-*` | 拆解热点 #1 #2 #3；新建 `style/menu/_variables.css` + 各组件文件；FL 块用 vh↔vw 互换 |
 | **P3-C** | 简单 modal | `.update-modal`、`.approve-modal`、`.help-popover` 已迁移 | P3-A 完成 | 容器尺寸 token 化；统一 `--modal-pad`、`--modal-radius` |
 | **P3-D** | 中等 modal | `.ann-modal`、`.account-info-modal`、`#avatar-modal`、`#avatar-crop-modal` | P3-C 完成；先消除热点 #4 | 字号继承链梳理；删除冗余媒体断点；vh→token |
 | **P3-E** | 复杂 modal | `.tokens-modal`、`.modal` 基础 | 上述全部完成 | 解决热点 #5；重设 `--tokens-pane-h`；最后修订 base.css 的核心 padding clamp |
@@ -668,9 +669,9 @@ padding: 0.8em 1.067em;
 | `--ann-*` / `--avatar-*` / `--help-*` | 单弹窗专属 | 仅在该 modal 文件内定义 |
 | `--tokens-modal-*` | 词元弹窗（区别于面板的 `--tokens-*`） | `--tokens-modal-pane-h` |
 
-### 8.6 迁移前置检查清单
+### 8.6 迁移前置检查清单（历史）
 
-每开始一个组别迁移前，逐项确认：
+迁移执行时曾按以下清单逐项确认；新增同类组件时仍可复用：
 
 - [ ] 该组件的所有 vh/vw/px 出现位置是否已在 §8.1 表中登记？
 - [ ] 是否有本表未列出的"隐式覆盖"（buttons.css / theme.css / Foundation 全局）？
@@ -678,4 +679,40 @@ padding: 0.8em 1.067em;
 - [ ] 涉及的 z-index 是否会与 modal/dropdown 层级冲突？
 - [ ] 内部子组件（`.btn`、`input`、`select`）是否需要在该组件作用域内做 §4.5.2 式的集成？
 
-> **结论**: 弹窗/菜单的迁移不能一次性做。建议从 **P3-B 菜单系列**正式启动（热点 #1#2#3 集中、力度最大、收益最明显），P3-A 作为命名/结构试水。`.modal` 基础类（P3-E）放到最后，因为它会影响所有继承它的弹窗。
+> **执行结果**: P3-A ~ P3-F 已完成，实际落点和验收记录见 §9。本节只保留迁移前的拆解依据。
+
+---
+
+## 9. 弹窗 / 菜单迁移进度记录
+
+> **更新日期**: 2026-04-28
+> **本轮目标**: 在既有菜单迁移基础上，补齐弹窗系统动态缩放 token，并清理残留断点与层级问题。
+
+### 9.1 已完成范围
+
+| 组别 | 状态 | 完成内容 |
+|---|---|---|
+| P3-A 简单试点 | ✅ 已完成 | 建立 `style/modals/_variables.css`；`.help-popover`、`.modal-message`、`.badge` 接入动态字号和 em 间距 |
+| P3-B 菜单系列 | ✅ 已完成 | 菜单容器、菜单按钮、头像行已迁至 `style/menu/`；设置菜单滑块与箭头控件继续接入菜单字号级联 |
+| P3-C 简单 modal | ✅ 已完成 | `.update-modal`、`.approve-modal` 的宽度和通用 `.modal` padding / 标题 / 表单尺寸 token 化 |
+| P3-D 中等 modal | ✅ 已完成 | `.ann-modal`、`.account-info-modal`、`#avatar-modal`、`#avatar-crop-modal` 接入动态尺寸；删除公告和名片的尺寸断点 |
+| P3-E 复杂 modal | ✅ 已完成 | `.tokens-modal` 的面板高度改为 `--tokens-modal-pane-h` 连续值；删除 860px 高度重定义，仅保留 768px 布局换列 |
+| P3-F dropdown 层级 | ✅ 已完成 | `.custom-select__dropdown` 最大高度 token 化，层级提升到 modal 之上 |
+
+### 9.2 本轮关键落点
+
+- `style/modals/_variables.css` 统一定义弹窗字号、宽高、帮助浮层、公告弹窗、头像弹窗、词元弹窗、下拉菜单等 token，并在 `html.force-landscape` 中完成 vh↔vw 互换。
+- `style/modals/base.css` 从静态全局间距切换为字号级联：通用弹窗、表单、消息条、徽章、小按钮和词元编辑器均由弹窗 token 驱动。
+- `style/modals/help.css` 删除 640px 断点，改为弹性换行和 token 宽度。
+- `style/modals/announcements.css` 删除 480px 断点，并统一在自身文件维护 `.ann-modal` 尺寸，解决 base.css 与 announcements.css 双重定义。
+- `style/modals/account-info.css` 删除 480px 尺寸断点，头像、标题、行内间距、简介输入框改为动态尺寸。
+- `style/modals/avatar.css` 将头像预览、待审核头像、裁剪区域高度 token 化；触屏裁剪只关闭动画，不再按小屏宽度隐藏裁剪控件。
+- `style/custom_select.css` 删除 600px 下拉高度断点，改由 `--custom-select-dropdown-max-h` 连续缩放。
+
+### 9.3 验收记录
+
+> **验收状态**: 已完成。
+
+- 标准尺寸：`371x675`、`1180x692`、`1180x734`、`1872x1086`、`1912x948`。
+- 覆盖范围：侧边栏 / 账号 / 设置菜单、帮助浮层、公告弹窗、名片弹窗、头像裁剪弹窗、词元创建 / 编辑弹窗、modal 内下拉菜单。
+- 验收目标：1912x948 下视觉接近原始基准；小窗口和 force-landscape 下不出现按钮挤压、下拉被遮挡、弹窗内容溢出。

@@ -1,0 +1,84 @@
+/* style/modals/_variables.css -- 弹窗系列动态缩放 token
+ *
+ * 级联模型：
+ *   窗口(vh/vw) -> 弹窗/控件字号 -> em(内距/间距)
+ *
+ * 基准窗口：1912 * 948（参见 ARCHITECTURE.md §0.13）
+ * 换算：纵向 px / 948 * 100 = vh；横向 px / 1912 * 100 = vw
+ *
+ * 说明：当前仍沿用 style/modals/ 目录承载弹窗样式；后续如整体迁至
+ * style/modal/，本文件可直接作为迁移入口。
+ */
+:root {
+  /* 字号阶梯：与 theme.css 静态阶梯在 1912x948 下对齐 */
+  --modal-fs-xs:    clamp(8px, 1.160vh, 13px);   /* 11px */
+  --modal-fs-sm:    clamp(8px, 1.266vh, 14px);   /* 12px */
+  --modal-fs-base:  clamp(9px, 1.371vh, 15px);   /* 13px */
+  --modal-fs-md:    clamp(9px, 1.477vh, 16px);   /* 14px */
+  --modal-fs-lg:    clamp(10px, 1.582vh, 17px);  /* 15px */
+  --modal-fs-xl:    clamp(11px, 1.688vh, 18px);  /* 16px */
+  --modal-fs-2xl:   clamp(12px, 1.899vh, 20px);  /* 18px */
+  --modal-fs-3xl:   clamp(13px, 2.110vh, 22px);  /* 20px */
+  --modal-title-fs: clamp(18px, 3.165vh, 30px);  /* 30px = 1.5rem@20px */
+
+  /* 通用弹窗容器 */
+  --modal-max-w: min(90vw, calc(100vw - 1.778em));
+  --modal-max-h: min(85vh, calc(100vh - 2.222em));
+  --modal-w-update:  clamp(300px, 20.921vw, 420px); /* 400px */
+  --modal-w-approve: clamp(360px, 33.473vw, 680px); /* 640px */
+  --modal-pad-y: 1.333em;  /* 24/18 */
+  --modal-pad-x: 1.333em;  /* 24/18 */
+
+  /* 专用弹窗尺寸 */
+  --ann-modal-w: clamp(360px, 39.749vw, 780px);          /* 760px */
+  --ann-content-max-h: clamp(240px, 65vh, 616px);        /* 616px */
+  --help-w: clamp(260px, 19.874vw, 380px);               /* 380px */
+  --help-safe-w: calc(100vw - 1.846em);
+  --help-max-h: clamp(220px, 55vh, 520px);
+  --avatar-preview-size: clamp(120px, 18.987vh, 180px);  /* 180px */
+  --avatar-pending-size: clamp(56px, 8.439vh, 88px);     /* 80px */
+  --avatar-crop-w: clamp(360px, 37.657vw, 720px);        /* 720px */
+  --avatar-crop-max-h: clamp(220px, 60vh, 620px);
+  --account-avatar-size: clamp(52px, 7.595vh, 80px);     /* 72px */
+  --account-intro-min-h: clamp(72px, 10.549vh, 120px);   /* 100px */
+  --tokens-modal-w: clamp(360px, 47.071vw, 900px);       /* 900px */
+  --tokens-modal-pane-h: clamp(180px, 48vh, 455px);      /* 455px */
+  --tokens-modal-side-w: clamp(240px, 16.736vw, 320px);  /* 320px */
+
+  /* 浮层控件 */
+  --custom-select-dropdown-max-h: clamp(140px, 23.207vh, 220px); /* 220px */
+  --z-dropdown: 10001;
+}
+
+/* force-landscape：vh↔vw 互换 */
+html.force-landscape {
+  --modal-fs-xs:    clamp(8px, 1.160vw, 13px);
+  --modal-fs-sm:    clamp(8px, 1.266vw, 14px);
+  --modal-fs-base:  clamp(9px, 1.371vw, 15px);
+  --modal-fs-md:    clamp(9px, 1.477vw, 16px);
+  --modal-fs-lg:    clamp(10px, 1.582vw, 17px);
+  --modal-fs-xl:    clamp(11px, 1.688vw, 18px);
+  --modal-fs-2xl:   clamp(12px, 1.899vw, 20px);
+  --modal-fs-3xl:   clamp(13px, 2.110vw, 22px);
+  --modal-title-fs: clamp(18px, 3.165vw, 30px);
+
+  --modal-max-w: min(90vh, calc(100vh - 1.778em));
+  --modal-max-h: min(85vw, calc(100vw - 2.222em));
+  --modal-w-update:  clamp(300px, 20.921vh, 420px);
+  --modal-w-approve: clamp(360px, 33.473vh, 680px);
+  --ann-modal-w: clamp(360px, 39.749vh, 780px);
+  --ann-content-max-h: clamp(240px, 65vw, 616px);
+  --help-w: clamp(260px, 19.874vh, 380px);
+  --help-safe-w: calc(100vh - 1.846em);
+  --help-max-h: clamp(220px, 55vw, 520px);
+  --avatar-preview-size: clamp(120px, 18.987vw, 180px);
+  --avatar-pending-size: clamp(56px, 8.439vw, 88px);
+  --avatar-crop-w: clamp(360px, 37.657vh, 720px);
+  --avatar-crop-max-h: clamp(220px, 60vw, 620px);
+  --account-avatar-size: clamp(52px, 7.595vw, 80px);
+  --account-intro-min-h: clamp(72px, 10.549vw, 120px);
+  --tokens-modal-w: clamp(360px, 47.071vh, 900px);
+  --tokens-modal-pane-h: clamp(180px, 48vw, 455px);
+  --tokens-modal-side-w: clamp(240px, 16.736vh, 320px);
+  --custom-select-dropdown-max-h: clamp(140px, 23.207vw, 220px);
+}

@@ -16,37 +16,38 @@
 #avatar-crop-modal .cropper-center::after { display: none !important; }
 
 /* Avatar Modal Layout */
-#avatar-modal .modal-form { 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  gap: var(--space-3xl); 
+#avatar-modal .modal-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: var(--modal-fs-md, var(--fs-md));
+  gap: 1.429em;
 }
 
 #avatar-modal-preview {
   display: none;
   align-self: center;
-  width: 180px; height: 180px; 
-  border-radius: var(--radius-full); 
-  object-fit: cover; 
-  border: 4px solid var(--surface, #fff); 
+  width: var(--avatar-preview-size, 180px); height: var(--avatar-preview-size, 180px);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 4px solid var(--surface, #fff);
   background: var(--bg-start, #f8fafc);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-#avatar-modal #avatar-modal-upload { 
-  width: 100%; 
+#avatar-modal #avatar-modal-upload {
+  width: 100%;
   margin-top: 0; /* Handled by gap */
 }
 
 /* Pending Avatar Section */
-#avatar-pending-wrap { 
-  margin-top: var(--space-lg) !important; 
-  display: none; 
-  flex-direction: column; 
-  align-items: center; 
-  gap: var(--space-sm);
-  padding: var(--space-lg);
+#avatar-pending-wrap {
+  margin-top: 0.857em !important;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.571em;
+  padding: 0.857em;
   background: var(--bg-start, #f8fafc);
   border-radius: var(--radius-lg) ;
   border: 1px dashed var(--border, #e2e8f0);
@@ -55,16 +56,16 @@
 }
 
 #avatar-pending-wrap div[data-i18n="modal.avatar.pending"] {
-  font-size: var(--fs-base); 
-  color: var(--text-subtle, #718096); 
+  font-size: var(--modal-fs-base, var(--fs-base));
+  color: var(--text-subtle, #718096);
   font-weight: 500;
 }
 
 #avatar-pending-preview {
-  width: 80px; height: 80px; 
-  border-radius: var(--radius-full); 
-  object-fit: cover; 
-  border: 2px solid var(--surface, #fff); 
+  width: var(--avatar-pending-size, 80px); height: var(--avatar-pending-size, 80px);
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--surface, #fff);
   background: var(--surface, #fff);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
@@ -73,51 +74,45 @@
 
 /* Cropper Modal Content */
 #avatar-crop-modal {
-  max-width: 720px;
+  max-width: var(--avatar-crop-w, 720px);
 }
 
-#avatar-crop-modal .modal-header { margin-bottom: var(--space-2xl); }
+#avatar-crop-modal .modal-header { margin-bottom: 0.889em; }
 
 .crop-modal-body {
-  padding: var(--space-lg);
+  padding: 0.667em;
 }
 
 #avatar-crop-message {
-  margin-top: var(--space-sm);
+  margin-top: 0.444em;
 }
 
 #avatar-crop-image-container {
-  width: 100%; 
-  max-height: 60vh; 
-  border: 1px solid var(--border, #e2e8f0); 
-  border-radius: var(--radius-lg) ; 
-  overflow: hidden; 
+  width: 100%;
+  max-height: var(--avatar-crop-max-h, 60vh);
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: var(--radius-lg) ;
+  overflow: hidden;
   background: #000; /* Cropper usually needs dark bg */
 }
 
 #avatar-crop-image {
-  max-width: 100%; 
+  max-width: 100%;
   display: block;
 }
 
 #avatar-crop-actions {
-  display: flex; 
-  gap: var(--space-lg); 
-  justify-content: flex-end; 
-  margin-top: var(--space-3xl);
+  display: flex;
+  gap: 0.667em;
+  justify-content: flex-end;
+  margin-top: 1.111em;
 }
 
-@media (max-width: 480px) {
-  /* Disable cropper animations on small screens */
+@media (pointer: coarse) {
+  /* Disable cropper animations on touch screens without removing controls */
   #avatar-crop-modal .cropper-container * { animation: none !important; transition: none !important; }
   #avatar-crop-modal .cropper-dashed,
   #avatar-crop-modal .cropper-line { animation: none !important; background-image: none !important; }
   #avatar-crop-modal .cropper-line,
   #avatar-crop-modal .cropper-point { background-color: var(--success, #22c55e) !important; }
-  #avatar-crop-modal .cropper-point { display: none !important; }
-  #avatar-crop-modal .cropper-center,
-  #avatar-crop-modal .cropper-face::before,
-  #avatar-crop-modal .cropper-face::after { display: none !important; }
-  
-  #avatar-modal-preview { width: 140px; height: 140px; }
 }

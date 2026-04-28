@@ -1,9 +1,11 @@
 /* 上下文帮助浮层 */
 .help-popover {
   position: fixed;
-  bottom: var(--space-lg);
-  right: var(--space-lg);
-  width: min(380px, calc(100vw - 2 * var(--space-lg)));
+  bottom: 0.923em; /* 12/13 */
+  right: 0.923em;
+  width: min(var(--help-w, 380px), var(--help-safe-w, calc(100vw - 1.846em)));
+  max-height: var(--help-max-h, 55vh);
+  font-size: var(--modal-fs-base, var(--fs-base));
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -28,23 +30,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-sm) var(--space-md);
+  padding: 0.615em 0.769em; /* 8/13, 10/13 */
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 .help-popover__title {
-  font-size: var(--fs-base);
+  font-size: inherit;
   font-weight: 600;
   color: var(--text);
 }
 .help-popover__close {
   background: none;
   border: none;
-  font-size: 1.25rem;
+  font-size: 1.538em; /* 20/13 */
   line-height: 1;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 0 var(--space-2xs);
+  padding: 0 0.308em;
   transition: color var(--dur-fast) var(--ease-default);
 }
 .help-popover__close:hover {
@@ -55,25 +57,26 @@
 .help-popover__body {
   overflow-y: auto;
   flex: 1;
-  padding: var(--space-sm) var(--space-md);
+  padding: 0.615em 0.769em;
 }
 
 /* 提示行 */
 .help-row {
   display: flex;
   align-items: baseline;
-  gap: var(--space-md);
-  padding: var(--space-2xs) 0;
+  flex-wrap: wrap;
+  gap: 0.308em 0.769em;
+  padding: 0.308em 0;
 }
 .help-keys {
   flex-shrink: 0;
   display: flex;
-  gap: var(--space-3xs);
+  gap: 0.154em;
 }
 .help-keys kbd {
   display: inline-block;
-  padding: var(--space-3xs) var(--space-xs);
-  font-size: var(--fs-sm);
+  padding: 0.167em 0.5em; /* 2/12, 6/12 */
+  font-size: 0.923em; /* 12/13 */
   font-family: var(--font-kbd, var(--font-mono));
   color: var(--text);
   background: color-mix(in srgb, var(--surface) 85%, var(--text) 15%);
@@ -85,21 +88,22 @@
   text-align: center;
 }
 .help-desc {
+  flex: 1 1 14em;
   color: var(--text);
-  font-size: var(--fs-sm);
+  font-size: 0.923em;
   line-height: var(--lh-normal);
 }
 
 /* 分隔线（通用提示） */
 .help-popover__separator {
-  font-size: var(--fs-xs);
+  font-size: 0.846em; /* 11/13 */
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding-top: var(--space-sm);
-  margin-top: var(--space-xs);
-  margin-bottom: var(--space-2xs);
+  padding-top: 0.727em;
+  margin-top: 0.545em;
+  margin-bottom: 0.364em;
   border-top: 1px solid var(--border);
 }
 
@@ -107,27 +111,16 @@
 .help-popover__empty {
   text-align: center;
   color: var(--text-muted);
-  padding: var(--space-lg) 0;
-  font-size: var(--fs-sm);
+  padding: 0.923em 0;
+  font-size: 0.923em;
 }
 
 /* 底部提示 */
 .help-popover__hint {
-  padding: var(--space-xs) var(--space-md);
-  font-size: var(--fs-xs);
+  padding: 0.462em 0.769em;
+  font-size: 0.846em;
   color: var(--text-muted);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
   text-align: center;
-}
-
-/* 小屏 */
-@media (max-width: 640px) {
-  .help-popover {
-    bottom: var(--space-sm);
-    right: var(--space-sm);
-    width: calc(100vw - 2 * var(--space-sm));
-    max-height: 55vh;
-  }
-  .help-row { flex-direction: column; gap: var(--space-3xs); }
 }
