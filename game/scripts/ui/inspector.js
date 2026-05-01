@@ -43,15 +43,15 @@
             style.textContent = `
                 #game-inspector-tooltip {
                     position: fixed;
-                    padding: 8px 12px;
-                    border-radius: 4px;
-                    font-size: 12px;
+                    padding: var(--inspector-pad-y, 8px) var(--inspector-pad-x, 12px);
+                    border-radius: var(--inspector-radius, 4px);
+                    font-size: var(--inspector-fs, 12px);
                     font-family: Consolas, Monaco, monospace;
                     pointer-events: none;
                     z-index: 20000;
                     display: none;
-                    max-width: 600px;
-                    max-height: 80vh;
+                    max-width: var(--inspector-max-w, 600px);
+                    max-height: var(--inspector-max-h, 80vh);
                     overflow-y: hidden;
                     white-space: pre-wrap;
                     text-align: left;
@@ -66,8 +66,8 @@
                 
                 #game-inspector-tooltip strong {
                     display: block;
-                    margin-bottom: 5px;
-                    padding-bottom: 2px;
+                    margin-bottom: var(--inspector-title-mb, 5px);
+                    padding-bottom: var(--inspector-title-pad-b, 2px);
                     border-bottom: 1px solid #e1e4e8;
                     color: #0366d6;
                 }

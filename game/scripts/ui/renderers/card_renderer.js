@@ -2,57 +2,49 @@
     window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
-    // 布局计算器：自动调整平铺区域的 margin 以防止换行
+    function clamp(min, value, max) {
+        return Math.max(min, Math.min(max, value));
+    }
+
+    function getVisibleCards(container) {
+        return Array.from(container.children).filter(c =>
+            c.classList.contains('card-placeholder') &&
+            c.style.display !== 'none' &&
+            !c.classList.contains('drag-placeholder-hidden')
+        );
+    }
+
+    function getCardWidth(cards) {
+        if (cards[0]) {
+            const rectWidth = cards[0].getBoundingClientRect().width;
+            if (rectWidth > 0) return rectWidth;
+        }
+        return 100;
+    }
+
+    // 平铺区域：空间充足时保持常规牌距，空间不足时恢复受控露边重叠。
     function updateSpreadLayouts() {
         const containers = document.querySelectorAll('.area-spread');
-        // 读取当前牌宽（跟随 media.css --card-w 响应式变化）
-        const rootCardW = parseFloat(
-            getComputedStyle(document.documentElement).getPropertyValue('--card-w')
-        ) || 100;
-
         containers.forEach(container => {
-            const width = container.clientWidth;
-            // 考虑 Padding（由容器 CSS 决定）
-            const cs = getComputedStyle(container);
-            const padL = parseFloat(cs.paddingLeft) || 0;
-            const padR = parseFloat(cs.paddingRight) || 0;
-            const contentWidth = width - padL - padR;
-            
-            const cards = Array.from(container.children).filter(c => 
-                c.classList.contains('card-placeholder') && 
-                c.style.display !== 'none' && 
-                !c.classList.contains('drag-placeholder-hidden')
-            );
-            
+            const cards = getVisibleCards(container);
+
             if (cards.length <= 1) {
-                container.style.setProperty('--dynamic-card-margin', '10px');
+                container.style.removeProperty('--dynamic-card-margin');
                 return;
             }
 
-            const cardWidth = rootCardW; // 跟随 --card-w 变量
-            const maxGap = 10; // 默认间距
-            
-            // W = w + (n-1)(w + margin)
-            // (W - w) / (n-1) = w + margin
-            // margin = (W - w) / (n-1) - w
-            
-            const totalRequired = cards.length * cardWidth + (cards.length - 1) * maxGap;
-            
-            if (totalRequired <= contentWidth) {
-                container.style.setProperty('--dynamic-card-margin', `${maxGap}px`);
-            } else {
-                const availableSpace = contentWidth - cardWidth; // 给最后一张牌留足空间
-                const step = availableSpace / (cards.length - 1);
-                let newMargin = step - cardWidth;
-                
-                // 限制最大重叠 (例如露出至少 20px) => margin >= 20 - 100 = -80
-                const minVisibleSpine = 30;
-                if (newMargin < (minVisibleSpine - cardWidth)) {
-                    newMargin = minVisibleSpine - cardWidth;
-                }
-                
-                container.style.setProperty('--dynamic-card-margin', `${newMargin}px`);
-            }
+            const cs = getComputedStyle(container);
+            const padL = parseFloat(cs.paddingLeft) || 0;
+            const padR = parseFloat(cs.paddingRight) || 0;
+            const contentWidth = Math.max(0, container.clientWidth - padL - padR);
+            const cardWidth = getCardWidth(cards);
+            const maxGap = clamp(4, cardWidth * 0.1, 10);
+            const minVisibleSpine = clamp(20, cardWidth * 0.3, 30);
+            const minMargin = minVisibleSpine - cardWidth;
+            const availableMargin = (contentWidth - cards.length * cardWidth) / (cards.length - 1);
+            const nextMargin = clamp(minMargin, availableMargin, maxGap);
+
+            container.style.setProperty('--dynamic-card-margin', `${nextMargin}px`);
         });
     }
 

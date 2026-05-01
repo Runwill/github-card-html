@@ -8,12 +8,16 @@
   --table-layout-gap: clamp(6px, calc(var(--card-w, 100px) * 0.16), 16px); /* 桌面三列间距 */
   --board-area-row-minh: clamp(80px, 14.768vh, 140px);  /* 牌堆/治疗区行最小高度 */
   --table-panel-minh: clamp(70px, 12.658vh, 120px);     /* 桌面面板最小高度 */
-  --area-watermark-fs: clamp(1.2rem, 5.274vh, 2.5rem);  /* 区域水印字号 */
+  --area-watermark-fs: clamp(16px, min(2.615vw, 5.274vh), 50px);  /* 区域水印字号 */
+  --viewer-watermark-owner-fs: clamp(12px, min(1.569vw, 3.165vh), 30px);
+  --viewer-watermark-area-fs: clamp(22px, min(3.661vw, 7.384vh), 70px);
 }
 
 html.force-landscape {
   --table-side-col-minw: clamp(70px, 7.322vh, 140px);
   --board-area-row-minh: clamp(80px, 14.768vw, 140px);
   --table-panel-minh: clamp(70px, 12.658vw, 120px);
-  --area-watermark-fs: clamp(1.2rem, 5.274vw, 2.5rem);
+  --area-watermark-fs: clamp(16px, min(2.615vh, 5.274vw), 50px);
+  --viewer-watermark-owner-fs: clamp(12px, min(1.569vh, 3.165vw), 30px);
+  --viewer-watermark-area-fs: clamp(22px, min(3.661vh, 7.384vw), 70px);
 }

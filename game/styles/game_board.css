@@ -205,7 +205,7 @@ body.is-global-dragging .deck-slot {
 
 .area-stacked > .card-placeholder.is-top-card {
     display: flex;
-    box-shadow: 2px 2px 0 #bbb, 4px 4px 0 #999, 0 2px 5px var(--shadow-1);
+    box-shadow: var(--stack-card-shadow, 2px 2px 0 #bbb, 4px 4px 0 #999, 0 2px 5px var(--shadow-1));
 }
 
 /* Spread Mode Utilities (Hand Mode) */
@@ -222,7 +222,7 @@ body.is-global-dragging .deck-slot {
 .area-spread .card-placeholder {
     flex-shrink: 0;
     transition: margin-left var(--dur-fast) var(--ease-out);
-    margin-left: var(--dynamic-card-margin, 10px);
+    margin-left: var(--dynamic-card-margin, var(--spread-card-gap, 10px));
 }
 .area-spread .card-placeholder:first-child {
     margin-left: 0 !important;
@@ -243,7 +243,7 @@ body.is-global-dragging .deck-slot {
 /* Depth Effect for Cards in Deck Slot - REMOVED for cleaner look per user request */
 /* Just a standard shadow now */
 .deck-slot.area-stacked > .card-placeholder.is-top-card {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: var(--deck-card-shadow, 0 4px 8px rgba(0,0,0,0.2));
 }
 
 /* Empty State Placeholder */

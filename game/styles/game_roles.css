@@ -10,27 +10,27 @@
     flex: 1;
     background: var(--surface);
     border-radius: var(--radius-lg) ;
-    padding: var(--space-3xl);
+    padding: var(--role-list-panel-pad, var(--space-3xl));
     box-shadow: 0 4px 12px var(--shadow-1);
     border: 1px solid var(--border);
-    min-width: 250px;
+    min-width: var(--role-list-panel-minw, 250px);
 }
 
 .role-list-panel h4 {
     margin-top: 0;
-    margin-bottom: 15px;
+    margin-bottom: var(--role-panel-title-mb, 15px);
     color: var(--text-muted);
-    font-size: 1rem;
+    font-size: var(--role-panel-title-fs, 1rem);
     text-transform: uppercase;
     letter-spacing: 1px;
     border-bottom: 2px solid var(--border);
-    padding-bottom: var(--space-md);
+    padding-bottom: var(--role-panel-title-pad-b, var(--space-md));
 }
 
 .role-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-md);
+    gap: var(--role-list-gap, var(--space-md));
 }
 
 .role-summary {
@@ -72,9 +72,9 @@
 /* Table Layout (Opponents) */
 .role-table-layout {
     display: flex;
-    gap: var(--space-2xl);
+    gap: var(--role-table-gap, var(--space-2xl));
     overflow-x: auto;
-    padding: var(--space-md) 0;
+    padding: var(--role-table-pad-y, var(--space-md)) 0;
     align-items: flex-start;
     flex-direction: row-reverse; /* Consolidated to the intended layout */
     justify-content: space-around;
@@ -103,7 +103,7 @@
     background: var(--surface);
     border-radius: var(--radius-lg) ;
     padding: var(--pad-current-panel, 25px);
-    box-shadow: 0 4px 12px var(--shadow-1);
+    box-shadow: var(--current-panel-shadow, 0 4px 12px var(--shadow-1));
     border: 1px solid var(--border);
     display: flex;
     gap: var(--current-panel-gap, var(--space-4xl));
@@ -120,7 +120,7 @@
     /* Table specific overrides merged */
     width: auto;
     min-width: 286px;
-    flex-shrink: 0;
+    flex-shrink: var(--character-info-flex-shrink, 0);
     border-bottom: none;
     border-left: 1px solid var(--border);
     padding-bottom: 0;
@@ -223,7 +223,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     margin-bottom: var(--player-hand-h4-mb, 15px);
     display: var(--player-hand-h4-display, block);
     color: var(--text-muted);
-    font-size: 1rem;
+    font-size: var(--role-panel-title-fs, 1rem);
     text-transform: uppercase;
     letter-spacing: 1px;
 }

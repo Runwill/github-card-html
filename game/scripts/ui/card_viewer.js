@@ -164,8 +164,9 @@
         }
 
         // 2. Create DOM Structure
+        const isSlotViewer = options.slots && Array.isArray(options.slots);
         const modal = document.createElement('div');
-        modal.className = 'card-viewer-modal modal show';
+        modal.className = 'card-viewer-modal modal show' + (isSlotViewer ? ' card-viewer-modal--slots' : '');
         modal.id = `card-viewer-modal-${sourceId}`;
         modal.style.zIndex = ++window.Game.UI.maxViewerZIndex;
         
@@ -178,7 +179,7 @@
 
         // Determine Layout
         let bodyContent = '';
-        if (options.slots && Array.isArray(options.slots)) {
+        if (isSlotViewer) {
             // Layout: Multi-Slot (e.g. Equipment)
             // Note: We use a Wrapper for drop targeting and Label display.
             // The inner .equip-slot is the container for renderCardList but has pointer-events: none to allow pass-through.
@@ -203,12 +204,11 @@
 
         // Modal Content
         // Use auto width for slots to fit content tightly
-        const modalStyle = options.slots ? 'width: auto; max-width: 95vw;' : '';
-        const bodyStyle = options.slots ? 'padding: 20px; flex-direction: column;' : '';
+        const bodyClass = isSlotViewer ? ' modal-body--slots' : '';
 
         modal.innerHTML = `
-            <div class="modal-content" style="${modalStyle}">
-                <div class="modal-body" style="${bodyStyle}">
+            <div class="modal-content">
+                <div class="modal-body${bodyClass}">
                     <div id="card-viewer-watermark-${sourceId}" class="area-watermark"></div>
                     ${bodyContent}
                 </div>

@@ -4,16 +4,15 @@
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  --gamecontrols-gap: clamp(8px, calc(-2px + 1.15vw), 20px);            /* 控件行间距 */
-  --gamecontrols-btn-minw: clamp(40px, calc(-9.41px + 10.294vw), 140px); /* 按钮最小宽度 */
-  --gamecontrols-btn-padding: clamp(2px, calc(-3.294px + 1.103vw), 8px) clamp(2px, calc(-5.059px + 1.471vw), 10px); /* 按钮内距 */
-  --gamecontrols-btn-fontsize: clamp(9px, calc(6.353px + 0.552vw), 14px); /* 按钮文字大小 */
-  --gamecontrols-btn-minh: clamp(20px, calc(5.88px + 2.941vw), 36px);   /* 按钮最小高度 */
+  --gamecontrols-axis: 1vw;
+  --gamecontrols-gap: clamp(8px, calc(-2px + var(--gamecontrols-axis) * 1.15), 20px);            /* 控件行间距 */
+  --gamecontrols-btn-minw: clamp(40px, calc(-9.41px + var(--gamecontrols-axis) * 10.294), 140px); /* 按钮最小宽度 */
+  --gamecontrols-btn-padding: clamp(2px, calc(-3.294px + var(--gamecontrols-axis) * 1.103), 8px) clamp(2px, calc(-5.059px + var(--gamecontrols-axis) * 1.471), 10px); /* 按钮内距 */
+  --gamecontrols-btn-fontsize: clamp(9px, calc(6.353px + var(--gamecontrols-axis) * 0.552), 14px); /* 按钮文字大小 */
+  --gamecontrols-btn-minh: clamp(20px, calc(5.88px + var(--gamecontrols-axis) * 2.941), 36px);   /* 按钮最小高度 */
   --gamecontrols-btn-lineheight: 1.2;                                  /* 按钮行高 */
 }
 
 html.force-landscape {
-  --gamecontrols-gap: clamp(8px, calc(-2px + 1.15vh), 20px);
-  --gamecontrols-btn-minw: clamp(40px, calc(-9.41px + 10.294vh), 140px);
-  --gamecontrols-btn-padding: clamp(2px, calc(-3.294px + 1.103vw), 8px) clamp(2px, calc(-5.059px + 1.471vh), 10px);
+  --gamecontrols-axis: 1vh;
 }

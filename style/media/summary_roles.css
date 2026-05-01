@@ -18,6 +18,14 @@
   --summary-detail-btn-size: clamp(16px, calc(10.85px + 1.385vh), 24px); /* 摘要判定/装备按钮尺寸 */
   --summary-detail-btn-fs: clamp(11px, calc(6.55px + 0.786vh), 14px);   /* 摘要判定/装备按钮字号 */
   --char-stats-minh: clamp(16px, 3.376vh, 32px);
+  --role-list-panel-pad: clamp(6px, min(1.046vw, 2.11vh), 20px);
+  --role-list-panel-minw: clamp(140px, 13.075vw, 250px);
+  --role-panel-title-fs: clamp(10px, min(0.837vw, 1.688vh), 16px);
+  --role-panel-title-mb: clamp(4px, min(0.785vw, 1.582vh), 15px);
+  --role-panel-title-pad-b: clamp(4px, min(0.523vw, 1.055vh), 10px);
+  --role-list-gap: clamp(4px, min(0.418vw, 0.844vh), 8px);
+  --role-table-gap: clamp(6px, min(0.837vw, 1.688vh), 16px);
+  --role-table-pad-y: clamp(4px, min(0.523vw, 1.055vh), 10px);
   --player-judge-count-size: clamp(12px, 1.899vh, 18px);
   --player-judge-count-fs: clamp(8px, 1.266vh, 12px);
   --player-judge-count-offset: calc(var(--player-judge-count-size) * -0.222);
@@ -38,6 +46,14 @@ html.force-landscape {
   --summary-detail-btn-size: clamp(16px, calc(10.85px + 1.385vw), 24px);
   --summary-detail-btn-fs: clamp(11px, calc(6.55px + 0.786vw), 14px);
   --char-stats-minh: clamp(16px, 3.376vw, 32px);
+  --role-list-panel-pad: clamp(6px, min(1.046vh, 2.11vw), 20px);
+  --role-list-panel-minw: clamp(140px, 13.075vh, 250px);
+  --role-panel-title-fs: clamp(10px, min(0.837vh, 1.688vw), 16px);
+  --role-panel-title-mb: clamp(4px, min(0.785vh, 1.582vw), 15px);
+  --role-panel-title-pad-b: clamp(4px, min(0.523vh, 1.055vw), 10px);
+  --role-list-gap: clamp(4px, min(0.418vh, 0.844vw), 8px);
+  --role-table-gap: clamp(6px, min(0.837vh, 1.688vw), 16px);
+  --role-table-pad-y: clamp(4px, min(0.523vh, 1.055vw), 10px);
   --player-judge-count-size: clamp(12px, 1.899vw, 18px);
   --player-judge-count-fs: clamp(8px, 1.266vw, 12px);
   --player-judge-count-offset: calc(var(--player-judge-count-size) * -0.222);

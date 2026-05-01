@@ -10,6 +10,20 @@
   --card-pad: clamp(2px, calc(var(--card-w) * 0.05), 5px);           /* 牌内距 */
   --cards-container-pad: clamp(2px, calc(var(--card-w) * 0.15), 15px); /* 牌容器内距 */
   --cards-container-gap: clamp(4px, calc(var(--card-w) * 0.16), 16px); /* 牌容器间距 */
+  --spread-card-gap: clamp(4px, calc(var(--card-w) * 0.1), 10px);      /* 平铺牌距 */
+  --card-shadow-rest: 0 clamp(1px, calc(var(--card-w) * 0.02), 2px) clamp(2px, calc(var(--card-w) * 0.05), 5px) var(--shadow-1);
+  --card-shadow-hover: 0 clamp(4px, calc(var(--card-w) * 0.08), 8px) clamp(8px, calc(var(--card-w) * 0.15), 15px) var(--shadow-2);
+  --card-shadow-press: 0 0 clamp(4px, calc(var(--card-w) * 0.1), 10px) var(--primary-ring);
+  --card-shadow-drag: 0 clamp(8px, calc(var(--card-w) * 0.2), 20px) clamp(16px, calc(var(--card-w) * 0.4), 40px) rgba(0,0,0,0.5);
+  --card-shadow-lifted: 0 clamp(8px, calc(var(--card-w) * 0.2), 20px) clamp(16px, calc(var(--card-w) * 0.4), 40px) rgba(0,0,0,0.4);
+  --card-shadow-move: 0 clamp(2px, calc(var(--card-w) * 0.04), 4px) clamp(6px, calc(var(--card-w) * 0.12), 12px) rgba(0,0,0,0.18);
+  --card-drop-zone-shadow: inset 0 0 clamp(8px, calc(var(--card-w) * 0.2), 20px) rgba(var(--primary-rgb), 0.2);
+  --stack-card-shadow-a: clamp(1px, calc(var(--card-w) * 0.02), 2px) clamp(1px, calc(var(--card-w) * 0.02), 2px) 0 #bbb;
+  --stack-card-shadow-b: clamp(2px, calc(var(--card-w) * 0.04), 4px) clamp(2px, calc(var(--card-w) * 0.04), 4px) 0 #999;
+  --stack-card-shadow: var(--stack-card-shadow-a), var(--stack-card-shadow-b), var(--card-shadow-rest);
+  --deck-card-shadow: 0 clamp(2px, calc(var(--card-w) * 0.04), 4px) clamp(4px, calc(var(--card-w) * 0.08), 8px) rgba(0,0,0,0.2);
+  --inspector-card-shadow: 0 clamp(2px, calc(var(--card-w) * 0.04), 4px) clamp(5px, calc(var(--card-w) * 0.1), 10px) rgba(0,0,0,0.3);
+  --inspector-card-center-shadow: 0 0 clamp(8px, calc(var(--card-w) * 0.15), 15px) var(--primary-ring);
   --board-area-row-gap: clamp(6px, calc(var(--card-w) * 0.15), 15px); /* 牌堆行间距 */
   --board-pile-slot-w: var(--card-w);                               /* 牌堆列宽 */
   --board-title-fs: clamp(10px, min(0.8rem, calc(var(--card-w) * 0.16)), 0.8rem); /* 牌区标题字号 */
@@ -27,6 +41,7 @@
   --viewer-index-badge-fs: clamp(7px, calc(var(--card-w) * 0.1), 10px);
   --viewer-index-badge-pad-y: clamp(1px, calc(var(--card-w) * 0.02), 2px);
   --viewer-index-badge-pad-x: clamp(3px, calc(var(--card-w) * 0.05), 5px);
+  --equip-slot-label-fs: clamp(8px, calc(var(--card-w) * 0.14), 14px);
 }
 
 html.force-landscape {

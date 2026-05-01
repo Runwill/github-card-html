@@ -189,7 +189,7 @@ html[data-theme="elegant"] #login-container {
   border: 1px solid rgba(211, 173, 107, 0.18) !important;
   backdrop-filter: blur(3px);
 }
-html[data-theme="elegant"] .modal {
+html[data-theme="elegant"] .modal:not(.card-viewer-modal) {
   background: rgba(15, 21, 26, 0.95) !important;
   border: 1px solid rgba(211, 173, 107, 0.25) !important;
 }

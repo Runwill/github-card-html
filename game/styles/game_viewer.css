@@ -28,7 +28,7 @@
     max-width: 90vw; /* Cap at 90vw */
     
     /* height: 80vh;  <-- Removed fixed height */
-    max-height: 80vh;
+    max-height: var(--viewer-content-max-h, 80dvh);
 
     display: flex;
     flex-direction: column;
@@ -36,7 +36,7 @@
     background: var(--surface);
     border-radius: var(--radius-lg) ;
     /* Match current-character-panel style */
-    box-shadow: 0 4px 12px var(--shadow-1);
+    box-shadow: var(--current-panel-shadow, 0 4px 12px var(--shadow-1));
     border: 1px solid var(--border);
     overflow: hidden;
 
@@ -50,6 +50,11 @@
     position: relative; /* Essential for Drag functionality (left/top) */
 }
 
+.card-viewer-modal.card-viewer-modal--slots .modal-content {
+    width: auto;
+    max-width: 95vw;
+}
+
 /*Wrapper for scroll view */
 .card-viewer-modal .modal-body {
     flex: 1;
@@ -61,6 +66,11 @@
     position: relative;
     max-width: 100%;
     min-width: 0;
+}
+
+.card-viewer-modal .modal-body--slots {
+    padding: var(--viewer-slot-body-pad, var(--viewer-body-pad, var(--space-3xl)));
+    flex-direction: column;
 }
 
 /* ... gradient masks ... */
@@ -228,7 +238,7 @@ body.is-global-dragging .card-grid {
 }
 
 .card-viewer-modal .watermark-owner {
-    font-size: 1.5rem;
+    font-size: var(--viewer-watermark-owner-fs, 1.5rem);
     font-weight: 600;
     color: var(--text);
     opacity: 0.1; /* 调低不透明度，使其接近区域水印的深浅 (此前为 0.4) */
@@ -243,7 +253,7 @@ body.is-global-dragging .card-grid {
 }
 
 .card-viewer-modal .watermark-area {
-    font-size: 3.5rem;
+    font-size: var(--viewer-watermark-area-fs, 3.5rem);
     font-weight: 900;
     color: var(--text);
     opacity: 0.08;
@@ -289,7 +299,7 @@ body.is-global-dragging .card-grid {
     width: 90%;
     text-align: center;
     
-    font-size: var(--fs-md);
+    font-size: var(--equip-slot-label-fs, var(--fs-md));
     color: var(--text-muted);
     font-weight: bold;
     opacity: 0.3;

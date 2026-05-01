@@ -4,88 +4,67 @@
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  --game-container-gap: clamp(0px, 1.688vh, 16px);
-  --game-layout-gap: clamp(6px, 2.11vh, 20px);
-  --game-panel-pad: clamp(6px, 1.582vh, 15px);
-  --panel-game-pad: clamp(4px, 1.582vh, 15px);
-  --top-section-gap: clamp(8px, 2.11vh, 20px);
+  --main-axis-inline: 1vw;
+  --main-axis-block: 1vh;
+  --game-container-gap: clamp(0px, calc(var(--main-axis-block) * 1.688), 16px);
+  --game-layout-gap: clamp(6px, calc(var(--main-axis-block) * 2.11), 20px);
+  --game-panel-pad: clamp(6px, calc(var(--main-axis-block) * 1.582), 15px);
+  --panel-game-pad: clamp(4px, calc(var(--main-axis-block) * 1.582), 15px);
+  --top-section-gap: clamp(8px, calc(var(--main-axis-block) * 2.11), 20px);
   --top-section-pad-r: 0px;
-  --top-section-pad-b: clamp(0px, 1.055vh, 10px);
-  --game-sidebar-w: clamp(136px, 14.644vw, 280px);
+  --top-section-pad-b: clamp(0px, calc(var(--main-axis-block) * 1.055), 10px);
+  --game-sidebar-w: clamp(136px, calc(var(--main-axis-inline) * 14.644), 280px);
 
-  --game-action-panel-pad: clamp(0px, 1.582vh, 15px);
-  --bottom-section-pt: clamp(0px, 0.527vh, 5px);
-  --bottom-section-pb: clamp(6px, 2.11vh, 20px);
-  --bottom-section-mb: clamp(8px, 2.11vh, 20px);
-  --bottom-section-gap: clamp(6px, 1.688vh, 16px);
-  --game-main-area-gap: clamp(4px, 1.055vh, 10px);
-  --main-perspective-gap: clamp(8px, 2.11vh, 20px);
+  --game-action-panel-pad: clamp(0px, calc(var(--main-axis-block) * 1.582), 15px);
+  --bottom-section-pt: clamp(0px, calc(var(--main-axis-block) * 0.527), 5px);
+  --bottom-section-pb: clamp(6px, calc(var(--main-axis-block) * 2.11), 20px);
+  --bottom-section-mb: clamp(8px, calc(var(--main-axis-block) * 2.11), 20px);
+  --bottom-section-gap: clamp(6px, calc(var(--main-axis-block) * 1.688), 16px);
+  --game-main-area-gap: clamp(4px, calc(var(--main-axis-block) * 1.055), 10px);
+  --main-perspective-gap: clamp(8px, calc(var(--main-axis-block) * 2.11), 20px);
 
-  --main-avatar-size: clamp(32px, 10.548vh, 100px);
-  --main-char-name-fs: clamp(12px, 2.954vh, 28px);
-  --main-char-name-mb: clamp(0px, 1.055vh, 10px);
-  --current-panel-gap: clamp(8px, 2.532vh, 24px);
-  --pad-current-panel: clamp(5px, 2.637vh, 25px);
-  --detail-btn-size: clamp(18px, 2.532vh, 24px);
-  --detail-btn-fs: clamp(12px, 1.688vh, 16px);
-  --timing-badge-fs: clamp(10px, 2.532vh, 24px);
-  --timing-badge-minh: clamp(24px, 4.641vh, 44px);
-  --timing-badge-pad: clamp(2px, 0.633vh, 6px) clamp(8px, 1.688vh, 16px);
+  --main-avatar-size: clamp(32px, min(calc(var(--main-axis-inline) * 5.23), calc(var(--main-axis-block) * 10.548)), 100px);
+  --main-char-name-fs: clamp(12px, min(calc(var(--main-axis-inline) * 1.464), calc(var(--main-axis-block) * 2.954)), 28px);
+  --main-char-name-mb: clamp(0px, min(calc(var(--main-axis-inline) * 0.523), calc(var(--main-axis-block) * 1.055)), 10px);
+  --current-panel-gap: clamp(8px, min(calc(var(--main-axis-inline) * 1.255), calc(var(--main-axis-block) * 2.532)), 24px);
+  --pad-current-panel: clamp(2px, calc(var(--card-w, 100px) * 0.5 - 25px), 25px);
+  --current-panel-shadow: 0 clamp(2px, min(calc(var(--main-axis-inline) * 0.21), calc(var(--main-axis-block) * 0.422)), 4px) clamp(6px, min(calc(var(--main-axis-inline) * 0.628), calc(var(--main-axis-block) * 1.266)), 12px) var(--shadow-1);
+  --detail-btn-size: clamp(18px, calc(var(--main-axis-block) * 2.532), 24px);
+  --detail-btn-fs: clamp(12px, calc(var(--main-axis-block) * 1.688), 16px);
+  --game-breadcrumb-fs: clamp(10px, min(calc(var(--main-axis-inline) * 0.837), calc(var(--main-axis-block) * 1.688)), 16px);
+  --game-breadcrumb-gap: clamp(2px, min(calc(var(--main-axis-inline) * 0.209), calc(var(--main-axis-block) * 0.422)), 4px);
+  --timing-badge-fs: clamp(10px, calc(var(--main-axis-block) * 2.532), 24px);
+  --timing-badge-minh: clamp(24px, calc(var(--main-axis-block) * 4.641), 44px);
+  --timing-badge-pad: clamp(2px, calc(var(--main-axis-block) * 0.633), 6px) clamp(8px, calc(var(--main-axis-block) * 1.688), 16px);
 
-  --play-view-gap: clamp(8px, 2.11vh, 20px);
-  --equip-slots-gap: clamp(6px, 2.11vh, 20px);
-  --equip-slots-pad: clamp(6px, 3.165vh, 30px);
-  --player-hand-h4-mb: clamp(0px, 1.582vh, 15px);
-  --pad-character-info-l: clamp(6px, 2.11vh, 20px);
+  --play-view-gap: clamp(8px, calc(var(--main-axis-block) * 2.11), 20px);
+  --equip-slots-gap: clamp(6px, calc(var(--main-axis-block) * 2.11), 20px);
+  --equip-slots-pad: clamp(6px, calc(var(--main-axis-block) * 3.165), 30px);
+  --player-hand-h4-mb: clamp(0px, calc(var(--main-axis-block) * 1.582), 15px);
+  --pad-character-info-l: clamp(6px, min(calc(var(--main-axis-inline) * 1.046), calc(var(--main-axis-block) * 2.11)), 20px);
   --character-info-textalign: left;
-  --character-info-gap: clamp(4px, 2.11vh, 20px);
-  --pad-character-info-r: clamp(0px, 2.11vh, 20px);
-  --pad-player-hand-r: clamp(0px, 2.11vh, 20px);
-  --minw-character-info: clamp(120px, 14.958vw, 286px);
+  --character-info-gap: clamp(4px, min(calc(var(--main-axis-inline) * 1.046), calc(var(--main-axis-block) * 2.11)), 20px);
+  --pad-character-info-r: clamp(0px, min(calc(var(--main-axis-inline) * 1.046), calc(var(--main-axis-block) * 2.11)), 20px);
+  --pad-player-hand-r: clamp(0px, min(calc(var(--main-axis-inline) * 1.046), calc(var(--main-axis-block) * 2.11)), 20px);
+  --minw-character-info: clamp(120px, calc(var(--main-axis-inline) * 14.958), 286px);
+  --character-info-flex-shrink: 0;
 }
 
 html.force-landscape {
-  --game-container-gap: clamp(0px, 1.688vw, 16px);
-  --game-layout-gap: clamp(6px, 2.11vw, 20px);
-  --game-panel-pad: clamp(6px, 1.582vw, 15px);
-  --panel-game-pad: clamp(4px, 1.582vw, 15px);
-  --top-section-gap: clamp(8px, 2.11vw, 20px);
-  --top-section-pad-b: clamp(0px, 1.055vw, 10px);
-  --game-sidebar-w: clamp(136px, 14.644vh, 280px);
-
-  --game-action-panel-pad: clamp(0px, 1.582vw, 15px);
-  --bottom-section-pt: clamp(0px, 0.527vw, 5px);
-  --bottom-section-pb: clamp(6px, 2.11vw, 20px);
-  --bottom-section-mb: clamp(8px, 2.11vw, 20px);
-  --bottom-section-gap: clamp(6px, 1.688vw, 16px);
-  --game-main-area-gap: clamp(4px, 1.055vw, 10px);
-  --main-perspective-gap: clamp(8px, 2.11vw, 20px);
-
-  --main-avatar-size: clamp(32px, 10.548vw, 100px);
-  --main-char-name-fs: clamp(12px, 2.954vw, 28px);
-  --main-char-name-mb: clamp(0px, 1.055vw, 10px);
-  --current-panel-gap: clamp(8px, 2.532vw, 24px);
-  --pad-current-panel: clamp(5px, 2.637vw, 25px);
-  --detail-btn-size: clamp(18px, 2.532vw, 24px);
-  --detail-btn-fs: clamp(12px, 1.688vw, 16px);
-  --timing-badge-fs: clamp(10px, 2.532vw, 24px);
-  --timing-badge-minh: clamp(24px, 4.641vw, 44px);
-  --timing-badge-pad: clamp(2px, 0.633vw, 6px) clamp(8px, 1.688vw, 16px);
-
-  --play-view-gap: clamp(8px, 2.11vw, 20px);
-  --equip-slots-gap: clamp(6px, 2.11vw, 20px);
-  --equip-slots-pad: clamp(6px, 3.165vw, 30px);
-  --player-hand-h4-mb: clamp(0px, 1.582vw, 15px);
-  --pad-character-info-l: clamp(6px, 2.11vw, 20px);
-  --character-info-gap: clamp(4px, 2.11vw, 20px);
-  --pad-character-info-r: clamp(0px, 2.11vw, 20px);
-  --pad-player-hand-r: clamp(0px, 2.11vw, 20px);
+  --main-axis-inline: 1vh;
+  --main-axis-block: 1vw;
 }
 
 @media (max-width: 768px) {
   :root {
     --character-info-flex: column;
     --character-info-textalign: center;
+    --main-char-name-mb: clamp(0px, calc((var(--card-w, 100px) - 40px) * 0.08), 4px);
+    --character-info-gap: clamp(2px, calc((var(--card-w, 100px) - 40px) * 0.15), 8px);
+    --pad-character-info-l: clamp(2px, calc(var(--card-w, 100px) * 0.06), 6px);
+    --pad-character-info-r: clamp(0px, calc(var(--card-w, 100px) * 0.04), 4px);
+    --minw-character-info: clamp(84px, calc(var(--card-w, 100px) * 1.4), 120px);
+    --character-info-flex-shrink: 1;
     --char-stats-justify: center;
     --stats-btn-left: 50%;
     --stats-btn-x-offset: -50%;
