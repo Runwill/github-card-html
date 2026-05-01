@@ -189,9 +189,3 @@
     min-height: 0;
     align-items: flex-start;
 }
-
-@media (max-width: 768px) {
-    .game-main-area {
-        flex-direction: column;
-    }
-}

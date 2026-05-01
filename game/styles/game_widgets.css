@@ -31,7 +31,10 @@
     opacity: 0;
     animation: slideInUp var(--dur-moderate) forwards;
     font-size: inherit;
-    transition: all var(--dur-moderate) var(--ease-default);
+    transition:
+        opacity var(--dur-moderate) var(--ease-default),
+        transform var(--dur-moderate) var(--ease-default),
+        color var(--dur-moderate) var(--ease-default);
 }
 
 .breadcrumbs .crumb:last-child {

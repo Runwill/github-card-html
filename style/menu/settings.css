@@ -104,7 +104,11 @@ html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewpo
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--dur-normal) var(--ease-default);
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    color var(--dur-normal) var(--ease-default),
+    opacity var(--dur-normal) var(--ease-default),
+    transform var(--dur-normal) var(--ease-default);
   border-radius: var(--radius-sm);
 }
 

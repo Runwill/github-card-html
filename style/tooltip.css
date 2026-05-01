@@ -29,8 +29,8 @@
         0 0 0 1px rgba(0, 0, 0, 0.02);
 
     /* 排版 */
-    padding: var(--space-sm) var(--space-lg);
-    font-size: clamp(15px, 0.85rem + 0.22vw, 18px);
+    padding: 0.444em 0.667em;
+    font-size: clamp(14px, calc(13px + 0.262vw), 18px);
     font-weight: 400;
     line-height: 1.6;
     letter-spacing: 0.01em;
@@ -67,14 +67,6 @@ html[data-theme="dark"] #lore-tooltip {
         0 10px 15px -3px rgba(0, 0, 0, 0.3), 
         0 4px 6px -2px rgba(0, 0, 0, 0.2),
         0 0 0 1px rgba(255, 255, 255, 0.05);
-}
-
-/* 手机：字号与内边距收敛，提升可读性且避免拥挤 */
-@media (max-width: 640px) {
-    #lore-tooltip {
-        padding: var(--space-sm) var(--space-md);
-        font-size: clamp(14px, 0.82rem + 0.12vw, 16px);
-    }
 }
 
 /* 减少运动时的模糊感 */

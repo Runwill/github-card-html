@@ -22,7 +22,7 @@
 
 /* Segmented scheme buttons */
 .tokens-scheme__group { display:inline-flex; flex-wrap:wrap; gap:0.444em; }
-.tokens-scheme__btn { display:inline-flex; align-items:center; gap:0.462em; padding:0.462em 0.769em; border:1px solid var(--border) !important; border-radius: var(--radius-md); cursor:pointer; user-select:none; background: var(--surface) !important; color: var(--text) !important; font-size: var(--modal-fs-base, var(--fs-base)); line-height:1.2; white-space:nowrap; transition: all var(--dur-normal) var(--ease-default); }
+.tokens-scheme__btn { display:inline-flex; align-items:center; gap:0.462em; padding:0.462em 0.769em; border:1px solid var(--border) !important; border-radius: var(--radius-md); cursor:pointer; user-select:none; background: var(--surface) !important; color: var(--text) !important; font-size: var(--modal-fs-base, var(--fs-base)); line-height:1.2; white-space:nowrap; transition: background var(--dur-normal) var(--ease-default), border-color var(--dur-normal) var(--ease-default), box-shadow var(--dur-normal) var(--ease-default), color var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default); }
 .tokens-scheme__btn:hover { background: color-mix(in srgb, var(--surface) 92%, transparent) !important; transform: translateY(-1px); }
 .tokens-scheme__btn:focus { outline:none; box-shadow:0 0 0 3px var(--primary-ring) !important; border-color: var(--primary-2) !important; }
 .tokens-scheme__btn.is-selected { background: linear-gradient(135deg, var(--primary-1) 0%, var(--primary-2) 50%, var(--primary-3) 100%) !important; background-size:200% 200% !important; background-position:0% 50% !important; border:none !important; box-shadow:0 4px 6px -1px var(--primary-shadow) !important; color:#fff !important; }

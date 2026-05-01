@@ -265,10 +265,10 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
 /* Inspector Progress Bar */
 .inspector-progress {
     position: absolute;
-    bottom: -10px;
-    left: 10px;
-    right: 10px;
-    height: 4px;
+    bottom: calc(var(--card-w, 100px) * -0.1);
+    left: calc(var(--card-w, 100px) * 0.1);
+    right: calc(var(--card-w, 100px) * 0.1);
+    height: clamp(2px, calc(var(--card-w, 100px) * 0.04), 4px);
     background: rgba(0,0,0,0.2);
     border-radius: var(--radius-xs);
 }

@@ -1,15 +1,18 @@
 /* 回到顶部按钮样式 */
 .back-to-top {
+  --back-to-top-size: clamp(40px, calc(52px - var(--fs-root, 20px) * 0.6), 44px);
+  --back-to-top-offset-x: clamp(12px, calc(var(--fs-root, 20px) * 0.8), 16px);
+  --back-to-top-offset-b: clamp(56px, calc(var(--fs-root, 20px) * 3.2), 64px);
   position: fixed;
-  right: 16px;
+  right: var(--back-to-top-offset-x);
   /* 避让固定页脚，预留空间；同时考虑移动端安全区域 */
-  bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(var(--back-to-top-offset-b) + env(safe-area-inset-bottom, 0px));
   z-index: var(--z-fab);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--back-to-top-size);
+  height: var(--back-to-top-size);
   border-radius: var(--radius-pill);
   border: 1px solid rgba(0,0,0,0.08);
   background: rgba(255,255,255,0.9);
@@ -35,8 +38,8 @@
 .back-to-top:focus-visible { outline: none; }
 
 .back-to-top__icon {
-  width: 18px;
-  height: 18px;
+  width: calc(var(--back-to-top-size) * 0.45);
+  height: calc(var(--back-to-top-size) * 0.45);
   display: inline-block;
 }
 
@@ -48,7 +51,3 @@
   box-shadow: 0 6px 20px rgba(0,0,0,0.5);
 }
 [data-theme="dark"] .back-to-top:hover { background: rgba(45,55,72,0.95); }
-
-@media (max-width: 480px) {
-  .back-to-top { right: 12px; bottom: calc(56px + env(safe-area-inset-bottom, 0px)); width: 44px; height: 44px; }
-}

@@ -79,8 +79,8 @@
 /* Chevron arrow */
 .custom-select__arrow {
     flex-shrink: 0;
-    width: 10px;
-    height: 10px;
+    width: 0.714em;
+    height: 0.714em;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -90,8 +90,8 @@
 }
 
 .custom-select__arrow svg {
-    width: 10px;
-    height: 7px;
+    width: 0.714em;
+    height: 0.5em;
     fill: none;
     stroke: currentColor;
     stroke-width: 1.5;
@@ -203,14 +203,18 @@
 
 /* tokens-input style trigger inside game-panel input-group */
 .game-panel .input-group .custom-select .custom-select__trigger {
-    font-size: var(--fs-base);
+    font-size: var(--game-form-fs, var(--fs-base));
     line-height: normal;
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
     background: transparent;
     border: 1px solid var(--border);
     margin-left: -1px;
     color: var(--text);
-    transition: all var(--dur-normal) var(--ease-default);
+    transition:
+        background var(--dur-normal) var(--ease-default),
+        border-color var(--dur-normal) var(--ease-default),
+        box-shadow var(--dur-normal) var(--ease-default),
+        color var(--dur-normal) var(--ease-default);
 }
 
 .game-panel .input-group .custom-select .custom-select__trigger:hover {

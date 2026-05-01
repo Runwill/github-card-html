@@ -30,16 +30,10 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: var(--space-3xl);
+    padding: var(--game-online-panel-pad, var(--space-3xl));
     box-shadow: var(--shadow-elev-1);
     color: var(--text);
-}
-
-.setup-panel .row {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3xl);
-    flex-wrap: wrap;
+    font-size: var(--game-online-panel-fs, var(--fs-base));
 }
 
 .game-panel .input-group {
@@ -52,8 +46,8 @@
 .game-panel .input-group-label {
     background: transparent;
     color: color-mix(in srgb, var(--text) 86%, var(--bg-end));
-    padding: var(--space-sm) var(--space-lg);
-    font-size: var(--fs-base);
+    padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
+    font-size: var(--game-form-fs, var(--fs-base));
     border: 1px solid var(--border);
     border-right: none;
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
@@ -71,11 +65,15 @@
     border: 1px solid var(--border);
     background: transparent;
     color: var(--text);
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    font-size: var(--fs-base);
+    font-size: var(--game-form-fs, var(--fs-base));
     outline: none;
-    transition: all var(--dur-normal) var(--ease-default);
+    transition:
+        background var(--dur-normal) var(--ease-default),
+        border-color var(--dur-normal) var(--ease-default),
+        box-shadow var(--dur-normal) var(--ease-default),
+        color var(--dur-normal) var(--ease-default);
     box-sizing: border-box;
 }
 
@@ -96,8 +94,8 @@
 .setup-panel > .row {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-md);
-    margin-bottom: var(--space-md);
+    gap: var(--game-setup-row-gap, var(--space-md));
+    margin-bottom: var(--game-setup-row-gap, var(--space-md));
 }
 .setup-panel > .row:last-of-type {
     margin-bottom: 0;
@@ -111,32 +109,32 @@
 
 /* 座位数选择框：适中宽度 */
 .setup-panel .input-group:has(#setup-player-count-select) {
-    min-width: 140px;
+    min-width: var(--game-setup-count-minw, 140px);
 }
 /* 牌堆预设选择框：更宽，文字较长 */
 .setup-panel .input-group:has(#setup-card-preset-select) {
-    min-width: 210px;
+    min-width: var(--game-setup-preset-minw, 210px);
 }
 
 .setup-panel #setup-players-list {
-    margin-top: var(--space-2xl);
+    margin-top: var(--game-setup-section-gap, var(--space-3xl));
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-md);
+    gap: var(--game-setup-row-gap, var(--space-md));
 }
 
 .setup-panel #setup-players-list .input-group {
-    flex: 1 1 calc(50% - var(--space-md));
-    min-width: 200px;
+    flex: 1 1 calc(50% - var(--game-setup-row-gap, var(--space-md)));
+    min-width: var(--game-setup-player-minw, 200px);
 }
 
 .setup-panel #setup-players-list .input-group-label {
-    min-width: 60px;
+    min-width: var(--game-setup-label-minw, 60px);
     justify-content: center;
 }
 
 .setup-actions {
-    margin-top: var(--space-2xl);
+    margin-top: var(--game-setup-section-gap, var(--space-3xl));
 }
 
 /* ── Click Toggle (用于自动时机/允许旁观等 是/否 切换) ──────────────────── */
@@ -146,17 +144,21 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 48px;
+    min-width: var(--game-setup-toggle-minw, 48px);
     border: 1px solid var(--border);
     background: transparent;
     color: var(--text-muted, #999);
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important; /* override Foundation :last-child reset */
-    font-size: var(--fs-base);
+    font-size: var(--game-form-fs, var(--fs-base));
     font-weight: 600;
     cursor: pointer;
     user-select: none;
-    transition: all var(--dur-normal) var(--ease-default);
+    transition:
+        background var(--dur-normal) var(--ease-default),
+        border-color var(--dur-normal) var(--ease-default),
+        color var(--dur-normal) var(--ease-default),
+        opacity var(--dur-normal) var(--ease-default);
     box-sizing: border-box;
 }
 

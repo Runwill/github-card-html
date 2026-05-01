@@ -213,7 +213,10 @@
   background: transparent;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border, #e2e8f0);
-  transition: all var(--dur-normal) var(--ease-default);
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default),
+    box-shadow var(--dur-normal) var(--ease-default);
 }
 
 .account-info__body .info-row:hover {
@@ -292,7 +295,11 @@
   color: var(--text, #2d3748);
   font-size: inherit;
   line-height: var(--lh-relaxed);
-  transition: all var(--dur-normal) var(--ease-default);
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default),
+    box-shadow var(--dur-normal) var(--ease-default),
+    color var(--dur-normal) var(--ease-default);
   font-family: inherit;
 }
 

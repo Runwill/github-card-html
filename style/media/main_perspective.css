@@ -15,6 +15,36 @@
   --top-section-pad-b: clamp(0px, calc(var(--main-axis-block) * 1.055), 10px);
   --game-sidebar-w: clamp(136px, calc(var(--main-axis-inline) * 14.644), 280px);
 
+  --game-online-panel-fs: clamp(10px, calc(var(--main-axis-block) * 1.371), 13px);
+  --game-online-title-fs: clamp(12px, calc(var(--main-axis-block) * 1.688), 16px);
+  --game-online-small-fs: clamp(8px, calc(var(--main-axis-block) * 1.266), 12px);
+  --game-online-xs-fs: clamp(8px, calc(var(--main-axis-block) * 1.16), 11px);
+  --game-online-panel-pad: clamp(8px, calc(var(--main-axis-block) * 2.11), 20px);
+  --game-online-header-mb: clamp(6px, calc(var(--main-axis-block) * 1.477), 14px);
+  --game-online-header-pad-b: clamp(4px, calc(var(--main-axis-block) * 1.055), 10px);
+  --game-online-row-gap: clamp(4px, calc(var(--main-axis-block) * 0.844), 8px);
+  --game-online-list-pad: clamp(2px, calc(var(--main-axis-block) * 0.422), 4px);
+  --game-online-list-maxh: clamp(96px, calc(var(--main-axis-block) * 21.097), 200px);
+  --game-online-label-gap: clamp(1px, calc(var(--main-axis-block) * 0.211), 2px);
+  --game-online-viewer-label-maxw: clamp(72px, calc(var(--main-axis-inline) * 6.276), 120px);
+  --game-online-create-minw: clamp(56px, calc(var(--main-axis-inline) * 4.184), 80px);
+
+  --game-form-fs: clamp(10px, calc(var(--main-axis-block) * 1.371), 13px);
+  --game-form-pad-y: clamp(4px, calc(var(--main-axis-block) * 0.844), 8px);
+  --game-form-pad-x: clamp(6px, calc(var(--main-axis-block) * 1.266), 12px);
+  --game-setup-row-gap: clamp(4px, calc(var(--main-axis-block) * 1.055), 10px);
+  --game-setup-section-gap: clamp(8px, calc(var(--main-axis-block) * 2.11), 20px);
+  --game-setup-count-minw: clamp(84px, calc(var(--main-axis-inline) * 7.322), 140px);
+  --game-setup-preset-minw: clamp(126px, calc(var(--main-axis-inline) * 10.983), 210px);
+  --game-setup-player-minw: clamp(120px, calc(var(--main-axis-inline) * 10.46), 200px);
+  --game-setup-label-minw: clamp(38px, calc(var(--main-axis-inline) * 3.138), 60px);
+  --game-setup-toggle-minw: clamp(32px, calc(var(--main-axis-inline) * 2.51), 48px);
+
+  --game-context-menu-fs: clamp(10px, calc(var(--main-axis-block) * 1.477), 14px);
+  --game-context-menu-header-fs: var(--game-online-small-fs);
+  --game-context-menu-minw: clamp(112px, calc(var(--main-axis-inline) * 9.414), 180px);
+  --game-context-menu-icon-w: clamp(12px, calc(var(--main-axis-inline) * 0.837), 16px);
+
   --game-action-panel-pad: clamp(0px, calc(var(--main-axis-block) * 1.582), 15px);
   --bottom-section-pt: clamp(0px, calc(var(--main-axis-block) * 0.527), 5px);
   --bottom-section-pb: clamp(6px, calc(var(--main-axis-block) * 2.11), 20px);
@@ -48,6 +78,8 @@
   --pad-player-hand-r: clamp(0px, min(calc(var(--main-axis-inline) * 1.046), calc(var(--main-axis-block) * 2.11)), 20px);
   --minw-character-info: clamp(120px, calc(var(--main-axis-inline) * 14.958), 286px);
   --character-info-flex-shrink: 0;
+  --main-equip-name-tag-fs: clamp(8px, calc(var(--main-avatar-size) * 0.11), 11px);
+  --main-equip-name-tag-maxw: clamp(48px, calc(var(--main-avatar-size) * 0.8), 80px);
 }
 
 html.force-landscape {

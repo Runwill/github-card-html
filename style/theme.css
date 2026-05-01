@@ -305,7 +305,11 @@ html.theme-switching *::after {
   border: 1px solid var(--border) !important;
   background: transparent !important;
   color: var(--text) !important;
-  transition: all var(--dur-normal) var(--ease-default);
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default),
+    box-shadow var(--dur-normal) var(--ease-default),
+    color var(--dur-normal) var(--ease-default);
 }
 
 .modal-form input:hover,

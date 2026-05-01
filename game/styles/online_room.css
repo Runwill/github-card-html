@@ -4,24 +4,25 @@
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: var(--space-3xl);
+    padding: var(--game-online-panel-pad, var(--space-3xl));
     box-shadow: var(--shadow-elev-1);
     color: var(--text);
+    font-size: var(--game-online-panel-fs, var(--fs-base));
 }
 
 .online-panel-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--game-online-header-mb, var(--space-xl));
     border-bottom: 1px solid var(--border);
-    padding-bottom: var(--space-md);
+    padding-bottom: var(--game-online-header-pad-b, var(--space-md));
 }
 
 .online-panel-header h4 {
     margin: 0;
     color: var(--text);
-    font-size: var(--fs-xl);
+    font-size: var(--game-online-title-fs, var(--fs-xl));
     font-weight: 700;
     letter-spacing: 0.5px;
 }
@@ -29,8 +30,8 @@
 /* ── Status Badge ──────────────────────────────────────────────────────── */
 
 .online-status {
-    font-size: var(--fs-sm);
-    padding: var(--space-2xs) var(--space-md);
+    font-size: var(--game-online-small-fs, var(--fs-sm));
+    padding: 0.333em 0.833em;
     border-radius: var(--radius-pill);
     background: var(--panel-header-bg);
     color: var(--text-subtle);
@@ -55,7 +56,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
+    margin-bottom: 0.923em;
     flex-wrap: nowrap;
 }
 
@@ -65,7 +66,7 @@
     gap: 0;
     margin: 0;
     flex: 1 1 0;
-    min-width: 80px;
+    min-width: var(--game-online-create-minw, 80px);
 }
 
 .online-create-row .btn {
@@ -78,35 +79,35 @@
 /* ── Room List ─────────────────────────────────────────────────────────── */
 
 .online-room-list-header {
-    font-size: var(--fs-sm);
+    font-size: var(--game-online-small-fs, var(--fs-sm));
     color: var(--text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: 700;
-    margin-bottom: var(--space-xs);
+    margin-bottom: 0.5em;
 }
 
 .online-room-list {
-    max-height: 200px;
+    max-height: var(--game-online-list-maxh, 200px);
     overflow-y: auto;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg-start);
-    padding: var(--space-2xs);
+    padding: var(--game-online-list-pad, var(--space-2xs));
 }
 
 .room-empty {
     text-align: center;
     color: var(--text-subtle);
-    font-size: var(--fs-base);
-    padding: var(--space-2xl);
+    font-size: inherit;
+    padding: 1.231em;
 }
 
 .room-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--space-sm) var(--space-lg);
+    padding: 0.615em 0.923em;
     border-radius: var(--radius-sm);
     transition: background var(--dur-fast) var(--ease-default);
     cursor: default;
@@ -123,31 +124,31 @@
 .room-item-info {
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: 0.769em;
     min-width: 0;
 }
 
 .room-item-name {
     font-weight: 600;
-    font-size: var(--fs-base);
+    font-size: inherit;
     color: var(--text);
 }
 
 .room-item-status {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
+    gap: 0.462em;
 }
 
 .room-item-users {
-    font-size: var(--fs-sm);
+    font-size: var(--game-online-small-fs, var(--fs-sm));
     color: var(--text-subtle);
 }
 
 .room-item-tag {
-    padding: var(--space-2xs) var(--space-sm);
+    padding: 0.333em 0.667em;
     border-radius: var(--radius-xs);
-    font-size: var(--fs-sm);
+    font-size: var(--game-online-small-fs, var(--fs-sm));
     font-weight: 700;
     line-height: var(--lh-tight);
 }
@@ -179,7 +180,7 @@
 
 .room-item-actions {
     display: flex;
-    gap: var(--space-xs);
+    gap: 0.462em;
     align-items: center;
     flex-shrink: 0;
 }
@@ -191,38 +192,38 @@
 /* ── In-Room View ──────────────────────────────────────────────────────── */
 
 .online-room-info {
-    font-size: var(--fs-md);
+    font-size: var(--game-context-menu-fs, var(--fs-md));
     color: var(--text);
     margin-bottom: var(--space-sm);
 }
 
 .room-user-count-wrap {
     color: var(--text-subtle);
-    font-size: var(--fs-base);
+    font-size: var(--game-online-panel-fs, var(--fs-base));
 }
 
 .online-user-list {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-sm);
-    padding: var(--space-sm) 0;
+    gap: var(--game-online-row-gap, var(--space-sm));
+    padding: var(--game-online-row-gap, var(--space-sm)) 0;
 }
 
 .room-user {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2xs);
-    padding: var(--space-xs) var(--space-md);
+    gap: 0.308em;
+    padding: 0.462em 0.769em;
     border-radius: var(--radius-sm);
     background: var(--panel-header-bg);
     border: 1px solid var(--border);
-    font-size: var(--fs-base);
+    font-size: inherit;
     color: var(--text);
     transition: border-color var(--dur-fast) var(--ease-default);
 }
 
 .room-user-badge {
-    font-size: var(--fs-sm);
+    font-size: var(--game-online-small-fs, var(--fs-sm));
     font-weight: 700;
     padding: 0 var(--space-2xs);
     border-radius: var(--radius-xs);
@@ -262,12 +263,12 @@
 }
 
 .online-hint {
-    margin-top: var(--space-lg);
-    padding: var(--space-md) var(--space-xl);
+    margin-top: 0.923em;
+    padding: 0.769em 1.077em;
     background: rgba(var(--primary-rgb), 0.08);
     border-left: 3px solid var(--primary-2);
     border-radius: var(--radius-sm);
-    font-size: var(--fs-base);
+    font-size: inherit;
     color: var(--text-muted);
     line-height: var(--lh-normal);
 }
@@ -279,7 +280,7 @@
 }
 
 .online-actions {
-    margin-top: var(--space-lg);
+    margin-top: 0.923em;
 }
 
 /* Spectate button active state */
@@ -292,17 +293,17 @@
 /* ── Room Options (allow spectate toggle, etc.) ────────────────────────── */
 
 .online-room-options {
-    margin-top: var(--space-md);
+    margin-top: 0.769em;
     display: flex;
-    gap: var(--space-md);
+    gap: 0.769em;
     align-items: center;
 }
 
 .online-toggle-label {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-xs);
-    font-size: var(--fs-sm);
+    gap: 0.5em;
+    font-size: var(--game-online-small-fs, var(--fs-sm));
     color: var(--text-muted);
     cursor: pointer;
     user-select: none;
@@ -322,25 +323,25 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: var(--game-online-label-gap, 2px);
     pointer-events: none;
     z-index: 20;
-    margin-bottom: var(--space-2xs);
+    margin-bottom: var(--game-online-label-gap, var(--space-2xs));
 }
 
 .online-viewer-label {
     background: var(--surface);
     /* make badge text lighter than normal text */
     color: var(--text-subtle);
-    font-size: var(--fs-xs);
+    font-size: var(--game-online-xs-fs, var(--fs-xs));
     font-weight: 600;
-    padding: 1px var(--space-xs);
+    padding: 0.091em 0.545em;
     border-radius: var(--radius-xs);
     border: 1px solid var(--border);
     box-shadow: var(--shadow-subtle);
     white-space: nowrap;
     text-align: center;
-    max-width: 120px;
+    max-width: var(--game-online-viewer-label-maxw, 120px);
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: var(--lh-tight);
@@ -382,33 +383,4 @@
 /* Ensure avatar containers support absolute positioning for labels */
 .char-avatar {
     position: relative;
-}
-
-/* ── Button helpers ────────────────────────────────────────────────────── */
-
-/* btn--accent: now handled by theme.css for consistency */
-
-/* ── Responsive ────────────────────────────────────────────────────────── */
-
-@media (max-width: 600px) {
-    .setup-panel,
-    #online-room-ui {
-        padding: var(--space-lg);
-    }
-    .setup-panel .row {
-        gap: var(--space-sm);
-    }
-    .online-create-row {
-        flex-wrap: nowrap;
-    }
-    .online-room-list {
-        max-height: 150px;
-    }
-    .online-viewer-labels {
-        margin-bottom: 2px;
-    }
-    .online-viewer-label {
-        font-size: 9px;
-        padding: 1px var(--space-2xs);
-    }
 }

@@ -30,6 +30,14 @@
   --player-judge-count-fs: clamp(8px, 1.266vh, 12px);
   --player-judge-count-offset: calc(var(--player-judge-count-size) * -0.222);
   --player-judge-count-pad-h: calc(var(--player-judge-count-size) * 0.222);
+  --equip-name-tag-fs: clamp(7px, 1.055vh, 10px);
+  --equip-name-tag-pad-x: clamp(1px, 0.211vh, 2px);
+  --equip-name-tag-maxw: clamp(36px, 6.329vh, 60px);
+  --equip-name-tag-gap: max(1px, calc(var(--role-badge-gap) * 0.25));
+  --equip-name-tag-offset: var(--role-badge-gap);
+  --turn-ring-width: clamp(1px, calc(var(--role-avatar-size) * 0.05), 3px);
+  --turn-ring-inset: calc(var(--turn-ring-width) * -1.333);
+  --turn-glow-inset: calc(var(--turn-ring-width) * -2);
 }
 
 html.force-landscape {
@@ -58,4 +66,12 @@ html.force-landscape {
   --player-judge-count-fs: clamp(8px, 1.266vw, 12px);
   --player-judge-count-offset: calc(var(--player-judge-count-size) * -0.222);
   --player-judge-count-pad-h: calc(var(--player-judge-count-size) * 0.222);
+  --equip-name-tag-fs: clamp(7px, 1.055vw, 10px);
+  --equip-name-tag-pad-x: clamp(1px, 0.211vw, 2px);
+  --equip-name-tag-maxw: clamp(36px, 6.329vw, 60px);
+  --equip-name-tag-gap: max(1px, calc(var(--role-badge-gap) * 0.25));
+  --equip-name-tag-offset: var(--role-badge-gap);
+  --turn-ring-width: clamp(1px, calc(var(--role-avatar-size) * 0.05), 3px);
+  --turn-ring-inset: calc(var(--turn-ring-width) * -1.333);
+  --turn-glow-inset: calc(var(--turn-ring-width) * -2);
 }

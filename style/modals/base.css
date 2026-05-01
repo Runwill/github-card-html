@@ -89,7 +89,11 @@
   box-sizing: border-box;
   font-size: var(--modal-fs-lg, var(--fs-lg));
   line-height: var(--lh-normal);
-  transition: all var(--dur-normal) var(--ease-default);
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default),
+    box-shadow var(--dur-normal) var(--ease-default),
+    color var(--dur-normal) var(--ease-default);
   background: transparent;
   color: var(--text, #2d3748);
 }
@@ -109,7 +113,11 @@
   cursor: pointer;
   font-size: var(--modal-fs-lg, var(--fs-lg));
   font-weight: 600;
-  transition: all var(--dur-normal) var(--ease-standard);
+  transition:
+    background var(--dur-normal) var(--ease-standard),
+    box-shadow var(--dur-normal) var(--ease-standard),
+    color var(--dur-normal) var(--ease-standard),
+    transform var(--dur-normal) var(--ease-standard);
   box-shadow: var(--shadow-elev-1);
 }
 

@@ -8,7 +8,11 @@
     top: 0;
     z-index: var(--z-header);
     white-space: nowrap;
-    transition: all var(--dur-moderate) var(--ease-standard);
+    transition:
+        background var(--dur-moderate) var(--ease-standard),
+        box-shadow var(--dur-moderate) var(--ease-standard),
+        transform var(--dur-moderate) var(--ease-standard),
+        border-color var(--dur-moderate) var(--ease-standard);
     backdrop-filter: blur(8px) saturate(1.1);
     border-bottom: 1px solid rgba(0,0,0,0.06);
     align-items: center;
@@ -28,13 +32,13 @@
     font-size: .9rem;
     margin-left: 0;
     padding-left: 1.111em;                               /* 20/18 */
-    transition: all var(--dur-normal) var(--ease-default);
+    transition: color var(--dur-normal) var(--ease-default), transform var(--dur-normal) var(--ease-default);
 }
 
 #sidebar .title-a {
     text-decoration: none;
     color: #2d3748;
-    transition: all var(--dur-moderate) var(--ease-standard);
+    transition: color var(--dur-moderate) var(--ease-standard), transform var(--dur-moderate) var(--ease-standard);
     position: relative;
     padding: 0.2em 0;
 }
@@ -47,7 +51,7 @@
     width: 0;
     height: 2px;
     background: #2d3748;
-    transition: all var(--dur-moderate) var(--ease-standard);
+    transition: width var(--dur-moderate) var(--ease-standard), opacity var(--dur-moderate) var(--ease-standard);
     transform: translateX(-50%);
 }
 
@@ -94,7 +98,10 @@
     border: none;
     cursor: pointer;
     border-radius: var(--radius-sm) ;
-    transition: all var(--dur-normal) var(--ease-default);
+    transition:
+        background var(--dur-normal) var(--ease-default),
+        box-shadow var(--dur-normal) var(--ease-default),
+        color var(--dur-normal) var(--ease-default);
     color: var(--text, #4a5568);
     font-weight: 500;
 }
@@ -110,7 +117,11 @@
 }
 
 #nav .tabs-title a {
-    transition: all var(--dur-moderate) var(--ease-standard) !important;
+    transition:
+        background-color var(--dur-moderate) var(--ease-standard),
+        color var(--dur-moderate) var(--ease-standard),
+        box-shadow var(--dur-moderate) var(--ease-standard),
+        transform var(--dur-moderate) var(--ease-standard) !important;
     position: relative;
     overflow: hidden;
 }

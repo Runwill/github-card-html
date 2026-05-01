@@ -54,8 +54,8 @@
 
 /* ── The spinning gradient ring ── */
 .char-avatar::after {
-    inset: -4px;
-    padding: 3px;
+    inset: var(--turn-ring-inset, -4px);
+    padding: var(--turn-ring-width, 3px);
     /*
      * Dynamic color from breadcrumbs via --turn-ring-color.
      * Fixed gradient — rotation via transform (GPU-accelerated).
@@ -84,7 +84,7 @@
 
 /* ── Ambient glow behind the ring ── */
 .char-avatar::before {
-    inset: -6px;
+    inset: var(--turn-glow-inset, -6px);
     background: radial-gradient(circle,
         color-mix(in srgb, var(--turn-ring-color, #ffd700) 25%, transparent) 0%,
         transparent 70%);
@@ -251,24 +251,24 @@ html[data-theme="light"] .player-judge-count {
     left: 100%;
     top: 50%;
     transform: translateY(-50%);
-    margin-left: 4px;
+    margin-left: var(--equip-name-tag-offset, 4px);
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: var(--equip-name-tag-gap, 1px);
     white-space: nowrap;
     pointer-events: none;
     z-index: 5;
 }
 
 .equip-name-tag {
-    font-size: var(--fs-2xs, 10px);
+    font-size: var(--equip-name-tag-fs, var(--fs-2xs, 10px));
     line-height: 1.2;
-    padding: 0 2px;
+    padding: 0 var(--equip-name-tag-pad-x, 2px);
     color: var(--text-subtle, #888);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 60px;
+    max-width: var(--equip-name-tag-maxw, 60px);
 }
 
 /* Main view equip names */
@@ -278,17 +278,17 @@ html[data-theme="light"] .player-judge-count {
     top: auto;
     transform: none;
     margin-left: 0;
-    margin-top: var(--space-2xs, 4px);
+    margin-top: var(--equip-name-tag-offset, var(--space-2xs, 4px));
     flex-direction: row;
     flex-wrap: wrap;
-    gap: 2px;
-    max-width: 120px;
+    gap: var(--equip-name-tag-pad-x, 2px);
+    max-width: calc(var(--main-equip-name-tag-maxw, 80px) * 1.5);
     pointer-events: auto;
 }
 
 .character-info .equip-name-tag {
-    max-width: 80px;
-    font-size: var(--fs-xs, 11px);
+    max-width: var(--main-equip-name-tag-maxw, 80px);
+    font-size: var(--main-equip-name-tag-fs, var(--fs-xs, 11px));
 }
 
 .role-summary--spectator {

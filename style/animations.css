@@ -60,7 +60,7 @@ html { scroll-behavior: smooth; }
 .smart-fade-in {
     opacity: 0;
     transform: translateY(20px);
-    transition: all var(--dur-slower) var(--ease-standard);
+    transition: opacity var(--dur-slower) var(--ease-standard), transform var(--dur-slower) var(--ease-standard);
 }
 .smart-fade-in.loaded {
     opacity: 1;
