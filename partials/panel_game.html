@@ -112,10 +112,10 @@
                         
                         <!-- Treatment Area (Center) & Piles -->
                         <div class="game-panel game-board-panel hidden" id="game-board-panel" style="width: 100%;">
-                            <div class="board-area-row" style="display: flex; gap: 15px; align-items: flex-start; justify-content: center; min-height: var(--board-area-row-minh, 140px);">
+                            <div class="board-area-row">
                                 
                                 <!-- Draw Pile (Left) -->
-                                <div class="board-pile-slot" style="flex: 0 0 100px; width: 100px; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 5;">
+                                <div class="board-pile-slot">
                                     <div id="header-pile" class="area-watermark"></div>
                                     <div id="pile-container" class="cards-container pile-container deck-slot" data-area-name="pile" style="flex: 1; position: relative;">
                                         <!-- Cards here -->
@@ -123,7 +123,7 @@
                                 </div>
 
                                 <!-- Treatment Area (Center) -->
-                                <div class="treatment-area-wrappper" style="flex: 0.8; position: relative; min-width: 0; display: flex; flex-direction: column; z-index: 1;">
+                                <div class="treatment-area-wrappper">
                                     <div id="header-treatment-area" class="area-watermark"></div>
                                     <div id="treatment-area-container" class="cards-container treatment-container" data-area-name="treatmentArea" style="flex: 1;">
                                         <!-- Cards will be rendered here -->
@@ -131,7 +131,7 @@
                                 </div>
 
                                 <!-- Discard Pile (Right) -->
-                                <div class="board-pile-slot" style="flex: 0 0 100px; width: 100px; display: flex; flex-direction: column; justify-content: center; position: relative; z-index: 5;">
+                                <div class="board-pile-slot">
                                     <div id="header-discard-pile" class="area-watermark"></div>
                                     <div id="discard-pile-container" class="cards-container pile-container deck-slot" data-area-name="discardPile" style="flex: 1; position: relative;">
                                         <!-- Cards here -->

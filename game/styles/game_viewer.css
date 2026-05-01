@@ -24,7 +24,7 @@
     /* Stability Fix: Use explicit width instead of fit-content to prevent 
        overflow scrolling on the viewport when card lists are huge. */
     width: fit-content; /* Changed from 90vw to fit-content to allow shrinking */
-    min-width: calc(var(--card-w, 100px) + 40px); /* Minimum width to fit at least one card + padding */
+    min-width: calc(var(--card-w, 100px) + var(--viewer-content-extra-w, 40px)); /* Minimum width to fit at least one card + padding */
     max-width: 90vw; /* Cap at 90vw */
     
     /* height: 80vh;  <-- Removed fixed height */
@@ -68,35 +68,35 @@
 
 /* 1. At Start (Hide Right Edge if overflow) */
 .card-viewer-modal .modal-body.at-start:not(.at-end) {
-    -webkit-mask-image: linear-gradient(to right, black calc(100% - 60px), transparent 100%);
-    mask-image: linear-gradient(to right, black calc(100% - 60px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - var(--viewer-mask-w, 60px)), transparent 100%);
+    mask-image: linear-gradient(to right, black calc(100% - var(--viewer-mask-w, 60px)), transparent 100%);
 }
 
 /* 2. At End (Hide Left Edge) */
 .card-viewer-modal .modal-body.at-end:not(.at-start) {
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60px);
-    mask-image: linear-gradient(to right, transparent 0%, black 60px);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black var(--viewer-mask-w, 60px));
+    mask-image: linear-gradient(to right, transparent 0%, black var(--viewer-mask-w, 60px));
 }
 
 /* 3. In Middle (Hide Both) */
 .card-viewer-modal .modal-body:not(.at-start):not(.at-end) {
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
-    mask-image: linear-gradient(to right, transparent 0%, black 60px, black calc(100% - 60px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black var(--viewer-mask-w, 60px), black calc(100% - var(--viewer-mask-w, 60px)), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black var(--viewer-mask-w, 60px), black calc(100% - var(--viewer-mask-w, 60px)), transparent 100%);
 }
 
 /* The actual scrollable list */
 .card-grid {
     display: flex;
     flex-wrap: nowrap;
-    gap: var(--space-2xl);
+    gap: var(--cards-container-gap, var(--space-2xl));
     justify-content: flex-start;
-    padding: var(--space-md); /* Reverted to 10px */
+    padding: var(--cards-container-pad, var(--space-md));
     
     width: 100%; 
-    min-height: calc(var(--card-h, 140px) + 20px); /* card-h + padding */
+    min-height: calc(var(--card-h, 140px) + var(--viewer-grid-extra-h, 20px));
     
     /* ADDED: Minimum width ensures drop target exists */
-    min-width: 350px; 
+    min-width: var(--viewer-grid-minw, 350px);
     
     overflow-x: auto;
     /* scrollbar-hidden via HTML class */
@@ -181,12 +181,12 @@ body.is-global-dragging .card-grid {
     content: counter(card-index);
     
     position: absolute;
-    top: 2px; /* Inner offset */
-    left: 2px;
-    font-size: 10px;
+    top: var(--viewer-index-badge-pad-y, 2px);
+    left: var(--viewer-index-badge-pad-y, 2px);
+    font-size: var(--viewer-index-badge-fs, 10px);
     background: rgba(0,0,0,0.6);
     color: #fff;
-    padding: 2px 5px;
+    padding: var(--viewer-index-badge-pad-y, 2px) var(--viewer-index-badge-pad-x, 5px);
     border-radius: var(--radius-xs);
     z-index: 20; /* Ensure on top of card content */
     pointer-events: none;

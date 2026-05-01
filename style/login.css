@@ -1,4 +1,10 @@
 html, body { height: 100%; }
+:root {
+    --login-panel-fs: clamp(12px, 1.582vh, 17px);
+    --login-panel-w: min(clamp(300px, 18.828vw, 360px), 92vw);
+    --login-lang-offset: clamp(8px, 1.055vw, 20px);
+}
+
 body {
     min-height: 100vh;
     margin: 0;
@@ -8,21 +14,21 @@ body {
 
 /* .panel + .panel--page 样式统一定义在 modals/base.css */
 
-.modal-header { margin-bottom: var(--space-lg); }
+.modal-header { margin-bottom: 0.533em; }
 .modal-header h2 {
     margin: 0;
-    font-size: var(--fs-2xl);
+    font-size: 1.2em;
     color: var(--text);
     font-weight: 600;
 }
 .modal-form {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xl);
+    gap: 0.8em;
 }
 .modal-form button { transition: background-color var(--dur-normal) var(--ease-default), color var(--dur-normal) var(--ease-default), border-color var(--dur-normal) var(--ease-default); }
 
-.modal-message { margin-top: var(--space-xs); min-height: 20px; font-size: var(--fs-md); text-align: center; color: var(--text-muted); }
+.modal-message { margin-top: 0.267em; min-height: 1.333em; font-size: 0.933em; text-align: center; color: var(--text-muted); }
 .modal-message.success { color: var(--success); }
 .modal-message.error { color: var(--danger); }
 
@@ -34,21 +40,17 @@ body {
 }
 .shake { animation: shake var(--dur-slower); }
 
-#login-container { width: 360px; max-width: 92vw; margin: 0; }
-#login-container .modal-form input { margin-bottom: var(--space-md); padding: var(--space-sm); border: 1px solid var(--border); border-radius: var(--radius-xs); }
-#login-container .btn { width: 100%; padding: var(--space-md); border-radius: var(--radius-xs); border: none; }
-#login-message:not(:empty) { margin-top: var(--space-md); }
+#login-container { width: var(--login-panel-w); max-width: 92vw; margin: 0; }
+#login-container .modal-form input { margin-bottom: 0.533em; padding: 0.533em; border: 1px solid var(--border); border-radius: var(--radius-xs); }
+#login-container .btn { width: 100%; padding: 0.533em; border-radius: var(--radius-xs); border: none; }
+#login-message:not(:empty) { margin-top: 0.533em; }
 #login-message.success { color: var(--success, #38a169); }
 #login-message.error   { color: var(--danger, #e53e3e); }
-
-@media (max-width: 480px) {
-    #login-container { width: 92vw; }
-}
 
 /* 登录页语言切换按钮（固定右上角） */
 #lang-toggle-button {
     position: fixed;
-    top: 10px;
-    right: 10px;
+    top: var(--login-lang-offset);
+    right: var(--login-lang-offset);
     z-index: var(--z-sticky);
 }

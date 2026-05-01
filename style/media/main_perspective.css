@@ -3,136 +3,92 @@
    Token 驱动，消费于 game_roles.css / game_layout.css 等
    ═══════════════════════════════════════════════════════════ */
 
-/* ── 默认值（最小屏） ── */
 :root {
-  --main-avatar-size: 60px;           /* 主视角头像尺寸 */
-  --main-char-name-fs: 1rem;          /* 主视角名字号 */
-  --main-char-name-mb: var(--space-xs); /* 主视角名下边距 */
-  --play-view-gap: var(--space-3xl);  /* game-view-play 间距 */
-  --top-section-pad-b: var(--space-md); /* game-top-section 下内距 */
-  --detail-btn-size: 24px;            /* 判定/装备按钮尺寸 */
-  --detail-btn-fs: var(--fs-xl);      /* 判定/装备按钮字号 */
-  --bottom-section-pt: 5px;           /* 底部区域上内距 */
-  --bottom-section-pb: var(--space-3xl); /* 底部区域下内距 */
-  --bottom-section-mb: var(--space-3xl); /* 底部区域下外距（footer防遮挡） */
-  --bottom-section-gap: var(--space-2xl); /* 底部区域子元素间距 */
-  --panel-game-pad: 15px;             /* 游戏面板内距 */
-  --pad-current-panel: 25px;          /* 主视角面板内距 */
-  --equip-slots-gap: var(--space-3xl); /* 装备槽间距 */
-  --equip-slots-pad: 30px;            /* 装备槽容器内距 */
-  --player-hand-h4-mb: 15px;          /* 手牌标题下边距 */
-  --pad-character-info-l: var(--space-3xl); /* 角色信息左内距 */
-  --character-info-textalign: left;         /* 信息区文字对齐 */
-  --character-info-gap: var(--space-3xl);   /* 头像与详情间距 */
-  --pad-character-info-r: var(--space-3xl); /* 信息区右内距 */
-  --pad-player-hand-r: var(--space-3xl);    /* 手牌区右内距 */
-  --minw-character-info: 286px;             /* 信息区最低宽度 */
+  --game-container-gap: clamp(0px, 1.688vh, 16px);
+  --game-layout-gap: clamp(6px, 2.11vh, 20px);
+  --game-panel-pad: clamp(6px, 1.582vh, 15px);
+  --panel-game-pad: clamp(4px, 1.582vh, 15px);
+  --top-section-gap: clamp(8px, 2.11vh, 20px);
+  --top-section-pad-r: 0px;
+  --top-section-pad-b: clamp(0px, 1.055vh, 10px);
+  --game-sidebar-w: clamp(136px, 14.644vw, 280px);
+
+  --game-action-panel-pad: clamp(0px, 1.582vh, 15px);
+  --bottom-section-pt: clamp(0px, 0.527vh, 5px);
+  --bottom-section-pb: clamp(6px, 2.11vh, 20px);
+  --bottom-section-mb: clamp(8px, 2.11vh, 20px);
+  --bottom-section-gap: clamp(6px, 1.688vh, 16px);
+  --game-main-area-gap: clamp(4px, 1.055vh, 10px);
+  --main-perspective-gap: clamp(8px, 2.11vh, 20px);
+
+  --main-avatar-size: clamp(32px, 10.548vh, 100px);
+  --main-char-name-fs: clamp(12px, 2.954vh, 28px);
+  --main-char-name-mb: clamp(0px, 1.055vh, 10px);
+  --current-panel-gap: clamp(8px, 2.532vh, 24px);
+  --pad-current-panel: clamp(5px, 2.637vh, 25px);
+  --detail-btn-size: clamp(18px, 2.532vh, 24px);
+  --detail-btn-fs: clamp(12px, 1.688vh, 16px);
+  --timing-badge-fs: clamp(10px, 2.532vh, 24px);
+  --timing-badge-minh: clamp(24px, 4.641vh, 44px);
+  --timing-badge-pad: clamp(2px, 0.633vh, 6px) clamp(8px, 1.688vh, 16px);
+
+  --play-view-gap: clamp(8px, 2.11vh, 20px);
+  --equip-slots-gap: clamp(6px, 2.11vh, 20px);
+  --equip-slots-pad: clamp(6px, 3.165vh, 30px);
+  --player-hand-h4-mb: clamp(0px, 1.582vh, 15px);
+  --pad-character-info-l: clamp(6px, 2.11vh, 20px);
+  --character-info-textalign: left;
+  --character-info-gap: clamp(4px, 2.11vh, 20px);
+  --pad-character-info-r: clamp(0px, 2.11vh, 20px);
+  --pad-player-hand-r: clamp(0px, 2.11vh, 20px);
+  --minw-character-info: clamp(120px, 14.958vw, 286px);
 }
 
-/* ── 小桌面 / 平板 ── */
-@media (max-width: 1024px) {
-  :root {
-    --pad-current-panel: 15px;
-    --main-char-name-mb: var(--space-xs);
-    --minw-character-info: 180px;
-  }
+html.force-landscape {
+  --game-container-gap: clamp(0px, 1.688vw, 16px);
+  --game-layout-gap: clamp(6px, 2.11vw, 20px);
+  --game-panel-pad: clamp(6px, 1.582vw, 15px);
+  --panel-game-pad: clamp(4px, 1.582vw, 15px);
+  --top-section-gap: clamp(8px, 2.11vw, 20px);
+  --top-section-pad-b: clamp(0px, 1.055vw, 10px);
+  --game-sidebar-w: clamp(136px, 14.644vh, 280px);
+
+  --game-action-panel-pad: clamp(0px, 1.582vw, 15px);
+  --bottom-section-pt: clamp(0px, 0.527vw, 5px);
+  --bottom-section-pb: clamp(6px, 2.11vw, 20px);
+  --bottom-section-mb: clamp(8px, 2.11vw, 20px);
+  --bottom-section-gap: clamp(6px, 1.688vw, 16px);
+  --game-main-area-gap: clamp(4px, 1.055vw, 10px);
+  --main-perspective-gap: clamp(8px, 2.11vw, 20px);
+
+  --main-avatar-size: clamp(32px, 10.548vw, 100px);
+  --main-char-name-fs: clamp(12px, 2.954vw, 28px);
+  --main-char-name-mb: clamp(0px, 1.055vw, 10px);
+  --current-panel-gap: clamp(8px, 2.532vw, 24px);
+  --pad-current-panel: clamp(5px, 2.637vw, 25px);
+  --detail-btn-size: clamp(18px, 2.532vw, 24px);
+  --detail-btn-fs: clamp(12px, 1.688vw, 16px);
+  --timing-badge-fs: clamp(10px, 2.532vw, 24px);
+  --timing-badge-minh: clamp(24px, 4.641vw, 44px);
+  --timing-badge-pad: clamp(2px, 0.633vw, 6px) clamp(8px, 1.688vw, 16px);
+
+  --play-view-gap: clamp(8px, 2.11vw, 20px);
+  --equip-slots-gap: clamp(6px, 2.11vw, 20px);
+  --equip-slots-pad: clamp(6px, 3.165vw, 30px);
+  --player-hand-h4-mb: clamp(0px, 1.582vw, 15px);
+  --pad-character-info-l: clamp(6px, 2.11vw, 20px);
+  --character-info-gap: clamp(4px, 2.11vw, 20px);
+  --pad-character-info-r: clamp(0px, 2.11vw, 20px);
+  --pad-player-hand-r: clamp(0px, 2.11vw, 20px);
 }
 
-/* ── 级别 1：小手机横屏 / 小平板竖屏 ── */
-@media (min-width: 480px) and (min-height: 400px) {
-  :root {
-    --main-avatar-size: 70px;
-    --main-char-name-fs: 1.1rem;
-    --main-char-name-mb: var(--space-sm);
-  }
-}
-
-/* ── 级别 2：平板竖屏 / 小桌面（高度也需≥750） ── */
-@media (min-width: 768px) and (min-height: 750px) {
-  :root {
-    --main-avatar-size: 80px;
-    --main-char-name-fs: 1.2rem;
-    --main-char-name-mb: var(--space-md);
-  }
-}
-
-/* ── 级别 3：标准桌面（宽>1180 且 高≥750） ── */
-@media (min-width: 1181px) and (min-height: 750px) {
-  :root {
-    --main-avatar-size: 90px;
-    --main-char-name-fs: 1.3rem;
-    --main-char-name-mb: var(--space-md);
-  }
-}
-
-/* ── 级别 4：大桌面 ── */
-@media (min-width: 1280px) and (min-height: 750px) {
-  :root {
-    --main-avatar-size: 100px;
-    --main-char-name-fs: 1.4rem;
-    --main-char-name-mb: var(--space-md);
-  }
-}
-
-/* ── 中等宽度覆盖（头像间距缩小） ── */
-@media (max-width: 800px) {
-  :root {
-    --character-info-gap: var(--space-xl);
-    --main-char-name-mb: var(--space-3xs);
-  }
-}
-
-/* ── 平板及以下宽度覆盖 ── */
 @media (max-width: 768px) {
   :root {
     --character-info-flex: column;
     --character-info-textalign: center;
-    --character-info-gap: var(--space-2xs);
-    --main-char-name-mb: 0px;
-    --pad-character-info-r: 0;
-    --pad-player-hand-r: 0;
-    --minw-character-info: 150px;
-    /* 列模式下：徽章居中，按钮组居中 */
     --char-stats-justify: center;
     --stats-btn-left: 50%;
     --stats-btn-x-offset: -50%;
     --name-row-justify: center;
-  }
-}
-
-@media (max-width: 700px) {
-  :root {
-    --minw-character-info: 130px;
-  }
-}
-
-@media (max-width: 600px) {
-  :root {
-    --minw-character-info: 120px;
-  }
-}
-
-/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
-@media (max-height: 399px), (max-width: 480px) {
-  :root {
-    --main-avatar-size: 36px;
-    --main-char-name-fs: 0.8rem;
-    --main-char-name-mb: 0px;
-    --play-view-gap: 8px;
-    --top-section-pad-b: 0px;
-    --detail-btn-size: 18px;
-    --detail-btn-fs: var(--fs-sm);
-    --pad-current-panel: 5px;
-    --bottom-section-pt: 0px;
-    --bottom-section-mb: var(--space-sm);
-    --bottom-section-gap: var(--space-xs);
-    --panel-game-pad: 4px;
-    --equip-slots-gap: var(--space-xs);
-    --equip-slots-pad: 6px;
-    --player-hand-h4-mb: 4px;
-    --pad-character-info-l: var(--space-xs);
-    --main-avatar-size: 32px;
-    --player-hand-h4-display: none;
-    --player-stats-row-mt: 0px;
   }
 }

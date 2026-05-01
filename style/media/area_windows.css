@@ -3,48 +3,17 @@
    Token 驱动，消费于 game_board.css / game_layout.css 等
    ═══════════════════════════════════════════════════════════ */
 
-/* ── 默认值（最小屏） ── */
 :root {
-  --table-side-col-minw: 90px;        /* 桌面左右列最小宽度 */
-  --board-area-row-minh: 140px;       /* 牌堆/治疗区行最小高度 */
-  --table-panel-minh: 120px;          /* 桌面面板最小高度 */
-  --area-watermark-fs: 2.5rem;        /* 区域水印字号 */
+  --table-side-col-minw: clamp(70px, 7.322vw, 140px);   /* 桌面左右列最小宽度 */
+  --table-layout-gap: clamp(6px, calc(var(--card-w, 100px) * 0.16), 16px); /* 桌面三列间距 */
+  --board-area-row-minh: clamp(80px, 14.768vh, 140px);  /* 牌堆/治疗区行最小高度 */
+  --table-panel-minh: clamp(70px, 12.658vh, 120px);     /* 桌面面板最小高度 */
+  --area-watermark-fs: clamp(1.2rem, 5.274vh, 2.5rem);  /* 区域水印字号 */
 }
 
-/* ── 级别 1：小手机横屏 / 小平板竖屏 ── */
-@media (min-width: 480px) and (min-height: 400px) {
-  :root {
-    --table-side-col-minw: 100px;
-  }
-}
-
-/* ── 级别 2：平板竖屏 / 小桌面（高度也需≥750） ── */
-@media (min-width: 768px) and (min-height: 750px) {
-  :root {
-    --table-side-col-minw: 120px;
-  }
-}
-
-/* ── 级别 3：标准桌面（宽>1180 且 高≥750） ── */
-@media (min-width: 1181px) and (min-height: 750px) {
-  :root {
-    --table-side-col-minw: 130px;
-  }
-}
-
-/* ── 级别 4：大桌面 ── */
-@media (min-width: 1280px) and (min-height: 750px) {
-  :root {
-    --table-side-col-minw: 140px;
-  }
-}
-
-/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
-@media (max-height: 399px), (max-width: 480px) {
-  :root {
-    --table-side-col-minw: 70px;
-    --board-area-row-minh: 80px;
-    --table-panel-minh: 70px;
-    --area-watermark-fs: 1.2rem;
-  }
+html.force-landscape {
+  --table-side-col-minw: clamp(70px, 7.322vh, 140px);
+  --board-area-row-minh: clamp(80px, 14.768vw, 140px);
+  --table-panel-minh: clamp(70px, 12.658vw, 120px);
+  --area-watermark-fs: clamp(1.2rem, 5.274vw, 2.5rem);
 }

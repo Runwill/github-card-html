@@ -129,7 +129,7 @@
     /* Shape & Box */
     padding: var(--role-badge-pad-v) var(--role-badge-pad-h);
     border-radius: var(--radius-lg) ;
-    margin-right: var(--space-xs); /* Changed from margin-left to margin-right */
+    margin-right: var(--role-badge-gap, var(--space-xs)); /* Changed from margin-left to margin-right */
     margin-left: 0;
     min-width: var(--role-summary-badge-minw, 24px);
     text-align: center;
@@ -141,7 +141,8 @@
     
     /* Typography */
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.5px;
+    letter-spacing: var(--role-badge-letter-spacing, 0.5px);
+    line-height: var(--role-badge-line-h, 1.15);
     
     display: inline-flex;
     align-items: center;
@@ -153,9 +154,9 @@
     font-weight: bold;
     color: #FFD700;
     background: rgba(0,0,0,0.5);
-    padding: 0 var(--space-2xs);
+    padding: 0 var(--role-badge-gap, var(--space-2xs));
     border-radius: var(--radius-xs);
-    margin-right: var(--space-2xs);
+    margin-right: var(--role-badge-gap, var(--space-2xs));
 }
 
 .player-stats-row {
@@ -175,8 +176,8 @@
 
 .player-judge-count {
     position: absolute;
-    top: -4px;
-    right: -4px;
+    top: var(--player-judge-count-offset, -4px);
+    right: var(--player-judge-count-offset, -4px);
     z-index: 12;
 
     /* Appearance: Matched with .stat-hp style but using Judge Colors */
@@ -185,14 +186,14 @@
     border: 1px solid rgba(255, 193, 7, 0.5); /* Subtle border */
     
     /* Layout */
-    min-width: 18px; /* Slightly tighter than hand count */
-    height: 18px;
-    padding: 0 var(--space-2xs); 
+    min-width: var(--player-judge-count-size, 18px); /* Slightly tighter than hand count */
+    height: var(--player-judge-count-size, 18px);
+    padding: 0 var(--player-judge-count-pad-h, var(--space-2xs));
     border-radius: var(--radius-lg); /* Pill shape */
 
     /* Typography */
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: 0.75rem; 
+    font-size: var(--player-judge-count-fs, 0.75rem);
     font-weight: 700;
     line-height: var(--lh-none);
     text-shadow: none; /* No shadow needed for this flat style */

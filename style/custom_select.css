@@ -233,16 +233,17 @@
 /* ── Inside tokens-log__filters (permissions log filter bar) ───────── */
 
 .tokens-log__filters .custom-select {
-    flex: 1 1 60px;
-    min-width: 60px;
-    max-width: 160px;
+    font-size: var(--tp-fs-md, var(--fs-md));
+    flex: 1 1 4.286em;
+    min-width: 4.286em;
+    max-width: 11.429em;
 }
 
 .tokens-log__filters .custom-select .custom-select__trigger {
-    height: 32px !important;
-    font-size: var(--fs-md) !important;
+    height: var(--tokens-input-h, 32px) !important;
+    font-size: var(--tp-fs-md, var(--fs-md)) !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
     border-radius: var(--radius-none) !important;
-    line-height: 32px;
+    line-height: var(--tokens-input-h, 32px);
 }

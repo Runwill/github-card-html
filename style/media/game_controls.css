@@ -3,36 +3,17 @@
    Token 驱动，消费于 game/styles/game_widgets.css
    ═══════════════════════════════════════════════════════════ */
 
-/* ── 默认值（最大屏） ── */
 :root {
-  --gamecontrols-gap: var(--space-3xl);            /* 控件行间距 */
-  --gamecontrols-btn-minw: 140px;                  /* 按钮最小宽度 */
-  --gamecontrols-btn-padding: var(--space-sm) var(--space-md); /* 按钮内距 */
-  --gamecontrols-btn-fontsize: var(--fs-md);       /* 按钮文字大小 */
-  --gamecontrols-btn-minh: 0;                      /* 按钮最小高度 */
-  --gamecontrols-btn-lineheight: normal;           /* 按钮行高 */
+  --gamecontrols-gap: clamp(8px, calc(-2px + 1.15vw), 20px);            /* 控件行间距 */
+  --gamecontrols-btn-minw: clamp(40px, calc(-9.41px + 10.294vw), 140px); /* 按钮最小宽度 */
+  --gamecontrols-btn-padding: clamp(2px, calc(-3.294px + 1.103vw), 8px) clamp(2px, calc(-5.059px + 1.471vw), 10px); /* 按钮内距 */
+  --gamecontrols-btn-fontsize: clamp(9px, calc(6.353px + 0.552vw), 14px); /* 按钮文字大小 */
+  --gamecontrols-btn-minh: clamp(20px, calc(5.88px + 2.941vw), 36px);   /* 按钮最小高度 */
+  --gamecontrols-btn-lineheight: 1.2;                                  /* 按钮行高 */
 }
 
-/* ── 小桌面 / 平板 ── */
-@media (max-width: 1024px) {
-  :root {
-    --gamecontrols-gap: var(--space-sm);
-    --gamecontrols-btn-minw: 96px;
-    --gamecontrols-btn-padding: var(--space-sm) var(--space-md);
-    --gamecontrols-btn-fontsize: var(--fs-sm);
-    --gamecontrols-btn-minh: 36px;
-    --gamecontrols-btn-lineheight: 1.2;
-  }
-}
-
-/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
-@media (max-height: 399px), (max-width: 480px) {
-  :root {
-    --gamecontrols-gap: var(--space-md);
-    --gamecontrols-btn-minw: 40px;
-    --gamecontrols-btn-padding: 2px var(--space-3xs);
-    --gamecontrols-btn-fontsize: 9px;
-    --gamecontrols-btn-minh: 20px;
-    --gamecontrols-btn-lineheight: 1;
-  }
+html.force-landscape {
+  --gamecontrols-gap: clamp(8px, calc(-2px + 1.15vh), 20px);
+  --gamecontrols-btn-minw: clamp(40px, calc(-9.41px + 10.294vh), 140px);
+  --gamecontrols-btn-padding: clamp(2px, calc(-3.294px + 1.103vw), 8px) clamp(2px, calc(-5.059px + 1.471vh), 10px);
 }

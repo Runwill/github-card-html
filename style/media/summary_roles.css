@@ -3,81 +3,43 @@
    Token 驱动，消费于 game/styles/game_roles.css 等
    ═══════════════════════════════════════════════════════════ */
 
-/* ── 默认值（最小屏） ── */
 :root {
-  --role-avatar-size: 36px;           /* 头像尺寸 */
-  --role-summary-pad: 3px 4px;        /* 摘要卡内距（上下 左右） */
-  --role-summary-name-fs: 11px;       /* 摘要角色名字号 */
-  --role-summary-stats-minh: 24px;    /* 状态行最小高度 */
-  --role-summary-badge-fs: 10px;      /* HP/手牌数徽章字号 */
-  --role-summary-badge-minw: 20px;    /* 手牌数徽章最小宽 */
-  --role-badge-pad-v: var(--space-3xs);  /* 徽章上下内距 */
-  --role-badge-pad-h: var(--space-sm);   /* 徽章左右内距 */
-  --summary-detail-btn-size: 24px;    /* 摘要判定/装备按钮尺寸 */
-  --summary-detail-btn-fs: var(--fs-md); /* 摘要判定/装备按钮字号 */
+  --role-avatar-size: clamp(22px, calc(-2.44px + 6.586vh), 60px);       /* 头像尺寸 */
+  --role-summary-pad: clamp(1px, calc(-15.8px + 2.93vh), 12px) clamp(2px, calc(-32.1px + 5.495vh), 20px); /* 摘要卡内距 */
+  --role-summary-name-fs: clamp(8px, calc(-5.31px + 2.564vh), 19px);    /* 摘要角色名字号 */
+  --role-summary-stats-minh: clamp(16px, 3.323vh, 31.5px);             /* 状态行最小高度 */
+  --role-summary-badge-fs: clamp(7px, 1.793vh, 17px);                  /* HP/手牌数徽章字号 */
+  --role-summary-badge-minw: clamp(14px, 2.532vh, 24px);               /* 手牌数徽章最小宽 */
+  --role-badge-pad-v: clamp(0px, 0.211vh, 2px);                        /* 徽章上下内距 */
+  --role-badge-pad-h: clamp(2px, 0.844vh, 8px);                        /* 徽章左右内距 */
+  --role-badge-gap: clamp(2px, 0.422vh, 4px);
+  --role-badge-letter-spacing: clamp(0px, 0.053vh, 0.5px);
+  --role-badge-line-h: 1.15;
+  --summary-detail-btn-size: clamp(16px, calc(10.85px + 1.385vh), 24px); /* 摘要判定/装备按钮尺寸 */
+  --summary-detail-btn-fs: clamp(11px, calc(6.55px + 0.786vh), 14px);   /* 摘要判定/装备按钮字号 */
+  --char-stats-minh: clamp(16px, 3.376vh, 32px);
+  --player-judge-count-size: clamp(12px, 1.899vh, 18px);
+  --player-judge-count-fs: clamp(8px, 1.266vh, 12px);
+  --player-judge-count-offset: calc(var(--player-judge-count-size) * -0.222);
+  --player-judge-count-pad-h: calc(var(--player-judge-count-size) * 0.222);
 }
 
-/* ── 级别 1：小手机横屏 / 小平板竖屏 ── */
-@media (min-width: 480px) and (min-height: 400px) {
-  :root {
-    --role-avatar-size: 42px;
-    --role-summary-pad: 4px 5px;
-    --role-summary-name-fs: 12px;
-    --role-summary-stats-minh: 26px;
-    --role-summary-badge-fs: 11px;
-    --role-summary-badge-minw: 22px;
-  }
-}
-
-/* ── 级别 2：平板竖屏 / 小桌面（高度也需≥750） ── */
-@media (min-width: 768px) and (min-height: 750px) {
-  :root {
-    --role-avatar-size: 50px;
-    --role-summary-pad: 7px 9px;
-    --role-summary-name-fs: 14px;
-    --role-summary-stats-minh: 28px;
-    --role-summary-badge-fs: 13px;
-    --role-summary-badge-minw: 24px;
-  }
-}
-
-/* ── 级别 3：标准桌面（宽>1180 且 高≥750） ── */
-@media (min-width: 1181px) and (min-height: 750px) {
-  :root {
-    --role-avatar-size: 56px;
-    --role-summary-pad: 9px 12px;
-    --role-summary-name-fs: 16px;
-    --role-summary-stats-minh: 30px;
-    --role-summary-badge-fs: 15px;
-    --role-summary-badge-minw: 24px;
-  }
-}
-
-/* ── 级别 4：大桌面 ── */
-@media (min-width: 1280px) and (min-height: 750px) {
-  :root {
-    --role-avatar-size: 60px;
-    --role-summary-pad: 12px 20px;
-    --role-summary-name-fs: 19px;
-    --role-summary-stats-minh: 31.5px;
-    --role-summary-badge-fs: 17px;
-    --role-summary-badge-minw: 24px;
-  }
-}
-
-/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
-@media (max-height: 399px), (max-width: 480px) {
-  :root {
-    --role-avatar-size: 22px;
-    --role-summary-pad: 1px 2px;
-    --role-summary-name-fs: 8px;
-    --role-summary-stats-minh: 16px;
-    --role-summary-badge-fs: 7px;
-    --role-summary-badge-minw: 14px;
-    --role-badge-pad-v: 0px;
-    --role-badge-pad-h: 2px;
-    --summary-detail-btn-size: 16px;
-    --summary-detail-btn-fs: var(--fs-xs);
-    --char-stats-minh: 20px;
-  }
+html.force-landscape {
+  --role-avatar-size: clamp(22px, calc(-2.44px + 6.586vw), 60px);
+  --role-summary-pad: clamp(1px, calc(-15.8px + 2.93vw), 12px) clamp(2px, calc(-32.1px + 5.495vw), 20px);
+  --role-summary-name-fs: clamp(8px, calc(-5.31px + 2.564vw), 19px);
+  --role-summary-stats-minh: clamp(16px, 3.323vw, 31.5px);
+  --role-summary-badge-fs: clamp(7px, 1.793vw, 17px);
+  --role-summary-badge-minw: clamp(14px, 2.532vw, 24px);
+  --role-badge-pad-v: clamp(0px, 0.211vw, 2px);
+  --role-badge-pad-h: clamp(2px, 0.844vw, 8px);
+  --role-badge-gap: clamp(2px, 0.422vw, 4px);
+  --role-badge-letter-spacing: clamp(0px, 0.053vw, 0.5px);
+  --summary-detail-btn-size: clamp(16px, calc(10.85px + 1.385vw), 24px);
+  --summary-detail-btn-fs: clamp(11px, calc(6.55px + 0.786vw), 14px);
+  --char-stats-minh: clamp(16px, 3.376vw, 32px);
+  --player-judge-count-size: clamp(12px, 1.899vw, 18px);
+  --player-judge-count-fs: clamp(8px, 1.266vw, 12px);
+  --player-judge-count-offset: calc(var(--player-judge-count-size) * -0.222);
+  --player-judge-count-pad-h: calc(var(--player-judge-count-size) * 0.222);
 }

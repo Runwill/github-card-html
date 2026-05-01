@@ -390,12 +390,6 @@
 
 /* ── Responsive ────────────────────────────────────────────────────────── */
 
-@media (max-width: 1024px) {
-    #game-view-play {
-        flex-direction: column;
-    }
-}
-
 @media (max-width: 600px) {
     .setup-panel,
     #online-room-ui {

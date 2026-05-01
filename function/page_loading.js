@@ -12,6 +12,23 @@ const loadingTexts=[
 // 计算动态字间距的函数
 function calculateLetterSpacing(text){ const n=text.replace(/\s/g,'').length, base=1, len=6; return n<=len?base:Math.max(0.3, base*(len/n)) }
 
+let loadingTitleText=''
+function fitLoadingTitleLetterSpacing(title, base){
+    const bar=document.querySelector('.loading-bar-container')
+    if(!title || !bar) return base
+    title.style.letterSpacing=`${base}em`
+    const target=bar.getBoundingClientRect().width, width=title.getBoundingClientRect().width
+    const fontSize=parseFloat(getComputedStyle(title).fontSize)||1
+    const gaps=Math.max(Array.from(title.textContent||'').length-1,1)
+    if(!target || !width || width<=target) return base
+    return Math.max(0.3, base-((width-target)/(gaps*fontSize))-0.02)
+}
+function applyLoadingTitleSpacing(){
+    const title=document.getElementById('loading-title')
+    if(!title || !loadingTitleText) return
+    title.style.letterSpacing=`${fitLoadingTitleLetterSpacing(title, calculateLetterSpacing(loadingTitleText))}em`
+}
+
 // 计算动态进度条时间的函数
 function calculateProgressBarDuration(text){
     const last=sessionStorage.getItem('loading_last_shown'), now=Date.now();
@@ -34,11 +51,13 @@ function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 ;(async function(){
     await whenDOMReady(); await whenPartialsReady();
     const text=pickRandom(loadingTexts), title=document.getElementById('loading-title');
-    if(title){ title.textContent=text; title.style.letterSpacing=`${calculateLetterSpacing(text)}em`; }
+    if(title){ loadingTitleText=text; title.textContent=text; applyLoadingTitleSpacing(); }
     const dur=calculateProgressBarDuration(text), bar=document.querySelector('.loading-bar');
     if(bar){ bar.style.setProperty('--pb-duration', `${dur}s`); const end= dur<=1.2?0.88:Math.min(0.93,0.88+(dur-1.2)*0.08); bar.style.setProperty('--pb-end', String(end)); }
     setTimeout(startCompletionCheck, dur*900+800);
 })()
+
+window.addEventListener('resize', applyLoadingTitleSpacing)
 
 // 加载状态跟踪
 // domReady/resourcesReady/fontsReady/replacementsReady：四条件满足且 canComplete=true 时触发完成
@@ -116,7 +135,7 @@ window.addEventListener('load', ()=>{ resourcesReady=true; scheduleStatus(); att
             // 严格等待：全局字体就绪 + 关键字体（康熙）加载完毕
             const allFontsReady = document.fonts.ready
             const keyFontPromise = document.fonts.load("1em '康熙'").catch(()=>{})
-            Promise.all([allFontsReady, keyFontPromise]).then(()=>{ fontsReady=true; attemptCompletion() })
+            Promise.all([allFontsReady, keyFontPromise]).then(()=>{ applyLoadingTitleSpacing(); fontsReady=true; attemptCompletion() })
         } else {
             // 不支持 FontFaceSet：不阻塞完成
             fontsReady=true; attemptCompletion()

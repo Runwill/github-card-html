@@ -8,7 +8,7 @@
 .card-placeholder {
     width: var(--card-w, 100px);
     height: var(--card-h, 140px);
-    flex: 0 0 var(--card-w, 100px); 
+    flex: 0 0 var(--card-w, 100px);
     background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
@@ -25,14 +25,14 @@
         background var(--dur-moderate),
         color var(--dur-moderate);
         
-    font-size: 0.9rem;
+    font-size: var(--card-fs, 0.9rem);
     color: var(--text);
     font-weight: 500;
     user-select: none;
     position: relative;
     touch-action: none;
     text-align: center;
-    padding: var(--space-2xs);
+    padding: var(--card-pad, var(--space-2xs));
     
     /* Essential for ::before layering */
     overflow: hidden; 
@@ -152,7 +152,7 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     justify-content: center;
     font-weight: bold;
     opacity: 0.95;
-    font-size: 0.9rem;
+    font-size: var(--card-fs, 0.9rem);
     color: var(--text);
     background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%);
 }
@@ -214,8 +214,8 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     bottom: 110%; 
     left: 50%;
     transform: translateX(-50%);
-    width: 300px;
-    height: 160px;
+    width: calc(var(--card-w, 100px) * 3);
+    height: calc(var(--card-h, 140px) + var(--card-w, 100px) * 0.2);
     pointer-events: auto;
     display: none;
     perspective: 1000px;
@@ -228,10 +228,10 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
 
 .inspector-card {
     position: absolute;
-    bottom: 10px;
+    bottom: calc(var(--card-w, 100px) * 0.1);
     left: 50%;
-    width: 100px;
-    height: 140px;
+    width: var(--card-w, 100px);
+    height: var(--card-h, 140px);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
@@ -239,7 +239,7 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.9rem;
+    font-size: var(--card-fs, 0.9rem);
     font-weight: bold;
     color: var(--text);
     text-align: center;

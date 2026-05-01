@@ -23,7 +23,7 @@
     width: 100%;
     min-height: 100%; 
     flex: 1;
-    gap: var(--space-2xl);
+    gap: var(--table-layout-gap, var(--space-2xl));
 }
 
 .table-side-col {
@@ -60,19 +60,23 @@
 
 /* 牌堆行撑满 board-panel 剩余高度 */
 .board-area-row {
+    display: flex;
     flex: 1;
+    gap: var(--board-area-row-gap, 15px);
+    min-height: var(--board-area-row-minh, 140px);
     align-items: stretch !important; /* 覆盖 inline align-items:flex-start，让子元素垂直撑满 */
+    justify-content: center;
 }
 
 .game-board-panel h3 {
     margin-top: 0;
     color: var(--text-muted);
-    font-size: 1.1rem;
+    font-size: var(--board-title-fs, 1.1rem);
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.0625em;
     border-bottom: 2px solid var(--border);
-    padding-bottom: var(--space-md);
-    margin-bottom: 15px;
+    padding-bottom: var(--board-title-pad-b, var(--space-md));
+    margin-bottom: var(--board-title-gap, 15px);
 }
 
 /* Container Foundations */
@@ -81,7 +85,7 @@
 .player-hand .cards-container,
 .game-card-area {
     display: flex;
-    gap: var(--space-2xl);
+    gap: var(--cards-container-gap, var(--space-2xl));
     flex-wrap: wrap;
     min-height: calc(var(--card-h, 140px) + var(--cards-container-pad, 15px) * 2 + 4px); /* card-h + padding×2 + border×2 */
     width: 100%;
@@ -97,7 +101,24 @@
 }
 
 .treatment-area-wrappper {
+    flex: 0.8;
+    position: relative;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
     margin-bottom: 0; /* removed extra bottom gap for narrow/stacked layouts */
+}
+
+.board-pile-slot {
+    flex: 0 0 var(--board-pile-slot-w, var(--card-w, 100px));
+    width: var(--board-pile-slot-w, var(--card-w, 100px));
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 5;
 }
 
 /* Specific override for treatment container */
@@ -117,7 +138,7 @@
 /* Treatment area: subtle mover label beneath each card */
 .treatment-container .card-mover-label {
     position: absolute;
-    bottom: 2px;
+    bottom: var(--card-mover-label-offset, 2px);
     left: 0;
     right: 0;
     text-align: center;
@@ -127,7 +148,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding: 0 2px;
+    padding: 0 var(--card-mover-label-pad-x, 2px);
     color: var(--text-muted, #888);
 }
 
@@ -232,15 +253,15 @@ body.is-global-dragging .deck-slot {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60px;
-    height: 80px;
+    width: var(--deck-empty-w, 60px);
+    height: var(--deck-empty-h, 80px);
     border: 2px dashed var(--border);
     border-radius: var(--radius-sm) ;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--text-muted);
-    font-size: 0.7rem;
+    font-size: var(--deck-empty-fs, 0.7rem);
     font-weight: 600;
     opacity: 0.3;
     pointer-events: none;

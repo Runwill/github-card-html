@@ -3,18 +3,13 @@
    Token 驱动，消费于 style/footer.css
    ═══════════════════════════════════════════════════════════ */
 
-/* ── 默认值 ── */
 :root {
-  --footer-fs: var(--fs-base);              /* 页脚字号 */
-  --footer-pad: var(--space-sm) var(--space-lg); /* 页脚内距 */
-  --footer-gap: var(--space-md);            /* 页脚元素间距 */
+  --footer-fs: clamp(10px, calc(var(--fs-root, 20px) * 0.65), var(--fs-base, 13px)); /* 页脚字号 */
+  --footer-pad: clamp(2px, calc(-6px + 1.2vw), 8px) clamp(6px, calc(-14px + 2.5vw), 16px); /* 页脚内距 */
+  --footer-gap: clamp(6px, calc(-4px + 1.6vw), 10px); /* 页脚元素间距 */
 }
 
-/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
-@media (max-height: 399px), (max-width: 480px) {
-  :root {
-    --footer-fs: 10px;
-    --footer-pad: 2px var(--space-xs);
-    --footer-gap: var(--space-xs);
-  }
+html.force-landscape {
+  --footer-pad: clamp(2px, calc(-6px + 1.2vh), 8px) clamp(6px, calc(-14px + 2.5vh), 16px);
+  --footer-gap: clamp(6px, calc(-4px + 1.6vh), 10px);
 }

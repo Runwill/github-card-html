@@ -232,14 +232,18 @@ html[data-theme="dark"] {
 html, body { color: var(--text); }
 /* 让 html/body 覆盖满屏，避免短页面时出现“页面下方另一块底色” */
 /* dvh 优先：平板浏览器 100vh 含地址栏/工具栏后面的区域，比可见区域大，导致产生滚动 */
-html, body { min-height: 100vh; min-height: 100dvh; }/* 防止触屏设备（iPad 等）水平滑动到溢出区域（搜索栏等元素使用负偏移隐藏）
-   使用 clip 而非 hidden：clip 不会创建滚动容器，不影响 position:sticky */
-html, body { overflow-x: clip; }/* 使用 Flex 布局确保内容区域撑满剩余高度 */
+html, body { min-height: 100vh; min-height: 100dvh; }
+body:has(#panel_game.is-active) { height: 100vh; height: 100dvh; }
+/* 防止触屏设备（iPad 等）水平滑动到溢出区域（搜索栏等元素使用负偏移隐藏）
+  使用 clip 而非 hidden：clip 不会创建滚动容器，不影响 position:sticky */
+html, body { overflow-x: clip; }
+/* 使用 Flex 布局确保内容区域撑满剩余高度 */
 body { display: flex; flex-direction: column; }
-#main-content-row { flex: 1; display: flex; flex-direction: column; }
-#main-content-row > .columns { flex: 1; display: flex; flex-direction: column; }
-.tabs-content { flex: 1; display: flex; flex-direction: column; }
-.tabs-panel.is-active { flex: 1; overflow-x: clip; }
+#main-content-row { flex: 1; display: flex; flex-direction: column; min-height: 0; background: var(--surface); }
+#main-content-row > .columns { flex: 1; display: flex; flex-direction: column; min-height: 0; background: var(--surface); }
+.tabs-content { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+/* 长正文面板需要按内容撑开背景；对局面板在 game_layout.css 中单独收缩。 */
+.tabs-panel.is-active { flex: 1; min-height: auto; overflow-x: clip; }
 
 /* 同步 html 与 body 的背景，避免某些浏览器在 body 不满屏时显示不同底色 */
 /* 简写中包含 --bg-end 作为 background-color 兆底，避免平板端快速滚动时未栅格化区域显示黑色 */
@@ -500,8 +504,18 @@ html[data-theme="dark"] .btn.is-active:hover {
 #panel_character #search-input:focus,
 #panel_skill #search-input:focus { border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important; }
 
+:root {
+  --character-placeholder-min-h: clamp(280px, 52.743vh, 500px);
+  --approval-img-size: clamp(36px, 5.063vh, 52px);
+}
+
+html.force-landscape {
+  --character-placeholder-min-h: clamp(280px, 52.743vw, 500px);
+  --approval-img-size: clamp(36px, 5.063vw, 52px);
+}
+
 /* 面板内临时白底块统一随主题 */
-#panel_character #character-placeholder { height: 500px; background-color: var(--surface); }
+#panel_character #character-placeholder { min-height: var(--character-placeholder-min-h, 500px); background-color: var(--surface); }
 
 /* 草稿面板：继承父级色彩，并对输入框做主题化 */
 #panel_draft,
@@ -552,7 +566,7 @@ html[data-theme="dark"] .btn.is-active:hover {
 .tokens-log code.log-code { background: var(--panel-header-bg) !important; border-color: var(--border) !important; color: var(--text) !important; }
 
 /* Tokens 主面板占满可视高度，避免底部露出背景色差 */
-:root { --header-height: 64px; }
+:root { --header-height: calc(var(--fs-root, 20px) * 3.2); }
 #panel_tokens { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
 #panel_permissions { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
 
@@ -569,7 +583,7 @@ html[data-theme="dark"] .btn.is-active:hover {
   border-radius: var(--radius-sm); background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
 }
 .approval-left { display: flex; align-items: center; gap: var(--space-md); }
-.approval-img { width: 48px; height: 48px; border-radius: var(--radius-full); object-fit: cover; border: 1px solid var(--border) !important; background: var(--surface) !important; }
+.approval-img { width: var(--approval-img-size, 48px); height: var(--approval-img-size, 48px); border-radius: var(--radius-full); object-fit: cover; border: 1px solid var(--border) !important; background: var(--surface) !important; }
 .approval-title { font-weight: 600; color: var(--text) !important; }
 .approval-sub { font-size: var(--fs-sm); color: var(--text-subtle) !important; }
 .approval-right { display: flex; gap: var(--space-sm); }

@@ -66,6 +66,7 @@
     background: rgba(245, 101, 101, 0.1);
     padding: var(--role-badge-pad-v) var(--role-badge-pad-h);
     border-radius: var(--radius-lg);
+    line-height: var(--role-badge-line-h, 1.15);
 }
 
 /* Table Layout (Opponents) */
@@ -105,7 +106,7 @@
     box-shadow: 0 4px 12px var(--shadow-1);
     border: 1px solid var(--border);
     display: flex;
-    gap: var(--space-4xl);
+    gap: var(--current-panel-gap, var(--space-4xl));
     /* Merged Layout */
     flex-direction: row;
     align-items: center;
@@ -173,7 +174,7 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
 
 .char-stats {
     display: flex;
-    gap: var(--space-2xs);
+    gap: var(--role-badge-gap, var(--space-2xs));
     align-items: center;
     justify-content: var(--char-stats-justify, flex-start);
 }
@@ -190,15 +191,16 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     padding: var(--role-badge-pad-v) var(--role-badge-pad-h);
     border-radius: var(--radius-lg) ;
     min-width: var(--role-summary-badge-minw, 24px);
-    height: fit-content;
+    height: auto;
+    line-height: var(--role-badge-line-h, 1.15);
     font-weight: 700;
     font-size: var(--role-summary-badge-fs, 0.85rem);
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.5px;
+    letter-spacing: var(--role-badge-letter-spacing, 0.5px);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2xs);
+    gap: var(--role-badge-gap, var(--space-2xs));
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     box-shadow: 0 2px 4px var(--shadow-1, rgba(0,0,0,0.1));
@@ -239,10 +241,10 @@ body.is-global-dragging #hand-cards-container {
 
 /* Timing Badge */
 .timing-badge {
-    font-size: 1.2rem;
+    font-size: var(--timing-badge-fs, 1.2rem);
     font-weight: 700;
     color: var(--text);
-    padding: var(--space-xs) var(--space-2xl);
+    padding: var(--timing-badge-pad, var(--space-xs) var(--space-2xl));
     background: var(--surface);
     border-radius: var(--radius-2xl);
     border: 1px solid transparent;
@@ -251,9 +253,12 @@ body.is-global-dragging #hand-cards-container {
     align-items: center;
     justify-content: center;
     letter-spacing: 0.02em;
-    line-height: 1.4;
-    min-height: 44px;
-    white-space: nowrap;
+    line-height: 1.2;
+    min-height: var(--timing-badge-minh, 44px);
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    white-space: normal;
     flex-shrink: 0;
     margin-left: 0;
     width: 100%;
@@ -376,7 +381,7 @@ html[data-theme="dark"] .judge-detail-btn:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2xs);
+    gap: var(--role-badge-gap, var(--space-2xs));
     
     /* Initial Hidden State */
     opacity: 0;
@@ -447,7 +452,7 @@ html[data-theme="dark"] .judge-detail-btn:active {
 .char-stats {
     position: relative; /* Context for absolute buttons */
     min-height: var(--char-stats-minh, 32px);  /* Maintain height */
-    min-width: 60px;   /* Maintain minimal width for buttons */
+    min-width: calc(var(--detail-btn-size, 24px) * 2 + var(--role-badge-gap, var(--space-2xs)));   /* Maintain minimal width for buttons */
 }
 /* Sidebar Container Adjustment */
 .player-stats-row {

@@ -3,16 +3,12 @@
    Token 驱动，消费于 game_cards.css / viewer 等
    ═══════════════════════════════════════════════════════════ */
 
-/* ── 默认值（最小屏） ── */
 :root {
-  --card-mover-label-fs: 10px;        /* 处理区角色名字号 */
+  --card-mover-label-fs: clamp(7px, calc(3.054px + 0.733vh), 10px);        /* 处理区角色名字号 */
+  --viewer-modal-pad: clamp(6px, calc(var(--card-w, 100px) * 0.2), 20px);
+  --viewer-body-pad: clamp(6px, calc(var(--card-w, 100px) * 0.2), 20px);
 }
 
-/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
-@media (max-height: 399px), (max-width: 480px) {
-  :root {
-    --card-mover-label-fs: 7px;
-    --viewer-modal-pad: var(--space-xs);
-    --viewer-body-pad: var(--space-xs);
-  }
+html.force-landscape {
+  --card-mover-label-fs: clamp(7px, calc(3.054px + 0.733vw), 10px);
 }

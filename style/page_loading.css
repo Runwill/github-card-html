@@ -1,4 +1,8 @@
 /* 加载动画样式 */
+:root {
+    --loading-fs: clamp(15px, calc(var(--fs-root, 20px) * 0.9), 18px);
+}
+
 #loading-overlay {
     position: fixed;
     z-index: var(--z-loading);
@@ -19,6 +23,7 @@
     align-items: center;
     position: relative;
     width: 100%;
+    font-size: var(--loading-fs, 18px);
 }
 
 #loading-overlay.fade-out {
@@ -37,11 +42,11 @@
 
 .loading-bar-container {
     width: 39%;
-    /* 保证进度条在小屏下也不会太短，可按需调大或通过 CSS 变量覆盖 */
-    min-width: min(260px, 82%);
+    /* 小屏按最长加载标题兜底，桌面仍保持 39% 的留白比例 */
+    min-width: min(25.5em, 86%); /* 459/18 */
     /* 可选上限，防止超宽屏过长 */
     max-width: 86%;
-    height: 8px;
+    height: 0.444em; /* 8/18 */
     background: color-mix(in srgb, var(--surface) 86%, transparent);
     border: 1px solid var(--border);
     border-radius: var(--radius-sm) ;
@@ -77,7 +82,7 @@
 }
 
 .loading-title {
-    margin-bottom: 18px;
+    margin-bottom: 0.667em; /* 18/27 */
     font-size: 1.5em;
     color: color-mix(in srgb, var(--text) 55%, transparent);
     letter-spacing: 1em;
@@ -90,10 +95,11 @@
 
 .loading-status {
     position: absolute;
+    top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    margin-top: 10px;
-    font-size: 11px;
+    margin-top: 0.909em; /* 10/11 */
+    font-size: 0.611em;  /* 11/18 */
     color: color-mix(in srgb, var(--text) 30%, transparent);
     letter-spacing: 0.05em;
     opacity: 0;

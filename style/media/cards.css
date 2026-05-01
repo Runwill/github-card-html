@@ -3,42 +3,33 @@
    Token 驱动，消费于 game_cards.css 等
    ═══════════════════════════════════════════════════════════ */
 
-/* ── 默认值（最小屏） ── */
 :root {
-  --card-w: 70px;             /* 牌宽 */
-  --card-h: 98px;             /* 牌高（宽×1.4） */
-  --cards-container-pad: 15px; /* 牌容器内距 */
+  --card-w: clamp(40px, min(7.322vw, 10.548vh), 100px);             /* 牌宽 */
+  --card-h: calc(var(--card-w) * 1.4);                              /* 牌高（宽×1.4） */
+  --card-fs: clamp(7px, min(0.9rem, calc(var(--card-w) * 0.27)), 0.9rem); /* 牌文字字号 */
+  --card-pad: clamp(2px, calc(var(--card-w) * 0.05), 5px);           /* 牌内距 */
+  --cards-container-pad: clamp(2px, calc(var(--card-w) * 0.15), 15px); /* 牌容器内距 */
+  --cards-container-gap: clamp(4px, calc(var(--card-w) * 0.16), 16px); /* 牌容器间距 */
+  --board-area-row-gap: clamp(6px, calc(var(--card-w) * 0.15), 15px); /* 牌堆行间距 */
+  --board-pile-slot-w: var(--card-w);                               /* 牌堆列宽 */
+  --board-title-fs: clamp(10px, min(0.8rem, calc(var(--card-w) * 0.16)), 0.8rem); /* 牌区标题字号 */
+  --board-title-pad-b: clamp(4px, calc(var(--card-w) * 0.1), 10px);
+  --board-title-gap: clamp(6px, calc(var(--card-w) * 0.15), 15px);
+  --card-mover-label-offset: clamp(1px, calc(var(--card-w) * 0.02), 2px);
+  --card-mover-label-pad-x: clamp(1px, calc(var(--card-w) * 0.02), 2px);
+  --deck-empty-w: clamp(30px, calc(var(--card-w) * 0.6), 60px);
+  --deck-empty-h: calc(var(--deck-empty-w) * 1.333);
+  --deck-empty-fs: clamp(7px, min(0.7rem, calc(var(--card-w) * 0.14)), 0.7rem);
+  --viewer-mask-w: clamp(36px, calc(var(--card-w) * 0.6), 60px);
+  --viewer-content-extra-w: clamp(20px, calc(var(--card-w) * 0.4), 40px);
+  --viewer-grid-minw: clamp(calc(var(--card-w) * 1.4), calc(var(--card-w) * 3.5), 350px);
+  --viewer-grid-extra-h: clamp(10px, calc(var(--card-w) * 0.2), 20px);
+  --viewer-index-badge-fs: clamp(7px, calc(var(--card-w) * 0.1), 10px);
+  --viewer-index-badge-pad-y: clamp(1px, calc(var(--card-w) * 0.02), 2px);
+  --viewer-index-badge-pad-x: clamp(3px, calc(var(--card-w) * 0.05), 5px);
 }
 
-/* ── 级别 1：小手机横屏 / 小平板竖屏 ── */
-@media (min-width: 480px) and (min-height: 400px) {
-  :root {
-    --card-w: 80px;
-    --card-h: 112px;
-  }
-}
-
-/* ── 级别 2：平板竖屏 / 小桌面（高度也需≥750） ── */
-@media (min-width: 768px) and (min-height: 750px) {
-  :root {
-    --card-w: 90px;
-    --card-h: 126px;
-  }
-}
-
-/* ── 级别 3：标准桌面（宽>1180 且 高≥750） ── */
-@media (min-width: 1181px) and (min-height: 750px) {
-  :root {
-    --card-w: 100px;
-    --card-h: 140px;
-  }
-}
-
-/* ── 紧凑视口（手机竖屏 / 极矮视口） ── */
-@media (max-height: 399px), (max-width: 480px) {
-  :root {
-    --card-w: 50px;
-    --card-h: 70px;
-    --cards-container-pad: 2px;
-  }
+html.force-landscape {
+  --card-w: clamp(40px, min(7.322vh, 10.548vw), 100px);
+  --card-h: calc(var(--card-w) * 1.4);
 }

@@ -259,7 +259,8 @@
 
 /* 页面面板（登录页） */
 .panel--page {
-  padding: 22px 20px;
+  font-size: var(--login-panel-fs, var(--modal-fs-lg, var(--fs-lg, 15px)));
+  padding: 1.467em 1.333em;
   border-radius: var(--radius-lg) ;
   box-shadow: var(--shadow-soft);
   transition: opacity var(--dur-moderate) var(--ease-default), transform var(--dur-moderate) var(--ease-default), visibility var(--dur-instant) linear var(--dur-moderate);
