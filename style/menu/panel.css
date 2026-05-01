@@ -55,8 +55,15 @@
  *   2.4em   = 36/15  最小高度
  * -------------------------------------------------- */
 .menu__button {
-  transition: all var(--dur-normal) var(--ease-standard) !important;
+  transition:
+    left var(--dur-normal) var(--ease-standard),
+    background-color var(--dur-normal) var(--ease-standard),
+    color var(--dur-normal) var(--ease-standard),
+    border-color var(--dur-normal) var(--ease-standard),
+    box-shadow var(--dur-normal) var(--ease-standard) !important;
   font-weight: 500 !important;
+  position: relative;
+  left: 0;
   width: 100%;
   text-align: left;
   padding: 0.8em 1.067em;
@@ -73,8 +80,8 @@
 }
 
 .menu__button:hover {
+  left: 0.267em;
   background-color: var(--bg-start, #f7fafc) !important;
-  transform: translateX(4px);
   color: var(--primary-2, #7084ff) !important;
 }
 
