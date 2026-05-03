@@ -33,6 +33,7 @@
     let _snapshot = null;
     // areaPath -> [ { el, rect } ]  布局快照
     let _layoutSnapshot = null;
+    let _fallbackCardSize = null;
 
     // ─── 区域 → DOM 容器映射 ─────────────────────────────────────────────
     /**
@@ -136,12 +137,18 @@
     }
 
     function getFallbackCardSize() {
+        if (_fallbackCardSize) return _fallbackCardSize;
         const cs = getComputedStyle(document.documentElement);
         const sample = document.querySelector('.card-placeholder');
         const sampleRect = sample ? sample.getBoundingClientRect() : null;
         const width = parseCssPx(cs.getPropertyValue('--card-w'), sampleRect && sampleRect.width || 100);
         const height = parseCssPx(cs.getPropertyValue('--card-h'), sampleRect && sampleRect.height || width * 1.4);
-        return { width, height };
+        _fallbackCardSize = { width, height };
+        return _fallbackCardSize;
+    }
+
+    function resetFallbackCardSize() {
+        _fallbackCardSize = null;
     }
 
     function makeCardRectAtAnchor(anchor) {
@@ -166,10 +173,14 @@
 
     function getCardElementAppearance(el) {
         if (!el) return null;
-        const clone = el.cloneNode(true);
-        clone.querySelectorAll('.card-mover-label').forEach(node => node.remove());
+        let innerHTML = el.innerHTML;
+        if (el.querySelector('.card-mover-label')) {
+            const clone = el.cloneNode(true);
+            clone.querySelectorAll('.card-mover-label').forEach(node => node.remove());
+            innerHTML = clone.innerHTML;
+        }
         return {
-            innerHTML: clone.innerHTML,
+            innerHTML,
             dataCardKey: el.getAttribute('data-card-key') || ''
         };
     }
@@ -188,6 +199,7 @@
      * @param {Object} payload  { cardId, fromAreaPath, toAreaPath }
      */
     function snapshotBeforeMove(payload) {
+        resetFallbackCardSize();
         _snapshot = {};
         _layoutSnapshot = {};
 
@@ -256,6 +268,7 @@
      */
     function animateAfterMove(payload) {
         if (!_snapshot) return;
+        resetFallbackCardSize();
         const { cardId, toAreaPath } = payload;
         const snap = _snapshot[cardId];
         const E = window.Game.UI._CardMoveEngine;
@@ -342,6 +355,7 @@
         getFallbackAnchor,
         getFallbackRect,
         getCardElementAppearance,
+        resetFallbackCardSize,
     };
 
     // ─── 导出 ─────────────────────────────────────────────────────────────

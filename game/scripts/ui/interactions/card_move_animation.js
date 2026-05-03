@@ -48,22 +48,25 @@
         const sourceAppearance = snap && snap.appearance;
         const snapTargetAppearance = snap && snap.targetAppearance;
 
+        const srcFace = sourceAppearance && sourceAppearance.dataCardKey && sourceAppearance.dataCardKey !== 'CardBack';
+
         // 移动后目标元素的外观（updateUI 已执行）
         let targetAppearance = null;
-        const toContainer = getContainerForArea(toAreaPath);
-        const toAreaObj = _resolveAreaLocal(toAreaPath);
-        if (toContainer && toAreaObj) {
-            const tEl = findCardElement(toContainer, cardId, toAreaObj);
-            if (tEl) {
-                const key = tEl.getAttribute('data-card-key');
-                if (key && key !== 'CardBack') {
-                    targetAppearance = getCardElementAppearance ? getCardElementAppearance(tEl) : { innerHTML: tEl.innerHTML, dataCardKey: key };
+        if (!srcFace) {
+            const toContainer = getContainerForArea(toAreaPath);
+            const toAreaObj = _resolveAreaLocal(toAreaPath);
+            if (toContainer && toAreaObj) {
+                const tEl = findCardElement(toContainer, cardId, toAreaObj);
+                if (tEl) {
+                    const key = tEl.getAttribute('data-card-key');
+                    if (key && key !== 'CardBack') {
+                        targetAppearance = getCardElementAppearance ? getCardElementAppearance(tEl) : { innerHTML: tEl.innerHTML, dataCardKey: key };
+                    }
                 }
             }
         }
 
         // 只要任一端可见就用牌面，否则牌背
-        const srcFace = sourceAppearance && sourceAppearance.dataCardKey && sourceAppearance.dataCardKey !== 'CardBack';
         const targetFace = targetAppearance && targetAppearance.dataCardKey && targetAppearance.dataCardKey !== 'CardBack';
         const snapTargetFace = snapTargetAppearance && snapTargetAppearance.dataCardKey && snapTargetAppearance.dataCardKey !== 'CardBack';
         const finalAppearance = srcFace ? sourceAppearance
@@ -256,14 +259,19 @@
                     el.style.transition = `transform ${CONFIG.layoutDuration}ms ${CONFIG.easing}`;
                     el.style.transform = '';
 
+                    let cleanupTimer = null;
                     const cleanup = () => {
+                        if (cleanupTimer != null) {
+                            clearTimeout(cleanupTimer);
+                            cleanupTimer = null;
+                        }
                         el.style.transition = '';
                         el.style.transform = '';
                         el.removeEventListener('transitionend', cleanup);
                     };
                     el.addEventListener('transitionend', cleanup, { once: true });
                     // Fallback cleanup
-                    setTimeout(cleanup, CONFIG.layoutDuration + 50);
+                    cleanupTimer = setTimeout(cleanup, CONFIG.layoutDuration + 50);
                 });
             });
         });
