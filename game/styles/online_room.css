@@ -329,10 +329,8 @@
     margin-bottom: var(--game-online-label-gap, var(--space-2xs));
 }
 
-#role-list-top .online-viewer-labels {
-    top: var(--game-online-label-gap, 2px);
-    bottom: auto;
-    margin-bottom: 0;
+#role-list-top.has-online-viewers {
+    padding-top: var(--game-online-label-reserve, calc(var(--game-online-xs-fs, var(--fs-xs)) * 1.8 + var(--game-online-label-gap, 2px)));
 }
 
 .online-viewer-label {

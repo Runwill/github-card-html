@@ -130,6 +130,50 @@
         return areaObj.cards.find(c => c && c.id === cardId) || null;
     }
 
+    function parseCssPx(value, fallback) {
+        const num = parseFloat(value);
+        return Number.isFinite(num) && num > 0 ? num : fallback;
+    }
+
+    function getFallbackCardSize() {
+        const cs = getComputedStyle(document.documentElement);
+        const sample = document.querySelector('.card-placeholder');
+        const sampleRect = sample ? sample.getBoundingClientRect() : null;
+        const width = parseCssPx(cs.getPropertyValue('--card-w'), sampleRect && sampleRect.width || 100);
+        const height = parseCssPx(cs.getPropertyValue('--card-h'), sampleRect && sampleRect.height || width * 1.4);
+        return { width, height };
+    }
+
+    function makeCardRectAtAnchor(anchor) {
+        if (!anchor) return null;
+        const anchorRect = anchor.getBoundingClientRect();
+        const size = getFallbackCardSize();
+        const left = anchorRect.left + anchorRect.width / 2 - size.width / 2;
+        const top = anchorRect.top + anchorRect.height / 2 - size.height / 2;
+        return {
+            left,
+            top,
+            width: size.width,
+            height: size.height,
+            right: left + size.width,
+            bottom: top + size.height
+        };
+    }
+
+    function getFallbackRect(areaPath) {
+        return makeCardRectAtAnchor(getFallbackAnchor(areaPath));
+    }
+
+    function getCardElementAppearance(el) {
+        if (!el) return null;
+        const clone = el.cloneNode(true);
+        clone.querySelectorAll('.card-mover-label').forEach(node => node.remove());
+        return {
+            innerHTML: clone.innerHTML,
+            dataCardKey: el.getAttribute('data-card-key') || ''
+        };
+    }
+
     function getModelAppearance(card, areaObj) {
         if (!card || !window.Game.UI.getCardAppearanceForArea) return null;
         return window.Game.UI.getCardAppearanceForArea(card, areaObj, { forceFaceDown: false });
@@ -162,17 +206,13 @@
             const el = findCardElement(fromContainer, cardId, fromAreaObj);
             if (el) {
                 cardRect = el.getBoundingClientRect();
-                cardAppearance = {
-                    innerHTML: el.innerHTML,
-                    dataCardKey: el.getAttribute('data-card-key') || ''
-                };
+                cardAppearance = getCardElementAppearance(el);
             }
         }
 
         // 如果在容器中找不到（未渲染），使用 fallback 锚点
         if (!cardRect) {
-            const anchor = getFallbackAnchor(fromAreaPath);
-            if (anchor) cardRect = anchor.getBoundingClientRect();
+            cardRect = getFallbackRect(fromAreaPath);
         }
 
         if (!cardAppearance) {
@@ -263,8 +303,7 @@
         }
 
         if (!targetRect) {
-            const anchor = getFallbackAnchor(toAreaPath);
-            if (anchor) targetRect = anchor.getBoundingClientRect();
+            targetRect = getFallbackRect(toAreaPath);
         }
 
         if (!targetRect) { E.cleanup(); return; }
@@ -301,6 +340,8 @@
         getContainerForArea,
         findCardElement,
         getFallbackAnchor,
+        getFallbackRect,
+        getCardElementAppearance,
     };
 
     // ─── 导出 ─────────────────────────────────────────────────────────────

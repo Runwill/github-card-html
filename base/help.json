@@ -32,7 +32,8 @@
     ],
     "game-settings-modal": [
       { "keys": ["时机速度"], "desc": "help.gameset.speed" },
-      { "keys": ["拖动惯性"], "desc": "help.gameset.inertia" }
+      { "keys": ["拖动惯性"], "desc": "help.gameset.inertia" },
+      { "keys": ["重置"], "desc": "help.gameset.reset" }
     ],
     "update-account-modal": [
       { "keys": ["旧密码"], "desc": "help.password.old" },
@@ -98,13 +99,15 @@
       { "keys": ["缩略/详细"], "desc": "help.tokens.compact" },
       { "keys": ["点击值"], "desc": "help.tokens.inlineEdit" },
       { "keys": ["跳转按钮"], "desc": "help.tokens.go" },
-      { "keys": ["日志面板"], "desc": "help.tokens.logs" }
+      { "keys": ["日志面板"], "desc": "help.tokens.logs" },
+      { "keys": ["日志操作"], "desc": "help.tokens.logOps" }
     ],
     "panel_permissions": [
       { "keys": ["搜索框"], "desc": "help.perm.search" },
       { "keys": ["部分/完全"], "desc": "help.perm.mode" },
       { "keys": ["用户条目"], "desc": "help.perm.userRow" },
-      { "keys": ["日志"], "desc": "help.perm.logs" }
+      { "keys": ["日志"], "desc": "help.perm.logs" },
+      { "keys": ["日志筛选"], "desc": "help.perm.logFilter" }
     ],
     "panel_game": {
       "common": [
@@ -113,6 +116,7 @@
       ],
       "setup": [
         { "keys": ["座位数"], "desc": "help.game.setupSeats" },
+        { "keys": ["武将选择"], "desc": "help.game.setupCharacters" },
         { "keys": ["牌堆预设"], "desc": "help.game.setupPreset" },
         { "keys": ["模式切换"], "desc": "help.game.setupMode" },
         { "keys": ["旁观开关"], "desc": "help.game.setupSpectate" },
@@ -121,13 +125,26 @@
       "online": [
         { "keys": ["创建房间"], "desc": "help.game.onlineCreate" },
         { "keys": ["房间列表"], "desc": "help.game.onlineList" },
+        { "keys": ["进入 / 加入"], "desc": "help.game.onlineEnter" },
+        { "keys": ["返回大厅"], "desc": "help.game.onlineBack" },
+        { "keys": ["解散房间"], "desc": "help.game.onlineDissolve" },
+        { "keys": ["成员列表"], "desc": "help.game.onlineMembers" },
         { "keys": ["旁观 / 离开"], "desc": "help.game.onlineActions" }
       ],
       "play": [
-        { "keys": ["拖拽手牌"], "desc": "help.game.drag" },
-        { "keys": ["右键"], "desc": "help.game.context" },
+        { "keys": ["拖拽卡牌"], "desc": "help.game.drag" },
+        { "keys": ["拖到摘要"], "desc": "help.game.dragToSummary" },
+        { "keys": ["悬停摘要"], "desc": "help.game.dragSummaryJudge" },
+        { "keys": ["点击摘要"], "desc": "help.game.summaryHand" },
+        { "keys": ["长按摘要"], "desc": "help.game.summaryJudge" },
+        { "keys": ["判 / 備"], "desc": "help.game.areaButtons" },
+        { "keys": ["牌堆 / 弃牌堆"], "desc": "help.game.pileViewer" },
+        { "keys": ["区域窗口"], "desc": "help.game.viewerWindow" },
+        { "keys": ["装备窗口"], "desc": "help.game.equipViewer" },
+        { "keys": ["右键卡牌"], "desc": "help.game.cardContext" },
+        { "keys": ["右键角色"], "desc": "help.game.roleContext" },
         { "keys": ["检查键 (按住)"], "desc": "help.game.inspect" },
-        { "keys": ["角色摘要"], "desc": "help.game.roleSummary" },
+        { "keys": ["玩家徽标"], "desc": "help.game.viewerBadges" },
         { "keys": ["时机/日志"], "desc": "help.game.timing" }
       ]
     }

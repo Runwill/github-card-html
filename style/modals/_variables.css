@@ -32,9 +32,10 @@
   /* 专用弹窗尺寸 */
   --ann-modal-w: clamp(360px, 39.749vw, 780px);          /* 760px */
   --ann-content-max-h: clamp(240px, 65vh, 616px);        /* 616px */
+  --help-inset: 0.923em;                                 /* 12/13 */
   --help-w: clamp(260px, 19.874vw, 380px);               /* 380px */
-  --help-safe-w: calc(100vw - 1.846em);
-  --help-max-h: clamp(220px, 55vh, 520px);
+  --help-safe-w: calc(100dvw - var(--help-inset) - var(--help-inset));
+  --help-max-h: calc(100dvh - var(--help-inset) - var(--help-inset));
   --avatar-preview-size: clamp(120px, 18.987vh, 180px);  /* 180px */
   --avatar-pending-size: clamp(56px, 8.439vh, 88px);     /* 80px */
   --avatar-crop-w: clamp(360px, 37.657vw, 720px);        /* 720px */
@@ -69,8 +70,8 @@ html.force-landscape {
   --ann-modal-w: clamp(360px, 39.749vh, 780px);
   --ann-content-max-h: clamp(240px, 65vw, 616px);
   --help-w: clamp(260px, 19.874vh, 380px);
-  --help-safe-w: calc(100vh - 1.846em);
-  --help-max-h: clamp(220px, 55vw, 520px);
+  --help-safe-w: calc(100dvh - var(--help-inset) - var(--help-inset));
+  --help-max-h: calc(100dvw - var(--help-inset) - var(--help-inset));
   --avatar-preview-size: clamp(120px, 18.987vw, 180px);
   --avatar-pending-size: clamp(56px, 8.439vw, 88px);
   --avatar-crop-w: clamp(360px, 37.657vh, 720px);

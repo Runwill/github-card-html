@@ -276,11 +276,18 @@
      */
     function updateViewerLabels(avatarContainer, playerIndex) {
         if (!avatarContainer) return;
+
+        const syncTopRowReserve = () => {
+            const topRow = avatarContainer.closest && avatarContainer.closest('#role-list-top');
+            if (!topRow) return;
+            topRow.classList.toggle('has-online-viewers', !!topRow.querySelector('.online-viewer-labels'));
+        };
         
         const gs = window.Game.GameState;
         if (!gs || !gs.onlineMode) {
             const existing = avatarContainer.querySelector('.online-viewer-labels');
             if (existing) existing.remove();
+            syncTopRowReserve();
             return;
         }
         
@@ -291,6 +298,7 @@
 
         if (viewers.length === 0) {
             if (container) container.remove();
+            syncTopRowReserve();
             return;
         }
 
@@ -307,6 +315,7 @@
                 `<span class="online-viewer-label${v.spectating ? ' is-spectator' : ''}">${v.username}</span>`
             ).join('');
         }
+        syncTopRowReserve();
     }
 
     // Expose utilities for sibling renderer files

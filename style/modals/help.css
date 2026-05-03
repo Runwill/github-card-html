@@ -1,10 +1,11 @@
 /* 上下文帮助浮层 */
 .help-popover {
   position: fixed;
-  bottom: 0.923em; /* 12/13 */
-  right: 0.923em;
-  width: min(var(--help-w, 380px), var(--help-safe-w, calc(100vw - 1.846em)));
-  max-height: var(--help-max-h, 55vh);
+  bottom: var(--help-inset, 0.923em);
+  right: var(--help-inset, 0.923em);
+  box-sizing: border-box;
+  width: min(var(--help-w, 380px), var(--help-safe-w, calc(100dvw - 1.846em)));
+  max-height: var(--help-max-h, calc(100dvh - 1.846em));
   font-size: var(--modal-fs-base, var(--fs-base));
   display: flex;
   flex-direction: column;
@@ -14,7 +15,7 @@
   box-shadow: 0 8px 32px rgba(0,0,0,.18);
   z-index: 9999;
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(0.75em);
   pointer-events: none;
   transition: opacity var(--dur-normal) var(--ease-default),
               transform var(--dur-normal) var(--ease-default);
@@ -57,6 +58,7 @@
 .help-popover__body {
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
   padding: 0.615em 0.769em;
 }
 

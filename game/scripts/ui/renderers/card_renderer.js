@@ -89,8 +89,7 @@
             const contentWidth = Math.max(0, container.clientWidth - padL - padR);
             const cardWidth = getCardWidth(cards);
             const maxGap = clamp(4, cardWidth * 0.1, 10);
-            const minVisibleSpine = clamp(20, cardWidth * 0.3, 30);
-            const minMargin = minVisibleSpine - cardWidth;
+            const minMargin = -cardWidth;
             const availableMargin = (contentWidth - cards.length * cardWidth) / (cards.length - 1);
             const nextMargin = clamp(minMargin, availableMargin, maxGap);
 

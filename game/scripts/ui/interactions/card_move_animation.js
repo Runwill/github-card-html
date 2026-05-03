@@ -8,7 +8,32 @@
     "use strict";
 
     const I = window.Game.UI._CardMoveInternal;
-    const { CONFIG, getContainerForArea, findCardElement } = I;
+    const { CONFIG, getContainerForArea, findCardElement, getFallbackAnchor, getCardElementAppearance } = I;
+
+    function getPlayerIndexFromAreaPath(areaPath) {
+        if (!areaPath) return null;
+        const parts = areaPath.split(':');
+        if (parts[0] !== 'player') return null;
+        const index = parseInt(parts[1]);
+        return Number.isFinite(index) ? index : null;
+    }
+
+    function getSummaryLoopVector(fromAreaPath, toAreaPath, fromRect, toRect) {
+        if (getPlayerIndexFromAreaPath(fromAreaPath) !== getPlayerIndexFromAreaPath(toAreaPath)) return null;
+
+        const centerDx = Math.abs((fromRect.left + fromRect.width / 2) - (toRect.left + toRect.width / 2));
+        const centerDy = Math.abs((fromRect.top + fromRect.height / 2) - (toRect.top + toRect.height / 2));
+        if (centerDx > 2 || centerDy > 2) return null;
+
+        const anchor = getFallbackAnchor && getFallbackAnchor(toAreaPath);
+        const summary = anchor && anchor.closest ? anchor.closest('.role-summary') : null;
+        if (!summary) return null;
+
+        const distance = Math.max(fromRect.width * 0.85, 24);
+        if (summary.closest('#role-list-left')) return { x: distance, y: 0 };
+        if (summary.closest('#role-list-right')) return { x: -distance, y: 0 };
+        return { x: 0, y: Math.max(fromRect.height * 0.55, 24) };
+    }
 
     // ─── 弧形飞行动画 ─────────────────────────────────────────────────────
 
@@ -32,7 +57,7 @@
             if (tEl) {
                 const key = tEl.getAttribute('data-card-key');
                 if (key && key !== 'CardBack') {
-                    targetAppearance = { innerHTML: tEl.innerHTML, dataCardKey: key };
+                    targetAppearance = getCardElementAppearance ? getCardElementAppearance(tEl) : { innerHTML: tEl.innerHTML, dataCardKey: key };
                 }
             }
         }
@@ -77,14 +102,23 @@
         let ey = toRect.top + toRect.height / 2;
 
         // 弧线控制点：垂直于 start→end 向量，偏移 bulge*chordLength
-        const dx = ex - sx, dy = ey - sy;
-        const chord = Math.sqrt(dx * dx + dy * dy);
-        const bulge = chord * CONFIG.arcBulge;
-        // 法向量（左手边 = 向上/左弯）
-        const nx = -dy / (chord || 1);
-        const ny = dx / (chord || 1);
-        let cx = (sx + ex) / 2 + nx * bulge;
-        let cy = (sy + ey) / 2 + ny * bulge;
+        const loopVector = getSummaryLoopVector(snap && snap.areaPath, toAreaPath, fromRect, toRect);
+        let dx = ex - sx, dy = ey - sy;
+        let chord = Math.sqrt(dx * dx + dy * dy);
+        let cx;
+        let cy;
+        if (loopVector) {
+            cx = sx + loopVector.x * 2;
+            cy = sy + loopVector.y * 2;
+            chord = Math.max(Math.sqrt(loopVector.x * loopVector.x + loopVector.y * loopVector.y) * 2, 1);
+        } else {
+            const bulge = chord * CONFIG.arcBulge;
+            // 法向量（左手边 = 向上/左弯）
+            const nx = -dy / (chord || 1);
+            const ny = dx / (chord || 1);
+            cx = (sx + ex) / 2 + nx * bulge;
+            cy = (sy + ey) / 2 + ny * bulge;
+        }
 
         // 目标尺寸
         let tw = toRect.width;
@@ -102,7 +136,7 @@
             if (t > 1) t = 1;
 
             // 首帧校正：重新读取目标卡牌位置，修正因布局延迟产生的偏差
-            if (!endpointCorrected) {
+            if (!endpointCorrected && !loopVector) {
                 endpointCorrected = true;
                 const toContainer2 = getContainerForArea(toAreaPath);
                 const toAreaObj2 = _resolveAreaLocal(toAreaPath);
