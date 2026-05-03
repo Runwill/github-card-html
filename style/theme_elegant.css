@@ -228,7 +228,7 @@ html[data-theme="elegant"] .btn.is-active:hover {
 /* 典雅主题：滚动条 */
 html[data-theme="elegant"] ::-webkit-scrollbar { width: 6px; height: 6px; }
 html[data-theme="elegant"] ::-webkit-scrollbar-track { background: transparent; }
-html[data-theme="elegant"] ::-webkit-scrollbar-thumb { background: rgba(211, 173, 107, 0.25); border-radius: 3px; }
+html[data-theme="elegant"] ::-webkit-scrollbar-thumb { background: rgba(211, 173, 107, 0.25); border-radius: var(--radius-pill); }
 html[data-theme="elegant"] ::-webkit-scrollbar-thumb:hover { background: rgba(211, 173, 107, 0.40); }
 
 /* ═══ 典雅主题：跨文件兼容覆盖 ═══════════════════════════════════════

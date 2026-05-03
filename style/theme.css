@@ -104,14 +104,14 @@
   --ease-accel: cubic-bezier(.4, 0, 1, 1);
   --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* 圆角半径 */
+  /* 圆角半径：跟随视觉高度缩放，1912x948 下保持原 4/6/8/12/16/20px */
   --radius-none: 0;
-  --radius-xs:   4px;   /* 标签、code、小按钮 */
-  --radius-sm:   6px;   /* 卡片内元素、输入框 */
-  --radius-md:   8px;   /* 通用按钮、面板内区块 */
-  --radius-lg:  12px;   /* 面板、弹窗内区域 */
-  --radius-xl:  16px;   /* 弹窗、菜单面板 */
-  --radius-2xl: 20px;   /* 移动端弹窗 */
+  --radius-xs:   clamp(2px, 0.421941vh, 5px);    /* 标签、code、小按钮 */
+  --radius-sm:   clamp(3px, 0.632911vh, 7px);    /* 卡片内元素、输入框 */
+  --radius-md:   clamp(4px, 0.843882vh, 10px);   /* 通用按钮、面板内区块 */
+  --radius-lg:   clamp(6px, 1.265823vh, 14px);   /* 面板、弹窗内区域 */
+  --radius-xl:   clamp(8px, 1.687764vh, 18px);   /* 弹窗、菜单面板 */
+  --radius-2xl:  clamp(10px, 2.109705vh, 22px);  /* 移动端弹窗 */
   --radius-pill: 999px; /* 药丸标签 */
   --radius-full: 50%;   /* 头像、圆形控件 */
 
@@ -514,6 +514,12 @@ html[data-theme="dark"] .btn.is-active:hover {
 }
 
 html.force-landscape {
+  --radius-xs:   clamp(2px, 0.421941vw, 5px);
+  --radius-sm:   clamp(3px, 0.632911vw, 7px);
+  --radius-md:   clamp(4px, 0.843882vw, 10px);
+  --radius-lg:   clamp(6px, 1.265823vw, 14px);
+  --radius-xl:   clamp(8px, 1.687764vw, 18px);
+  --radius-2xl:  clamp(10px, 2.109705vw, 22px);
   --character-placeholder-min-h: clamp(280px, 52.743vw, 500px);
   --approval-img-size: clamp(36px, 5.063vw, 52px);
 }
