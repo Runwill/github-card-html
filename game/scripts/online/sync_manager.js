@@ -29,6 +29,17 @@
         client.on('stateUpdated', onRemoteStateUpdate);
     }
 
+    function refreshGameUI() {
+        if (window.Game.UI && window.Game.UI.updateUI) {
+            window.Game.UI.updateUI();
+        }
+    }
+
+    function clearPerspectives() {
+        perspectives = {};
+        refreshGameUI();
+    }
+
     /**
      * 序列化游戏状态（用于网络传输）
      * 将 GameState 中的关键数据转为 JSON 安全格式
@@ -361,29 +372,8 @@
             return;
         }
 
-        // 从旧区域移除
-        if (card.lyingArea) {
-            const idx = card.lyingArea.cards.indexOf(card);
-            if (idx > -1) card.lyingArea.cards.splice(idx, 1);
-        }
-
-        // 加入新区域
-        const pos = payload.position;
-        if (pos >= 0 && pos < toArea.cards.length) {
-            toArea.cards.splice(pos, 0, card);
-        } else {
-            toArea.cards.push(card);
-        }
-        card.lyingArea = toArea;
-
-        // 更新可见性（与 Events.move whenPlaced 逻辑一致）
-        if (toArea.forOrAgainst !== undefined) {
-            card.visibility = toArea.forOrAgainst;
-        }
-        card.visibleTo = new Set();
-        if (toArea.owner && toArea.owner.id !== undefined) {
-            card.visibleTo.add(toArea.owner.id);
-        }
+        const pos = payload.position > 0 ? payload.position - 1 : payload.position;
+        window.Game.Models.moveCardToArea(card, toArea, pos, card.lyingArea);
     }
 
     function applyRemoteHealthChange(payload) {
@@ -489,9 +479,24 @@
     function onPerspectivesChanged(newPerspectives) {
         perspectives = newPerspectives || {};
         // 更新 UI 显示
-        if (window.Game.UI && window.Game.UI.updateUI) {
-            window.Game.UI.updateUI();
-        }
+        refreshGameUI();
+    }
+
+    function removeUserFromPerspectives(userId) {
+        if (!userId || !perspectives) return;
+
+        let changed = false;
+        Object.keys(perspectives).forEach(index => {
+            const viewers = perspectives[index];
+            if (!Array.isArray(viewers)) return;
+            const next = viewers.filter(viewer => viewer && viewer.userId !== userId);
+            if (next.length !== viewers.length) {
+                perspectives[index] = next;
+                changed = true;
+            }
+        });
+
+        if (changed) refreshGameUI();
     }
 
     /**
@@ -537,6 +542,8 @@
         serializeGameState,
         applyFullState,
         onPerspectivesChanged,
+        removeUserFromPerspectives,
+        clearPerspectives,
         onRemoteGameStart,
         getAreaPath,
         get isApplyingRemote() { return isApplyingRemote; },

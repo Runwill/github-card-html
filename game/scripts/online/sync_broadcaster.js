@@ -63,9 +63,18 @@
 
         if (typeof areaOrId === 'string' && (areaOrId.startsWith('role:') || areaOrId.startsWith('role-judge:'))) {
             const isJudge = areaOrId.startsWith('role-judge:');
+            const isEquip = areaOrId.includes(':equip');
             const roleId = parseInt(areaOrId.split(':')[1]);
             const p = gs.players.find(pl => pl.id === roleId);
-            if (p) return isJudge ? p.judgeArea : p.hand;
+            if (p) {
+                if (isJudge) return p.judgeArea;
+                if (isEquip && p.equipSlots) {
+                    const slotMatch = areaOrId.match(/:slot:(\d+)/);
+                    const slotIndex = slotMatch ? parseInt(slotMatch[1]) : 0;
+                    return p.equipSlots[slotIndex] || null;
+                }
+                return p.hand;
+            }
         }
 
         return null;

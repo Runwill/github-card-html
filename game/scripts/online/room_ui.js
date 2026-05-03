@@ -262,6 +262,9 @@
             try { await client.leaveRoom(); } catch (_) { /* ignore */ }
             currentRoom = null;
         }
+        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
+            window.Game.Online.SyncManager.clearPerspectives();
+        }
 
         try {
             setStatus(t('online.creating'));
@@ -295,6 +298,9 @@
         if (currentRoom) {
             try { await client.leaveRoom(); } catch (_) { /* ignore */ }
             currentRoom = null;
+        }
+        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
+            window.Game.Online.SyncManager.clearPerspectives();
         }
 
         try {
@@ -342,6 +348,9 @@
                 if (window.Game.GameState) {
                     window.Game.GameState.onlineMode = false;
                 }
+                if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
+                    window.Game.Online.SyncManager.clearPerspectives();
+                }
                 showLobby();
             }
             setStatus(t('online.roomDissolved'));
@@ -372,6 +381,9 @@
         // 清除在线模式标记
         if (window.Game.GameState) {
             window.Game.GameState.onlineMode = false;
+        }
+        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
+            window.Game.Online.SyncManager.clearPerspectives();
         }
 
         showLobby();
@@ -493,6 +505,9 @@
             currentRoom = data.room;
             renderRoomInfo();
         }
+        if (data.userId && window.Game.Online.SyncManager && window.Game.Online.SyncManager.removeUserFromPerspectives) {
+            window.Game.Online.SyncManager.removeUserFromPerspectives(data.userId);
+        }
         setStatus(`${data.username} ${t('online.hasLeft')}`);
     }
 
@@ -538,6 +553,9 @@
             currentRoom = null;
             if (window.Game.GameState) {
                 window.Game.GameState.onlineMode = false;
+            }
+            if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
+                window.Game.Online.SyncManager.clearPerspectives();
             }
             showLobby();
         }

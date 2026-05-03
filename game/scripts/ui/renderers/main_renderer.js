@@ -269,12 +269,10 @@
                     // 如果有 forcedTargetSlot, 使用对应的 equipSlot
                     if (forcedTargetSlot !== -1 && targetPlayer.equipSlots) {
                         targetArea = targetPlayer.equipSlots[forcedTargetSlot];
+                    } else if (targetPlayer.equipSlots) {
+                        targetArea = targetPlayer.equipSlots[0];
                     } else if (targetPlayer.equipArea) {
-                        // Fallback (Proxy)
-                        targetArea = targetPlayer.equipArea; 
-                    } else {
-                        // Very bad fallback if model changed
-                         targetArea = targetPlayer.equipSlots ? targetPlayer.equipSlots[0] : null;
+                        targetArea = targetPlayer.equipArea;
                     }
                 } else {
                     targetArea = targetPlayer.hand;
@@ -344,7 +342,10 @@
                  if (forcedSourceSlot !== -1 && currentPlayer.equipSlots) {
                      sourceArea = currentPlayer.equipSlots[forcedSourceSlot];
                  } else {
-                     sourceArea = currentPlayer.equipArea; // Proxy (unsafe for remove via Events? Events usually handle it if card is found)
+                     sourceArea = currentPlayer.equipSlots
+                         ? currentPlayer.equipSlots.find(slot => slot && slot.cards.includes(cardData))
+                         : null;
+                     if (!sourceArea) sourceArea = currentPlayer.equipArea;
                  }
             } else if (resolvedSourceId === 'treatmentArea') {
                 sourceArea = GameState.treatmentArea; 
@@ -363,7 +364,10 @@
                         if (forcedSourceSlot !== -1 && p.equipSlots) {
                             sourceArea = p.equipSlots[forcedSourceSlot];
                         } else {
-                            sourceArea = p.equipArea; // Fallback
+                            sourceArea = p.equipSlots
+                                ? p.equipSlots.find(slot => slot && slot.cards.includes(cardData))
+                                : null;
+                            if (!sourceArea) sourceArea = p.equipArea;
                         }
                     } else {
                         sourceArea = p.hand;

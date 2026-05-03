@@ -8,7 +8,6 @@
     border-radius: var(--radius-sm) ;
     padding: 0.286em 0;
     min-width: var(--game-context-menu-minw, 180px);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: var(--game-context-menu-fs, var(--fs-md));
     color: var(--text);
     display: none; /* Hidden by default */

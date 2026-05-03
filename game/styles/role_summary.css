@@ -279,10 +279,10 @@ html[data-theme="light"] .player-judge-count {
     transform: none;
     margin-left: 0;
     margin-top: var(--equip-name-tag-offset, var(--space-2xs, 4px));
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: var(--equip-name-tag-pad-x, 2px);
-    max-width: calc(var(--main-equip-name-tag-maxw, 80px) * 1.5);
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: var(--equip-name-tag-gap, 1px);
+    max-width: var(--main-equip-name-tag-maxw, 80px);
     pointer-events: auto;
 }
 

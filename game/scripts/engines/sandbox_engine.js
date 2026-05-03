@@ -87,8 +87,7 @@
              this.state.pile.cards.forEach(c => {
                  if (c && typeof c === 'object') {
                      c.lyingArea = this.state.pile;
-                     c.visibility = this.state.pile.forOrAgainst !== undefined ? this.state.pile.forOrAgainst : 1;
-                     c.visibleTo = new Set();
+                     window.Game.Models.applyCardVisibility(c, this.state.pile);
                  }
              });
              
@@ -99,11 +98,7 @@
                  // 修正抽到手牌的可见性：手牌对持有者可见
                  player.hand.cards.forEach(c => {
                      if (c && typeof c === 'object') {
-                         c.visibility = player.hand.forOrAgainst !== undefined ? player.hand.forOrAgainst : 1;
-                         c.visibleTo = new Set();
-                         if (player.id !== undefined) {
-                             c.visibleTo.add(player.id);
-                         }
+                         window.Game.Models.applyCardVisibility(c, player.hand);
                      }
                  });
              });
@@ -113,51 +108,7 @@
 
         // Directly move card without event stack
         moveCard(card, toArea, toIndex = -1, fromAreaHint = null) {
-             // 1. Find and remove from old area
-             // If card is string (legacy mock), we can't track it easily. 
-             // Ideally we upgraded data in _distributeCards, but let's be safe.
-             
-             let fromArea = fromAreaHint;
-             if (!fromArea) {
-                 fromArea = (typeof card === 'object') ? card.lyingArea : null;
-             } 
-             
-             if (fromArea) {
-                 const idx = fromArea.cards.indexOf(card);
-                 if (idx > -1) fromArea.cards.splice(idx, 1);
-                 else {
-                     // 尝试在 source 中按引用找不到时（可能对象克隆了？），按 ID 查找？
-                     // 目前假设对象同一性。
-                     // 如果 fromArea 是正确的但 card 引用不对，这里会静默失败 (Card Duplication bug)
-                 }
-             } else {
-                 // Try brute force search if card is object
-                 if (typeof card === 'object') {
-                      // 简单查找：players hands, pile, discard
-                      // 考虑到性能，这里仅作为一个最后的安全网，Controller 应该已经处理了
-                 }
-             }
-             
-             // 2. Add to new area
-             if (toIndex >= 0 && toIndex < toArea.cards.length) {
-                 toArea.cards.splice(toIndex, 0, card);
-             } else {
-                 toArea.cards.push(card);
-             }
-             
-             // 3. Update linkage & visibility
-             if (typeof card === 'object') {
-                card.lyingArea = toArea;
-
-                // 根据目标区域更新可见性（与 Events.move whenPlaced 逻辑一致）
-                if (toArea.forOrAgainst !== undefined) {
-                    card.visibility = toArea.forOrAgainst;
-                }
-                card.visibleTo = new Set();
-                if (toArea.owner && toArea.owner.id !== undefined) {
-                    card.visibleTo.add(toArea.owner.id);
-                }
-             }
+             window.Game.Models.moveCardToArea(card, toArea, toIndex, fromAreaHint);
              
              console.log(`[Sandbox] Moved card ${card.name || card} to ${toArea.name}`);
              

@@ -22,6 +22,56 @@
         return 100;
     }
 
+    function hasVisibleRole(visibleTo, roleId) {
+        if (roleId === undefined || roleId === null || !visibleTo) return false;
+        if (visibleTo instanceof Set) return visibleTo.has(roleId);
+        if (Array.isArray(visibleTo)) return visibleTo.includes(roleId);
+        if (typeof visibleTo.has === 'function') return visibleTo.has(roleId);
+        return false;
+    }
+
+    function isCardVisibleToPerspective(card, visibilityState) {
+        const visibility = visibilityState && visibilityState.visibility !== undefined
+            ? visibilityState.visibility
+            : card && card.visibility;
+
+        if (visibility !== 1) return true;
+
+        const GameState = window.Game.GameState;
+        const perspIdx = GameState && GameState.perspectiveIndex != null ? GameState.perspectiveIndex : 0;
+        const mainPlayer = GameState && GameState.players && GameState.players[perspIdx];
+        const visibleTo = visibilityState && visibilityState.visibleTo ? visibilityState.visibleTo : card && card.visibleTo;
+
+        return !!(mainPlayer && hasVisibleRole(visibleTo, mainPlayer.id));
+    }
+
+    function getCardRenderState(card, options = {}) {
+        const originalName = card && (card.name || card.key) || 'CardBack';
+        const visibilityState = options.visibilityState || null;
+        const showBack = !!options.forceFaceDown || !isCardVisibleToPerspective(card, visibilityState);
+        const renderName = showBack ? 'CardBack' : originalName;
+        const GameText = window.Game.UI.GameText;
+
+        return {
+            renderName,
+            htmlContent: renderName === 'CardBack' || !GameText ? '' : GameText.render(renderName),
+            isFaceUp: renderName !== 'CardBack'
+        };
+    }
+
+    function getCardAppearanceForArea(card, area, options = {}) {
+        const Models = window.Game.Models;
+        const visibilityState = Models && Models.getCardVisibilityForArea
+            ? Models.getCardVisibilityForArea(area)
+            : null;
+        const state = getCardRenderState(card, { ...options, visibilityState });
+        return {
+            innerHTML: state.htmlContent,
+            dataCardKey: state.renderName,
+            isFaceUp: state.isFaceUp
+        };
+    }
+
     // 平铺区域：空间充足时保持常规牌距，空间不足时恢复受控露边重叠。
     function updateSpreadLayouts() {
         const containers = document.querySelectorAll('.area-spread');
@@ -88,40 +138,8 @@
 
         // 差量更新 (Diffing) 策略：复用现有 DOM 节点，避免暴力清空导致的闪烁和 Hover 状态丢失
         cards.forEach((card, index) => {
-            // 模型层保证 card 是 Card 实例
-            const originalName = card.name || card.key;
-            
-            // 决定渲染的卡牌名称：是否强制背面
-            
-            // 1. 基础判断：强制背面参数
-            let showBack = !!options.forceFaceDown;
-
-            // 2. 也是最重要的：可见性系统
-            // 规则：
-            // A. 如果 card.visibility == 0 (公开)，则可见。
-            // B. 如果 card.visibility == 1 (私有/背面)，则检查可见性列表。
-            //    如果 当前视角角色 (Main Player) 在 visibleTo 列表中，则可见。
-            //    否则，渲染为卡背。
-            
-            if (!showBack && card.visibility === 1) {
-                // 默认不可见，需检查权限
-                showBack = true; // 先假设不可见
-                
-                const GameState = window.Game.GameState;
-                
-                // 获取当前主视角角色 ID（使用 perspectiveIndex）
-                const perspIdx = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
-                const mainPlayer = GameState.players && GameState.players[perspIdx];
-                
-                if (mainPlayer && card.visibleTo && card.visibleTo.has(mainPlayer.id)) {
-                    showBack = false; // 对我可见
-                }
-            }
-            
-            let renderName = originalName;
-            if (showBack) {
-                renderName = 'CardBack';
-            }
+            const renderState = getCardRenderState(card, options);
+            const renderName = renderState.renderName;
             
             // 尝试复用现有位置的节点
             let cardEl = currentChildren[index];
@@ -148,10 +166,7 @@
 
             // 检查内容是否需要更新 (Dirty Checking)
             // 准备渲染内容
-            let htmlContent = '';
-            if (renderName !== 'CardBack') {
-                 htmlContent = GameText.render(renderName);
-            }
+            const htmlContent = renderState.htmlContent;
 
             // 注入位置序号 (如果开启)
             // REFACTOR: Moved to CSS Counter in game_viewer.css for cleaner drag handling.
@@ -233,6 +248,8 @@
 
     // 导出到全局命名空间供其他模块使用
     window.Game.UI.renderCardList = renderCardList;
+    window.Game.UI.getCardRenderState = getCardRenderState;
+    window.Game.UI.getCardAppearanceForArea = getCardAppearanceForArea;
 
     // 辅助：获取区域的渲染配置
     function getAreaConfig(containerId) {

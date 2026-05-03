@@ -21,6 +21,7 @@
         // 规则：移动前或移动后对主视角可见 → 显示牌名；否则显示牌背
         const snap = I.snapshot && I.snapshot[cardId];
         const sourceAppearance = snap && snap.appearance;
+        const snapTargetAppearance = snap && snap.targetAppearance;
 
         // 移动后目标元素的外观（updateUI 已执行）
         let targetAppearance = null;
@@ -38,8 +39,13 @@
 
         // 只要任一端可见就用牌面，否则牌背
         const srcFace = sourceAppearance && sourceAppearance.dataCardKey && sourceAppearance.dataCardKey !== 'CardBack';
+        const targetFace = targetAppearance && targetAppearance.dataCardKey && targetAppearance.dataCardKey !== 'CardBack';
+        const snapTargetFace = snapTargetAppearance && snapTargetAppearance.dataCardKey && snapTargetAppearance.dataCardKey !== 'CardBack';
         const finalAppearance = srcFace ? sourceAppearance
+            : targetFace ? targetAppearance
+            : snapTargetFace ? snapTargetAppearance
             : targetAppearance ? targetAppearance
+            : snapTargetAppearance ? snapTargetAppearance
             : (sourceAppearance || { innerHTML: '', dataCardKey: 'CardBack' });
 
         // 创建幽灵

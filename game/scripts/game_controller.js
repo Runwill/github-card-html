@@ -24,6 +24,9 @@
         if (window.Game.UI.MoveLog) {
             window.Game.UI.MoveLog.clear();
         }
+        if (!window.Game.GameState.onlineMode && window.Game.Online && window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
+            window.Game.Online.SyncManager.clearPerspectives();
+        }
         
         if (mode === 'manual' || mode === 'sandbox') {
             if (!window.Game.Engines || !window.Game.Engines.SandboxEngine) {
@@ -151,7 +154,11 @@
         if (gs.players) {
             for (let p of gs.players) {
                 if (p.hand && p.hand.cards.includes(card)) return p.hand;
-                if (p.equipArea && p.equipArea.cards.includes(card)) return p.equipArea;
+                if (p.equipSlots) {
+                    for (const slot of p.equipSlots) {
+                        if (slot && slot.cards.includes(card)) return slot;
+                    }
+                }
                 if (p.judgeArea && p.judgeArea.cards.includes(card)) return p.judgeArea;
             }
         }

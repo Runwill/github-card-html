@@ -83,6 +83,70 @@
         }
     }
 
+    function getVisibleRoleId(value) {
+        if (value && typeof value === 'object') return value.id;
+        return value;
+    }
+
+    function getCardVisibilityForArea(area) {
+        const visibility = area && area.forOrAgainst !== undefined ? area.forOrAgainst : 0;
+        const visibleTo = new Set();
+
+        if (area && area.owner && area.owner.id !== undefined) {
+            visibleTo.add(area.owner.id);
+        }
+
+        if (area && area.visible && typeof area.visible.forEach === 'function') {
+            area.visible.forEach(value => {
+                const id = getVisibleRoleId(value);
+                if (id !== undefined && id !== null) visibleTo.add(id);
+            });
+        }
+
+        return { visibility, visibleTo };
+    }
+
+    function applyCardVisibility(card, area) {
+        if (!card || typeof card !== 'object') return card;
+        const state = getCardVisibilityForArea(area);
+        card.visibility = state.visibility;
+        card.visibleTo = state.visibleTo;
+        return card;
+    }
+
+    function removeCardFromArea(card, fromArea, fromIndex = -1) {
+        if (!card || !fromArea || !Array.isArray(fromArea.cards)) return false;
+
+        if (fromIndex !== undefined && fromIndex > -1 && fromArea.cards[fromIndex] === card) {
+            if (typeof fromArea.removeAt === 'function') fromArea.removeAt(fromIndex);
+            else fromArea.cards.splice(fromIndex, 1);
+            return true;
+        }
+
+        const index = fromArea.cards.indexOf(card);
+        if (index < 0) return false;
+        if (typeof fromArea.remove === 'function') fromArea.remove(card);
+        else fromArea.cards.splice(index, 1);
+        return true;
+    }
+
+    function moveCardToArea(card, toArea, toIndex = -1, fromArea = null, fromIndex = -1) {
+        if (!card || !toArea || !Array.isArray(toArea.cards)) return false;
+
+        const sourceArea = fromArea || (typeof card === 'object' ? card.lyingArea : null);
+        if (sourceArea) removeCardFromArea(card, sourceArea, fromIndex);
+
+        const insertIndex = toIndex >= 0 && toIndex < toArea.cards.length ? toIndex : toArea.cards.length;
+        toArea.cards.splice(insertIndex, 0, card);
+
+        if (typeof card === 'object') {
+            card.lyingArea = toArea;
+            applyCardVisibility(card, toArea);
+        }
+
+        return true;
+    }
+
     // 静态配置定义，用于统一管理不同类型区域的默认属性
     Area.Configs = {
         // 0: 友方/通用, 1: 敌方/特定
@@ -201,6 +265,7 @@
                     const card = fromArea.cards.pop();
                     card.lyingArea = this.hand;
                     this.hand.add(card);
+                    applyCardVisibility(card, this.hand);
                 } else {
                     console.warn(`[Player] ${this.name} tried to draw ${count} cards but source is empty.`);
                     break;
@@ -212,6 +277,9 @@
     window.Game.Models.Card = Card;
     window.Game.Models.Area = Area;
     window.Game.Models.Player = Player;
+    window.Game.Models.getCardVisibilityForArea = getCardVisibilityForArea;
+    window.Game.Models.applyCardVisibility = applyCardVisibility;
+    window.Game.Models.moveCardToArea = moveCardToArea;
 
 })();
 

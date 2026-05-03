@@ -116,6 +116,25 @@
         return children[idx] || null;
     }
 
+    function resolveAreaForPath(areaPath) {
+        if (!areaPath) return null;
+        const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
+        if (SyncMgr && SyncMgr._resolveArea) return SyncMgr._resolveArea(areaPath);
+        const Engine = window.Game.UI && window.Game.UI._CardMoveEngine;
+        if (Engine && Engine.resolveAreaLocal) return Engine.resolveAreaLocal(areaPath);
+        return null;
+    }
+
+    function findCardInArea(areaObj, cardId) {
+        if (!areaObj || !areaObj.cards) return null;
+        return areaObj.cards.find(c => c && c.id === cardId) || null;
+    }
+
+    function getModelAppearance(card, areaObj) {
+        if (!card || !window.Game.UI.getCardAppearanceForArea) return null;
+        return window.Game.UI.getCardAppearanceForArea(card, areaObj, { forceFaceDown: false });
+    }
+
     // ─── 快照 API ─────────────────────────────────────────────────────────
 
     /**
@@ -129,12 +148,11 @@
         _layoutSnapshot = {};
 
         const { cardId, fromAreaPath, toAreaPath } = payload;
-        const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
-
         // ── 被移动卡牌的当前位置 ──
         const fromContainer = getContainerForArea(fromAreaPath);
-        const fromAreaObj = fromAreaPath && SyncMgr ? SyncMgr._resolveArea
-            ? SyncMgr._resolveArea(fromAreaPath) : window.Game.UI._CardMoveEngine.resolveAreaLocal(fromAreaPath) : null;
+        const fromAreaObj = resolveAreaForPath(fromAreaPath);
+        const toAreaObj = resolveAreaForPath(toAreaPath);
+        const cardObj = findCardInArea(fromAreaObj, cardId);
 
         let cardRect = null;
 
@@ -157,7 +175,13 @@
             if (anchor) cardRect = anchor.getBoundingClientRect();
         }
 
-        // 如果没能从源 DOM 获取外观，默认显示牌背
+        if (!cardAppearance) {
+            cardAppearance = getModelAppearance(cardObj, fromAreaObj);
+        }
+
+        const targetAppearance = getModelAppearance(cardObj, toAreaObj);
+
+        // 如果没能从源 DOM 和模型获取外观，默认显示牌背
         if (!cardAppearance) {
             cardAppearance = { innerHTML: '', dataCardKey: 'CardBack' };
         }
@@ -165,7 +189,8 @@
         _snapshot[cardId] = {
             rect: cardRect,
             areaPath: fromAreaPath,
-            appearance: cardAppearance
+            appearance: cardAppearance,
+            targetAppearance: targetAppearance || null
         };
 
         // ── 布局快照：记录受影响区域中所有牌的当前位置 ──

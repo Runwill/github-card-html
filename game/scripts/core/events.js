@@ -116,7 +116,12 @@
                     if (gs.players) {
                         for (let p of gs.players) {
                             if (p.hand && p.hand.cards.includes(card)) { fromArea = p.hand; break; }
-                            if (p.equipArea && p.equipArea.cards.includes(card)) { fromArea = p.equipArea; break; }
+                            if (p.equipSlots) {
+                                for (const slot of p.equipSlots) {
+                                    if (slot && slot.cards.includes(card)) { fromArea = slot; break; }
+                                }
+                                if (fromArea) break;
+                            }
                             if (p.judgeArea && p.judgeArea.cards.includes(card)) { fromArea = p.judgeArea; break; }
                         }
                     }
@@ -149,58 +154,10 @@
                      // 确保 movedCard 是数组
                      const cards = Array.isArray(ctx.movedCard) ? ctx.movedCard : [ctx.movedCard];
 
-                     cards.forEach(card => {
-                         // Try to remove from old area
-                         let removed = false;
-
-                         // 1. Explicit fromArea
-                         if (ctx.fromArea) {
-                             if (ctx.fromIndex !== undefined && ctx.fromIndex > -1 && typeof ctx.fromArea.removeAt === 'function') {
-                                ctx.fromArea.removeAt(ctx.fromIndex);
-                                removed = true;
-                                // Reset index to avoid reusing for next card if multiple (though rare for drag)
-                                ctx.fromIndex = -1; 
-                             } else if (typeof ctx.fromArea.remove === 'function') {
-                                 ctx.fromArea.remove(card);
-                                 removed = true;
-                             }
-                         }
-                         
-                         // 2. Object property (Fallback)
-                         if (!removed && card && card.lyingArea && typeof card.lyingArea.remove === 'function') {
-                             card.lyingArea.remove(card);
-                         } 
-                     });
-
-                     // Insert into new area
-                     // Arrays are 0-indexed, movedAtPosition is 1-based default.
-                     if (ctx.movedInArea.cards && Array.isArray(ctx.movedInArea.cards)) {
-                         const insertIdx = Math.max(0, (ctx.movedAtPosition || 1) - 1);
-                         ctx.movedInArea.cards.splice(insertIdx, 0, ...cards);
-                     }
-                     
-                     // Update properties
-                     cards.forEach(card => {
-                         if (card && typeof card === 'object') {
-                             card.lyingArea = ctx.movedInArea;
-                             // We don't track 'position' property explicitly as it is array index
-
-                             // 设置可见性为区域的默认值
-                             if (ctx.movedInArea.forOrAgainst !== undefined) {
-                                 card.visibility = ctx.movedInArea.forOrAgainst;
-                             }
-                             
-                             // 重置并设置特定角色可见性
-                             // 如果卡牌进入了某人的专属区域 (Owner存在)，则默认对拥有者可见
-                             // 此逻辑实现了 "手牌对自己可见" 的需求
-                             card.visibleTo = new Set();
-                             if (ctx.movedInArea.owner) {
-                                 // 假设 owner 对象有 id 属性
-                                 if (ctx.movedInArea.owner.id !== undefined) {
-                                     card.visibleTo.add(ctx.movedInArea.owner.id);
-                                 }
-                             }
-                         }
+                     cards.forEach((card, index) => {
+                         const insertIdx = Math.max(0, (ctx.movedAtPosition || 1) - 1) + index;
+                         window.Game.Models.moveCardToArea(card, ctx.movedInArea, insertIdx, ctx.fromArea, ctx.fromIndex);
+                         ctx.fromIndex = -1;
                      });
                      
                      console.log('[Game] Event: Move executed.', { 

@@ -98,6 +98,21 @@
         return ghost;
     }
 
+    function syncGhostAppearance(el, placeholder, targetKey) {
+        if (!el || !targetKey) return false;
+        const currentKey = el.getAttribute('data-card-key');
+        if (currentKey === targetKey) return false;
+
+        el.setAttribute('data-card-key', targetKey);
+        if (targetKey === 'CardBack') {
+            el.innerHTML = '';
+        } else if (placeholder) {
+            el.innerHTML = placeholder.innerHTML || '';
+        }
+
+        return true;
+    }
+
     function animateDropToPlaceholder(el, placeholder, onComplete, options = {}) {
         const DragState = UI.DragState;
         const DRAG_CONFIG = UI.DragConfig;
@@ -112,12 +127,10 @@
         // we apply it to the dragging ghost to trigger CSS transitions (flip/fade).
         if (placeholder && el) {
             const targetKey = placeholder.getAttribute('data-card-key');
-            const currentKey = el.getAttribute('data-card-key');
             
-            if (targetKey && currentKey !== targetKey) {
+            if (syncGhostAppearance(el, placeholder, targetKey)) {
                 // Determine if we need to force a flip style
-                console.log(`[DragAnim] Syncing Keys: ${currentKey} -> ${targetKey}`);
-                el.setAttribute('data-card-key', targetKey);
+                console.log(`[DragAnim] Syncing Keys to ${targetKey}`);
                 
                 // Optional: visual enhancement for flip
                 // We could add a 'flipping' class if we wanted 3D rotate, 
@@ -173,12 +186,8 @@
                  targetKey = 'CardBack';
             }
 
-            const currentKey = el.getAttribute('data-card-key');
-            
-            if (targetKey && currentKey !== targetKey) {
+            if (syncGhostAppearance(el, placeholder, targetKey)) {
                 // Critical: Apply the key change immediately to start CSS transitions
-                el.setAttribute('data-card-key', targetKey);
-                
                 // Visual Highlight: Add a class to indicate active transition state
                 // This can be used in CSS to force 3D rotation or ensure properties are prioritized
                 el.classList.add('is-flipping-state');

@@ -159,28 +159,8 @@
                          const preVisibleTo = card.visibleTo ? [...card.visibleTo] : [];
                          const fromAreaPath = I.getAreaPathForLog(sourceArea, card);
 
-                         // 直接同步移动卡牌（不走事件栈）
-                         const fromArea = sourceArea || card.lyingArea;
-                         if (fromArea) {
-                             const idx = fromArea.cards.indexOf(card);
-                             if (idx > -1) fromArea.cards.splice(idx, 1);
-                         }
                          const insertIdx = Math.max(0, (payload.position || 1) - 1);
-                         if (insertIdx < targetArea.cards.length) {
-                             targetArea.cards.splice(insertIdx, 0, card);
-                         } else {
-                             targetArea.cards.push(card);
-                         }
-                         card.lyingArea = targetArea;
-
-                         // 更新可见性（与 Events.move whenPlaced 逻辑一致）
-                         if (targetArea.forOrAgainst !== undefined) {
-                             card.visibility = targetArea.forOrAgainst;
-                         }
-                         card.visibleTo = new Set();
-                         if (targetArea.owner && targetArea.owner.id !== undefined) {
-                             card.visibleTo.add(targetArea.owner.id);
-                         }
+                         window.Game.Models.moveCardToArea(card, targetArea, insertIdx, sourceArea);
 
                          const toAreaPath = I.getAreaPathForLog(targetArea, card);
 

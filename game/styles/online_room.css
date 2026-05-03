@@ -329,6 +329,12 @@
     margin-bottom: var(--game-online-label-gap, var(--space-2xs));
 }
 
+#role-list-top .online-viewer-labels {
+    top: var(--game-online-label-gap, 2px);
+    bottom: auto;
+    margin-bottom: 0;
+}
+
 .online-viewer-label {
     background: var(--surface);
     /* make badge text lighter than normal text */
