@@ -140,12 +140,22 @@
           if (!panel) return;
           const target = e.target;
           // 如果点击在任一编辑器内部，忽略
-          if (target && (target.closest && (target.closest('.perm-editor')))) return;
+          if (target && (target.closest && (target.closest('.perm-editor, .perm-editor-stack')))) return;
           // 如果点击在触发器上（编辑按钮/修改密码按钮/角色值），忽略，避免立刻被折叠
           if (target && (target.closest && target.closest('[data-perm-trigger]'))) return;
           // 其它区域（包括面板外部或行空白处）则收起全部编辑器
+          const stacks = panel.querySelectorAll('.perm-editor-stack');
+          stacks.forEach(stack => {
+            try {
+              if (typeof stack.__closeEditorStack === 'function') stack.__closeEditorStack();
+              else toggleSection(stack, false);
+            } catch {}
+          });
           const editors = panel.querySelectorAll('.perm-editor');
-          editors.forEach(ed => { try { toggleSection(ed, false); } catch {} });
+          editors.forEach(ed => {
+            if (ed.closest && ed.closest('.perm-editor-stack')) return;
+            try { toggleSection(ed, false); } catch {}
+          });
         });
 
         

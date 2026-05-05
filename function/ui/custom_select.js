@@ -16,6 +16,7 @@
     const WRAP_CLASS = 'custom-select';
     const TRIGGER_CLASS = 'custom-select__trigger';
     const DROPDOWN_CLASS = 'custom-select__dropdown';
+    const PORTAL_CLASS = 'custom-select__dropdown--portal';
     const OPTION_CLASS = 'custom-select__option';
     const ARROW_CLASS = 'custom-select__arrow';
     const OPEN_CLASS = 'is-open';
@@ -48,7 +49,7 @@
         }
 
         // Transfer classes from select to wrapper (except input-group-field)
-        const keepOnSelect = ['input-group-field', 'setup-char-select', 'tokens-input'];
+        const keepOnSelect = ['input-group-field', 'setup-char-select', 'admin-input', 'tokens-input'];
         sel.classList.forEach(cls => {
             if (!keepOnSelect.includes(cls)) {
                 wrapper.classList.add(cls);
@@ -85,7 +86,7 @@
         wrapper.appendChild(dropdown);
 
         // Build context object
-        const ctx = { sel, wrapper, trigger, label, dropdown, focusIdx: -1 };
+        const ctx = { sel, wrapper, trigger, label, dropdown, focusIdx: -1, dropdownHome: wrapper };
         sel[DATA_KEY] = ctx;
 
         // Build options
@@ -190,7 +191,11 @@
 
         // Auto-shrink any option text that overflows the dropdown width
         if (window._CustomSelectFit) {
-            window._CustomSelectFit.fitOptionTexts(ctx.dropdown, OPEN_CLASS);
+            window._CustomSelectFit.fitOptionTexts(ctx.dropdown, OPEN_CLASS, ctx.wrapper);
+        }
+
+        if (ctx.wrapper.classList.contains(OPEN_CLASS)) {
+            _positionDropdown(ctx);
         }
     }
 
@@ -231,20 +236,101 @@
         ctx.wrapper.classList.add(OPEN_CLASS);
         ctx.trigger.setAttribute('aria-expanded', 'true');
         ctx.focusIdx = ctx.sel.selectedIndex;
+        _attachDropdownPortal(ctx);
 
         // Scroll selected into view
         const items = ctx.dropdown.children;
         if (items[ctx.focusIdx]) {
             _clearFocus(ctx);
             items[ctx.focusIdx].classList.add(FOCUS_CLASS);
-            items[ctx.focusIdx].scrollIntoView({ block: 'nearest' });
+            _scrollFocusedIntoView(ctx);
         }
     }
 
     function _close(ctx) {
         ctx.wrapper.classList.remove(OPEN_CLASS);
+        ctx.dropdown.classList.remove(OPEN_CLASS);
         ctx.trigger.setAttribute('aria-expanded', 'false');
         _clearFocus(ctx);
+        _restoreDropdown(ctx);
+    }
+
+    function _attachDropdownPortal(ctx) {
+        const { dropdown, trigger } = ctx;
+        if (dropdown.parentElement !== document.body) {
+            ctx.dropdownHome = dropdown.parentElement || ctx.wrapper;
+            document.body.appendChild(dropdown);
+        }
+        const triggerStyle = getComputedStyle(trigger);
+        dropdown.style.fontSize = triggerStyle.fontSize;
+        dropdown.style.fontFamily = triggerStyle.fontFamily;
+        dropdown.style.fontWeight = triggerStyle.fontWeight;
+        dropdown.classList.add(PORTAL_CLASS);
+        dropdown.dataset.csPortal = '1';
+        _positionDropdown(ctx);
+        dropdown.classList.add(OPEN_CLASS);
+        _ensurePortalPositioning();
+    }
+
+    function _restoreDropdown(ctx) {
+        const { dropdown, dropdownHome } = ctx;
+        dropdown.classList.remove(PORTAL_CLASS);
+        delete dropdown.dataset.csPortal;
+        dropdown.style.left = '';
+        dropdown.style.top = '';
+        dropdown.style.right = '';
+        dropdown.style.width = '';
+        dropdown.style.maxHeight = '';
+        dropdown.style.fontSize = '';
+        dropdown.style.fontFamily = '';
+        dropdown.style.fontWeight = '';
+        if (dropdownHome && dropdown.parentElement !== dropdownHome) {
+            dropdownHome.appendChild(dropdown);
+        }
+    }
+
+    function _positionDropdown(ctx) {
+        if (!ctx || !ctx.wrapper.classList.contains(OPEN_CLASS)) return;
+        const { trigger, dropdown } = ctx;
+        const rect = trigger.getBoundingClientRect();
+        const viewportW = window.innerWidth || document.documentElement.clientWidth || 0;
+        const viewportH = window.innerHeight || document.documentElement.clientHeight || 0;
+        const margin = 8;
+        const gap = 4;
+        const computed = getComputedStyle(dropdown);
+        const configuredMax = parseFloat(computed.maxHeight) || 220;
+        const rawWidth = Math.max(rect.width, parseFloat(computed.minWidth) || 0);
+        const width = Math.min(rawWidth, Math.max(margin, viewportW - margin * 2));
+        const left = Math.min(Math.max(rect.left, margin), Math.max(margin, viewportW - width - margin));
+        const availableBelow = Math.max(80, viewportH - rect.bottom - gap - margin);
+        const availableAbove = Math.max(80, rect.top - gap - margin);
+        const desiredHeight = Math.min(dropdown.scrollHeight || configuredMax, configuredMax);
+        const openAbove = availableBelow < Math.min(desiredHeight, 160) && availableAbove > availableBelow;
+        const maxHeight = Math.max(80, Math.min(configuredMax, openAbove ? availableAbove : availableBelow));
+        const panelHeight = Math.min(dropdown.scrollHeight || maxHeight, maxHeight);
+        const top = openAbove
+            ? Math.max(margin, rect.top - gap - panelHeight)
+            : Math.min(rect.bottom + gap, viewportH - margin - panelHeight);
+
+        dropdown.style.left = left + 'px';
+        dropdown.style.top = Math.max(margin, top) + 'px';
+        dropdown.style.right = 'auto';
+        dropdown.style.width = width + 'px';
+        dropdown.style.maxHeight = maxHeight + 'px';
+    }
+
+    function _scrollFocusedIntoView(ctx) {
+        const item = ctx.dropdown.children[ctx.focusIdx];
+        if (!item) return;
+        const viewTop = ctx.dropdown.scrollTop;
+        const viewBottom = viewTop + ctx.dropdown.clientHeight;
+        const itemTop = item.offsetTop;
+        const itemBottom = itemTop + item.offsetHeight;
+        if (itemTop < viewTop) {
+            ctx.dropdown.scrollTop = itemTop;
+        } else if (itemBottom > viewBottom) {
+            ctx.dropdown.scrollTop = itemBottom - ctx.dropdown.clientHeight;
+        }
     }
 
     function _closeAll() {
@@ -311,8 +397,23 @@
         const items = ctx.dropdown.children;
         if (items[ctx.focusIdx]) {
             items[ctx.focusIdx].classList.add(FOCUS_CLASS);
-            items[ctx.focusIdx].scrollIntoView({ block: 'nearest' });
+            _scrollFocusedIntoView(ctx);
         }
+    }
+
+    let _portalPositioningInstalled = false;
+    function _ensurePortalPositioning() {
+        if (_portalPositioningInstalled) return;
+        _portalPositioningInstalled = true;
+        window.addEventListener('resize', _positionOpenDropdowns, { passive: true });
+        document.addEventListener('scroll', _positionOpenDropdowns, true);
+    }
+
+    function _positionOpenDropdowns() {
+        document.querySelectorAll('.' + WRAP_CLASS + '.' + OPEN_CLASS).forEach(w => {
+            const sel = w.querySelector('select');
+            if (sel && sel[DATA_KEY]) _positionDropdown(sel[DATA_KEY]);
+        });
     }
 
     /* ── Global close handler (registered once) ────────────────────── */
@@ -321,7 +422,7 @@
         if (_globalCloseInstalled) return;
         _globalCloseInstalled = true;
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.' + WRAP_CLASS)) {
+            if (!e.target.closest('.' + WRAP_CLASS) && !e.target.closest('.' + DROPDOWN_CLASS)) {
                 _closeAll();
             }
         });

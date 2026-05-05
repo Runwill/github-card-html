@@ -44,13 +44,14 @@
     color: var(--text);
     background: transparent;
     border: 1px solid var(--border);
-    padding: var(--space-sm) var(--space-lg);
-    border-radius: var(--radius-sm);
+    height: var(--custom-select-trigger-h, auto);
+    padding: var(--custom-select-trigger-pad-y, var(--space-sm)) var(--custom-select-trigger-pad-x, var(--space-lg));
+    border-radius: var(--custom-select-trigger-radius, var(--radius-sm));
     outline: none;
     transition: background var(--dur-normal) var(--ease-default),
                 border-color var(--dur-normal) var(--ease-default),
                 box-shadow var(--dur-normal) var(--ease-default);
-    line-height: var(--lh-normal);
+    line-height: var(--custom-select-trigger-lh, var(--lh-normal));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -138,6 +139,13 @@
     scrollbar-color: var(--text-subtle) transparent;
 }
 
+.custom-select__dropdown--portal {
+    position: fixed;
+    right: auto;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
 .custom-select__dropdown::-webkit-scrollbar { width: 5px; }
 .custom-select__dropdown::-webkit-scrollbar-track { background: transparent; }
 .custom-select__dropdown::-webkit-scrollbar-thumb {
@@ -145,7 +153,8 @@
     border-radius: var(--radius-xs);
 }
 
-.custom-select.is-open .custom-select__dropdown {
+.custom-select.is-open .custom-select__dropdown,
+.custom-select__dropdown.is-open {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
@@ -206,7 +215,7 @@
     z-index: 1;
 }
 
-/* tokens-input style trigger inside game-panel input-group */
+/* Game form trigger inside game-panel input-group */
 .game-panel .input-group .custom-select .custom-select__trigger {
     font-size: var(--game-form-fs, var(--fs-base));
     line-height: normal;

@@ -42,7 +42,7 @@
     if (!panel) return;
     const DURATION = 220;
     const FALLBACK = DURATION + 160;
-    const TRANSITION = 'height 220ms ease, opacity 150ms ease, transform 220ms ease, padding-top 220ms ease, padding-bottom 220ms ease, margin-top 220ms ease, margin-bottom 220ms ease, border-width 220ms ease';
+    const TRANSITION = 'height 220ms ease, opacity 150ms ease, transform 220ms ease';
     if (panel.__animating) return;
     const isHidden = (panel.style.display === 'none') || panel.classList.contains('is-collapsed');
     const shouldOpen = (open == null) ? isHidden : !!open;
@@ -55,21 +55,18 @@
       const prevTransition = panel.style.transition;
       panel.style.transition = 'none';
       const prevVisibility = panel.style.visibility;
-      const prevPosition = panel.style.position;
       const prevPointer = panel.style.pointerEvents;
       panel.style.visibility = 'hidden';
-      panel.style.position = 'absolute';
       panel.style.pointerEvents = 'none';
       panel.classList.remove('is-collapsed');
       panel.style.height = 'auto';
-      let target = panel.scrollHeight;
+      let target = panel.getBoundingClientRect().height;
 
       // 还原到起始收起状态
       panel.classList.add('is-collapsed');
       panel.style.height = '0px';
       panel.style.opacity = '0';
       panel.style.visibility = prevVisibility || '';
-      panel.style.position = prevPosition || '';
       panel.style.pointerEvents = prevPointer || '';
       void panel.offsetHeight;
 
@@ -102,7 +99,7 @@
         panel.addEventListener('transitionend', done);
       });
     } else {
-      const start = panel.scrollHeight;
+      const start = panel.getBoundingClientRect().height || panel.scrollHeight;
       panel.style.height = start + 'px';
       panel.style.opacity = '1';
       void panel.offsetHeight;

@@ -342,7 +342,7 @@
       main.appendChild(editingLabel);
 
       var editInput = document.createElement('input');
-      editInput.className = 'editor-node-edit tokens-input';
+      editInput.className = 'editor-node-edit admin-input';
       editInput.type = 'text';
       editInput.value = nodeValueText(node);
       editInput.dataset.id = node.id;

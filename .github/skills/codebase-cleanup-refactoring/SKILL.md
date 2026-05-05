@@ -26,6 +26,7 @@ user-invocable: true
 - 优先修改原定义并删除失效定义，不在后面追加更高优先级覆盖。
 - 能用全局类、主题 token、共享 helper 或原生能力表达的，不新建平行体系。
 - 页面或业务来源命名如果已经扩散成共享控件语义，应迁移到中性类名；旧类最多作为兼容别名，不继续作为权威 owner。
+- 浮层类组件（下拉、菜单、tooltip、popover）如果需要越过滚动、折叠或 overflow 容器，必须由共享 overlay/portal owner 定位；不要用提高 z-index、撑高父容器或追加局部 min-height 来掩盖结构问题。
 - 如果已有自定义实现只是在复刻原生/全局行为，评估是否可以退回更简单的实现；保留自定义层必须有明确收益，如主题化下拉、虚拟列表、复杂键盘行为或跨浏览器一致性。
 - 不为“减行数”删除 markdown 文档内容；只清理 js/css/html 中的死代码、重复逻辑和无效样式。
 - 不借清理之名改业务语义、视觉风格或交互结果；行为变化必须能用用户请求解释。
@@ -43,6 +44,7 @@ user-invocable: true
 
 - hover/focus/open/active/disabled 属于交互语义，不应在每个组件硬编码一套颜色和阴影。
 - 自定义 div/span 控件如果视觉上承担 input/select/button 职责，必须复用相同状态口径。
+- dropdown/menu/tooltip/popover 不应在错误的滚动或折叠容器内参与布局；需要逃逸容器时，把浮层移到统一 portal 层，并在关闭时清理定位与 DOM 归属。
 - active 和 focus 不应改变布局尺寸；避免用 `border` 简写覆盖分段按钮的单侧边框，优先用 `border-color`、`outline` 或 inset ring。
 - 浅色/深色主题的焦点反馈保持克制；典雅主题允许保留独立金色质感，但也应通过主题层集中表达。
 - 发现 `!important` 链、重复断点、重复 font-size、硬编码 3px ring 等，优先回到原定义清理。

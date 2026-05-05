@@ -4,8 +4,8 @@
  * 位置：.tokens-log > .tokens-log__wrap > .tokens-log__filters.admin-input-group
  * 字号继承：body 18px（--tp-fs-2xl）
  * 子控件字号/高度：由 toolbar.css 提供
- *   → .tokens-input  字号 --tp-fs-md (14px)  高度 --tokens-input-h
- *   → .tokens-btn    字号 --tp-fs-md (14px)  高度 --tokens-input-h
+ *   → .admin-input      字号 --tp-fs-md (14px)  高度 --admin-input-h
+ *   → .admin-input-btn  字号 --tp-fs-md (14px)  高度 --admin-input-h
  *
  * 本文件仅负责：
  *   · 筛选条容器布局（flex nowrap）
@@ -13,7 +13,7 @@
  *   · 宽度/伸缩微调
  *
  * 已移除：
- *   × height: 32px !important    → 由 --tokens-input-h 接管
+ *   × height: 32px !important    → 由 --admin-input-h 接管
  *   × font-size: var(--fs-md)    → 由 --tp-fs-md 接管
  *   × @media (max-width: 520px)  → clamp() 自动处理
  * ─────────────────────────────────────────────────────── */
@@ -35,24 +35,43 @@
 }
 
 /* 子控件直角拼接 */
-#panel_permissions .tokens-log__filters input.tokens-input,
-#panel_permissions .tokens-log__filters select.tokens-input,
-#panel_permissions .tokens-log__filters button,
-#panel_permissions .tokens-log__filters .btn,
-#panel_permissions .tokens-log__filters .tokens-btn,
-#panel_permissions .tokens-log__filters input,
-#panel_permissions .tokens-log__filters select {
+#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .custom-select, .btn, button) {
+  position: relative;
   vertical-align: middle;
   margin-top: 0;
   margin-bottom: 0;
-  border-right: none !important;
-  border-radius: var(--radius-none) !important;
+  border-radius: var(--radius-none);
 }
 
-.tokens-log__filters input.tokens-input,
-.tokens-log__filters select.tokens-input,
-.tokens-log__filters input,
-.tokens-log__filters select,
+#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .custom-select, .btn, button) + :is(.admin-input, .tokens-input, .custom-select, .btn, button) {
+  margin-left: -1px;
+}
+
+#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .btn, button),
+#panel_permissions .tokens-log__filters > .custom-select .custom-select__trigger {
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-left-width: 1px;
+  border-left-style: solid;
+}
+
+#panel_permissions .tokens-log__filters > :first-child {
+  border-radius: var(--radius-none);
+}
+
+#panel_permissions .tokens-log__filters > :last-child {
+  border-radius: var(--radius-none);
+}
+
+#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .btn, button):hover,
+#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .btn, button):focus,
+#panel_permissions .tokens-log__filters > .custom-select:hover,
+#panel_permissions .tokens-log__filters > .custom-select:focus-within,
+#panel_permissions .tokens-log__filters > .custom-select.is-open {
+  z-index: 2;
+}
+
+.tokens-log__filters :is(.admin-input, .tokens-input),
 #panel_permissions .tokens-log__filters .custom-select .custom-select__trigger {
   box-shadow: none !important;
 }
@@ -62,16 +81,13 @@
 
 /* 按钮不伸缩 */
 .tokens-log__filters .btn,
-.tokens-log__filters .tokens-btn {
+.tokens-log__filters :is(.admin-input-btn, .tokens-btn) {
   min-width: 0 !important;
   flex: 0 0 auto !important;
 }
 
 /* 输入/选择框自适应伸缩 */
-.tokens-log__filters input.tokens-input,
-.tokens-log__filters select.tokens-input,
-.tokens-log__filters input,
-.tokens-log__filters select {
+.tokens-log__filters :is(.admin-input, .tokens-input) {
   min-width: 0 !important;
   flex: 1 1 4.286em !important;     /* 60/14 基于 --tp-fs-md */
 }
@@ -81,13 +97,11 @@
   flex: 1 1 4.286em;               /* 60/14 */
   min-width: 4.286em;
   max-width: 11.429em;             /* 160/14 */
+  --custom-select-trigger-h: var(--admin-input-h, var(--tokens-input-h, 36px));
+  --custom-select-trigger-pad-y: 0;
+  --custom-select-trigger-lh: var(--custom-select-trigger-h);
+  --custom-select-trigger-radius: var(--radius-none);
 }
 #panel_permissions .tokens-log__filters .custom-select .custom-select__trigger {
-  height: var(--tokens-input-h, 36px);
   font-size: var(--tp-fs-md, 14px);
-  padding-top: 0;
-  padding-bottom: 0;
-  border-right: none !important;
-  border-radius: var(--radius-none);
-  line-height: var(--tokens-input-h, 36px);
 }

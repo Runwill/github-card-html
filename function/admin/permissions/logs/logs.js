@@ -103,22 +103,22 @@
         const filters = document.createElement('div');
         filters.className = 'tokens-log__filters admin-input-group';
         filters.innerHTML = [
-          '<input id="perms-log-q" class="tokens-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
+          '<input id="perms-log-q" class="admin-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
           // 动态类型下拉：初始仅包含“全部类型”，后续由 hydrateUserLogs 基于后端返回补齐
-          '<select id="perms-log-type" class="tokens-input">\
+          '<select id="perms-log-type" class="admin-input">\
             <option value="all" data-i18n="permissions.log.filter.cat.all">全部类型</option>\
           </select>',
-          '<select id="perms-log-outcome" class="tokens-input">\
+          '<select id="perms-log-outcome" class="admin-input">\
             <option value="any" data-i18n="permissions.log.filter.outcome.any">全部结果</option>\
             <option value="submitted" data-i18n="permissions.log.filter.outcome.submitted">已提交</option>\
             <option value="approved" data-i18n="permissions.log.filter.outcome.approved">已通过</option>\
             <option value="rejected" data-i18n="permissions.log.filter.outcome.rejected">已拒绝</option>\
             <option value="cancelled" data-i18n="permissions.log.filter.outcome.cancelled">已撤回</option>\
           </select>',
-          '<input id="perms-log-from" class="tokens-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.from" placeholder="起始日期" />',
-          '<input id="perms-log-to" class="tokens-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.to" placeholder="结束日期" />',
-          '<button id="perms-log-apply" class="btn btn--secondary tokens-btn tokens-refresh" data-i18n="permissions.log.filter.apply">筛选</button>',
-          '<button id="perms-log-reset" class="btn btn--secondary tokens-btn" data-i18n="permissions.log.filter.reset">重置</button>'
+          '<input id="perms-log-from" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.from" placeholder="起始日期" />',
+          '<input id="perms-log-to" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.to" placeholder="结束日期" />',
+          '<button id="perms-log-apply" class="btn btn--secondary admin-input-btn admin-toolbar-action" data-i18n="permissions.log.filter.apply">筛选</button>',
+          '<button id="perms-log-reset" class="btn btn--secondary admin-input-btn" data-i18n="permissions.log.filter.reset">重置</button>'
         ].join('');
         try { window.i18n && window.i18n.apply && window.i18n.apply(filters); } catch(_){ }
   // 根据语言为日期输入设置地区

@@ -100,7 +100,7 @@ html.force-landscape {
 }
 
 #panel_draft #htmlInput,
-#panel_draft .tokens-input {
+#panel_draft :is(.admin-input, .tokens-input) {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
@@ -126,10 +126,17 @@ html.force-landscape {
 
 #panel_draft #htmlInput::placeholder {
   color: var(--text-subtle);
+  font-family: var(--font-ui, inherit);
+  line-height: var(--lh-relaxed);
+  opacity: 0.82;
+}
+
+#panel_draft #htmlInput:placeholder-shown {
+  font-family: var(--font-ui, inherit);
 }
 
 #panel_draft #htmlInput:focus,
-#panel_draft .tokens-input:focus {
+#panel_draft :is(.admin-input, .tokens-input):focus {
   border-color: var(--primary-2);
   background: var(--surface);
   box-shadow: none;
@@ -227,12 +234,20 @@ html.force-landscape {
 }
 
 #panel_draft .editor-search,
-#panel_draft .editor-field .tokens-input {
+#panel_draft .editor-field :is(.admin-input, .tokens-input) {
   width: 100%;
-  height: var(--tokens-input-h, 36px);
+  height: var(--admin-input-h, var(--tokens-input-h, 36px));
   margin: 0;
   font-size: var(--draft-fs-control, 14px);
   padding: 0.571em 0.714em;
+}
+
+#panel_draft .editor-field :is(.admin-input, .tokens-input):disabled {
+  color: var(--text-subtle);
+  background: color-mix(in srgb, var(--surface) 80%, var(--border) 20%);
+  border-color: color-mix(in srgb, var(--border) 72%, transparent);
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 #panel_draft .editor-search {
@@ -254,8 +269,8 @@ html.force-landscape {
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
 
-#panel_draft .admin-input-group .tokens-btn {
-  height: var(--tokens-input-h, 36px);
+#panel_draft .admin-input-group :is(.admin-input-btn, .tokens-btn) {
+  height: var(--admin-input-h, var(--tokens-input-h, 36px));
   flex: 0 0 auto;
   padding: 0 0.857em;
   border: 1px solid var(--border);
@@ -266,7 +281,7 @@ html.force-landscape {
   white-space: nowrap;
 }
 
-#panel_draft .admin-input-group:focus-within .tokens-btn {
+#panel_draft .admin-input-group:focus-within :is(.admin-input-btn, .tokens-btn) {
   border-color: color-mix(in srgb, var(--primary-2) 55%, var(--border));
 }
 
@@ -316,12 +331,12 @@ html.force-landscape {
 #panel_draft .editor-entry {
   --editor-entry-accent: color-mix(in srgb, var(--primary-2) 42%, var(--border));
   width: 100%;
-  min-height: 2.25em;
+  min-height: 2.4em;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.556em;
-  padding: 0.429em 0.571em;
+  padding: 0.5em 0.571em;
   border: 1px solid var(--border);
   border-left: 0.286em solid var(--editor-entry-accent);
   border-radius: var(--radius-md);
@@ -329,6 +344,7 @@ html.force-landscape {
   color: var(--text);
   cursor: grab;
   font-size: var(--draft-fs-control, 14px);
+  line-height: var(--lh-normal);
   text-align: left;
   transition: border-color var(--dur-normal) var(--ease-default),
               background-color var(--dur-normal) var(--ease-default),
@@ -347,9 +363,12 @@ html.force-landscape {
 }
 
 #panel_draft .editor-entry__name,
+#panel_draft .editor-entry__meta,
 #panel_draft .editor-node-label,
 #panel_draft .editor-node-tag,
 #panel_draft .editor-node-attrs {
+  display: block;
+  line-height: var(--lh-normal);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -625,7 +644,7 @@ html.force-landscape {
 }
 
 #panel_draft .editor-field > span {
-  height: var(--tokens-input-h, 36px);
+  height: var(--admin-input-h, var(--tokens-input-h, 36px));
   display: flex;
   align-items: center;
   line-height: var(--lh-tight);

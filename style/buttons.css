@@ -63,6 +63,7 @@
 /* 全站按钮的移动端防误触设置（与“返回顶部按钮/水波按钮”保持一致） */
 button,
 .btn,
+.admin-input-btn,
 .tokens-btn,
 .menu__button,
 .button,
@@ -74,6 +75,7 @@ button,
 }
 button *,
 .btn *,
+.admin-input-btn *,
 .tokens-btn *,
 .menu__button *,
 .button *,

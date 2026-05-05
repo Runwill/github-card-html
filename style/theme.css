@@ -46,6 +46,7 @@
   --text:        #2d3748; /* 主文本 */
   --text-muted:  #4a5568; /* 次文本 */
   --text-subtle: #a0aec0; /* 占位/提示 */
+  --font-ui: "Microsoft YaHei", "微软雅黑", Arial, Helvetica, sans-serif;
 
   /* 主色/语义色 */
   --primary-1: #8698ff;
@@ -297,10 +298,8 @@ html.theme-switching *::after {
 /* 表单控件 */
 .modal-form input,
 #login-form input,
-#panel_tokens .tokens-input,
-#panel_permissions .tokens-input,
-.perm-editor input,
-.perm-editor select,
+#panel_tokens :is(.admin-input, .tokens-input),
+#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) :is(.admin-input, .tokens-input),
 .intro-textarea {
   border: 1px solid var(--border) !important;
   background: transparent !important;
@@ -314,26 +313,22 @@ html.theme-switching *::after {
 
 .modal-form input:hover,
 #login-form input:hover,
-#panel_tokens .tokens-input:hover,
-#panel_permissions .tokens-input:hover,
-.perm-editor input:hover,
-.perm-editor select:hover,
+#panel_tokens :is(.admin-input, .tokens-input):hover,
+#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) :is(.admin-input, .tokens-input):hover,
 .intro-textarea:hover {
   background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
   border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border)) !important;
 }
 
 .modal-form input::placeholder,
-#panel_tokens .tokens-input::placeholder,
-#panel_permissions .tokens-input::placeholder,
+#panel_tokens :is(.admin-input, .tokens-input)::placeholder,
+#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) :is(.admin-input, .tokens-input)::placeholder,
 .intro-textarea::placeholder { color: var(--text-subtle) !important; opacity: 0.8; }
 
 .modal-form input:focus,
 #login-form input:focus,
-#panel_tokens .tokens-input:focus,
-#panel_permissions .tokens-input:focus,
-.perm-editor input:focus,
-.perm-editor select:focus,
+#panel_tokens :is(.admin-input, .tokens-input):focus,
+#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) :is(.admin-input, .tokens-input):focus,
 .intro-textarea:focus {
   border-color: var(--primary-2) !important;
   box-shadow: none !important;
@@ -342,9 +337,9 @@ html.theme-switching *::after {
   background: var(--surface) !important;
 }
 
-/* Tokens 工具栏按钮与输入框边框颜色一致 */
-#panel_tokens .tokens-btn,
-#panel_permissions .tokens-btn { border-color: var(--border) !important; }
+/* 管理工具栏按钮与输入框边框颜色一致 */
+#panel_tokens :is(.admin-input-btn, .tokens-btn),
+#panel_permissions :is(.admin-input-btn, .tokens-btn) { border-color: var(--border) !important; }
 #panel_tokens #tokens-compact-toggle { border-color: var(--border) !important; }
 
 /* ═══ 按钮系统 ═══════════════════════════════════════════════════════════

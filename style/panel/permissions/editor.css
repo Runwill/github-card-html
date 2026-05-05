@@ -11,14 +11,14 @@
  *     → .perm-editor__item        字号：继承 18px
  *       → .perm-editor__item-text 字号 ← --tp-fs-base (13px)
  *   → .perm-editor__actions       字号：继承 18px
- *   → .tokens-input / input       字号 ← --tp-fs-md (14px) [toolbar.css]
+ *   → .admin-input / input        字号 ← --tp-fs-md (14px) [toolbar.css]
  *
  * 合并自：
  *   · permissions.css  .perm-editor 基础规则
  *   · theme.css        #panel_permissions .perm-editor* 覆盖
  *
  * 已移除：
- *   × height: 32px !important  → 由 --tokens-input-h 接管
+ *   × height: 32px !important  → 由 --admin-input-h 接管
  *   × font-size: var(--fs-md)  → 由 --tp-fs-md 接管
  *   × @media (max-width: 480px) → clamp() 自动处理
  * ─────────────────────────────────────────────────────── */
@@ -26,6 +26,7 @@
 /* ── 编辑器容器 ────────────────────────────────────────── */
 #panel_permissions .perm-editor {
   border: 1px solid var(--border);
+  box-sizing: border-box;
   border-radius: var(--radius-md);
   padding: 0.667em;                 /* 12/18 */
   background: color-mix(in srgb, var(--surface) 96%, transparent);
@@ -36,13 +37,27 @@
   opacity: 1;
   transition: height var(--dur-normal) var(--ease-default),
               opacity var(--dur-normal) var(--ease-default),
-              transform var(--dur-normal) var(--ease-default),
-              padding-top var(--dur-normal) var(--ease-default),
-              padding-bottom var(--dur-normal) var(--ease-default),
-              margin-top var(--dur-normal) var(--ease-default),
-              margin-bottom var(--dur-normal) var(--ease-default),
-              border-width var(--dur-normal) var(--ease-default);
-  will-change: height, opacity, transform, padding, margin, border-width;
+              transform var(--dur-normal) var(--ease-default);
+  will-change: height, opacity, transform;
+}
+
+#panel_permissions .perm-editor-stack {
+  height: auto;
+  overflow: hidden;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    height var(--dur-normal) var(--ease-default),
+    opacity var(--dur-fast) var(--ease-default),
+    transform var(--dur-normal) var(--ease-default);
+  will-change: height, opacity, transform;
+}
+
+#panel_permissions .perm-editor-stack.is-collapsed {
+  height: 0 !important;
+  opacity: 0 !important;
+  transform: translateY(-0.222em);   /* 4/18 */
+  pointer-events: none;
 }
 
 /* 精简变体（修改密码、角色等） */
@@ -119,14 +134,47 @@
 }
 
 /* ── 编辑器内独立输入框（覆盖 toolbar.css 的拼接外观） ── */
-#panel_permissions .perm-editor .tokens-input,
+#panel_permissions .perm-editor :is(.admin-input, .tokens-input),
 #panel_permissions .perm-editor input[type="text"],
 #panel_permissions .perm-editor input[type="password"],
 #panel_permissions .perm-editor input[type="date"],
 #panel_permissions .perm-editor select {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  color: var(--text);
+  box-shadow: none;
   outline: none;
   width: 100%;
+  min-width: 0;
+  height: var(--admin-input-h, var(--tokens-input-h, 36px));
+  padding: 0.571em 0.714em;
+  font-size: var(--tp-fs-md, 14px);
+  line-height: var(--lh-tight);
   box-sizing: border-box;
+  transition: background var(--dur-normal) var(--ease-default),
+              border-color var(--dur-normal) var(--ease-default),
+              box-shadow var(--dur-normal) var(--ease-default),
+              color var(--dur-normal) var(--ease-default);
+}
+
+#panel_permissions .perm-editor :is(.admin-input, .tokens-input):hover,
+#panel_permissions .perm-editor input[type="text"]:hover,
+#panel_permissions .perm-editor input[type="password"]:hover,
+#panel_permissions .perm-editor input[type="date"]:hover,
+#panel_permissions .perm-editor select:hover {
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
+}
+
+#panel_permissions .perm-editor :is(.admin-input, .tokens-input):focus,
+#panel_permissions .perm-editor input[type="text"]:focus,
+#panel_permissions .perm-editor input[type="password"]:focus,
+#panel_permissions .perm-editor input[type="date"]:focus,
+#panel_permissions .perm-editor select:focus {
+  border-color: var(--primary-2);
+  background: var(--surface);
+  box-shadow: none;
+  outline: 1px solid var(--primary-ring);
+  outline-offset: -1px;
 }

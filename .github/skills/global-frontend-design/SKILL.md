@@ -28,8 +28,12 @@ user-invocable: true
 - 新增面板功能、弹窗或隐藏交互时，同步 `base/help.json`、`i18n/strings.js`，必要时更新 `function/ui/help_panel.js` 映射。
 - 颜色、阴影、字体走主题变量，不硬编码主题色；注意 Foundation 对 `kbd`、`label`、`table`、`button` 等基础标签的默认覆盖。
 - hover/focus/open/active/disabled 属于全局交互语义；自定义 div/span 控件如果扮演 input/select/button，必须复用同一套主题 token 和状态口径，不能另写一套相似但漂移的颜色、边框和发光。
+- disabled/read-only/editable 必须有可辨认的视觉差异，且由控件 owner 维护；不要只依赖浏览器默认样式。
+- 单行省略、按钮标签、placeholder 要用合适的 line-height 和字体栈保证文字完整显示，不能用 padding 或 overflow 裁切来“挤”出紧凑感。
 - 多面板复用的控件类名应描述角色或行为，不沿用最初页面名；例如共享输入组使用中性命名，并把旧页面命名降级为兼容别名。
+- 下拉、菜单、tooltip、popover 这类浮层需要跨出折叠、滚动或 overflow 容器时，应使用共享 portal/overlay 方式定位；不要通过提高 z-index、撑高容器或隐藏内容来修补裁切。
 - active 和 focus 反馈不得改变控件几何尺寸；分段按钮不要用 `border` 简写覆盖单侧边框，优先改 `border-color`、`outline` 或 inset ring。
+- 同一行里互斥展开的面板切换时，用共享高度容器做一次高度动画，避免多个面板同步开合造成下方内容抖动。
 - 触摸端避免文本或按钮出现系统蓝色选中；但不要牺牲键盘焦点可见性。
 
 ## 设计口径

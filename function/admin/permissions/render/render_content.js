@@ -60,10 +60,14 @@
     row.appendChild(left); row.appendChild(right);
     block.appendChild(row);
 
+    const editorStack = makeEl('div', 'perm-editor-stack');
+    editorStack.style.display = 'none';
+    editorStack.classList.add('is-collapsed');
+
     // 权限编辑器
     const editor = makeEl('div', 'perm-editor'); editor.style.display = 'none'; editor.classList.add('is-collapsed');
     const toolbar = makeEl('div', 'perm-editor__toolbar');
-    const btnSelectAll = makeEl('button', 'btn btn--secondary btn--sm tokens-refresh');
+    const btnSelectAll = makeEl('button', 'btn btn--secondary btn--sm admin-toolbar-action');
     setI18nAttr(btnSelectAll, 'permissions.selectAll', t('permissions.selectAll', '全选/清空'));
     toolbar.appendChild(btnSelectAll);
     const list = makeEl('div', 'perm-editor__list');
@@ -93,16 +97,16 @@
     setI18nAttr(btnSave, 'common.save', t('common.save', '保存'));
     actions.appendChild(btnCancel); actions.appendChild(btnSave);
     editor.appendChild(toolbar); editor.appendChild(list); editor.appendChild(actions);
-    block.appendChild(editor);
+    editorStack.appendChild(editor);
 
     // 密码编辑器（用 <form> 包裹以满足浏览器 DOM 规范要求）
     const pwdEditor = makeEl('div', 'perm-editor perm-editor--plain'); pwdEditor.style.display='none'; pwdEditor.classList.add('is-collapsed');
     const pwdForm = document.createElement('form'); pwdForm.autocomplete='off'; pwdForm.addEventListener('submit', e => e.preventDefault());
     const pwdList = makeEl('div', 'perm-editor__list');
     const rowNew = makeEl('div', 'perm-editor__item');
-    const inputNew = document.createElement('input'); inputNew.type='password'; inputNew.className='tokens-input'; inputNew.autocomplete='new-password'; inputNew.placeholder = t('modal.password.new','新密码'); rowNew.appendChild(inputNew);
+    const inputNew = document.createElement('input'); inputNew.type='password'; inputNew.className='admin-input'; inputNew.autocomplete='new-password'; inputNew.placeholder = t('modal.password.new','新密码'); rowNew.appendChild(inputNew);
     const rowConfirm = makeEl('div', 'perm-editor__item');
-    const inputConfirm = document.createElement('input'); inputConfirm.type='password'; inputConfirm.className='tokens-input'; inputConfirm.autocomplete='new-password'; inputConfirm.placeholder = t('modal.password.confirm','确认新密码'); rowConfirm.appendChild(inputConfirm);
+    const inputConfirm = document.createElement('input'); inputConfirm.type='password'; inputConfirm.className='admin-input'; inputConfirm.autocomplete='new-password'; inputConfirm.placeholder = t('modal.password.confirm','确认新密码'); rowConfirm.appendChild(inputConfirm);
     pwdList.appendChild(rowNew); pwdList.appendChild(rowConfirm);
     const pwdActions = makeEl('div', 'perm-editor__actions');
     const btnPwdCancel = makeEl('button', 'btn btn--secondary');
@@ -112,13 +116,13 @@
     pwdActions.appendChild(btnPwdCancel); pwdActions.appendChild(btnPwdSave);
     pwdForm.appendChild(pwdList); pwdForm.appendChild(pwdActions);
     pwdEditor.appendChild(pwdForm);
-    block.appendChild(pwdEditor);
+    editorStack.appendChild(pwdEditor);
 
     // 角色编辑器
     const roleEditor = makeEl('div', 'perm-editor perm-editor--plain'); roleEditor.style.display='none'; roleEditor.classList.add('is-collapsed');
     const roleList = makeEl('div', 'perm-editor__list');
     const roleRow = makeEl('div', 'perm-editor__item');
-    const select = document.createElement('select'); select.className='tokens-input';
+    const select = document.createElement('select'); select.className='admin-input';
     const ROLES = [ { v: 'admin', k: 'role.admin' }, { v: 'moderator', k: 'role.moderator' }, { v: 'user', k: 'role.user' }, { v: 'guest', k: 'role.guest' } ];
     ROLES.forEach(r => { const opt = document.createElement('option'); opt.value = r.v; setText(opt, r.k, r.v); if (String(u.role) === r.v) opt.selected = true; select.appendChild(opt); });
     roleRow.appendChild(select); roleList.appendChild(roleRow);
@@ -129,14 +133,106 @@
     setI18nAttr(btnRoleSave, 'common.save', t('common.save','保存'));
     roleActions.appendChild(btnRoleCancel); roleActions.appendChild(btnRoleSave);
     roleEditor.appendChild(roleList); roleEditor.appendChild(roleActions);
-    block.appendChild(roleEditor);
+    editorStack.appendChild(roleEditor);
+    block.appendChild(editorStack);
 
     const editors = [editor, pwdEditor, roleEditor];
-    const isEditorOpen = (target)=> target && target.style.display !== 'none' && !target.classList.contains('is-collapsed');
+    const STACK_TRANSITION = 'height 220ms ease, opacity 150ms ease, transform 220ms ease';
+    const STACK_FALLBACK = 380;
+    const isStackOpen = ()=> editorStack.style.display !== 'none' && !editorStack.classList.contains('is-collapsed');
+    const isEditorOpen = (target)=> isStackOpen() && editorStack.__activeEditor === target;
+    const setEditorVisible = (target)=>{
+      editors.forEach(ed => {
+        const active = ed === target;
+        ed.style.display = active ? 'block' : 'none';
+        ed.classList.toggle('is-collapsed', !active);
+        ed.style.height = '';
+        ed.style.opacity = '';
+      });
+    };
+    const measureEditor = (target)=>{
+      if (!target) return 0;
+      const prevDisplay = target.style.display;
+      const prevVisibility = target.style.visibility;
+      const wasCollapsed = target.classList.contains('is-collapsed');
+      target.style.display = 'block';
+      target.style.visibility = 'hidden';
+      target.classList.remove('is-collapsed');
+      target.style.height = '';
+      const rect = target.getBoundingClientRect();
+      const style = getComputedStyle(target);
+      const margin = (parseFloat(style.marginTop) || 0) + (parseFloat(style.marginBottom) || 0);
+      target.style.display = prevDisplay;
+      target.style.visibility = prevVisibility;
+      target.classList.toggle('is-collapsed', wasCollapsed);
+      return rect.height + margin;
+    };
+    const finishStack = (target, focusEl)=>{
+      editorStack.removeEventListener('transitionend', editorStack.__onTransitionEnd || (()=>{}));
+      if (editorStack.__timer) { clearTimeout(editorStack.__timer); editorStack.__timer = null; }
+      editorStack.style.transition = '';
+      editorStack.style.height = '';
+      editorStack.style.opacity = '';
+      editorStack.__animating = false;
+      editorStack.__activeEditor = target || null;
+      if (target && focusEl) setTimeout(()=>{ try { focusEl.focus(); } catch{} }, 60);
+    };
+    const openEditorStack = (target, focusEl)=>{
+      if (!target || editorStack.__animating) return;
+      const startHeight = isStackOpen() ? editorStack.getBoundingClientRect().height : 0;
+      editorStack.__animating = true;
+      editorStack.style.display = 'block';
+      editorStack.classList.remove('is-collapsed');
+      editorStack.style.transition = 'none';
+      editorStack.style.height = startHeight + 'px';
+      editorStack.style.opacity = '1';
+      const targetHeight = measureEditor(target);
+      setEditorVisible(target);
+      void editorStack.offsetHeight;
+      const done = (e)=>{
+        if (e && e.target !== editorStack) return;
+        if (e && e.propertyName !== 'height') return;
+        finishStack(target, focusEl);
+      };
+      editorStack.__onTransitionEnd = done;
+      editorStack.addEventListener('transitionend', done);
+      editorStack.__timer = setTimeout(()=>done(), STACK_FALLBACK);
+      editorStack.style.transition = STACK_TRANSITION;
+      editorStack.style.height = targetHeight + 'px';
+      editorStack.style.opacity = '1';
+    };
+    const closeEditorStack = ()=>{
+      if (!isStackOpen() || editorStack.__animating) return;
+      editorStack.__animating = true;
+      editorStack.style.transition = 'none';
+      editorStack.style.height = editorStack.getBoundingClientRect().height + 'px';
+      editorStack.style.opacity = '1';
+      void editorStack.offsetHeight;
+      const done = (e)=>{
+        if (e && e.target !== editorStack) return;
+        if (e && e.propertyName !== 'height') return;
+        editorStack.removeEventListener('transitionend', done);
+        if (editorStack.__timer) { clearTimeout(editorStack.__timer); editorStack.__timer = null; }
+        editorStack.style.transition = '';
+        editorStack.style.height = '';
+        editorStack.style.opacity = '';
+        editorStack.style.display = 'none';
+        editorStack.classList.add('is-collapsed');
+        editorStack.__activeEditor = null;
+        editorStack.__animating = false;
+        setEditorVisible(null);
+      };
+      editorStack.addEventListener('transitionend', done);
+      editorStack.__timer = setTimeout(()=>done(), STACK_FALLBACK);
+      editorStack.style.transition = STACK_TRANSITION;
+      editorStack.style.height = '0px';
+      editorStack.style.opacity = '0';
+    };
+    editorStack.__closeEditorStack = closeEditorStack;
     const openEditor = (target, focusEl)=>{
       const nextOpen = !isEditorOpen(target);
-      editors.forEach(ed => toggleSection(ed, ed === target ? nextOpen : false));
-      if (nextOpen && focusEl) setTimeout(()=>{ try { focusEl.focus(); } catch{} }, 240);
+      if (nextOpen) openEditorStack(target, focusEl);
+      else closeEditorStack();
     };
 
     // 交互绑定 —— 权限
@@ -148,13 +244,13 @@
       const shouldSelectAll = cbs.some(cb => !cb.checked);
       cbs.forEach(cb => { cb.checked = shouldSelectAll; });
     });
-  btnCancel.addEventListener('click', ()=> toggleSection(editor, false));
-  btnSave.addEventListener('click', async ()=>{
+    btnCancel.addEventListener('click', closeEditorStack);
+    btnSave.addEventListener('click', async ()=>{
       const selected = Array.from(list.querySelectorAll('input[type="checkbox"]')).filter(cb=>cb.checked).map(cb=>cb.value);
       const curSet = new Set(current); const selSet = new Set(selected);
       const toGrant = selected.filter(p => !curSet.has(p));
       const toRevoke = current.filter(p => !selSet.has(p));
-      if (!toGrant.length && !toRevoke.length) { toggleSection(editor, false); return; }
+      if (!toGrant.length && !toRevoke.length) { closeEditorStack(); return; }
       spinnerBtn(btnSave, true);
       try {
         for (const p of toGrant) { await API.grant(userId, p); if (!curSet.has(p)) { curSet.add(p); current.push(p); } }
@@ -164,14 +260,14 @@
         // 自动刷新日志
         if (ns.refreshLogs) ns.refreshLogs();
       } catch(e) { toast((e && e.message) ? e.message : 'permissions.saveFailed', 'error'); }
-      finally { spinnerBtn(btnSave, false); toggleSection(editor, false); }
+      finally { spinnerBtn(btnSave, false); closeEditorStack(); }
     });
 
     // 交互绑定 —— 密码
     pwdBtn.addEventListener('click', ()=>{
       openEditor(pwdEditor, inputNew);
     });
-    btnPwdCancel.addEventListener('click', ()=> toggleSection(pwdEditor, false));
+    btnPwdCancel.addEventListener('click', closeEditorStack);
     btnPwdSave.addEventListener('click', async ()=>{
       const p1 = (inputNew.value || '').trim(); const p2 = (inputConfirm.value || '').trim();
       if (!p1 || !p2) { toast('error.fillAll', 'error'); return; }
@@ -180,7 +276,7 @@
       spinnerBtn(btnPwdSave, true);
       try {
         await API.setPassword(userId, p1);
-        toast('status.updated'); inputNew.value=''; inputConfirm.value=''; toggleSection(pwdEditor, false);
+        toast('status.updated'); inputNew.value=''; inputConfirm.value=''; closeEditorStack();
         // 自动刷新日志
         if (ns.refreshLogs) ns.refreshLogs();
       } catch(e) { toast(e && e.message ? e.message : 'error.updateFailed', 'error'); }
@@ -194,9 +290,9 @@
     meta.addEventListener('click', toggleRoleEditor);
     meta.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' ') { e.preventDefault(); toggleRoleEditor(); }});
     select.addEventListener('keydown', (e)=>{ if (e.key==='Enter') { e.preventDefault(); btnRoleSave.click(); } else if (e.key==='Escape') { e.preventDefault(); btnRoleCancel.click(); }});
-    btnRoleCancel.addEventListener('click', ()=> toggleSection(roleEditor, false));
+    btnRoleCancel.addEventListener('click', closeEditorStack);
     btnRoleSave.addEventListener('click', async ()=>{
-      const newRole = select.value; if (!newRole) { toggleSection(roleEditor, false); return; }
+      const newRole = select.value; if (!newRole) { closeEditorStack(); return; }
       spinnerBtn(btnRoleSave, true);
       try {
         await API.setRole(userId, newRole); toast('status.updated');
@@ -205,7 +301,7 @@
         // 局部更新角色文本，不刷新整页
         try { roleValue.textContent = select.options[select.selectedIndex]?.textContent || newRole; } catch { roleValue.textContent = newRole; }
       } catch(e) { toast(e && e.message ? e.message : 'error.updateFailed', 'error'); }
-      finally { spinnerBtn(btnRoleSave, false); toggleSection(roleEditor, false); }
+      finally { spinnerBtn(btnRoleSave, false); closeEditorStack(); }
     });
 
   return block;
