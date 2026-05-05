@@ -1,8 +1,76 @@
 <div class="tabs-panel" id="panel_draft">
-  <main>
-    <padding>
-  <textarea id="htmlInput" data-i18n-attr="placeholder" data-i18n-placeholder="draft.input.placeholder" placeholder="输入HTML代码"></textarea>
-      <div class="draftBlock"></div>
-    </padding>
+  <main class="draft-page">
+    <section class="draft-live" data-i18n-attr="aria-label" data-i18n-aria-label="nav.draft" aria-label="草稿">
+      <div class="draft-live__grid">
+        <label class="draft-pane draft-pane--input" for="htmlInput" data-i18n-attr="aria-label" data-i18n-aria-label="draft.input.title" aria-label="HTML 输入">
+          <textarea id="htmlInput" data-i18n-attr="placeholder" data-i18n-placeholder="draft.input.placeholder" placeholder="输入HTML代码"></textarea>
+        </label>
+        <section class="draft-pane draft-pane--preview" data-i18n-attr="aria-label" data-i18n-aria-label="draft.preview.title" aria-label="实时预览">
+          <div class="draftBlock"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="editor-shell" aria-labelledby="editor-title">
+      <header class="editor-toolbar">
+        <h2 id="editor-title" data-i18n="editor.title">HTML 编辑器</h2>
+        <div class="editor-toolbar__actions">
+          <label class="editor-toggle">
+            <input id="editor-escape-toggle" type="checkbox" checked>
+            <span data-i18n="editor.action.escapeQuotes">转义引号</span>
+          </label>
+          <button type="button" class="btn btn--sm" id="editor-expand-all" data-i18n="editor.action.expandAll">展开</button>
+          <button type="button" class="btn btn--sm" id="editor-collapse-all" data-i18n="editor.action.collapseAll">折叠</button>
+          <button type="button" class="btn btn--sm" id="editor-import-draft" data-i18n="editor.action.importFromDraft">输入</button>
+          <button type="button" class="btn btn--sm" id="editor-apply-output" data-i18n="editor.action.outputToDraft">输出</button>
+          <button type="button" class="btn btn--sm btn--danger" id="editor-clear-tree" data-i18n="editor.action.clearTree">清空</button>
+        </div>
+      </header>
+
+      <div class="editor-workspace">
+        <aside class="editor-pane editor-palette" data-i18n-attr="aria-label" data-i18n-aria-label="editor.palette.title" aria-label="元素库">
+          <div class="editor-search-row">
+            <input id="editor-search" class="tokens-input editor-search" type="search" data-i18n-attr="placeholder" data-i18n-placeholder="editor.search.placeholder" placeholder="搜索元素">
+            <button type="button" class="btn btn--sm" id="editor-reload-palette" data-i18n="editor.action.reloadPalette">刷新</button>
+          </div>
+          <div id="editor-palette-status" class="editor-status" aria-live="polite"></div>
+          <section id="editor-recommendations" class="editor-recommendations" hidden>
+            <div class="editor-recommendation-head">
+              <div class="editor-subtitle" data-i18n="editor.recommendations.title">相关推荐</div>
+              <button type="button" class="btn btn--sm" id="editor-recommend-direction" data-i18n="editor.recommendation.modeBidirectional">双向</button>
+            </div>
+            <div id="editor-recommendation-list" class="editor-entry-list editor-entry-list--compact"></div>
+          </section>
+          <div id="editor-palette-list" class="editor-entry-list" role="listbox"></div>
+        </aside>
+
+        <section class="editor-pane editor-tree-pane" id="editor-tree-pane" data-i18n-attr="aria-label" data-i18n-aria-label="editor.tree.title" aria-label="结构树">
+          <div id="editor-variant-badge" class="editor-variant-badge" hidden data-i18n="editor.variant.badge">变体</div>
+          <div id="editor-tree" class="editor-tree" role="tree"></div>
+        </section>
+
+        <aside class="editor-pane editor-inspector" id="editor-inspector" data-i18n-attr="aria-label" data-i18n-aria-label="editor.inspector.title" aria-label="属性">
+          <span id="editor-selected-name" class="editor-selected-name" data-i18n="editor.inspector.empty">未选中</span>
+          <label class="editor-field">
+            <span>Class</span>
+            <input id="editor-class-input" class="tokens-input" type="text" disabled>
+          </label>
+          <label class="editor-field">
+            <span>epithet</span>
+            <input id="editor-epithet-input" class="tokens-input" type="text" disabled>
+          </label>
+          <div class="editor-button-row">
+            <button type="button" class="btn btn--sm" id="editor-convert-node" data-needs-selection data-i18n="editor.action.convertElement">转为元素</button>
+          </div>
+          <section class="editor-log" aria-labelledby="editor-log-title">
+            <div class="editor-log__header">
+              <h4 id="editor-log-title" data-i18n="editor.log.title">日志</h4>
+              <button type="button" class="btn btn--sm" id="editor-clear-log" data-i18n="editor.log.clear">清空</button>
+            </div>
+            <div id="editor-log-list" class="editor-log__list" aria-live="polite"></div>
+          </section>
+        </aside>
+      </div>
+    </section>
   </main>
 </div>

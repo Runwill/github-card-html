@@ -55,6 +55,7 @@ function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
     const dur=calculateProgressBarDuration(text), bar=document.querySelector('.loading-bar');
     if(bar){ bar.style.setProperty('--pb-duration', `${dur}s`); const end= dur<=1.2?0.88:Math.min(0.93,0.88+(dur-1.2)*0.08); bar.style.setProperty('--pb-end', String(end)); }
     setTimeout(startCompletionCheck, dur*900+800);
+    setTimeout(()=>{ if(!completionStarted) completeProgressBar() }, 10000);
 })()
 
 window.addEventListener('resize', applyLoadingTitleSpacing)
@@ -80,13 +81,19 @@ function scheduleStatus(){ if(!statusTimer) statusTimer=setTimeout(updateStatus,
 
 // 平滑完成进度条
 function completeProgressBar(){
-    if(completionStarted) return; completionStarted=true
-    sessionStorage.setItem('loading_last_shown', Date.now())
     const bar=document.querySelector('.loading-bar'), overlay=document.getElementById('loading-overlay')
-    requestAnimationFrame(()=>{
+    if(!overlay){ setTimeout(completeProgressBar,100); return }
+    if(completionStarted && (overlay.classList.contains('fade-out') || overlay.style.display==='none')) return
+    completionStarted=true
+    sessionStorage.setItem('loading_last_shown', Date.now())
+    setTimeout(()=>{
         bar?.classList.add('accelerate')
-        setTimeout(()=>{ requestAnimationFrame(()=>{ if(!overlay) return; overlay.classList.add('fade-out'); window.textAnimationController?.startAnimations?.(); setTimeout(()=>{ overlay.style.display='none' },3000) }) },400)
-    })
+        setTimeout(()=>{
+            overlay.classList.add('fade-out')
+            window.textAnimationController?.startAnimations?.()
+            setTimeout(()=>{ overlay.style.display='none' },3000)
+        },400)
+    },0)
 }
 
 // 开始检查完成条件的循环
@@ -103,10 +110,15 @@ window.addEventListener('load', ()=>{ resourcesReady=true; scheduleStatus(); att
 // 名称 / 术语等替换完成（由 app_bootstrap.js 暴露）
 ;(function(){
     try{
+        const fallbackTimer = setTimeout(()=>{
+            if(!replacementsReady){ replacementsReady=true; attemptCompletion() }
+        }, 8000)
         // 支持“迟到”的赋值：若此时尚未设置 window.replacementsReady，则拦截其后续 set
         const hook = (p)=>{
+            clearTimeout(fallbackTimer)
+            const timeout = new Promise(resolve=>setTimeout(resolve, 8000))
             if(p && typeof p.then === 'function'){
-                p.then(()=>{ replacementsReady=true; attemptCompletion() })
+                Promise.race([p, timeout]).then(()=>{ replacementsReady=true; attemptCompletion() })
                  .catch(()=>{ replacementsReady=true; attemptCompletion() })
             }else{
                 // 未提供 Promise，视作不阻塞

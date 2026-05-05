@@ -11,15 +11,24 @@
   }
 
   function callReplacers(root){
+    if (!root || !window.endpoints) return;
     var reps = [
-      ['replace_character_name', endpoints.character()],
-      ['replace_skill_name', endpoints.skill()],
-      ['replace_card_name', endpoints.card()],
-      ['replace_term', endpoints.termDynamic(), 1],
-      ['replace_term', endpoints.termFixed(), 1]
+      ['replace_character_name', window.endpoints.character()],
+      ['replace_skill_name', window.endpoints.skill()],
+      ['replace_card_name', window.endpoints.card()],
+      ['replace_term', window.endpoints.termDynamic(), 1],
+      ['replace_term', window.endpoints.termFixed(), 1]
     ];
     for (var i=0;i<reps.length;i++) (function(it){
-      safe(function(){ var fn = window[it[0]]; if(!fn) return; var args = it.slice(1); args.push(root); return fn.apply(window, args); });
+      safe(function(){
+        var fn = window[it[0]];
+        if(!fn || !it[1]) return;
+        var args = it.slice(1);
+        args.push(root);
+        var result = fn.apply(window, args);
+        if (result && typeof result.catch === 'function') result.catch(function(){});
+        return result;
+      });
     })(reps[i]);
     setTimeout(function(){ safe(function(){ return window.pronounCheck && window.pronounCheck(root); }); }, 50);
   }
@@ -45,6 +54,16 @@
     render(val); save(val);
   }
 
+  function setContent(html){
+    if (!inputEl || !previewEl) init();
+    if (!inputEl) return;
+    var val = html || '';
+    inputEl.value = val;
+    render(val);
+    save(val);
+    safe(autosizeNow);
+  }
+
   function isVisible(el){
     if (!el) return false;
     var cs = window.getComputedStyle ? getComputedStyle(el) : null;
@@ -53,9 +72,19 @@
     return rect.width > 0 && rect.height > 0;
   }
 
+  function usesFixedEditorLayout(){
+    return !!(inputEl && inputEl.closest && inputEl.closest('.draft-live__grid'));
+  }
+
   function autosizeNow(){
     if (!inputEl) return;
     if (!isVisible(inputEl)) return;
+    if (usesFixedEditorLayout()) {
+      inputEl.style.height = '';
+      inputEl.style.overflow = 'auto';
+      inputEl.style.resize = 'none';
+      return;
+    }
     inputEl.style.height = 'auto';
     var next = Math.max(80, inputEl.scrollHeight);
     inputEl.style.height = next + 'px';
@@ -72,7 +101,12 @@
       render(saved);
     }
 
-    try { inputEl.style.height='auto'; inputEl.style.overflow='hidden'; inputEl.style.resize='none'; if (isVisible(inputEl)) autosizeNow(); } catch(_) {}
+    try {
+      inputEl.style.height = usesFixedEditorLayout() ? '' : 'auto';
+      inputEl.style.overflow = usesFixedEditorLayout() ? 'auto' : 'hidden';
+      inputEl.style.resize = 'none';
+      if (isVisible(inputEl)) autosizeNow();
+    } catch(_) {}
 
     var debouncedRender = debounce(onInput, 250);
     inputEl.addEventListener('input', function(e){
@@ -115,5 +149,5 @@
     init();
   })();
 
-  window.draftPanel = { render: render, save: save, load: load, init: init, autosize: function(){ safe(autosizeNow); } };
+  window.draftPanel = { render: render, save: save, load: load, init: init, setContent: setContent, autosize: function(){ safe(autosizeNow); } };
 })();

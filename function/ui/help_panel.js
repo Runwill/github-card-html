@@ -162,15 +162,37 @@
     el.querySelector('.help-popover__hint').textContent = t('help.hint');
   }
 
+  function getActionKeyText(action) {
+    var settings = window.KeySettings;
+    if (settings && typeof settings.getBindingText === 'function') return settings.getBindingText(action);
+    return action;
+  }
+
+  function tipKeys(tip) {
+    var keys = [];
+    if (Array.isArray(tip.actions)) {
+      for (var actionIndex = 0; actionIndex < tip.actions.length; actionIndex++) {
+        keys.push(getActionKeyText(tip.actions[actionIndex]));
+      }
+    }
+    if (Array.isArray(tip.keys)) {
+      for (var keyIndex = 0; keyIndex < tip.keys.length; keyIndex++) {
+        keys.push(tip.keys[keyIndex]);
+      }
+    }
+    return keys.length ? keys : [''];
+  }
+
   function renderRow(tip, t) {
     var row = document.createElement('div');
     row.className = 'help-row';
 
     var keysEl = document.createElement('span');
     keysEl.className = 'help-keys';
-    for (var i = 0; i < tip.keys.length; i++) {
+    var keys = tipKeys(tip);
+    for (var i = 0; i < keys.length; i++) {
       var kbd = document.createElement('kbd');
-      kbd.textContent = tip.keys[i];
+      kbd.textContent = keys[i];
       keysEl.appendChild(kbd);
     }
 
@@ -234,6 +256,13 @@
       // 等待 overlay 栈变化后再渲染
       setTimeout(function () { renderContent(getActiveContext()); }, 80);
     }, true);
+
+    window.addEventListener('keybindings-changed', function () {
+      if (visible) renderContent(getActiveContext());
+    });
+    window.addEventListener('i18n:changed', function () {
+      if (visible) renderContent(getActiveContext());
+    });
   }
 
   if (window.partialsReady) {

@@ -3,6 +3,10 @@
 ;(function(){
   const sr = (fn)=>{ try { return typeof fn === 'function' ? fn() : undefined } catch(_) {} }
   window.delay ||= (ms)=>new Promise(r=>setTimeout(r,ms))
+  const withTimeout = (promise, ms)=>Promise.race([
+    Promise.resolve(promise).catch(()=>{}),
+    window.delay(ms).then(()=>{})
+  ])
 
   document.addEventListener('DOMContentLoaded',()=>{
     const ready = window.partialsReady?.then ? window.partialsReady : Promise.resolve()
@@ -24,7 +28,7 @@
 
         // 向全局暴露术语/名称替换完成信号，供加载覆盖层附加等待
         if(tasks.length){
-          window.replacementsReady = Promise.all(tasks).catch(()=>{})
+          window.replacementsReady = Promise.all(tasks.map(task=>withTimeout(task, 4500))).catch(()=>{})
         } else {
           window.replacementsReady = Promise.resolve()
         }

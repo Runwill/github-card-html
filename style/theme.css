@@ -527,28 +527,6 @@ html.force-landscape {
 /* 面板内临时白底块统一随主题 */
 #panel_character #character-placeholder { min-height: var(--character-placeholder-min-h, 500px); background-color: var(--surface); }
 
-/* 草稿面板：继承父级色彩，并对输入框做主题化 */
-#panel_draft,
-#panel_draft * {
-  color: inherit;
-}
-#panel_draft .draftBlock { background: inherit !important; }
-#panel_draft #htmlInput {
-  width: 100%;
-  overflow: hidden;
-  resize: none;
-  background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
-  color: var(--text) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-sm);
-}
-#panel_draft #htmlInput::placeholder { color: var(--text-subtle) !important; }
-#panel_draft #htmlInput:focus {
-  border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important;
-  box-shadow: var(--shadow-ring) !important;
-  background: var(--surface) !important;
-}
-
 #tokens-content .token-card {
   background: var(--token-bg, var(--surface)) !important;
   border: 1px solid var(--border) !important;

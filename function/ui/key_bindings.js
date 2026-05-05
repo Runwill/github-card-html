@@ -3,12 +3,12 @@
   const KEY_SETTINGS_BUTTON_ID = 'key-settings-button';
   
   // Actions Definition
-  const ACTIONS = {
+    const ACTIONS = Object.assign({
       'expand_all_terms': { label: 'Expand All Terms', default: null, btnId: 'key-bind-expand-all' },
       // default: { key: 'Control' } means the key 'Control' itself.
       'inspect_details': { label: 'Inspect Details (Hold)', default: { key: 'Control' }, btnId: 'key-bind-inspect' },
       'toggle_theme': { label: 'Toggle Theme', default: { key: 't' }, btnId: 'key-bind-toggle-theme' }
-  };
+    }, window.CardEditorKeyActions || {});
 
   let bindings = {};
   let isRecording = false;
@@ -34,7 +34,7 @@
   }
 
   function getBinding(action) {
-      if (bindings[action]) return bindings[action];
+      if (Object.prototype.hasOwnProperty.call(bindings, action)) return bindings[action];
       return ACTIONS[action] ? ACTIONS[action].default : null;
   }
 
@@ -63,7 +63,7 @@
 
     // Backspace: Clear binding (not assigned)
     if (e.key === 'Backspace') {
-      delete bindings[recordingAction];
+      bindings[recordingAction] = null;
       saveBindings();
       stopRecording();
       return;
@@ -226,6 +226,8 @@
   window.KeySettings = {
       isActionActive,
       checkBinding,
+      getBinding,
+      getBindingText,
       ACTIONS
   };
 

@@ -1,5 +1,5 @@
 ;(function(){
-  const titles=['程序','技能','牌库','将池','草稿','词元','权限'];
+  const titles=['程序','技能','牌库','将池','草稿','词元','权限','对局'];
   const changeTitle=n=> document.title='Document丨'+(titles[n]||'');
   const isAdmin=()=>{ try{ return localStorage.getItem('role')==='admin' }catch(_){ return false } };
 
@@ -19,7 +19,10 @@
           if(window.renderPermissionsPanel && !hasRow){ window.renderPermissionsPanel(''); }
         }
         if(href==='#panel_draft'){
-          requestAnimationFrame(()=>{ window.draftPanel?.autosize && window.draftPanel.autosize(); });
+          requestAnimationFrame(()=>{
+            window.draftPanel?.autosize && window.draftPanel.autosize();
+            window.CardEditor?.Panel?.renderAll && window.CardEditor.Panel.renderAll(false);
+          });
         }
         changeTitle(idx);
       });

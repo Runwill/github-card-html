@@ -1,7 +1,7 @@
 {
   "global": [
     { "keys": ["?"], "desc": "help.key.help" },
-    { "keys": ["T"], "desc": "help.key.theme" },
+    { "actions": ["toggle_theme"], "desc": "help.key.theme" },
     { "keys": ["导航栏滚轮"], "desc": "help.nav.scroll" },
     { "keys": ["☰ / 头像"], "desc": "help.nav.sidebar" }
   ],
@@ -28,6 +28,7 @@
       { "keys": ["展开所有术语"], "desc": "help.keybind.expandAll" },
       { "keys": ["显示属性"], "desc": "help.keybind.inspect" },
       { "keys": ["切换深浅色"], "desc": "help.keybind.theme" },
+      { "keys": ["草稿编辑器"], "desc": "help.keybind.editor" },
       { "keys": ["Esc / Backspace"], "desc": "help.keybind.hint" }
     ],
     "game-settings-modal": [
@@ -44,7 +45,7 @@
       { "keys": ["注册审核"], "desc": "help.approve.register" },
       { "keys": ["头像审核"], "desc": "help.approve.avatar" },
       { "keys": ["用户名/简介"], "desc": "help.approve.profile" },
-      { "keys": ["仅管理员"], "desc": "help.approve.role" }
+      { "keys": ["审核入口"], "desc": "help.approve.role" }
     ],
     "avatar-modal": [
       { "keys": ["当前头像"], "desc": "help.avatar.preview" },
@@ -72,26 +73,40 @@
   "panels": {
     "panel_term": [
       { "keys": ["▾ 三角按钮"], "desc": "help.term.collapse" },
-      { "keys": ["展开所有术语"], "desc": "help.term.expandAll" },
-      { "keys": ["动态标签"], "desc": "help.term.dynamic" }
+      { "actions": ["expand_all_terms"], "desc": "help.term.expandAll" },
+      { "keys": ["悬停 / 双击标签"], "desc": "help.term.dynamic" }
     ],
     "panel_skill": [
       { "keys": ["搜索框"], "desc": "help.skill.search" },
-      { "keys": ["Ctrl (按住)"], "desc": "help.skill.copy" },
-      { "keys": ["动态标签"], "desc": "help.skill.dynamic" }
+      { "actions": ["inspect_details"], "desc": "help.skill.copy" },
+      { "keys": ["悬停 / 双击标签"], "desc": "help.skill.dynamic" }
     ],
     "panel_card": [
-      { "keys": ["动态标签"], "desc": "help.card.dynamic" }
+      { "keys": ["悬停 / 双击标签"], "desc": "help.card.dynamic" }
     ],
     "panel_character": [
       { "keys": ["搜索框"], "desc": "help.character.search" },
       { "keys": ["技能名悬停"], "desc": "help.character.lore" },
-      { "keys": ["动态标签"], "desc": "help.character.dynamic" }
+      { "keys": ["悬停 / 双击标签"], "desc": "help.character.dynamic" }
     ],
     "panel_draft": [
       { "keys": ["输入区"], "desc": "help.draft.input" },
-      { "keys": ["自动替换"], "desc": "help.draft.replace" },
-      { "keys": ["自动保存"], "desc": "help.draft.save" }
+      { "keys": ["元素库"], "desc": "help.editor.palette" },
+      { "keys": ["点击元素"], "desc": "help.editor.insert" },
+      { "keys": ["拖拽位置"], "desc": "help.editor.dragInsert" },
+      { "actions": ["editor_variant_mode"], "desc": "help.editor.variant" },
+      { "keys": ["结构树"], "desc": "help.editor.editInline" },
+      { "keys": ["属性栏"], "desc": "help.editor.attrs" },
+      { "keys": ["单向 / 双向"], "desc": "help.editor.recommendationMode" },
+      { "keys": ["输入 / 输出"], "desc": "help.editor.io" },
+      { "keys": ["拖动节点"], "desc": "help.editor.move" },
+      { "actions": ["editor_focus_search"], "desc": "help.editor.key.focusSearch" },
+      { "actions": ["editor_clear_selection"], "desc": "help.editor.key.clearSelection" },
+      { "actions": ["editor_add_child"], "desc": "help.editor.key.addChild" },
+      { "actions": ["editor_add_sibling"], "desc": "help.editor.key.addSibling" },
+      { "actions": ["editor_edit_selected"], "desc": "help.editor.key.editSelected" },
+      { "actions": ["editor_delete_selected"], "desc": "help.editor.key.deleteSelected" },
+      { "actions": ["editor_variant_mode"], "desc": "help.editor.key.variant" }
     ],
     "panel_tokens": [
       { "keys": ["搜索框"], "desc": "help.tokens.search" },
@@ -143,7 +158,7 @@
         { "keys": ["装备窗口"], "desc": "help.game.equipViewer" },
         { "keys": ["右键卡牌"], "desc": "help.game.cardContext" },
         { "keys": ["右键角色"], "desc": "help.game.roleContext" },
-        { "keys": ["检查键 (按住)"], "desc": "help.game.inspect" },
+        { "actions": ["inspect_details"], "desc": "help.game.inspect" },
         { "keys": ["玩家徽标"], "desc": "help.game.viewerBadges" },
         { "keys": ["时机/日志"], "desc": "help.game.timing" }
       ]

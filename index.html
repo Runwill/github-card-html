@@ -57,7 +57,7 @@
     <link rel="stylesheet" type="text/css" href="style/panel/tokens/nest.css?v=202604102135">
     <link rel="stylesheet" type="text/css" href="style/panel/tokens/log.css?v=202604102135">
     <link rel="stylesheet" type="text/css" href="style/panel/tokens/animation.css?v=202604102135">
-    <link rel="stylesheet" type="text/css" href="style/theme.css?v=202605030245">
+    <link rel="stylesheet" type="text/css" href="style/theme.css?v=202605040130">
     <link rel="stylesheet" type="text/css" href="style/theme_elegant.css?v=202605030245">
     <link rel="stylesheet" type="text/css" href="style/skill_copy.css?v=202605010430">
     <link rel="stylesheet" type="text/css" href="style/footer.css?v=202605010410">
@@ -65,6 +65,7 @@
     <link rel="stylesheet" type="text/css" href="style/panel/permissions/filters.css?v=202604102135">
     <link rel="stylesheet" type="text/css" href="style/panel/permissions/editor.css?v=202604102135">
     <link rel="stylesheet" type="text/css" href="style/panel/permissions/rows.css?v=202604102135">
+    <link rel="stylesheet" type="text/css" href="editor/styles/editor.css?v=202605040900">
     <link rel="stylesheet" type="text/css" href="style/collapsible.css?v=202604102135">
     <!-- Game Modules (Replaces game.css) -->
     <link rel="stylesheet" type="text/css" href="game/styles/game_layout.css?v=202605010520">
@@ -88,7 +89,7 @@
     <!-- 通用 API 工具（提供 getEndpointUrl/fetchJSON） -->
 
     <!-- i18n：先加载词典，再加载运行时（在 UI 初始化前） -->
-    <script src="i18n/strings.js?v=202605030130"></script>
+    <script src="i18n/strings.js?v=202605040760"></script>
     <script src="game/i18n/strings.js?v=202604102135"></script>
     <script src="function/admin/tokens/i18n/strings.js?v=202604102135"></script>
     <script src="function/admin/permissions/i18n/strings.js?v=202604102135"></script>
@@ -117,7 +118,7 @@
     <!-- API endpoints config: must load before app_bootstrap.js -->
     <script src="function/api/endpoints.js?v=202604102135"></script>
     <script src="function/auth/login_check.js?v=202604102135"></script>
-    <script src="function/page_loading.js?v=202604292145"></script>
+    <script src="function/page_loading.js?v=202605040764"></script>
     <!-- 全局 Toast（所有模块共用，须最先加载） -->
     <script src="function/ui/toast.js?v=202604102135"></script>
     <!-- tokens admin split modules -->
@@ -216,12 +217,16 @@
     <script src="function/ui/event_bindings.js?v=202604102135"></script>
     <script src="function/ui/tabs.js?v=202604102135"></script>
     <script src="function/ui/shared_search.js?v=202604102135"></script>
-    <script src="function/ui/draft_panel.js?v=202604102135"></script>
+    <script src="function/ui/draft_panel.js?v=202605040760"></script>
+    <script src="editor/scripts/key_actions.js?v=202605040760"></script>
+    <script src="editor/scripts/data.js?v=202605040700"></script>
+    <script src="editor/scripts/recommendations.js?v=202605040760"></script>
+    <script src="editor/scripts/panel.js?v=202605040900"></script>
     <script src="function/ui/theme_toggle_button.js?v=202604102135"></script>
     <script src="function/ui/lang_toggle_button.js?v=202604102135"></script>
-    <script src="function/app_bootstrap.js?v=202604102135"></script>
+    <script src="function/app_bootstrap.js?v=202605040760"></script>
     <script src="function/ui/skill_copy.js?v=202604102135"></script>
-    <script src="function/ui/help_panel.js?v=202604102135"></script>
+    <script src="function/ui/help_panel.js?v=202605040500"></script>
     <script src="https://unpkg.com/cropperjs@1.6.2/dist/cropper.min.js"></script>
 
     <title>Document丨程序</title>
@@ -252,7 +257,7 @@
     <script src="function/ui/back_to_top.js?v=202604102135"></script>
     <script src="function/ui/collapsible_transition.js?v=202604102135"></script>
     <script src="function/ui/collapsible.js?v=202604102135"></script>
-    <script src="function/ui/key_bindings.js?v=202604102135"></script>
+    <script src="function/ui/key_bindings.js?v=202605040760"></script>
     <script src="function/ui/game_settings.js?v=202604102135"></script>
 </body>
 
