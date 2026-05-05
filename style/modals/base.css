@@ -206,11 +206,35 @@
 }
 
 /* Settings shared – info row & hint */
-.modal-form > .info-row {
+.modal-form > .info-row,
+.key-settings-pane > .info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.556em;
+}
+
+.key-settings-categories {
+  display: flex;
+  align-items: center;
+  gap: 0.444em;
+  margin-bottom: 0.667em;
+  padding-bottom: 0.556em;
+  border-bottom: 1px solid var(--border);
+}
+
+.key-settings-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.key-settings-pane {
+  display: none;
+}
+
+.key-settings-pane.is-active {
+  display: block;
 }
 
 .modal-form > .info-hint {

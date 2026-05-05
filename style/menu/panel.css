@@ -82,7 +82,7 @@
 .menu__button:hover {
   left: 0.267em;
   background-color: var(--bg-start, #f7fafc) !important;
-  color: var(--primary-2, #7084ff) !important;
+  color: var(--text, #2d3748) !important;
 }
 
 #logout-button {

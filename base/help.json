@@ -27,7 +27,7 @@
     "key-settings-modal": [
       { "keys": ["展开所有术语"], "desc": "help.keybind.expandAll" },
       { "keys": ["显示属性"], "desc": "help.keybind.inspect" },
-      { "keys": ["切换深浅色"], "desc": "help.keybind.theme" },
+      { "keys": ["切换主题"], "desc": "help.keybind.theme" },
       { "keys": ["草稿编辑器"], "desc": "help.keybind.editor" },
       { "keys": ["Esc / Backspace"], "desc": "help.keybind.hint" }
     ],

@@ -10,7 +10,7 @@
  * 向下传递：
  *   → h2                      字号：rem 规则（1.2rem = 24px@ref）
  *   → .toolbar-actions        字号：继承 18px；gap ← 0.444em
- *   → .tokens-input-group     字号：继承 18px
+ *   → .admin-input-group      字号：继承 18px（tokens-input-group 为旧别名）
  *     → .tokens-input         字号 ← --tp-fs-md (14px)；高度 ← token；内距 ← em
  *     → .tokens-btn           字号 ← --tp-fs-md (14px)；高度 ← token；内距 ← em
  *   → .mode-toggle            字号：继承 18px
@@ -37,8 +37,8 @@
   flex-wrap: nowrap;
 }
 
-/* 统一输入组（搜索 + 刷新） */
-.admin-panel .tokens-input-group {
+/* 统一管理面板输入组（搜索 + 刷新） */
+.admin-panel :is(.admin-input-group, .tokens-input-group) {
   display: inline-flex;
   align-items: stretch;
   max-width: 60vw;
@@ -54,6 +54,7 @@
   font-size: var(--tp-fs-md, 14px);
   color: var(--text);
   background: var(--surface);
+  box-shadow: none;
   line-height: var(--lh-tight);
   transition: border-color var(--dur-normal) var(--ease-default),
               box-shadow var(--dur-normal) var(--ease-default);
@@ -74,32 +75,29 @@
 }
 
 /* 输入组内的相邻按钮做成"分段"连接 */
-.admin-panel .tokens-input-group .tokens-btn { border-radius: var(--radius-none); }
-.admin-panel .tokens-input-group .tokens-btn:last-of-type { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-.admin-panel .tokens-input-group .tokens-btn + .tokens-btn { border-left: none; }
+.admin-panel :is(.admin-input-group, .tokens-input-group) .tokens-btn { border-radius: var(--radius-none); }
+.admin-panel :is(.admin-input-group, .tokens-input-group) .tokens-btn:last-of-type { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.admin-panel :is(.admin-input-group, .tokens-input-group) .tokens-btn + .tokens-btn { border-left: none; }
 
 /* 聚焦：仅键盘导航时显示可视焦点 */
 .admin-panel .tokens-btn:focus { outline: none; box-shadow: none; }
-.admin-panel .tokens-btn:focus-visible { box-shadow: var(--shadow-ring); }
+.admin-panel .tokens-btn:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--primary-2) 72%, var(--border));
+  outline-offset: 2px;
+  box-shadow: none;
+}
 .admin-panel .btn:focus { outline: none; box-shadow: none; }
-.admin-panel .btn:focus-visible { box-shadow: var(--shadow-ring); }
+.admin-panel .btn:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--primary-2) 72%, var(--border));
+  outline-offset: 2px;
+  box-shadow: none;
+}
 
 /* 模式切换按钮 */
 .admin-panel .mode-toggle {
   transition: background-color var(--dur-normal) var(--ease-standard),
               border-color var(--dur-normal) var(--ease-standard),
               color var(--dur-normal) var(--ease-standard);
-}
-.admin-panel .mode-toggle.is-active {
-  background-color: var(--success);
-  border-color: var(--success-hover);
-  color: #FFFFFF;
-}
-.admin-panel .mode-toggle.is-active:hover,
-.admin-panel .mode-toggle.is-active:focus-visible {
-  background-color: var(--success-hover);
-  border-color: #2F855A;
-  color: #FFFFFF;
 }
 
 /* 展开 / 收起按钮 */

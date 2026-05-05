@@ -30,7 +30,7 @@
     <button id="settings-button" class="menu__button" data-i18n="sidebar.settings">设置</button>
   </li>
   <li>
-    <button id="theme-toggle-button" class="menu__button" data-i18n="theme.toggle.toDark">切换为深色</button>
+    <button id="theme-toggle-button" class="menu__button" data-i18n="theme.toggle">切换主题</button>
   </li>
   <li>
     <button id="lang-toggle-button" class="menu__button">语言：中文</button>
@@ -181,46 +181,57 @@
       <h2 data-i18n="modal.keySettings.title">按键设置</h2>
     </div>
     <div class="modal-form">
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.expandAll">术语：展开所有术语</span>
-        <button id="key-bind-expand-all" class="btn btn--sm key-bind-btn">未设置</button>
+      <div class="key-settings-categories" role="tablist" data-i18n-attr="aria-label" data-i18n-aria-label="keySettings.categories" aria-label="按键分类">
+        <button type="button" class="btn btn--sm btn--secondary key-settings-tab is-active" id="key-settings-tab-global" data-key-settings-category="global" role="tab" aria-selected="true" aria-controls="key-settings-pane-global" data-i18n="keySettings.category.global">全局</button>
+        <button type="button" class="btn btn--sm btn--secondary key-settings-tab" id="key-settings-tab-terms" data-key-settings-category="terms" role="tab" aria-selected="false" aria-controls="key-settings-pane-terms" data-i18n="keySettings.category.terms">术语</button>
+        <button type="button" class="btn btn--sm btn--secondary key-settings-tab" id="key-settings-tab-draft" data-key-settings-category="draft" role="tab" aria-selected="false" aria-controls="key-settings-pane-draft" data-i18n="keySettings.category.draft">草稿</button>
       </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.inspect">全局：显示属性</span>
-        <button id="key-bind-inspect" class="btn btn--sm key-bind-btn">Ctrl</button>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.toggleTheme">全局：切换深浅色</span>
-        <button id="key-bind-toggle-theme" class="btn btn--sm key-bind-btn">T</button>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.editorFocusSearch">草稿：聚焦搜索</span>
-        <button id="key-bind-editor-focus-search" class="btn btn--sm key-bind-btn">F</button>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.editorClearSelection">草稿：清除选择</span>
-        <button id="key-bind-editor-clear-selection" class="btn btn--sm key-bind-btn">Q</button>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.editorAddChild">草稿：添加子节点</span>
-        <button id="key-bind-editor-add-child" class="btn btn--sm key-bind-btn">Z</button>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.editorAddSibling">草稿：添加同级节点</span>
-        <button id="key-bind-editor-add-sibling" class="btn btn--sm key-bind-btn">X</button>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.editorEditSelected">草稿：编辑选中节点</span>
-        <button id="key-bind-editor-edit-selected" class="btn btn--sm key-bind-btn">/</button>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.editorDeleteSelected">草稿：删除选中节点</span>
-        <button id="key-bind-editor-delete-selected" class="btn btn--sm key-bind-btn">Delete</button>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="keySettings.editorVariantMode">草稿：变体插入</span>
-        <button id="key-bind-editor-variant-mode" class="btn btn--sm key-bind-btn">Ctrl</button>
-      </div>
+      <section class="key-settings-pane is-active" id="key-settings-pane-global" data-key-settings-pane="global" role="tabpanel" aria-labelledby="key-settings-tab-global">
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.inspect">显示属性</span>
+          <button id="key-bind-inspect" class="btn btn--sm key-bind-btn">Ctrl</button>
+        </div>
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.toggleTheme">切换主题</span>
+          <button id="key-bind-toggle-theme" class="btn btn--sm key-bind-btn">T</button>
+        </div>
+      </section>
+      <section class="key-settings-pane" id="key-settings-pane-terms" data-key-settings-pane="terms" role="tabpanel" aria-labelledby="key-settings-tab-terms">
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.expandAll">展开所有术语</span>
+          <button id="key-bind-expand-all" class="btn btn--sm key-bind-btn">未设置</button>
+        </div>
+      </section>
+      <section class="key-settings-pane" id="key-settings-pane-draft" data-key-settings-pane="draft" role="tabpanel" aria-labelledby="key-settings-tab-draft">
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.editorFocusSearch">聚焦搜索</span>
+          <button id="key-bind-editor-focus-search" class="btn btn--sm key-bind-btn">F</button>
+        </div>
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.editorClearSelection">清除选择</span>
+          <button id="key-bind-editor-clear-selection" class="btn btn--sm key-bind-btn">Q</button>
+        </div>
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.editorAddChild">添加子节点</span>
+          <button id="key-bind-editor-add-child" class="btn btn--sm key-bind-btn">Z</button>
+        </div>
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.editorAddSibling">添加同级节点</span>
+          <button id="key-bind-editor-add-sibling" class="btn btn--sm key-bind-btn">X</button>
+        </div>
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.editorEditSelected">编辑选中节点</span>
+          <button id="key-bind-editor-edit-selected" class="btn btn--sm key-bind-btn">/</button>
+        </div>
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.editorDeleteSelected">删除选中节点</span>
+          <button id="key-bind-editor-delete-selected" class="btn btn--sm key-bind-btn">Delete</button>
+        </div>
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.editorVariantMode">变体插入</span>
+          <button id="key-bind-editor-variant-mode" class="btn btn--sm key-bind-btn">Ctrl</button>
+        </div>
+      </section>
       <div class="info-hint" data-i18n="keySettings.hint">
         按下 Esc 或 Backspace 可清除设置。
       </div>

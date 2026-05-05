@@ -1,7 +1,7 @@
 /* style/panel/permissions/filters.css -- 权限页日志筛选条
  *
  * ── .tokens-log__filters ─────────────────────────────────
- * 位置：.tokens-log > .tokens-log__wrap > .tokens-log__filters
+ * 位置：.tokens-log > .tokens-log__wrap > .tokens-log__filters.admin-input-group
  * 字号继承：body 18px（--tp-fs-2xl）
  * 子控件字号/高度：由 toolbar.css 提供
  *   → .tokens-input  字号 --tp-fs-md (14px)  高度 --tokens-input-h
@@ -35,17 +35,26 @@
 }
 
 /* 子控件直角拼接 */
-.tokens-log__filters input.tokens-input,
-.tokens-log__filters select.tokens-input,
-.tokens-log__filters button,
-.tokens-log__filters .btn,
-.tokens-log__filters .tokens-btn,
-.tokens-log__filters input,
-.tokens-log__filters select {
+#panel_permissions .tokens-log__filters input.tokens-input,
+#panel_permissions .tokens-log__filters select.tokens-input,
+#panel_permissions .tokens-log__filters button,
+#panel_permissions .tokens-log__filters .btn,
+#panel_permissions .tokens-log__filters .tokens-btn,
+#panel_permissions .tokens-log__filters input,
+#panel_permissions .tokens-log__filters select {
   vertical-align: middle;
   margin-top: 0;
   margin-bottom: 0;
+  border-right: none !important;
   border-radius: var(--radius-none) !important;
+}
+
+.tokens-log__filters input.tokens-input,
+.tokens-log__filters select.tokens-input,
+.tokens-log__filters input,
+.tokens-log__filters select,
+#panel_permissions .tokens-log__filters .custom-select .custom-select__trigger {
+  box-shadow: none !important;
 }
 
 /* box-sizing 统一 */
@@ -67,17 +76,18 @@
   flex: 1 1 4.286em !important;     /* 60/14 基于 --tp-fs-md */
 }
 
-/* ── 覆盖 custom_select.css 的静态 32px / --fs-md ────── */
+/* ── 日志筛选自定义下拉，与同排输入框保持同一外观 ────── */
 #panel_permissions .tokens-log__filters .custom-select {
   flex: 1 1 4.286em;               /* 60/14 */
   min-width: 4.286em;
   max-width: 11.429em;             /* 160/14 */
 }
 #panel_permissions .tokens-log__filters .custom-select .custom-select__trigger {
-  height: var(--tokens-input-h, 36px) !important;
-  font-size: var(--tp-fs-md, 14px) !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  border-radius: var(--radius-none) !important;
+  height: var(--tokens-input-h, 36px);
+  font-size: var(--tp-fs-md, 14px);
+  padding-top: 0;
+  padding-bottom: 0;
+  border-right: none !important;
+  border-radius: var(--radius-none);
   line-height: var(--tokens-input-h, 36px);
 }

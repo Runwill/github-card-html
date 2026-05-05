@@ -10,7 +10,10 @@
 
   function bindCollapseBtn(header, panel){
     if (!header) return;
-    header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
+    const btn = header.querySelector('.js-log-collapse');
+    if (!btn || btn.__tokensLogCollapseBound) return;
+    btn.__tokensLogCollapseBound = true;
+    btn.addEventListener('click',(e)=>{
       const btn = e.currentTarget;
       const w = panel.querySelector('.tokens-log__wrap');
       if (!w || isAnimating(w)) return;
@@ -21,6 +24,23 @@
         openCollapsible(w);
         if (btn) { try{ btn.setAttribute('data-i18n','common.collapse'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.add('is-expanded'); }
       }
+    });
+  }
+
+  function bindClearBtn(header, body) {
+    const btn = header?.querySelector('.js-log-clear');
+    if (!btn || btn.__tokensLogClearBound) return;
+    btn.__tokensLogClearBound = true;
+    btn.addEventListener('click', async()=>{
+      try{
+        const auth = T.getAuth ? T.getAuth() : { canEdit:false };
+        if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
+        if (T.apiJson) {
+          await T.apiJson('/tokens/logs', { method: 'DELETE', auth: true });
+        }
+        try{ body.innerHTML=''; }catch(_){}
+        T.showToast(window.t('tokens.toast.cleared'));
+      }catch(e){ alert((e && e.message) || window.t('tokens.error.updateFailed')); }
     });
   }
 
@@ -69,24 +89,14 @@
 
         // 绑定按钮（首次创建时）
         try{
-          header.querySelector('.js-log-clear')?.addEventListener('click',async ()=>{
-            try{
-              const auth = T.getAuth ? T.getAuth() : { canEdit:false };
-              if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
-              if (T.apiJson) {
-                await T.apiJson('/tokens/logs', { method: 'DELETE', auth: true });
-              }
-              try{ body.innerHTML=''; }catch(_){}
-              T.showToast(window.t('tokens.toast.cleared'));
-            }catch(e){ alert((e && e.message) || window.t('tokens.error.updateFailed')); }
-          });
+          bindClearBtn(header, body);
           bindCollapseBtn(header, panel);
         }catch(_){ }
       } else {
         body = document.getElementById('tokens-log');
         // 绑定控制按钮（在已存在面板时需要从 panel 查询 header）
-  const headerEl = panel.querySelector('.tokens-log__header');
-  headerEl?.querySelector('.js-log-clear')?.addEventListener('click',()=>{ try{ body.innerHTML=''; }catch(_){} });
+        const headerEl = panel.querySelector('.tokens-log__header');
+        bindClearBtn(headerEl, body);
         bindCollapseBtn(headerEl, panel);
       }
 

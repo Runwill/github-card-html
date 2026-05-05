@@ -28,8 +28,8 @@
   --shadow-elev-2-soft: 0 8px 18px var(--shadow-1);
   --shadow-elev-3: 0 20px 25px -5px var(--shadow-2), 0 10px 10px -5px var(--shadow-1);
   --shadow-elev-4: 0 25px 50px -12px var(--shadow-3);
-  --shadow-ring: 0 0 0 3px var(--primary-ring);
-  --shadow-ring-lg: 0 0 0 4px var(--primary-ring);
+  --shadow-ring: 0 0 0 1px var(--primary-ring);
+  --shadow-ring-lg: 0 0 0 1px var(--primary-ring);
   --shadow-primary-1: 0 4px 6px -1px var(--primary-shadow);
   --shadow-primary-2: 0 6px 8px -1px var(--primary-shadow);
   --shadow-header: 0 2px 8px var(--shadow-1), 0 4px 16px color-mix(in srgb, var(--shadow-1) 50%, transparent);
@@ -52,7 +52,7 @@
   --primary-2: #7084ff;
   --primary-3: #5a6cff;
   --primary-rgb: 112, 132, 255; /* --primary-2 的 RGB 分量，用于 rgba() */
-  --primary-ring: rgba(66,153,225,0.20);
+  --primary-ring: rgba(112,132,255,0.18);
   --primary-shadow: rgba(134, 152, 255, 0.25);
 
   --success:       #48bb78;
@@ -186,7 +186,7 @@ html[data-theme="dark"] {
   --primary-2: #4f46e5; /* indigo-600 */
   --primary-3: #4338ca; /* indigo-700 */
   --primary-rgb: 79, 70, 229; /* --primary-2 的 RGB 分量 */
-  --primary-ring: rgba(99,102,241,0.28); /* indigo-500 ring */
+  --primary-ring: rgba(129,140,248,0.24); /* indigo-400 ring */
   --primary-shadow: rgba(99,102,241,0.30);
 
   --success:       #16a34a; /* green-600 */
@@ -320,7 +320,7 @@ html.theme-switching *::after {
 .perm-editor select:hover,
 .intro-textarea:hover {
   background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
-  border-color: var(--text-muted) !important;
+  border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border)) !important;
 }
 
 .modal-form input::placeholder,
@@ -336,7 +336,9 @@ html.theme-switching *::after {
 .perm-editor select:focus,
 .intro-textarea:focus {
   border-color: var(--primary-2) !important;
-  box-shadow: var(--shadow-ring) !important;
+  box-shadow: none !important;
+  outline: 1px solid var(--primary-ring) !important;
+  outline-offset: -1px !important;
   background: var(--surface) !important;
 }
 
@@ -349,7 +351,7 @@ html.theme-switching *::after {
    架构：buttons.css → 结构/布局/尺寸/交互反馈
          theme.css   → 色彩/主题/变体
    每个填充变体声明 --_btn-accent（主色）和可选 --_btn-accent-soft（柔和色），
-   统一的 .btn.is-active 规则自动完成"填充 → 描边"反转，明暗模式通用。
+  统一的 .btn.is-active 规则使用柔和底色和边框标记状态，明暗模式通用。
 */
 .btn { color: var(--text) }
 
@@ -377,9 +379,9 @@ html.theme-switching *::after {
   border-color: var(--border) !important;
 }
 .btn--secondary:hover {
-  background: color-mix(in srgb, var(--surface) 92%, transparent) !important;
-  border-color: color-mix(in srgb, var(--border) 80%, transparent) !important;
-  color: var(--primary-2) !important;
+  background: color-mix(in srgb, var(--border) 24%, transparent) !important;
+  border-color: color-mix(in srgb, var(--primary-2) 28%, var(--border)) !important;
+  color: var(--text) !important;
 }
 
 /* ── Success（绿色实底） ── */
@@ -431,18 +433,20 @@ html[data-theme="dark"] .btn--accent {
   color: var(--text) !important;
 }
 
-/* ── 双状态通用：激活时透明底 + 有色字 + 边框（明暗模式通用） ── */
+/* ── 双状态通用：激活时以柔和底色标记，不改变文字语义（明暗模式通用） ── */
 /* 需要 html[data-theme="dark"] 前缀以打赢深色模式变体的特异性 */
 .btn.is-active,
 html[data-theme="dark"] .btn.is-active {
-  background: transparent !important;
-  color: var(--_btn-accent) !important;
-  border: 1.5px solid var(--_btn-accent) !important;
-  box-shadow: none !important;
+  background: color-mix(in srgb, var(--_btn-accent-soft, var(--_btn-accent, var(--primary-2))) 12%, transparent) !important;
+  color: var(--text) !important;
+  border-color: color-mix(in srgb, var(--_btn-accent, var(--primary-2)) 52%, var(--border)) !important;
+  box-shadow: inset 0 0 0 1px var(--primary-ring) !important;
 }
 .btn.is-active:hover,
 html[data-theme="dark"] .btn.is-active:hover {
-  background: color-mix(in srgb, var(--_btn-accent-soft, var(--_btn-accent)) 10%, transparent) !important;
+  background: color-mix(in srgb, var(--_btn-accent-soft, var(--_btn-accent, var(--primary-2))) 16%, transparent) !important;
+  color: var(--text) !important;
+  border-color: color-mix(in srgb, var(--_btn-accent, var(--primary-2)) 58%, var(--border)) !important;
 }
 
 /* ── Disabled（统一禁用色） ── */

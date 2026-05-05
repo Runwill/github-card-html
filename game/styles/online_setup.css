@@ -80,13 +80,15 @@
 .game-panel .input-group-field:hover,
 .game-panel .input-group select:hover {
     background: color-mix(in srgb, var(--surface) 96%, transparent);
-    border-color: var(--text-muted);
+    border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
 }
 
 .game-panel .input-group-field:focus,
 .game-panel .input-group select:focus {
     border-color: var(--primary-2);
-    box-shadow: var(--shadow-ring);
+    box-shadow: none;
+    outline: 1px solid var(--primary-ring);
+    outline-offset: -1px;
     background: var(--surface);
 }
 
@@ -164,7 +166,7 @@
 
 .setup-click-toggle:hover:not(.is-locked) {
     background: color-mix(in srgb, var(--surface) 96%, transparent);
-    border-color: var(--text-muted);
+    border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
 }
 
 .setup-click-toggle.is-active {

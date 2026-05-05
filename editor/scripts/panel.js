@@ -227,18 +227,61 @@
     }
   }
 
+  function cssColorValue(value) {
+    var color = String(value || '').trim();
+    if (!color) return '';
+    if (/^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(color)) return color;
+    if (/^[a-zA-Z]+$/.test(color)) return color;
+    if (/^(rgb|rgba|hsl|hsla)\(/i.test(color)) return color;
+    return '';
+  }
+
+  function nodeAutoLabel(node) {
+    if (!node) return '';
+    return node.element ? (node.text || node.tag || '') : (node.text || '');
+  }
+
+  function nodeValueText(node) {
+    if (!node) return '';
+    return node.element ? (node.tag || '') : (node.text || '');
+  }
+
+  function textMeasureUnits(text) {
+    text = String(text || '');
+    var units = 0;
+    for (var index = 0; index < text.length; index++) {
+      units += text.charCodeAt(index) > 255 ? 1.05 : 0.62;
+    }
+    return units;
+  }
+
+  function applyTreeNameWidth() {
+    if (!els.tree) return;
+    var maxUnits = 0;
+    function visit(nodes, depth) {
+      (nodes || []).forEach(function (node) {
+        maxUnits = Math.max(maxUnits, textMeasureUnits(nodeAutoLabel(node)) + depth * 1.25);
+        if (node.element && node.children && node.children.length && node.expanded !== false) visit(node.children, depth + 1);
+      });
+    }
+    visit(state.nodes, 0);
+    els.tree.style.setProperty('--editor-node-name-w', Math.max(8, Math.min(22, maxUnits + 2.6)).toFixed(2) + 'em');
+  }
+
   function colorForNode(node) {
     if (!node || !node.element) return '';
     var meta = state.chineseMap[String(node.tag || '').toLowerCase()];
-    if (meta && meta.color) return meta.color;
+    var accent = meta && cssColorValue(meta.color);
     var seed = 0;
     var text = String(node.tag || node.text || '');
     for (var i = 0; i < text.length; i++) seed = ((seed << 5) - seed + text.charCodeAt(i)) | 0;
-    return 'hsl(' + (Math.abs(seed) % 360) + ' 38% 91%)';
+    if (!accent) accent = 'hsl(' + (Math.abs(seed) % 360) + ' 54% 52%)';
+    return accent;
   }
 
   function renderTree() {
     if (!els.tree) return;
+    applyTreeNameWidth();
     els.tree.innerHTML = '';
     if (!state.nodes.length) {
       var empty = document.createElement('div');
@@ -268,13 +311,15 @@
     var row = document.createElement('div');
     row.className = 'editor-node-row'
       + (node.id === state.selectedId ? ' is-selected' : '')
+      + (node.id === state.editingNodeId ? ' is-editing' : '')
       + (!node.element ? ' is-text' : '')
       + (node.id === state.dropTargetId && state.dropMode ? ' ' + dropClassName(state.dropMode) : '');
     row.dataset.id = node.id;
     row.draggable = false;
     row.style.setProperty('--node-depth', String(depth));
+    row.style.setProperty('--node-indent', (depth * 1.25).toFixed(2) + 'em');
     var color = colorForNode(node);
-    if (color) row.style.setProperty('--node-color', color);
+    if (color) row.style.setProperty('--node-accent', color);
 
     var toggle = document.createElement('button');
     toggle.type = 'button';
@@ -282,30 +327,36 @@
     toggle.dataset.action = 'toggle';
     toggle.textContent = node.element && node.children && node.children.length ? (node.expanded === false ? '▸' : '▾') : '';
     toggle.setAttribute('aria-label', t('editor.action.toggleNode'));
-    row.appendChild(toggle);
+
+    var main = document.createElement('span');
+    main.className = 'editor-node-main';
+    main.appendChild(toggle);
+
+    var side = document.createElement('span');
+    side.className = 'editor-node-side';
 
     if (state.editingNodeId === node.id) {
+      var editingLabel = document.createElement('span');
+      editingLabel.className = 'editor-node-label';
+      editingLabel.textContent = nodeAutoLabel(node);
+      main.appendChild(editingLabel);
+
       var editInput = document.createElement('input');
       editInput.className = 'editor-node-edit tokens-input';
       editInput.type = 'text';
-      editInput.value = node.element ? (node.tag || '') : (node.text || '');
+      editInput.value = nodeValueText(node);
       editInput.dataset.id = node.id;
-      row.appendChild(editInput);
-
-      var tagHint = document.createElement('span');
-      tagHint.className = 'editor-node-tag';
-      tagHint.textContent = node.element ? (node.text || node.tag) : t('editor.node.text');
-      row.appendChild(tagHint);
+      side.appendChild(editInput);
     } else {
       var label = document.createElement('span');
       label.className = 'editor-node-label';
-      label.textContent = node.element ? (node.text || node.tag) : (node.text || t('editor.node.textEmpty'));
-      row.appendChild(label);
+      label.textContent = nodeAutoLabel(node) || t('editor.node.textEmpty');
+      main.appendChild(label);
 
       var tag = document.createElement('span');
       tag.className = 'editor-node-tag';
-      tag.textContent = node.element ? '<' + node.tag + '>' : t('editor.node.text');
-      row.appendChild(tag);
+      tag.textContent = nodeValueText(node) || t('editor.node.textEmpty');
+      side.appendChild(tag);
     }
 
     var attr = document.createElement('span');
@@ -314,7 +365,9 @@
     if (node.attrs && node.attrs.class_name) attrParts.push('.' + node.attrs.class_name);
     if (node.attrs && node.attrs.epithet) attrParts.push('epithet=' + node.attrs.epithet);
     attr.textContent = attrParts.join(' ');
-    row.appendChild(attr);
+    side.appendChild(attr);
+    row.appendChild(main);
+    row.appendChild(side);
 
     item.appendChild(row);
     if (node.element && node.children && node.children.length && node.expanded !== false) {
@@ -339,9 +392,6 @@
     results.forEach(function (entry) {
       els.palette.appendChild(renderEntryButton(entry, 'palette'));
     });
-    if (els.paletteStatus) {
-      els.paletteStatus.textContent = t('editor.palette.count', { shown: results.length, total: results.length });
-    }
   }
 
   function renderEntryButton(entry, area) {
@@ -421,7 +471,6 @@
     var info = getSelectedInfo();
     var disabled = !info;
     els.inspector.classList.toggle('is-empty', disabled);
-    if (els.selectedName) els.selectedName.textContent = info ? (info.node.element ? info.node.text : t('editor.node.text')) : t('editor.inspector.empty');
     if (els.classInput) {
       els.classInput.disabled = disabled || !info.node.element;
       els.classInput.value = info && info.node.attrs ? info.node.attrs.class_name || '' : '';
@@ -445,6 +494,13 @@
     els.recommendationDirection.textContent = t(state.bidirectionalMode ? 'editor.recommendation.modeBidirectional' : 'editor.recommendation.modeDirected');
     els.recommendationDirection.classList.toggle('is-active', !!state.bidirectionalMode);
     els.recommendationDirection.setAttribute('aria-pressed', state.bidirectionalMode ? 'true' : 'false');
+  }
+
+  function renderEscapeToggle() {
+    if (!els || !els.escapeToggle) return;
+    els.escapeToggle.textContent = t('editor.action.escapeQuotes');
+    els.escapeToggle.classList.toggle('is-active', !!state.escapeQuotes);
+    els.escapeToggle.setAttribute('aria-pressed', state.escapeQuotes ? 'true' : 'false');
   }
 
   function renderLog() {
@@ -560,6 +616,7 @@
     renderPalette();
     renderRecommendations();
     renderVariantState();
+    renderEscapeToggle();
     updateOutput();
     if (persist) saveState();
   }
@@ -616,9 +673,10 @@
       });
     }
     if (els.escapeToggle) {
-      els.escapeToggle.checked = state.escapeQuotes;
-      els.escapeToggle.addEventListener('change', function () {
-        state.escapeQuotes = !!els.escapeToggle.checked;
+      renderEscapeToggle();
+      els.escapeToggle.addEventListener('click', function () {
+        state.escapeQuotes = !state.escapeQuotes;
+        renderEscapeToggle();
         renderAll(true);
       });
     }
@@ -702,11 +760,49 @@
     return 'child';
   }
 
+  function normalizeDropMode(targetId, mode) {
+    if (mode === 'before' || mode === 'after') return mode;
+    var info = targetId ? findNodeInfo(targetId) : null;
+    return info && !info.node.element ? 'after' : 'child';
+  }
+
+  function dropTargetForRow(event, row, mode) {
+    var targetId = row && row.dataset ? row.dataset.id || null : null;
+    return { targetId: targetId, mode: normalizeDropMode(targetId, mode || modeForDropEvent(event, row)) };
+  }
+
+  function getNearestRowDropTarget(event) {
+    if (!els.tree || !state.nodes.length) return null;
+    var treeRect = els.tree.getBoundingClientRect();
+    if (event.clientX < treeRect.left || event.clientX > treeRect.right || event.clientY < treeRect.top || event.clientY > treeRect.bottom) return null;
+    var rows = Array.from(els.tree.querySelectorAll('.editor-node-row'));
+    if (!rows.length) return null;
+    var pointerY = event.clientY;
+    for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+      var rowRect = rows[rowIndex].getBoundingClientRect();
+      if (pointerY >= rowRect.top && pointerY <= rowRect.bottom) return dropTargetForRow(event, rows[rowIndex]);
+    }
+    var firstRect = rows[0].getBoundingClientRect();
+    if (pointerY < firstRect.top) return dropTargetForRow(event, rows[0], 'before');
+    for (var gapIndex = 0; gapIndex < rows.length - 1; gapIndex++) {
+      var previousRect = rows[gapIndex].getBoundingClientRect();
+      var nextRect = rows[gapIndex + 1].getBoundingClientRect();
+      if (pointerY > previousRect.bottom && pointerY < nextRect.top) {
+        return pointerY - previousRect.bottom <= nextRect.top - pointerY
+          ? dropTargetForRow(event, rows[gapIndex], 'after')
+          : dropTargetForRow(event, rows[gapIndex + 1], 'before');
+      }
+    }
+    return dropTargetForRow(event, rows[rows.length - 1], 'after');
+  }
+
   function getDropTargetFromEvent(event, preferIndicator) {
     var row = event.target.closest && event.target.closest('.editor-node-row');
     if (row && els.tree && els.tree.contains(row)) {
-      return { targetId: row.dataset.id || null, mode: modeForDropEvent(event, row) };
+      return dropTargetForRow(event, row);
     }
+    var nearest = getNearestRowDropTarget(event);
+    if (nearest) return nearest;
     if (preferIndicator && state.dropMode) {
       return { targetId: state.dropTargetId || null, mode: state.dropMode || 'child' };
     }
@@ -842,9 +938,11 @@
     var element = document.elementFromPoint(event.clientX, event.clientY);
     var row = element && element.closest && element.closest('.editor-node-row');
     if (row && els.tree && els.tree.contains(row)) {
-      return { targetId: row.dataset.id || null, mode: modeForDropEvent(event, row) };
+      return dropTargetForRow(event, row);
     }
     if (element && els.treeDropRoot && els.treeDropRoot.contains(element)) {
+      var nearest = getNearestRowDropTarget(event);
+      if (nearest) return nearest;
       if (preferIndicator && state.dropMode) return { targetId: state.dropTargetId || null, mode: state.dropMode || 'child' };
       return { targetId: null, mode: 'child' };
     }
@@ -909,7 +1007,7 @@
       renderAll(true);
       return;
     }
-    if (info.node.id === state.selectedId && event.target.closest('.editor-node-label, .editor-node-tag')) {
+    if (info.node.id === state.selectedId && event.target.closest('.editor-node-tag')) {
       startInlineEdit(info.node.id);
       return;
     }
@@ -1047,7 +1145,6 @@
   }
 
   async function reloadPalette() {
-    if (els.paletteStatus) els.paletteStatus.textContent = t('editor.palette.loading');
     var loaded = await ns.Data.loadElementData();
     state.entries = loaded.entries;
     state.defaultElements = loaded.defaultElements;
@@ -1057,7 +1154,6 @@
     ns.Data.refreshLabels(state.nodes, state.chineseMap);
     logEditor('editor.log.paletteReloaded', { count: state.entries.length });
     renderAll(true);
-    if (window.showToast) window.showToast(t('editor.toast.paletteReloaded'));
   }
 
   function eventMatchesAction(event, action) {
@@ -1121,7 +1217,6 @@
       panel: byId('panel_draft'),
       search: byId('editor-search'),
       palette: byId('editor-palette-list'),
-      paletteStatus: byId('editor-palette-status'),
       recommendations: byId('editor-recommendations'),
       recommendationDirection: byId('editor-recommend-direction'),
       recommendationList: byId('editor-recommendation-list'),
@@ -1129,7 +1224,6 @@
       treeDropRoot: byId('editor-tree-pane'),
       workspace: document.querySelector('#panel_draft .editor-workspace'),
       inspector: byId('editor-inspector'),
-      selectedName: byId('editor-selected-name'),
       classInput: byId('editor-class-input'),
       epithetInput: byId('editor-epithet-input'),
       convertButton: byId('editor-convert-node'),

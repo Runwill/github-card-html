@@ -23,6 +23,8 @@ html[data-theme="elegant"] {
   --primary-rgb: 196, 154, 90;
   --primary-ring: rgba(211, 173, 107, 0.25);
   --primary-shadow: rgba(211, 173, 107, 0.25);
+  --shadow-ring: 0 0 0 3px var(--primary-ring);
+  --shadow-ring-lg: 0 0 0 4px var(--primary-ring);
 
   --success:       #7db87d;
   --success-hover: #6aa86a;
@@ -100,6 +102,12 @@ html[data-theme="elegant"] .btn--primary {
 html[data-theme="elegant"] .btn--primary:hover {
   background: rgba(211, 173, 107, 0.12) !important;
   color: #fff !important;
+  box-shadow: 0 0 15px rgba(211, 173, 107, 0.18) !important;
+}
+
+html[data-theme="elegant"] .btn:focus-visible {
+  outline: 1px solid rgba(211, 173, 107, 0.65);
+  outline-offset: 2px;
   box-shadow: 0 0 15px rgba(211, 173, 107, 0.18) !important;
 }
 
@@ -218,7 +226,7 @@ html[data-theme="elegant"] .badge.badge-permission {
 html[data-theme="elegant"] .btn.is-active {
   background: transparent !important;
   color: var(--primary-1) !important;
-  border: 1.5px solid var(--primary-1) !important;
+  border-color: var(--primary-1) !important;
   box-shadow: none !important;
 }
 html[data-theme="elegant"] .btn.is-active:hover {

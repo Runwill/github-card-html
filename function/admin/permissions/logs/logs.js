@@ -101,7 +101,7 @@
 
     // 筛选工具条（布局样式移至 style/permissions.css）
         const filters = document.createElement('div');
-        filters.className = 'tokens-log__filters tokens-input-group';
+        filters.className = 'tokens-log__filters admin-input-group';
         filters.innerHTML = [
           '<input id="perms-log-q" class="tokens-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
           // 动态类型下拉：初始仅包含“全部类型”，后续由 hydrateUserLogs 基于后端返回补齐

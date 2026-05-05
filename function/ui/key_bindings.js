@@ -7,7 +7,7 @@
       'expand_all_terms': { label: 'Expand All Terms', default: null, btnId: 'key-bind-expand-all' },
       // default: { key: 'Control' } means the key 'Control' itself.
       'inspect_details': { label: 'Inspect Details (Hold)', default: { key: 'Control' }, btnId: 'key-bind-inspect' },
-      'toggle_theme': { label: 'Toggle Theme', default: { key: 't' }, btnId: 'key-bind-toggle-theme' }
+      'toggle_theme': { label: 'Toggle Theme', default: { key: 'T' }, btnId: 'key-bind-toggle-theme' }
     }, window.CardEditorKeyActions || {});
 
   let bindings = {};
@@ -19,6 +19,10 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         bindings = JSON.parse(saved);
+      }
+      if (Object.prototype.hasOwnProperty.call(bindings, 'toggle_theme') && bindings.toggle_theme === null) {
+        delete bindings.toggle_theme;
+        saveBindings();
       }
     } catch (e) {
       console.error('Failed to load key bindings', e);
@@ -53,6 +57,46 @@
             btn.classList.remove('btn--primary');
         }
     });
+  }
+
+  function setupCategoryTabs() {
+    const modal = document.getElementById('key-settings-modal');
+    if (!modal) return;
+    const tabs = Array.from(modal.querySelectorAll('[data-key-settings-category]'));
+    const panes = Array.from(modal.querySelectorAll('[data-key-settings-pane]'));
+    if (!tabs.length || !panes.length) return;
+
+    const activateCategory = (category, shouldFocus) => {
+      tabs.forEach(tab => {
+        const active = tab.dataset.keySettingsCategory === category;
+        tab.classList.toggle('is-active', active);
+        tab.setAttribute('aria-selected', active ? 'true' : 'false');
+        tab.setAttribute('tabindex', active ? '0' : '-1');
+        if (active && shouldFocus) tab.focus();
+      });
+      panes.forEach(pane => {
+        const active = pane.dataset.keySettingsPane === category;
+        pane.classList.toggle('is-active', active);
+        pane.hidden = !active;
+      });
+    };
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activateCategory(tab.dataset.keySettingsCategory, false));
+      tab.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        let nextIndex = index;
+        if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+        if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+        if (event.key === 'Home') nextIndex = 0;
+        if (event.key === 'End') nextIndex = tabs.length - 1;
+        activateCategory(tabs[nextIndex].dataset.keySettingsCategory, true);
+      });
+    });
+
+    const initial = tabs.find(tab => tab.classList.contains('is-active')) || tabs[0];
+    activateCategory(initial.dataset.keySettingsCategory, false);
   }
 
   function handleRecord(e) {
@@ -176,6 +220,8 @@
           updateUI();
         });
       }
+
+      setupCategoryTabs();
 
       // Bind record buttons
       Object.keys(ACTIONS).forEach(action => {

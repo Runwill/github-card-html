@@ -15,10 +15,7 @@
       <header class="editor-toolbar">
         <h2 id="editor-title" data-i18n="editor.title">HTML 编辑器</h2>
         <div class="editor-toolbar__actions">
-          <label class="editor-toggle">
-            <input id="editor-escape-toggle" type="checkbox" checked>
-            <span data-i18n="editor.action.escapeQuotes">转义引号</span>
-          </label>
+          <button type="button" class="btn btn--sm btn--secondary is-active" id="editor-escape-toggle" aria-pressed="true" data-i18n="editor.action.escapeQuotes">转义引号</button>
           <button type="button" class="btn btn--sm" id="editor-expand-all" data-i18n="editor.action.expandAll">展开</button>
           <button type="button" class="btn btn--sm" id="editor-collapse-all" data-i18n="editor.action.collapseAll">折叠</button>
           <button type="button" class="btn btn--sm" id="editor-import-draft" data-i18n="editor.action.importFromDraft">输入</button>
@@ -29,15 +26,14 @@
 
       <div class="editor-workspace">
         <aside class="editor-pane editor-palette" data-i18n-attr="aria-label" data-i18n-aria-label="editor.palette.title" aria-label="元素库">
-          <div class="editor-search-row">
+          <div class="editor-search-row admin-input-group">
             <input id="editor-search" class="tokens-input editor-search" type="search" data-i18n-attr="placeholder" data-i18n-placeholder="editor.search.placeholder" placeholder="搜索元素">
-            <button type="button" class="btn btn--sm" id="editor-reload-palette" data-i18n="editor.action.reloadPalette">刷新</button>
+            <button type="button" class="btn btn--secondary tokens-btn tokens-refresh" id="editor-reload-palette" data-i18n="editor.action.reloadPalette">刷新</button>
           </div>
-          <div id="editor-palette-status" class="editor-status" aria-live="polite"></div>
           <section id="editor-recommendations" class="editor-recommendations" hidden>
             <div class="editor-recommendation-head">
               <div class="editor-subtitle" data-i18n="editor.recommendations.title">相关推荐</div>
-              <button type="button" class="btn btn--sm" id="editor-recommend-direction" data-i18n="editor.recommendation.modeBidirectional">双向</button>
+              <button type="button" class="btn btn--sm btn--secondary" id="editor-recommend-direction" data-i18n="editor.recommendation.modeBidirectional">双向</button>
             </div>
             <div id="editor-recommendation-list" class="editor-entry-list editor-entry-list--compact"></div>
           </section>
@@ -46,11 +42,10 @@
 
         <section class="editor-pane editor-tree-pane" id="editor-tree-pane" data-i18n-attr="aria-label" data-i18n-aria-label="editor.tree.title" aria-label="结构树">
           <div id="editor-variant-badge" class="editor-variant-badge" hidden data-i18n="editor.variant.badge">变体</div>
-          <div id="editor-tree" class="editor-tree" role="tree"></div>
+          <div id="editor-tree" class="editor-tree scrollbar-thin" role="tree"></div>
         </section>
 
         <aside class="editor-pane editor-inspector" id="editor-inspector" data-i18n-attr="aria-label" data-i18n-aria-label="editor.inspector.title" aria-label="属性">
-          <span id="editor-selected-name" class="editor-selected-name" data-i18n="editor.inspector.empty">未选中</span>
           <label class="editor-field">
             <span>Class</span>
             <input id="editor-class-input" class="tokens-input" type="text" disabled>
@@ -67,7 +62,7 @@
               <h4 id="editor-log-title" data-i18n="editor.log.title">日志</h4>
               <button type="button" class="btn btn--sm" id="editor-clear-log" data-i18n="editor.log.clear">清空</button>
             </div>
-            <div id="editor-log-list" class="editor-log__list" aria-live="polite"></div>
+            <div id="editor-log-list" class="editor-log__list scrollbar-thin" aria-live="polite"></div>
           </section>
         </aside>
       </div>

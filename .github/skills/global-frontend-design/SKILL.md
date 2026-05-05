@@ -27,6 +27,9 @@ user-invocable: true
 - 用户可见文本使用 i18n：`window.t(key)`、`data-i18n` 或对应词典文件。
 - 新增面板功能、弹窗或隐藏交互时，同步 `base/help.json`、`i18n/strings.js`，必要时更新 `function/ui/help_panel.js` 映射。
 - 颜色、阴影、字体走主题变量，不硬编码主题色；注意 Foundation 对 `kbd`、`label`、`table`、`button` 等基础标签的默认覆盖。
+- hover/focus/open/active/disabled 属于全局交互语义；自定义 div/span 控件如果扮演 input/select/button，必须复用同一套主题 token 和状态口径，不能另写一套相似但漂移的颜色、边框和发光。
+- 多面板复用的控件类名应描述角色或行为，不沿用最初页面名；例如共享输入组使用中性命名，并把旧页面命名降级为兼容别名。
+- active 和 focus 反馈不得改变控件几何尺寸；分段按钮不要用 `border` 简写覆盖单侧边框，优先改 `border-color`、`outline` 或 inset ring。
 - 触摸端避免文本或按钮出现系统蓝色选中；但不要牺牲键盘焦点可见性。
 
 ## 设计口径
@@ -41,9 +44,10 @@ user-invocable: true
 
 1. 定位影响范围：单面板、全局组件、overlay、主题、帮助或 i18n。
 2. 先改已有参数、组件或渲染路径，不额外创建平行体系。
-3. 改用户可见功能时同步帮助速查和翻译。
-4. 改静态资源时刷新 `index.html` 中相关 `?v=`。
-5. 改用户可见行为时更新 `base/announcements.json`，用用户视角写一句话。
+3. 若发现局部控件复刻了全局交互态，回到原定义清理重复实现，而不是追加覆盖选择器。
+4. 改用户可见功能时同步帮助速查和翻译。
+5. 改静态资源时刷新 `index.html` 中相关 `?v=`。
+6. 改用户可见行为时更新 `base/announcements.json`，用用户视角写一句话。
 
 ## 验收
 

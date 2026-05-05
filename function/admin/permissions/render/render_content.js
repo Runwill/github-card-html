@@ -131,10 +131,17 @@
     roleEditor.appendChild(roleList); roleEditor.appendChild(roleActions);
     block.appendChild(roleEditor);
 
+    const editors = [editor, pwdEditor, roleEditor];
+    const isEditorOpen = (target)=> target && target.style.display !== 'none' && !target.classList.contains('is-collapsed');
+    const openEditor = (target, focusEl)=>{
+      const nextOpen = !isEditorOpen(target);
+      editors.forEach(ed => toggleSection(ed, ed === target ? nextOpen : false));
+      if (nextOpen && focusEl) setTimeout(()=>{ try { focusEl.focus(); } catch{} }, 240);
+    };
+
     // 交互绑定 —— 权限
     editBtn.addEventListener('click', ()=>{
-      const visible = editor.style.display !== 'none' && !editor.classList.contains('is-collapsed');
-      toggleSection(editor, !visible);
+      openEditor(editor);
     });
     btnSelectAll.addEventListener('click', ()=>{
       const cbs = Array.from(list.querySelectorAll('input[type="checkbox"]').values());
@@ -147,7 +154,7 @@
       const curSet = new Set(current); const selSet = new Set(selected);
       const toGrant = selected.filter(p => !curSet.has(p));
       const toRevoke = current.filter(p => !selSet.has(p));
-      if (!toGrant.length && !toRevoke.length) { editor.style.display = 'none'; return; }
+      if (!toGrant.length && !toRevoke.length) { toggleSection(editor, false); return; }
       spinnerBtn(btnSave, true);
       try {
         for (const p of toGrant) { await API.grant(userId, p); if (!curSet.has(p)) { curSet.add(p); current.push(p); } }
@@ -162,8 +169,7 @@
 
     // 交互绑定 —— 密码
     pwdBtn.addEventListener('click', ()=>{
-      const visible = pwdEditor.style.display !== 'none' && !pwdEditor.classList.contains('is-collapsed');
-      toggleSection(pwdEditor, !visible);
+      openEditor(pwdEditor, inputNew);
     });
     btnPwdCancel.addEventListener('click', ()=> toggleSection(pwdEditor, false));
     btnPwdSave.addEventListener('click', async ()=>{
@@ -183,9 +189,7 @@
 
     // 交互绑定 —— 角色
     const toggleRoleEditor = ()=>{
-      const visible = roleEditor.style.display !== 'none' && !roleEditor.classList.contains('is-collapsed');
-      toggleSection(roleEditor, !visible);
-      if (!visible) { try { select.focus(); } catch{} }
+      openEditor(roleEditor, select);
     };
     meta.addEventListener('click', toggleRoleEditor);
     meta.addEventListener('keydown', (e)=>{ if (e.key==='Enter' || e.key===' ') { e.preventDefault(); toggleRoleEditor(); }});

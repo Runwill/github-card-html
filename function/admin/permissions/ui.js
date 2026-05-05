@@ -41,10 +41,13 @@
   function toggleSection(panel, open){
     if (!panel) return;
     const DURATION = 220;
-    const FALLBACK = DURATION + 160; // 兜底计时，防止 transitionend 未触发导致卡死
+    const FALLBACK = DURATION + 160;
+    const TRANSITION = 'height 220ms ease, opacity 150ms ease, transform 220ms ease, padding-top 220ms ease, padding-bottom 220ms ease, margin-top 220ms ease, margin-bottom 220ms ease, border-width 220ms ease';
     if (panel.__animating) return;
     const isHidden = (panel.style.display === 'none') || panel.classList.contains('is-collapsed');
     const shouldOpen = (open == null) ? isHidden : !!open;
+    if (shouldOpen && !isHidden) return;
+    if (!shouldOpen && isHidden) return;
     panel.__animating = true;
 
     if (shouldOpen){
@@ -81,13 +84,14 @@
       }
 
       requestAnimationFrame(()=>{
-        panel.style.transition = 'height 200ms ease, opacity 150ms ease, transform 200ms ease, padding-top 200ms ease, padding-bottom 200ms ease, margin-top 200ms ease, margin-bottom 200ms ease, border-width 200ms ease';
+        panel.style.transition = TRANSITION;
         panel.classList.remove('is-collapsed');
         panel.style.height = target + 'px';
         panel.style.opacity = '1';
         let timer = setTimeout(()=>done(), FALLBACK);
         const done = (e)=>{
           if (e && e.target !== panel) return;
+          if (e && e.propertyName !== 'height') return;
           panel.removeEventListener('transitionend', done);
           if (timer) { clearTimeout(timer); timer = null; }
           panel.style.transition = prevTransition || '';
@@ -95,20 +99,21 @@
           panel.style.opacity = '';
           panel.__animating = false;
         };
-        panel.addEventListener('transitionend', done, { once: true });
+        panel.addEventListener('transitionend', done);
       });
     } else {
       const start = panel.scrollHeight;
       panel.style.height = start + 'px';
       panel.style.opacity = '1';
       void panel.offsetHeight;
-      panel.style.transition = 'height 200ms ease, opacity 150ms ease, transform 200ms ease, padding-top 200ms ease, padding-bottom 200ms ease, margin-top 200ms ease, margin-bottom 200ms ease, border-width 200ms ease';
+      panel.style.transition = TRANSITION;
       panel.style.height = '0px';
       panel.style.opacity = '0';
       panel.classList.add('is-collapsed');
       let timer = setTimeout(()=>done(), FALLBACK);
       const done = (e)=>{
         if (e && e.target !== panel) return;
+        if (e && e.propertyName !== 'height') return;
         panel.removeEventListener('transitionend', done);
         if (timer) { clearTimeout(timer); timer = null; }
         panel.style.transition = '';
@@ -117,7 +122,7 @@
         panel.style.display = 'none';
         panel.__animating = false;
       };
-      panel.addEventListener('transitionend', done, { once: true });
+      panel.addEventListener('transitionend', done);
     }
   }
 

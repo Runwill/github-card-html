@@ -42,12 +42,13 @@
     font-family: inherit;
     font-weight: inherit;
     color: var(--text);
-    background: var(--surface);
+    background: transparent;
     border: 1px solid var(--border);
     padding: var(--space-sm) var(--space-lg);
     border-radius: var(--radius-sm);
     outline: none;
-    transition: border-color var(--dur-normal) var(--ease-default),
+    transition: background var(--dur-normal) var(--ease-default),
+                border-color var(--dur-normal) var(--ease-default),
                 box-shadow var(--dur-normal) var(--ease-default);
     line-height: var(--lh-normal);
     white-space: nowrap;
@@ -67,13 +68,17 @@
 }
 
 .custom-select__trigger:hover {
-    border-color: var(--text-muted);
+    background: color-mix(in srgb, var(--surface) 96%, transparent);
+    border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
 }
 
 .custom-select__trigger:focus,
 .custom-select.is-open .custom-select__trigger {
     border-color: var(--primary-2);
-    box-shadow: var(--shadow-ring);
+    box-shadow: none;
+    outline: 1px solid var(--primary-ring);
+    outline-offset: -1px;
+    background: var(--surface);
 }
 
 /* Chevron arrow */
@@ -219,35 +224,19 @@
 
 .game-panel .input-group .custom-select .custom-select__trigger:hover {
     background: color-mix(in srgb, var(--surface) 96%, transparent);
-    border-color: var(--text-muted);
+    border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
 }
 
 .game-panel .input-group .custom-select.is-open .custom-select__trigger,
 .game-panel .input-group .custom-select .custom-select__trigger:focus {
     border-color: var(--primary-2);
-    box-shadow: var(--shadow-ring);
+    box-shadow: none;
+    outline: 1px solid var(--primary-ring);
+    outline-offset: -1px;
     background: var(--surface);
 }
 
 /* Dynamic character select (full-width standalone) */
 .custom-select--block .custom-select__trigger {
     border-radius: var(--radius-sm);
-}
-
-/* ── Inside tokens-log__filters (permissions log filter bar) ───────── */
-
-.tokens-log__filters .custom-select {
-    font-size: var(--tp-fs-md, var(--fs-md));
-    flex: 1 1 4.286em;
-    min-width: 4.286em;
-    max-width: 11.429em;
-}
-
-.tokens-log__filters .custom-select .custom-select__trigger {
-    height: var(--tokens-input-h, 32px) !important;
-    font-size: var(--tp-fs-md, var(--fs-md)) !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    border-radius: var(--radius-none) !important;
-    line-height: var(--tokens-input-h, 32px);
 }

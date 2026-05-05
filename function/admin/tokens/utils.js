@@ -8,6 +8,10 @@
     return (s == null ? '' : String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])));
   }
 
+  function showToast(message, type) {
+    if (typeof window.showToast === 'function') window.showToast(message, type);
+  }
+
   // 通过 a.b.c 或 a.0.b 路径设置值
   function setByPath(obj, path, value) {
     if (!obj || !path) return;
@@ -84,5 +88,5 @@
     return o;
   }
 
-  Object.assign(window.tokensAdmin, { esc, setByPath, deleteFieldInDocByPath, getAccent, computeTint, HIDE_KEYS, stripHidden });
+  Object.assign(window.tokensAdmin, { esc, showToast, setByPath, deleteFieldInDocByPath, getAccent, computeTint, HIDE_KEYS, stripHidden });
 })();
