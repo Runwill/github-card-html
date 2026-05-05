@@ -6,10 +6,11 @@
  * 间距单位：em（基于继承 18px）
  *
  * 向下传递：
- *   → .perm-editor__toolbar       字号：继承 18px；gap ← em
+ *   → .perm-editor__head          字号：继承 18px；gap ← em
  *   → .perm-editor__list          字号：继承 18px；grid gap ← em
- *     → .perm-editor__item        字号：继承 18px
+ *     → .perm-editor__option      字号：继承 18px
  *       → .perm-editor__item-text 字号 ← --tp-fs-base (13px)
+ *   → .perm-editor__form-grid     字号：继承 18px；grid gap ← em
  *   → .perm-editor__actions       字号：继承 18px
  *   → .admin-input / input        字号 ← --tp-fs-md (14px) [toolbar.css]
  *
@@ -25,11 +26,11 @@
 
 /* ── 编辑器容器 ────────────────────────────────────────── */
 #panel_permissions .perm-editor {
-  border: 1px solid var(--border);
+  border: 1px solid color-mix(in srgb, var(--border) 88%, var(--primary-2));
   box-sizing: border-box;
   border-radius: var(--radius-md);
-  padding: 0.667em;                 /* 12/18 */
-  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  padding: 0.778em;                 /* 14/18 */
+  background: color-mix(in srgb, var(--surface) 97%, var(--primary-2) 3%);
   box-shadow: var(--shadow-perm-editor);
   margin: 0 0 0.556em;              /* 10/18 */
   overflow: hidden;
@@ -60,14 +61,6 @@
   pointer-events: none;
 }
 
-/* 精简变体（修改密码、角色等） */
-#panel_permissions .perm-editor--plain {
-  border-color: color-mix(in srgb, var(--border) 84%, var(--primary-2));
-  background: color-mix(in srgb, var(--surface) 94%, var(--primary-2) 6%);
-  padding: 0.556em;                 /* 10/18 */
-  box-shadow: var(--shadow-perm-editor);
-}
-
 /* 收起态 */
 #panel_permissions .perm-editor.is-collapsed {
   height: 0 !important;
@@ -80,49 +73,146 @@
   border-width: 0 !important;
 }
 
-/* 精简模式下项目无边框 */
-#panel_permissions .perm-editor--plain .perm-editor__item {
-  border: none !important;
-  background: transparent !important;
+/* ── 面板头部 ──────────────────────────────────────────── */
+#panel_permissions .perm-editor__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.667em;                     /* 12/18 */
+  padding-bottom: 0.556em;          /* 10/18 */
+  margin-bottom: 0.556em;           /* 10/18 */
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
 }
 
-/* ── 工具栏 ────────────────────────────────────────────── */
-#panel_permissions .perm-editor__toolbar {
+#panel_permissions .perm-editor__head-main {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.5em;                       /* 9/18 */
+}
+
+#panel_permissions .perm-editor__title {
+  color: var(--text);
+  font-size: var(--tp-fs-base, 13px);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+}
+
+#panel_permissions .perm-editor__counter {
+  color: var(--text-muted);
+  font-size: var(--tp-fs-sm, 12px);
+  line-height: var(--lh-tight);
+}
+
+#panel_permissions .perm-editor__tools {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  flex-wrap: nowrap;
   gap: 0.444em;                     /* 8/18 */
-  margin-bottom: 0.556em;           /* 10/18 */
 }
-#panel_permissions .perm-editor__toolbar .btn {
+
+#panel_permissions .perm-editor__tools .btn {
   white-space: nowrap;
   flex: 0 0 auto;
 }
 
-/* ── 权限清单网格 ──────────────────────────────────────── */
+/* ── 权限清单网格 ─────────────────────────────────────── */
 #panel_permissions .perm-editor__list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10em, 1fr)); /* 180/18 */
+  grid-template-columns: repeat(auto-fill, minmax(9.5em, 1fr));
   gap: 0.444em;                     /* 8/18 */
-  max-height: 12.222em;             /* 220/18 */
+  max-height: 13.333em;             /* 240/18 */
   overflow: auto;
-  padding-right: 0.222em;           /* 4/18 */
+  padding: 0.111em 0.222em 0.111em 0;
 }
 
-/* ── 单个权限项 ────────────────────────────────────────── */
-#panel_permissions .perm-editor__item {
-  display: flex;
+/* ── 权限选项 ─────────────────────────────────────────── */
+#panel_permissions .perm-editor__option {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 1em minmax(0, 1fr);
   align-items: center;
   gap: 0.444em;                     /* 8/18 */
-  padding: 0.333em 0.444em;         /* 6/18, 8/18 */
+  padding: 0.444em 0.556em;         /* 8/18, 10/18 */
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  background: color-mix(in srgb, var(--surface) 97%, transparent);
+  cursor: pointer;
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default),
+    color var(--dur-normal) var(--ease-default);
 }
-#panel_permissions .perm-editor__item input { margin: 0; }
+
+#panel_permissions .perm-editor__option:hover,
+#panel_permissions .perm-editor__option:focus-within {
+  border-color: color-mix(in srgb, var(--primary-2) 38%, var(--border));
+  background: color-mix(in srgb, var(--primary-2) 6%, var(--surface));
+}
+
+#panel_permissions .perm-editor__option:has(input:checked) {
+  border-color: color-mix(in srgb, var(--primary-2) 54%, var(--border));
+  background: color-mix(in srgb, var(--primary-2) 12%, var(--surface));
+}
+
+#panel_permissions .perm-editor__option input[type="checkbox"] {
+  width: 1em;
+  height: 1em;
+  margin: 0;
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--border) 76%, var(--text-muted));
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 0 var(--surface);
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default),
+    box-shadow var(--dur-normal) var(--ease-default);
+}
+
+#panel_permissions .perm-editor__option input[type="checkbox"]:checked {
+  border-color: var(--primary-2);
+  background: var(--primary-2);
+  box-shadow: inset 0 0 0 0.214em var(--surface);
+}
+
 #panel_permissions .perm-editor__item-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: var(--tp-fs-base, 13px);
   color: var(--text);
+  line-height: var(--lh-normal);
+}
+
+/* ── 表单编辑器 ───────────────────────────────────────── */
+#panel_permissions .perm-editor--form form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.556em;                     /* 10/18 */
+}
+
+#panel_permissions .perm-editor__form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12em, 1fr));
+  align-items: start;
+  gap: 0.556em;                     /* 10/18 */
+}
+
+#panel_permissions .perm-editor__field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.333em;                     /* 6/18 */
+}
+
+#panel_permissions .perm-editor__field-label {
+  color: var(--text-muted);
+  font-size: var(--tp-fs-sm, 12px);
+  font-weight: 500;
+  line-height: var(--lh-tight);
 }
 
 /* ── 操作区 ────────────────────────────────────────────── */
@@ -130,7 +220,9 @@
   display: flex;
   gap: 0.444em;                     /* 8/18 */
   justify-content: flex-end;
-  margin-top: 0.556em;              /* 10/18 */
+  margin-top: 0.667em;              /* 12/18 */
+  padding-top: 0.556em;             /* 10/18 */
+  border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
 }
 
 /* ── 编辑器内独立输入框（覆盖 toolbar.css 的拼接外观） ── */
@@ -147,7 +239,9 @@
   outline: none;
   width: 100%;
   min-width: 0;
+  flex: 0 0 auto;
   height: var(--admin-input-h, var(--tokens-input-h, 36px));
+  margin: 0;
   padding: 0.571em 0.714em;
   font-size: var(--tp-fs-md, 14px);
   line-height: var(--lh-tight);
@@ -177,4 +271,9 @@
   box-shadow: none;
   outline: 1px solid var(--primary-ring);
   outline-offset: -1px;
+}
+
+#panel_permissions [data-perm-trigger].is-active {
+  border-color: color-mix(in srgb, var(--primary-2) 50%, var(--border));
+  background: color-mix(in srgb, var(--primary-2) 10%, var(--surface));
 }

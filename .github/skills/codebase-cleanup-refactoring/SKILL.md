@@ -46,6 +46,8 @@ user-invocable: true
 - 自定义 div/span 控件如果视觉上承担 input/select/button 职责，必须复用相同状态口径。
 - dropdown/menu/tooltip/popover 不应在错误的滚动或折叠容器内参与布局；需要逃逸容器时，把浮层移到统一 portal 层，并在关闭时清理定位与 DOM 归属。
 - active 和 focus 不应改变布局尺寸；避免用 `border` 简写覆盖分段按钮的单侧边框，优先用 `border-color`、`outline` 或 inset ring。
+- 搜索框、日期筛选、按钮拼接等分段输入组应由共享 owner 保留完整边框并用负间距合并；发现局部 `border-left: none` / `border-right: none` 导致 hover/focus 少边框时，要回到共享输入组规则修复。
+- 共享输入类如果带有工具栏布局语义（如 flex 增长或固定 flex-basis），独立表单字段必须在所属 owner 中中和这部分布局语义；不要让横向输入组尺寸规则泄漏到纵向表单。
 - 浅色/深色主题的焦点反馈保持克制；典雅主题允许保留独立金色质感，但也应通过主题层集中表达。
 - 发现 `!important` 链、重复断点、重复 font-size、硬编码 3px ring 等，优先回到原定义清理。
 

@@ -135,6 +135,11 @@ html.force-landscape {
   font-family: var(--font-ui, inherit);
 }
 
+#panel_draft #htmlInput:hover,
+#panel_draft :is(.admin-input, .tokens-input):hover {
+  border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
+}
+
 #panel_draft #htmlInput:focus,
 #panel_draft :is(.admin-input, .tokens-input):focus {
   border-color: var(--primary-2);
@@ -265,7 +270,6 @@ html.force-landscape {
 }
 
 #panel_draft .admin-input-group .editor-search {
-  border-right: none;
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
 
@@ -274,7 +278,6 @@ html.force-landscape {
   flex: 0 0 auto;
   padding: 0 0.857em;
   border: 1px solid var(--border);
-  border-left: none;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   font-size: var(--draft-fs-control, 14px);
   line-height: var(--lh-tight);

@@ -44,12 +44,27 @@
   max-width: 60vw;
 }
 
+:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button, .custom-select) {
+  position: relative;
+}
+
+:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button, .custom-select) + :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button, .custom-select) {
+  margin-left: -1px;
+}
+
+:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button):hover,
+:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button):focus,
+:is(.admin-input-group, .tokens-input-group) > .custom-select:hover,
+:is(.admin-input-group, .tokens-input-group) > .custom-select:focus-within,
+:is(.admin-input-group, .tokens-input-group) > .custom-select.is-open {
+  z-index: 2;
+}
+
 .admin-panel :is(.admin-input, .tokens-input) {
   height: var(--admin-input-h, var(--tokens-input-h, 36px));
   flex: 1 1 17.143em;       /* 240/14，基于自身 14px 字号 */
   padding: 0.571em 0.714em; /* 8/14, 10/14 */
   border: 1px solid var(--border);
-  border-right: none;       /* 与按钮合并 */
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
   font-size: var(--tp-fs-md, 14px);
   color: var(--text);
@@ -67,7 +82,6 @@
   padding: 0 0.857em;      /* 0 12/14 */
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   border: 1px solid var(--border);
-  border-left: none;
   font-size: var(--tp-fs-md, 14px);
   line-height: var(--lh-tight);
   display: inline-flex;
@@ -77,7 +91,6 @@
 /* 输入组内的相邻按钮做成"分段"连接 */
 .admin-panel :is(.admin-input-group, .tokens-input-group) :is(.admin-input-btn, .tokens-btn) { border-radius: var(--radius-none); }
 .admin-panel :is(.admin-input-group, .tokens-input-group) :is(.admin-input-btn, .tokens-btn):last-of-type { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-.admin-panel :is(.admin-input-group, .tokens-input-group) :is(.admin-input-btn, .tokens-btn) + :is(.admin-input-btn, .tokens-btn) { border-left: none; }
 
 /* 聚焦：仅键盘导航时显示可视焦点 */
 .admin-panel :is(.admin-input-btn, .tokens-btn):focus { outline: none; box-shadow: none; }

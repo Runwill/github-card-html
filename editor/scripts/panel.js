@@ -265,7 +265,7 @@
       });
     }
     visit(state.nodes, 0);
-    els.tree.style.setProperty('--editor-node-name-w', Math.max(8, Math.min(22, maxUnits + 2.6)).toFixed(2) + 'em');
+    els.tree.style.setProperty('--editor-node-name-w', Math.max(6.8, Math.min(18, maxUnits + 1.25)).toFixed(2) + 'em');
   }
 
   function colorForNode(node) {

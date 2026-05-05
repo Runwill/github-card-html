@@ -15,6 +15,11 @@
         'permissions.changePassword': '修改密码',
         'permissions.changeRole': '修改角色',
         'permissions.selectAll': '全选',
+        'permissions.clearAll': '清空',
+        'permissions.editor.permissionsTitle': '编辑权限',
+        'permissions.editor.passwordTitle': '修改密码',
+        'permissions.editor.roleTitle': '修改角色',
+        'permissions.editor.selectedCount': '已选 {selected}/{total}',
         'permissions.saveFailed': '保存失败',
         // Permissions logs
         'permissions.log.title': '用户变更日志',
@@ -96,6 +101,11 @@
         'permissions.changePassword': 'Change password',
         'permissions.changeRole': 'Change role',
         'permissions.selectAll': 'Select all',
+        'permissions.clearAll': 'Clear',
+        'permissions.editor.permissionsTitle': 'Edit permissions',
+        'permissions.editor.passwordTitle': 'Change password',
+        'permissions.editor.roleTitle': 'Change role',
+        'permissions.editor.selectedCount': '{selected}/{total} selected',
         'permissions.saveFailed': 'Save failed',
         // Permissions logs
         'permissions.log.title': 'User change log',
