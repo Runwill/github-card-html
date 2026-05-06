@@ -79,7 +79,7 @@
     return `color-mix(in srgb, ${col} ${accentPct}%, var(--surface))`;
   };
 
-  const HIDE_KEYS = new Set(['_id', '__v', '_v', 'py']);
+  const HIDE_KEYS = new Set(['_id', '__v', '_v', 'py', 'pyAbbr']);
   function stripHidden(v){
     if (!v || typeof v !== 'object') return v;
     if (Array.isArray(v)) return v.map(stripHidden);

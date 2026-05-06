@@ -67,7 +67,7 @@ html.force-landscape {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.667em;
+  gap: 0.444em;
 }
 
 #panel_draft .editor-toolbar h2 {
@@ -179,20 +179,24 @@ html.force-landscape {
 }
 
 #panel_draft .editor-shell {
-  padding: 0.667em;
+  padding: 0.5em;
 }
 
 #panel_draft .editor-toolbar {
-  padding: 0 0 0.667em;
-  margin-bottom: 0.667em;
+  padding: 0 0 0.444em;
+  margin-bottom: 0.444em;
   border-bottom: 1px solid var(--border);
+}
+
+#panel_draft .editor-toolbar h2 {
+  font-size: var(--tp-fs-xl, 16px);
 }
 
 #panel_draft .editor-toolbar__actions,
 #panel_draft .editor-button-row {
   display: flex;
   align-items: center;
-  gap: 0.444em;
+  gap: 0.333em;
   flex-wrap: wrap;
 }
 
@@ -289,7 +293,6 @@ html.force-landscape {
 }
 
 #panel_draft .editor-status,
-#panel_draft .editor-entry__meta,
 #panel_draft .editor-node-tag,
 #panel_draft .editor-node-attrs,
 #panel_draft .editor-log__entry,
@@ -348,14 +351,14 @@ html.force-landscape {
 #panel_draft .editor-entry {
   --editor-entry-accent: color-mix(in srgb, var(--primary-2) 42%, var(--border));
   width: 100%;
-  min-height: 2.4em;
+  min-height: 2.05em;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.556em;
-  padding: 0.5em 0.571em;
+  gap: 0.333em;
+  padding: 0.357em 0.5em;
   border: 1px solid var(--border);
-  border-left: 0.286em solid var(--editor-entry-accent);
+  border-left: 0.214em solid var(--editor-entry-accent);
   border-radius: var(--radius-md);
   background: var(--surface);
   color: var(--text);
@@ -380,7 +383,6 @@ html.force-landscape {
 }
 
 #panel_draft .editor-entry__name,
-#panel_draft .editor-entry__meta,
 #panel_draft .editor-node-label,
 #panel_draft .editor-node-tag,
 #panel_draft .editor-node-attrs {
@@ -388,6 +390,17 @@ html.force-landscape {
   line-height: var(--lh-normal);
   min-width: 0;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#panel_draft .editor-entry__meta {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: var(--tp-fs-xs, 11px);
+  line-height: var(--lh-tight);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -490,6 +503,7 @@ html.force-landscape {
   grid-template-columns: minmax(0, calc(var(--editor-node-name-w, 12em) - var(--node-indent, 0em))) minmax(0, 1fr);
   align-items: stretch;
   gap: 0;
+  font-size: var(--tp-fs-sm, 12px);
   margin: 0.222em 0 0.222em var(--node-indent, 0em);
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--node-accent) 18%, var(--border));
@@ -545,21 +559,18 @@ html.force-landscape {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 0.389em;
-  padding: 0.25em 0.444em;
+  gap: 0.25em;
+  padding: 0.25em 0.333em 0.25em calc(0.333em + var(--node-toggle-space, 0em));
 }
 
 #panel_draft .editor-node-main {
-  padding-left: 0.444em;
   border-radius: var(--radius-md) 0 0 var(--radius-md);
-  font-size: var(--tp-fs-sm, 12px);
 }
 
 #panel_draft .editor-node-side {
   border-left: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   background: color-mix(in srgb, var(--surface) 62%, transparent);
-  font-size: var(--tp-fs-sm, 12px);
 }
 
 #panel_draft .editor-node-row.is-drop-inside {
@@ -589,8 +600,8 @@ html.force-landscape {
 }
 
 #panel_draft .editor-node-toggle {
-  width: 1.4em;
-  height: 1.4em;
+  width: 1.15em;
+  height: 1.15em;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -618,27 +629,26 @@ html.force-landscape {
   min-height: 0;
   margin: 0;
   padding: 0;
-  border-width: 0 0 1px;
-  border-style: solid;
+  border: 0;
   border-radius: var(--radius-none);
   appearance: none;
   background: transparent;
   color: inherit;
   font: inherit;
   line-height: inherit;
-  box-shadow: none;
+  box-shadow: inset 0 -0.071em 0 color-mix(in srgb, var(--border) 78%, transparent);
 }
 
 #panel_draft .editor-node-row.is-editing .editor-node-edit {
-  border-color: color-mix(in srgb, var(--primary-2) 46%, var(--border));
+  border-color: transparent;
   background: transparent;
-  box-shadow: none;
+  box-shadow: inset 0 -0.071em 0 color-mix(in srgb, var(--primary-2) 46%, var(--border));
 }
 
 #panel_draft .editor-node-edit:focus {
   outline: none;
   background: transparent;
-  box-shadow: none;
+  box-shadow: inset 0 -0.071em 0 color-mix(in srgb, var(--primary-2) 46%, var(--border));
 }
 
 #panel_draft .editor-field > span {

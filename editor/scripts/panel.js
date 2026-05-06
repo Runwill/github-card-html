@@ -305,12 +305,12 @@
     var maxUnits = 0;
     function visit(nodes, depth) {
       (nodes || []).forEach(function (node) {
-        maxUnits = Math.max(maxUnits, textMeasureUnits(nodeAutoLabel(node)) + depth * 1.25);
+        maxUnits = Math.max(maxUnits, textMeasureUnits(nodeAutoLabel(node)) + 1.45 + depth * 0.95);
         if (node.element && node.children && node.children.length && node.expanded !== false) visit(node.children, depth + 1);
       });
     }
     visit(state.nodes, 0);
-    els.tree.style.setProperty('--editor-node-name-w', Math.max(3.8, Math.min(14, maxUnits + 1.72)).toFixed(2) + 'em');
+    els.tree.style.setProperty('--editor-node-name-w', Math.max(2.35, maxUnits + 0.9).toFixed(2) + 'em');
   }
 
   function colorForNode(node) {
@@ -362,20 +362,24 @@
     row.dataset.id = node.id;
     row.draggable = false;
     row.style.setProperty('--node-depth', String(depth));
-    row.style.setProperty('--node-indent', (depth * 1.25).toFixed(2) + 'em');
+    row.style.setProperty('--node-indent', (depth * 0.95).toFixed(2) + 'em');
     var color = colorForNode(node);
     if (color) row.style.setProperty('--node-accent', color);
 
-    var toggle = document.createElement('button');
-    toggle.type = 'button';
-    toggle.className = 'editor-node-toggle';
-    toggle.dataset.action = 'toggle';
-    toggle.textContent = node.element && node.children && node.children.length ? (node.expanded === false ? '▸' : '▾') : '';
-    toggle.setAttribute('aria-label', t('editor.action.toggleNode'));
+    var hasToggle = !!(node.element && node.children && node.children.length);
 
     var main = document.createElement('span');
     main.className = 'editor-node-main';
-    main.appendChild(toggle);
+    if (!hasToggle) main.style.setProperty('--node-toggle-space', '1.4em');
+    if (hasToggle) {
+      var toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'editor-node-toggle';
+      toggle.dataset.action = 'toggle';
+      toggle.textContent = node.expanded === false ? '▸' : '▾';
+      toggle.setAttribute('aria-label', t('editor.action.toggleNode'));
+      main.appendChild(toggle);
+    }
 
     var side = document.createElement('span');
     side.className = 'editor-node-side';

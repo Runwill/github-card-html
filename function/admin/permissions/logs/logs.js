@@ -55,7 +55,7 @@
   function choiceGroupHtml(kind, labelKey, labelFallback, ariaLabel, items, activeValue){
     const buttons = items.map(item => {
       const active = item.value === activeValue;
-      return `<button type="button" class="perms-log-choice__btn${active ? ' is-active' : ''}" role="radio" aria-checked="${active ? 'true' : 'false'}" data-value="${item.value}"><span data-i18n="${item.key}">${item.fallback}</span></button>`;
+      return `<button type="button" class="perms-log-choice__btn btn btn--sm btn--secondary${active ? ' is-active' : ''}" role="radio" aria-checked="${active ? 'true' : 'false'}" data-value="${item.value}"><span data-i18n="${item.key}">${item.fallback}</span></button>`;
     }).join('');
     return `<div class="perms-log-choice perms-log-choice--${kind}" role="radiogroup" aria-label="${ariaLabel}"><span class="perms-log-choice__label" data-i18n="${labelKey}">${labelFallback}</span>${buttons}</div>`;
   }

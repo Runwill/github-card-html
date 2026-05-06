@@ -20,7 +20,6 @@
         'tokens.edit.cancel': '取消',
         'tokens.edit.saveas': '另存',
         'tokens.edit.submit': '保存',
-        'tokens.scheme.label': '方案 {index}',
         // Tokens hints in modal
         'tokens.hints.title': '{name} 结构字段：',
         'tokens.hints.listTitle': '{name} 字段（• 必填）：',
@@ -101,7 +100,6 @@
         'tokens.edit.cancel': 'Cancel',
         'tokens.edit.saveas': 'Save as new',
         'tokens.edit.submit': 'Save',
-        'tokens.scheme.label': 'Scheme {index}',
         // Tokens hints in modal
         'tokens.hints.title': '{name} schema fields:',
         'tokens.hints.listTitle': '{name} fields (• required):',

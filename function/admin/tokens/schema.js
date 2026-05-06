@@ -19,7 +19,7 @@
     if (t === 'boolean') return { kind: 'bool' };
     if (t === 'object') {
       // 过滤掉非持久化/聚合类字段（如列表拼音 py）以及内部字段
-      const keys = Object.keys(val).filter(k => k !== '_id' && k !== '__v' && k !== '_v' && k !== 'py');
+      const keys = Object.keys(val).filter(k => k !== '_id' && k !== '__v' && k !== '_v' && k !== 'py' && k !== 'pyAbbr');
       keys.sort();
       const fields = {};
       for (const k of keys) fields[k] = deriveSchema(val[k]);
