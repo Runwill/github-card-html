@@ -27,23 +27,6 @@
     });
   }
 
-  function bindClearBtn(header, body) {
-    const btn = header?.querySelector('.js-log-clear');
-    if (!btn || btn.__tokensLogClearBound) return;
-    btn.__tokensLogClearBound = true;
-    btn.addEventListener('click', async()=>{
-      try{
-        const auth = T.getAuth ? T.getAuth() : { canEdit:false };
-        if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
-        if (T.apiJson) {
-          await T.apiJson('/tokens/logs', { method: 'DELETE', auth: true });
-        }
-        try{ body.innerHTML=''; }catch(_){}
-        T.showToast(window.t('tokens.toast.cleared'));
-      }catch(e){ alert((e && e.message) || window.t('tokens.error.updateFailed')); }
-    });
-  }
-
   // HTML 转义：复用 tokensAdmin.esc
   const T = window.tokensAdmin;
   const esc = T.esc;
@@ -65,7 +48,7 @@
 
     const header = document.createElement('div');
     header.className = 'tokens-log__header';
-  header.innerHTML = '<div class="tokens-log__title" data-i18n="tokens.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button><button class="btn btn--secondary btn--sm js-log-clear" data-i18n="tokens.log.clear"></button></div>';
+  header.innerHTML = '<div class="tokens-log__title" data-i18n="tokens.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button></div>';
     try { if (window.i18n && window.i18n.apply) { window.i18n.apply(header); } } catch (_) {}
 
         // 外包一层可折叠容器，内层保持可滚动
@@ -89,81 +72,35 @@
 
         // 绑定按钮（首次创建时）
         try{
-          bindClearBtn(header, body);
           bindCollapseBtn(header, panel);
         }catch(_){ }
       } else {
         body = document.getElementById('tokens-log');
         // 绑定控制按钮（在已存在面板时需要从 panel 查询 header）
         const headerEl = panel.querySelector('.tokens-log__header');
-        bindClearBtn(headerEl, body);
         bindCollapseBtn(headerEl, panel);
       }
 
-      // 日志内“删除”按钮事件委托（样式与删除词元属性一致：.btn-del）；若有 _id 则请求后端删除
+      // 日志内“复制 / 删除 / 恢复”按钮事件委托
       try {
-        if (body && !body.__delDelegationBound) {
-          body.__delDelegationBound = true;
-          body.addEventListener('click', (ev) => {
-            const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
-            if (!btn) return;
-            const entry = btn.closest('.tokens-log__entry');
-            if (!entry) return;
-            (async () => {
+        if (body) {
+          LogUtils.bindLogCopy(body);
+          LogUtils.bindLogDelete(body, async (id) => {
               const auth = T.getAuth ? T.getAuth() : { canEdit:false };
               if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
-              const id = entry.getAttribute('data-log-id');
               if (id) {
-                try {
-                  if (T.apiJson) {
-                    await T.apiJson(`/tokens/logs/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
-                  }
-                } catch (e) {
-                  alert((e && e.message) || window.t('tokens.error.deleteFailed'));
-                  return;
+                if (T.apiJson) {
+                  await T.apiJson(`/tokens/logs/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
                 }
               }
-              try { entry.remove(); } catch (_) {}
               T.showToast(window.t('tokens.toast.deleted'));
-            })();
-          });
-        }
-      } catch (_) {}
-
-      // 日志内“复制”按钮事件委托
-      try {
-        if (body && !body.__copyDelegationBound) {
-          body.__copyDelegationBound = true;
-          body.addEventListener('click', (ev) => {
-            const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-copy') : null;
-            if (!btn) return;
-            const entry = btn.closest('.tokens-log__entry');
-            if (!entry) return;
-            
-            const clone = entry.cloneNode(true);
-            const actions = clone.querySelector('.log-actions');
-            if (actions) actions.remove();
-            
-            const timeEl = clone.querySelector('.log-time');
-            if (timeEl && timeEl.hasAttribute('data-abs')) {
-                timeEl.textContent = timeEl.getAttribute('data-abs') + ' ';
-            }
-            
-            const text = clone.innerText.replace(/\s+/g, ' ').trim();
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text).then(() => {
-                    const originalI18n = btn.getAttribute('data-i18n');
-                    btn.setAttribute('data-i18n', 'common.copied');
-                    if (window.i18n && window.i18n.apply) window.i18n.apply(btn);
-                    setTimeout(() => {
-                        btn.setAttribute('data-i18n', originalI18n || 'common.copy');
-                        if (window.i18n && window.i18n.apply) window.i18n.apply(btn);
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Copy failed', err);
-                });
-            }
+          }, async (id) => {
+              const auth = T.getAuth ? T.getAuth() : { canEdit:false };
+              if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
+              if (id && T.apiJson) {
+                await T.apiJson(`/tokens/logs/${encodeURIComponent(id)}/restore`, { method: 'PATCH', auth: true });
+              }
+              T.showToast(window.t('tokens.toast.restored'));
           });
         }
       } catch (_) {}
@@ -251,7 +188,7 @@
   const pill = (key, cls='')=> `<i class="log-pill ${cls}" data-i18n="${key}"></i>`;
     const code = (txt)=> `<code class="log-code">${esc(txt||'')}</code>`;
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
-    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button></div>`;
+    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button><button class="btn-inline-action btn-restore" data-i18n="common.restore"></button></div>`;
     if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
       const msg = (function(){
@@ -353,7 +290,7 @@
       const fetchTokenLogs = T.fetchTokenLogs;
       (async ()=>{
         try{
-          const out = fetchTokenLogs ? await fetchTokenLogs({ page:1, pageSize: 100 }) : null;
+          const out = fetchTokenLogs ? await fetchTokenLogs({ page:1, pageSize: 100, includeDeleted: true }) : null;
           const list = (out && out.list) || [];
           if (Array.isArray(list) && list.length){
             // 新在上：按时间降序排序（若缺时间则保持原顺序近似）
@@ -384,8 +321,9 @@
                 return t ? Object.assign(base, { ts: t }) : base;
               })();
               const row = document.createElement('div');
-              row.className = 'tokens-log__entry';
+              row.className = 'tokens-log__entry' + (log && log.deleted ? ' is-deleted' : '');
               if (log && log._id) { try { row.setAttribute('data-log-id', String(log._id)); }catch(_){} }
+              if (log && log.deleted) { try { row.setAttribute('data-log-deleted', '1'); }catch(_){} }
               row.innerHTML = makeLine(log.type, payload);
               try { if (window.i18n && window.i18n.apply) window.i18n.apply(row); } catch (_) {}
               frag.appendChild(row);

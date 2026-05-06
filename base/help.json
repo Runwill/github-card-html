@@ -106,6 +106,7 @@
       { "actions": ["editor_add_sibling"], "desc": "help.editor.key.addSibling" },
       { "actions": ["editor_edit_selected"], "desc": "help.editor.key.editSelected" },
       { "actions": ["editor_delete_selected"], "desc": "help.editor.key.deleteSelected" },
+      { "keys": ["Ctrl+Z / Ctrl+Y"], "desc": "help.editor.key.undoRedo" },
       { "actions": ["editor_variant_mode"], "desc": "help.editor.key.variant" }
     ],
     "panel_tokens": [

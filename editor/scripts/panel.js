@@ -23,11 +23,14 @@
     bidirectionalMode: true,
     logs: [],
     editingNodeId: '',
-    lastRecommendationLogSignature: ''
+    lastRecommendationLogSignature: '',
+    undoStack: [],
+    redoStack: []
   };
   var els = {};
   var pointerDrag = null;
   var POINTER_DRAG_THRESHOLD = 6;
+  var HISTORY_LIMIT = 80;
 
   function t(key, params) {
     return window.t ? window.t(key, params) : key;
@@ -109,6 +112,46 @@
     return removed;
   }
 
+  function treeSnapshot() {
+    return JSON.stringify({
+      nodes: state.nodes,
+      selectedId: state.selectedId || null,
+      lastInsertedKey: state.lastInsertedKey || ''
+    });
+  }
+
+  function pushTreeHistory() {
+    var snapshot = treeSnapshot();
+    if (state.undoStack[state.undoStack.length - 1] === snapshot) return;
+    state.undoStack.push(snapshot);
+    if (state.undoStack.length > HISTORY_LIMIT) state.undoStack.shift();
+    state.redoStack = [];
+  }
+
+  function restoreTreeSnapshot(snapshot) {
+    var parsed = JSON.parse(snapshot || '{}');
+    state.nodes = Array.isArray(parsed.nodes) ? parsed.nodes : [];
+    state.selectedId = parsed.selectedId || null;
+    state.editingNodeId = '';
+    state.lastInsertedKey = parsed.lastInsertedKey || '';
+    ns.Data.refreshLabels(state.nodes, state.chineseMap);
+    renderAll(true);
+  }
+
+  function undoTreeChange() {
+    if (!state.undoStack.length) return;
+    state.redoStack.push(treeSnapshot());
+    restoreTreeSnapshot(state.undoStack.pop());
+    logEditor('editor.log.undone', {});
+  }
+
+  function redoTreeChange() {
+    if (!state.redoStack.length) return;
+    state.undoStack.push(treeSnapshot());
+    restoreTreeSnapshot(state.redoStack.pop());
+    logEditor('editor.log.redone', {});
+  }
+
   function insertNodes(nodes, targetId, mode) {
     if (!Array.isArray(nodes) || nodes.length === 0) return;
     var target = targetId ? findNodeInfo(targetId) : null;
@@ -142,6 +185,7 @@
   function addEntryByKey(key, targetId, mode) {
     var entry = state.entries.find(function (item) { return item.key === key; });
     if (!entry) return;
+    pushTreeHistory();
     var variantIndex = state.variantMode && entry.hasVariant ? 1 : 0;
     var pair = ns.Data.getVariant(entry.value, variantIndex);
     var nodes = ns.Data.parseHtmlToNodes(pair[0] + pair[1], state.defaultElements, state.chineseMap);
@@ -158,6 +202,7 @@
   }
 
   function addText(mode) {
+    pushTreeHistory();
     insertNodes([makeTextNode('')], state.selectedId, mode || 'child');
     renderAll(true);
     startInlineEdit(state.selectedId);
@@ -265,7 +310,7 @@
       });
     }
     visit(state.nodes, 0);
-    els.tree.style.setProperty('--editor-node-name-w', Math.max(4.4, Math.min(16, maxUnits + 2.68)).toFixed(2) + 'em');
+    els.tree.style.setProperty('--editor-node-name-w', Math.max(3.8, Math.min(14, maxUnits + 1.72)).toFixed(2) + 'em');
   }
 
   function colorForNode(node) {
@@ -530,9 +575,9 @@
     var velocityY = 0;
     var directionX = 0;
     var directionY = 0;
-    var acceleration = 3.2;
+    var acceleration = 4.6;
     var friction = 0.86;
-    var maxSpeed = 58;
+    var maxSpeed = 96;
 
     function canScrollX() {
       return element.scrollWidth > element.clientWidth + 1;
@@ -869,6 +914,8 @@
       return true;
     }
     if (!sourceId || isInvalidDrop(sourceId, target.targetId)) return false;
+    if (!findNodeInfo(sourceId)) return false;
+    pushTreeHistory();
     var moved = removeNode(sourceId);
     if (!moved) return false;
     insertNodes([moved], target.targetId, target.targetId ? target.mode : 'child');
@@ -1039,12 +1086,20 @@
   function commitInlineEdit(id, value) {
     var info = findNodeInfo(id);
     if (!info) return;
+    var nextValue = info.node.element ? (value.trim() || 'span') : value;
+    if (nodeValueText(info.node) === nextValue) {
+      state.editingNodeId = '';
+      renderTree();
+      renderInspector();
+      return;
+    }
+    pushTreeHistory();
     if (info.node.element) {
-      info.node.tag = value.trim() || 'span';
+      info.node.tag = nextValue;
       info.node.text = (state.chineseMap[String(info.node.tag).toLowerCase()] || {}).label || info.node.tag;
     } else {
-      info.node.text = value;
-      info.node.tag = value;
+      info.node.text = nextValue;
+      info.node.tag = nextValue;
     }
     state.editingNodeId = '';
     renderAll(true);
@@ -1078,13 +1133,18 @@
     var info = getSelectedInfo();
     if (!info || !info.node.element) return;
     info.node.attrs = info.node.attrs || {};
-    info.node.attrs.class_name = els.classInput ? els.classInput.value : '';
-    info.node.attrs.epithet = els.epithetInput ? els.epithetInput.value : '';
+    var className = els.classInput ? els.classInput.value : '';
+    var epithet = els.epithetInput ? els.epithetInput.value : '';
+    if ((info.node.attrs.class_name || '') === className && (info.node.attrs.epithet || '') === epithet) return;
+    pushTreeHistory();
+    info.node.attrs.class_name = className;
+    info.node.attrs.epithet = epithet;
     renderAll(true);
   }
 
   function deleteSelected() {
     if (!state.selectedId) return;
+    pushTreeHistory();
     removeNode(state.selectedId);
     logEditor('editor.log.deleted', {});
     renderAll(true);
@@ -1093,6 +1153,7 @@
   function toggleSelectedElement() {
     var info = getSelectedInfo();
     if (!info) return;
+    pushTreeHistory();
     var node = info.node;
     node.element = !node.element;
     if (node.element) {
@@ -1108,6 +1169,7 @@
 
   function clearTree() {
     if (state.nodes.length && !window.confirm(t('editor.confirm.clear'))) return;
+    if (state.nodes.length) pushTreeHistory();
     state.nodes = [];
     state.selectedId = null;
     state.editingNodeId = '';
@@ -1135,6 +1197,7 @@
     var input = byId('htmlInput');
     var raw = input ? input.value : '';
     if (!raw.trim()) return;
+    pushTreeHistory();
     state.nodes = ns.Data.parseHtmlToNodes(raw, state.defaultElements, state.chineseMap);
     state.selectedId = state.nodes[0] ? state.nodes[0].id : null;
     state.editingNodeId = '';
@@ -1183,6 +1246,17 @@
     var tagName = (event.target && event.target.tagName || '').toLowerCase();
     var typing = tagName === 'input' || tagName === 'textarea' || tagName === 'select' || event.target.isContentEditable;
     if (typing) return;
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key && event.key.toLowerCase() === 'z') {
+      event.preventDefault();
+      if (event.shiftKey) redoTreeChange();
+      else undoTreeChange();
+      return;
+    }
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key && event.key.toLowerCase() === 'y') {
+      event.preventDefault();
+      redoTreeChange();
+      return;
+    }
     var keySettings = window.KeySettings;
     var matches = keySettings && typeof keySettings.checkBinding === 'function'
       ? function (action) { return keySettings.checkBinding(event, action); }

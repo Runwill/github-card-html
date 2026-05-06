@@ -1,7 +1,7 @@
 (function(){
   // permissions/logs/logs_data — 数据层: 日志获取、事件绑定、语言切换
   // UI factory 在 logs.js 中，通过 TokensPerm._LogsUI 共享
-  const { jsonGet: apiGet, jsonDelete: apiDelete } = window.TokensPerm.API;
+  const { jsonGet: apiGet, jsonDelete: apiDelete, jsonPatch: apiPatch } = window.TokensPerm.API;
   const UI = window.TokensPerm._LogsUI;
 
   async function hydrateUserLogs(fromFilters){
@@ -12,17 +12,17 @@
       const url = '/user/logs' + (qs.toString() ? ('?' + qs.toString()) : '');
       const out = await apiGet(url);
       const list = (out && out.list) || [];
-      // 动态填充类型下拉
+      // 同步后端新增日志类型，供分类筛选的“其他”集合使用
       try {
         const types = Array.from(new Set(list.map(l => l && l.type).filter(Boolean)));
-        if (types.length) { UI.KNOWN_TYPES = new Set([...UI.KNOWN_TYPES, ...types]); }
-        UI.renderTypeOptions(Array.from(UI.KNOWN_TYPES.values()));
+        UI.syncKnownTypes(types);
       } catch(_){ }
       const frag = document.createDocumentFragment();
       list.forEach(l => {
         const row = document.createElement('div');
-        row.className='tokens-log__entry';
+        row.className='tokens-log__entry' + (l && l.deleted ? ' is-deleted' : '');
         if (l && l._id) { try { row.setAttribute('data-log-id', String(l._id)); }catch(_){ } }
+        if (l && l.deleted) { try { row.setAttribute('data-log-deleted', '1'); }catch(_){ } }
         if (l && l.userId) { try { row.setAttribute('data-user-id', String(l.userId)); }catch(_){ } }
         if (l && l.type) { try { row.setAttribute('data-type', String(l.type)); }catch(_){ } }
         row.innerHTML = UI.makeRow(l);
@@ -51,6 +51,8 @@
         LogUtils.bindLogCopy(root);
         LogUtils.bindLogDelete(root, async (id)=>{
           if (id) await apiDelete(`/user/logs/${encodeURIComponent(id)}`);
+        }, async (id)=>{
+          if (id) await apiPatch(`/user/logs/${encodeURIComponent(id)}/restore`);
         });
       }catch(_){ }
     }

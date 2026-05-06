@@ -1,138 +1,133 @@
 /* style/panel/permissions/filters.css -- 权限页日志筛选条
  *
- * ── .tokens-log__filters ─────────────────────────────────
- * 位置：.tokens-log > .tokens-log__wrap > .tokens-log__filters.admin-input-group
- * 字号继承：body 18px（--tp-fs-2xl）
- * 子控件字号/高度：由 toolbar.css 提供
- *   → .admin-input      字号 --tp-fs-md (14px)  高度 --admin-input-h
- *   → .admin-input-btn  字号 --tp-fs-md (14px)  高度 --admin-input-h
- *
- * 本文件仅负责：
- *   · 筛选条容器布局（flex nowrap）
- *   · 子控件的"拼接直角"外观
- *   · 宽度/伸缩微调
- *
- * 已移除：
- *   × height: 32px !important    → 由 --admin-input-h 接管
- *   × font-size: var(--fs-md)    → 由 --tp-fs-md 接管
- *   × @media (max-width: 520px)  → clamp() 自动处理
- * ─────────────────────────────────────────────────────── */
+ * .tokens-log__filters 是筛选条 owner：
+ *   - 主查询/日期/动作使用 .tokens-log__filters-main.admin-input-group 贴边拼接。
+ *   - 类型/结果使用 .perms-log-choice 连续按钮轨，不再复制隐藏 select 状态。
+ *   - 尺寸继续消费 toolbar.css 提供的 --admin-input-h 与 --tp-fs-md。
+ */
 
-/* 筛选条容器 */
 .tokens-log__filters {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5em), 1fr));
-  align-items: stretch;
-  gap: 0.444em;                     /* 8/18 */
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   overflow: visible;
-  padding-bottom: 0.111em;          /* 2/18 */
 }
 
-/* 权限面板内占满可用宽度，避免受 60vw 限制 */
-#panel_permissions .tokens-log__filters {
+#panel_permissions .tokens-log__filters,
+#panel_permissions .tokens-log__filters-main {
   width: 100%;
   max-width: none;
 }
 
 .tokens-log__filters * { box-sizing: border-box; }
 
-#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .btn, button) {
+#panel_permissions .tokens-log__filters-main {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+
+#panel_permissions .tokens-log__filters-main > :is(.admin-input, .tokens-input, .btn, button) {
   position: relative;
   min-width: 0;
-  width: 100%;
   margin: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-none);
   box-shadow: none !important;
 }
 
-#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input) {
-  flex: 1 1 auto !important;
+#panel_permissions .tokens-log__filters-main > :is(.admin-input, .tokens-input, .btn, button) + :is(.admin-input, .tokens-input, .btn, button) {
+  margin-left: -1px;
 }
 
-#panel_permissions .tokens-log__filters > :is(.btn, button) {
-  justify-content: center;
+#panel_permissions .tokens-log__filters-main > :first-child {
+  border-top-left-radius: var(--radius-none);
+  border-bottom-left-radius: var(--radius-none);
+}
+
+#panel_permissions .tokens-log__filters-main > :last-child {
+  border-top-right-radius: var(--radius-none);
+  border-bottom-right-radius: var(--radius-none);
+}
+
+#panel_permissions #perms-log-q { flex: 1 1 18em !important; }
+#panel_permissions #perms-log-from,
+#panel_permissions #perms-log-to { flex: 0 1 10em !important; }
+
+#panel_permissions .tokens-log__filters-main > :is(.btn, button) {
   flex: 0 0 auto !important;
+  justify-content: center;
   white-space: nowrap;
 }
 
-#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input):hover,
-#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input):focus {
-  z-index: 3;
-}
+#panel_permissions .tokens-log__filters-main > :is(.admin-input, .tokens-input):hover,
+#panel_permissions .tokens-log__filters-main > :is(.admin-input, .tokens-input):focus { z-index: 3; }
 
-#panel_permissions .tokens-log__filters > :is(.btn, button):hover,
-#panel_permissions .tokens-log__filters > :is(.btn, button):focus {
-  z-index: 2;
-}
-
-.perms-log-native-filter {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
+#panel_permissions .tokens-log__filters-main > :is(.btn, button):hover,
+#panel_permissions .tokens-log__filters-main > :is(.btn, button):focus { z-index: 2; }
 
 .perms-log-choice {
   min-width: 0;
   display: flex;
   flex-wrap: wrap;
-  align-content: flex-start;
-  align-items: center;
-  gap: 0.333em;                     /* 6/18 */
-  padding: 0.278em;                  /* 5/18 */
+  gap: 0;
+  overflow: visible;
   border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--surface) 95%, var(--bg-soft, var(--surface)));
+  border-right: 0;
+  border-left: 0;
+  border-radius: var(--radius-none);
+  background: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
 }
 
-.perms-log-choice--type,
-.perms-log-choice--outcome {
-  grid-column: 1 / -1;
+.perms-log-choice + .perms-log-choice {
+  border-top: 0;
+}
+
+.perms-log-choice__label,
+.perms-log-choice__btn {
+  min-height: var(--admin-input-h, var(--tokens-input-h, 36px));
+  display: inline-flex;
+  align-items: center;
+  line-height: var(--lh-tight);
 }
 
 .perms-log-choice__label {
   flex: 0 0 auto;
-  padding: 0 0.333em;
+  padding: 0 0.778em;
+  border-right: 1px solid var(--border);
   color: var(--text-subtle);
   font-size: var(--tp-fs-sm, 12px);
   font-weight: 600;
-  line-height: var(--admin-input-h, var(--tokens-input-h, 36px));
+  background: color-mix(in srgb, var(--surface) 92%, var(--border));
 }
 
 .perms-log-choice__btn {
   flex: 0 1 auto;
-  min-width: 0;
-  min-height: calc(var(--admin-input-h, var(--tokens-input-h, 36px)) - 0.556em);
-  display: inline-flex;
-  align-items: center;
   justify-content: center;
-  padding: 0.286em 0.714em;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
+  padding: 0 0.857em;
+  border: 0;
+  border-left: 1px solid var(--border);
+  border-radius: var(--radius-none);
   background: transparent;
   color: var(--text-muted);
   font-size: var(--tp-fs-md, 14px);
-  line-height: var(--lh-tight);
   white-space: nowrap;
   cursor: pointer;
   transition:
     background var(--dur-normal) var(--ease-default),
-    border-color var(--dur-normal) var(--ease-default),
     color var(--dur-normal) var(--ease-default);
 }
 
+.perms-log-choice__label + .perms-log-choice__btn { border-left: 0; }
+
 .perms-log-choice__btn:hover,
 .perms-log-choice__btn:focus-visible {
-  border-color: color-mix(in srgb, var(--primary-2) 34%, var(--border));
   background: color-mix(in srgb, var(--primary-2) 7%, var(--surface));
   color: var(--text);
   outline: none;
+  box-shadow: inset 0 0 0 0.071em var(--primary-ring);
 }
 
 .perms-log-choice__btn.is-active {
-  border-color: color-mix(in srgb, var(--primary-2) 54%, var(--border));
   background: color-mix(in srgb, var(--primary-2) 12%, var(--surface));
   color: var(--primary-1);
-  font-weight: 600;
 }

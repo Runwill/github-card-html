@@ -80,6 +80,10 @@
   border-bottom: 1px dashed var(--border);
 }
 .tokens-log__entry:last-child { border-bottom: none; }
+.tokens-log__entry.is-deleted { opacity: 0.62; }
+.tokens-log__entry.is-deleted .log-row { color: var(--text-muted); }
+.tokens-log__entry:not(.is-deleted) .btn-restore,
+.tokens-log__entry.is-deleted .btn-del { display: none; }
 
 .tokens-log .log-row {
   display: flex;
@@ -170,6 +174,10 @@
 }
 .btn-inline-action.btn-copy:hover {
   color: var(--primary-2);
+  background: color-mix(in srgb, var(--primary-2) 8%, transparent);
+}
+.btn-inline-action.btn-restore:hover {
+  color: var(--primary-1);
   background: color-mix(in srgb, var(--primary-2) 8%, transparent);
 }
 

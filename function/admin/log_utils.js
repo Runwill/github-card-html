@@ -30,19 +30,36 @@
     });
   }
 
-  // V3 — 删除按钮事件委托
-  function bindLogDelete(root, deleteFn){
+  function setLogDeleted(entry, deleted){
+    if (!entry) return;
+    entry.classList.toggle('is-deleted', !!deleted);
+    entry.setAttribute('data-log-deleted', deleted ? '1' : '0');
+    const del = entry.querySelector('.btn-del');
+    const restore = entry.querySelector('.btn-restore');
+    if (del) del.hidden = !!deleted;
+    if (restore) restore.hidden = !deleted;
+  }
+
+  // V3 — 删除/恢复按钮事件委托
+  function bindLogDelete(root, deleteFn, restoreFn){
     if (!root || root.__delDelegationBound) return;
     root.__delDelegationBound = true;
     root.addEventListener('click', (ev)=>{
-      const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
+      const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del, .btn-restore') : null;
       if (!btn) return;
       const entry = btn.closest('.tokens-log__entry');
       if (!entry) return;
       (async ()=>{
         const id = entry.getAttribute('data-log-id');
-        try { await deleteFn(id); } catch(e){ alert((e && e.message) || ''); return; }
-        try { entry.remove(); } catch(_){}
+        try {
+          if (btn.classList.contains('btn-restore')) {
+            if (restoreFn) await restoreFn(id);
+            setLogDeleted(entry, false);
+          } else {
+            await deleteFn(id);
+            setLogDeleted(entry, true);
+          }
+        } catch(e){ alert((e && e.message) || ''); }
       })();
     });
   }
@@ -83,5 +100,5 @@
     }catch(_){}
   }
 
-  window.LogUtils = { bindLogCopy, bindLogDelete, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
+  window.LogUtils = { bindLogCopy, bindLogDelete, setLogDeleted, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
 })();

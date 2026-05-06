@@ -23,7 +23,6 @@
         'permissions.saveFailed': '保存失败',
         // Permissions logs
         'permissions.log.title': '用户变更日志',
-        'permissions.log.clear': '清空',
         'permissions.log.register': '注册',
         'permissions.log.roleChanged': '角色变更',
         'permissions.log.passwordChanged': '修改密码',
@@ -113,7 +112,6 @@
         'permissions.saveFailed': 'Save failed',
         // Permissions logs
         'permissions.log.title': 'User change log',
-        'permissions.log.clear': 'Clear',
         'permissions.log.register': 'Register',
         'permissions.log.roleChanged': 'Role changed',
         'permissions.log.passwordChanged': 'Password changed',

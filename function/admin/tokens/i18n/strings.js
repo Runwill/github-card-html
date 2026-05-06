@@ -21,7 +21,6 @@
         'tokens.edit.saveas': '另存',
         'tokens.edit.submit': '保存',
         'tokens.scheme.label': '方案 {index}',
-        'tokens.scheme.count': '{count} 项',
         // Tokens hints in modal
         'tokens.hints.title': '{name} 结构字段：',
         'tokens.hints.listTitle': '{name} 字段（• 必填）：',
@@ -33,7 +32,7 @@
         'tokens.toast.useCtrlToEdit': '按住 Ctrl 键以启用编辑',
         'tokens.toast.saved': '已保存',
         'tokens.toast.deleted': '已删除',
-        'tokens.toast.cleared': '已清空',
+        'tokens.toast.restored': '已恢复',
         'tokens.toast.created': '创建成功',
         'tokens.toast.savedAs': '已另存为新对象',
         'tokens.error.jsonInvalid': 'JSON 不合法',
@@ -45,7 +44,6 @@
         'tokens.go.openFailed': '无法打开链接',
         // Logger
         'tokens.log.title': '变更日志',
-        'tokens.log.clear': '清空',
         'tokens.log.create': '新增',
         'tokens.log.deleteDoc': '删除对象',
         'tokens.log.deleteField': '删除字段',
@@ -104,7 +102,6 @@
         'tokens.edit.saveas': 'Save as new',
         'tokens.edit.submit': 'Save',
         'tokens.scheme.label': 'Scheme {index}',
-        'tokens.scheme.count': '{count} items',
         // Tokens hints in modal
         'tokens.hints.title': '{name} schema fields:',
         'tokens.hints.listTitle': '{name} fields (• required):',
@@ -116,7 +113,7 @@
         'tokens.toast.useCtrlToEdit': 'Hold Ctrl to enable edit',
         'tokens.toast.saved': 'Saved',
         'tokens.toast.deleted': 'Deleted',
-        'tokens.toast.cleared': 'Cleared',
+        'tokens.toast.restored': 'Restored',
         'tokens.toast.created': 'Created',
         'tokens.toast.savedAs': 'Saved as new object',
         'tokens.error.jsonInvalid': 'Invalid JSON',
@@ -128,7 +125,6 @@
         'tokens.go.openFailed': 'Unable to open link',
         // Logger
         'tokens.log.title': 'Change log',
-        'tokens.log.clear': 'Clear',
         'tokens.log.create': 'Created',
         'tokens.log.deleteDoc': 'Delete object',
         'tokens.log.deleteField': 'Delete field',

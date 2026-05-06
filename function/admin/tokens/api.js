@@ -90,6 +90,7 @@
       if (params.until) q.set('until', String(params.until));
       if (params.collection) q.set('collection', String(params.collection));
       if (params.docId) q.set('docId', String(params.docId));
+      if (params.includeDeleted) q.set('includeDeleted', 'true');
     }
     return apiJson('/tokens/logs' + (q.toString()? ('?' + q.toString()) : ''), { auth: true });
   }

@@ -37,11 +37,23 @@
     return out;
   }
 
+  async function jsonPatch(path, body){
+    const r = await fetch(`${API_ROOT}${path}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', ...authHeader() },
+      body: JSON.stringify(body||{})
+    });
+    const out = await r.json().catch(()=>({}));
+    if (!r.ok) { handle401(r); throw new Error((out && out.message) || `HTTP ${r.status}`); }
+    return out;
+  }
+
   ns.API = {
     authHeader,
     jsonGet,
     jsonPost,
     jsonDelete,
+    jsonPatch,
     setPassword(userId, newPassword){ return jsonPost('/user/password/set', { userId, newPassword }); },
     async fetchUsers(search){
       const q = search ? ('?search=' + encodeURIComponent(search)) : '';

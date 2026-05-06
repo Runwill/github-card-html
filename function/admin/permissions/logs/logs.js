@@ -1,23 +1,9 @@
 (function(){
   // permissions/logs/logs: 在权限页添加用户变更日志，沿用 tokens 日志样式与行为
   // API 层复用 permissions/api.js 中的 TokensPerm.API
-  const { jsonGet: apiGet, jsonDelete: apiDelete } = window.TokensPerm.API;
 
   const MAX_LOGS = 200;
-  // 预置全部已定义的日志类型，用于结果筛选和类型分类映射
-  const PRESET_LOG_TYPES = [
-    'user-registered','user-approved','user-rejected',
-    'password-change','role-changed',
-    'avatar-submitted','avatar-approved','avatar-rejected',
-    'username-submitted','username-approved','username-rejected','username-cancelled',
-    'intro-submitted','intro-approved','intro-rejected','intro-cancelled',
-    'permissions-granted','permissions-revoked','permissions-replaced'
-  ];
-  // 动态类型缓存（用于“结果”过滤映射），初始即包含全部预置类型
-  let KNOWN_TYPES = new Set(PRESET_LOG_TYPES);
-
-  const TYPE_FILTERS = [
-    { value: 'all', key: 'permissions.log.filter.cat.all', fallback: '全部类型' },
+  const TYPE_GROUPS = [
     { value: 'register', key: 'permissions.log.filter.cat.register', fallback: '注册', types: ['user-registered','user-approved','user-rejected','register'] },
     { value: 'username', key: 'permissions.log.filter.cat.username', fallback: '用户名', types: ['username-submitted','username-approved','username-rejected','username-cancelled'] },
     { value: 'intro', key: 'permissions.log.filter.cat.intro', fallback: '简介', types: ['intro-submitted','intro-approved','intro-rejected','intro-cancelled'] },
@@ -27,6 +13,15 @@
     { value: 'role', key: 'permissions.log.filter.cat.role', fallback: '角色', types: ['role-changed'] },
     { value: 'other', key: 'permissions.log.filter.cat.other', fallback: '其他' }
   ];
+  const TYPE_FILTERS = [{ value: 'all', key: 'permissions.log.filter.cat.all', fallback: '全部类型' }, ...TYPE_GROUPS];
+  const OUTCOME_FILTERS = [
+    { value: 'any', key: 'permissions.log.filter.outcome.any', fallback: '全部结果' },
+    { value: 'submitted', key: 'permissions.log.filter.outcome.submitted', fallback: '已提交' },
+    { value: 'approved', key: 'permissions.log.filter.outcome.approved', fallback: '已通过' },
+    { value: 'rejected', key: 'permissions.log.filter.outcome.rejected', fallback: '已拒绝' },
+    { value: 'cancelled', key: 'permissions.log.filter.outcome.cancelled', fallback: '已撤回' }
+  ];
+  let KNOWN_TYPES = new Set(TYPE_GROUPS.flatMap(item => item.types || []));
 
   const { isAnimating, isOpen, openCollapsible, closeCollapsible } = window.CollapsibleAnim;
 
@@ -43,14 +38,8 @@
     }catch(_){ }
   }
 
-  function typeFilterKnownSet(){
-    const set = new Set();
-    TYPE_FILTERS.forEach(item => (item.types || []).forEach(type => set.add(type)));
-    return set;
-  }
-
   function getOtherTypes(){
-    const grouped = typeFilterKnownSet();
+    const grouped = new Set(TYPE_GROUPS.flatMap(item => item.types || []));
     return Array.from(KNOWN_TYPES.values()).filter(type => !grouped.has(String(type || '')));
   }
 
@@ -63,61 +52,32 @@
     return raw ? [raw] : [];
   }
 
-  function localText(key, fallback){
-    try { return (window.t && window.t(key)) || fallback || key || ''; }
-    catch(_) { return fallback || key || ''; }
+  function choiceGroupHtml(kind, labelKey, labelFallback, ariaLabel, items, activeValue){
+    const buttons = items.map(item => {
+      const active = item.value === activeValue;
+      return `<button type="button" class="perms-log-choice__btn${active ? ' is-active' : ''}" role="radio" aria-checked="${active ? 'true' : 'false'}" data-value="${item.value}"><span data-i18n="${item.key}">${item.fallback}</span></button>`;
+    }).join('');
+    return `<div class="perms-log-choice perms-log-choice--${kind}" role="radiogroup" aria-label="${ariaLabel}"><span class="perms-log-choice__label" data-i18n="${labelKey}">${labelFallback}</span>${buttons}</div>`;
   }
 
-  function syncFilterChoice(select){
-    try{
-      if (!select || !select.id) return;
-      const panel = document.getElementById('perms-log-panel');
-      const group = panel ? panel.querySelector(`[data-choice-for="${select.id}"]`) : null;
-      if (!group) return;
-      const value = select.value;
-      group.querySelectorAll('.perms-log-choice__btn').forEach(btn => {
-        const active = btn.getAttribute('data-value') === value;
-        btn.classList.toggle('is-active', active);
-        btn.setAttribute('aria-checked', active ? 'true' : 'false');
-      });
-    }catch(_){ }
+  function choiceValue(root, kind, fallback){
+    const group = root && root.querySelector ? root.querySelector(`.perms-log-choice--${kind}`) : null;
+    const active = group && group.querySelector('.perms-log-choice__btn.is-active');
+    return (active && active.getAttribute('data-value')) || fallback;
   }
 
-  function syncFilterChoices(root){
-    try{
-      (root || document).querySelectorAll('.perms-log-native-filter').forEach(syncFilterChoice);
-    }catch(_){ }
-  }
-
-  function renderFilterChoice(select){
-    try{
-      if (!select || !select.id) return;
-      const panel = document.getElementById('perms-log-panel');
-      const group = panel ? panel.querySelector(`[data-choice-for="${select.id}"]`) : null;
-      if (!group) return;
-      group.innerHTML = '';
-      const label = document.createElement('span');
-      label.className = 'perms-log-choice__label';
-      const labelKey = group.getAttribute('data-label-key') || '';
-      if (labelKey) label.setAttribute('data-i18n', labelKey);
-      label.textContent = localText(labelKey, group.getAttribute('aria-label') || '');
-      group.appendChild(label);
-      Array.from(select.options).forEach(opt => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'perms-log-choice__btn';
-        btn.setAttribute('role', 'radio');
-        btn.setAttribute('data-value', opt.value);
-        const text = document.createElement('span');
-        const key = opt.getAttribute('data-i18n') || '';
-        if (key) text.setAttribute('data-i18n', key);
-        text.textContent = key ? localText(key, opt.textContent || opt.value) : (opt.textContent || opt.value);
-        btn.appendChild(text);
-        group.appendChild(btn);
-      });
-      try { window.i18n && window.i18n.apply && window.i18n.apply(group); } catch(_){ }
-      syncFilterChoice(select);
-    }catch(_){ }
+  function setChoiceValue(root, kind, value){
+    const group = root && root.querySelector ? root.querySelector(`.perms-log-choice--${kind}`) : null;
+    if (!group) return;
+    let found = false;
+    group.querySelectorAll('.perms-log-choice__btn').forEach(btn => {
+      const active = btn.getAttribute('data-value') === value;
+      found = found || active;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-checked', active ? 'true' : 'false');
+    });
+    const fallback = kind === 'outcome' ? 'any' : 'all';
+    if (!found && value !== fallback) setChoiceValue(root, kind, fallback);
   }
 
   // 获取当前 i18n 语言代码（zh/en/debug）
@@ -183,7 +143,7 @@
         panel.className = 'tokens-log';
         const header = document.createElement('div');
         header.className = 'tokens-log__header';
-        header.innerHTML = '<div class="tokens-log__title" data-i18n="permissions.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button><button class="btn btn--secondary btn--sm js-log-clear" data-i18n="permissions.log.clear"></button></div>';
+        header.innerHTML = '<div class="tokens-log__title" data-i18n="permissions.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button></div>';
         try { window.i18n && window.i18n.apply && window.i18n.apply(header); } catch(_){ }
         const wrap = document.createElement('div');
         wrap.className = 'tokens-log__wrap collapsible is-open';
@@ -192,23 +152,15 @@
         const filters = document.createElement('div');
         filters.className = 'tokens-log__filters';
         filters.innerHTML = [
-          '<input id="perms-log-q" class="admin-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
-          '<select id="perms-log-type" class="perms-log-native-filter" aria-hidden="true" tabindex="-1" hidden>\
-            <option value="all" data-i18n="permissions.log.filter.cat.all">全部类型</option>\
-          </select>',
-          '<div class="perms-log-choice perms-log-choice--type" data-choice-for="perms-log-type" data-label-key="permissions.log.filter.typeLabel" role="radiogroup" aria-label="日志类型"></div>',
-          '<select id="perms-log-outcome" class="perms-log-native-filter" aria-hidden="true" tabindex="-1" hidden>\
-            <option value="any" data-i18n="permissions.log.filter.outcome.any">全部结果</option>\
-            <option value="submitted" data-i18n="permissions.log.filter.outcome.submitted">已提交</option>\
-            <option value="approved" data-i18n="permissions.log.filter.outcome.approved">已通过</option>\
-            <option value="rejected" data-i18n="permissions.log.filter.outcome.rejected">已拒绝</option>\
-            <option value="cancelled" data-i18n="permissions.log.filter.outcome.cancelled">已撤回</option>\
-          </select>',
-          '<div class="perms-log-choice perms-log-choice--outcome" data-choice-for="perms-log-outcome" data-label-key="permissions.log.filter.outcomeLabel" role="radiogroup" aria-label="处理结果"></div>',
-          '<input id="perms-log-from" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.from" placeholder="起始日期" />',
-          '<input id="perms-log-to" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.to" placeholder="结束日期" />',
-          '<button id="perms-log-apply" class="btn btn--secondary admin-input-btn admin-toolbar-action" data-i18n="permissions.log.filter.apply">筛选</button>',
-          '<button id="perms-log-reset" class="btn btn--secondary admin-input-btn" data-i18n="permissions.log.filter.reset">重置</button>'
+          '<div class="tokens-log__filters-main admin-input-group">',
+            '<input id="perms-log-q" class="admin-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
+            '<input id="perms-log-from" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.from" placeholder="起始日期" />',
+            '<input id="perms-log-to" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.to" placeholder="结束日期" />',
+            '<button id="perms-log-apply" class="btn btn--secondary admin-input-btn admin-toolbar-action" data-i18n="permissions.log.filter.apply">筛选</button>',
+            '<button id="perms-log-reset" class="btn btn--secondary admin-input-btn" data-i18n="permissions.log.filter.reset">重置</button>',
+          '</div>',
+          choiceGroupHtml('type', 'permissions.log.filter.typeLabel', '类型', '日志类型', TYPE_FILTERS, 'all'),
+          choiceGroupHtml('outcome', 'permissions.log.filter.outcomeLabel', '结果', '处理结果', OUTCOME_FILTERS, 'any')
         ].join('');
         try { window.i18n && window.i18n.apply && window.i18n.apply(filters); } catch(_){ }
   // 根据语言为日期输入设置地区
@@ -224,27 +176,23 @@
         panel.appendChild(wrap);
         const container = parent.querySelector('padding') || parent; // 放在 panel 内
         container.appendChild(panel);
-        try { renderTypeOptions(Array.from(KNOWN_TYPES.values())); renderFilterChoice(filters.querySelector('#perms-log-outcome')); } catch(_){ }
+        try { syncKnownTypes(Array.from(KNOWN_TYPES.values())); } catch(_){ }
 
         // 绑定按钮
         header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
           const btn=e.currentTarget; const w=panel.querySelector('.tokens-log__wrap'); if(!w) return; if(isAnimating(w)) return; if(isOpen(w)){ closeCollapsible(w); if(btn){ try{ btn.setAttribute('data-i18n','common.expand'); window.i18n && window.i18n.apply && window.i18n.apply(btn);}catch(_){} btn.classList.remove('is-expanded'); } } else { openCollapsible(w); if(btn){ try{ btn.setAttribute('data-i18n','common.collapse'); window.i18n && window.i18n.apply && window.i18n.apply(btn);}catch(_){} btn.classList.add('is-expanded'); } }
         });
-        header.querySelector('.js-log-clear')?.addEventListener('click', async ()=>{
-          try { await apiDelete('/user/logs'); body.innerHTML=''; } catch(e){ alert((e&&e.message)||''); }
-        });
-
         // 绑定筛选事件（hydrateUserLogs 在 logs_data.js 中定义，通过命名空间延迟绑定）
         const apply = ()=>{ try { window.TokensPerm.hydrateUserLogs(true); }catch(_){ } };
         filters.querySelector('#perms-log-apply')?.addEventListener('click', apply);
         filters.querySelector('#perms-log-reset')?.addEventListener('click', ()=>{
           try{
             const q = filters.querySelector('#perms-log-q'); if(q) q.value = '';
-            const cat = filters.querySelector('#perms-log-type'); if(cat) cat.value = 'all';
-            const oc = filters.querySelector('#perms-log-outcome'); if(oc) oc.value = 'any';
+            setChoiceValue(filters, 'type', 'all');
+            setChoiceValue(filters, 'outcome', 'any');
             const f = filters.querySelector('#perms-log-from'); if(f) f.value = '';
             const t = filters.querySelector('#perms-log-to'); if(t) t.value = '';
-            syncFilterChoices(filters);
+            updateFormatPreview();
           }catch(_){ }
           apply();
         });
@@ -252,25 +200,23 @@
           const btn = e.target && e.target.closest ? e.target.closest('.perms-log-choice__btn') : null;
           if (!btn || !filters.contains(btn)) return;
           const group = btn.closest('.perms-log-choice');
-          const selectId = group && group.getAttribute('data-choice-for');
-          const select = selectId ? filters.querySelector('#' + selectId) : null;
-          if (!select) return;
-          select.value = btn.getAttribute('data-value') || '';
-          syncFilterChoice(select);
-          select.dispatchEvent(new Event('change', { bubbles: true }));
+          if (!group) return;
+          group.querySelectorAll('.perms-log-choice__btn').forEach(item => {
+            const active = item === btn;
+            item.classList.toggle('is-active', active);
+            item.setAttribute('aria-checked', active ? 'true' : 'false');
+          });
+          if (group.classList.contains('perms-log-choice--type')) { try { updateFormatPreview(); } catch(_){ } }
+          apply();
         });
         ['change','keyup'].forEach(evt=>{
           filters.querySelector('#perms-log-q')?.addEventListener(evt, (e)=>{ if(evt==='keyup' && e.key!=='Enter') return; apply(); });
         });
         ['change'].forEach(evt=>{
-          ['#perms-log-type','#perms-log-outcome','#perms-log-from','#perms-log-to'].forEach(sel=>{
+          ['#perms-log-from','#perms-log-to'].forEach(sel=>{
             const el = filters.querySelector(sel);
             if (!el) return;
-            el.addEventListener(evt, (e)=>{
-              syncFilterChoice(el);
-              if (sel === '#perms-log-type') { try { updateFormatPreview(); } catch(_){ } }
-              apply();
-            });
+            el.addEventListener(evt, apply);
           });
         });
       }
@@ -347,7 +293,7 @@
   }
   const detail = '';
     // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
-    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button></div>`;
+    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button><button class="btn-inline-action btn-restore" data-i18n="common.restore"></button></div>`;
     return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}${actions}</div>`;
     }catch(_){ return ''; }
   }
@@ -369,15 +315,14 @@
     const filters = panel ? panel.querySelector('.tokens-log__filters') : null;
     const p = new URLSearchParams();
     p.set('page','1'); p.set('pageSize', String(MAX_LOGS));
+    p.set('includeDeleted','true');
     if (filters){
       const q = filters.querySelector('#perms-log-q');
-      const typeSel = filters.querySelector('#perms-log-type');
-      const oc = filters.querySelector('#perms-log-outcome');
       const from = filters.querySelector('#perms-log-from');
       const to = filters.querySelector('#perms-log-to');
       const qv = q && q.value && q.value.trim(); if(qv) p.set('q', qv);
-      const typeV = (typeSel && typeSel.value) || 'all';
-      const ocV = (oc && oc.value) || 'any';
+      const typeV = choiceValue(filters, 'type', 'all');
+      const ocV = choiceValue(filters, 'outcome', 'any');
       // 按动态类型与结果构建 types 参数
       if (typeV === 'all'){
         if (ocV !== 'any'){
@@ -396,29 +341,9 @@
     return p;
   }
 
-  function renderTypeOptions(types){
+  function syncKnownTypes(types){
     try{
-      const panel = document.getElementById('perms-log-panel');
-      const select = panel ? panel.querySelector('#perms-log-type') : null;
-      if (!select) return;
-      const prev = select.value || 'all';
       if (Array.isArray(types)) types.forEach(type => { if (type) KNOWN_TYPES.add(String(type)); });
-      select.innerHTML = '';
-      TYPE_FILTERS.forEach(item => {
-        if (item.value === 'other' && !getOtherTypes().length) return;
-        const opt = document.createElement('option');
-        opt.value = item.value;
-        opt.setAttribute('data-i18n', item.key);
-        opt.textContent = item.fallback;
-        select.appendChild(opt);
-      });
-      // 恢复之前选择
-      try { select.value = prev; } catch(_){ }
-      if (!select.value) select.value = 'all';
-      // 应用 i18n
-      try { window.i18n && window.i18n.apply && window.i18n.apply(select); } catch(_){ }
-      renderFilterChoice(select);
-      // 更新类型格式预览（保持与当前选择一致）
       try { updateFormatPreview(); } catch(_){ }
     }catch(_){ }
   }
@@ -428,10 +353,10 @@
     try{
       const panel = document.getElementById('perms-log-panel');
       if (!panel) return;
-      const sel = panel.querySelector('#perms-log-type');
       const body = panel.querySelector('#perms-log');
-      if (!sel || !body) return;
-      const val = (sel.value||'all');
+      if (!body) return;
+      const selected = choiceValue(panel, 'type', 'all');
+      const val = selected === 'all' ? 'all' : (resolveTypeFilter(selected).find(type => msgKey(type)) || '');
       // 查找或创建预览行节点
       let preview = body.querySelector('#perms-log-preview');
       const ensurePreview = ()=>{
@@ -488,12 +413,10 @@
   // ── 暴露内部 API 供 logs_data.js 使用 ──
   window.TokensPerm._LogsUI = {
     ensureUserLogArea,
-    renderTypeOptions,
+    syncKnownTypes,
     updateFormatPreview,
     makeRow,
     setDateInputLang,
     buildQuery,
-    get KNOWN_TYPES() { return KNOWN_TYPES; },
-    set KNOWN_TYPES(v) { KNOWN_TYPES = v; },
   };
 })();

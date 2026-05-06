@@ -39,6 +39,7 @@ user-invocable: true
 4. 改原定义：把重复实现改为消费保留实现的 token/helper/class，或直接删除不再需要的分支。
 5. 检查调用链：确认初始化顺序、事件绑定、i18n、帮助速查、缓存 query 没有遗漏。
 6. 验证行为：运行语法/JSON/CSS 基础校验；前端变更至少验证浅色、深色、典雅主题和相关交互态。
+7. 规则沉淀：如果清理中发现可复用的反模式或旧规则已经误导实现，当轮更新相关 skill/ARCHITECTURE；优先改写或删除过时条目，不只追加新段落。
 
 ## CSS 专项规则
 
@@ -46,7 +47,7 @@ user-invocable: true
 - 自定义 div/span 控件如果视觉上承担 input/select/button 职责，必须复用相同状态口径。
 - dropdown/menu/tooltip/popover 不应在错误的滚动或折叠容器内参与布局；需要逃逸容器时，把浮层移到统一 portal 层，并在关闭时清理定位与 DOM 归属。
 - active 和 focus 不应改变布局尺寸；避免用 `border` 简写覆盖分段按钮的单侧边框，优先用 `border-color`、`outline` 或 inset ring。
-- 搜索框、日期筛选、按钮拼接等分段输入组应由共享 owner 保留完整边框并用负间距合并；发现局部 `border-left: none` / `border-right: none` 导致 hover/focus 少边框时，要回到共享输入组规则修复。
+- 搜索、日期、执行按钮组成的主操作段应由共享 owner 保留完整边框并用负间距合并；发现局部 `border-left: none` / `border-right: none` 导致 hover/focus 少边框时，要回到共享输入组规则修复。类别/状态等可见筛选项可独立成连续按钮轨，但必须在一个 owner 内贴边拼接，避免每个按钮像独立卡片一样漂浮。
 - 共享输入类如果带有工具栏布局语义（如 flex 增长或固定 flex-basis），独立表单字段必须在所属 owner 中中和这部分布局语义；不要让横向输入组尺寸规则泄漏到纵向表单。
 - 浅色/深色主题的焦点反馈保持克制；典雅主题允许保留独立金色质感，但也应通过主题层集中表达。
 - 发现 `!important` 链、重复断点、重复 font-size、硬编码 3px ring 等，优先回到原定义清理。
@@ -55,6 +56,7 @@ user-invocable: true
 
 - 重复事件绑定、重复 DOM 查询、重复状态同步和重复渲染分支，优先收敛到一个模块或 helper。
 - 新 helper 必须减少真实复杂度；只被调用一次、只是换名字的 wrapper 不算清理。
+- 可见筛选按钮不要再复制一套隐藏 select 状态和同步渲染 helper；除非需要原生表单提交兼容，否则查询构建应直接读取唯一的可见状态。
 - 删除逻辑前先确认是否仍被 HTML、动态 include、快捷键、权限分支或在线同步引用。
 - 对旧实现迁移时保留用户心智模型，简化内部路径，不偷换功能。
 
