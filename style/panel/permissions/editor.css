@@ -203,16 +203,7 @@
 
 #panel_permissions .perm-editor__field {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.333em;                     /* 6/18 */
-}
-
-#panel_permissions .perm-editor__field-label {
-  color: var(--text-muted);
-  font-size: var(--tp-fs-sm, 12px);
-  font-weight: 500;
-  line-height: var(--lh-tight);
+  display: block;
 }
 
 /* ── 操作区 ────────────────────────────────────────────── */

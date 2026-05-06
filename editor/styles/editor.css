@@ -317,6 +317,20 @@ html.force-landscape {
   display: none;
 }
 
+#panel_draft :is(.editor-tree, .editor-log__list) {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--border) 58%, transparent) transparent;
+}
+
+#panel_draft :is(.editor-tree, .editor-log__list)::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--border) 58%, transparent);
+  border-radius: var(--radius-pill);
+}
+
+#panel_draft :is(.editor-tree, .editor-log__list):hover::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--text-subtle) 42%, transparent);
+}
+
 #panel_draft .editor-entry-list {
   flex: 1 1 auto;
   min-height: 0;

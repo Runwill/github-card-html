@@ -67,6 +67,8 @@
 
         // Permissions log filters
         'permissions.log.filter.keyword': '按申请人/审核人/内容搜索',
+        'permissions.log.filter.typeLabel': '类型',
+        'permissions.log.filter.outcomeLabel': '结果',
         'permissions.log.filter.cat.all': '全部类型',
         'permissions.log.filter.cat.register': '注册',
         'permissions.log.filter.cat.username': '用户名',
@@ -74,6 +76,8 @@
         'permissions.log.filter.cat.avatar': '头像',
         'permissions.log.filter.cat.permissions': '权限',
         'permissions.log.filter.cat.password': '密码',
+        'permissions.log.filter.cat.role': '角色',
+        'permissions.log.filter.cat.other': '其他',
         'permissions.log.filter.outcome.any': '全部结果',
         'permissions.log.filter.outcome.submitted': '已提交',
         'permissions.log.filter.outcome.approved': '已通过',
@@ -153,6 +157,8 @@
 
         // Permissions log filters
         'permissions.log.filter.keyword': 'Search by applicant/reviewer/content',
+        'permissions.log.filter.typeLabel': 'Type',
+        'permissions.log.filter.outcomeLabel': 'Result',
         'permissions.log.filter.cat.all': 'All types',
         'permissions.log.filter.cat.register': 'Register',
         'permissions.log.filter.cat.username': 'Username',
@@ -160,6 +166,8 @@
         'permissions.log.filter.cat.avatar': 'Avatar',
         'permissions.log.filter.cat.permissions': 'Permissions',
         'permissions.log.filter.cat.password': 'Password',
+        'permissions.log.filter.cat.role': 'Role',
+        'permissions.log.filter.cat.other': 'Other',
         'permissions.log.filter.outcome.any': 'Any result',
         'permissions.log.filter.outcome.submitted': 'Submitted',
         'permissions.log.filter.outcome.approved': 'Approved',

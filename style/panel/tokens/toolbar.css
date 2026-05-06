@@ -52,8 +52,13 @@
   margin-left: -1px;
 }
 
-:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button):hover,
-:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button):focus,
+:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input):hover,
+:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input):focus {
+  z-index: 3;
+}
+
+:is(.admin-input-group, .tokens-input-group) > :is(.admin-input-btn, .tokens-btn, .btn, button):hover,
+:is(.admin-input-group, .tokens-input-group) > :is(.admin-input-btn, .tokens-btn, .btn, button):focus,
 :is(.admin-input-group, .tokens-input-group) > .custom-select:hover,
 :is(.admin-input-group, .tokens-input-group) > .custom-select:focus-within,
 :is(.admin-input-group, .tokens-input-group) > .custom-select.is-open {

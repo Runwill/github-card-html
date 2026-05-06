@@ -4,7 +4,7 @@
   const { jsonGet: apiGet, jsonDelete: apiDelete } = window.TokensPerm.API;
 
   const MAX_LOGS = 200;
-  // 预置全部已定义的日志类型（即使尚未产生，也可在下拉中选择并查看格式预览）
+  // 预置全部已定义的日志类型，用于结果筛选和类型分类映射
   const PRESET_LOG_TYPES = [
     'user-registered','user-approved','user-rejected',
     'password-change','role-changed',
@@ -13,8 +13,20 @@
     'intro-submitted','intro-approved','intro-rejected','intro-cancelled',
     'permissions-granted','permissions-revoked','permissions-replaced'
   ];
-  // 动态类型缓存（用于类型下拉与“结果”过滤映射），初始即包含全部预置类型
+  // 动态类型缓存（用于“结果”过滤映射），初始即包含全部预置类型
   let KNOWN_TYPES = new Set(PRESET_LOG_TYPES);
+
+  const TYPE_FILTERS = [
+    { value: 'all', key: 'permissions.log.filter.cat.all', fallback: '全部类型' },
+    { value: 'register', key: 'permissions.log.filter.cat.register', fallback: '注册', types: ['user-registered','user-approved','user-rejected','register'] },
+    { value: 'username', key: 'permissions.log.filter.cat.username', fallback: '用户名', types: ['username-submitted','username-approved','username-rejected','username-cancelled'] },
+    { value: 'intro', key: 'permissions.log.filter.cat.intro', fallback: '简介', types: ['intro-submitted','intro-approved','intro-rejected','intro-cancelled'] },
+    { value: 'avatar', key: 'permissions.log.filter.cat.avatar', fallback: '头像', types: ['avatar-submitted','avatar-approved','avatar-rejected'] },
+    { value: 'permissions', key: 'permissions.log.filter.cat.permissions', fallback: '权限', types: ['permissions-granted','permissions-revoked','permissions-replaced'] },
+    { value: 'password', key: 'permissions.log.filter.cat.password', fallback: '密码', types: ['password-change'] },
+    { value: 'role', key: 'permissions.log.filter.cat.role', fallback: '角色', types: ['role-changed'] },
+    { value: 'other', key: 'permissions.log.filter.cat.other', fallback: '其他' }
+  ];
 
   const { isAnimating, isOpen, openCollapsible, closeCollapsible } = window.CollapsibleAnim;
 
@@ -28,6 +40,83 @@
         const el = (container && container.querySelector) ? container.querySelector(sel) : document.querySelector(sel);
         if (el) el.setAttribute('lang', locale);
       });
+    }catch(_){ }
+  }
+
+  function typeFilterKnownSet(){
+    const set = new Set();
+    TYPE_FILTERS.forEach(item => (item.types || []).forEach(type => set.add(type)));
+    return set;
+  }
+
+  function getOtherTypes(){
+    const grouped = typeFilterKnownSet();
+    return Array.from(KNOWN_TYPES.values()).filter(type => !grouped.has(String(type || '')));
+  }
+
+  function resolveTypeFilter(value){
+    const raw = String(value || 'all');
+    if (raw === 'all') return Array.from(KNOWN_TYPES.values());
+    if (raw === 'other') return getOtherTypes();
+    const item = TYPE_FILTERS.find(filter => filter.value === raw);
+    if (item && Array.isArray(item.types)) return item.types.slice();
+    return raw ? [raw] : [];
+  }
+
+  function localText(key, fallback){
+    try { return (window.t && window.t(key)) || fallback || key || ''; }
+    catch(_) { return fallback || key || ''; }
+  }
+
+  function syncFilterChoice(select){
+    try{
+      if (!select || !select.id) return;
+      const panel = document.getElementById('perms-log-panel');
+      const group = panel ? panel.querySelector(`[data-choice-for="${select.id}"]`) : null;
+      if (!group) return;
+      const value = select.value;
+      group.querySelectorAll('.perms-log-choice__btn').forEach(btn => {
+        const active = btn.getAttribute('data-value') === value;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-checked', active ? 'true' : 'false');
+      });
+    }catch(_){ }
+  }
+
+  function syncFilterChoices(root){
+    try{
+      (root || document).querySelectorAll('.perms-log-native-filter').forEach(syncFilterChoice);
+    }catch(_){ }
+  }
+
+  function renderFilterChoice(select){
+    try{
+      if (!select || !select.id) return;
+      const panel = document.getElementById('perms-log-panel');
+      const group = panel ? panel.querySelector(`[data-choice-for="${select.id}"]`) : null;
+      if (!group) return;
+      group.innerHTML = '';
+      const label = document.createElement('span');
+      label.className = 'perms-log-choice__label';
+      const labelKey = group.getAttribute('data-label-key') || '';
+      if (labelKey) label.setAttribute('data-i18n', labelKey);
+      label.textContent = localText(labelKey, group.getAttribute('aria-label') || '');
+      group.appendChild(label);
+      Array.from(select.options).forEach(opt => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'perms-log-choice__btn';
+        btn.setAttribute('role', 'radio');
+        btn.setAttribute('data-value', opt.value);
+        const text = document.createElement('span');
+        const key = opt.getAttribute('data-i18n') || '';
+        if (key) text.setAttribute('data-i18n', key);
+        text.textContent = key ? localText(key, opt.textContent || opt.value) : (opt.textContent || opt.value);
+        btn.appendChild(text);
+        group.appendChild(btn);
+      });
+      try { window.i18n && window.i18n.apply && window.i18n.apply(group); } catch(_){ }
+      syncFilterChoice(select);
     }catch(_){ }
   }
 
@@ -101,20 +190,21 @@
 
     // 筛选工具条（布局样式移至 style/permissions.css）
         const filters = document.createElement('div');
-        filters.className = 'tokens-log__filters admin-input-group';
+        filters.className = 'tokens-log__filters';
         filters.innerHTML = [
           '<input id="perms-log-q" class="admin-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
-          // 动态类型下拉：初始仅包含“全部类型”，后续由 hydrateUserLogs 基于后端返回补齐
-          '<select id="perms-log-type" class="admin-input">\
+          '<select id="perms-log-type" class="perms-log-native-filter" aria-hidden="true" tabindex="-1" hidden>\
             <option value="all" data-i18n="permissions.log.filter.cat.all">全部类型</option>\
           </select>',
-          '<select id="perms-log-outcome" class="admin-input">\
+          '<div class="perms-log-choice perms-log-choice--type" data-choice-for="perms-log-type" data-label-key="permissions.log.filter.typeLabel" role="radiogroup" aria-label="日志类型"></div>',
+          '<select id="perms-log-outcome" class="perms-log-native-filter" aria-hidden="true" tabindex="-1" hidden>\
             <option value="any" data-i18n="permissions.log.filter.outcome.any">全部结果</option>\
             <option value="submitted" data-i18n="permissions.log.filter.outcome.submitted">已提交</option>\
             <option value="approved" data-i18n="permissions.log.filter.outcome.approved">已通过</option>\
             <option value="rejected" data-i18n="permissions.log.filter.outcome.rejected">已拒绝</option>\
             <option value="cancelled" data-i18n="permissions.log.filter.outcome.cancelled">已撤回</option>\
           </select>',
+          '<div class="perms-log-choice perms-log-choice--outcome" data-choice-for="perms-log-outcome" data-label-key="permissions.log.filter.outcomeLabel" role="radiogroup" aria-label="处理结果"></div>',
           '<input id="perms-log-from" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.from" placeholder="起始日期" />',
           '<input id="perms-log-to" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.to" placeholder="结束日期" />',
           '<button id="perms-log-apply" class="btn btn--secondary admin-input-btn admin-toolbar-action" data-i18n="permissions.log.filter.apply">筛选</button>',
@@ -124,9 +214,6 @@
   // 根据语言为日期输入设置地区
         try { setDateInputLang(filters); } catch(_){ }
         // 对齐/圆角等外观统一由 permissions.css 控制
-  // 初始渲染类型下拉（预置类型）
-  try { renderTypeOptions(Array.from(KNOWN_TYPES.values())); } catch(_){ }
-
         body = document.createElement('div');
         body.id = 'perms-log';
         body.className = 'tokens-log__body';
@@ -137,6 +224,7 @@
         panel.appendChild(wrap);
         const container = parent.querySelector('padding') || parent; // 放在 panel 内
         container.appendChild(panel);
+        try { renderTypeOptions(Array.from(KNOWN_TYPES.values())); renderFilterChoice(filters.querySelector('#perms-log-outcome')); } catch(_){ }
 
         // 绑定按钮
         header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
@@ -156,8 +244,20 @@
             const oc = filters.querySelector('#perms-log-outcome'); if(oc) oc.value = 'any';
             const f = filters.querySelector('#perms-log-from'); if(f) f.value = '';
             const t = filters.querySelector('#perms-log-to'); if(t) t.value = '';
+            syncFilterChoices(filters);
           }catch(_){ }
           apply();
+        });
+        filters.addEventListener('click', (e)=>{
+          const btn = e.target && e.target.closest ? e.target.closest('.perms-log-choice__btn') : null;
+          if (!btn || !filters.contains(btn)) return;
+          const group = btn.closest('.perms-log-choice');
+          const selectId = group && group.getAttribute('data-choice-for');
+          const select = selectId ? filters.querySelector('#' + selectId) : null;
+          if (!select) return;
+          select.value = btn.getAttribute('data-value') || '';
+          syncFilterChoice(select);
+          select.dispatchEvent(new Event('change', { bubbles: true }));
         });
         ['change','keyup'].forEach(evt=>{
           filters.querySelector('#perms-log-q')?.addEventListener(evt, (e)=>{ if(evt==='keyup' && e.key!=='Enter') return; apply(); });
@@ -167,14 +267,12 @@
             const el = filters.querySelector(sel);
             if (!el) return;
             el.addEventListener(evt, (e)=>{
+              syncFilterChoice(el);
               if (sel === '#perms-log-type') { try { updateFormatPreview(); } catch(_){ } }
               apply();
             });
           });
         });
-
-        // Wrap filter selects with themed custom dropdown
-        try { if (window.CustomSelect) window.CustomSelect.init(filters); } catch(_){ }
       }
       if (body) body.__ready = true;
       return body || null;
@@ -288,8 +386,9 @@
           if (subset.length) p.set('types', subset.join(',')); else p.set('types','__none__');
         }
       } else {
-        // 指定了具体类型：直接按该类型查询；若结果不匹配，后端会返回空
-        p.set('types', typeV);
+        const matched = resolveTypeFilter(typeV);
+        const subset = ocV === 'any' ? matched : matched.filter(t => outcomeMatches(t, ocV));
+        if (subset.length) p.set('types', subset.join(',')); else p.set('types','__none__');
       }
       const fv = from && from.value; if (fv) p.set('since', fv);
       const tv = to && to.value; if (tv) p.set('until', tv);
@@ -303,33 +402,22 @@
       const select = panel ? panel.querySelector('#perms-log-type') : null;
       if (!select) return;
       const prev = select.value || 'all';
-      // 先清空，仅保留“全部类型”
+      if (Array.isArray(types)) types.forEach(type => { if (type) KNOWN_TYPES.add(String(type)); });
       select.innerHTML = '';
-      const optAll = document.createElement('option');
-      optAll.value = 'all';
-      optAll.setAttribute('data-i18n','permissions.log.filter.cat.all');
-      optAll.textContent = '全部类型';
-      select.appendChild(optAll);
-      // 按字母序插入所有类型
-  const base = (Array.isArray(types) ? types.slice() : []).concat(Array.from(KNOWN_TYPES.values()));
-  const sorted = Array.from(new Set(base)).sort();
-      sorted.forEach(t => {
+      TYPE_FILTERS.forEach(item => {
+        if (item.value === 'other' && !getOtherTypes().length) return;
         const opt = document.createElement('option');
-        opt.value = String(t);
-        // 若有已知映射则用 i18n key，否则直接显示类型名
-        const key = typeKey(t);
-        if (key) {
-          opt.setAttribute('data-i18n', key);
-          opt.textContent = key; // 先放 key，稍后 i18n.apply 会替换
-        } else {
-          opt.textContent = String(t);
-        }
+        opt.value = item.value;
+        opt.setAttribute('data-i18n', item.key);
+        opt.textContent = item.fallback;
         select.appendChild(opt);
       });
       // 恢复之前选择
       try { select.value = prev; } catch(_){ }
+      if (!select.value) select.value = 'all';
       // 应用 i18n
       try { window.i18n && window.i18n.apply && window.i18n.apply(select); } catch(_){ }
+      renderFilterChoice(select);
       // 更新类型格式预览（保持与当前选择一致）
       try { updateFormatPreview(); } catch(_){ }
     }catch(_){ }

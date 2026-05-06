@@ -19,8 +19,6 @@
     const meta = makeEl('div');
     const title = makeEl('div', 'approval-title', u.username || '');
     const sub = makeEl('div', 'approval-sub');
-    // const subLabel = makeEl('span', 'approval-sub__label');
-    // setI18nAttr(subLabel, 'permissions.user.roleLabel', t('permissions.user.roleLabel', 'role'));
     // 初始化角色显示时使用 i18n 名称，而不是原始英文代码
     const roleValue = makeEl('span', 'approval-role');
     try {
@@ -32,7 +30,7 @@
       }
     } catch(_) { roleValue.textContent = (u && u.role) || '-'; }
   try { meta.classList.add('is-editable'); meta.setAttribute('tabindex', '0'); meta.setAttribute('data-perm-trigger',''); meta.style.cursor='pointer'; } catch {}
-    /* sub.appendChild(subLabel); */ sub.appendChild(roleValue);
+    sub.appendChild(roleValue);
     
     // 注册时间
     if (u.createdAt) {
@@ -81,9 +79,11 @@
 
     const makeEditorField = (labelKey, fallback, input)=>{
       const field = makeEl('label', 'perm-editor__field');
-      const label = makeEl('span', 'perm-editor__field-label');
-      setI18nAttr(label, labelKey, fallback);
-      field.appendChild(label);
+      try {
+        input.setAttribute('aria-label', fallback || labelKey || '');
+        input.setAttribute('data-i18n-attr', 'aria-label');
+        input.setAttribute('data-i18n-aria-label', labelKey);
+      } catch(_) {}
       field.appendChild(input);
       return field;
     };

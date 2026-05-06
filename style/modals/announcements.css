@@ -9,12 +9,17 @@
   padding: 0.267em;
   display: block;
   max-height: var(--ann-content-max-h, 65vh);
+  min-height: var(--ann-content-min-h, min(26em, var(--ann-content-max-h, 65vh)));
   overflow-y: auto;
   /* scrollbar-thin via HTML class */
 }
 
 /* Empty and loading states */
 .ann-empty, .ann-loading {
+  min-height: calc(var(--ann-content-min-h, min(26em, var(--ann-content-max-h, 65vh))) - 4.266em);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 2.133em;
   border: 2px dashed var(--border, #e2e8f0);
   border-radius: var(--radius-lg) ;

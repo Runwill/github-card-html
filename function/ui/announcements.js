@@ -149,7 +149,8 @@
       cached = data; render(cached);
     } catch(err){
       lastError = err;
-      container.textContent = t('announcements.error.loadFailed');
+      container.innerHTML = '';
+      container.appendChild(h('div','ann-empty',t('announcements.error.loadFailed')));
     } finally { loading = false; }
   }
 

@@ -20,10 +20,10 @@
 
 /* 筛选条容器 */
 .tokens-log__filters {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5em), 1fr));
+  align-items: stretch;
+  gap: 0.444em;                     /* 8/18 */
   overflow: visible;
   padding-bottom: 0.111em;          /* 2/18 */
 }
@@ -34,74 +34,105 @@
   max-width: none;
 }
 
-/* 子控件直角拼接 */
-#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .custom-select, .btn, button) {
+.tokens-log__filters * { box-sizing: border-box; }
+
+#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .btn, button) {
   position: relative;
-  vertical-align: middle;
-  margin-top: 0;
-  margin-bottom: 0;
-  border-radius: var(--radius-none);
-}
-
-#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .custom-select, .btn, button) + :is(.admin-input, .tokens-input, .custom-select, .btn, button) {
-  margin-left: -1px;
-}
-
-#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .btn, button),
-#panel_permissions .tokens-log__filters > .custom-select .custom-select__trigger {
-  border-right-width: 1px;
-  border-right-style: solid;
-  border-left-width: 1px;
-  border-left-style: solid;
-}
-
-#panel_permissions .tokens-log__filters > :first-child {
-  border-radius: var(--radius-none);
-}
-
-#panel_permissions .tokens-log__filters > :last-child {
-  border-radius: var(--radius-none);
-}
-
-#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .btn, button):hover,
-#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input, .btn, button):focus,
-#panel_permissions .tokens-log__filters > .custom-select:hover,
-#panel_permissions .tokens-log__filters > .custom-select:focus-within,
-#panel_permissions .tokens-log__filters > .custom-select.is-open {
-  z-index: 2;
-}
-
-.tokens-log__filters :is(.admin-input, .tokens-input),
-#panel_permissions .tokens-log__filters .custom-select .custom-select__trigger {
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+  border-radius: var(--radius-sm);
   box-shadow: none !important;
 }
 
-/* box-sizing 统一 */
-.tokens-log__filters * { box-sizing: border-box; }
+#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input) {
+  flex: 1 1 auto !important;
+}
 
-/* 按钮不伸缩 */
-.tokens-log__filters .btn,
-.tokens-log__filters :is(.admin-input-btn, .tokens-btn) {
-  min-width: 0 !important;
+#panel_permissions .tokens-log__filters > :is(.btn, button) {
+  justify-content: center;
   flex: 0 0 auto !important;
+  white-space: nowrap;
 }
 
-/* 输入/选择框自适应伸缩 */
-.tokens-log__filters :is(.admin-input, .tokens-input) {
-  min-width: 0 !important;
-  flex: 1 1 4.286em !important;     /* 60/14 基于 --tp-fs-md */
+#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input):hover,
+#panel_permissions .tokens-log__filters > :is(.admin-input, .tokens-input):focus {
+  z-index: 3;
 }
 
-/* ── 日志筛选自定义下拉，与同排输入框保持同一外观 ────── */
-#panel_permissions .tokens-log__filters .custom-select {
-  flex: 1 1 4.286em;               /* 60/14 */
-  min-width: 4.286em;
-  max-width: 11.429em;             /* 160/14 */
-  --custom-select-trigger-h: var(--admin-input-h, var(--tokens-input-h, 36px));
-  --custom-select-trigger-pad-y: 0;
-  --custom-select-trigger-lh: var(--custom-select-trigger-h);
-  --custom-select-trigger-radius: var(--radius-none);
+#panel_permissions .tokens-log__filters > :is(.btn, button):hover,
+#panel_permissions .tokens-log__filters > :is(.btn, button):focus {
+  z-index: 2;
 }
-#panel_permissions .tokens-log__filters .custom-select .custom-select__trigger {
+
+.perms-log-native-filter {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.perms-log-choice {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: center;
+  gap: 0.333em;                     /* 6/18 */
+  padding: 0.278em;                  /* 5/18 */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 95%, var(--bg-soft, var(--surface)));
+}
+
+.perms-log-choice--type,
+.perms-log-choice--outcome {
+  grid-column: 1 / -1;
+}
+
+.perms-log-choice__label {
+  flex: 0 0 auto;
+  padding: 0 0.333em;
+  color: var(--text-subtle);
+  font-size: var(--tp-fs-sm, 12px);
+  font-weight: 600;
+  line-height: var(--admin-input-h, var(--tokens-input-h, 36px));
+}
+
+.perms-log-choice__btn {
+  flex: 0 1 auto;
+  min-width: 0;
+  min-height: calc(var(--admin-input-h, var(--tokens-input-h, 36px)) - 0.556em);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.286em 0.714em;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
   font-size: var(--tp-fs-md, 14px);
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default),
+    color var(--dur-normal) var(--ease-default);
+}
+
+.perms-log-choice__btn:hover,
+.perms-log-choice__btn:focus-visible {
+  border-color: color-mix(in srgb, var(--primary-2) 34%, var(--border));
+  background: color-mix(in srgb, var(--primary-2) 7%, var(--surface));
+  color: var(--text);
+  outline: none;
+}
+
+.perms-log-choice__btn.is-active {
+  border-color: color-mix(in srgb, var(--primary-2) 54%, var(--border));
+  background: color-mix(in srgb, var(--primary-2) 12%, var(--surface));
+  color: var(--primary-1);
+  font-weight: 600;
 }
