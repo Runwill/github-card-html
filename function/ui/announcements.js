@@ -1,11 +1,8 @@
 ;(function(){
-  const onReady = (cb)=> document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', cb, {once:true}) : cb();
   const t = (typeof window.t==='function') ? window.t : (k)=>k;
   const $ = (id)=> document.getElementById(id);
   const h = (tag, cls, text)=> { const e = document.createElement(tag); if(cls) e.className = cls; if(text!==undefined) e.textContent = text; return e; };
   // 前端直读：使用相对路径，不再通过后端基址
-
-  let cached = null; let loading = false; let lastError = null;
 
   // 鼠标位置追踪（用于滚动时计算悬浮态）
   let gMx = 0, gMy = 0;
@@ -144,22 +141,19 @@
   container.textContent = '';
   container.appendChild(h('div','ann-loading','...'));
     try {
-      loading = true; lastError = null;
       const data = await fetchAnnouncements();
-      cached = data; render(cached);
+      render(data);
     } catch(err){
-      lastError = err;
       container.innerHTML = '';
       container.appendChild(h('div','ann-empty',t('announcements.error.loadFailed')));
-    } finally { loading = false; }
+    }
   }
 
   // 暴露给 bindings 调用
   window.loadAnnouncements = function(){
-    // 每次点击都尝试刷新；如需缓存可判断 cached
     return load();
   };
 
   // 可选：当语言切换时重新应用容器中的 i18n（内容本身不翻译）
-  try { window.addEventListener('i18n:changed', ()=>{ const el=$('announcements-modal'); if(el && typeof window.i18n?.apply==='function'){ window.i18n.apply(el); } }); } catch(_){ }
+  try { window.addEventListener('i18n:changed', ()=>{ const el=$('announcements-modal'); if(el) window.i18n?.applySafe?.(el); }); } catch(_){ }
 })();

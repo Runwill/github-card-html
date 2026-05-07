@@ -172,7 +172,7 @@
     const summaryEl=document.getElementById('tokens-summary');
     const contentEl=document.getElementById('tokens-content');
   if(!summaryEl||!contentEl) return;
-  if(!summaryEl.__initialized||forceReload){ summaryEl.innerHTML='<div class="tokens-status tokens-status--loading" data-i18n="tokens.status.loading"></div>'; try{ window.i18n && window.i18n.apply && window.i18n.apply(summaryEl); }catch(_){ } }
+  if(!summaryEl.__initialized||forceReload){ summaryEl.innerHTML='<div class="tokens-status tokens-status--loading" data-i18n="tokens.status.loading"></div>'; window.i18n?.applySafe?.(summaryEl); }
     contentEl.innerHTML='';
     const { canEdit }=getAuth();
     try{
@@ -196,7 +196,7 @@
           s2: bucket(allSkills,2)
         };
       }
-  const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', i18nKey:'tokens.summary.termFixed', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', i18nKey:'tokens.summary.termDynamic', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', i18nKey:'tokens.summary.card', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', i18nKey:'tokens.summary.character', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', i18nKey:'tokens.summary.skill', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" tabindex="0"><div class="type-tile__label" data-i18n="${t.i18nKey}"></div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); try{ window.i18n && window.i18n.apply && window.i18n.apply(summaryEl); }catch(_){ } summaryEl.__initialized=true; 
+  const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', i18nKey:'tokens.summary.termFixed', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', i18nKey:'tokens.summary.termDynamic', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', i18nKey:'tokens.summary.card', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', i18nKey:'tokens.summary.character', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', i18nKey:'tokens.summary.skill', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" tabindex="0"><div class="type-tile__label" data-i18n="${t.i18nKey}"></div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); window.i18n?.applySafe?.(summaryEl); summaryEl.__initialized=true;
         // 初次渲染后应用主题色，并绑定主题观察者
         applyTypeTileTheme();
         ensureThemeObserverForTiles();
@@ -204,7 +204,7 @@
         // 更新统计值后也重新应用（防止列表被重建导致样式丢失）
         applyTypeTileTheme();
       }
-  const q=state.q; const sections=[ { type:'term-fixed', titleKey:'tokens.section.termFixed', items:Array.isArray(termFixed)? filterByQuery(termFixed,q): [], render: termFixedItem }, { type:'term-dynamic', titleKey:'tokens.section.termDynamic', items:Array.isArray(termDynamic)? filterByQuery(termDynamic,q): [], render: termDynamicItem }, { type:'card', titleKey:'tokens.section.card', items:Array.isArray(cards)? filterByQuery(cards,q): [], render: cardItem }, { type:'character', titleKey:'tokens.section.character', items:Array.isArray(characters)? filterByQuery(characters,q): [], render: characterItem }, { type:'skill', titleKey:'tokens.section.skill', items:Array.isArray(skills)? filterByQuery(skills,q): [], render: skillItem } ]; const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.titleKey,s.items,s.render, canEdit)).join(''); try{ window.i18n && window.i18n.apply && window.i18n.apply(contentEl); }catch(_){ } try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
+  const q=state.q; const sections=[ { type:'term-fixed', titleKey:'tokens.section.termFixed', items:Array.isArray(termFixed)? filterByQuery(termFixed,q): [], render: termFixedItem }, { type:'term-dynamic', titleKey:'tokens.section.termDynamic', items:Array.isArray(termDynamic)? filterByQuery(termDynamic,q): [], render: termDynamicItem }, { type:'card', titleKey:'tokens.section.card', items:Array.isArray(cards)? filterByQuery(cards,q): [], render: cardItem }, { type:'character', titleKey:'tokens.section.character', items:Array.isArray(characters)? filterByQuery(characters,q): [], render: characterItem }, { type:'skill', titleKey:'tokens.section.skill', items:Array.isArray(skills)? filterByQuery(skills,q): [], render: skillItem } ]; const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.titleKey,s.items,s.render, canEdit)).join(''); window.i18n?.applySafe?.(contentEl); try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
 
       // 点击区段抬头，等效于点击“展开/收起”按钮
       if(!contentEl.__sectionHeaderToggleBound){
@@ -252,7 +252,7 @@
           }
         });
       }
-  }catch(e){ console.error('加载词元数据失败:', e); summaryEl.innerHTML='<div class="tokens-status tokens-status--error" data-i18n="tokens.status.loadFailedWithRefresh"></div>'; try{ window.i18n && window.i18n.apply && window.i18n.apply(summaryEl); }catch(_){ } }
+  }catch(e){ console.error('加载词元数据失败:', e); summaryEl.innerHTML='<div class="tokens-status tokens-status--error" data-i18n="tokens.status.loadFailedWithRefresh"></div>'; window.i18n?.applySafe?.(summaryEl); }
   }
   // 区段展开/收起（带动画 + 状态记忆）
   function toggleTokensSection(baseId){
@@ -265,7 +265,7 @@
       if(!more) return;
       const expanded=root.getAttribute('data-expanded')==='1';
       const transitionMs=400;
-  const setBtn=(isOpen)=>{ if(btn){ try{ btn.setAttribute('data-i18n', isOpen? 'common.collapse':'common.expand'); if(window.i18n && window.i18n.apply) window.i18n.apply(btn); }catch(_){ btn.textContent=isOpen? '收起':'展开'; } btn.classList.toggle('is-expanded', isOpen); } };
+  const setBtn=(isOpen)=>{ if(btn){ btn.setAttribute('data-i18n', isOpen? 'common.collapse':'common.expand'); window.i18n?.applySafe?.(btn); btn.classList.toggle('is-expanded', isOpen); } };
       const onEnd=(cb)=>{ let called=false; const handler=()=>{ if(called) return; called=true; more.removeEventListener('transitionend',handler); cb&&cb(); }; more.addEventListener('transitionend', handler, { once:true }); setTimeout(handler, transitionMs+50); };
       if(!expanded){
         more.style.display='block';

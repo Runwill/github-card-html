@@ -1,13 +1,16 @@
 // 统一 API 端点配置（支持 URL 参数 / localStorage / 环境默认）
 // 暴露 window.endpoints：base/getBase/setBase/api/abs/character/skill/card/termDynamic/termFixed
 ;(function(){
+  function storageGet(key){ try { return (typeof localStorage!== 'undefined' && localStorage.getItem(key)) || ''; } catch(e) { return ''; } }
+  function storageSet(key, value){ try { if (typeof localStorage!== 'undefined') localStorage.setItem(key, value); } catch(e) {} }
+
   function readQueryApiBase(){
     try {
       if (typeof window === 'undefined' || !window.location) return '';
       var u = new URL(window.location.href);
       var b = u.searchParams.get('apiBase');
       if (b && /^https?:\/\//i.test(b)) {
-        try { if (typeof localStorage!== 'undefined') localStorage.setItem('apiBase', b); } catch(e) {}
+        storageSet('apiBase', b);
         return b;
       }
     } catch(e) {}
@@ -15,11 +18,8 @@
   }
 
   function readLocalApiBase(){
-    try {
-      var saved = (typeof localStorage!== 'undefined') ? localStorage.getItem('apiBase') : '';
-      if (saved && /^https?:\/\//i.test(saved)) return saved;
-    } catch(e) {}
-    return '';
+    var saved = storageGet('apiBase');
+    return saved && /^https?:\/\//i.test(saved) ? saved : '';
   }
 
   function envDefaultBase(){
@@ -41,10 +41,7 @@
 
   var DEFAULT_BASE=(function(){
     // 优先级：URL 参数 > localStorage > 环境默认 > 公网后端
-    var qb = readQueryApiBase(); if (qb) return qb;
-    var lb = readLocalApiBase(); if (lb) return lb;
-    var eb = envDefaultBase(); if (eb) return eb;
-    return 'http://120.55.7.7:3000';
+    return readQueryApiBase() || readLocalApiBase() || envDefaultBase() || 'http://120.55.7.7:3000';
   })();
 
   function base(){ return String(DEFAULT_BASE||'').replace(/\/$/,'') }
@@ -53,18 +50,57 @@
   function setBase(url){
     if (!url || !/^https?:\/\//i.test(url)) return;
     DEFAULT_BASE = url;
-    try { if (typeof localStorage!== 'undefined') localStorage.setItem('apiBase', url); } catch(e) {}
+    storageSet('apiBase', url);
   }
   function getBase(){ return base(); }
+
+  function authHeader(includeEmpty){
+    var token = storageGet('token');
+    return token || includeEmpty ? { 'Authorization': 'Bearer ' + token } : {};
+  }
+
+  async function requestJson(endpoint, opts){
+    opts = opts || {};
+    var headers = Object.assign({}, opts.headers || {});
+    if (opts.auth) Object.assign(headers, authHeader(opts.auth === 'always'));
+
+    var payload = opts.body;
+    if (payload != null && typeof payload !== 'string') {
+      headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+      payload = JSON.stringify(payload);
+    }
+
+    var raw = String(endpoint || '');
+    var resp = await fetch(/^https?:\/\//i.test(raw) ? raw : withBase('/api' + (raw.startsWith('/') ? raw : '/' + raw)), {
+      method: opts.method || 'GET',
+      headers: headers,
+      body: payload
+    });
+    var out = await resp.json().catch(function(){ return {}; });
+
+    if (!resp.ok) {
+      if (resp.status === 401 && typeof opts.onUnauthorized === 'function') {
+        try { opts.onUnauthorized(resp, out); } catch(e) {}
+      }
+      var message = (opts.preferJsonMessage !== false && out && out.message) || opts.defaultMessage || ('HTTP ' + resp.status);
+      var err = new Error(message);
+      try { Object.assign(err, { status: resp.status, data: out, response: resp }); } catch(e) {}
+      throw err;
+    }
+
+    return out;
+  }
 
   window.endpoints={
     base,
     getBase,
     setBase,
+    authHeader,
+    requestJson,
     api: function(p){ return withBase(p) },
     abs: function(u){ if(!u) return ''; return /^https?:\/\//i.test(u)?u:withBase(u.startsWith('/')?u:'/'+u) },
     character: function(){ return withBase('/api/character') },
-    skill: function(strength){ var s=strength || (typeof localStorage!== 'undefined' ? localStorage.getItem('strength') : ''); return withBase('/api/skill?strength='+encodeURIComponent(s||'')) },
+    skill: function(strength){ var s=strength || storageGet('strength'); return withBase('/api/skill?strength='+encodeURIComponent(s||'')) },
     card: function(){ return withBase('/api/card') },
     termDynamic: function(){ return withBase('/api/term-dynamic') },
     termFixed: function(){ return withBase('/api/term-fixed') }

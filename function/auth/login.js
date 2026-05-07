@@ -6,8 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function applyMessageType(el, type) {
-  el.className = 'modal-message';
-  if (type) { try { el.classList.add(type); } catch(_){ el.className = `modal-message ${type}`; } }
+  el.className = type ? 'modal-message ' + type : 'modal-message';
 }
 
 function setMessage(text, type) {
@@ -42,8 +41,6 @@ try{
   });
 }catch(_){}
 
-function apiUrl(path) { return (typeof endpoints !== 'undefined' && endpoints && endpoints.api) ? endpoints.api(path) : path; }
-
 function shakePanel() {
   const panel = document.getElementById('login-container');
   if (panel) { panel.classList.remove('shake'); void panel.offsetWidth; panel.classList.add('shake'); }
@@ -55,22 +52,16 @@ async function postForm(path, body, onOk, failKey, errorKey) {
   const registerBtn = document.getElementById('register-button');
   loginBtn.disabled = true; registerBtn.disabled = true;
   try {
-    const response = await fetch(apiUrl(path), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    const data = await response.json();
-    if (response.ok) {
-      await onOk(data);
-    } else {
-      if (data && data.message) { setMessage(data.message, 'error'); }
+    await onOk(await endpoints.requestJson(path, { method: 'POST', body }));
+  } catch (err) {
+    if (err && err.status) {
+      if (err.data && err.data.message) { setMessage(err.data.message, 'error'); }
       else { setMessageKey(failKey, null, 'error'); }
       shakePanel();
+    } else {
+      console.error(err);
+      setMessageKey(errorKey, null, 'error');
     }
-  } catch (err) {
-    console.error(err);
-    setMessageKey(errorKey, null, 'error');
   } finally {
     loginBtn.disabled = false; registerBtn.disabled = false;
   }
@@ -84,7 +75,7 @@ if (loginForm) {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     setMessageKey('login.loggingIn');
-    await postForm('/api/login', { username, password }, async (data) => {
+    await postForm('/login', { username, password }, async (data) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('id', data.user.id);
       localStorage.setItem('username', data.user.username);
@@ -106,7 +97,7 @@ if (registerBtn) {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     if (!username || !password) { setMessageKey('register.needUserPass', null, 'error'); return; }
-    await postForm('/api/register', { username, password }, (data) => {
+    await postForm('/register', { username, password }, (data) => {
       if (data && data.message) { setMessage(data.message, 'success'); }
       else { setMessageKey('register.success', null, 'success'); }
     }, 'register.fail', 'register.failRetry');

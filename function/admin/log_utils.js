@@ -23,8 +23,8 @@
         navigator.clipboard.writeText(text).then(()=>{
           const orig = btn.getAttribute('data-i18n');
           btn.setAttribute('data-i18n', 'common.copied');
-          if (window.i18n && window.i18n.apply) window.i18n.apply(btn);
-          setTimeout(()=>{ btn.setAttribute('data-i18n', orig || 'common.copy'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn); }, 2000);
+          window.i18n?.applySafe?.(btn);
+          setTimeout(()=>{ btn.setAttribute('data-i18n', orig || 'common.copy'); window.i18n?.applySafe?.(btn); }, 2000);
         }).catch(err=> console.error('Copy failed', err));
       }
     });

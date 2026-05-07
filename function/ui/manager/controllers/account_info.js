@@ -5,7 +5,6 @@
   const Ctrls = window.CardUI.Manager.Controllers;
   const dom = Core.dom;
   const $ = dom.$;
-  const qs = dom.qs;
   const resolveAvatarUrl = dom.resolveAvatarUrl;
 
   const t = (typeof window.t === 'function') ? window.t : (k)=>k;
@@ -40,14 +39,14 @@
       }
       if (createdAtEl) {
         const ca = localStorage.getItem('createdAt');
-        if (ca) { try { createdAtEl.textContent = new Date(ca).toLocaleString(); } catch { createdAtEl.textContent = ca; } }
+        if (ca) { createdAtEl.textContent = window.TimeFmt.formatAbsOrRaw(ca); }
         else {
           createdAtEl.textContent = '-';
           // 尝试异步获取
           if (Core.userService && Core.userService.refreshCurrentUserFromServer) {
             Core.userService.refreshCurrentUserFromServer().then(()=>{
               const n = localStorage.getItem('createdAt');
-              if (n) { try { createdAtEl.textContent = new Date(n).toLocaleString(); } catch {} }
+              if (n) { createdAtEl.textContent = window.TimeFmt.formatAbsOrRaw(n); }
             });
           }
         }

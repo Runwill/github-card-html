@@ -144,7 +144,7 @@
         const header = document.createElement('div');
         header.className = 'tokens-log__header';
         header.innerHTML = '<div class="tokens-log__title" data-i18n="permissions.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button></div>';
-        try { window.i18n && window.i18n.apply && window.i18n.apply(header); } catch(_){ }
+        window.i18n?.applySafe?.(header);
         const wrap = document.createElement('div');
         wrap.className = 'tokens-log__wrap collapsible is-open';
 
@@ -162,7 +162,7 @@
           choiceGroupHtml('type', 'permissions.log.filter.typeLabel', '类型', '日志类型', TYPE_FILTERS, 'all'),
           choiceGroupHtml('outcome', 'permissions.log.filter.outcomeLabel', '结果', '处理结果', OUTCOME_FILTERS, 'any')
         ].join('');
-        try { window.i18n && window.i18n.apply && window.i18n.apply(filters); } catch(_){ }
+        window.i18n?.applySafe?.(filters);
   // 根据语言为日期输入设置地区
         try { setDateInputLang(filters); } catch(_){ }
         // 对齐/圆角等外观统一由 permissions.css 控制
@@ -180,7 +180,7 @@
 
         // 绑定按钮
         header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
-          const btn=e.currentTarget; const w=panel.querySelector('.tokens-log__wrap'); if(!w) return; if(isAnimating(w)) return; if(isOpen(w)){ closeCollapsible(w); if(btn){ try{ btn.setAttribute('data-i18n','common.expand'); window.i18n && window.i18n.apply && window.i18n.apply(btn);}catch(_){} btn.classList.remove('is-expanded'); } } else { openCollapsible(w); if(btn){ try{ btn.setAttribute('data-i18n','common.collapse'); window.i18n && window.i18n.apply && window.i18n.apply(btn);}catch(_){} btn.classList.add('is-expanded'); } }
+          const btn=e.currentTarget; const w=panel.querySelector('.tokens-log__wrap'); if(!w) return; if(isAnimating(w)) return; if(isOpen(w)){ closeCollapsible(w); if(btn){ btn.setAttribute('data-i18n','common.expand'); window.i18n?.applySafe?.(btn); btn.classList.remove('is-expanded'); } } else { openCollapsible(w); if(btn){ btn.setAttribute('data-i18n','common.collapse'); window.i18n?.applySafe?.(btn); btn.classList.add('is-expanded'); } }
         });
         // 绑定筛选事件（hydrateUserLogs 在 logs_data.js 中定义，通过命名空间延迟绑定）
         const apply = ()=>{ try { window.TokensPerm.hydrateUserLogs(true); }catch(_){ } };

@@ -26,7 +26,7 @@
         if (l && l.userId) { try { row.setAttribute('data-user-id', String(l.userId)); }catch(_){ } }
         if (l && l.type) { try { row.setAttribute('data-type', String(l.type)); }catch(_){ } }
         row.innerHTML = UI.makeRow(l);
-        try{ window.i18n && window.i18n.apply && window.i18n.apply(row);}catch(_){}
+        window.i18n?.applySafe?.(row);
         frag.appendChild(row);
       });
       body.innerHTML=''; body.appendChild(frag);
@@ -105,7 +105,7 @@
 
     // 语言切换：重渲染 i18n + 刷新时间格式
     const onLang = ()=>{
-      try{ const panel=document.getElementById('perms-log-panel'); if(panel && window.i18n && window.i18n.apply) window.i18n.apply(panel);}catch(_){ }
+      try{ const panel=document.getElementById('perms-log-panel'); if(panel) window.i18n?.applySafe?.(panel);}catch(_){ }
       // 语言变化时同步更新日期输入的地区
       try{ const panel=document.getElementById('perms-log-panel'); const filters = panel ? panel.querySelector('.tokens-log__filters') : null; UI.setDateInputLang(filters||panel); }catch(_){ }
       LogUtils.refreshLogTimes('#perms-log .log-time[data-ts]');
@@ -129,7 +129,7 @@
             span.setAttribute('data-i18n-params', JSON.stringify(params));
           }catch(_){ }
         });
-        try{ const panel=document.getElementById('perms-log-panel'); if(panel && window.i18n && window.i18n.apply) window.i18n.apply(panel);}catch(_){ }
+        try{ const panel=document.getElementById('perms-log-panel'); if(panel) window.i18n?.applySafe?.(panel);}catch(_){ }
       }catch(_){ }
     };
     try{ document.addEventListener('i18n:changed', onLang);}catch(_){}

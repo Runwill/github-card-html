@@ -176,6 +176,8 @@
     } catch {}
   }
 
+  const applySafe = root => { try { apply(root); } catch(_) {} };
+
   // 初始化：等待 partials 注入后应用翻译
   const ready = window.partialsReady instanceof Promise ? window.partialsReady : Promise.resolve();
   ready.then(() => {
@@ -214,5 +216,5 @@
 
   // 暴露全局 API：提供单一全局函数 t，避免重复别名
   window.t = t;
-  window.i18n = { t, apply, setLang, getLang: current, nextLang, nameOf };
+  window.i18n = { t, apply, applySafe, setLang, getLang: current, nextLang, nameOf };
 })();

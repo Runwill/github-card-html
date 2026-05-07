@@ -19,10 +19,10 @@
       if (!w || isAnimating(w)) return;
       if (isOpen(w)) {
         closeCollapsible(w);
-        if (btn) { try{ btn.setAttribute('data-i18n','common.expand'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.remove('is-expanded'); }
+        if (btn) { btn.setAttribute('data-i18n','common.expand'); window.i18n?.applySafe?.(btn); btn.classList.remove('is-expanded'); }
       } else {
         openCollapsible(w);
-        if (btn) { try{ btn.setAttribute('data-i18n','common.collapse'); if (window.i18n && window.i18n.apply) window.i18n.apply(btn);}catch(_){ } btn.classList.add('is-expanded'); }
+        if (btn) { btn.setAttribute('data-i18n','common.collapse'); window.i18n?.applySafe?.(btn); btn.classList.add('is-expanded'); }
       }
     });
   }
@@ -49,7 +49,7 @@
     const header = document.createElement('div');
     header.className = 'tokens-log__header';
   header.innerHTML = '<div class="tokens-log__title" data-i18n="tokens.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button></div>';
-    try { if (window.i18n && window.i18n.apply) { window.i18n.apply(header); } } catch (_) {}
+    window.i18n?.applySafe?.(header);
 
         // 外包一层可折叠容器，内层保持可滚动
         const wrap = document.createElement('div');
@@ -243,7 +243,7 @@
     const row = document.createElement('div');
     row.className = 'tokens-log__entry';
     row.innerHTML = line;
-  try { if (window.i18n && window.i18n.apply) window.i18n.apply(row); } catch (_) {}
+  window.i18n?.applySafe?.(row);
     // 在插入前记录当前滚动位置，用于插入后恢复视口
     const prevTop = body.scrollTop || 0;
     const atTop = prevTop <= 5; // 视为已置顶
@@ -325,7 +325,7 @@
               if (log && log._id) { try { row.setAttribute('data-log-id', String(log._id)); }catch(_){} }
               if (log && log.deleted) { try { row.setAttribute('data-log-deleted', '1'); }catch(_){} }
               row.innerHTML = makeLine(log.type, payload);
-              try { if (window.i18n && window.i18n.apply) window.i18n.apply(row); } catch (_) {}
+              window.i18n?.applySafe?.(row);
               frag.appendChild(row);
             });
             body.appendChild(frag);
@@ -350,7 +350,7 @@
     // 1) 重新应用 i18n 到日志面板（更新所有 data-i18n 文案）
     // 2) 立即刷新一次相对时间文案，避免等待下一分钟
     function onI18nChanged(){
-      try { const panel = document.getElementById('tokens-log-panel'); if (panel && window.i18n && window.i18n.apply) window.i18n.apply(panel); } catch (_){ }
+      try { const panel = document.getElementById('tokens-log-panel'); if (panel) window.i18n?.applySafe?.(panel); } catch (_){ }
       LogUtils.refreshLogTimes('.log-time[data-ts]');
     }
     try{ document.addEventListener('i18n:changed', onI18nChanged); }catch(_){ }

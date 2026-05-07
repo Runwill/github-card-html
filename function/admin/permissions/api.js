@@ -1,55 +1,23 @@
 (function(w){
   const ns = w.TokensPerm = w.TokensPerm || {};
 
-  const endpointsBase = (w.endpoints && endpoints.base ? endpoints.base() : '');
-  const API_ROOT = (endpointsBase || '').replace(/\/$/, '') + '/api';
-
-  function authHeader(){ return { 'Authorization': `Bearer ${localStorage.getItem('token')||''}` }; }
-
   function handle401(r){
-    if (r.status === 401) {
-      try { console.warn('[permissions/api] 401 未授权（可能登录已过期）'); } catch(_){ }
-      try { if (w.CardUI && w.CardUI.Manager && w.CardUI.Manager.Controllers && typeof w.CardUI.Manager.Controllers.session?.handleLogout === 'function') w.CardUI.Manager.Controllers.session.handleLogout(); } catch(_){ }
-    }
+    if (r.status !== 401) return;
+    try { console.warn('[permissions/api] 401 未授权（可能登录已过期）'); } catch(_){ }
+    try { w.CardUI?.Manager?.Controllers?.session?.handleLogout?.(); } catch(_){ }
   }
 
-  async function jsonGet(path){
-    const r = await fetch(`${API_ROOT}${path}`, { headers: authHeader() });
-    if (!r.ok) { handle401(r); throw new Error(`HTTP ${r.status}`); }
-    return r.json();
-  }
+  const request = (path, opts)=> w.endpoints.requestJson(path, Object.assign({ auth: 'always', onUnauthorized: handle401 }, opts || {}));
 
-  async function jsonPost(path, body){
-    const r = await fetch(`${API_ROOT}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...authHeader() },
-      body: JSON.stringify(body||{})
-    });
-    const out = await r.json().catch(()=>({}));
-    if (!r.ok) { handle401(r); throw new Error((out && out.message) || `HTTP ${r.status}`); }
-    return out;
-  }
+  const jsonGet = path => request(path, { preferJsonMessage: false });
 
-  async function jsonDelete(path){
-    const r = await fetch(`${API_ROOT}${path}`, { method: 'DELETE', headers: authHeader() });
-    const out = await r.json().catch(()=>({}));
-    if (!r.ok) { handle401(r); throw new Error((out && out.message) || `HTTP ${r.status}`); }
-    return out;
-  }
+  const jsonPost = (path, body)=> request(path, { method: 'POST', body: body || {} });
 
-  async function jsonPatch(path, body){
-    const r = await fetch(`${API_ROOT}${path}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', ...authHeader() },
-      body: JSON.stringify(body||{})
-    });
-    const out = await r.json().catch(()=>({}));
-    if (!r.ok) { handle401(r); throw new Error((out && out.message) || `HTTP ${r.status}`); }
-    return out;
-  }
+  const jsonDelete = path => request(path, { method: 'DELETE' });
+
+  const jsonPatch = (path, body)=> request(path, { method: 'PATCH', body: body || {} });
 
   ns.API = {
-    authHeader,
     jsonGet,
     jsonPost,
     jsonDelete,

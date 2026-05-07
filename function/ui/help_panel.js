@@ -71,8 +71,7 @@
 
   // ── 当前面板检测 ──
   function getActivePanel() {
-    const active = document.querySelector('#main-tabs .tabs-title.is-active a');
-    return active ? active.getAttribute('href')?.replace('#', '') : 'panel_term';
+    return window.TabsUI?.getActivePanelId?.('panel_term') || 'panel_term';
   }
 
   // ── DOM 创建 ──

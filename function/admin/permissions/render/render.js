@@ -17,7 +17,7 @@
     if (!el) return;
     try {
       el.setAttribute('data-i18n', key);
-      w.i18n && w.i18n.apply && w.i18n.apply(el);
+      w.i18n?.applySafe?.(el);
     } catch { if (fallbackText != null) el.textContent = fallbackText; }
   };
   const setText = (el, key, fallback) => {
@@ -168,12 +168,7 @@
   function measureNewHeight(container, fragment, fallbackH){
     try {
       const probe = document.createElement('div');
-      probe.style.position = 'absolute';
-      probe.style.left = '-10000px';
-      probe.style.top = '0';
-      probe.style.visibility = 'hidden';
-      probe.style.pointerEvents = 'none';
-      probe.style.width = container.clientWidth + 'px';
+      Object.assign(probe.style, { position:'absolute', left:'-10000px', top:'0', visibility:'hidden', pointerEvents:'none', width:container.clientWidth + 'px' });
       probe.className = container.className || '';
       const parent = container.parentNode || document.body;
       parent.appendChild(probe);

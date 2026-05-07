@@ -36,8 +36,7 @@
   }
 
   function getActivePanelId() {
-    const el = document.querySelector('.tabs-panel.is-active');
-    return el ? el.id : null;
+    return window.TabsUI?.getActivePanelId?.() || null;
   }
 
   function saveScroll(panelId, y) {

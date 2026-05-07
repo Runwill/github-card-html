@@ -15,7 +15,6 @@
     }
   }
 
-  const API_BASE = (endpoints && endpoints.base ? endpoints.base() : '').replace(/\/$/, '') + '/api';
   const CLIENT_ID = (()=>{
     try{
       const k='tokens_client_id';
@@ -25,59 +24,21 @@
     }catch(_){ return 'web_' + Math.random().toString(36).slice(2,10); }
   })();
 
+  function handleUnauthorized(){
+    try { ['token','id','username','role','avatar'].forEach(key => localStorage.removeItem(key)); } catch (_) {}
+    try {
+      if (!/login\.html$/i.test(location.pathname)) {
+        console.warn('登录已过期，请重新登录');
+        location.href = 'login.html';
+      }
+    } catch (_) {}
+  }
+
   // 统一的 JSON 请求封装
-  async function apiJson(endpoint, opts) {
-    const { method = 'GET', headers = {}, body, auth = false } = opts || {};
-    const { token } = getAuth();
-
-    // 构建请求头
-  const h = Object.assign({}, headers);
-  try { h['x-client-id'] = CLIENT_ID; } catch(_){}
-    if (auth && token) h['Authorization'] = `Bearer ${token}`;
-
-    // 处理 body 与 Content-Type
-    let payload = body;
-    if (body != null && typeof body !== 'string') {
-      h['Content-Type'] = h['Content-Type'] || 'application/json';
-      payload = JSON.stringify(body);
-    }
-
-    // 构建 URL
-    const url = endpoint.startsWith('http') ? endpoint : (API_BASE + endpoint);
-
-    // 发起请求
-    const resp = await fetch(url, { method, headers: h, body: payload });
-
-    // 401 统一处理：清理登录态并跳转登录页
-    if (resp.status === 401) {
-      try {
-        localStorage.removeItem('token');
-        localStorage.removeItem('id');
-        localStorage.removeItem('username');
-        localStorage.removeItem('role');
-        localStorage.removeItem('avatar');
-      } catch (_) {}
-      // 避免在登录页循环跳转
-      try {
-        if (!/login\.html$/i.test(location.pathname)) {
-          // 轻量提示（可选）
-          console.warn('登录已过期，请重新登录');
-          location.href = 'login.html';
-        }
-      } catch (_) {}
-    }
-
-    // 尝试解析 JSON；解析失败回退为 {}
-    const out = await resp.json().catch(() => ({}));
-
-    // 非 2xx 抛错，优先使用返回的 message，并附带状态码与原始响应体，便于上层展示详细原因
-    if (!resp.ok) {
-      const err = new Error((out && out.message) || '请求失败');
-      try { err.status = resp.status; err.data = out; } catch(_){}
-      throw err;
-    }
-
-    return out;
+  function apiJson(endpoint, opts) {
+    const requestOpts = Object.assign({ defaultMessage: '请求失败', onUnauthorized: handleUnauthorized }, opts || {});
+    requestOpts.headers = Object.assign({}, requestOpts.headers || {}, { 'x-client-id': CLIENT_ID });
+    return endpoints.requestJson(endpoint, requestOpts);
   }
 
   // 拉取统一存储的日志
@@ -97,12 +58,12 @@
 
   // 统一的集合元信息
   const COLLECTIONS = Object.freeze({
-    'term-fixed': { key: 'termFixed', url: API_BASE + '/term-fixed' },
-    'term-dynamic': { key: 'termDynamic', url: API_BASE + '/term-dynamic' },
-    'card': { key: 'cards', url: API_BASE + '/card' },
-    'character': { key: 'characters', url: API_BASE + '/character' },
-    'skill': { key: 'skills', url: API_BASE + '/skill' },
+    'term-fixed': { key: 'termFixed', url: '/term-fixed' },
+    'term-dynamic': { key: 'termDynamic', url: '/term-dynamic' },
+    'card': { key: 'cards', url: '/card' },
+    'character': { key: 'characters', url: '/character' },
+    'skill': { key: 'skills', url: '/skill' },
   });
 
-  Object.assign(window.tokensAdmin, { getAuth, apiJson, API_BASE, COLLECTIONS, CLIENT_ID, fetchTokenLogs });
+  Object.assign(window.tokensAdmin, { getAuth, apiJson, COLLECTIONS, CLIENT_ID, fetchTokenLogs });
 })();

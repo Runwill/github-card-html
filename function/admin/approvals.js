@@ -1,19 +1,11 @@
 // 审核模块：统一管理注册与头像审核（管理员/版主）
-(function(){  const API = (endpoints && endpoints.base ? endpoints.base() : '').replace(/\/$/, '') + '/api';
-  const authHeader = () => ({ 'Authorization': `Bearer ${localStorage.getItem('token')||''}` });
+(function(){
   const refreshUser = () => { try { const us = window.CardUI && window.CardUI.Manager && window.CardUI.Manager.Core && window.CardUI.Manager.Core.userService; if (us && us.refreshCurrentUserFromServer) us.refreshCurrentUserFromServer(); } catch(_){} };
 
-  async function jsonGet(path){
-    const resp = await fetch(`${API}${path}`, { headers: authHeader() });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    return resp.json();
-  }
-  async function jsonPost(path, body){
-    const resp = await fetch(`${API}${path}`, { method:'POST', headers: { 'Content-Type':'application/json', ...authHeader() }, body: JSON.stringify(body||{}) });
-    const out = await resp.json().catch(()=>({}));
-    if (!resp.ok) throw new Error(out && out.message || `HTTP ${resp.status}`);
-    return out;
-  }
+  const jsonGet = path => endpoints.requestJson(path, { auth: 'always', preferJsonMessage: false });
+  const jsonPost = (path, body)=> endpoints.requestJson(path, { method:'POST', auth: 'always', body: body || {} });
+
+  const createdAtDate = value => new Date((window.TimeFmt?.parseTimeValue?.(value) ?? Date.parse(value)) || 0);
 
   // 极简 DOM 工厂
   function el(tag, attrs, children){
@@ -51,10 +43,7 @@
 
   // 平滑动画：先固定当前高度，再过渡到 0 高度与透明；保留外边距，避免容器高度“回弹”
       const startHeight = row.offsetHeight;
-  row.style.boxSizing = 'border-box';
-  row.style.height = startHeight + 'px';
-  row.style.overflow = 'hidden';
-  row.style.transition = 'height 200ms ease, opacity 200ms ease';
+        Object.assign(row.style, { boxSizing:'border-box', height:startHeight + 'px', overflow:'hidden', transition:'height 200ms ease, opacity 200ms ease' });
       // 触发回流，确保初始高度生效
       void row.offsetHeight;
       row.style.opacity = '0';
@@ -82,17 +71,19 @@
   }
 
   // ── 通用审批处理 ──
+  const setRowButtonsDisabled = (row, disabled)=> row?.querySelectorAll('button').forEach(button => { button.disabled = disabled; });
+
   async function handleApproval(apiPath, body, trigger, postSuccess){
     const row = trigger && trigger.closest ? trigger.closest('.approval-row') : null;
     try {
-      row && row.querySelectorAll('button').forEach(b=>b.disabled=true);
+      setRowButtonsDisabled(row, true);
       await jsonPost(apiPath, body);
       removeApprovalRowFromTrigger(trigger);
       if (postSuccess) postSuccess();
       try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
     } catch(e){
       alert(e.message || '操作失败');
-      row && row.querySelectorAll('button').forEach(b=>b.disabled=false);
+      setRowButtonsDisabled(row, false);
     }
   }
 
@@ -121,10 +112,10 @@
     try {
   const [users, avatars, usernames, intros] = await Promise.all([fetchPendingUsers(), fetchPendingAvatars(), fetchPendingUsernames(), fetchPendingIntros()]);
       const items = [];
-      (users||[]).forEach(u => items.push({ type:'register', id:u._id, createdAt: u.createdAt ? new Date(u.createdAt) : new Date(0), username: u.username }));
-      (avatars||[]).forEach(a => items.push({ type:'avatar', id:a._id, createdAt: a.createdAt ? new Date(a.createdAt) : new Date(0), username: (a.user && a.user.username) ? a.user.username : (a.user || ''), url: a.url }));
-  (usernames||[]).forEach(rec => items.push({ type:'username', id:rec._id, createdAt: rec.createdAt ? new Date(rec.createdAt) : new Date(0), username: (rec.user && rec.user.username) ? rec.user.username : '', newUsername: rec.newUsername || '' }));
-  (intros||[]).forEach(rec => items.push({ type:'intro', id:rec._id, createdAt: rec.createdAt ? new Date(rec.createdAt) : new Date(0), username: (rec.user && rec.user.username) ? rec.user.username : '', newIntro: rec.newIntro || '' }));
+      (users||[]).forEach(u => items.push({ type:'register', id:u._id, createdAt: createdAtDate(u.createdAt), username: u.username }));
+      (avatars||[]).forEach(a => items.push({ type:'avatar', id:a._id, createdAt: createdAtDate(a.createdAt), username: (a.user && a.user.username) ? a.user.username : (a.user || ''), url: a.url }));
+      (usernames||[]).forEach(rec => items.push({ type:'username', id:rec._id, createdAt: createdAtDate(rec.createdAt), username: (rec.user && rec.user.username) ? rec.user.username : '', newUsername: rec.newUsername || '' }));
+      (intros||[]).forEach(rec => items.push({ type:'intro', id:rec._id, createdAt: createdAtDate(rec.createdAt), username: (rec.user && rec.user.username) ? rec.user.username : '', newIntro: rec.newIntro || '' }));
       items.sort((a,b)=> b.createdAt - a.createdAt);
         if (!items.length) {
           container.appendChild(el('p', {

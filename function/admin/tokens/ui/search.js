@@ -29,7 +29,7 @@
             try {
               const key = state.compactMode ? 'tokens.mode.compact' : 'tokens.mode.detail';
               tgl.setAttribute('data-i18n', key);
-              window.i18n && window.i18n.apply && window.i18n.apply(tgl);
+              window.i18n?.applySafe?.(tgl);
             } catch {
               // 兜底中文
               tgl.textContent = state.compactMode ? '缩略' : '详细';

@@ -29,6 +29,13 @@
     }catch(_){ return String(v || ''); }
   }
 
+  function formatAbsOrRaw(value){
+    try{
+      const t = parseTimeValue(value);
+      return t == null ? String(value || '') : formatAbsForLang(t);
+    }catch(_){ return String(value || ''); }
+  }
+
   function formatRel(v){
     try{
       const now = Date.now();
@@ -50,5 +57,5 @@
     }catch(_){ return ''; }
   }
 
-  window.TimeFmt = { parseTimeValue, getLocaleFromI18n, formatAbsForLang, formatRel };
+  window.TimeFmt = { parseTimeValue, getLocaleFromI18n, formatAbsForLang, formatAbsOrRaw, formatRel };
 })();

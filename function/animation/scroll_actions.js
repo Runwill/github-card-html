@@ -138,11 +138,7 @@
   // 判断当前激活的 panel 是否为指定 panelId（支持传入 '#id' 或 'id'）
   function isPanelActive(panelId){
     try {
-      if (!panelId) return true
-      const activePane = document.querySelector('.tabs-panel.is-active')
-      if (!activePane) return true
-      const wantId = (panelId[0] === '#') ? panelId.slice(1) : panelId
-      return activePane.id === wantId
+      return window.TabsUI?.isPanelActive?.(panelId) ?? true
     } catch(e) { return true }
   }
 
@@ -330,8 +326,7 @@
     const root = document;
     const mo = new MutationObserver(function(){
       try {
-        const active = document.querySelector('.tabs-panel.is-active')
-        const activeId = active ? active.id : null
+        const activeId = window.TabsUI?.getActivePanelId?.() || null
         if (__currentOp && activeId && __currentOp.panelId && activeId !== (__currentOp.panelId[0]==='#' ? __currentOp.panelId.slice(1) : __currentOp.panelId)) {
           cancelCurrentOp('panel-changed')
         }

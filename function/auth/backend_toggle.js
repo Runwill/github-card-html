@@ -11,20 +11,15 @@
   function normalize(u) { return String(u || '').replace(/\/$/, ''); }
 
   function applyStyle(current) {
+    var publicBase = isPublic(current);
+    var key = publicBase ? 'login.backend.publicSelected' : 'login.backend.localSelected';
     btn.classList.remove('btn--primary', 'btn--secondary', 'btn--success', 'btn--danger');
-    if (isPublic(current)) {
-      btn.classList.add('btn--success');
-      try { btn.setAttribute('data-i18n', 'login.backend.publicSelected'); } catch (_) {}
-      try { btn.textContent = window.t('login.backend.publicSelected'); } catch (_) { btn.textContent = '公网后端 (已选)'; }
-    } else {
-      btn.classList.add('btn--danger');
-      try { btn.setAttribute('data-i18n', 'login.backend.localSelected'); } catch (_) {}
-      try { btn.textContent = window.t('login.backend.localSelected'); } catch (_) { btn.textContent = '本地后端 (已选)'; }
-    }
+    btn.classList.add(publicBase ? 'btn--success' : 'btn--danger');
+    try { btn.setAttribute('data-i18n', key); btn.textContent = window.t(key); } catch (_) { btn.textContent = publicBase ? '公网后端 (已选)' : '本地后端 (已选)'; }
   }
 
-  function currentBase() { try { return endpoints && endpoints.getBase ? endpoints.getBase() : LOCAL_URL; } catch (e) { return LOCAL_URL; } }
-  function setBase(u) { try { if (endpoints && endpoints.setBase) endpoints.setBase(u); } catch (e) {} }
+  function currentBase() { try { return endpoints?.getBase?.() || LOCAL_URL; } catch (e) { return LOCAL_URL; } }
+  function setBase(u) { try { endpoints?.setBase?.(u); } catch (e) {} }
 
   function refreshMessage() {
     var b = currentBase();
@@ -51,7 +46,7 @@
   }
 
   function boot() {
-    try { if (window.i18n && window.i18n.apply) window.i18n.apply(document); } catch (_) {}
+    window.i18n?.applySafe?.(document);
     init();
     try { window.addEventListener('i18n:changed', function () { applyStyle(currentBase()); refreshMessage(); }); } catch (_) {}
   }

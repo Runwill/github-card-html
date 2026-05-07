@@ -35,7 +35,7 @@
     // 注册时间
     if (u.createdAt) {
       const dateSpan = makeEl('span', 'approval-sub__date');
-      try { dateSpan.textContent = new Date(u.createdAt).toLocaleString(); } catch { dateSpan.textContent = u.createdAt; }
+      dateSpan.textContent = w.TimeFmt.formatAbsOrRaw(u.createdAt);
       sub.appendChild(dateSpan);
     }
 
@@ -96,9 +96,11 @@
     const editorHead = makeEditorHead('permissions.editor.permissionsTitle', t('permissions.edit', '编辑权限'), btnSelectAll);
     editorHead.main.appendChild(selectedCounter);
     const list = makeEl('div', 'perm-editor__list perm-editor__list--permissions');
+    const permissionCheckboxes = ()=> Array.from(list.querySelectorAll('input[type="checkbox"]'));
+    const checkedPermissionValues = ()=> permissionCheckboxes().filter(cb => cb.checked).map(cb => cb.value);
     const updatePermissionSummary = ()=>{
       const total = allPerms.length;
-      const selected = Array.from(list.querySelectorAll('input[type="checkbox"]')).filter(cb => cb.checked).length;
+      const selected = checkedPermissionValues().length;
       selectedCounter.textContent = (t('permissions.editor.selectedCount', '已选 {selected}/{total}') || '')
         .replace('{selected}', String(selected))
         .replace('{total}', String(total));
@@ -287,14 +289,14 @@
       openEditor(editor);
     });
     btnSelectAll.addEventListener('click', ()=>{
-      const cbs = Array.from(list.querySelectorAll('input[type="checkbox"]').values());
+      const cbs = permissionCheckboxes();
       const shouldSelectAll = cbs.some(cb => !cb.checked);
       cbs.forEach(cb => { cb.checked = shouldSelectAll; });
       updatePermissionSummary();
     });
     btnCancel.addEventListener('click', closeEditorStack);
     btnSave.addEventListener('click', async ()=>{
-      const selected = Array.from(list.querySelectorAll('input[type="checkbox"]')).filter(cb=>cb.checked).map(cb=>cb.value);
+      const selected = checkedPermissionValues();
       const curSet = new Set(current); const selSet = new Set(selected);
       const toGrant = selected.filter(p => !curSet.has(p));
       const toRevoke = current.filter(p => !selSet.has(p));
@@ -408,7 +410,7 @@
     if (skipAnim){
       box.innerHTML = '';
       box.appendChild(frag);
-      try { w.i18n && w.i18n.apply && w.i18n.apply(box); } catch {}
+      w.i18n?.applySafe?.(box);
       return;
     }
 
@@ -433,7 +435,7 @@
     // 替换内容并淡入新行
     box.innerHTML = '';
     box.appendChild(frag);
-  try { w.i18n && w.i18n.apply && w.i18n.apply(box); } catch {}
+    w.i18n?.applySafe?.(box);
     const newRows = Array.from(box.children || []).filter(el => el?.classList?.contains('approval-row'));
     animateEnterRows(newRows);
 

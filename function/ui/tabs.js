@@ -2,6 +2,8 @@
   const titles=['程序','技能','牌库','将池','草稿','词元','权限','对局'];
   const changeTitle=n=> document.title='Document丨'+(titles[n]||'');
   const isAdmin=()=>{ try{ return localStorage.getItem('role')==='admin' }catch(_){ return false } };
+  const getActivePanelId=(fallback)=> document.querySelector('.tabs-panel.is-active')?.id || document.querySelector('#main-tabs .tabs-title.is-active a')?.getAttribute('href')?.replace('#', '') || fallback || null;
+  const isPanelActive=(panelId)=>{ const activeId = panelId && getActivePanelId(); return !panelId || !activeId || activeId === (panelId[0] === '#' ? panelId.slice(1) : panelId); };
 
   Promise.resolve(window.partialsReady).then(()=>{
     document.querySelectorAll('#main-tabs a.title-a').forEach((a,idx)=>{
@@ -83,5 +85,6 @@
       }, { passive: false });
     }
   });
+  window.TabsUI = Object.assign(window.TabsUI || {}, { changeTitle, getActivePanelId, isPanelActive });
   window.changeTitle=changeTitle;
 })()

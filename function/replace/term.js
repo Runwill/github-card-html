@@ -12,6 +12,14 @@ function replace_term(path, mode, paragraphs = document) {
             }
         }
 
+        const bindTermDoubleClick = ($element, resolveTagName) => {
+            $element.off('dblclick.termScroll').on('dblclick.termScroll', function (event) {
+                event.stopPropagation();
+                const tagName = typeof resolveTagName === 'function' ? resolveTagName(event.currentTarget) : resolveTagName;
+                scrollActions.scrollToTagAndFlash('panel_term', tagName, { behavior: 'smooth', stop: true });
+            });
+        };
+
         // 定义处理单个节点的函数 (核心逻辑抽取)
         const processNode = (node, termData, index) => {
             const $node = $(node);
@@ -41,10 +49,7 @@ function replace_term(path, mode, paragraphs = document) {
                 // 即使 irreplaceable，原逻辑通常也会绑定高亮与交互
                 if (mode) {
                     // 双击滚动
-                    $node.off('dblclick.termScroll').on('dblclick.termScroll', function (event) {
-                        event.stopPropagation();
-                        scrollActions.scrollToTagAndFlash('panel_term', event.currentTarget.tagName, { behavior: 'smooth', stop: true });
-                    });
+                    bindTermDoubleClick($node, currentTarget => currentTarget.tagName);
                     
                     // 高亮
                     node.i = index; // 存储索引供 highlight 使用
@@ -86,10 +91,7 @@ function replace_term(path, mode, paragraphs = document) {
                    }
 
                    // 双击滚动 (Main Term)
-                   $node.off('dblclick.termScroll').on('dblclick.termScroll', function(event){
-                       event.stopPropagation();
-                       scrollActions.scrollToTagAndFlash('panel_term', t.en, { behavior: 'smooth', stop: true });
-                   });
+                   bindTermDoubleClick($node, t.en);
 
                    // 子元素交互 (Parts)
                    for (var j in t.part) {
@@ -106,10 +108,7 @@ function replace_term(path, mode, paragraphs = document) {
                                }
 
                                // 双击滚动 (Part)
-                               $subEl.off('dblclick.termScroll').on('dblclick.termScroll', function(event){
-                                   event.stopPropagation();
-                                   scrollActions.scrollToTagAndFlash('panel_term', t.part[event.currentTarget.j].en, { behavior: 'smooth', stop: true });
-                               });
+                               bindTermDoubleClick($subEl, currentTarget => t.part[currentTarget.j].en);
                            });
                        }
                    }
