@@ -24,6 +24,7 @@
   let ensureRetryTimer = null;
   let ensureRetryCount = 0;
   const MAX_ENSURE_RETRY = 12;
+  const USER_CACHE_KEYS = ['id','token','username','avatar','intro','permissions'];
   const scheduleEnsureRetry = () => {
     if (ensureRetryCount >= MAX_ENSURE_RETRY) return;
     if (ensureRetryTimer) return;
@@ -40,26 +41,13 @@
       const id = localStorage.getItem('id');
       const token = localStorage.getItem('token');
       if (!id || !token) return; // 未登录
-      const apiFn = (window.endpoints && typeof window.endpoints.api === 'function') ? window.endpoints.api : null;
-      if (!apiFn) { scheduleEnsureRetry(); return; }
-      const url = apiFn('/api/user/' + encodeURIComponent(id));
-      const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + token } });
-      if (res && res.status === 404) {
-        try {
-          localStorage.removeItem('id');
-          localStorage.removeItem('token');
-          localStorage.removeItem('username');
-          localStorage.removeItem('avatar');
-          localStorage.removeItem('intro');
-          localStorage.removeItem('permissions');
-        } catch(_){}
-        return;
-      }
-      if (!res.ok) return;
+      const requestJson = window.endpoints?.requestJson;
+      if (!requestJson) { scheduleEnsureRetry(); return; }
+      let data;
+      try { data = await requestJson('/user/' + encodeURIComponent(id), { auth: true }); }
+      catch(e){ if (e?.status === 404) try { USER_CACHE_KEYS.forEach(key => localStorage.removeItem(key)); } catch(_){}; return; }
       ensureRetryCount = 0;
-      const data = await res.json().catch(()=>null);
-      const perms = (data && Array.isArray(data.permissions)) ? data.permissions : [];
-      try { localStorage.setItem('permissions', JSON.stringify(perms)); } catch(_){ }
+      try { localStorage.setItem('permissions', JSON.stringify(Array.isArray(data?.permissions) ? data.permissions : [])); } catch(_){ }
     } catch(_){ }
   }
 

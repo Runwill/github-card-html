@@ -100,7 +100,7 @@ html.force-landscape {
 }
 
 #panel_draft #htmlInput,
-#panel_draft :is(.admin-input, .tokens-input) {
+#panel_draft .admin-input {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
@@ -136,12 +136,12 @@ html.force-landscape {
 }
 
 #panel_draft #htmlInput:hover,
-#panel_draft :is(.admin-input, .tokens-input):hover {
+#panel_draft .admin-input:hover {
   border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
 }
 
 #panel_draft #htmlInput:focus,
-#panel_draft :is(.admin-input, .tokens-input):focus {
+#panel_draft .admin-input:focus {
   border-color: var(--primary-2);
   background: var(--surface);
   box-shadow: none;
@@ -243,15 +243,15 @@ html.force-landscape {
 }
 
 #panel_draft .editor-search,
-#panel_draft .editor-field :is(.admin-input, .tokens-input) {
+#panel_draft .editor-field .admin-input {
   width: 100%;
-  height: var(--admin-input-h, var(--tokens-input-h, 36px));
+  height: var(--admin-input-h, 36px);
   margin: 0;
   font-size: var(--draft-fs-control, 14px);
   padding: 0.571em 0.714em;
 }
 
-#panel_draft .editor-field :is(.admin-input, .tokens-input):disabled {
+#panel_draft .editor-field .admin-input:disabled {
   color: var(--text-subtle);
   background: color-mix(in srgb, var(--surface) 80%, var(--border) 20%);
   border-color: color-mix(in srgb, var(--border) 72%, transparent);
@@ -277,8 +277,8 @@ html.force-landscape {
   border-radius: var(--radius-sm) 0 0 var(--radius-sm);
 }
 
-#panel_draft .admin-input-group :is(.admin-input-btn, .tokens-btn) {
-  height: var(--admin-input-h, var(--tokens-input-h, 36px));
+#panel_draft .admin-input-group .admin-input-btn {
+  height: var(--admin-input-h, 36px);
   flex: 0 0 auto;
   padding: 0 0.857em;
   border: 1px solid var(--border);
@@ -288,7 +288,7 @@ html.force-landscape {
   white-space: nowrap;
 }
 
-#panel_draft .admin-input-group:focus-within :is(.admin-input-btn, .tokens-btn) {
+#panel_draft .admin-input-group:focus-within .admin-input-btn {
   border-color: color-mix(in srgb, var(--primary-2) 55%, var(--border));
 }
 
@@ -490,21 +490,22 @@ html.force-landscape {
 }
 
 #panel_draft .editor-node .editor-node-list {
-  margin-left: 0;
-  padding-left: 0;
-  border-left: 0;
+  margin-left: 0.95em;
+  padding-left: 0.556em;
+  border-left: 1px dashed var(--editor-node-guide-color, color-mix(in srgb, var(--border) 84%, transparent));
 }
 
 #panel_draft .editor-node-row {
   --node-accent: var(--primary-2);
+  --editor-node-divider-gap: 0.5em;
   position: relative;
   min-height: 1.75em;
   display: grid;
-  grid-template-columns: minmax(0, calc(var(--editor-node-name-w, 12em) - var(--node-indent, 0em))) minmax(0, 1fr);
+  grid-template-columns: minmax(0, calc(var(--editor-node-name-w, 12em) - var(--node-layout-indent, 0px))) minmax(0, 1fr);
   align-items: stretch;
   gap: 0;
   font-size: var(--tp-fs-sm, 12px);
-  margin: 0.222em 0 0.222em var(--node-indent, 0em);
+  margin: 0.222em 0;
   padding: 0;
   border: 1px solid color-mix(in srgb, var(--node-accent) 18%, var(--border));
   border-radius: var(--radius-md);
@@ -560,14 +561,16 @@ html.force-landscape {
   display: flex;
   align-items: center;
   gap: 0.25em;
-  padding: 0.25em 0.333em 0.25em calc(0.333em + var(--node-toggle-space, 0em));
+  padding: 0.25em 0.333em;
 }
 
 #panel_draft .editor-node-main {
+  padding-left: calc(0.333em + var(--node-toggle-space, 0em));
   border-radius: var(--radius-md) 0 0 var(--radius-md);
 }
 
 #panel_draft .editor-node-side {
+  padding-left: var(--editor-node-divider-gap, 0.5em);
   border-left: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   background: color-mix(in srgb, var(--surface) 62%, transparent);
@@ -671,7 +674,7 @@ html.force-landscape {
 }
 
 #panel_draft .editor-field > span {
-  height: var(--admin-input-h, var(--tokens-input-h, 36px));
+  height: var(--admin-input-h, 36px);
   display: flex;
   align-items: center;
   line-height: var(--lh-tight);

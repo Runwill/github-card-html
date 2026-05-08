@@ -6,7 +6,7 @@
   var dom = w.CardUI.Manager.Core.dom;
   var messages = w.CardUI.Manager.Core.messages;
   var $ = dom.$;
-  var api = dom.api;
+  var requestJson = w.endpoints && w.endpoints.requestJson;
   var showMessage = messages.showMessage;
 
   async function handleUpdateFormSubmit(event){
@@ -23,18 +23,12 @@
     if (newPassword !== confirmPassword) { showMessage(responseMessage, t('error.pwdNotMatch'), 'error'); return; }
     try {
       showMessage(responseMessage, t('status.updating'), '');
-      var response = await fetch(api('/api/change-password'), { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ id: id, oldPassword: oldPassword, newPassword: newPassword }) });
-      if (response.ok) {
-        showMessage(responseMessage, t('success.pwdUpdated'), 'success');
-        setTimeout(function(){ try { w.CardUI.Manager.Controllers.overlay.closeAll(); } catch(_){ } w.location.href = 'login.html'; }, 2000);
-      } else {
-        var errMsg = '';
-        try { var data = await response.json(); errMsg = (data && data.message) || ''; } catch(_){ }
-        showMessage(responseMessage, errMsg || t('error.updateFailed'), 'error');
-      }
+      await requestJson('/change-password', { method: 'PUT', auth: true, body: { id: id, oldPassword: oldPassword, newPassword: newPassword }, defaultMessage: t('error.updateFailed') });
+      showMessage(responseMessage, t('success.pwdUpdated'), 'success');
+      setTimeout(function(){ try { w.CardUI.Manager.Controllers.overlay.closeAll(); } catch(_){ } w.location.href = 'login.html'; }, 2000);
     } catch(error){
-      showMessage(responseMessage, t('error.requestFailed'), 'error');
-      console.error(t('error.requestFailedPrefix'), error);
+      showMessage(responseMessage, error && error.status ? (error.message || t('error.updateFailed')) : t('error.requestFailed'), 'error');
+      if (!(error && error.status)) console.error(t('error.requestFailedPrefix'), error);
     }
   }
 

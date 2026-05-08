@@ -53,6 +53,7 @@
           if (id) await apiDelete(`/user/logs/${encodeURIComponent(id)}`);
         }, async (id)=>{
           if (id) await apiPatch(`/user/logs/${encodeURIComponent(id)}/restore`);
+          await hydrateUserLogs(false);
         });
       }catch(_){ }
     }
@@ -105,7 +106,6 @@
 
     // 语言切换：重渲染 i18n + 刷新时间格式
     const onLang = ()=>{
-      try{ const panel=document.getElementById('perms-log-panel'); if(panel) window.i18n?.applySafe?.(panel);}catch(_){ }
       // 语言变化时同步更新日期输入的地区
       try{ const panel=document.getElementById('perms-log-panel'); const filters = panel ? panel.querySelector('.tokens-log__filters') : null; UI.setDateInputLang(filters||panel); }catch(_){ }
       LogUtils.refreshLogTimes('#perms-log .log-time[data-ts]');
@@ -132,8 +132,7 @@
         try{ const panel=document.getElementById('perms-log-panel'); if(panel) window.i18n?.applySafe?.(panel);}catch(_){ }
       }catch(_){ }
     };
-    try{ document.addEventListener('i18n:changed', onLang);}catch(_){}
-    try{ window.addEventListener && window.addEventListener('i18n:changed', onLang);}catch(_){}
+    try{ window.addEventListener?.('i18n:changed', onLang);}catch(_){}
 
     // 暴露刷新方法供外部调用（如权限变更后自动刷新日志）
     try {

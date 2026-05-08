@@ -291,26 +291,59 @@
     return node.element ? (node.tag || '') : (node.text || '');
   }
 
-  function textMeasureUnits(text) {
-    text = String(text || '');
-    var units = 0;
-    for (var index = 0; index < text.length; index++) {
-      units += text.charCodeAt(index) > 255 ? 1.05 : 0.62;
-    }
-    return units;
+  function applyTreeColumns() {
+    if (!els.tree) return;
+    var treeFontSize = 0;
+    var rowFontSize = 0;
+    try { treeFontSize = parseFloat(window.getComputedStyle(els.tree).fontSize) || 0; } catch(_){ }
+    try {
+      var sampleRow = els.tree.querySelector('.editor-node-row');
+      rowFontSize = sampleRow ? (parseFloat(window.getComputedStyle(sampleRow).fontSize) || 0) : 0;
+    } catch(_){ }
+    rowFontSize = rowFontSize || treeFontSize || 12;
+    var indentStep = 0;
+    try {
+      var childList = els.tree.querySelector('.editor-node .editor-node-list');
+      if (childList) {
+        var listStyle = window.getComputedStyle(childList);
+        indentStep = (parseFloat(listStyle.marginLeft) || 0) +
+          (parseFloat(listStyle.paddingLeft) || 0) +
+          (parseFloat(listStyle.borderLeftWidth) || 0);
+      }
+    } catch(_){ }
+    if (!indentStep) indentStep = treeFontSize ? (treeFontSize * 1.506 + 1) : (rowFontSize * 1.506 + 1);
+    var dividerGap = 0;
+    try {
+      var sampleSide = els.tree.querySelector('.editor-node-side');
+      dividerGap = sampleSide ? (parseFloat(window.getComputedStyle(sampleSide).paddingLeft) || 0) : 0;
+    } catch(_){ }
+    var maxWidth = 0;
+    els.tree.querySelectorAll('.editor-node-row').forEach(function(row){
+      var depth = Number(row.style.getPropertyValue('--node-depth')) || 0;
+      row.style.setProperty('--node-layout-indent', depth ? (depth * indentStep).toFixed(2) + 'px' : '0px');
+      var main = row.querySelector('.editor-node-main');
+      var label = main && main.querySelector('.editor-node-label');
+      if (!main || !label) return;
+      var labelWidth = label.scrollWidth;
+      try {
+        var range = document.createRange();
+        range.selectNodeContents(label);
+        labelWidth = range.getBoundingClientRect().width || labelWidth;
+        range.detach();
+      } catch(_){ }
+      var mainStyle = window.getComputedStyle(main);
+      var gap = parseFloat(mainStyle.columnGap || mainStyle.gap) || 0;
+      var mainWidth = (parseFloat(mainStyle.paddingLeft) || 0) + (parseFloat(mainStyle.paddingRight) || 0) + labelWidth + dividerGap;
+      var toggle = main.querySelector('.editor-node-toggle');
+      if (toggle) mainWidth += toggle.getBoundingClientRect().width + gap;
+      maxWidth = Math.max(maxWidth, depth * indentStep + mainWidth);
+    });
+    els.tree.style.setProperty('--editor-node-name-w', Math.max(rowFontSize * 2.35, maxWidth).toFixed(2) + 'px');
   }
 
-  function applyTreeNameWidth() {
-    if (!els.tree) return;
-    var maxUnits = 0;
-    function visit(nodes, depth) {
-      (nodes || []).forEach(function (node) {
-        maxUnits = Math.max(maxUnits, textMeasureUnits(nodeAutoLabel(node)) + 1.45 + depth * 0.95);
-        if (node.element && node.children && node.children.length && node.expanded !== false) visit(node.children, depth + 1);
-      });
-    }
-    visit(state.nodes, 0);
-    els.tree.style.setProperty('--editor-node-name-w', Math.max(2.35, maxUnits + 0.9).toFixed(2) + 'em');
+  function scheduleTreeColumns() {
+    if (window.requestAnimationFrame) window.requestAnimationFrame(applyTreeColumns);
+    else setTimeout(applyTreeColumns, 0);
   }
 
   function colorForNode(node) {
@@ -326,7 +359,6 @@
 
   function renderTree() {
     if (!els.tree) return;
-    applyTreeNameWidth();
     els.tree.innerHTML = '';
     if (!state.nodes.length) {
       var empty = document.createElement('div');
@@ -336,12 +368,24 @@
       return;
     }
     els.tree.appendChild(renderNodeList(state.nodes, 0));
+    applyTreeColumns();
+    scheduleTreeColumns();
   }
 
   function renderNodeList(nodes, depth) {
     var list = document.createElement('ul');
     list.className = 'editor-node-list';
     list.setAttribute('role', depth ? 'group' : 'tree');
+    if (depth) {
+      var guideColors = [
+        'color-mix(in srgb, var(--primary-2) 42%, var(--border))',
+        'color-mix(in srgb, var(--success) 38%, var(--border))',
+        'color-mix(in srgb, var(--danger) 30%, var(--border))',
+        'color-mix(in srgb, var(--primary-3) 58%, var(--border))',
+        'color-mix(in srgb, var(--text-subtle) 60%, var(--border))'
+      ];
+      list.style.setProperty('--editor-node-guide-color', guideColors[(depth - 1) % guideColors.length]);
+    }
     nodes.forEach(function (node) {
       list.appendChild(renderNode(node, depth));
     });
@@ -362,7 +406,6 @@
     row.dataset.id = node.id;
     row.draggable = false;
     row.style.setProperty('--node-depth', String(depth));
-    row.style.setProperty('--node-indent', (depth * 0.95).toFixed(2) + 'em');
     var color = colorForNode(node);
     if (color) row.style.setProperty('--node-accent', color);
 
@@ -762,6 +805,8 @@
     document.addEventListener('keyup', handleKeyup);
     window.addEventListener('blur', function () { setVariantMode(false); });
     window.addEventListener('i18n:changed', function () { renderAll(false); });
+    window.addEventListener('resize', scheduleTreeColumns);
+    window.addEventListener('hashchange', scheduleTreeColumns);
   }
 
   function bindButton(id, handler) {

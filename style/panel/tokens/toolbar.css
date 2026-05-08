@@ -10,11 +10,11 @@
  * 向下传递：
  *   → h2                      字号：rem 规则（1.2rem = 24px@ref）
  *   → .toolbar-actions        字号：继承 18px；gap ← 0.444em
- *   → .admin-input-group      字号：继承 18px（tokens-input-group 为旧别名）
+ *   → .admin-input-group      字号：继承 18px
  *     → .admin-input          字号 ← --tp-fs-md (14px)；高度 ← token；内距 ← em
  *     → .admin-input-btn      字号 ← --tp-fs-md (14px)；高度 ← token；内距 ← em
  *   → .mode-toggle            字号：继承 18px
- *   → .admin-toolbar-action   字号：继承 18px（tokens-refresh 为旧别名）
+ *   → .admin-toolbar-action   字号：继承 18px
  *   → .expand-btn             字号 ← --tp-fs-base (13px) [_variables.css 集成]；内距 ← em
  * ─────────────────────────────────────────────────────── */
 
@@ -38,35 +38,35 @@
 }
 
 /* 统一管理面板输入组（搜索 + 刷新） */
-.admin-panel :is(.admin-input-group, .tokens-input-group) {
+.admin-panel .admin-input-group {
   display: inline-flex;
   align-items: stretch;
   max-width: 60vw;
 }
 
-:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button, .custom-select) {
+.admin-input-group > :is(.admin-input, .admin-input-btn, .btn, button, .custom-select) {
   position: relative;
 }
 
-:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button, .custom-select) + :is(.admin-input, .tokens-input, .admin-input-btn, .tokens-btn, .btn, button, .custom-select) {
+.admin-input-group > :is(.admin-input, .admin-input-btn, .btn, button, .custom-select) + :is(.admin-input, .admin-input-btn, .btn, button, .custom-select) {
   margin-left: -1px;
 }
 
-:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input):hover,
-:is(.admin-input-group, .tokens-input-group) > :is(.admin-input, .tokens-input):focus {
+.admin-input-group > .admin-input:hover,
+.admin-input-group > .admin-input:focus {
   z-index: 3;
 }
 
-:is(.admin-input-group, .tokens-input-group) > :is(.admin-input-btn, .tokens-btn, .btn, button):hover,
-:is(.admin-input-group, .tokens-input-group) > :is(.admin-input-btn, .tokens-btn, .btn, button):focus,
-:is(.admin-input-group, .tokens-input-group) > .custom-select:hover,
-:is(.admin-input-group, .tokens-input-group) > .custom-select:focus-within,
-:is(.admin-input-group, .tokens-input-group) > .custom-select.is-open {
+.admin-input-group > :is(.admin-input-btn, .btn, button):hover,
+.admin-input-group > :is(.admin-input-btn, .btn, button):focus,
+.admin-input-group > .custom-select:hover,
+.admin-input-group > .custom-select:focus-within,
+.admin-input-group > .custom-select.is-open {
   z-index: 2;
 }
 
-.admin-panel :is(.admin-input, .tokens-input) {
-  height: var(--admin-input-h, var(--tokens-input-h, 36px));
+.admin-panel .admin-input {
+  height: var(--admin-input-h, 36px);
   flex: 1 1 17.143em;       /* 240/14，基于自身 14px 字号 */
   padding: 0.571em 0.714em; /* 8/14, 10/14 */
   border: 1px solid var(--border);
@@ -80,10 +80,10 @@
               box-shadow var(--dur-normal) var(--ease-default);
 }
 
-.admin-panel :is(.admin-input, .tokens-input)::placeholder { color: var(--text-subtle); }
+.admin-panel .admin-input::placeholder { color: var(--text-subtle); }
 
-.admin-panel :is(.admin-input-btn, .tokens-btn) {
-  height: var(--admin-input-h, var(--tokens-input-h, 36px));
+.admin-panel .admin-input-btn {
+  height: var(--admin-input-h, 36px);
   padding: 0 0.857em;      /* 0 12/14 */
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   border: 1px solid var(--border);
@@ -94,12 +94,12 @@
 }
 
 /* 输入组内的相邻按钮做成"分段"连接 */
-.admin-panel :is(.admin-input-group, .tokens-input-group) :is(.admin-input-btn, .tokens-btn) { border-radius: var(--radius-none); }
-.admin-panel :is(.admin-input-group, .tokens-input-group) :is(.admin-input-btn, .tokens-btn):last-of-type { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.admin-panel .admin-input-group .admin-input-btn { border-radius: var(--radius-none); }
+.admin-panel .admin-input-group .admin-input-btn:last-of-type { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
 
 /* 聚焦：仅键盘导航时显示可视焦点 */
-.admin-panel :is(.admin-input-btn, .tokens-btn):focus { outline: none; box-shadow: none; }
-.admin-panel :is(.admin-input-btn, .tokens-btn):focus-visible {
+.admin-panel .admin-input-btn:focus { outline: none; box-shadow: none; }
+.admin-panel .admin-input-btn:focus-visible {
   outline: 1px solid color-mix(in srgb, var(--primary-2) 72%, var(--border));
   outline-offset: 2px;
   box-shadow: none;
@@ -143,4 +143,4 @@
 }
 
 /* 刷新按钮在窄屏保持不被压缩 */
-.admin-panel :is(.admin-toolbar-action, .tokens-refresh) { white-space: nowrap; flex: 0 0 auto; }
+.admin-panel .admin-toolbar-action { white-space: nowrap; flex: 0 0 auto; }

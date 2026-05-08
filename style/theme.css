@@ -298,8 +298,8 @@ html.theme-switching *::after {
 /* 表单控件 */
 .modal-form input,
 #login-form input,
-#panel_tokens :is(.admin-input, .tokens-input),
-#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) :is(.admin-input, .tokens-input),
+#panel_tokens .admin-input,
+#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) .admin-input,
 .intro-textarea {
   border: 1px solid var(--border) !important;
   background: transparent !important;
@@ -313,22 +313,22 @@ html.theme-switching *::after {
 
 .modal-form input:hover,
 #login-form input:hover,
-#panel_tokens :is(.admin-input, .tokens-input):hover,
-#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) :is(.admin-input, .tokens-input):hover,
+#panel_tokens .admin-input:hover,
+#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) .admin-input:hover,
 .intro-textarea:hover {
   background: color-mix(in srgb, var(--surface) 96%, transparent) !important;
   border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border)) !important;
 }
 
 .modal-form input::placeholder,
-#panel_tokens :is(.admin-input, .tokens-input)::placeholder,
-#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) :is(.admin-input, .tokens-input)::placeholder,
+#panel_tokens .admin-input::placeholder,
+#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) .admin-input::placeholder,
 .intro-textarea::placeholder { color: var(--text-subtle) !important; opacity: 0.8; }
 
 .modal-form input:focus,
 #login-form input:focus,
-#panel_tokens :is(.admin-input, .tokens-input):focus,
-#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) :is(.admin-input, .tokens-input):focus,
+#panel_tokens .admin-input:focus,
+#panel_permissions :is(.tokens-toolbar, .tokens-log__filters) .admin-input:focus,
 .intro-textarea:focus {
   border-color: var(--primary-2) !important;
   box-shadow: none !important;
@@ -338,8 +338,8 @@ html.theme-switching *::after {
 }
 
 /* 管理工具栏按钮与输入框边框颜色一致 */
-#panel_tokens :is(.admin-input-btn, .tokens-btn),
-#panel_permissions :is(.admin-input-btn, .tokens-btn) { border-color: var(--border) !important; }
+#panel_tokens .admin-input-btn,
+#panel_permissions .admin-input-btn { border-color: var(--border) !important; }
 #panel_tokens #tokens-compact-toggle { border-color: var(--border) !important; }
 
 /* ═══ 按钮系统 ═══════════════════════════════════════════════════════════

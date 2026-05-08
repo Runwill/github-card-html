@@ -21,6 +21,10 @@
     { value: 'rejected', key: 'permissions.log.filter.outcome.rejected', fallback: '已拒绝' },
     { value: 'cancelled', key: 'permissions.log.filter.outcome.cancelled', fallback: '已撤回' }
   ];
+  const SCOPE_FILTERS = [
+    { value: 'active', key: 'permissions.log.filter.scope.active', fallback: '当前' },
+    { value: 'trash', key: 'permissions.log.filter.scope.trash', fallback: '回收站' }
+  ];
   let KNOWN_TYPES = new Set(TYPE_GROUPS.flatMap(item => item.types || []));
 
   const { isAnimating, isOpen, openCollapsible, closeCollapsible } = window.CollapsibleAnim;
@@ -160,7 +164,8 @@
             '<button id="perms-log-reset" class="btn btn--secondary admin-input-btn" data-i18n="permissions.log.filter.reset">重置</button>',
           '</div>',
           choiceGroupHtml('type', 'permissions.log.filter.typeLabel', '类型', '日志类型', TYPE_FILTERS, 'all'),
-          choiceGroupHtml('outcome', 'permissions.log.filter.outcomeLabel', '结果', '处理结果', OUTCOME_FILTERS, 'any')
+          choiceGroupHtml('outcome', 'permissions.log.filter.outcomeLabel', '结果', '处理结果', OUTCOME_FILTERS, 'any'),
+          choiceGroupHtml('scope', 'permissions.log.filter.scopeLabel', '范围', '日志范围', SCOPE_FILTERS, 'active')
         ].join('');
         window.i18n?.applySafe?.(filters);
   // 根据语言为日期输入设置地区
@@ -190,6 +195,7 @@
             const q = filters.querySelector('#perms-log-q'); if(q) q.value = '';
             setChoiceValue(filters, 'type', 'all');
             setChoiceValue(filters, 'outcome', 'any');
+            setChoiceValue(filters, 'scope', 'active');
             const f = filters.querySelector('#perms-log-from'); if(f) f.value = '';
             const t = filters.querySelector('#perms-log-to'); if(t) t.value = '';
             updateFormatPreview();
@@ -315,7 +321,6 @@
     const filters = panel ? panel.querySelector('.tokens-log__filters') : null;
     const p = new URLSearchParams();
     p.set('page','1'); p.set('pageSize', String(MAX_LOGS));
-    p.set('includeDeleted','true');
     if (filters){
       const q = filters.querySelector('#perms-log-q');
       const from = filters.querySelector('#perms-log-from');
@@ -323,6 +328,8 @@
       const qv = q && q.value && q.value.trim(); if(qv) p.set('q', qv);
       const typeV = choiceValue(filters, 'type', 'all');
       const ocV = choiceValue(filters, 'outcome', 'any');
+      const scopeV = choiceValue(filters, 'scope', 'active');
+      if (scopeV === 'trash') p.set('deletedOnly', 'true');
       // 按动态类型与结果构建 types 参数
       if (typeV === 'all'){
         if (ocV !== 'any'){

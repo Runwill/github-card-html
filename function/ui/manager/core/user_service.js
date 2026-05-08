@@ -4,6 +4,7 @@
   'use strict';
   var w = window;
   var ns = w.CardUI.Manager.Core;
+  var USER_CACHE_KEYS = ['id','username','avatar','intro','permissions'];
 
   function _dom(){ return (ns && ns.dom) || {}; }
 
@@ -12,23 +13,11 @@
       var id = w.localStorage ? w.localStorage.getItem('id') : '';
       if (!id) return;
       var d = _dom();
-      var api = d.api || (function(u){ return u; });
-      var resp = await fetch(api('/api/user/' + encodeURIComponent(id)));
-      if (!resp) return;
-      if (resp.status === 404) {
-        if (w.localStorage) {
-          try {
-            w.localStorage.removeItem('id');
-            w.localStorage.removeItem('username');
-            w.localStorage.removeItem('avatar');
-            w.localStorage.removeItem('intro');
-            w.localStorage.removeItem('permissions');
-          } catch(_){}
-        }
-        return;
-      }
-      if (!resp.ok) return;
-      var data = await resp.json();
+      var requestJson = w.endpoints && w.endpoints.requestJson;
+      if (!requestJson) return;
+      var data;
+      try { data = await requestJson('/user/' + encodeURIComponent(id), { auth: true }); }
+      catch(e){ if (e && e.status === 404 && w.localStorage) try { USER_CACHE_KEYS.forEach(function(k){ w.localStorage.removeItem(k); }); } catch(_){}; return; }
       if (!data) return;
 
       if (typeof data.intro === 'string' && w.localStorage) w.localStorage.setItem('intro', data.intro || '');
@@ -44,10 +33,9 @@
         if (oldName !== nextName) {
           w.localStorage.setItem('username', nextName);
           try {
-            var ctrls = w.CardUI && w.CardUI.Manager && w.CardUI.Manager.Controllers;
-            var pli = ctrls && ctrls.profileInlineEdit;
-            if (pli && typeof pli.refreshUsernameUI === 'function') pli.refreshUsernameUI(nextName);
-            if (pli && typeof pli.loadPendingUsernameBadge === 'function') pli.loadPendingUsernameBadge();
+            var pli = w.CardUI?.Manager?.Controllers?.profileInlineEdit;
+            pli?.refreshUsernameUI?.(nextName);
+            pli?.loadPendingUsernameBadge?.();
           } catch(_){ }
         }
       }

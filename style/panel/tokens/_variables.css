@@ -18,8 +18,7 @@
   --tp-fs-4xl:   clamp(12px, 2.321vh, 26px);   /* 基准 22px ← 统计数字 */
 
   /* -- 需要独立于字号的尺寸 ----------------------------- */
-  --tokens-input-h:     clamp(20px, 3.797vh, 40px);    /* 旧名：输入框 / 按钮固定高度 */
-  --admin-input-h:      var(--tokens-input-h);          /* 中性名：管理输入框 / 按钮固定高度 */
+  --admin-input-h:      clamp(20px, 3.797vh, 40px);    /* 管理输入框 / 按钮固定高度 */
   --tokens-kv-key-w:    clamp(60px, 8.368vw, 180px);   /* 键值对键名列宽（横向 → vw） */
   --tokens-log-max-h:   clamp(100px, 27.426vh, 300px); /* 日志面板最大高度 */
 }
@@ -37,7 +36,7 @@ html.force-landscape {
   --tp-fs-md:         clamp(9px, 1.477vw, 16px);
   --tp-fs-2xl:        clamp(10px, 1.899vw, 20px);
   --tp-fs-4xl:        clamp(12px, 2.321vw, 26px);
-  --tokens-input-h:   clamp(20px, 3.797vw, 40px);
+  --admin-input-h:    clamp(20px, 3.797vw, 40px);
   --tokens-log-max-h: clamp(100px, 27.426vw, 300px);
 
   /* 横向尺寸：视觉宽度 = 物理高 → vh */

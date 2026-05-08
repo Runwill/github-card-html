@@ -49,7 +49,7 @@
         }
 
         // Transfer classes from select to wrapper (except input-group-field)
-        const keepOnSelect = ['input-group-field', 'setup-char-select', 'admin-input', 'tokens-input'];
+        const keepOnSelect = ['input-group-field', 'setup-char-select', 'admin-input'];
         sel.classList.forEach(cls => {
             if (!keepOnSelect.includes(cls)) {
                 wrapper.classList.add(cls);

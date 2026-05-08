@@ -217,7 +217,7 @@
 }
 
 /* ── 编辑器内独立输入框（覆盖 toolbar.css 的拼接外观） ── */
-#panel_permissions .perm-editor :is(.admin-input, .tokens-input),
+#panel_permissions .perm-editor .admin-input,
 #panel_permissions .perm-editor input[type="text"],
 #panel_permissions .perm-editor input[type="password"],
 #panel_permissions .perm-editor input[type="date"],
@@ -231,7 +231,7 @@
   width: 100%;
   min-width: 0;
   flex: 0 0 auto;
-  height: var(--admin-input-h, var(--tokens-input-h, 36px));
+  height: var(--admin-input-h, 36px);
   margin: 0;
   padding: 0.571em 0.714em;
   font-size: var(--tp-fs-md, 14px);
@@ -243,7 +243,7 @@
               color var(--dur-normal) var(--ease-default);
 }
 
-#panel_permissions .perm-editor :is(.admin-input, .tokens-input):hover,
+#panel_permissions .perm-editor .admin-input:hover,
 #panel_permissions .perm-editor input[type="text"]:hover,
 #panel_permissions .perm-editor input[type="password"]:hover,
 #panel_permissions .perm-editor input[type="date"]:hover,
@@ -252,7 +252,7 @@
   border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
 }
 
-#panel_permissions .perm-editor :is(.admin-input, .tokens-input):focus,
+#panel_permissions .perm-editor .admin-input:focus,
 #panel_permissions .perm-editor input[type="text"]:focus,
 #panel_permissions .perm-editor input[type="password"]:focus,
 #panel_permissions .perm-editor input[type="date"]:focus,

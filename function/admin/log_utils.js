@@ -54,10 +54,10 @@
         try {
           if (btn.classList.contains('btn-restore')) {
             if (restoreFn) await restoreFn(id);
-            setLogDeleted(entry, false);
+            entry.remove();
           } else {
             await deleteFn(id);
-            setLogDeleted(entry, true);
+            entry.remove();
           }
         } catch(e){ alert((e && e.message) || ''); }
       })();

@@ -8,6 +8,7 @@
 
   var $ = dom.$;
   var api = dom.api;
+  var requestJson = w.endpoints && w.endpoints.requestJson;
 
   // 共享 flash message 辅助
   function showFlash(type, text){
@@ -26,23 +27,12 @@
   // state = { saveFailed, lastTried } 会被函数修改
   async function trySave(el, url, body, state, onOk) {
     try {
-      var resp = await fetch(api(url), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      var respJson = await resp.clone().json().catch(function(){ return null; });
-      if (!resp.ok) {
-        var msg = t('error.updateFailed');
-        try { var data = await resp.json(); msg = (data && (data.message || msg)); } catch(_){ }
-        showFlash('error', msg);
-        state.saveFailed = true;
-        return;
-      }
+      var respJson = await requestJson(url, { method: 'POST', body: body, defaultMessage: t('error.updateFailed') });
       state.saveFailed = false;
       state.lastTried = '';
       await onOk(respJson);
     } catch(e) {
+      if (e && e.status) { showFlash('error', e.message || t('error.updateFailed')); state.saveFailed = true; return; }
       console.error(e);
       showFlash('error', t('error.networkRetryLater'));
       state.saveFailed = true;
@@ -92,7 +82,7 @@
       if (newIntro.length > 500) { showFlash('error', t('error.introMax')); return; }
       saving = true;
       _introState.lastTried = newIntro;
-      await trySave(introEl, '/api/intro/change', { userId: id, newIntro: newIntro }, _introState, async function(respJson) {
+      await trySave(introEl, '/intro/change', { userId: id, newIntro: newIntro }, _introState, async function(respJson) {
         if (respJson && respJson.applied) {
           if (w.localStorage) w.localStorage.setItem('intro', newIntro);
           original = newIntro; introEl.value = newIntro;
@@ -150,13 +140,9 @@
     try {
       var id = w.localStorage ? w.localStorage.getItem('id') : '';
       if (!id) return;
-      var resp = await fetch(api('/api/intro/cancel'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: id }) });
-      if (!resp.ok) {
-        try { var e = await resp.json(); alert(e && e.message ? e.message : t('error.revokeFailed')); } catch(_){ alert(t('error.revokeFailed')); }
-        return;
-      }
+      await requestJson('/intro/cancel', { method: 'POST', body: { userId: id }, defaultMessage: t('error.revokeFailed') });
       await loadPendingIntroBadge();
-    } catch(_){ alert(t('error.networkRevokeFailed')); }
+    } catch(e){ alert(e && e.status ? (e.message || t('error.revokeFailed')) : t('error.networkRevokeFailed')); }
   }
 
   function setupUsernameInlineEdit(){
@@ -191,7 +177,7 @@
         if (!id) { alert(t('error.noLoginSimple')); cleanup(); return; }
         _saving = true;
         _usernameState.lastTried = newName;
-        await trySave(nameEl, '/api/username/change', { userId: id, newUsername: newName }, _usernameState, async function(respJson) {
+        await trySave(nameEl, '/username/change', { userId: id, newUsername: newName }, _usernameState, async function(respJson) {
           if (respJson && respJson.applied) {
             if (w.localStorage) w.localStorage.setItem('username', newName);
             refreshUsernameUI(newName);
@@ -251,10 +237,9 @@
     try {
       var id = w.localStorage ? w.localStorage.getItem('id') : '';
       if (!id) return;
-      var resp = await fetch(api('/api/username/cancel'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ userId: id }) });
-      if (!resp.ok) { try { var e = await resp.json(); alert(e && e.message ? e.message : t('error.revokeFailed')); } catch(_){ alert(t('error.revokeFailed')); } return; }
+      await requestJson('/username/cancel', { method: 'POST', body: { userId: id }, defaultMessage: t('error.revokeFailed') });
       loadPendingUsernameBadge();
-    } catch(_){ alert(t('error.networkRevokeFailed')); }
+    } catch(e){ alert(e && e.status ? (e.message || t('error.revokeFailed')) : t('error.networkRevokeFailed')); }
   }
 
   w.CardUI.Manager.Controllers.profileInlineEdit = {
