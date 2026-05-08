@@ -121,7 +121,7 @@
 /* 展开 / 收起按钮 */
 #panel_tokens .expand-btn {
   position: relative;
-  padding-left: 2.154em !important; /* 28/13，基于 --tp-fs-base 13px；!important 覆盖 btn--sm 的 padding shorthand */
+  --btn-sm-padding: 0.462em 0.923em 0.462em 2.154em; /* 6/13, 12/13, 6/13, 28/13 */
   white-space: nowrap;
 }
 #panel_tokens .expand-btn::before {

@@ -44,11 +44,10 @@ html.force-landscape {
 }
 
 /* -- 全局 .btn--sm 集成 -----------------------------------
- * buttons.css .btn--sm 使用静态 --fs-base (13px) + 固定 --space 内距，
- * 此处替换为动态 token + em，使词元面板内的按钮跟随 vh 缩放。
+ * buttons.css .btn--sm 消费以下 token，使管理面板按钮跟随 vh 缩放。
  */
-#panel_tokens .btn--sm,
-#panel_permissions .btn--sm {
-  font-size: var(--tp-fs-base, 13px) !important;
-  padding: 0.462em 0.923em !important;   /* 6/13, 12/13 */
+#panel_tokens,
+#panel_permissions {
+  --btn-sm-font-size: var(--tp-fs-base, 13px);
+  --btn-sm-padding: 0.462em 0.923em;   /* 6/13, 12/13 */
 }

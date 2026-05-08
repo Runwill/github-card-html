@@ -1,8 +1,10 @@
 /* 技能行复制：样式控制 */
 
-/* 按钮位置/显隐：具体视觉风格复用 .btn + 变体类 */
 .skill-row { position: relative; }
 .skill-copy-btn {
+  --btn-xs-font-size: clamp(10px, calc(var(--fs-root, 20px) * 0.6), var(--fs-sm, 12px));
+  --btn-xs-padding: 0.167em 0.667em;
+  --btn-xs-radius: var(--radius-xs);
   position: absolute;
   left: auto;
   right: calc(100% + 0.667em); /* 贴靠在行首外侧，随按钮自身宽度自适应 */
@@ -12,42 +14,24 @@
   pointer-events: none; /* 默认不可点，防止误触 */
   user-select: none;
   z-index: 2;
-  /* 造型对齐 tokens 的“跳转”按钮（等效于 .btn .btn--secondary .btn--xs） */
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  /* 尺寸：对齐 btn--xs */
-  font-size: clamp(10px, calc(var(--fs-root, 20px) * 0.6), var(--fs-sm, 12px)) !important;
-  line-height: var(--lh-tight) !important;
-  padding: 0.167em 0.667em !important;
-  border-radius: var(--radius-xs) !important;
-  min-height: 0 !important;
-  /* 配色：对齐 btn--secondary */
-  background: transparent !important;
-  color: var(--text-muted) !important; /* gray-700 */
-  border: 1px solid var(--border) !important; /* gray-200 */
-  /* 过渡：对齐全局按钮 */
-  transition: opacity var(--dur-normal) ease, background-color var(--dur-normal) ease, color var(--dur-normal) ease, border-color var(--dur-normal) ease, box-shadow var(--dur-normal) ease, transform .08s var(--ease-default) !important;
+  min-height: 0;
+  transition: opacity var(--dur-normal) ease,
+              background-color var(--dur-normal) ease,
+              color var(--dur-normal) ease,
+              border-color var(--dur-normal) ease,
+              box-shadow var(--dur-normal) ease,
+              transform .08s var(--ease-default);
 }
 
-/* 悬浮态：对齐 btn--secondary:hover */
-/* 修正：必须保留 -50% 垂直居中基准，覆盖 btn--danger:hover 的 translateY(-1px) */
 .skill-copy-btn:hover {
   transform: translateY(calc(-50% - 1px));
-  background-color: color-mix(in srgb, var(--surface) 92%, transparent) !important; /* gray-50 */
-  border-color: color-mix(in srgb, var(--border) 80%, transparent) !important;     /* gray-300 */
-  color: var(--text) !important;            /* 改为普通文本色，去掉变蓝 */
 }
 
-/* 去掉点击后的选中效果（Focus Ring） */
 .skill-copy-btn:focus {
-  outline: none !important;
-  box-shadow: none !important;
+  outline: none;
+  box-shadow: none;
 }
 
-/* 激活态微动效（与全局按钮一致） */
-/* 修正：需保留垂直居中的 -50% 基准，否则会跳动 */
 .skill-copy-btn:active { transform: translateY(calc(-50% + 1px)); }
 
 /* 仅在“按下 Ctrl 且 hover 行/按钮”时显示 */
@@ -60,8 +44,6 @@ html.ctrl-pressed .skill-row:hover .skill-copy-btn,
 html.ctrl-pressed .skill-copy-btn:hover {
   opacity: 1;
 }
-
-/* hover 态保持使用 .btn 变体的默认样式 */
 
 /* 小屏策略（方案B）：默认不占位，只有在可见状态时才占位 */
 @media (max-width: 640px) {

@@ -9,6 +9,7 @@
   font-size: var(--fs-lg);
   font-weight: 500;
   line-height: var(--lh-tight);
+  white-space: nowrap;
   border: 1px solid transparent;
   cursor: pointer;
   user-select: none;
@@ -27,7 +28,13 @@
   box-shadow: none;
 }
 
-.btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.btn:disabled,
+.btn.is-disabled {
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:disabled { opacity: 0.7; }
 
 .btn--block { width: 100%; }
 
@@ -36,29 +43,33 @@
 .btn--primary:active, .btn--secondary:active, .btn--accent:active, .btn--success:active, .btn--danger:active { transform: translateY(0.5px); }
 
 
-/* 统一“禁用样式/悬浮”——用于只读用户下的可点提示（不屏蔽点击，以便弹 toast） */
+/* 统一模拟禁用：不屏蔽点击，以便只读用户触发 toast */
 .btn.is-disabled {
-  opacity: 0.5 !important;
-  cursor: not-allowed !important;
-  box-shadow: none !important;
-  transform: none !important;
+  opacity: 0.5;
+  box-shadow: none;
 }
 .btn.is-disabled:hover {
-  background-color: inherit !important;
-  color: inherit !important;
+  transform: none;
 }
 /* 去掉悬浮提示，禁用态仅提供视觉弱化；提示改为点击后 toast */
 
 
 /* 小尺寸按钮（列表内使用） */
 .btn--sm {
-  padding: var(--space-xs) var(--space-lg) !important;
-  font-size: var(--fs-base) !important;
-  border-radius: var(--radius-sm) !important;
+  padding: var(--btn-sm-padding, var(--space-xs) var(--space-lg));
+  font-size: var(--btn-sm-font-size, var(--fs-base));
+  border-radius: var(--btn-sm-radius, var(--radius-sm));
+}
+
+.btn--xs {
+  padding: var(--btn-xs-padding, 0.167em 0.667em);
+  font-size: var(--btn-xs-font-size, var(--fs-sm));
+  line-height: var(--btn-xs-line-height, var(--lh-tight));
+  border-radius: var(--btn-xs-radius, var(--radius-xs));
 }
 
 /* 间距工具（用于堆叠按钮轻微错位） */
-.btn--mt-2 { margin-top: var(--space-3xs) !important; }
+.btn--mt-2 { margin-top: var(--space-3xs); }
 
 /* 全站按钮的移动端防误触设置（与“返回顶部按钮/水波按钮”保持一致） */
 button,

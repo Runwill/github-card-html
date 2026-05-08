@@ -35,6 +35,13 @@ html.force-landscape {
 }
 
 #panel_draft .draft-page {
+  --btn-sm-font-size: var(--tp-fs-base, 13px);
+  --btn-sm-padding: 0.462em 0.923em;
+  --editor-node-guide-1: color-mix(in srgb, var(--primary-2) 42%, var(--border));
+  --editor-node-guide-2: color-mix(in srgb, var(--success) 38%, var(--border));
+  --editor-node-guide-3: color-mix(in srgb, var(--danger) 30%, var(--border));
+  --editor-node-guide-4: color-mix(in srgb, var(--primary-3) 58%, var(--border));
+  --editor-node-guide-5: color-mix(in srgb, var(--text-subtle) 60%, var(--border));
   color: var(--text);
   display: grid;
   grid-template-rows: minmax(0, var(--draft-live-min-h, 220px)) minmax(0, 1fr);
@@ -435,8 +442,8 @@ html.force-landscape {
   margin-bottom: 0.333em;
 }
 
-#panel_draft #editor-recommend-direction {
-  padding: 0.286em 0.714em !important;
+#panel_draft .editor-recommend-direction {
+  --btn-sm-padding: 0.286em 0.714em;
 }
 
 #panel_draft .editor-recommendation-head .editor-subtitle {
@@ -731,11 +738,6 @@ html.force-landscape {
   border: 1px dashed var(--border);
   border-radius: var(--radius-md);
   color: var(--text-subtle);
-}
-
-#panel_draft .btn--sm {
-  font-size: var(--tp-fs-base, 13px) !important;
-  padding: 0.462em 0.923em !important;
 }
 
 #panel_draft .editor-search-row .editor-search {

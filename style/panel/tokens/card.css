@@ -32,6 +32,10 @@
 
 /* 卡片工具条：悬浮角标 */
 #tokens-content .token-card__toolbar {
+  --btn-xs-font-size: var(--tp-fs-sm, 12px);
+  --btn-xs-padding: 0.167em 0.667em;
+  --btn-xs-line-height: var(--lh-tight);
+  --btn-xs-radius: var(--radius-xs);
   position: absolute;
   top: 0.333em;                /* 6/18 */
   right: 0.444em;              /* 8/18 */
@@ -56,14 +60,6 @@
 
 /* Ctrl 按住时隐藏属性删除按钮 */
 .ctrl-down #tokens-content .kv-row .kv-actions { display: none; }
-
-/* 小号按钮 */
-#tokens-content .btn--xs {
-  font-size: var(--tp-fs-sm, 12px);
-  padding: 0.167em 0.667em;     /* 2/12, 8/12 — 基于 --tp-fs-sm 12px */
-  line-height: var(--lh-tight);
-  border-radius: var(--radius-xs);
-}
 
 /* 危险按钮 */
 #tokens-content .btn--danger {

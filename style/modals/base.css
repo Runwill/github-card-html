@@ -247,9 +247,9 @@
   min-width: 6.154em; /* 80/13 */
 }
 
-.modal .btn--sm {
-  font-size: var(--modal-fs-base, 13px) !important;
-  padding: 0.462em 0.923em !important; /* 6/13, 12/13 */
+.modal {
+  --btn-sm-font-size: var(--modal-fs-base, 13px);
+  --btn-sm-padding: 0.462em 0.923em; /* 6/13, 12/13 */
 }
 
 .setting-control {

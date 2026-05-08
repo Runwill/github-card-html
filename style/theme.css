@@ -445,7 +445,8 @@ html[data-theme="dark"] .btn.is-active:hover {
 }
 
 /* ── Disabled（统一禁用色） ── */
-.btn:disabled {
+.btn:disabled,
+.btn.is-disabled {
   background: color-mix(in srgb, var(--border) 70%, transparent) !important;
   color: var(--text-subtle) !important;
   border-color: var(--border) !important;

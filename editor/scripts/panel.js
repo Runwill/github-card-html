@@ -31,6 +31,7 @@
   var pointerDrag = null;
   var POINTER_DRAG_THRESHOLD = 6;
   var HISTORY_LIMIT = 80;
+  var GUIDE_COLOR_COUNT = 5;
 
   function t(key, params) {
     return window.t ? window.t(key, params) : key;
@@ -377,14 +378,7 @@
     list.className = 'editor-node-list';
     list.setAttribute('role', depth ? 'group' : 'tree');
     if (depth) {
-      var guideColors = [
-        'color-mix(in srgb, var(--primary-2) 42%, var(--border))',
-        'color-mix(in srgb, var(--success) 38%, var(--border))',
-        'color-mix(in srgb, var(--danger) 30%, var(--border))',
-        'color-mix(in srgb, var(--primary-3) 58%, var(--border))',
-        'color-mix(in srgb, var(--text-subtle) 60%, var(--border))'
-      ];
-      list.style.setProperty('--editor-node-guide-color', guideColors[(depth - 1) % guideColors.length]);
+      list.style.setProperty('--editor-node-guide-color', 'var(--editor-node-guide-' + (((depth - 1) % GUIDE_COLOR_COUNT) + 1) + ')');
     }
     nodes.forEach(function (node) {
       list.appendChild(renderNode(node, depth));

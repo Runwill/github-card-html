@@ -167,14 +167,6 @@ html[data-theme="elegant"] .btn--ghost:hover {
   color: var(--primary-1) !important;
 }
 
-/* ── Disabled：典雅暗淡 ── */
-html[data-theme="elegant"] .btn:disabled {
-  background: rgba(211, 173, 107, 0.04) !important;
-  color: rgba(211, 173, 107, 0.35) !important;
-  border-color: rgba(211, 173, 107, 0.12) !important;
-  box-shadow: none !important;
-}
-
 /* 典雅主题：Header 金色底线 */
 html[data-theme="elegant"] #header {
   background: rgba(11, 17, 21, 0.92) !important;
@@ -231,6 +223,15 @@ html[data-theme="elegant"] .btn.is-active {
 }
 html[data-theme="elegant"] .btn.is-active:hover {
   background: rgba(211, 173, 107, 0.08) !important;
+}
+
+/* ── Disabled：典雅暗淡 ── */
+html[data-theme="elegant"] .btn:disabled,
+html[data-theme="elegant"] .btn.is-disabled {
+  background: rgba(211, 173, 107, 0.04) !important;
+  color: rgba(211, 173, 107, 0.35) !important;
+  border-color: rgba(211, 173, 107, 0.12) !important;
+  box-shadow: none !important;
 }
 
 /* 典雅主题：滚动条 */
