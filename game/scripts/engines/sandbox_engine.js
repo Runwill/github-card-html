@@ -41,15 +41,9 @@
         }
 
         _setupPlayers(config) {
-             let playersData;
-             if (config && Array.isArray(config.players)) {
-                  playersData = config.players;
-             } else {
-                  // 如果未提供配置，回退到一个基本配置，或者空数组
-                  // playersData = window.Game.MockData.mockCharacters; // 已移除
-                  playersData = [];
-                  console.warn("[Sandbox] No players config provided and no MockData available.");
-             }
+               const hasPlayersConfig = config && Array.isArray(config.players);
+               const playersData = hasPlayersConfig ? config.players : [];
+               if (!hasPlayersConfig) console.warn("[Sandbox] No players config provided; starting with no players.");
      
              this.state.players = playersData.map((char, index) => {
                  const Player = window.Game.Models.Player;
@@ -64,7 +58,7 @@
 
         _distributeCards(config) {
              const Area = window.Game.Models.Area;
-             const Card = window.Game.Models.Card; // 使用 Card 类
+                         const Card = window.Game.Models.Card;
              const shuffle = window.Game.Utils.shuffle;
              
              // 重置牌组
@@ -73,7 +67,7 @@
              this.state.treatmentArea = new Area('treatmentArea', Area.Configs.TreatmentArea);
              
              // 填充牌组 
-             if (config && config.deck && Array.isArray(config.deck) && config.deck.length > 0) {
+             if (config && Array.isArray(config.deck) && config.deck.length > 0) {
                  // 使用配置中的 deck (字符串数组)
                  this.state.pile.cards = config.deck.map(cardName => new Card(cardName));
              } else {
@@ -91,8 +85,7 @@
                  }
              });
              
-             // 初始抽牌 (可选的沙盒设置，或许从空手牌开始?)
-             // Let's give them 4 cards to start playing with
+             // 初始抽牌
              this.state.players.forEach(player => {
                  player.drawCards(this.state.pile, 4);
                  // 修正抽到手牌的可见性：手牌对持有者可见
@@ -118,7 +111,6 @@
         modifyHealth(roleId, delta) {
             const player = this.state.players.find(p => p.id === roleId);
             if (player) {
-                // Manual mode: Allow exceeding health limit (removed Math.min)
                 player.health = Math.max(player.health + delta, 0);
                 if (window.Game.UI.updateUI) window.Game.UI.updateUI();
             }

@@ -149,11 +149,10 @@
     min-width: var(--game-setup-toggle-minw, 48px);
     border: 1px solid var(--border);
     background: transparent;
-    color: var(--text-muted, #999);
+    color: var(--text);
     padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important; /* override Foundation :last-child reset */
     font-size: var(--game-form-fs, var(--fs-base));
-    font-weight: 600;
     cursor: pointer;
     user-select: none;
     transition:

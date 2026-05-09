@@ -346,7 +346,7 @@ html.theme-switching *::after {
    架构：buttons.css → 结构/布局/尺寸/交互反馈
          theme.css   → 色彩/主题/变体
    每个填充变体声明 --_btn-accent（主色）和可选 --_btn-accent-soft（柔和色），
-  统一的 .btn.is-active 规则使用柔和底色和边框标记状态，明暗模式通用。
+  统一的 .btn.is-active 规则使用透明底、有色文字和描边标记状态，明暗模式通用。
 */
 .btn { color: var(--text) }
 
@@ -428,20 +428,18 @@ html[data-theme="dark"] .btn--accent {
   color: var(--text) !important;
 }
 
-/* ── 双状态通用：激活时以柔和底色标记，不改变文字语义（明暗模式通用） ── */
+/* ── 双状态通用：激活时透明底 + 有色文字 + 描边（明暗模式通用） ── */
 /* 需要 html[data-theme="dark"] 前缀以打赢深色模式变体的特异性 */
 .btn.is-active,
 html[data-theme="dark"] .btn.is-active {
-  background: color-mix(in srgb, var(--_btn-accent-soft, var(--_btn-accent, var(--primary-2))) 12%, transparent) !important;
-  color: var(--text) !important;
-  border-color: color-mix(in srgb, var(--_btn-accent, var(--primary-2)) 52%, var(--border)) !important;
-  box-shadow: inset 0 0 0 1px var(--primary-ring) !important;
+  background: transparent !important;
+  color: var(--_btn-accent) !important;
+  border: 1.5px solid var(--_btn-accent) !important;
+  box-shadow: none !important;
 }
 .btn.is-active:hover,
 html[data-theme="dark"] .btn.is-active:hover {
-  background: color-mix(in srgb, var(--_btn-accent-soft, var(--_btn-accent, var(--primary-2))) 16%, transparent) !important;
-  color: var(--text) !important;
-  border-color: color-mix(in srgb, var(--_btn-accent, var(--primary-2)) 58%, var(--border)) !important;
+  background: color-mix(in srgb, var(--_btn-accent-soft, var(--_btn-accent)) 10%, transparent) !important;
 }
 
 /* ── Disabled（统一禁用色） ── */

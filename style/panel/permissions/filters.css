@@ -1,8 +1,8 @@
 /* style/panel/permissions/filters.css -- 权限页日志筛选条
  *
- * .tokens-log__filters 是筛选条 owner：
+ * .tokens-log__filters 是权限日志筛选布局 owner：
  *   - 主查询/日期/动作使用 .tokens-log__filters-main.admin-input-group 贴边拼接。
- *   - 类型/结果使用 .perms-log-choice 连续按钮轨，不再复制隐藏 select 状态。
+ *   - 类型/结果/范围使用 toolbar.css 的 .admin-segmented 连续按钮轨。
  *   - 尺寸继续消费 toolbar.css 提供的 --admin-input-h 与 --tp-fs-md。
  */
 
@@ -64,56 +64,3 @@
 
 #panel_permissions .tokens-log__filters-main > :is(.btn, button):hover,
 #panel_permissions .tokens-log__filters-main > :is(.btn, button):focus { z-index: 2; }
-
-.perms-log-choice {
-  position: relative;
-  min-width: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0;
-  overflow: visible;
-  border-radius: var(--radius-none);
-  background: transparent;
-}
-
-.perms-log-choice + .perms-log-choice {
-  margin-top: -1px;
-}
-
-.perms-log-choice__label,
-.perms-log-choice__btn {
-  min-height: 2.25em;
-  display: inline-flex;
-  align-items: center;
-  line-height: var(--lh-tight);
-}
-
-.perms-log-choice__label {
-  flex: 0 0 auto;
-  padding: 0 0.778em;
-  border: 1px solid var(--border);
-  color: var(--text-subtle);
-  font-size: var(--tp-fs-sm, 12px);
-  font-weight: 600;
-  background: color-mix(in srgb, var(--surface) 92%, var(--border));
-  z-index: 0;
-}
-
-.perms-log-choice .perms-log-choice__btn {
-  flex: 1 1 auto;
-  border-radius: var(--radius-none) !important;
-  margin-right: -1px;
-  white-space: nowrap;
-  z-index: 0;
-}
-
-.perms-log-choice__label + .perms-log-choice__btn { margin-left: -1px; }
-
-.perms-log-choice__btn:hover,
-.perms-log-choice__btn.is-active {
-  z-index: 1;
-}
-
-.perms-log-choice__btn:focus-visible {
-  z-index: 2;
-}

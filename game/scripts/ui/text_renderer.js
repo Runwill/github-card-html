@@ -13,14 +13,7 @@
     const GameText = {
         
         // 模板注册表 - 可通过配置扩展
-        templates: {
-            // 示例:
-            'Round': '第 {n} <round></round>', 
-            
-            // 下方映射已移除，直接使用 attack/dodge 作为键值
-            // 'Sha': '<attack></attack>',
-            // 'Shan': '<dodge></dodge>',
-        },
+        templates: {},
 
         config: {
             useI18n: true
@@ -44,8 +37,7 @@
          * 优先级:
          * 1. 明确在 `templates` 中注册的模板
          * 2. i18n 查找（如果启用）
-         * 3. 自动生成："<Key></Key>"（如果键看起来像一个术语）
-         * 4. 原始文本
+         * 3. 原始文本
          */
         getTemplate(key) {
             // 1. 已注册模板
@@ -64,13 +56,6 @@
                 // 我们可能需要迁移这些通过使用标签。
             }
 
-            // 3. 回退：假设它是一个 Term 标签
-            // 转换为小驼峰或帕斯卡命名法？
-            // term.js 期望 TAG NAME 与 `en` 属性匹配（HTML 中通常不区分大小写，但 map 使用大写）
-            // 如果键是 'Turn'，标签为 <Turn> 或 <turn>
-            // [用户请求移除 implicit fallback]
-            // return `<${key}></${key}>`;
-            
             // 如果找不到模板，返回原始键名，以便调试即时发现缺失
             console.warn(`[GameText] Template not found for key: "${key}"`);
             return key; 
@@ -109,10 +94,6 @@
         // 注册武将术语模板
         // 前端生成方式参考: <characterName class="characterID{id}"></characterName>
         'Character': '<characterName class="characterID{id}">{name}</characterName>',
-        // 注册卡牌术语模板
-        // 卡牌渲染直接使用卡牌名称标签，例如 <SHA>，text_renderer 默认 fallback 到 <Key> 已经覆盖了大部分情况
-        // 但为了明确语义或特殊处理，我们可以显式声明
-        // 'Card': '<{name}></{name}>' // 动态生成
     });
 
     // 暴露

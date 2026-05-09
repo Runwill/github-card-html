@@ -1,6 +1,14 @@
 (function() {
     const { fitSummaryName, setupHandInspector, resolveAvatarUrl, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
 
+    function createSummaryButton(className, text, title) {
+        const button = document.createElement('button');
+        button.className = className;
+        button.innerText = text;
+        if (title) button.title = title;
+        return button;
+    }
+
     /**
      * 渲染角色列表 (Role List)
      * 场上所有角色的列表
@@ -140,11 +148,16 @@
                 hpSpan.className = 'player-hp stat-hp';
                 statsDiv.appendChild(hpSpan);
 
-                const summaryEquipBtn = document.createElement('button');
-                summaryEquipBtn.className = 'equip-detail-btn summary-equip-btn';
-                summaryEquipBtn.title = 'Equipment';
-                summaryEquipBtn.innerText = '備'; 
-                statsDiv.appendChild(summaryEquipBtn);
+                const btnGroup = document.createElement('div');
+                btnGroup.className = 'stats-btn-group';
+
+                const summaryJudgeBtn = createSummaryButton('judge-detail-btn summary-judge-btn', '判');
+                btnGroup.appendChild(summaryJudgeBtn);
+
+                const summaryEquipBtn = createSummaryButton('equip-detail-btn summary-equip-btn', '備', 'Equipment');
+                btnGroup.appendChild(summaryEquipBtn);
+
+                statsDiv.appendChild(btnGroup);
                 
                 pEl.appendChild(statsDiv);
                 
@@ -236,33 +249,21 @@
             // Judge Button
             let summaryJudgeBtn = pEl.querySelector('.summary-judge-btn');
             if (!summaryJudgeBtn) {
-                 summaryJudgeBtn = document.createElement('button');
-                 summaryJudgeBtn.className = 'judge-detail-btn summary-judge-btn';
-                 summaryJudgeBtn.innerText = '判';
-                 const equipBtn = btnGroup.querySelector('.summary-equip-btn');
-                 if (equipBtn) {
-                     btnGroup.insertBefore(summaryJudgeBtn, equipBtn);
-                 } else {
-                     btnGroup.appendChild(summaryJudgeBtn);
-                 }
-            } else {
-                if (summaryJudgeBtn.parentElement !== btnGroup) {
-                    btnGroup.appendChild(summaryJudgeBtn);
-                }
+                 summaryJudgeBtn = createSummaryButton('judge-detail-btn summary-judge-btn', '判');
+            }
+            if (summaryJudgeBtn.parentElement !== btnGroup) {
+                const equipBtn = btnGroup.querySelector('.summary-equip-btn');
+                btnGroup.insertBefore(summaryJudgeBtn, equipBtn || null);
             }
             setupJudgeButton(summaryJudgeBtn, role, GameText);
             
             // Equipment Button
             let summaryEquipBtn = pEl.querySelector('.summary-equip-btn');
             if (!summaryEquipBtn) {
-                 summaryEquipBtn = document.createElement('button');
-                 summaryEquipBtn.className = 'equip-detail-btn summary-equip-btn';
-                 summaryEquipBtn.innerText = '備';
+                 summaryEquipBtn = createSummaryButton('equip-detail-btn summary-equip-btn', '備', 'Equipment');
                  btnGroup.appendChild(summaryEquipBtn);
-            } else {
-                if (summaryEquipBtn.parentElement !== btnGroup) {
-                    btnGroup.appendChild(summaryEquipBtn);
-                }
+            } else if (summaryEquipBtn.parentElement !== btnGroup) {
+                btnGroup.appendChild(summaryEquipBtn);
             }
             setupEquipmentButton(summaryEquipBtn, role, GameText);
 

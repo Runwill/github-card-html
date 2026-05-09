@@ -1,0 +1,154 @@
+/* style/panel/admin_controls.css -- 管理面板共享输入组与分段控件 */
+
+/* 输入组（搜索 + 动作按钮） */
+.admin-panel .admin-input-group {
+  display: inline-flex;
+  align-items: stretch;
+  max-width: 60vw;
+}
+
+.admin-input-group > :is(.admin-input, .admin-input-btn, .btn, button, .custom-select) {
+  position: relative;
+}
+
+.admin-input-group > :is(.admin-input, .admin-input-btn, .btn, button, .custom-select) + :is(.admin-input, .admin-input-btn, .btn, button, .custom-select) {
+  margin-left: -1px;
+}
+
+.admin-input-group > .admin-input:hover,
+.admin-input-group > .admin-input:focus { z-index: 3; }
+
+.admin-input-group > :is(.admin-input-btn, .btn, button):hover,
+.admin-input-group > :is(.admin-input-btn, .btn, button):focus,
+.admin-input-group > .custom-select:hover,
+.admin-input-group > .custom-select:focus-within,
+.admin-input-group > .custom-select.is-open { z-index: 2; }
+
+.admin-panel .admin-input {
+  height: var(--admin-input-h, 36px);
+  flex: 1 1 17.143em;
+  padding: 0.571em 0.714em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  font-size: var(--tp-fs-md, 14px);
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: none;
+  line-height: var(--lh-tight);
+  transition:
+    border-color var(--dur-normal) var(--ease-default),
+    box-shadow var(--dur-normal) var(--ease-default);
+}
+
+.admin-panel .admin-input::placeholder { color: var(--text-subtle); }
+
+.admin-panel .admin-input-btn {
+  height: var(--admin-input-h, 36px);
+  padding: 0 0.857em;
+  border: 1px solid var(--border);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: var(--tp-fs-md, 14px);
+  line-height: var(--lh-tight);
+  display: inline-flex;
+  align-items: center;
+}
+
+.admin-panel .admin-input-group .admin-input-btn { border-radius: var(--radius-none); }
+.admin-panel .admin-input-group .admin-input-btn:last-of-type { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+.admin-panel .admin-input-btn:focus,
+.admin-panel .btn:focus { outline: none; box-shadow: none; }
+
+.admin-panel .admin-input-btn:focus-visible,
+.admin-panel .btn:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--primary-2) 72%, var(--border));
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.admin-panel .mode-toggle {
+  transition:
+    background-color var(--dur-normal) var(--ease-standard),
+    border-color var(--dur-normal) var(--ease-standard),
+    color var(--dur-normal) var(--ease-standard);
+}
+
+.admin-panel .admin-toolbar-action { white-space: nowrap; flex: 0 0 auto; }
+
+/* 连续分段选择轨（多行筛选、单选标签等） */
+.admin-panel .admin-segmented {
+  --admin-segmented-border-width: 1px;
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  overflow: visible;
+  border-radius: var(--radius-none);
+  background: transparent;
+}
+
+.admin-panel .admin-segmented + .admin-segmented { margin-top: calc(-1 * var(--admin-segmented-border-width)); }
+
+.admin-panel .admin-segmented__label,
+.admin-panel .admin-segmented__btn {
+  min-height: 2.25em;
+  display: inline-flex;
+  align-items: center;
+  line-height: var(--lh-tight);
+}
+
+.admin-panel .admin-segmented__label {
+  flex: 0 0 auto;
+  padding: 0 0.778em;
+  border: var(--admin-segmented-border-width) solid var(--border);
+  color: var(--text-subtle);
+  font-size: var(--tp-fs-sm, 12px);
+  font-weight: 600;
+  background: color-mix(in srgb, var(--surface) 92%, var(--border));
+}
+
+.admin-panel .admin-segmented__btn {
+  position: relative;
+  flex: 1 1 auto;
+  justify-content: center;
+  padding: var(--btn-sm-padding, var(--space-xs) var(--space-lg));
+  margin-right: calc(-1 * var(--admin-segmented-border-width));
+  border: var(--admin-segmented-border-width) solid var(--border);
+  border-radius: var(--radius-none);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: var(--btn-sm-font-size, var(--fs-base));
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-normal) var(--ease-default),
+    color var(--dur-normal) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default);
+  z-index: 0;
+}
+
+.admin-panel .admin-segmented__label + .admin-segmented__btn { margin-left: calc(-1 * var(--admin-segmented-border-width)); }
+
+.admin-panel .admin-segmented__btn:hover,
+.admin-panel .admin-segmented__btn:focus-visible {
+  background: color-mix(in srgb, var(--primary-2) 7%, var(--surface));
+  border-color: color-mix(in srgb, var(--primary-2) 34%, var(--border));
+  color: var(--text);
+}
+
+.admin-panel .admin-segmented__btn:hover { z-index: 1; }
+
+.admin-panel .admin-segmented__btn.is-active {
+  background: transparent;
+  border-color: var(--primary-2);
+  color: var(--primary-2);
+  z-index: 2;
+}
+
+.admin-panel .admin-segmented__btn:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--primary-2) 72%, var(--border));
+  outline-offset: 2px;
+  z-index: 3;
+}

@@ -218,7 +218,7 @@ html[data-theme="elegant"] .badge.badge-permission {
 html[data-theme="elegant"] .btn.is-active {
   background: transparent !important;
   color: var(--primary-1) !important;
-  border-color: var(--primary-1) !important;
+  border: 1.5px solid var(--primary-1) !important;
   box-shadow: none !important;
 }
 html[data-theme="elegant"] .btn.is-active:hover {

@@ -3,11 +3,8 @@
 
     // 依赖项
     const GameState = window.Game.GameState;
-    const Area = window.Game.Models.Area;
     const shuffle = window.Game.Utils.shuffle;
     const Events = window.Game.Core.Events;
-    const MockData = window.Game.MockData; 
-
 
     const Settings = {
         autoRunDelay: 0 // 默认 0ms
@@ -115,16 +112,7 @@
     }
 
     function startGame(customConfig) {
-        let playersData;
-        
-        if (customConfig && Array.isArray(customConfig.players)) {
-             // 使用自定义配置（来自 Setup 环节）
-             playersData = customConfig.players;
-        } else {
-             // 使用默认 Mock 数据 (已移除，设为空)
-             playersData = [];
-             // playersData = MockData.mockCharacters;
-        }
+        const playersData = (customConfig && Array.isArray(customConfig.players)) ? customConfig.players : [];
 
         // Initialize Public Areas (Reset all to clean state)
         const Area = window.Game.Models.Area;
@@ -145,8 +133,6 @@
                 return c;
             });
         } else {
-            // Default Fallback
-            // 统一使用 Card.generateStandardDeck
             GameState.pile.cards = Card.generateStandardDeck(80);
         }
         
@@ -332,14 +318,6 @@
             }
             checkAutoAdvance();
         }
-    }
-
-    function endTurn() {
-        // Deprecated/Modified logic
-        // This function was used when flow was just TurnProcess. 
-        // Now flow handles it naturally.
-        // We can force advance until TurnProcess ends if needed, but for now let's just use advanceState.
-        advanceState(); 
     }
 
     function checkAutoAdvance() {
