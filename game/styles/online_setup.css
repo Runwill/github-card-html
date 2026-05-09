@@ -140,7 +140,7 @@
 }
 
 /* ── Click Toggle (用于自动时机/允许旁观等 是/否 切换) ──────────────────── */
-/* 样式与 .input-group-field (select) 保持一致 */
+/* 基础尺寸与 .input-group-field (select) 保持一致；状态由 is-active / is-locked 表达 */
 
 .setup-click-toggle {
     display: inline-flex;
@@ -161,11 +161,6 @@
         color var(--dur-normal) var(--ease-default),
         opacity var(--dur-normal) var(--ease-default);
     box-sizing: border-box;
-}
-
-.setup-click-toggle:hover:not(.is-locked) {
-    background: color-mix(in srgb, var(--surface) 96%, transparent);
-    border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
 }
 
 .setup-click-toggle.is-active {
