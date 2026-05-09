@@ -435,17 +435,6 @@ html[data-theme="elegant"] .btn-inline-action.btn-copy:hover {
   background: rgba(211, 173, 107, 0.10);
 }
 
-/* ── Tokens：btn--xs + btn--danger 组合（属性删除按钮等） ── */
-html[data-theme="elegant"] #tokens-content .btn--danger {
-  background: rgba(200, 92, 92, 0.08);
-  color: #d08080;
-  border-color: rgba(200, 92, 92, 0.25);
-}
-html[data-theme="elegant"] #tokens-content .btn--danger:hover {
-  background: rgba(200, 92, 92, 0.18);
-  color: #e8a0a0;
-}
-
 /* ── Permissions 日志筛选按钮（is-active 已覆盖，此处补 tokens-log 滚动条） ── */
 html[data-theme="elegant"] .tokens-log__body {
   scrollbar-color: rgba(211, 173, 107, 0.25) transparent;

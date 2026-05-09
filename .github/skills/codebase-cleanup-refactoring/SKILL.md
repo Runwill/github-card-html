@@ -52,7 +52,8 @@ user-invocable: true
 - 先问“已有 owner 是谁”：API 用 `window.endpoints.requestJson`，i18n 安全刷新用 `window.i18n.applySafe`，时间格式用 `window.TimeFmt`，页签可见性用 `window.TabsUI`，不要再引入平行全局对象。
 - 先合并重复样板，再考虑抽象：重复 `fetch + headers + JSON + 错误解析`、重复 localStorage 容错、重复 active/hover/focus 样式、重复 DOM 事件委托，都应优先改为消费既有 owner。
 - 统计应区分当前批次与总工作树：存在 staged/unstaged 混合时，用 `git diff --shortstat`、`git diff --cached --shortstat` 或 `git diff HEAD --shortstat` 说明口径。
-- 每一轮结束时告诉用户“需要检查什么功能”，按用户实际能点到的功能列出，不只说文件名或函数名。
+- 每一轮结束时告诉用户“需要检查什么功能”，按用户实际能点到的功能列出，不只说文件名或函数名；报告 UI 审查 finding 时同时给出网站里的入口路径、菜单层级或可点击位置，不能只给源码位置和选择器。
+- 汇报“移除某机制 / 改用某 owner”时，必须翻译成具体用户可见差异：颜色或背景、边框或圆角、字号或字重、内距、阴影，以及 hover / focus / active / disabled 等交互状态分别会怎么变。
 - 如果用户要求记录内部清理轨迹，公告写概括性用户视角条目，不写文件名、函数名、选择器或实现细节。
 - 写公告前先查看当前日期已有条目；同一清理主题或同一功能结果要改写/合并相邻条目，不要把一个连续清理拆成多条短公告。
 
