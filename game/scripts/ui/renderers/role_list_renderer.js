@@ -11,10 +11,7 @@
         const containerTop = document.getElementById('role-list-top');
         const containerRight = document.getElementById('role-list-right');
 
-        // Fallback for setups without new layout (if any)
-        const legacyContainer = document.getElementById('role-list-container');
-        
-        if (!containerLeft && !containerTop && !containerRight && !legacyContainer) return;
+        if (!containerLeft && !containerTop && !containerRight) return;
 
         // "Main" player is now the Perspective Player (Center of layout)
         const mainPlayerIndex = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
@@ -27,12 +24,10 @@
             if (diff === 0) return;
 
             // Determine Target Container
-            let targetContainer = legacyContainer;
-            if (!targetContainer) {
-                if (playerCount >= 4 && diff === 1) targetContainer = containerRight;
-                else if (playerCount >= 4 && diff === playerCount - 1) targetContainer = containerLeft;
-                else targetContainer = containerTop;
-            }
+            let targetContainer;
+            if (playerCount >= 4 && diff === 1) targetContainer = containerRight;
+            else if (playerCount >= 4 && diff === playerCount - 1) targetContainer = containerLeft;
+            else targetContainer = containerTop;
 
             let pEl = document.getElementById(`player-summary-${role.id}`);
             
@@ -336,7 +331,7 @@
         });
         
         // 清理移除的角色
-        const allContainers = [containerLeft, containerTop, containerRight, legacyContainer];
+        const allContainers = [containerLeft, containerTop, containerRight];
         allContainers.forEach(container => {
             if (!container) return;
             Array.from(container.children).forEach(child => {

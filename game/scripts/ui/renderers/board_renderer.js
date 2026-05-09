@@ -25,7 +25,7 @@
                 const options = isFaceDown ? { forceFaceDown: true } : {};
                 window.Game.UI.renderCardList(containerId, pileData.cards || [], dropZoneId, options);
             }
-            // 初始化轮盘检视器
+            // 绑定点击检视器
             setupPileInspector(container, pileData.cards || [], isFaceDown);
         }
     }
@@ -98,14 +98,7 @@
     }
 
     /**
-     * 设置轮盘式检视器
-     *
-     * @param {HTMLElement} container - 鼠标交互的目标容器 (如 pile-container)
-     * @param {Array} cards - 数据源
-     * @param {boolean} forceBack - 是否强制显示背面
-     */
-    /**
-     * 设置点击式检视器 (原轮盘检视器已移除)
+     * 设置点击式检视器
      *
      * @param {HTMLElement} container - 鼠标交互的目标容器 (如 pile-container)
      * @param {Array} cards - 数据源
@@ -118,10 +111,6 @@
         const wrapper = container.closest('.board-pile-slot');
         if (!wrapper) return;
 
-        // Cleanup legacy inspector overlay
-        const oldOverlay = wrapper.querySelector('.pile-inspector-overlay');
-        if (oldOverlay) oldOverlay.remove();
-        
         // 绑定数据到 wrapper
         wrapper._inspectorCards = cards;
         wrapper._inspectorForceBack = forceBack;

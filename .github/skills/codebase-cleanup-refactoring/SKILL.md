@@ -1,6 +1,6 @@
 ---
 name: codebase-cleanup-refactoring
-description: "Use when: 清理 card-html 技术债、合并同类语义定义、删除重复逻辑/冗余 CSS/JS/HTML、简化不合理架构、统一原生控件与自定义控件实现、处理屎山代码、减少覆盖层和死代码。"
+description: "Use when: 清理 card-html 技术债、合并同类语义定义、删除重复逻辑/冗余 CSS/JS/HTML、简化不合理架构、统一原生控件与自定义控件实现、处理屎山代码、减少覆盖层和死代码，处理 CSS !important、specificity、选择器优先级回归。"
 argument-hint: "说明要清理的区域、重复现象或可疑架构"
 user-invocable: true
 ---
@@ -64,6 +64,8 @@ user-invocable: true
 - 共享输入类如果带有工具栏布局语义（如 flex 增长或固定 flex-basis），独立表单字段必须在所属 owner 中中和这部分布局语义；不要让横向输入组尺寸规则泄漏到纵向表单。
 - 浅色/深色主题的焦点反馈保持克制；典雅主题允许保留独立金色质感，但也应通过主题层集中表达。
 - 发现 `!important` 链、重复断点、重复 font-size、硬编码 3px ring 等，优先回到原定义清理。
+- 删除 `!important` 前必须先查同属性的所有候选 owner，并比较选择器 specificity 和加载顺序；如果组件特化选择器（如页面/区域名 + 子控件）会压过模式 owner，应删除或降级这个特化选择器，而不是把 `!important` 加回去。
+- 清理模式类（如 `is-*`、`area-*`、`mode-*`）时，要验证每个模式组合的 computed style；至少覆盖“基础类 + 模式类 + 页面特化父类”的组合，防止净删后被旧 selector 抢回布局、间距、定位或显隐。
 - 审查树、表格、两栏列表、输入组等固定格式控件时，重点搜索“同一几何结果的多重来源”：CSS token、元素真实 margin/padding/border、JS 测量值、内联 style、兼容 class 若同时参与同一列宽或间距，应收敛为单一 owner，并删除旧变量/旧类回退。
 
 ## JS / 架构专项规则
