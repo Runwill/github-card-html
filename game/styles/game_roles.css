@@ -107,6 +107,7 @@
 .current-character-panel {
     flex: 3;
     min-width: 0;
+    position: relative;
     background: var(--surface);
     border-radius: var(--radius-lg) ;
     padding: var(--pad-current-panel, 25px);
@@ -143,6 +144,7 @@
 
 .player-hand {
     padding-right: var(--pad-player-hand-r, var(--space-3xl));
+    position: relative;
 }
 
 .char-avatar {

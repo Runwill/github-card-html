@@ -8,8 +8,10 @@
 .game-table-panel {
     width: 100%;
     min-height: var(--table-panel-minh, 120px);
-    background: rgba(0, 0, 0, 0.2); 
-    border-bottom: 1px solid var(--border);
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -46,6 +48,7 @@
 
 /* Central/Public Area */
 .game-board-panel {
+    width: 100%;
     background: transparent;
     border: none;
     border-radius: var(--radius-none) ;
@@ -64,7 +67,7 @@
     flex: 1;
     gap: var(--board-area-row-gap, 15px);
     min-height: var(--board-area-row-minh, 140px);
-    align-items: stretch !important; /* 覆盖 inline align-items:flex-start，让子元素垂直撑满 */
+    align-items: stretch;
     justify-content: center;
 }
 
@@ -123,9 +126,10 @@
 
 /* Specific override for treatment container */
 .treatment-container {
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    flex: 1;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
     pointer-events: none; /* Allow clicks to pass through to watermark */
     justify-content: center;
 }
@@ -232,13 +236,16 @@ body.is-global-dragging .deck-slot {
    Deck Slot Style (Draw/Discard Piles)
    ========================================= */
 .deck-slot {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;    pointer-events: none; /* Allow events to pass through to watermark/text */
+    flex: 1;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    pointer-events: none; /* Allow events to pass through to watermark/text */
 }
 
 .deck-slot > * {
-    pointer-events: auto;}
+    pointer-events: auto;
+}
 
 /* Depth Effect for Cards in Deck Slot - REMOVED for cleaner look per user request */
 /* Just a standard shadow now */

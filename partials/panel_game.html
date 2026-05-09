@@ -98,7 +98,7 @@
             <div class="game-layout-main">
 
             <!-- Card Table Area (Encircling Layout) -->
-            <div class="game-panel game-table-panel hidden" id="game-table-panel" style="background: none; border: none; box-shadow: none; padding: 0;">
+            <div class="game-panel game-table-panel hidden" id="game-table-panel">
                 <div class="table-layout-grid">
                     <!-- Left Side (Upstream) -->
                     <div class="table-side-col left-col">
@@ -111,13 +111,13 @@
                         <div id="role-list-top" class="role-row"></div>
                         
                         <!-- Treatment Area (Center) & Piles -->
-                        <div class="game-panel game-board-panel hidden" id="game-board-panel" style="width: 100%;">
+                        <div class="game-panel game-board-panel hidden" id="game-board-panel">
                             <div class="board-area-row">
                                 
                                 <!-- Draw Pile (Left) -->
                                 <div class="board-pile-slot">
                                     <div id="header-pile" class="area-watermark"></div>
-                                    <div id="pile-container" class="cards-container pile-container deck-slot" data-area-name="pile" style="flex: 1; position: relative;">
+                                    <div id="pile-container" class="cards-container pile-container deck-slot" data-area-name="pile">
                                         <!-- Cards here -->
                                     </div>
                                 </div>
@@ -125,7 +125,7 @@
                                 <!-- Treatment Area (Center) -->
                                 <div class="treatment-area-wrappper">
                                     <div id="header-treatment-area" class="area-watermark"></div>
-                                    <div id="treatment-area-container" class="cards-container treatment-container" data-area-name="treatmentArea" style="flex: 1;">
+                                    <div id="treatment-area-container" class="cards-container treatment-container" data-area-name="treatmentArea">
                                         <!-- Cards will be rendered here -->
                                     </div>
                                 </div>
@@ -133,7 +133,7 @@
                                 <!-- Discard Pile (Right) -->
                                 <div class="board-pile-slot">
                                     <div id="header-discard-pile" class="area-watermark"></div>
-                                    <div id="discard-pile-container" class="cards-container pile-container deck-slot" data-area-name="discardPile" style="flex: 1; position: relative;">
+                                    <div id="discard-pile-container" class="cards-container pile-container deck-slot" data-area-name="discardPile">
                                         <!-- Cards here -->
                                     </div>
                                 </div>
@@ -181,8 +181,8 @@
 
             <div class="game-main-area hidden" id="game-main-area">
                 <div class="main-perspective-container">
-                <div class="current-character-panel" style="position: relative;">
-                    <div class="player-hand" style="position: relative;">
+                <div class="current-character-panel">
+                    <div class="player-hand">
                         <div id="header-hand-area" class="area-watermark">Hand Cards</div>
                         <div id="hand-cards-container" class="cards-container" data-area-name="hand">
                             <!-- Cards will be rendered here -->
