@@ -128,7 +128,7 @@
     const toolbar = `<div class="token-card__toolbar">
       <button class="btn btn--secondary btn--xs btn-go-doc" data-i18n="tokens.toolbar.go"></button>
       <button class="btn btn--secondary btn--xs btn-edit-doc" data-i18n="tokens.toolbar.editDoc"></button>
-      <button class="btn btn--danger btn--xs btn-del-doc${canEdit? '':' is-disabled'}" data-i18n="tokens.toolbar.deleteDoc"></button>
+      <button class="btn btn--danger btn--lift btn--xs btn-del-doc${canEdit? '':' is-disabled'}" data-i18n="tokens.toolbar.deleteDoc"></button>
     </div>`;
     return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${toolbar}${innerHtml}</div>`;
   }

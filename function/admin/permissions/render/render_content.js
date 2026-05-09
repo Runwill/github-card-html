@@ -129,7 +129,7 @@
     };
     const actions = makeEl('div', 'perm-editor__actions');
     const btnCancel = makeEl('button', 'btn btn--secondary');
-    const btnSave = makeEl('button', 'btn btn--primary');
+    const btnSave = makeEl('button', 'btn btn--primary btn--lift');
     setI18nAttr(btnCancel, 'common.cancel', t('common.cancel', '取消'));
     setI18nAttr(btnSave, 'common.save', t('common.save', '保存'));
     actions.appendChild(btnCancel); actions.appendChild(btnSave);
@@ -147,7 +147,7 @@
     pwdList.appendChild(makeEditorField('modal.password.confirm', t('modal.password.confirm','确认新密码'), inputConfirm));
     const pwdActions = makeEl('div', 'perm-editor__actions');
     const btnPwdCancel = makeEl('button', 'btn btn--secondary');
-    const btnPwdSave = makeEl('button', 'btn btn--primary');
+    const btnPwdSave = makeEl('button', 'btn btn--primary btn--lift');
     setI18nAttr(btnPwdCancel, 'common.cancel', t('common.cancel','取消'));
     setI18nAttr(btnPwdSave, 'common.save', t('common.save','保存'));
     pwdActions.appendChild(btnPwdCancel); pwdActions.appendChild(btnPwdSave);
@@ -165,7 +165,7 @@
     roleList.appendChild(makeEditorField('permissions.user.roleLabel', t('permissions.user.roleLabel', '角色：'), select));
     const roleActions = makeEl('div', 'perm-editor__actions');
     const btnRoleCancel = makeEl('button', 'btn btn--secondary');
-    const btnRoleSave = makeEl('button', 'btn btn--primary');
+    const btnRoleSave = makeEl('button', 'btn btn--primary btn--lift');
     setI18nAttr(btnRoleCancel, 'common.cancel', t('common.cancel','取消'));
     setI18nAttr(btnRoleSave, 'common.save', t('common.save','保存'));
     roleActions.appendChild(btnRoleCancel); roleActions.appendChild(btnRoleSave);

@@ -14,7 +14,7 @@
     var publicBase = isPublic(current);
     var key = publicBase ? 'login.backend.publicSelected' : 'login.backend.localSelected';
     btn.classList.remove('btn--primary', 'btn--secondary', 'btn--success', 'btn--danger');
-    btn.classList.add(publicBase ? 'btn--success' : 'btn--danger');
+    btn.classList.add(publicBase ? 'btn--success' : 'btn--danger', 'btn--lift');
     try { btn.setAttribute('data-i18n', key); btn.textContent = window.t(key); } catch (_) { btn.textContent = publicBase ? '公网后端 (已选)' : '本地后端 (已选)'; }
   }
 

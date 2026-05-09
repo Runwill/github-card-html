@@ -146,9 +146,9 @@
           ])
         ]);
         const right = el('div', { cls:'approval-right' }, [
-          el('button', { cls: 'btn btn--success btn--sm', text: '通过',
+          el('button', { cls: 'btn btn--success btn--lift btn--sm', text: '通过',
             onclick: (e) => HANDLER[it.type](it.id, 'approve', e.currentTarget) }),
-          el('button', { cls: 'btn btn--danger btn--sm',  text: '拒绝',
+          el('button', { cls: 'btn btn--danger btn--lift btn--sm',  text: '拒绝',
             onclick: (e) => HANDLER[it.type](it.id, 'reject', e.currentTarget) })
         ]);
         container.appendChild(el('div', { cls:'approval-row' }, [left, right]));

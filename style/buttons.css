@@ -14,7 +14,7 @@
   cursor: pointer;
   user-select: none;
   transition: background-color var(--dur-normal) var(--ease-default), color var(--dur-normal) var(--ease-default), border-color var(--dur-normal) var(--ease-default), box-shadow var(--dur-normal) var(--ease-default), transform var(--dur-fast) var(--ease-default), background-position var(--dur-moderate) var(--ease-default); 
-  will-change: background-position, box-shadow, transform;
+  will-change: background-position, box-shadow;
 }
 
 .btn:focus {
@@ -39,7 +39,8 @@
 .btn--block { width: 100%; }
 
 /* 变体交互反馈（颜色由 theme.css 统一管理） */
-.btn--primary:hover, .btn--accent:hover, .btn--success:hover, .btn--danger:hover { transform: translateY(-1px); }
+.btn--lift { will-change: background-position, box-shadow, transform; }
+.btn--lift:hover { transform: translateY(-1px); }
 .btn--primary:active, .btn--secondary:active, .btn--accent:active, .btn--success:active, .btn--danger:active { transform: translateY(0.5px); }
 
 
@@ -48,6 +49,7 @@
   opacity: 0.5;
   box-shadow: none;
 }
+.btn--lift:disabled:hover,
 .btn.is-disabled:hover {
   transform: none;
 }

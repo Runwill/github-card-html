@@ -42,7 +42,7 @@
                         <!-- Dynamic Inputs -->
                     </div>
                     <div class="text-center setup-actions">
-                        <button id="btn-confirm-setup" class="btn btn--success" data-i18n="game.setup.start">Start Game</button>
+                        <button id="btn-confirm-setup" class="btn btn--success btn--lift" data-i18n="game.setup.start">Start Game</button>
                     </div>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                                 <span class="input-group-label" data-i18n="online.roomId">房间ID</span>
                                 <input type="text" id="input-room-id" class="input-group-field" placeholder="输入房间名" maxlength="20">
                             </div>
-                            <button id="btn-create-room" class="btn btn--success btn--sm" data-i18n="online.create">创建房间</button>
+                            <button id="btn-create-room" class="btn btn--success btn--lift btn--sm" data-i18n="online.create">创建房间</button>
                             <button id="btn-refresh-rooms" class="btn btn--secondary btn--sm" data-i18n="online.refresh">刷新</button>
                         </div>
 
@@ -83,7 +83,7 @@
                         <div class="text-center online-actions">
                             <button id="btn-spectate" class="btn btn--secondary btn--sm hidden" data-i18n="online.spectate">旁观</button>
                             <button id="btn-back-lobby" class="btn btn--secondary btn--sm" data-i18n="online.backToLobby">返回大厅</button>
-                            <button id="btn-leave-room" class="btn btn--danger btn--sm" data-i18n="online.leave">离开房间</button>
+                            <button id="btn-leave-room" class="btn btn--danger btn--lift btn--sm" data-i18n="online.leave">离开房间</button>
                         </div>
                         <div id="room-no-spectate-hint" class="online-hint online-hint--warn hidden">🚫 该房间禁止旁观</div>
                         <div class="online-hint" data-i18n="online.sandboxHint">在线模式下固定为 Sandbox 模式，请通过「游戏设置」选择武将和牌堆后开始游戏。</div>
@@ -170,12 +170,12 @@
                 <div id="game-controls">
                     <button class="btn btn--primary" id="btn-show-setup" data-i18n="game.setup">Game Setup</button>
                     <button class="btn btn--accent" id="btn-show-online" data-i18n="online.room">Online Room</button>
-                    <button class="btn btn--primary hidden" id="btn-start-game" data-i18n="game.start">Start Game</button>
+                    <button class="btn btn--primary btn--lift hidden" id="btn-start-game" data-i18n="game.start">Start Game</button>
                     <button class="btn btn--secondary hidden" id="btn-pause-game">Pause</button>
                     
 
-                    <button class="btn btn--success hidden" id="btn-play-card" data-i18n="game.playCard">Play Card</button>
-                    <button class="btn btn--danger hidden" id="btn-end-turn" data-i18n="game.endTurn">End Turn</button>
+                    <button class="btn btn--success btn--lift hidden" id="btn-play-card" data-i18n="game.playCard">Play Card</button>
+                    <button class="btn btn--danger btn--lift hidden" id="btn-end-turn" data-i18n="game.endTurn">End Turn</button>
                 </div>
             </div>
 

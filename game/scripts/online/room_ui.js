@@ -194,7 +194,7 @@
             const isCurrent = myCurrentRoomId && room.id === myCurrentRoomId;
             const isHost = myId && room.host === myId;
             // 已在此房间：显示"进入"按钮（不同样式）；否则显示"加入"
-            const joinBtnClass = isCurrent ? 'btn btn--sm btn--success btn-enter-room' : 'btn btn--sm btn--primary btn-join-room';
+            const joinBtnClass = isCurrent ? 'btn btn--sm btn--success btn--lift btn-enter-room' : 'btn btn--sm btn--primary btn--lift btn-join-room';
             const joinBtnText = isCurrent ? t('online.enter') : t('online.join');
             const noSpectate = room.allowSpectate === false;
             return `
@@ -208,7 +208,7 @@
                     </span>
                 </div>
                 <div class="room-item-actions">
-                    ${isHost ? `<button class="btn btn--sm btn--danger btn-dissolve-room">${t('online.dissolve')}</button>` : ''}
+                    ${isHost ? `<button class="btn btn--sm btn--danger btn--lift btn-dissolve-room">${t('online.dissolve')}</button>` : ''}
                     <button class="${joinBtnClass}">${joinBtnText}</button>
                 </div>
             </div>`;
