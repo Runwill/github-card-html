@@ -220,29 +220,6 @@
     font-size: var(--game-form-fs, var(--fs-base));
     line-height: normal;
     padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
-    background: transparent;
-    border: 1px solid var(--border);
-    margin-left: -1px;
-    color: var(--text);
-    transition:
-        background var(--dur-normal) var(--ease-default),
-        border-color var(--dur-normal) var(--ease-default),
-        box-shadow var(--dur-normal) var(--ease-default),
-        color var(--dur-normal) var(--ease-default);
-}
-
-.game-panel .input-group .custom-select .custom-select__trigger:hover {
-    background: color-mix(in srgb, var(--surface) 96%, transparent);
-    border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
-}
-
-.game-panel .input-group .custom-select.is-open .custom-select__trigger,
-.game-panel .input-group .custom-select .custom-select__trigger:focus {
-    border-color: var(--primary-2);
-    box-shadow: none;
-    outline: 1px solid var(--primary-ring);
-    outline-offset: -1px;
-    background: var(--surface);
 }
 
 /* Dynamic character select (full-width standalone) */
