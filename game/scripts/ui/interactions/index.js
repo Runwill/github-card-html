@@ -53,25 +53,6 @@
     window.Game.UI.DragConfig = DRAG_CONFIG;
     
 
-    // 调试辅助函数
-    function logDragDebug(phase) {
-        if (!window.Game || !window.Game.Core || !window.Game.Core.GameState) return;
-        const gs = window.Game.Core.GameState;
-        const self = gs.players && gs.players[0];
-        const handCards = (self && self.hand && self.hand.cards) ? self.hand.cards : [];
-        const treatmentCards = (gs.treatmentArea && gs.treatmentArea.cards) ? gs.treatmentArea.cards : [];
-        console.group(`[DragDebug] ${phase}`);
-        
-        if (DragState.dragSource) {
-             const cardName = typeof DragState.dragSource.data === 'string' ? DragState.dragSource.data : (DragState.dragSource.data.name || 'Unknown');
-             console.log(`Moving Card: "${cardName}" (Index: ${DragState.dragSource.sourceIndex}, From: ${DragState.dragSource.sourceArea})`);
-        }
-        const getName = (c, i) => `[${i}] ${typeof c === 'string' ? c : (c.name || 'Unknown')}`;
-        console.log(`Hand (${handCards.length}):`, handCards.map(getName));
-        console.log(`Treatment (${treatmentCards.length}):`, treatmentCards.map(getName));
-        console.groupEnd();
-    }
-
     function initDrag(cardElement, cardData, sourceAreaName, sourceIndex = -1) {
         cardElement.classList.add('draggable-item');
         cardElement.onpointerdown = (e) => handlePointerDown(e, cardElement, cardData, sourceAreaName, sourceIndex);
@@ -105,7 +86,6 @@
 
     function startDrag(e) {
         if (!DragState.dragElement) return; 
-        logDragDebug('Start Drag');
         DragState.isDragging = true;
         document.body.classList.add('is-global-dragging');
         
@@ -315,7 +295,6 @@
                 targetIndex = -1;
             }
             
-            logDragDebug(`Before Drop Action (Target: ${targetZoneId})`);
             window.Game.UI.isRenderingSuspended = true;
 
             let isLogicFinished = false;
@@ -343,7 +322,6 @@
 
                     window.Game.UI.isRenderingSuspended = false;
                     if (window.Game.UI.updateUI) window.Game.UI.updateUI();
-                    logDragDebug('After Drop Action (All Done)');
 
                     if (DragState.dragElement === el) {
                         document.body.classList.remove('is-global-dragging');
@@ -378,8 +356,6 @@
                     DragState.dragSource.sourceIndex,
                     {
                         onMoveExecuted: () => {
-                            logDragDebug('Triggering Animation (Event Executed)');
-                            
                             // Force UI update to ensure target existence (hidden initially by logic below)
                             const wasSuspended = window.Game.UI.isRenderingSuspended;
                             window.Game.UI.isRenderingSuspended = false;
@@ -407,12 +383,7 @@
                                     }
                                 }
 
-                                if (newTargetEl) {
-                                    // Debug Flip Logic
-                                    const tKey = newTargetEl.getAttribute('data-card-key');
-                                    const gKey = el ? el.getAttribute('data-card-key') : 'null';
-                                    console.log(`[DragAnim] Found Target. TargetKey: ${tKey}, GhostKey: ${gKey}`);
-                                } else {
+                                if (!newTargetEl) {
                                     console.warn(`[DragAnim] Target Element NOT found in zone: ${targetZoneId}`);
                                 }
 
@@ -500,7 +471,6 @@
                         },
                         onComplete: () => {
                             isLogicFinished = true;
-                            logDragDebug('Logic Finished');
                             checkFinish();
                         }
                     },

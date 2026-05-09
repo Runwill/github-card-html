@@ -127,15 +127,7 @@
         // we apply it to the dragging ghost to trigger CSS transitions (flip/fade).
         if (placeholder && el) {
             const targetKey = placeholder.getAttribute('data-card-key');
-            
-            if (syncGhostAppearance(el, placeholder, targetKey)) {
-                // Determine if we need to force a flip style
-                console.log(`[DragAnim] Syncing Keys to ${targetKey}`);
-                
-                // Optional: visual enhancement for flip
-                // We could add a 'flipping' class if we wanted 3D rotate, 
-                // but for now relying on CSS background/opacity transitions.
-            }
+            syncGhostAppearance(el, placeholder, targetKey);
         }
 
         let cssX, cssY;
@@ -297,7 +289,6 @@
         startAnimationLoop,
         animateDropToPlaceholder,
         createGhost,
-        // copyComputedStyles (Removed: now in UI.copyStyles)
     };
 
 })();

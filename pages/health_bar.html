@@ -99,6 +99,7 @@
     .s {
       line-height: 0.68;
       margin-top: -0.02em;
+      animation-delay: var(--sym-delay, 0ms);
       transition:
         color var(--dur) var(--ease),
         text-shadow var(--dur) var(--ease),
@@ -196,6 +197,9 @@
     let touchEndY = 0
     let lastTouchTime = 0
     let touchCount = 0
+    const INITIAL_STAGGER_MS = 45
+    const ENTER_STAGGER_MS = 50
+    const EXIT_STAGGER_MS = 40
 
     // 触摸事件
     document.body.addEventListener('touchstart', (e) => {
@@ -250,6 +254,22 @@
       })
     }
 
+    function setSymbolDelay(el, delayMs) {
+      if (delayMs > 0) {
+        el.style.setProperty('--sym-delay', delayMs + 'ms')
+      } else {
+        el.style.removeProperty('--sym-delay')
+      }
+    }
+
+    function createSymbolNode(symbol, extraClass, delayMs) {
+      const div = document.createElement('div')
+      div.className = 's ' + symbol.cls + (extraClass ? ' ' + extraClass : '')
+      div.textContent = symbol.ch
+      setSymbolDelay(div, delayMs)
+      return div
+    }
+
     function health_bar_check() {
       const point = parseInt(localStorage.getItem('health_point'))
       const limit = parseInt(localStorage.getItem('health_limit'))
@@ -294,10 +314,15 @@
       if (entering && oldLen === 0) {
         // 首次加载：交错入场
         bar.style.fontSize = ''
-        bar.innerHTML = symbols.map((s, i) =>
-          `<div class="s ${s.cls}" style="animation-delay:${i * 45}ms">${s.ch}</div>`
-        ).join('')
-        setTimeout(() => bar.classList.remove('is-entering'), newLen * 45 + 500)
+        const fragment = document.createDocumentFragment()
+        symbols.forEach((symbol, index) => {
+          fragment.appendChild(createSymbolNode(symbol, '', index * INITIAL_STAGGER_MS))
+        })
+        bar.replaceChildren(fragment)
+        setTimeout(() => {
+          bar.classList.remove('is-entering')
+          Array.from(bar.children).forEach((child) => setSymbolDelay(child, 0))
+        }, newLen * INITIAL_STAGGER_MS + 500)
       } else if (oldLen === newLen) {
         // 数量相同：原地更新 + 字符变化脉冲
         for (let i = 0; i < newLen; i++) {
@@ -321,14 +346,11 @@
           if (child.textContent !== symbols[i].ch) child.textContent = symbols[i].ch
         }
         for (let i = oldLen; i < newLen; i++) {
-          const div = document.createElement('div')
-          div.className = 's ' + symbols[i].cls + ' is-enter'
-          div.textContent = symbols[i].ch
-          div.style.animationDelay = ((i - oldLen) * 50) + 'ms'
+          const div = createSymbolNode(symbols[i], 'is-enter', (i - oldLen) * ENTER_STAGGER_MS)
           bar.appendChild(div)
           div.addEventListener('animationend', () => {
             div.classList.remove('is-enter')
-            div.style.animationDelay = ''
+            setSymbolDelay(div, 0)
           }, { once: true })
         }
       } else {
@@ -341,7 +363,7 @@
         const toRemove = live.slice(newLen)
         toRemove.forEach((child, idx) => {
           child.className = 's is-exit'
-          child.style.animationDelay = (idx * 40) + 'ms'
+          setSymbolDelay(child, idx * EXIT_STAGGER_MS)
           child.addEventListener('animationend', () => child.remove(), { once: true })
         })
       }

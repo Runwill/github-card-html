@@ -81,27 +81,12 @@
 
 /* Card Back Styling */
 .card-placeholder[data-card-key='CardBack'] {
-    /* Keep base background color for the card body */
     background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%) !important;
-    
-    /* Remove direct background image to allow independent filtering via pseudo-element */
-    /* background-image: none !important;  <-- REMOVED: This was clearing the gradient */
-
-    /* Hide text content ("CardBack") */
     color: transparent !important;
     text-shadow: none !important;
-
-    /* Match normal card border - Removed specific rule to allow hover overwrite */
-    /* border: 1px solid var(--border) !important; */
-    
-    /* Ensure no extra gradient overrides */
     box-shadow: var(--card-shadow-rest, 0 2px 5px var(--shadow-1));
-
-    /* Essential for pseudo-element positioning and clipping */
     position: relative;
     overflow: hidden;
-
-    /* Clear legacy filters on the container itself */
     filter: none !important;
     opacity: 1 !important;
 }
@@ -112,11 +97,8 @@
    without inverting the card's border or background color.
 */
 .card-placeholder[data-card-key='CardBack']::before {
-    opacity: 1; /* Show image */
+    opacity: 1;
     transform: scale(1);
-    
-    /* Inherit base styles from generic .card-placeholder::before */
-    /* content, pos, bg-image etc are already defined there */
 }
 
 /* Dark Mode: Filter ONLY the image layer */
@@ -126,17 +108,13 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     opacity: 0.8;
 }
 
-/* Remove old direct rule to prevent conflict */
-/* html[data-theme="dark"] .card-placeholder[data-card-key='CardBack'] { ... } */
-
 /* Ensure CardBacks in Stacked/Deck slots stay absolute centered */
 .area-stacked > .card-placeholder[data-card-key='CardBack'] {
-    position: absolute !important;
+    position: absolute;
 }
 
-/* Ensure CardBacks in Spread/Hand slots can contain their absolute ::after children */
-.area-spread > .card-placeholder[data-card-key='CardBack'],
-.player-hand .card-placeholder[data-card-key='CardBack'] {
+/* Ensure CardBacks in Spread slots can contain their absolute ::after children */
+.area-spread > .card-placeholder[data-card-key='CardBack'] {
     position: relative;
 }
 

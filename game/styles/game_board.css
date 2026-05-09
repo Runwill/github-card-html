@@ -85,7 +85,6 @@
 /* Container Foundations */
 .cards-container, 
 .treatment-container,
-.player-hand .cards-container,
 .game-card-area {
     display: flex;
     gap: var(--cards-container-gap, var(--space-2xl));
@@ -110,7 +109,7 @@
     display: flex;
     flex-direction: column;
     z-index: 1;
-    margin-bottom: 0; /* removed extra bottom gap for narrow/stacked layouts */
+    margin-bottom: 0;
 }
 
 .board-pile-slot {
@@ -159,31 +158,31 @@
 /* Hide mover label on dragged card (clone & source) */
 .dragging-real .card-mover-label,
 .dragging-source .card-mover-label {
-    display: none !important;
+    display: none;
 }
 
 /* Allow dropping cards into treatment container when dragging */
 body.is-global-dragging .treatment-container,
 body.is-global-dragging .deck-slot {
-    pointer-events: auto !important;
+    pointer-events: auto;
 }
 
 /* .area-watermark → see game_widgets.css */
 
 /* Alignment Utilities */
 .area-centered {
-    justify-content: center !important;
+    justify-content: center;
 }
 .area-left {
-    justify-content: flex-start !important;
+    justify-content: flex-start;
 }
 
 /* Stacking Utilities (Pile Mode) */
 .area-stacked {
-    display: block !important; 
-    height: 100% !important;
+    display: block;
+    height: 100%;
     min-height: calc(var(--card-h, 140px) + var(--cards-container-pad, 15px) * 2 + 4px);
-    padding: 0 !important;
+    padding: 0;
     overflow: hidden;
     position: relative;
     transition: box-shadow var(--dur-normal), background-color var(--dur-normal);
@@ -195,7 +194,7 @@ body.is-global-dragging .deck-slot {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    margin: 0 !important;
+    margin: 0;
     display: none;
     z-index: 1;
 }
@@ -203,8 +202,8 @@ body.is-global-dragging .deck-slot {
 /* Fix: Ensure drag placeholder is always visible so it has dimensions for FLIP, 
    BUT hidden visually so it doesn't occlude the stack's top card. */
 .area-stacked > .card-placeholder.drag-placeholder {
-    display: flex !important;
-    visibility: hidden !important;
+    display: flex;
+    visibility: hidden;
 }
 
 .area-stacked > .card-placeholder.is-top-card {
@@ -214,10 +213,10 @@ body.is-global-dragging .deck-slot {
 
 /* Spread Mode Utilities (Hand Mode) */
 .area-spread {
-    flex-wrap: nowrap !important;
+    flex-wrap: nowrap;
     overflow-x: visible;
     overflow-y: visible; 
-    gap: 0 !important;
+    gap: 0;
     align-items: center;
     min-width: 0;
     max-width: 100%;
@@ -229,7 +228,7 @@ body.is-global-dragging .deck-slot {
     margin-left: var(--dynamic-card-margin, var(--spread-card-gap, 10px));
 }
 .area-spread .card-placeholder:first-child {
-    margin-left: 0 !important;
+    margin-left: 0;
 }
 
 /* =========================================
@@ -247,8 +246,6 @@ body.is-global-dragging .deck-slot {
     pointer-events: auto;
 }
 
-/* Depth Effect for Cards in Deck Slot - REMOVED for cleaner look per user request */
-/* Just a standard shadow now */
 .deck-slot.area-stacked > .card-placeholder.is-top-card {
     box-shadow: var(--deck-card-shadow, 0 4px 8px rgba(0,0,0,0.2));
 }

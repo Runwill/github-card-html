@@ -27,7 +27,6 @@
     min-width: calc(var(--card-w, 100px) + var(--viewer-content-extra-w, 40px)); /* Minimum width to fit at least one card + padding */
     max-width: 90vw; /* Cap at 90vw */
     
-    /* height: 80vh;  <-- Removed fixed height */
     max-height: var(--viewer-content-max-h, 80dvh);
 
     display: flex;
@@ -105,15 +104,11 @@
     width: 100%; 
     min-height: calc(var(--card-h, 140px) + var(--viewer-grid-extra-h, 20px));
     
-    /* ADDED: Minimum width ensures drop target exists */
     min-width: var(--viewer-grid-minw, 350px);
     
     overflow-x: auto;
     /* scrollbar-hidden via HTML class */
     
-    /* Ensure flex items are vertically centered if height > cards */
-    /* align-items: center; <--- REMOVED this, reverting alignment logic to default stretch or start */
-
     /* Pointer Events Logic for Watermark Interaction */
     pointer-events: none; /* Let events pass to watermark */
 }
@@ -210,7 +205,6 @@ body.is-global-dragging .card-grid {
 /* Card in Grid */
 .card-grid .card-placeholder {
     position: relative;
-    /* Removed transform: none !important to allow drag-sort animations */
     width: var(--card-w, 100px);
     height: var(--card-h, 140px);
     margin: 0;
