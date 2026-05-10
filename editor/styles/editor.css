@@ -162,18 +162,6 @@ html.force-landscape {
   outline-offset: -0.071em;
 }
 
-#panel_draft .btn:focus {
-  outline: none;
-  box-shadow: none;
-}
-
-#panel_draft .btn:focus-visible {
-  border-color: var(--primary-2);
-  box-shadow: none;
-  outline: 0.071em solid var(--primary-2);
-  outline-offset: 0.071em;
-}
-
 #panel_draft .draftBlock {
   flex: 1 1 auto;
   min-height: 0;

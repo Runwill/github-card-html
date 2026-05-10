@@ -26,7 +26,6 @@ body {
     flex-direction: column;
     gap: 0.8em;
 }
-.modal-form button { transition: background-color var(--dur-normal) var(--ease-default), color var(--dur-normal) var(--ease-default), border-color var(--dur-normal) var(--ease-default); }
 
 .modal-message { margin-top: 0.267em; min-height: 1.333em; font-size: 0.933em; text-align: center; color: var(--text-muted); }
 .modal-message.success { color: var(--success); }
@@ -42,7 +41,7 @@ body {
 
 #login-container { width: var(--login-panel-w); max-width: 92vw; margin: 0; }
 #login-container .modal-form input { margin-bottom: 0.533em; padding: 0.533em; border: 1px solid var(--border); border-radius: var(--radius-xs); }
-#login-container .btn { width: 100%; padding: 0.533em; border-radius: var(--radius-xs); border: none; }
+#login-container .btn { width: 100%; padding: 0.533em; border-radius: var(--radius-xs); }
 #login-message:not(:empty) { margin-top: 0.533em; }
 #login-message.success { color: var(--success, #38a169); }
 #login-message.error   { color: var(--danger, #e53e3e); }

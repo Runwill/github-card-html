@@ -27,21 +27,18 @@
   transform: translateY(calc(-50% - 1px));
 }
 
-.skill-copy-btn:focus {
-  outline: none;
-  box-shadow: none;
-}
-
 .skill-copy-btn:active { transform: translateY(calc(-50% + 1px)); }
 
 /* 仅在“按下 Ctrl 且 hover 行/按钮”时显示 */
 /* 按下 Ctrl 时先允许按钮捕获指针（避免从行移到偏左按钮时闪烁）*/
-html.ctrl-pressed .skill-copy-btn {
+html.ctrl-pressed .skill-copy-btn,
+.skill-copy-btn:focus-visible {
   pointer-events: auto;
 }
 /* hover 行或按钮自身时再显示 */
 html.ctrl-pressed .skill-row:hover .skill-copy-btn,
-html.ctrl-pressed .skill-copy-btn:hover {
+html.ctrl-pressed .skill-copy-btn:hover,
+.skill-copy-btn:focus-visible {
   opacity: 1;
 }
 
@@ -57,7 +54,8 @@ html.ctrl-pressed .skill-copy-btn:hover {
 
   /* 按下 Ctrl 且 hover/聚焦时显示并占位（内联弹性布局） */
   html.ctrl-pressed .skill-row:hover .skill-copy-btn,
-  html.ctrl-pressed .skill-copy-btn:hover {
+  html.ctrl-pressed .skill-copy-btn:hover,
+  .skill-copy-btn:focus-visible {
     display: inline-flex;
   }
 

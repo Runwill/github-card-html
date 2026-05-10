@@ -33,9 +33,12 @@
 
 .back-to-top:hover { background: #ffffff; }
 .back-to-top:active { transform: translateY(1px); }
-/* 去除移动端长按产生的聚焦外框；如需键盘可见焦点，可按需改为 .back-to-top[data-a11y-focus] */
-.back-to-top:focus,
-.back-to-top:focus-visible { outline: none; }
+/* 去除鼠标/触屏聚焦外框，保留键盘可见焦点 */
+.back-to-top:focus { outline: none; }
+.back-to-top:focus-visible {
+  outline: 1px solid color-mix(in srgb, var(--primary-2) 72%, var(--border));
+  outline-offset: 2px;
+}
 
 .back-to-top__icon {
   width: calc(var(--back-to-top-size) * 0.45);
