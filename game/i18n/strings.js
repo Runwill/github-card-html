@@ -55,7 +55,6 @@
         'online.spectate': '旁观',
         'online.cancelSpectate': '取消旁观',
         'online.spectating': '旁观中',
-        'online.seatsFull': '座位已满，无法加入（旁观未开启）'
     };
 
     const en = {
@@ -114,7 +113,6 @@
         'online.spectate': 'Spectate',
         'online.cancelSpectate': 'Cancel Spectate',
         'online.spectating': 'Spectating',
-        'online.seatsFull': 'Seats full, cannot join (spectate not enabled)'
     };
 
     if (window.I18N_STRINGS) {

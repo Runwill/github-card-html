@@ -6,7 +6,6 @@
         // 权限页：分离“角色”标签，便于点击角色值进行编辑
         'permissions.user.roleLabel': '角色：',
         'permissions.search': '搜索',
-        'permissions.mode.toggle.title': '切换展示模式：部分/全部',
         'permissions.mode.partial': '部分',
         'permissions.mode.all': '全部',
         'permissions.fetchUsersFailedPrefix': '获取用户失败：',
@@ -98,7 +97,6 @@
         // Permissions: split role label for clickable value editing
         'permissions.user.roleLabel': 'Role:',
         'permissions.search': 'Search',
-        'permissions.mode.toggle.title': 'Toggle view: Partial/All',
         'permissions.mode.partial': 'Partial',
         'permissions.mode.all': 'All',
         'permissions.fetchUsersFailedPrefix': 'Fetch users failed:',

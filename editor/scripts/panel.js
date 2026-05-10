@@ -684,16 +684,27 @@
 
   function renderVariantState() {
     if (els.variantBadge) els.variantBadge.hidden = !state.variantMode;
-    if (els.palette) {
-      Array.from(els.palette.querySelectorAll('.editor-entry.has-variant')).forEach(function (button) {
+    [els.palette, els.recommendationList].forEach(function (list) {
+      if (!list) return;
+      Array.from(list.querySelectorAll('.editor-entry.has-variant')).forEach(function (button) {
         button.classList.toggle('is-variant-active', state.variantMode);
       });
-    }
-    if (els.recommendationList) {
-      Array.from(els.recommendationList.querySelectorAll('.editor-entry.has-variant')).forEach(function (button) {
-        button.classList.toggle('is-variant-active', state.variantMode);
-      });
-    }
+    });
+  }
+
+  function bindEntryList(list) {
+    if (!list) return;
+    list.addEventListener('click', function (event) {
+      if (state.suppressClick) {
+        state.suppressClick = false;
+        return;
+      }
+      var button = event.target.closest('.editor-entry');
+      if (button) insertEntryFromButton(button);
+    });
+    list.addEventListener('dragstart', onEntryDragStart);
+    list.addEventListener('dragend', onTreeDragEnd);
+    list.addEventListener('pointerdown', onEntryPointerDown);
   }
 
   function renderAll(persist) {
@@ -709,32 +720,8 @@
 
   function bindEvents() {
     if (els.search) els.search.addEventListener('input', renderPalette);
-    if (els.palette) {
-      els.palette.addEventListener('click', function (event) {
-        if (state.suppressClick) {
-          state.suppressClick = false;
-          return;
-        }
-        var button = event.target.closest('.editor-entry');
-        if (button) insertEntryFromButton(button);
-      });
-      els.palette.addEventListener('dragstart', onEntryDragStart);
-      els.palette.addEventListener('dragend', onTreeDragEnd);
-      els.palette.addEventListener('pointerdown', onEntryPointerDown);
-    }
-    if (els.recommendationList) {
-      els.recommendationList.addEventListener('click', function (event) {
-        if (state.suppressClick) {
-          state.suppressClick = false;
-          return;
-        }
-        var button = event.target.closest('.editor-entry');
-        if (button) insertEntryFromButton(button);
-      });
-      els.recommendationList.addEventListener('dragstart', onEntryDragStart);
-      els.recommendationList.addEventListener('dragend', onTreeDragEnd);
-      els.recommendationList.addEventListener('pointerdown', onEntryPointerDown);
-    }
+    bindEntryList(els.palette);
+    bindEntryList(els.recommendationList);
     if (els.tree) {
       els.tree.addEventListener('click', onTreeClick);
       els.tree.addEventListener('dblclick', onTreeDoubleClick);

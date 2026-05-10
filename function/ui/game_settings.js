@@ -5,17 +5,21 @@
   
   // 惯性选项配置（轻左重右）
   const INERTIA_OPTIONS = [
-    { value: 1.0, label: '即时' },
-    { value: 0.8, label: '灵敏' },
-    { value: 0.5, label: '轻盈' },
-    { value: 0.25, label: '中等' },
-    { value: 0.15, label: '较重' },
-    { value: 0.1, label: '非常重' }
+    { value: 1.0, labelKey: 'gameSettings.inertia.instant' },
+    { value: 0.8, labelKey: 'gameSettings.inertia.veryLight' },
+    { value: 0.5, labelKey: 'gameSettings.inertia.light' },
+    { value: 0.25, labelKey: 'gameSettings.inertia.medium' },
+    { value: 0.15, labelKey: 'gameSettings.inertia.heavy' },
+    { value: 0.1, labelKey: 'gameSettings.inertia.veryHeavy' }
   ];
   
   const DEFAULT_SPEED = 0;
   const DEFAULT_INERTIA_INDEX = 3; // 默认中等
   let currentInertiaIndex = DEFAULT_INERTIA_INDEX;
+
+  function optionLabel(opt) {
+    return String(window.i18n.t(opt.labelKey)).replace(/^\s*[\d.]+\s*-\s*/, '');
+  }
 
   // 替换元素并绑定新监听器（消除 cloneNode 样板）
   function rebind(id, event, handler) {
@@ -57,7 +61,7 @@
     const inertiaPrev = document.getElementById('inertia-prev');
     const inertiaNext = document.getElementById('inertia-next');
     if (inertiaValue && INERTIA_OPTIONS[currentInertiaIndex]) {
-      inertiaValue.textContent = INERTIA_OPTIONS[currentInertiaIndex].label;
+      inertiaValue.textContent = optionLabel(INERTIA_OPTIONS[currentInertiaIndex]);
     }
     if (inertiaPrev) inertiaPrev.disabled = currentInertiaIndex <= 0;
     if (inertiaNext) inertiaNext.disabled = currentInertiaIndex >= INERTIA_OPTIONS.length - 1;

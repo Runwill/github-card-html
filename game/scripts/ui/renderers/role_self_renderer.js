@@ -1,5 +1,5 @@
 (function() {
-    const { setupHandInspector, resolveAvatarUrl, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
+    const { setupHandInspector, roleCharacterKey, updateAvatarImage, updateCountBadge, renderEquipNames, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
 
     /**
      * 渲染自身角色信息 (Self Role Info)
@@ -36,15 +36,7 @@
         // 头像 (Avatar) - Main View
         const mainAvatarImg = document.getElementById('char-img');
         if (mainAvatarImg) {
-            const avatarUrl = resolveAvatarUrl(selfRole);
-            if (avatarUrl && mainAvatarImg.getAttribute('src') !== avatarUrl) {
-                mainAvatarImg.src = avatarUrl;
-                if (avatarUrl.startsWith('source/')) {
-                    mainAvatarImg.classList.add('position-avatar');
-                } else {
-                    mainAvatarImg.classList.remove('position-avatar');
-                }
-            }
+            updateAvatarImage(mainAvatarImg, selfRole);
             const mainAvatarWrap = mainAvatarImg.closest('.char-avatar');
             if (mainAvatarWrap) {
                 mainAvatarWrap.classList.toggle('is-current-turn', isTurnOwner);
@@ -54,9 +46,7 @@
         // 名字 (角色/武将)
         const nameEl = document.getElementById('char-name');
         if (nameEl) {
-             let key = selfRole.character;
-             if (Array.isArray(key) && key.length > 0) key = key[0];
-             if (!key) key = selfRole.name;
+               const key = roleCharacterKey(selfRole);
 
              const renderKey = selfRole.characterId ? `char:${selfRole.characterId}:${key}` : `char:default:${key}`;
 
@@ -128,23 +118,7 @@
                     charImg.parentElement.appendChild(judgeCountEl);
                 }
 
-                let jCount = 0;
-                if (selfRole.judgeArea && selfRole.judgeArea.cards) {
-                    jCount = selfRole.judgeArea.cards.length;
-                }
-
-                if (jCount > 0) {
-                    judgeCountEl.style.display = 'flex';
-                    if (judgeCountEl.textContent !== String(jCount)) {
-                        judgeCountEl.classList.remove('count-changed');
-                        void judgeCountEl.offsetWidth;
-                        judgeCountEl.classList.add('count-changed');
-                        
-                        judgeCountEl.textContent = String(jCount);
-                    }
-                } else {
-                    judgeCountEl.style.display = 'none';
-                }
+                updateCountBadge(judgeCountEl, selfRole.judgeArea && selfRole.judgeArea.cards ? selfRole.judgeArea.cards.length : 0);
             }
 
             // Main View Hand Count
@@ -197,24 +171,7 @@
                 charInfoPanel.appendChild(mainEquipNames);
             }
             if (selfRole.equipSlots) {
-                const eNames = selfRole.equipSlots
-                    .map(slot => (slot.cards && slot.cards.length > 0) ? slot.cards[0].name : null)
-                    .filter(Boolean);
-                const eKey = eNames.join(',');
-                if (mainEquipNames.dataset.equipKey !== eKey) {
-                    mainEquipNames.dataset.equipKey = eKey;
-                    if (eNames.length > 0) {
-                        mainEquipNames.innerHTML = eNames.map(n => {
-                            const GT = GameText || window.Game.UI.GameText;
-                            const rendered = GT ? GT.render(n) : n;
-                            return `<span class="equip-name-tag">${rendered}</span>`;
-                        }).join('');
-                        mainEquipNames.style.display = '';
-                    } else {
-                        mainEquipNames.innerHTML = '';
-                        mainEquipNames.style.display = 'none';
-                    }
-                }
+                renderEquipNames(mainEquipNames, selfRole, GameText);
             }
         }
 

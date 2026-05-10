@@ -15,22 +15,23 @@
         return (window.i18n && window.i18n.t) ? window.i18n.t(key) : key;
     }
 
+    function byId(id) { return document.getElementById(id); }
+
+    function bind(id, event, handler) {
+        const el = byId(id);
+        if (el) el.addEventListener(event, handler);
+        return el;
+    }
+
     /**
      * 初始化在线房间 UI
      */
     function init() {
-        const onlineBtn = document.getElementById('btn-show-online');
-        if (onlineBtn) {
-            onlineBtn.addEventListener('click', toggleOnlinePanel);
-        }
-
-        const createBtn = document.getElementById('btn-create-room');
-        if (createBtn) {
-            createBtn.addEventListener('click', handleCreateRoom);
-        }
+        bind('btn-show-online', 'click', toggleOnlinePanel);
+        bind('btn-create-room', 'click', handleCreateRoom);
 
         // 回车键 = 点击创建房间
-        const roomInput = document.getElementById('input-room-id');
+        const roomInput = byId('input-room-id');
         if (roomInput) {
             roomInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -40,25 +41,10 @@
             });
         }
 
-        const refreshBtn = document.getElementById('btn-refresh-rooms');
-        if (refreshBtn) {
-            refreshBtn.addEventListener('click', refreshRoomList);
-        }
-
-        const leaveBtn = document.getElementById('btn-leave-room');
-        if (leaveBtn) {
-            leaveBtn.addEventListener('click', handleLeaveRoom);
-        }
-
-        const backBtn = document.getElementById('btn-back-lobby');
-        if (backBtn) {
-            backBtn.addEventListener('click', handleBackToLobby);
-        }
-
-        const spectateBtn = document.getElementById('btn-spectate');
-        if (spectateBtn) {
-            spectateBtn.addEventListener('click', handleToggleSpectate);
-        }
+        bind('btn-refresh-rooms', 'click', refreshRoomList);
+        bind('btn-leave-room', 'click', handleLeaveRoom);
+        bind('btn-back-lobby', 'click', handleBackToLobby);
+        bind('btn-spectate', 'click', handleToggleSpectate);
 
         // 注册事件回调
         const client = Client();
@@ -133,27 +119,28 @@
      * 显示大厅视图
      */
     function showLobby() {
-        const lobby = document.getElementById('online-lobby');
-        const inRoom = document.getElementById('online-in-room');
-        if (lobby) lobby.classList.remove('hidden');
-        if (inRoom) inRoom.classList.add('hidden');
+        setRoomView(false);
     }
 
     /**
      * 显示房间内视图
      */
     function showInRoom() {
-        const lobby = document.getElementById('online-lobby');
-        const inRoom = document.getElementById('online-in-room');
-        if (lobby) lobby.classList.add('hidden');
-        if (inRoom) inRoom.classList.remove('hidden');
+        setRoomView(true);
+    }
+
+    function setRoomView(inRoomVisible) {
+        const lobby = byId('online-lobby');
+        const inRoom = byId('online-in-room');
+        if (lobby) lobby.classList.toggle('hidden', inRoomVisible);
+        if (inRoom) inRoom.classList.toggle('hidden', !inRoomVisible);
     }
 
     /**
      * 设置状态信息
      */
     function setStatus(text, type) {
-        const el = document.getElementById('online-status');
+        const el = byId('online-status');
         if (!el) return;
         el.textContent = text;
         el.className = 'online-status';
@@ -179,8 +166,9 @@
      * 渲染房间列表
      */
     function renderRoomList(rooms) {
-        const list = document.getElementById('room-list');
+        const list = byId('room-list');
         if (!list) return;
+        bindRoomListActions(list);
 
         if (!rooms || rooms.length === 0) {
             list.innerHTML = `<div class="room-empty">${t('online.noRooms')}</div>`;
@@ -214,28 +202,24 @@
             </div>`;
         }).join('');
 
-        // 绑定加入按钮
-        list.querySelectorAll('.btn-join-room').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const roomId = e.target.closest('.room-item').dataset.roomId;
-                handleJoinRoom(roomId);
-            });
-        });
+    }
 
-        // 绑定进入按钮（已在房间中，直接切换到房间内视图）
-        list.querySelectorAll('.btn-enter-room').forEach(btn => {
-            btn.addEventListener('click', () => {
+    function bindRoomListActions(list) {
+        if (list.__roomListActionsBound) return;
+        list.__roomListActionsBound = true;
+        list.addEventListener('click', (e) => {
+            const btn = e.target.closest('.btn-join-room, .btn-enter-room, .btn-dissolve-room');
+            if (!btn) return;
+            const item = btn.closest('.room-item');
+            const roomId = item && item.dataset.roomId;
+            if (btn.classList.contains('btn-enter-room')) {
                 showInRoom();
                 renderRoomInfo();
-            });
-        });
-
-        // 绑定解散按钮
-        list.querySelectorAll('.btn-dissolve-room').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const roomId = e.target.closest('.room-item').dataset.roomId;
+            } else if (roomId && btn.classList.contains('btn-join-room')) {
+                handleJoinRoom(roomId);
+            } else if (roomId && btn.classList.contains('btn-dissolve-room')) {
                 handleDissolveRoom(roomId);
-            });
+            }
         });
     }
 
@@ -412,11 +396,11 @@
     function renderRoomInfo() {
         if (!currentRoom) return;
 
-        const nameEl = document.getElementById('current-room-name');
+        const nameEl = byId('current-room-name');
         if (nameEl) nameEl.textContent = currentRoom.id;
 
         // 更新旁观按钮可见性
-        const spectateBtn = document.getElementById('btn-spectate');
+        const spectateBtn = byId('btn-spectate');
         if (spectateBtn) {
             const allowSpectate = currentRoom.allowSpectate !== false; // default true
             if (allowSpectate) {
@@ -434,7 +418,7 @@
         }
 
         // 房间内禁止旁观提示
-        const noSpectateHint = document.getElementById('room-no-spectate-hint');
+        const noSpectateHint = byId('room-no-spectate-hint');
         if (noSpectateHint) {
             const allowed = currentRoom.allowSpectate !== false;
             noSpectateHint.classList.toggle('hidden', allowed);
@@ -448,7 +432,7 @@
      */
     function renderUserList() {
         if (!currentRoom) return;
-        const container = document.getElementById('room-user-list');
+        const container = byId('room-user-list');
         if (!container) return;
 
         const users = currentRoom.users || {};

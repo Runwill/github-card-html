@@ -4,14 +4,9 @@
         'tokens.title': '词元',
         'tokens.search.placeholder': '搜索...',
         'tokens.refresh': '刷新',
-        'tokens.mode.toggle.title': '切换显示模式',
         'tokens.mode.compact': '缩略',
         'tokens.mode.detail': '详细',
         // Tokens KV and common action texts
-        'tokens.kv.value': '值',
-        'tokens.kv.editHint': '单击编辑',
-        'tokens.kv.type.array': '数组',
-        'tokens.kv.type.object': '对象',
         // Tokens modal texts
         'tokens.create.title': '新增对象',
         'tokens.create.cancel': '取消',
@@ -84,14 +79,9 @@
         'tokens.title': 'Tokens',
         'tokens.search.placeholder': 'Search...',
         'tokens.refresh': 'Refresh',
-        'tokens.mode.toggle.title': 'Toggle display mode',
         'tokens.mode.compact': 'Compact',
         'tokens.mode.detail': 'Detailed',
         // Tokens KV and common action texts
-        'tokens.kv.value': 'Value',
-        'tokens.kv.editHint': 'Click to edit',
-        'tokens.kv.type.array': 'Array',
-        'tokens.kv.type.object': 'Object',
         // Tokens modal texts
         'tokens.create.title': 'Create object',
         'tokens.create.cancel': 'Cancel',

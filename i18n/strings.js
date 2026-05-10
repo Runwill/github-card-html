@@ -11,7 +11,6 @@
 
     'sidebar.account': '账号',
     'sidebar.approvals': '审核',
-    'sidebar.permissions': '权限',
     'sidebar.theme': '主题',
     'sidebar.logout': '退出',
     'sidebar.announcements': '更新公告',
@@ -47,7 +46,6 @@
     'account.info.userId': '用户ID',
     'account.info.createdAt': '注册时间',
     'account.info.placeholder.intro': '（暂无简介）',
-    'account.info.editUsername': '编辑用户名',
     'account.info.pending': '审核中：',
     'account.info.cancel': '撤回',
 
@@ -140,8 +138,6 @@
     'help.character.lore': '悬停技能名，显示专属引言浮层',
     'help.character.dynamic': '标签悬停高亮，双击跳转定义处',
     'help.draft.input': '编写 HTML，右侧实时预览；自动保存并替换标签',
-    'help.draft.replace': '自定义标签自动替换为带样式元素',
-    'help.draft.save': '自动保存，刷新后恢复',
     'help.editor.palette': '搜索并插入词元或快捷片段，支持中文、拼音和首字母',
     'help.editor.insert': '点击插入到选中节点子级；未选中时插入到结构树末尾',
     'help.editor.dragInsert': '拖拽到节点上半、下半或中部，可前插、后插或作为子级插入',
@@ -159,7 +155,6 @@
     'help.editor.key.deleteSelected': '删除选中节点',
     'help.editor.key.undoRedo': '撤回或重做结构树修改',
     'help.editor.key.variant': '按住时插入变体结构',
-    'help.editor.keys': '聚焦搜索、清选、加子级或加同级',
     'help.tokens.search': '关键词过滤词元列表',
     'help.tokens.refresh': '从服务器重新加载数据',
     'help.tokens.compact': '缩略模式隐藏英文名/颜色/序号',
@@ -198,9 +193,7 @@
     'help.game.equipViewer': '四格装备槽，可拖牌到指定槽',
     'help.game.cardContext': '快速置于牌堆、弃牌堆或角色区',
     'help.game.roleContext': '切换视角、设回合角色或处理体力',
-    'help.game.context': '右键打开快捷菜单',
     'help.game.inspect': '按住检查键查看详细属性',
-    'help.game.roleSummary': '点击看手牌；长按看判定区',
     'help.game.viewerBadges': '摘要头像上方显示查看或旁观用户',
     'help.game.timing': '时机标签、流程面包屑和日志',
     'help.game.viewSetup': '设置',
@@ -218,9 +211,6 @@
     'gameSettings.inertia.instant': '1.0 - 即时',
 
     'theme.toggle': '切换主题',
-    'theme.toggle.toLight': '切换为浅色',
-    'theme.toggle.toDark': '切换为深色',
-    'theme.toggle.toElegant': '切换为典雅',
 
     'lang.button.label': '语言：{lang}',
     'lang.name.zh': '中文',
@@ -238,7 +228,6 @@
     'editor.title': 'HTML 编辑器',
     'editor.palette.title': '元素库',
     'editor.palette.loading': '正在加载元素…',
-    'editor.palette.count': '显示 {shown} / {total}',
     'editor.search.placeholder': '搜索元素 / 拼音',
     'editor.recommendations.title': '相关推荐',
     'editor.recommendation.score': '相关度 {score}',
@@ -248,13 +237,6 @@
     'editor.tree.title': '结构树',
     'editor.tree.empty': '暂无结构',
     'editor.inspector.title': '属性',
-    'editor.inspector.empty': '未选中',
-    'editor.inspector.tag': '标签名',
-    'editor.inspector.text': '文本',
-    'editor.mode.child': '子级',
-    'editor.mode.before': '前插',
-    'editor.mode.after': '后插',
-    'editor.variant.label': '变体',
     'editor.variant.short': '变体',
     'editor.variant.badge': '变体',
     'editor.source.snippet': '片段',
@@ -264,7 +246,6 @@
     'editor.action.escapeQuotes': '转义引号',
     'editor.action.expandAll': '展开',
     'editor.action.collapseAll': '折叠',
-    'editor.action.clearSelection': '清除选择',
     'editor.action.importFromDraft': '输入',
     'editor.action.outputToDraft': '输出',
     'editor.action.clearTree': '清空',
@@ -272,10 +253,6 @@
     'editor.action.toggleNode': '展开或折叠节点',
     'editor.action.convertElement': '转为元素',
     'editor.action.convertText': '转为文本',
-    'editor.action.addChild': '加子节点',
-    'editor.action.addSibling': '加同级',
-    'editor.action.moveUp': '上移',
-    'editor.action.moveDown': '下移',
     'editor.log.title': '日志',
     'editor.log.clear': '清空',
     'editor.log.empty': '暂无日志',
@@ -295,7 +272,6 @@
     'editor.confirm.clear': '清空当前编辑器结构？',
     'editor.toast.imported': '已从草稿输入到编辑器',
     'editor.toast.appliedToDraft': '已输出到草稿',
-    'editor.toast.paletteReloaded': '元素库已刷新',
     // Common
     'common.empty': '空',
     'common.cancel': '取消',
@@ -334,8 +310,6 @@
     'announcements.error.loadFailed': '公告加载失败',
 
     // Error prefixes for developer console messages
-    'error.updateIntroFailedPrefix': '更新简介失败：',
-    'error.updateUsernameFailedPrefix': '更新用户名失败：',
     'error.requestFailedPrefix': '请求失败：',
 
     // Password modal
@@ -365,7 +339,6 @@
     'role.guest': '访客',
 
     // Permissions badge
-    'perm.badge.multiple': '权限×{count}',
     'perm.tooltip.prefix': '权限：{name}',
     'perm.tooltip.仪同三司': '修改账号信息免审核', //修改
     'perm.tooltip.赞拜不名': '允许切换到调试语言'
@@ -403,7 +376,6 @@
 
     'sidebar.account': 'Account',
     'sidebar.approvals': 'Approvals',
-    'sidebar.permissions': 'Permissions',
     'sidebar.theme': 'Theme',
     'sidebar.logout': 'Log out',
     'sidebar.announcements': 'Updates',
@@ -440,7 +412,6 @@
     'account.info.userId': 'User ID',
     'account.info.createdAt': 'Joined',
     'account.info.placeholder.intro': '(No intro yet)',
-    'account.info.editUsername': 'Edit username',
     'account.info.pending': 'Pending: ',
     'account.info.cancel': 'Revoke',
 
@@ -532,8 +503,6 @@
     'help.character.lore': 'Hover skill name for lore tooltip',
     'help.character.dynamic': 'Tags highlight on hover; double-click to jump',
     'help.draft.input': 'Write HTML; live preview with auto-save and tag replacement',
-    'help.draft.replace': 'Custom tags auto-replaced with styled elements',
-    'help.draft.save': 'Auto-saved; restored on reload',
     'help.editor.palette': 'Search and insert tokens or snippets by Chinese, pinyin, or initials',
     'help.editor.insert': 'Click to insert as a child of the selection; with no selection, append to the tree root',
     'help.editor.dragInsert': 'Drag onto the top, bottom, or middle of a node to insert before, after, or as child',
@@ -551,7 +520,6 @@
     'help.editor.key.deleteSelected': 'Delete the selected node',
     'help.editor.key.undoRedo': 'Undo or redo structure tree changes',
     'help.editor.key.variant': 'Hold to insert variant structures',
-    'help.editor.keys': 'Focus search, clear selection, add child or sibling',
     'help.tokens.search': 'Filter tokens by keyword',
     'help.tokens.refresh': 'Reload data from server',
     'help.tokens.compact': 'Compact hides English names/colors/indices',
@@ -590,9 +558,7 @@
     'help.game.equipViewer': 'Four equipment slots; drag cards to a slot',
     'help.game.cardContext': 'Quick-place to piles, treatment, or role areas',
     'help.game.roleContext': 'Switch view, set turn role, or adjust health',
-    'help.game.context': 'Right-click for context menu',
     'help.game.inspect': 'Hold inspect key to view attributes',
-    'help.game.roleSummary': 'Click for hand; long-press for judge area',
     'help.game.viewerBadges': 'Labels show who is viewing or spectating',
     'help.game.timing': 'Timing badge, breadcrumbs, and log',
     'help.game.viewSetup': 'Setup',
@@ -610,9 +576,6 @@
     'gameSettings.inertia.instant': '1.0 - Instant',
 
     'theme.toggle': 'Switch theme',
-    'theme.toggle.toLight': 'Switch to light',
-    'theme.toggle.toDark': 'Switch to dark',
-    'theme.toggle.toElegant': 'Switch to elegant',
 
     'lang.button.label': 'Language: {lang}',
     'lang.name.zh': '中文',
@@ -630,7 +593,6 @@
     'editor.title': 'HTML Editor',
     'editor.palette.title': 'Elements',
     'editor.palette.loading': 'Loading elements…',
-    'editor.palette.count': 'Showing {shown} / {total}',
     'editor.search.placeholder': 'Search elements / pinyin',
     'editor.recommendations.title': 'Related',
     'editor.recommendation.score': 'Relevance {score}',
@@ -640,13 +602,6 @@
     'editor.tree.title': 'Structure Tree',
     'editor.tree.empty': 'No structure yet',
     'editor.inspector.title': 'Attributes',
-    'editor.inspector.empty': 'Nothing selected',
-    'editor.inspector.tag': 'Tag name',
-    'editor.inspector.text': 'Text',
-    'editor.mode.child': 'Child',
-    'editor.mode.before': 'Before',
-    'editor.mode.after': 'After',
-    'editor.variant.label': 'Variant',
     'editor.variant.short': 'Variant',
     'editor.variant.badge': 'Variant',
     'editor.source.snippet': 'Snippet',
@@ -656,7 +611,6 @@
     'editor.action.escapeQuotes': 'Escape quotes',
     'editor.action.expandAll': 'Expand',
     'editor.action.collapseAll': 'Collapse',
-    'editor.action.clearSelection': 'Clear selection',
     'editor.action.importFromDraft': 'Input',
     'editor.action.outputToDraft': 'Output',
     'editor.action.clearTree': 'Clear',
@@ -664,10 +618,6 @@
     'editor.action.toggleNode': 'Expand or collapse node',
     'editor.action.convertElement': 'Convert to element',
     'editor.action.convertText': 'Convert to text',
-    'editor.action.addChild': 'Add child',
-    'editor.action.addSibling': 'Add sibling',
-    'editor.action.moveUp': 'Move up',
-    'editor.action.moveDown': 'Move down',
     'editor.log.title': 'Log',
     'editor.log.clear': 'Clear',
     'editor.log.empty': 'No log entries',
@@ -687,7 +637,6 @@
     'editor.confirm.clear': 'Clear the current editor structure?',
     'editor.toast.imported': 'Draft input loaded into editor',
     'editor.toast.appliedToDraft': 'Sent to draft',
-    'editor.toast.paletteReloaded': 'Element library reloaded',
     // Common
     'common.empty': 'Empty',
     'common.cancel': 'Cancel',
@@ -726,8 +675,6 @@
     'announcements.error.loadFailed': 'Failed to load announcements',
 
     // Error prefixes for developer console messages
-    'error.updateIntroFailedPrefix': 'Update intro failed:',
-    'error.updateUsernameFailedPrefix': 'Update username failed:',
     'error.requestFailedPrefix': 'Request failed:',
 
     // Password modal
@@ -757,7 +704,6 @@
     'role.guest': 'Guest',
 
     // Permissions badge
-    'perm.badge.multiple': 'Permissions×{count}',
     'perm.tooltip.prefix': 'Permission: {name}',
     'perm.tooltip.仪同三司': 'Bypass approval (username/intro/avatar)',
     'perm.tooltip.赞拜不名': 'Allow switching to Debug language'

@@ -1,5 +1,5 @@
 (function() {
-    const { fitSummaryName, setupHandInspector, resolveAvatarUrl, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
+    const { fitSummaryName, setupHandInspector, roleCharacterKey, updateAvatarImage, updateCountBadge, renderEquipNames, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
 
     function createSummaryButton(className, text, title) {
         const button = document.createElement('button');
@@ -188,24 +188,11 @@
             
             // 头像
             const avatarImg = pEl.querySelector('.char-avatar img');
-            if (avatarImg) {
-                const avatarUrl = resolveAvatarUrl(role);
-                
-                if (avatarUrl && avatarImg.getAttribute('src') !== avatarUrl) {
-                    avatarImg.src = avatarUrl;
-                    if (avatarUrl.startsWith('source/')) {
-                        avatarImg.classList.add('position-avatar');
-                    } else {
-                        avatarImg.classList.remove('position-avatar');
-                    }
-                }
-            }
+            updateAvatarImage(avatarImg, role);
 
             // 名字
             const nameSpan = pEl.querySelector('.player-name');
-            let key = role.character;
-            if (Array.isArray(key) && key.length > 0) key = key[0];
-            if (!key) key = role.name;
+            const key = roleCharacterKey(role);
             const renderKey = role.characterId ? `char:${role.characterId}:${key}` : `char:default:${key}`;
             if (nameSpan.getAttribute('data-render-key') !== renderKey) {
                 const newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
@@ -216,25 +203,7 @@
             
             // 判定区牌数
             const judgeCountSpan = pEl.querySelector('.player-judge-count');
-            if (judgeCountSpan) {
-                let jCount = 0;
-                if (role.judgeArea && role.judgeArea.cards) {
-                    jCount = role.judgeArea.cards.length;
-                }
-                
-                if (jCount > 0) {
-                    judgeCountSpan.style.display = 'flex';
-                    if (judgeCountSpan.textContent !== String(jCount)) {
-                        judgeCountSpan.classList.remove('count-changed');
-                        void judgeCountSpan.offsetWidth;
-                        judgeCountSpan.classList.add('count-changed');
-                        
-                        judgeCountSpan.textContent = String(jCount);
-                    }
-                } else {
-                    judgeCountSpan.style.display = 'none';
-                }
-            }
+            updateCountBadge(judgeCountSpan, role.judgeArea && role.judgeArea.cards ? role.judgeArea.cards.length : 0);
 
             // Stats Row Updates
             const statsDiv = pEl.querySelector('.player-stats-row') || pEl;
@@ -301,26 +270,7 @@
             
             // 装备区卡牌名称
             const equipNamesEl = pEl.querySelector('.player-equip-names');
-            if (equipNamesEl && role.equipSlots) {
-                const equipNames = role.equipSlots
-                    .map(slot => (slot.cards && slot.cards.length > 0) ? slot.cards[0].name : null)
-                    .filter(Boolean);
-                const equipKey = equipNames.join(',');
-                if (equipNamesEl.dataset.equipKey !== equipKey) {
-                    equipNamesEl.dataset.equipKey = equipKey;
-                    if (equipNames.length > 0) {
-                        equipNamesEl.innerHTML = equipNames.map(n => {
-                            const GT = GameText || window.Game.UI.GameText;
-                            const rendered = GT ? GT.render(n) : n;
-                            return `<span class="equip-name-tag">${rendered}</span>`;
-                        }).join('');
-                        equipNamesEl.style.display = '';
-                    } else {
-                        equipNamesEl.innerHTML = '';
-                        equipNamesEl.style.display = 'none';
-                    }
-                }
-            }
+            renderEquipNames(equipNamesEl, role, GameText);
 
             // 右键菜单
             pEl.oncontextmenu = (e) => {

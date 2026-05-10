@@ -42,11 +42,14 @@
     meta.appendChild(title); meta.appendChild(sub);
 
     const tagsWrap = makeEl('div', 'perm-tags');
-    const shown = current.slice(0, ns.constants.MAX_TAGS_SHOWN);
-    shown.forEach(p => { const el = tag(p, false); bindPermTooltip(el, p); tagsWrap.appendChild(el); });
-    const extra = current.slice(ns.constants.MAX_TAGS_SHOWN);
-    if (extra.length) tagsWrap.appendChild(tag('+' + extra.length, true, extra.join('、')));
     left.appendChild(meta); left.appendChild(tagsWrap);
+    const renderPermissionTags = ()=>{
+      tagsWrap.innerHTML = '';
+      current.slice(0, ns.constants.MAX_TAGS_SHOWN).forEach(p => { const el = tag(p, false); bindPermTooltip(el, p); tagsWrap.appendChild(el); });
+      const extra = current.slice(ns.constants.MAX_TAGS_SHOWN);
+      if (extra.length) tagsWrap.appendChild(tag('+' + extra.length, true, extra.join('、')));
+    };
+    renderPermissionTags();
 
     const right = makeEl('div', 'approval-right');
   const editBtn = makeEl('button', 'btn btn--secondary btn--sm');
@@ -88,8 +91,25 @@
       return field;
     };
 
+    const makeHiddenEditor = (className)=>{
+      const el = makeEl('div', className);
+      el.style.display = 'none';
+      el.classList.add('is-collapsed');
+      return el;
+    };
+
+    const makeEditorActions = ()=>{
+      const actions = makeEl('div', 'perm-editor__actions');
+      const cancel = makeEl('button', 'btn btn--secondary');
+      const save = makeEl('button', 'btn btn--primary btn--lift');
+      setI18nAttr(cancel, 'common.cancel', t('common.cancel', '取消'));
+      setI18nAttr(save, 'common.save', t('common.save', '保存'));
+      actions.appendChild(cancel); actions.appendChild(save);
+      return { actions, cancel, save };
+    };
+
     // 权限编辑器
-    const editor = makeEl('div', 'perm-editor perm-editor--permissions'); editor.style.display = 'none'; editor.classList.add('is-collapsed');
+    const editor = makeHiddenEditor('perm-editor perm-editor--permissions');
     const selectedCounter = makeEl('div', 'perm-editor__counter');
     const btnSelectAll = makeEl('button', 'btn btn--secondary btn--sm admin-toolbar-action');
     setI18nAttr(btnSelectAll, 'permissions.selectAll', t('permissions.selectAll', '全选'));
@@ -120,24 +140,12 @@
     };
     renderChecklist();
 
-    const refreshTags = ()=>{
-      tagsWrap.innerHTML = '';
-      const shown2 = current.slice(0, ns.constants.MAX_TAGS_SHOWN);
-      shown2.forEach(p => { const el = tag(p, false); bindPermTooltip(el, p); tagsWrap.appendChild(el); });
-      const extra2 = current.slice(ns.constants.MAX_TAGS_SHOWN);
-      if (extra2.length) tagsWrap.appendChild(tag('+' + extra2.length, true, extra2.join('、')));
-    };
-    const actions = makeEl('div', 'perm-editor__actions');
-    const btnCancel = makeEl('button', 'btn btn--secondary');
-    const btnSave = makeEl('button', 'btn btn--primary btn--lift');
-    setI18nAttr(btnCancel, 'common.cancel', t('common.cancel', '取消'));
-    setI18nAttr(btnSave, 'common.save', t('common.save', '保存'));
-    actions.appendChild(btnCancel); actions.appendChild(btnSave);
+    const { actions, cancel: btnCancel, save: btnSave } = makeEditorActions();
     editor.appendChild(editorHead.head); editor.appendChild(list); editor.appendChild(actions);
     editorStack.appendChild(editor);
 
     // 密码编辑器（用 <form> 包裹以满足浏览器 DOM 规范要求）
-    const pwdEditor = makeEl('div', 'perm-editor perm-editor--form'); pwdEditor.style.display='none'; pwdEditor.classList.add('is-collapsed');
+    const pwdEditor = makeHiddenEditor('perm-editor perm-editor--form');
     const pwdForm = document.createElement('form'); pwdForm.autocomplete='off'; pwdForm.addEventListener('submit', e => e.preventDefault());
     const pwdHead = makeEditorHead('permissions.editor.passwordTitle', t('permissions.changePassword', '修改密码'));
     const pwdList = makeEl('div', 'perm-editor__form-grid');
@@ -145,30 +153,20 @@
     const inputConfirm = document.createElement('input'); inputConfirm.type='password'; inputConfirm.className='admin-input'; inputConfirm.autocomplete='new-password'; inputConfirm.placeholder = t('modal.password.confirm','确认新密码');
     pwdList.appendChild(makeEditorField('modal.password.new', t('modal.password.new','新密码'), inputNew));
     pwdList.appendChild(makeEditorField('modal.password.confirm', t('modal.password.confirm','确认新密码'), inputConfirm));
-    const pwdActions = makeEl('div', 'perm-editor__actions');
-    const btnPwdCancel = makeEl('button', 'btn btn--secondary');
-    const btnPwdSave = makeEl('button', 'btn btn--primary btn--lift');
-    setI18nAttr(btnPwdCancel, 'common.cancel', t('common.cancel','取消'));
-    setI18nAttr(btnPwdSave, 'common.save', t('common.save','保存'));
-    pwdActions.appendChild(btnPwdCancel); pwdActions.appendChild(btnPwdSave);
+    const { actions: pwdActions, cancel: btnPwdCancel, save: btnPwdSave } = makeEditorActions();
     pwdForm.appendChild(pwdHead.head); pwdForm.appendChild(pwdList); pwdForm.appendChild(pwdActions);
     pwdEditor.appendChild(pwdForm);
     editorStack.appendChild(pwdEditor);
 
     // 角色编辑器
-    const roleEditor = makeEl('div', 'perm-editor perm-editor--form'); roleEditor.style.display='none'; roleEditor.classList.add('is-collapsed');
+    const roleEditor = makeHiddenEditor('perm-editor perm-editor--form');
     const roleHead = makeEditorHead('permissions.editor.roleTitle', t('permissions.changeRole', '修改角色'));
     const roleList = makeEl('div', 'perm-editor__form-grid');
     const select = document.createElement('select'); select.className='admin-input';
     const ROLES = [ { v: 'admin', k: 'role.admin' }, { v: 'moderator', k: 'role.moderator' }, { v: 'user', k: 'role.user' }, { v: 'guest', k: 'role.guest' } ];
     ROLES.forEach(r => { const opt = document.createElement('option'); opt.value = r.v; setText(opt, r.k, r.v); if (String(u.role) === r.v) opt.selected = true; select.appendChild(opt); });
     roleList.appendChild(makeEditorField('permissions.user.roleLabel', t('permissions.user.roleLabel', '角色：'), select));
-    const roleActions = makeEl('div', 'perm-editor__actions');
-    const btnRoleCancel = makeEl('button', 'btn btn--secondary');
-    const btnRoleSave = makeEl('button', 'btn btn--primary btn--lift');
-    setI18nAttr(btnRoleCancel, 'common.cancel', t('common.cancel','取消'));
-    setI18nAttr(btnRoleSave, 'common.save', t('common.save','保存'));
-    roleActions.appendChild(btnRoleCancel); roleActions.appendChild(btnRoleSave);
+    const { actions: roleActions, cancel: btnRoleCancel, save: btnRoleSave } = makeEditorActions();
     roleEditor.appendChild(roleHead.head); roleEditor.appendChild(roleList); roleEditor.appendChild(roleActions);
     editorStack.appendChild(roleEditor);
     block.appendChild(editorStack);
@@ -306,7 +304,7 @@
         for (const p of toGrant) { await API.grant(userId, p); if (!curSet.has(p)) { curSet.add(p); current.push(p); } }
         for (const p of toRevoke) { await API.revoke(userId, p); if (curSet.has(p)) { curSet.delete(p); const idx = current.indexOf(p); if (idx>-1) current.splice(idx,1); } }
         // 局部更新标签展示，不刷新整页
-        refreshTags();
+        renderPermissionTags();
         // 自动刷新日志
         if (ns.refreshLogs) ns.refreshLogs();
       } catch(e) { toast((e && e.message) ? e.message : 'permissions.saveFailed', 'error'); }

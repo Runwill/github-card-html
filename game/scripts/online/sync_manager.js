@@ -164,25 +164,16 @@
                 player.liveStatus = pData.liveStatus;
 
                 // 恢复手牌
-                if (pData.hand) {
-                    player.hand.cards = (pData.hand.cards || []).map(c => deserializeCard(c, Card));
-                    player.hand.cards.forEach(c => { if (c) c.lyingArea = player.hand; });
-                }
+                restoreAreaCards(player.hand, pData.hand, Card);
 
                 // 恢复判定区
-                if (pData.judgeArea) {
-                    player.judgeArea.cards = (pData.judgeArea.cards || []).map(c => deserializeCard(c, Card));
-                    player.judgeArea.cards.forEach(c => { if (c) c.lyingArea = player.judgeArea; });
-                }
+                restoreAreaCards(player.judgeArea, pData.judgeArea, Card);
 
                 // 恢复装备栏
                 if (pData.equipSlots) {
                     pData.equipSlots.forEach((slotData, slotIdx) => {
                         if (player.equipSlots[slotIdx] && slotData) {
-                            player.equipSlots[slotIdx].cards = (slotData.cards || []).map(c => deserializeCard(c, Card));
-                            player.equipSlots[slotIdx].cards.forEach(c => {
-                                if (c) c.lyingArea = player.equipSlots[slotIdx];
-                            });
+                            restoreAreaCards(player.equipSlots[slotIdx], slotData, Card);
                         }
                     });
                 }
@@ -221,6 +212,12 @@
             return card;
         }).filter(Boolean);
         return area;
+    }
+
+    function restoreAreaCards(area, data, Card) {
+        if (!area || !data) return;
+        area.cards = (data.cards || []).map(c => deserializeCard(c, Card));
+        area.cards.forEach(c => { if (c) c.lyingArea = area; });
     }
 
     function deserializeCard(data, Card) {
@@ -292,10 +289,7 @@
                     }
                 }
 
-                // 更新 UI
-                if (window.Game.UI && window.Game.UI.updateUI) {
-                    window.Game.UI.updateUI();
-                }
+                refreshGameUI();
 
                 // ── 动画播放：在 UI 更新后播放弧形飞行 + FLIP 动画 ──
                 if (Animator && animPayload) {
@@ -344,10 +338,7 @@
                     }
                 }
 
-                // 更新 UI
-                if (window.Game.UI && window.Game.UI.updateUI) {
-                    window.Game.UI.updateUI();
-                }
+                refreshGameUI();
             }
         } finally {
             isApplyingRemote = false;
@@ -377,20 +368,19 @@
     }
 
     function applyRemoteHealthChange(payload) {
-        const gs = window.Game.GameState;
-        if (!gs) return;
-        const player = gs.players.find(p => p.id === payload.roleId);
-        if (player) {
-            player.health = Math.max(player.health + payload.delta, 0);
-        }
+        adjustPlayerField(payload, 'health', 0);
     }
 
     function applyRemoteMaxHealthChange(payload) {
+        adjustPlayerField(payload, 'healthLimit', 1);
+    }
+
+    function adjustPlayerField(payload, field, minValue) {
         const gs = window.Game.GameState;
         if (!gs) return;
         const player = gs.players.find(p => p.id === payload.roleId);
         if (player) {
-            player.healthLimit = Math.max(player.healthLimit + payload.delta, 1);
+            player[field] = Math.max(player[field] + payload.delta, minValue);
         }
     }
 

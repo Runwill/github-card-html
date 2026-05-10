@@ -182,6 +182,53 @@
         return role.avatar || '';
     }
 
+    function roleCharacterKey(role) {
+        let key = role && role.character;
+        if (Array.isArray(key) && key.length > 0) key = key[0];
+        return key || (role && role.name) || '';
+    }
+
+    function updateAvatarImage(img, role) {
+        if (!img) return;
+        const avatarUrl = resolveAvatarUrl(role);
+        if (!avatarUrl || img.getAttribute('src') === avatarUrl) return;
+        img.src = avatarUrl;
+        img.classList.toggle('position-avatar', avatarUrl.startsWith('source/'));
+    }
+
+    function updateCountBadge(el, count) {
+        if (!el) return;
+        if (count > 0) {
+            el.style.display = 'flex';
+            if (el.textContent !== String(count)) {
+                el.classList.remove('count-changed');
+                void el.offsetWidth;
+                el.classList.add('count-changed');
+                el.textContent = String(count);
+            }
+        } else {
+            el.style.display = 'none';
+        }
+    }
+
+    function renderEquipNames(container, role, GameText) {
+        if (!container || !role || !role.equipSlots) return;
+        const equipNames = role.equipSlots
+            .map(slot => (slot.cards && slot.cards.length > 0) ? slot.cards[0].name : null)
+            .filter(Boolean);
+        const equipKey = equipNames.join(',');
+        if (container.dataset.equipKey === equipKey) return;
+        container.dataset.equipKey = equipKey;
+        if (equipNames.length > 0) {
+            const GT = GameText || window.Game.UI.GameText;
+            container.innerHTML = equipNames.map(n => `<span class="equip-name-tag">${GT ? GT.render(n) : n}</span>`).join('');
+            container.style.display = '';
+        } else {
+            container.innerHTML = '';
+            container.style.display = 'none';
+        }
+    }
+
     /**
      * 打开判定区查看器（共用逻辑，供 setupJudgeButton / judge badge 等复用）
      */
@@ -193,9 +240,7 @@
         const sourceId = `role-judge:${role.id}`;
         const cards = role.judgeArea.cards || [];
 
-        let charNameKey = role.character;
-        if (Array.isArray(charNameKey) && charNameKey.length > 0) charNameKey = charNameKey[0];
-        if (!charNameKey) charNameKey = role.name;
+        const charNameKey = roleCharacterKey(role);
 
         let ownerNameHtml = charNameKey;
         if (GT) {
@@ -251,7 +296,7 @@
                      equipData = [[], [], [], []]; 
                  }
                  
-                 const charNameKey = role.character || role.name;
+                 const charNameKey = roleCharacterKey(role);
                  const GT = GameText || window.Game.UI.GameText;
                  const ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
 
@@ -323,6 +368,10 @@
         fitSummaryName,
         setupHandInspector,
         resolveAvatarUrl,
+        roleCharacterKey,
+        updateAvatarImage,
+        updateCountBadge,
+        renderEquipNames,
         setupJudgeButton,
         setupEquipmentButton,
         updateViewerLabels,

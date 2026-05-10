@@ -2,11 +2,6 @@
     window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
-    // Scrolling State (Per-instance context will be easier, but we can reuse calculation logic)
-    const SCROLL_ACCEL = 3.0;      // Acceleration per frame
-    const MAX_SPEED = 80;        // Max speed
-    const SCROLL_FRICTION = 0.85; // Deceleration when stopped
-
     // Registry of open viewers: sourceId -> { modal, cleanup }
     window.Game.UI.viewers = {};
     window.Game.UI.maxViewerZIndex = 11000; // Start higher than base modal
@@ -53,11 +48,9 @@
         if (viewers.length > 0) {
             // Close all viewers that have been open for at least 200ms
             // This prevents immediate closing if the open event bubbles to document
-            let closedAny = false;
             viewers.forEach(v => {
                 if (now - v.openedAt > 200) {
                     if (v.cleanup) v.cleanup();
-                    closedAny = true;
                 }
             });
             
@@ -142,6 +135,44 @@
         return () => { // Cleanup function
              modalContent.removeEventListener('mousedown', onMouseDown);
         };
+    }
+
+    function slotCardsAt(cards, index) {
+        if (!Array.isArray(cards)) return [];
+        if (Array.isArray(cards[index])) return cards[index];
+        return cards[index] ? [cards[index]] : [];
+    }
+
+    function renderViewerSlot(sourceId, index, cards) {
+        if (!window.Game.UI.renderCardList) return;
+        const targetId = `viewer-slot-${sourceId}-${index}`;
+        if (!document.getElementById(targetId)) return;
+        window.Game.UI.renderCardList(targetId, cards, `${sourceId}:slot:${index}`, {
+            skipLayout: true,
+            forceFaceDown: false
+        });
+    }
+
+    function renderViewerGrid(gridId, cards, sourceId, options) {
+        if (!window.Game.UI.renderCardList) return;
+        window.Game.UI.renderCardList(gridId, cards || [], sourceId, {
+            skipLayout: true,
+            showIndex: true,
+            forceFaceDown: options && options.forceFaceDown
+        });
+    }
+
+    function resolveViewerCards(sourceId, GameState) {
+        if (sourceId === 'pile') return (GameState.pile && GameState.pile.cards) ? GameState.pile.cards : [];
+        if (sourceId === 'discardPile') return (GameState.discardPile && GameState.discardPile.cards) ? GameState.discardPile.cards : [];
+        if (sourceId === 'treatmentArea') return (GameState.treatmentArea && GameState.treatmentArea.cards) ? GameState.treatmentArea.cards : [];
+        if (!sourceId.startsWith('role:') && !sourceId.startsWith('role-judge:')) return [];
+
+        const isJudge = sourceId.startsWith('role-judge:');
+        const roleId = parseInt(sourceId.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));
+        const player = GameState.players.find(p => p.id === roleId);
+        const area = player && (isJudge ? player.judgeArea : player.hand);
+        return (area && area.cards) ? area.cards : [];
     }
 
     // --- Card Viewer Modal Logic ---
@@ -248,39 +279,10 @@
         }
 
         // Initial Card Render
-        if (window.Game.UI.renderCardList) {
-            if (options.slots) {
-                // Multi-Slot: cards is [ [Card...], [Card...] ]
-                // Or user passed flat array? We expect Array of Arrays.
-                // Or the caller logic will handle updating via updateAllViewers shortly anyway.
-                // Let's try to render initial state if possible.
-                options.slots.forEach(slot => {
-                    let slotCards = [];
-                    if (Array.isArray(cards)) {
-                        if (Array.isArray(cards[slot.index])) {
-                            slotCards = cards[slot.index];
-                        } else if (cards[slot.index]) {
-                            // Single card fallback
-                             slotCards = [cards[slot.index]];
-                        }
-                    }
-                    
-                    const slotElId = `viewer-slot-${sourceId}-${slot.index}`;
-                    const slotDropZone = `${sourceId}:slot:${slot.index}`;
-                    window.Game.UI.renderCardList(slotElId, slotCards, slotDropZone, { 
-                        skipLayout: true, 
-                        forceFaceDown: false 
-                    });
-                });
-            } else {
-                // Single Grid
-                const gridId = `card-viewer-grid-${sourceId}`;
-                window.Game.UI.renderCardList(gridId, cards, sourceId, { 
-                    skipLayout: true, 
-                    showIndex: true,
-                    forceFaceDown: options.forceFaceDown
-                });
-            }
+        if (options.slots) {
+            options.slots.forEach(slot => renderViewerSlot(sourceId, slot.index, slotCardsAt(cards, slot.index)));
+        } else {
+            renderViewerGrid(`card-viewer-grid-${sourceId}`, cards, sourceId, options);
         }
 
         // 4. Scrolling Animation Logic (Instance Scoped)
@@ -419,17 +421,7 @@
                  // Render if we found data
                  if (allSlotsData) {
                      options.slots.forEach(slot => {
-                         const targetId = `viewer-slot-${sourceId}-${slot.index}`;
-                         if (document.getElementById(targetId)) {
-                             const idx = slot.index;
-                             const cards = (allSlotsData[idx] && Array.isArray(allSlotsData[idx])) ? allSlotsData[idx] : [];
-                             const dropZone = `${sourceId}:slot:${idx}`; // Consistent Drop Zone
-                             
-                             window.Game.UI.renderCardList(targetId, cards, dropZone, { 
-                                 skipLayout: true, 
-                                 forceFaceDown: false 
-                             });
-                         }
+                         renderViewerSlot(sourceId, slot.index, slotCardsAt(allSlotsData, slot.index));
                      });
                  }
                  return;
@@ -439,37 +431,7 @@
              const grid = modal.querySelector('.card-grid');
              if (!grid) return;
 
-             // Resolve Data Source
-             let cards = [];
-             if (sourceId === 'pile') {
-                 cards = (GameState.pile && GameState.pile.cards) ? GameState.pile.cards : [];
-             } else if (sourceId === 'discardPile') {
-                 cards = (GameState.discardPile && GameState.discardPile.cards) ? GameState.discardPile.cards : [];
-             } else if (sourceId === 'treatmentArea') {
-                 cards = (GameState.treatmentArea && GameState.treatmentArea.cards) ? GameState.treatmentArea.cards : [];
-             } else if (sourceId.startsWith('role:') || sourceId.startsWith('role-judge:')) {
-                 const isJudge = sourceId.startsWith('role-judge:');
-                 // Fix: Parse ID carefully
-                 const roleId = parseInt(sourceId.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));
-                 
-                 const player = GameState.players.find(p => p.id === roleId);
-                 if (player) {
-                     // Determine Area
-                     let area = null;
-                     if (isJudge) area = player.judgeArea;
-                     else area = player.hand; // Default to hand for simple role:ID
-                     
-                     if (area && area.cards) cards = area.cards;
-                 }
-             }
-
-             if (window.Game.UI.renderCardList) {
-                 window.Game.UI.renderCardList(grid.id, cards, sourceId, { 
-                    skipLayout: true, 
-                    showIndex: true,
-                    forceFaceDown: options.forceFaceDown
-                 });
-             }
+             renderViewerGrid(grid.id, resolveViewerCards(sourceId, GameState), sourceId, options);
         });
     };
 

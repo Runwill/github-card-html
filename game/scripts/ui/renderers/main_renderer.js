@@ -209,6 +209,47 @@
 
     // 导出
     window.Game.UI.updateUI = updateUI;
+
+    function splitSlotAreaId(areaId) {
+        if (!areaId || !areaId.includes(':slot:')) return { id: areaId, slot: -1 };
+        const parts = areaId.split(':slot:');
+        const slotIdx = parseInt(parts[1]);
+        return { id: parts[0], slot: isNaN(slotIdx) ? -1 : slotIdx };
+    }
+
+    function equipAreaFor(player, slot, cardData, mode) {
+        if (slot !== -1 && player.equipSlots) return player.equipSlots[slot];
+        if (mode === 'source' && player.equipSlots) {
+            return player.equipSlots.find(area => area && area.cards.includes(cardData)) || player.equipArea;
+        }
+        return player.equipSlots ? player.equipSlots[0] : player.equipArea;
+    }
+
+    function roleAreaFor(player, areaId, slot, cardData, mode) {
+        if (!player) return null;
+        if (areaId.startsWith('role-judge:')) return player.judgeArea;
+        if (areaId.includes(':equip')) return equipAreaFor(player, slot, cardData, mode);
+        return player.hand;
+    }
+
+    function resolveDropArea(GameState, areaId, currentPlayer, cardData, mode) {
+        const parsed = splitSlotAreaId(areaId);
+        const result = { area: null, resolvedId: parsed.id, forcedSlot: parsed.slot, isRoleArea: false, appendToEnd: false };
+        if (parsed.id === 'hand') result.area = currentPlayer.hand;
+        else if (parsed.id === 'equipArea') {
+            result.area = mode === 'target'
+                ? (currentPlayer.equipSlots ? currentPlayer.equipSlots[parsed.slot !== -1 ? parsed.slot : 0] : null)
+                : equipAreaFor(currentPlayer, parsed.slot, cardData, mode);
+            result.appendToEnd = mode === 'target' && parsed.slot === -1 && !!currentPlayer.equipSlots;
+        } else if (parsed.id === 'treatmentArea') result.area = GameState.treatmentArea;
+        else if (parsed.id && (parsed.id.startsWith('role:') || parsed.id.startsWith('role-judge:'))) {
+            const roleId = parseInt(parsed.id.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));
+            const targetPlayer = GameState.players.find(p => p.id === roleId);
+            result.area = roleAreaFor(targetPlayer, parsed.id, parsed.slot, cardData, mode);
+            result.isRoleArea = !!result.area;
+        } else if (GameState[parsed.id]) result.area = GameState[parsed.id];
+        return result;
+    }
     
     // 拖放回调实现：触发核心 Move 事件
     window.Game.UI.onCardDrop = function(cardData, sourceAreaName, targetZoneId, targetIndex, sourceIndex, callbacks, options) {
@@ -222,162 +263,24 @@
         const perspIdx = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
         const currentPlayer = GameState.players[perspIdx] || GameState.players[0];
 
-        // 1. 解析 Slot 后缀 (支持 equipArea:slot:0 或 role:1001:equip:slot:0)
-        let resolvedTargetId = targetZoneId;
-        let forcedTargetSlot = -1;
-
-        if (targetZoneId && targetZoneId.includes(':slot:')) {
-            const parts = targetZoneId.split(':slot:');
-            resolvedTargetId = parts[0];
-            const slotIdx = parseInt(parts[1]);
-            if (!isNaN(slotIdx)) forcedTargetSlot = slotIdx;
-        }
-
-        // 2. 映射 targetZoneId 到 Area 对象
-        if (resolvedTargetId === 'hand') {
-            targetArea = currentPlayer.hand;
+        const targetInfo = resolveDropArea(GameState, targetZoneId, currentPlayer, cardData, 'target');
+        targetArea = targetInfo.area;
+        if (targetArea) {
             moveRole = currentPlayer;
-        } else if (resolvedTargetId === 'equipArea') {
-            targetArea = currentPlayer.equipArea;
-            moveRole = currentPlayer;
-        } else if (resolvedTargetId === 'treatmentArea') {
-            targetArea = GameState.treatmentArea;
-            moveRole = currentPlayer; 
-        } else if (resolvedTargetId && (resolvedTargetId.startsWith('role:') || resolvedTargetId.startsWith('role-judge:'))) {
-            // 解析角色相关区域
-            // role:1001 (Hand)
-            // role-judge:1001 (Judge)
-            // role:1001:equip (Equip)
-            
-            const isJudge = resolvedTargetId.startsWith('role-judge:');
-            const isEquip = resolvedTargetId.includes(':equip');
-            
-            // 提取 ID
-            // role-judge:1001 -> 1001
-            // role:1001 -> 1001
-            // role:1001:equip -> 1001
-            
-            let idPart = resolvedTargetId.replace('role-judge:', '').replace('role:', '').replace(':equip', '');
-            const roleId = parseInt(idPart);
-            
-            const targetPlayer = GameState.players.find(p => p.id === roleId);
-            
-            if (targetPlayer) {
-                if (isJudge) {
-                    targetArea = targetPlayer.judgeArea;
-                } else if (isEquip) {
-                    // 如果有 forcedTargetSlot, 使用对应的 equipSlot
-                    if (forcedTargetSlot !== -1 && targetPlayer.equipSlots) {
-                        targetArea = targetPlayer.equipSlots[forcedTargetSlot];
-                    } else if (targetPlayer.equipSlots) {
-                        targetArea = targetPlayer.equipSlots[0];
-                    } else if (targetPlayer.equipArea) {
-                        targetArea = targetPlayer.equipArea;
-                    }
-                } else {
-                    targetArea = targetPlayer.hand;
-                }
-
-                if (targetArea) {
-                    moveRole = currentPlayer; // 发起移动的始终是“操作者”，目标是“目标角色区域”
-                    animationHint = targetZoneId; 
-                }
-            }
-        } else if (GameState[resolvedTargetId]) {
-            // 尝试全局区域
-            targetArea = GameState[resolvedTargetId];
-            moveRole = currentPlayer;
+            if (targetInfo.isRoleArea) animationHint = targetZoneId;
         }
 
         if (targetArea) {
             // Game Core movedAtPosition 是 1-based index
             let finalTargetIndex = targetIndex;
-            
-            // 重要修正：
-            // 如果我们已经通过 forcedTargetSlot 选定了一个具体的 EquipSlot Area（独立区域），
-            // 那么 targetIndex 就是该区域内的相对位置。我们不应该强制重置为 0。
-            // 之前的逻辑 finalTargetIndex = 0 是为了应对“假定槽位只能放一张牌”的情况，
-            // 但如果用户想在一个槽位里放多张牌（堆叠），或者调整顺序，就必须尊重 targetIndex。
-            
-            // 注意：如果 targetArea 是 'equipArea' (Proxy/Legacy)，它没有 cards 数组 (它是 getter)，
-            // 这会导致 Events.move 失败。必须确保 targetArea 是真实的 Area 实例。
-            // 目前只有当 forcedTargetSlot 存在时，我们才映射到真实的 sub-area。
-            // 如果 drop zone 没有 slot info (e.g. drop to header generally)，我们可能需要默认逻辑。
-            if (resolvedTargetId === 'equipArea') {
-                 if (forcedTargetSlot !== -1 && currentPlayer.equipSlots) {
-                      targetArea = currentPlayer.equipSlots[forcedTargetSlot];
-                      // targetArea 已切换为 slot，targetIndex 有效，不做修改
-                 } else {
-                      // 拖到 'equipArea' 但不知道哪个槽位? 
-                      // 默认武器 slot 0
-                      targetArea = currentPlayer.equipSlots ? currentPlayer.equipSlots[0] : null;
-                      // 在这种模糊情况下，我们只能追加到末尾或头部
-                      if (finalTargetIndex === -1) finalTargetIndex = 9999;
-                 }
-            }
-            
-            // 如果我们处于一个具体的 Slot 区域内，且 targetIndex 是 -1 (Drop on blank space)，这意味着 append
-            // 否则尊重由 interactions.js 计算出的 targetIndex
+            if (targetInfo.appendToEnd && finalTargetIndex === -1) finalTargetIndex = 9999;
 
             // 如果索引无效 (<0)，Core 通常使用 9999 代表追加到末尾
             // 如果有明确的 finalTargetIndex (且 >=0)，则转换为 1-based position
             const position = (finalTargetIndex < 0) ? 9999 : (finalTargetIndex + 1); 
             
             // Resolve sourceArea based on sourceAreaName
-            let sourceArea = null;
-            let resolvedSourceId = sourceAreaName;
-            let forcedSourceSlot = -1;
-
-            if (sourceAreaName && sourceAreaName.includes(':slot:')) {
-                const parts = sourceAreaName.split(':slot:');
-                resolvedSourceId = parts[0];
-                const slotIdx = parseInt(parts[1]);
-                if (!isNaN(slotIdx)) forcedSourceSlot = slotIdx;
-            }
-
-            if (resolvedSourceId === 'hand') {
-                sourceArea = currentPlayer.hand;
-            } else if (resolvedSourceId === 'equipArea') {
-                 // 如果来源有 slot，使用具体 slot
-                 if (forcedSourceSlot !== -1 && currentPlayer.equipSlots) {
-                     sourceArea = currentPlayer.equipSlots[forcedSourceSlot];
-                 } else {
-                     sourceArea = currentPlayer.equipSlots
-                         ? currentPlayer.equipSlots.find(slot => slot && slot.cards.includes(cardData))
-                         : null;
-                     if (!sourceArea) sourceArea = currentPlayer.equipArea;
-                 }
-            } else if (resolvedSourceId === 'treatmentArea') {
-                sourceArea = GameState.treatmentArea; 
-            } else if (resolvedSourceId && (resolvedSourceId.startsWith('role:') || resolvedSourceId.startsWith('role-judge:'))) {
-                const isJudge = resolvedSourceId.startsWith('role-judge:');
-                const isEquip = resolvedSourceId.includes(':equip');
-                
-                let idPart = resolvedSourceId.replace('role-judge:', '').replace('role:', '').replace(':equip', '');
-                const roleId = parseInt(idPart);
-                const p = GameState.players.find(pl => pl.id === roleId);
-                
-                if (p) {
-                    if (isJudge) {
-                        sourceArea = p.judgeArea;
-                    } else if (isEquip) {
-                        if (forcedSourceSlot !== -1 && p.equipSlots) {
-                            sourceArea = p.equipSlots[forcedSourceSlot];
-                        } else {
-                            sourceArea = p.equipSlots
-                                ? p.equipSlots.find(slot => slot && slot.cards.includes(cardData))
-                                : null;
-                            if (!sourceArea) sourceArea = p.equipArea;
-                        }
-                    } else {
-                        sourceArea = p.hand;
-                    }
-                }
-            } else if (GameState[resolvedSourceId]) {
-                sourceArea = GameState[resolvedSourceId];
-            } else {
-                 // Try to check if it's a role ID or similar (not implemented here yet)
-            }
+            const sourceArea = resolveDropArea(GameState, sourceAreaName, currentPlayer, cardData, 'source').area;
 
             // cardData 是 Card 对象 (or String)
             // Delegate to Controller to handle mode-specific logic

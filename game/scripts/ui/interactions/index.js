@@ -337,14 +337,48 @@
             const playDropAnimation = () => {
                 if (window.Game.UI.DragAnimation) {
                      window.Game.UI.DragAnimation.animateDropToPlaceholder(el, placeholder, () => {
-                        isAnimationFinished = true;
-                        checkFinish();
+                        finishAnimation();
                     });
                 } else {
-                    el.remove(); // Fallback if module missing
-                    isAnimationFinished = true;
-                    checkFinish();
+                    fallbackAnimation();
                 }
+            };
+
+            const finishAnimation = () => {
+                isAnimationFinished = true;
+                checkFinish();
+            };
+
+            const fallbackAnimation = () => {
+                if (el) el.remove();
+                finishAnimation();
+            };
+
+            const revealPreviousStackCard = (targetEl, zone) => {
+                if (!zone || !zone.classList.contains('area-stacked')) return null;
+                const prevStackCard = targetEl && targetEl.previousElementSibling;
+                if (!prevStackCard || !prevStackCard.classList.contains('card-placeholder')) return null;
+                prevStackCard.style.display = 'flex';
+                return prevStackCard;
+            };
+
+            const animateToDropTarget = (targetEl, zone) => {
+                if (!targetEl || !window.Game.UI.DragAnimation) { fallbackAnimation(); return; }
+                targetEl.style.visibility = 'hidden';
+                const prevStackCard = revealPreviousStackCard(targetEl, zone);
+                window.Game.UI.DragAnimation.animateDropToPlaceholder(el, targetEl, () => {
+                    if (prevStackCard) prevStackCard.style.display = '';
+                    finishAnimation();
+                });
+            };
+
+            const findResultCard = (zone) => {
+                if (!zone) return null;
+                const cardChildren = Array.from(zone.children).filter(c => c.classList.contains('card-placeholder'));
+                if (!cardChildren.length) return null;
+                return (targetIndex >= 0 && targetIndex < cardChildren.length)
+                    ? cardChildren[targetIndex]
+                    : cardChildren[cardChildren.length - 1];
             };
 
             if (window.Game.UI.onCardDrop) {
@@ -365,108 +399,16 @@
                             if (useRemoteAnimation) {
                                 if (placeholder) placeholder.remove(); 
 
-                                // [Enhanced Drop Animation]
-                                // Attempt to find the "real" resulting element in the target zone after UI update.
-                                let newTargetEl = null;
                                 const zone = document.querySelector(`[data-drop-zone="${targetZoneId}"]`);
-                                
-                                if (zone) {
-                                    const cardChildren = Array.from(zone.children).filter(c => c.classList.contains('card-placeholder'));
-                                    if (cardChildren.length > 0) {
-                                        // If we had a specific index, try to respect it (though it might be -1 for piles)
-                                        if (targetIndex >= 0 && targetIndex < cardChildren.length) {
-                                             newTargetEl = cardChildren[targetIndex];
-                                        } else {
-                                             // Default to the last element (most common for Deck/Discard Pile additions)
-                                             newTargetEl = cardChildren[cardChildren.length - 1];
-                                        }
-                                    }
-                                }
+                                const newTargetEl = findResultCard(zone);
 
                                 if (!newTargetEl) {
                                     console.warn(`[DragAnim] Target Element NOT found in zone: ${targetZoneId}`);
                                 }
 
-                                if (newTargetEl && window.Game.UI.DragAnimation) {
-                                    // Animate the ghost to merge with the new UI element.
-                                    // We hide the target temporarily to avoid seeing "double" during the fly-in.
-                                    newTargetEl.style.visibility = 'hidden';
-
-                                    // FIX: In stacked areas, showing only the "new" top card means the 'previous' top card
-                                    // (now covered by newTargetEl) is hidden by CSS (.area-stacked > not(.is-top-card) { display: none }).
-                                    // We must force the UNDERLYING card visible so the stack doesn't appear empty during animation.
-                                    let prevStackCard = null;
-                                    const isStacked = zone && zone.classList.contains('area-stacked');
-                                    if (isStacked) {
-                                        // newTargetEl is likely the last child. Find the one before it.
-                                        prevStackCard = newTargetEl.previousElementSibling;
-                                        // Ensure it's a card and not something else
-                                        if (prevStackCard && prevStackCard.classList.contains('card-placeholder')) {
-                                            prevStackCard.style.display = 'flex'; // Force visible override
-                                        } else {
-                                            prevStackCard = null;
-                                        }
-                                    }
-                                    
-                                    // The animation module will now also sync 'data-card-key' to trigger the flip effect.
-                                    window.Game.UI.DragAnimation.animateDropToPlaceholder(el, newTargetEl, () => {
-                                        // Cleanup temp visibility logic for the underlying card
-                                        if (prevStackCard) {
-                                            prevStackCard.style.display = ''; // Revert to CSS control (hidden)
-                                        }
-
-                                        isAnimationFinished = true;
-                                        checkFinish();
-                                    });
-                                } else {
-                                    // Fallback if target not found or animation missing
-                                    if (el) el.remove();
-                                    isAnimationFinished = true; 
-                                    checkFinish();
-                                }
+                                animateToDropTarget(newTargetEl, zone);
                             } else {
-                                // [Local Drop Animation]
-                                // Logic similar to remote: prevent double vision and empty stack issue.
-                                if (window.Game.UI.DragAnimation) {
-                                    // 1. Hide the target (placeholder) so we don't see the "real" card yet
-                                    placeholder.style.visibility = 'hidden';
-
-                                    // 2. Fix Underlying Card Visibility for Stacked Areas
-                                    let prevStackCard = null;
-                                    const dropZone = placeholder.parentNode;
-                                    const isStacked = dropZone && dropZone.classList.contains('area-stacked');
-                                    
-                                    if (isStacked) {
-                                        // The placeholder is now the top card. The card before it is the "old" top.
-                                        prevStackCard = placeholder.previousElementSibling;
-                                        if (prevStackCard && prevStackCard.classList.contains('card-placeholder')) {
-                                            prevStackCard.style.display = 'flex'; // Force visible
-                                        } else {
-                                            prevStackCard = null;
-                                        }
-                                    }
-
-                                    window.Game.UI.DragAnimation.animateDropToPlaceholder(el, placeholder, () => {
-                                        // 3. Cleanup
-                                        // Unhide default target
-                                        // Note: animation.js might handle removing 'drag-placeholder' & transitions,
-                                        // but it sets visibility='' at the very end.
-                                        // We trust it to clean up the target visibility.
-                                        // Here we clean up the sibling.
-                                        
-                                        if (prevStackCard) {
-                                            prevStackCard.style.display = ''; // Revert to CSS hidden
-                                        }
-                                        
-                                        isAnimationFinished = true;
-                                        checkFinish();
-                                    });
-                                } else {
-                                    // Fallback
-                                    el.remove();
-                                    isAnimationFinished = true;
-                                    checkFinish();
-                                }
+                                animateToDropTarget(placeholder, placeholder && placeholder.parentNode);
                             }
                         },
                         onComplete: () => {
