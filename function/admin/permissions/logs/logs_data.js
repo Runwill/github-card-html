@@ -15,7 +15,7 @@
       // 同步后端新增日志类型，供分类筛选的“其他”集合使用
       try {
         const types = Array.from(new Set(list.map(l => l && l.type).filter(Boolean)));
-        UI.syncKnownTypes(types);
+        UI.syncKnownTypes(types, { updatePreview: false });
       } catch(_){ }
       LogUtils.appendLogEntries(body, list, l => UI.makeRow(l), {
         clear: true,
@@ -51,7 +51,7 @@
           if (id) await apiDelete(`/user/logs/${encodeURIComponent(id)}`);
         }, async (id)=>{
           if (id) await apiPatch(`/user/logs/${encodeURIComponent(id)}/restore`);
-          await hydrateUserLogs(false);
+          await hydrateUserLogs();
         });
       }catch(_){ }
     }

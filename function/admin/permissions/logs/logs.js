@@ -180,7 +180,6 @@
             setChoiceValue(filters, 'scope', 'active');
             const f = filters.querySelector('#perms-log-from'); if(f) f.value = '';
             const t = filters.querySelector('#perms-log-to'); if(t) t.value = '';
-            updateFormatPreview();
           }catch(_){ }
           apply();
         });
@@ -194,7 +193,6 @@
             item.classList.toggle('is-active', active);
             item.setAttribute('aria-checked', active ? 'true' : 'false');
           });
-          if (group.classList.contains('perms-log-choice--type')) { try { updateFormatPreview(); } catch(_){ } }
           apply();
         });
         ['change','keyup'].forEach(evt=>{
@@ -215,8 +213,6 @@
       return body || null;
     }catch(_){ return null; }
   }
-
-  function pill(key, cls){ return `<i class="log-pill ${cls||''}" data-i18n="${key}"></i>`; }
 
   // ── 日志类型 → CSS 类名 / i18n key / 消息 key 映射表 ──
   var TYPE_CLS = {
@@ -256,7 +252,6 @@
       const k = typeKey(log && log.type);
       const cls = typeCls(log && log.type);
       const who = (log && log.actorName) ? log.actorName : '';
-  const data = (log && log.data) || {};
   const msgK = msgKey(log && log.type);
   const msgParams = buildMsgParamsForLog(log);
   let msg = '';
@@ -278,10 +273,9 @@
   } else if (log && log.message) {
     msg = `<span>${String(log.message)}</span>`;
   }
-  const detail = '';
     // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
     const actions = LogUtils.actionsHtml();
-    return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}${actions}</div>`;
+    return `<div class="log-row">${timeHtml}${k? LogUtils.pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${actions}</div>`;
     }catch(_){ return ''; }
   }
 
@@ -329,10 +323,10 @@
     return p;
   }
 
-  function syncKnownTypes(types){
+  function syncKnownTypes(types, options){
     try{
       if (Array.isArray(types)) types.forEach(type => { if (type) KNOWN_TYPES.add(String(type)); });
-      try { updateFormatPreview(); } catch(_){ }
+      if (!options || options.updatePreview !== false) { try { updateFormatPreview(); } catch(_){ } }
     }catch(_){ }
   }
 
@@ -368,15 +362,9 @@
       if (!val || val==='all') { if (preview) try{ preview.remove(); }catch(_){ } return; }
       const key = msgKey(val);
       if (!key) { if (preview) try{ preview.remove(); }catch(_){ } return; }
-      const lang = getI18nLang();
       const tmpl = getI18nString(key) || '';
       if (!tmpl.trim()) { if (preview) try{ preview.remove(); }catch(_){ } return; }
-      const esc = (s)=> String(s)
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#39;');
+      const esc = LogUtils.esc;
       // 构造 HTML：非占位符部分做 HTML 转义，占位符使用样式突出显示
       let html = '';
       let last = 0;

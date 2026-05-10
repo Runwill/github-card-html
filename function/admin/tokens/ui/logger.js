@@ -76,6 +76,13 @@
   const pickOld = v => pickField(v, ['from','prev','previous','old','before']);
   const pickNew = v => pickField(v, ['value','to','new','after']);
 
+  function pickList(source, key) {
+    try {
+      const value = source && (source[key] || (source.data && source.data[key]) || (source.diff && source.diff[key]));
+      return Array.isArray(value) ? value : [];
+    } catch (_) { return []; }
+  }
+
   function shortId(id) {
     try { const s = String(id || ''); return s.length > 8 ? s.slice(-6) : s; } catch(_) { return String(id || ''); }
   }
@@ -103,7 +110,6 @@
     const timeHtml = LogUtils.timeHtml(rawTime, esc);
   const cKey = payload && payload.collection ? mapCollectionKey(payload.collection) : '';
     const tag = (payload && payload.collection) ? resolveLabel(payload.collection, payload && payload.id, payload && payload.label) : '';
-  const pill = (key, cls='')=> `<i class="log-pill ${cls}" data-i18n="${key}"></i>`;
     const code = (txt)=> `<code class="log-code">${esc(txt||'')}</code>`;
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
     const actions = LogUtils.actionsHtml();
@@ -120,31 +126,31 @@
           return '';
         }catch(_){ return ''; }
       })();
-  return `<div class="log-row is-create">${timeHtml}${pill('tokens.log.create','is-green')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(label)}]</i><i class="log-msg">${code(msg)}</i>${actions}</div>`;
+  return `<div class="log-row is-create">${timeHtml}${LogUtils.pill('tokens.log.create','is-green')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(label)}]</i><i class="log-msg">${code(msg)}</i>${actions}</div>`;
     }
     if (type === 'delete-doc') {
-  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteDoc','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i>${actions}</div>`;
+  return `<div class="log-row is-delete">${timeHtml}${LogUtils.pill('tokens.log.deleteDoc','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i>${actions}</div>`;
     }
     if (type === 'delete-field') {
       const from = pickOld(payload);
-  return `<div class="log-row is-delete">${timeHtml}${pill('tokens.log.deleteField','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val"><span data-i18n="tokens.log.prev"></span>${code(json(from))}</i>`:''}${actions}</div>`;
+  return `<div class="log-row is-delete">${timeHtml}${LogUtils.pill('tokens.log.deleteField','is-red')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><i class="log-path">${code(payload.path)}</i>${from!==undefined? `<i class="log-val"><span data-i18n="tokens.log.prev"></span>${code(json(from))}</i>`:''}${actions}</div>`;
     }
     if (type === 'update') {
       const v = pickNew(payload);
       const from = pickOld(payload);
-  return `<div class="log-row is-update">${timeHtml}${pill('tokens.log.update','is-blue')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i>${actions}</div>`;
+  return `<div class="log-row is-update">${timeHtml}${LogUtils.pill('tokens.log.update','is-blue')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><i class="log-path">${code(payload.path)}</i><i class="log-val">${from!==undefined? `${code(json(from))} → `:''}${code(json(v))}</i>${actions}</div>`;
     }
     if (type === 'save-edits') {
-      const sets = (payload && payload.sets) || [];
-      const dels = (payload && payload.dels) || [];
-  const head = `<div class="log-row is-save">${timeHtml}${pill('tokens.edit.submit','is-indigo')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><i class="log-head" data-i18n="tokens.log.saveSummary" data-i18n-params='${esc(JSON.stringify({ sets: sets.length, dels: dels.length }))}'></i>${actions}</div>`;
+      const sets = pickList(payload, 'sets');
+      const dels = pickList(payload, 'dels');
+    const head = `${timeHtml}${LogUtils.pill('tokens.edit.submit','is-indigo')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><span class="log-summary" data-i18n="tokens.log.saveSummary" data-i18n-params='${esc(JSON.stringify({ sets: sets.length, dels: dels.length }))}'></span>`;
       const pick = (val) => (val && typeof val === 'object') ? JSON.stringify(val) : val;
       const detail = [];
-      sets.slice(0, 10).forEach(s => { detail.push(`<div class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(pick(s.from))} → `:''}${code(pick(s.to))}</div>`); });
-  dels.slice(0, 10).forEach(d => { detail.push(`<div class="log-sub is-del"><span data-i18n="common.delete"></span> ${code(d.path)}${d.from!==undefined? ` (<span data-i18n="tokens.log.prev"></span>${code(pick(d.from))})`:''}</div>`); });
-      return head + detail.join('');
+      sets.slice(0, 10).forEach(s => { detail.push(`<span class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(pick(s.from))} → `:''}${code(pick(s.to))}</span>`); });
+    dels.slice(0, 10).forEach(d => { detail.push(`<span class="log-sub is-del"><span data-i18n="common.delete"></span> ${code(d.path)}${d.from!==undefined? ` (<span data-i18n="tokens.log.prev"></span>${code(pick(d.from))})`:''}</span>`); });
+      return `<div class="log-row is-save">${head}${detail.join('')}${actions}</div>`;
     }
-  return `<div class=\"log-row\">${timeHtml}${pill(type)}${actions}</div>`;
+  return `<div class=\"log-row\">${timeHtml}${LogUtils.pill(type)}${actions}</div>`;
   }
 
   function logChange(type, payload) {
@@ -179,7 +185,7 @@
               });
             }catch(_){ }
             LogUtils.appendLogEntries(body, items, log=>{
-              const payload = { collection: log.collection, id: log.docId, path: log.path, value: pickNew(log), from: pickOld(log), doc: log.doc, label: log && log.doc ? pickUnique(log.doc) : '' };
+              const payload = { collection: log.collection, id: log.docId, path: log.path, value: pickNew(log), from: pickOld(log), doc: log.doc, label: log && log.doc ? pickUnique(log.doc) : '', sets: pickList(log, 'sets'), dels: pickList(log, 'dels') };
               const t = pickLogTime(log);
               if (t) payload.ts = t;
               return makeLine(log.type, payload);

@@ -107,8 +107,10 @@
 .tokens-log .log-pill,
 .tokens-log .log-ctx,
 .tokens-log .log-msg,
+.tokens-log .log-summary,
 .tokens-log .log-path,
-.tokens-log .log-val { font-style: normal; }
+.tokens-log .log-val,
+.tokens-log .log-sub { font-style: normal; }
 
 /* pill 颜色变体 */
 .tokens-log .log-pill.is-green  { background: #ECFDF5; color: #065F46; border-color: #A7F3D0; }
@@ -131,9 +133,14 @@
 
 .tokens-log .log-val { color: var(--text); }
 
+.tokens-log .log-summary { color: var(--text); }
+
 .tokens-log .log-sub {
-  padding-left: 1.692em;      /* 22/13 */
-  margin-top: 0.231em;        /* 3/13 */
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.231em;             /* 3/13 */
+  padding-left: 0;
+  margin-top: 0;
   color: var(--text-muted);
 }
 .tokens-log .log-sub.is-del { color: #7F1D1D; }

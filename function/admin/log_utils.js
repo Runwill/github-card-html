@@ -6,6 +6,8 @@
 
   function esc(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
+  function pill(key, cls){ return `<i class="log-pill ${esc(cls || '')}" data-i18n="${esc(key)}"></i>`; }
+
   function actionsHtml(){
     return '<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button><button class="btn-inline-action btn-restore" data-i18n="common.restore"></button></div>';
   }
@@ -192,5 +194,5 @@
     }catch(_){}
   }
 
-  window.LogUtils = { actionsHtml, timeHtml, bindLogCollapse, ensureLogPanel, createLogEntry, appendLogEntries, prependLogEntry, bindLogCopy, bindLogDelete, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
+  window.LogUtils = { esc, pill, actionsHtml, timeHtml, bindLogCollapse, ensureLogPanel, createLogEntry, appendLogEntries, prependLogEntry, bindLogCopy, bindLogDelete, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
 })();
