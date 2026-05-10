@@ -415,55 +415,8 @@
         return null;
     }
 
-    function resolveAreaByPath(path) {
-        if (!path) return null;
-        const gs = window.Game.GameState;
-        if (!gs) return null;
-
-        // 格式: "pile", "discardPile", "treatmentArea", "player:0:hand", "player:0:judgeArea", "player:0:equip:1"
-        if (gs[path]) return gs[path];
-
-        const parts = path.split(':');
-        if (parts[0] === 'player' && gs.players) {
-            const playerIdx = parseInt(parts[1]);
-            const player = gs.players[playerIdx];
-            if (!player) return null;
-
-            if (parts[2] === 'hand') return player.hand;
-            if (parts[2] === 'judgeArea') return player.judgeArea;
-            if (parts[2] === 'equip' && player.equipSlots) {
-                return player.equipSlots[parseInt(parts[3])];
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 获取区域路径（用于序列化）
-     */
-    function getAreaPath(area) {
-        if (!area) return null;
-        const gs = window.Game.GameState;
-        if (!gs) return null;
-
-        if (area === gs.pile) return 'pile';
-        if (area === gs.discardPile) return 'discardPile';
-        if (area === gs.treatmentArea) return 'treatmentArea';
-
-        if (gs.players) {
-            for (let i = 0; i < gs.players.length; i++) {
-                const p = gs.players[i];
-                if (area === p.hand) return `player:${i}:hand`;
-                if (area === p.judgeArea) return `player:${i}:judgeArea`;
-                if (p.equipSlots) {
-                    for (let j = 0; j < p.equipSlots.length; j++) {
-                        if (area === p.equipSlots[j]) return `player:${i}:equip:${j}`;
-                    }
-                }
-            }
-        }
-        return area.name;
-    }
+    const resolveAreaByPath = (path) => window.Game.Models?.resolveAreaByPath?.(path) || null;
+    const getAreaPath = (area) => window.Game.Models?.getAreaPath?.(area) || (area && area.name) || null;
 
     /**
      * 远程状态全量更新
@@ -530,6 +483,7 @@
     window.Game.Online._SyncInternal = {
         Client,
         getAreaPath,
+        resolveAreaByPath,
         serializeGameState,
         get isApplyingRemote() { return isApplyingRemote; },
         get perspectives() { return perspectives; },
@@ -546,6 +500,8 @@
         clearPerspectives,
         onRemoteGameStart,
         getAreaPath,
+        resolveAreaByPath,
+        _resolveArea: resolveAreaByPath,
         get isApplyingRemote() { return isApplyingRemote; },
         get perspectives() { return perspectives; }
     };

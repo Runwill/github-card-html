@@ -239,6 +239,37 @@
         });
     }
 
+    async function leaveCurrentRoom(client) {
+        if (currentRoom && client) {
+            try { await client.leaveRoom(); } catch (_) { /* ignore */ }
+            currentRoom = null;
+        }
+        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
+            window.Game.Online.SyncManager.clearPerspectives();
+        }
+    }
+
+    function setOnlineMode(enabled) { if (window.Game.GameState) window.Game.GameState.onlineMode = enabled; }
+
+    function enterRoom(result) {
+        currentRoom = result.room;
+        setOnlineMode(true);
+        if (currentRoom.perspectives && window.Game.Online.SyncManager) {
+            window.Game.Online.SyncManager.onPerspectivesChanged(currentRoom.perspectives);
+        }
+        showInRoom();
+        renderRoomInfo();
+    }
+
+    function returnToLobbyAfterRoomExit() {
+        currentRoom = null;
+        setOnlineMode(false);
+        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
+            window.Game.Online.SyncManager.clearPerspectives();
+        }
+        showLobby();
+    }
+
     /**
      * 创建房间
      */
@@ -257,30 +288,12 @@
             return;
         }
 
-        // 如果已经在某个房间里，先离开
-        if (currentRoom) {
-            try { await client.leaveRoom(); } catch (_) { /* ignore */ }
-            currentRoom = null;
-        }
-        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
-            window.Game.Online.SyncManager.clearPerspectives();
-        }
+        await leaveCurrentRoom(client);
 
         try {
             setStatus(t('online.creating'));
             const result = await client.createRoom(roomId);
-            currentRoom = result.room;
-
-            // 标记在线模式
-            if (window.Game.GameState) window.Game.GameState.onlineMode = true;
-
-            // 初始化 SyncManager 的 perspectives 数据
-            if (currentRoom.perspectives && window.Game.Online.SyncManager) {
-                window.Game.Online.SyncManager.onPerspectivesChanged(currentRoom.perspectives);
-            }
-
-            showInRoom();
-            renderRoomInfo();
+            enterRoom(result);
             setStatus(t('online.roomCreated'));
         } catch (e) {
             setStatus(e.message, 'error');
@@ -294,30 +307,12 @@
         const client = Client();
         if (!client || !client.isConnected) return;
 
-        // 如果已经在某个房间里，先离开
-        if (currentRoom) {
-            try { await client.leaveRoom(); } catch (_) { /* ignore */ }
-            currentRoom = null;
-        }
-        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
-            window.Game.Online.SyncManager.clearPerspectives();
-        }
+        await leaveCurrentRoom(client);
 
         try {
             setStatus(t('online.joining'));
             const result = await client.joinRoom(roomId);
-            currentRoom = result.room;
-
-            // 标记在线模式
-            if (window.Game.GameState) window.Game.GameState.onlineMode = true;
-
-            // 初始化 SyncManager 的 perspectives 数据
-            if (currentRoom.perspectives && window.Game.Online.SyncManager) {
-                window.Game.Online.SyncManager.onPerspectivesChanged(currentRoom.perspectives);
-            }
-
-            showInRoom();
-            renderRoomInfo();
+            enterRoom(result);
             setStatus(t('online.joined'));
 
             // 如果游戏已经开始，通过引擎初始化 + 状态覆盖恢复
@@ -344,14 +339,7 @@
             await client.dissolveRoom(roomId);
             // 如果自己正在这个房间里，清除状态
             if (currentRoom && currentRoom.id === roomId) {
-                currentRoom = null;
-                if (window.Game.GameState) {
-                    window.Game.GameState.onlineMode = false;
-                }
-                if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
-                    window.Game.Online.SyncManager.clearPerspectives();
-                }
-                showLobby();
+                returnToLobbyAfterRoomExit();
             }
             setStatus(t('online.roomDissolved'));
             refreshRoomList();
@@ -376,17 +364,7 @@
         if (client) {
             await client.leaveRoom();
         }
-        currentRoom = null;
-
-        // 清除在线模式标记
-        if (window.Game.GameState) {
-            window.Game.GameState.onlineMode = false;
-        }
-        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
-            window.Game.Online.SyncManager.clearPerspectives();
-        }
-
-        showLobby();
+        returnToLobbyAfterRoomExit();
         setStatus(t('online.left'));
         refreshRoomList();
     }
@@ -550,14 +528,7 @@
     function onRoomDissolved(data) {
         // 被房主解散的房间 — 回到大厅
         if (currentRoom && currentRoom.id === data.roomId) {
-            currentRoom = null;
-            if (window.Game.GameState) {
-                window.Game.GameState.onlineMode = false;
-            }
-            if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
-                window.Game.Online.SyncManager.clearPerspectives();
-            }
-            showLobby();
+            returnToLobbyAfterRoomExit();
         }
         setStatus(t('online.roomDissolved'));
         refreshRoomList();

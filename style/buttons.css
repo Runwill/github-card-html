@@ -80,8 +80,7 @@ button,
 .btn,
 .admin-input-btn,
 .menu__button,
-.button,
-.wave {
+.ripple-button {
   -webkit-touch-callout: none;      /* 禁用 iOS 长按呼出菜单 */
   -webkit-user-select: none;        /* iOS/Safari 禁止文本选择 */
   user-select: none;                /* 现代浏览器禁止文本选择 */
@@ -91,8 +90,7 @@ button *,
 .btn *,
 .admin-input-btn *,
 .menu__button *,
-.button *,
-.wave * {
+.ripple-button * {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;

@@ -14,16 +14,6 @@
 body { overflow-x: hidden; margin: 0; font-size: .9rem; }
 .hidden { display: none; }
 
-/* 移动端长按波纹按钮时，去除蓝色高亮/选中框（仅 .ripple-button） */
-.ripple-button,
-.ripple-button * {
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    user-select: none;
-}
-.ripple-button:focus { outline: none; }
-.ripple-button::-moz-focus-inner { border: 0; }
-
 /* 标题和特殊元素样式 */
 .strength_title {
     line-height: 1;
@@ -161,10 +151,3 @@ h3 { font-size: 1.0rem; }
 
 .animate-in, .visible { will-change: transform, opacity; }
 .animate-in.animation-complete, .visible.animation-complete { will-change: auto; }
-
-/* 水波按钮微上移，贴齐文本左上角视觉（不影响悬停时的 transform 动画） */
-.ripple-button {
-    position: relative;
-    top: 0.55em;
-    vertical-align: text-top;
-}

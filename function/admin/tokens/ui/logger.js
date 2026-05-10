@@ -1,33 +1,6 @@
 (function () {
-  // tokens/ui/logger
-  // 在词元页底部添加“变更日志”区域，并提供 logChange() 记录增删改
-
   const MAX_LOGS = 200;
-  // localStorage persistence removed; logs are pulled from server
 
-  // 折叠/展开动画：复用全局工具
-  const { isAnimating, isOpen, openCollapsible, closeCollapsible } = window.CollapsibleAnim;
-
-  function bindCollapseBtn(header, panel){
-    if (!header) return;
-    const btn = header.querySelector('.js-log-collapse');
-    if (!btn || btn.__tokensLogCollapseBound) return;
-    btn.__tokensLogCollapseBound = true;
-    btn.addEventListener('click',(e)=>{
-      const btn = e.currentTarget;
-      const w = panel.querySelector('.tokens-log__wrap');
-      if (!w || isAnimating(w)) return;
-      if (isOpen(w)) {
-        closeCollapsible(w);
-        if (btn) { btn.setAttribute('data-i18n','common.expand'); window.i18n?.applySafe?.(btn); btn.classList.remove('is-expanded'); }
-      } else {
-        openCollapsible(w);
-        if (btn) { btn.setAttribute('data-i18n','common.collapse'); window.i18n?.applySafe?.(btn); btn.classList.add('is-expanded'); }
-      }
-    });
-  }
-
-  // HTML 转义：复用 tokensAdmin.esc
   const T = window.tokensAdmin;
   const esc = T.esc;
 
@@ -39,49 +12,14 @@
       const content = document.getElementById('tokens-content');
       if (!content) return null;
 
-      // 容器：在 tokens-content 后追加一个日志面板
-      let panel = document.getElementById('tokens-log-panel');
-      if (!panel) {
-        panel = document.createElement('div');
-        panel.id = 'tokens-log-panel';
-        panel.className = 'tokens-log';
+      body = LogUtils.ensureLogPanel({
+        panelId: 'tokens-log-panel',
+        bodyId: 'tokens-log',
+        titleKey: 'tokens.log.title',
+        mount: content.parentElement || content,
+        insertAfter: content
+      });
 
-    const header = document.createElement('div');
-    header.className = 'tokens-log__header';
-  header.innerHTML = '<div class="tokens-log__title" data-i18n="tokens.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button></div>';
-    window.i18n?.applySafe?.(header);
-
-        // 外包一层可折叠容器，内层保持可滚动
-        const wrap = document.createElement('div');
-        wrap.className = 'tokens-log__wrap collapsible is-open';
-        // 可滚动主体
-        body = document.createElement('div');
-        body.id = 'tokens-log';
-        body.className = 'tokens-log__body';
-        wrap.appendChild(body);
-
-        panel.appendChild(header);
-        panel.appendChild(wrap);
-
-        // 插入到 content 后
-        if (content.parentElement) {
-          content.parentElement.appendChild(panel);
-        } else {
-          content.insertAdjacentElement('afterend', panel);
-        }
-
-        // 绑定按钮（首次创建时）
-        try{
-          bindCollapseBtn(header, panel);
-        }catch(_){ }
-      } else {
-        body = document.getElementById('tokens-log');
-        // 绑定控制按钮（在已存在面板时需要从 panel 查询 header）
-        const headerEl = panel.querySelector('.tokens-log__header');
-        bindCollapseBtn(headerEl, panel);
-      }
-
-      // 日志内“复制 / 删除 / 恢复”按钮事件委托
       try {
         if (body) {
           LogUtils.bindLogCopy(body);
@@ -110,29 +48,14 @@
     } catch (_) { return null; }
   }
 
-  // 时间工具：复用全局 TimeFmt
-  const { parseTimeValue, formatAbsForLang, formatRel } = window.TimeFmt;
+  const { parseTimeValue } = window.TimeFmt;
 
-  // 从对象中提取时间字段（服务端/前端均可用）
   function pickLogTime(v){
     try{
       return v && (v.ts || v.time || v.createdAt || v.updatedAt || v.date || v.at || v.timestamp);
     }catch(_){ return undefined; }
   }
 
-  function briefDoc(doc) {
-    try {
-      if (!doc || typeof doc !== 'object') return '';
-      const picks = [];
-      if (doc.en) picks.push(`en:${doc.en}`);
-      if (doc.cn) picks.push(`cn:${doc.cn}`);
-      if (doc.name) picks.push(`name:${doc.name}`);
-      if (doc.id != null) picks.push(`id:${doc.id}`);
-      return picks.join(' ');
-    } catch (_) { return ''; }
-  }
-
-  // 返回集合名称对应的 i18n key（而非直接翻译），以便语言切换时可动态更新
   function mapCollectionKey(coll) {
     try {
       switch (coll) {
@@ -146,13 +69,12 @@
     } catch (_) { return ''; }
   }
 
-  // 取旧值/新值的通用帮助，兼容多种字段命名
-  function pickOld(v){
-    try{ return (v && (v.from !== undefined ? v.from : (v.prev !== undefined ? v.prev : (v.previous !== undefined ? v.previous : (v.old !== undefined ? v.old : v.before))))); }catch(_){ return undefined; }
+  function pickField(v, keys){
+    try{ for (const key of keys) if (v && v[key] !== undefined) return v[key]; }catch(_){ }
+    return undefined;
   }
-  function pickNew(v){
-    try{ return (v && (v.value !== undefined ? v.value : (v.to !== undefined ? v.to : (v.new !== undefined ? v.new : v.after)))); }catch(_){ return undefined; }
-  }
+  const pickOld = v => pickField(v, ['from','prev','previous','old','before']);
+  const pickNew = v => pickField(v, ['value','to','new','after']);
 
   function shortId(id) {
     try { const s = String(id || ''); return s.length > 8 ? s.slice(-6) : s; } catch(_) { return String(id || ''); }
@@ -178,17 +100,13 @@
 
   function makeLine(type, payload) {
     const rawTime = pickLogTime(payload);
-    const ts = parseTimeValue(rawTime) ?? Date.now();
-    const iso = new Date(ts).toISOString();
-  const timeAbs = formatAbsForLang(ts);
-    const timeRel = formatRel(ts);
-    const timeHtml = `<time class="log-time" datetime="${esc(iso)}" data-ts="${esc(String(ts))}" data-rel="${esc(timeRel)}" data-abs="${esc(timeAbs)}">${esc(timeRel)}</time>`;
+    const timeHtml = LogUtils.timeHtml(rawTime, esc);
   const cKey = payload && payload.collection ? mapCollectionKey(payload.collection) : '';
     const tag = (payload && payload.collection) ? resolveLabel(payload.collection, payload && payload.id, payload && payload.label) : '';
   const pill = (key, cls='')=> `<i class="log-pill ${cls}" data-i18n="${key}"></i>`;
     const code = (txt)=> `<code class="log-code">${esc(txt||'')}</code>`;
     const json = (v)=> (v && typeof v==='object') ? JSON.stringify(v) : v;
-    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button><button class="btn-inline-action btn-restore" data-i18n="common.restore"></button></div>`;
+    const actions = LogUtils.actionsHtml();
     if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
       const msg = (function(){
@@ -229,71 +147,29 @@
   return `<div class=\"log-row\">${timeHtml}${pill(type)}${actions}</div>`;
   }
 
-  /**
-   * 追加一条日志到前端面板。
-   * 注意：若 payload 中包含 ts/time/createdAt/updatedAt/date/at/timestamp，将使用该时间显示；
-   * 否则回退到客户端当前时间。
-   */
   function logChange(type, payload) {
     try {
       const body = ensureTokensLogArea();
       if (!body) return;
 
-  const line = makeLine(type, payload || {});
-    const row = document.createElement('div');
-    row.className = 'tokens-log__entry';
-    row.innerHTML = line;
-  window.i18n?.applySafe?.(row);
-    // 在插入前记录当前滚动位置，用于插入后恢复视口
-    const prevTop = body.scrollTop || 0;
-    const atTop = prevTop <= 5; // 视为已置顶
-    // 新在上：头插
-    if (body.firstChild) body.insertBefore(row, body.firstChild); else body.appendChild(row);
-    // 若用户不在顶部，保持当前可见内容不跳动（补偿新增节点高度）
-    if (!atTop) {
-      try {
-        // 计算新增节点的可视高度（包含外边距）
-        let delta = row.offsetHeight || 0;
-        try {
-          const cs = window.getComputedStyle(row);
-          const mt = parseFloat(cs.marginTop) || 0;
-          const mb = parseFloat(cs.marginBottom) || 0;
-          delta += mt + mb;
-        } catch (_) { /* ignore */ }
-        body.scrollTop = prevTop + delta;
-      } catch (_) { /* ignore */ }
-    } else {
-      // 在顶部时，保持顶部即可看到最新日志
-      try { body.scrollTop = 0; } catch (_) { }
-    }
+  const row = LogUtils.createLogEntry(makeLine(type, payload || {}));
+    LogUtils.prependLogEntry(body, row, MAX_LOGS);
 
-  // Persistence removed; server is the source of truth
-
-      // 裁剪过长日志（新在上，删除底部老的）
-      try {
-        const extra = (body.children.length - MAX_LOGS);
-        for (let i = 0; i < extra; i++) body.removeChild(body.lastChild);
-      } catch (_) {}
-
-      // 不再强制滚动到底部；保持用户当前位置或置顶
     } catch (_) {}
   }
 
   Object.assign(window.tokensAdmin, { ensureTokensLogArea, logChange });
 
-  // 页面加载后自动恢复本地缓存的日志
   function hydrateLogs(){
     try{
       const body = ensureTokensLogArea();
       if(!body) return;
-      // 从服务端拉取最新日志
       const fetchTokenLogs = T.fetchTokenLogs;
       (async ()=>{
         try{
           const out = fetchTokenLogs ? await fetchTokenLogs({ page:1, pageSize: 100, includeDeleted: true }) : null;
           const list = (out && out.list) || [];
           if (Array.isArray(list) && list.length){
-            // 新在上：按时间降序排序（若缺时间则保持原顺序近似）
             const items = list.slice();
             try{
               items.sort((a,b)=>{
@@ -302,39 +178,24 @@
                 return tb - ta;
               });
             }catch(_){ }
-            const frag = document.createDocumentFragment();
-            items.forEach(log=>{
-              const payload = (function(){
-                // 兼容更多字段名：旧值/新值
-                const base = {
-                  collection: log.collection,
-                  id: log.docId,
-                  path: log.path,
-                  value: (log.value !== undefined ? log.value : (log.to !== undefined ? log.to : (log.new !== undefined ? log.new : log.after))),
-                  from: (log.from !== undefined ? log.from : (log.prev !== undefined ? log.prev : (log.previous !== undefined ? log.previous : (log.old !== undefined ? log.old : log.before)))),
-                  doc: log.doc,
-                  // 兜底标签：若服务端提供了简要 doc，则从中挑选一个可读字段（en/cn/name/key/code/slug/title）
-                  label: (function(){ try{ return log && log.doc ? pickUnique(log.doc) : ''; }catch(_){ return ''; } })()
-                };
-                // 注入时间字段，优先取服务端返回
-                const t = pickLogTime(log);
-                return t ? Object.assign(base, { ts: t }) : base;
-              })();
-              const row = document.createElement('div');
-              row.className = 'tokens-log__entry' + (log && log.deleted ? ' is-deleted' : '');
-              if (log && log._id) { try { row.setAttribute('data-log-id', String(log._id)); }catch(_){} }
-              if (log && log.deleted) { try { row.setAttribute('data-log-deleted', '1'); }catch(_){} }
-              row.innerHTML = makeLine(log.type, payload);
-              window.i18n?.applySafe?.(row);
-              frag.appendChild(row);
+            LogUtils.appendLogEntries(body, items, log=>{
+              const payload = { collection: log.collection, id: log.docId, path: log.path, value: pickNew(log), from: pickOld(log), doc: log.doc, label: log && log.doc ? pickUnique(log.doc) : '' };
+              const t = pickLogTime(log);
+              if (t) payload.ts = t;
+              return makeLine(log.type, payload);
+            }, {
+              entryOptions: log => ({
+                deleted: !!(log && log.deleted),
+                attrs: {
+                  'data-log-id': log && log._id,
+                  'data-log-deleted': log && log.deleted ? '1' : ''
+                }
+              })
             });
-            body.appendChild(frag);
-            // 新在上：滚动到顶部即可看到最新
             try { body.scrollTop = 0; } catch(_){ }
-            return; // 服务端已填充
+            return;
           }
-        }catch(_){ /* ignore and fallback to local */ }
-        // 拉取失败则暂不展示历史
+        }catch(_){ }
       })();
     }catch(_){ }
   }
@@ -346,9 +207,6 @@
         try{ LogUtils.bindLogTimeHover(document.getElementById('tokens-log') || document); }catch(_){ }
     });
 
-    // 语言切换时：
-    // 1) 重新应用 i18n 到日志面板（更新所有 data-i18n 文案）
-    // 2) 立即刷新一次相对时间文案，避免等待下一分钟
     function onI18nChanged(){
       try { const panel = document.getElementById('tokens-log-panel'); if (panel) window.i18n?.applySafe?.(panel); } catch (_){ }
       LogUtils.refreshLogTimes('.log-time[data-ts]');

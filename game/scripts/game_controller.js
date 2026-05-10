@@ -205,52 +205,8 @@
         return null;
     };
 
-    // 辅助函数：获取区域路径（用于 CardMoveAnimator）
-    const getAreaPath = (area) => {
-        // 优先使用 SyncManager 的方法
-        const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
-        if (SyncMgr && SyncMgr.getAreaPath) return SyncMgr.getAreaPath(area);
-        
-        // 本地回退
-        if (!area) return null;
-        const gs = window.Game.GameState;
-        if (!gs) return null;
-        if (area === gs.pile) return 'pile';
-        if (area === gs.discardPile) return 'discardPile';
-        if (area === gs.treatmentArea) return 'treatmentArea';
-        if (gs.players) {
-            for (let i = 0; i < gs.players.length; i++) {
-                const p = gs.players[i];
-                if (area === p.hand) return `player:${i}:hand`;
-                if (area === p.judgeArea) return `player:${i}:judgeArea`;
-                if (p.equipSlots) {
-                    for (let j = 0; j < p.equipSlots.length; j++) {
-                        if (area === p.equipSlots[j]) return `player:${i}:equip:${j}`;
-                    }
-                }
-            }
-        }
-        return area.name || null;
-    };
-
-    /**
-     * 获取包含位置信息的区域路径（仅用于移动日志）
-     * 在基础路径后附加卡牌索引，如 pile:3, discardPile:0, treatmentArea:2, player:0:hand:4
-     */
-    const getAreaPathForLog = (area, card) => {
-        const basePath = getAreaPath(area);
-        if (!card || !area) return basePath;
-
-        // 尝试从 area.cards 中查找卡牌索引
-        const cards = area.cards || area;
-        if (Array.isArray(cards)) {
-            const idx = cards.indexOf(card);
-            if (idx >= 0) return basePath + ':' + idx;
-            // 卡牌尚未插入 → 预测为末尾位置
-            return basePath + ':' + cards.length;
-        }
-        return basePath;
-    };
+    const getAreaPath = (area) => window.Game.Models && window.Game.Models.getAreaPath ? window.Game.Models.getAreaPath(area) : null;
+    const getAreaPathForLog = (area, card) => window.Game.Models && window.Game.Models.getAreaPathForLog ? window.Game.Models.getAreaPathForLog(area, card) : getAreaPath(area);
 
 
     // ── 内部 API 供 game_controller_dispatch.js 使用 ──

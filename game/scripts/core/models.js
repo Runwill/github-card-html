@@ -147,6 +147,61 @@
         return true;
     }
 
+    function resolveAreaByPath(path, gameState) {
+        if (!path) return null;
+        const gs = gameState || window.Game.GameState;
+        if (!gs) return null;
+
+        if (gs[path]) return gs[path];
+
+        const parts = String(path).split(':');
+        if (parts[0] === 'player' && gs.players) {
+            const player = gs.players[parseInt(parts[1])];
+            if (!player) return null;
+            if (parts[2] === 'hand') return player.hand;
+            if (parts[2] === 'judgeArea') return player.judgeArea;
+            if (parts[2] === 'equip' && player.equipSlots) return player.equipSlots[parseInt(parts[3])];
+        }
+        return null;
+    }
+
+    function getAreaPath(area, gameState) {
+        if (!area) return null;
+        const gs = gameState || window.Game.GameState;
+        if (!gs) return null;
+
+        if (area === gs.pile) return 'pile';
+        if (area === gs.discardPile) return 'discardPile';
+        if (area === gs.treatmentArea) return 'treatmentArea';
+
+        if (gs.players) {
+            for (let i = 0; i < gs.players.length; i++) {
+                const player = gs.players[i];
+                if (area === player.hand) return `player:${i}:hand`;
+                if (area === player.judgeArea) return `player:${i}:judgeArea`;
+                if (player.equipSlots) {
+                    for (let j = 0; j < player.equipSlots.length; j++) {
+                        if (area === player.equipSlots[j]) return `player:${i}:equip:${j}`;
+                    }
+                }
+            }
+        }
+        return area.name || null;
+    }
+
+    function getAreaPathForLog(area, card, gameState) {
+        const basePath = getAreaPath(area, gameState);
+        if (!card || !area) return basePath;
+
+        const cards = area.cards || area;
+        if (Array.isArray(cards)) {
+            const idx = cards.indexOf(card);
+            if (idx >= 0) return basePath + ':' + idx;
+            return basePath + ':' + cards.length;
+        }
+        return basePath;
+    }
+
     // 静态配置定义，用于统一管理不同类型区域的默认属性
     Area.Configs = {
         // 0: 友方/通用, 1: 敌方/特定
@@ -280,6 +335,9 @@
     window.Game.Models.getCardVisibilityForArea = getCardVisibilityForArea;
     window.Game.Models.applyCardVisibility = applyCardVisibility;
     window.Game.Models.moveCardToArea = moveCardToArea;
+    window.Game.Models.resolveAreaByPath = resolveAreaByPath;
+    window.Game.Models.getAreaPath = getAreaPath;
+    window.Game.Models.getAreaPathForLog = getAreaPathForLog;
 
 })();
 

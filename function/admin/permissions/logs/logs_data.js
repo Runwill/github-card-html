@@ -4,7 +4,7 @@
   const { jsonGet: apiGet, jsonDelete: apiDelete, jsonPatch: apiPatch } = window.TokensPerm.API;
   const UI = window.TokensPerm._LogsUI;
 
-  async function hydrateUserLogs(fromFilters){
+  async function hydrateUserLogs(){
     try{
       const body = UI.ensureUserLogArea();
       if (!body) return;
@@ -17,20 +17,18 @@
         const types = Array.from(new Set(list.map(l => l && l.type).filter(Boolean)));
         UI.syncKnownTypes(types);
       } catch(_){ }
-      const frag = document.createDocumentFragment();
-      list.forEach(l => {
-        const row = document.createElement('div');
-        row.className='tokens-log__entry' + (l && l.deleted ? ' is-deleted' : '');
-        if (l && l._id) { try { row.setAttribute('data-log-id', String(l._id)); }catch(_){ } }
-        if (l && l.deleted) { try { row.setAttribute('data-log-deleted', '1'); }catch(_){ } }
-        if (l && l.userId) { try { row.setAttribute('data-user-id', String(l.userId)); }catch(_){ } }
-        if (l && l.type) { try { row.setAttribute('data-type', String(l.type)); }catch(_){ } }
-        row.innerHTML = UI.makeRow(l);
-        window.i18n?.applySafe?.(row);
-        frag.appendChild(row);
+      LogUtils.appendLogEntries(body, list, l => UI.makeRow(l), {
+        clear: true,
+        entryOptions: l => ({
+          deleted: !!(l && l.deleted),
+          attrs: {
+            'data-log-id': l && l._id,
+            'data-log-deleted': l && l.deleted ? '1' : '',
+            'data-user-id': l && l.userId,
+            'data-type': l && l.type
+          }
+        })
       });
-      body.innerHTML=''; body.appendChild(frag);
-      try { body.scrollTop = 0; } catch(_){ }
       // 渲染（或恢复）预览行到列表顶部
       try { UI.updateFormatPreview(); } catch(_){ }
     }catch(_){ }
@@ -137,7 +135,7 @@
     // 暴露刷新方法供外部调用（如权限变更后自动刷新日志）
     try {
       window.TokensPerm = window.TokensPerm || {};
-      window.TokensPerm.refreshLogs = () => hydrateUserLogs(false);
+      window.TokensPerm.refreshLogs = hydrateUserLogs;
     } catch(_){ }
   });
 })();

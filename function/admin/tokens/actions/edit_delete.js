@@ -6,6 +6,31 @@
   const { setByPath, deleteFieldInDocByPath, computeTint } = T;
   const { apiJson } = T;
 
+  function getTokenCardMeta(node) {
+    const card = node && node.closest ? node.closest('.token-card[data-coll][data-id]') : null;
+    if (!card) return null;
+    const coll = card.getAttribute('data-coll');
+    const id = card.getAttribute('data-id');
+    return coll && id ? { card, coll, id } : null;
+  }
+
+  function applyTokenAccent(tokenCard, color) {
+    try {
+      const col = String(color || '').trim();
+      if (!tokenCard || !col) return;
+      const tint = computeTint(col);
+      [tokenCard, ...Array.from(tokenCard.querySelectorAll('.token-card, .nest-block'))].forEach((el) => {
+        try {
+          el.style.setProperty('--token-accent', col);
+          if (el.classList.contains('token-card')) {
+            if (tint) el.style.setProperty('--token-bg', tint);
+            el.style.borderLeft = `3px solid ${col}`;
+          }
+        } catch (_) {}
+      });
+    } catch (_) {}
+  }
+
 
   // 行内编辑（单击 kv 值触发）
   function bindInlineEdit(rootEl) {
@@ -32,11 +57,9 @@
       if (!path || path.startsWith('_') || path.includes('.__v')) return;
 
       const type = target.getAttribute('data-type') || 'string';
-      const tokenCard = target.closest('.token-card[data-coll][data-id]');
-      if (!tokenCard) return;
-      const coll = tokenCard.getAttribute('data-coll');
-      const id = tokenCard.getAttribute('data-id');
-      if (!coll || !id) return;
+      const meta = getTokenCardMeta(target);
+      if (!meta) return;
+      const { card: tokenCard, coll, id } = meta;
 
       if (target.getAttribute('data-editing') === '1') return;
       if (target.querySelector('.inline-edit')) return;
@@ -54,24 +77,7 @@
       let input;
       let colorPicker = null;
 
-      const applyPreview = (val) => {
-        try {
-          if (!tokenCard || !val) return;
-          const col = String(val).trim();
-          if (!col) return;
-          const tint = computeTint(col);
-          const list = [tokenCard, ...Array.from(tokenCard.querySelectorAll('.token-card, .nest-block'))];
-          list.forEach((el) => {
-            try {
-              el.style.setProperty('--token-accent', col);
-              if (el.classList.contains('token-card')) {
-                if (tint) el.style.setProperty('--token-bg', tint);
-                el.style.borderLeft = `3px solid ${col}`;
-              }
-            } catch (_) {}
-          });
-        } catch (_) {}
-      };
+      const applyPreview = (val) => applyTokenAccent(tokenCard, val);
 
       if (isColorField) {
         const wrap = document.createElement('div');
@@ -224,20 +230,7 @@
           T.updateDocInState(coll, id, (doc) => setByPath(doc, path, value));
 
           if (path === 'color') {
-            const col = value;
-            const tint = computeTint(col);
-            if (tokenCard && col) {
-              const list = [tokenCard, ...Array.from(tokenCard.querySelectorAll('.token-card, .nest-block'))];
-              list.forEach((el) => {
-                try {
-                  el.style.setProperty('--token-accent', col);
-                  if (el.classList.contains('token-card')) {
-                    if (tint) el.style.setProperty('--token-bg', tint);
-                    el.style.borderLeft = `3px solid ${col}`;
-                  }
-                } catch (_) {}
-              });
-            }
+            applyTokenAccent(tokenCard, value);
           }
 
           cleanup();
@@ -301,10 +294,9 @@
       const path = row.getAttribute('data-path');
       if (!path || path.startsWith('_') || path.includes('.__v')) return;
 
-      const tokenCard = row.closest('.token-card[data-coll][data-id]');
-      if (!tokenCard) return;
-      const coll = tokenCard.getAttribute('data-coll');
-      const id = tokenCard.getAttribute('data-id');
+      const meta = getTokenCardMeta(row);
+      if (!meta) return;
+      const { coll, id } = meta;
 
       const keyNameEl = row.querySelector('.kv-key');
       const keyName = keyNameEl ? keyNameEl.textContent.trim() : path.split('.').pop();
@@ -336,11 +328,9 @@
         return;
       }
 
-      const card = btn.closest('.token-card[data-coll][data-id]');
-      if (!card) return;
-      const coll = card.getAttribute('data-coll');
-      const id = card.getAttribute('data-id');
-      if (!coll || !id) return;
+      const meta = getTokenCardMeta(btn);
+      if (!meta) return;
+      const { card, coll, id } = meta;
 
   if (!confirm(window.t('common.confirm.deleteDoc'))) return;
 
@@ -370,11 +360,9 @@
         return;
       }
 
-      const card = btn.closest('.token-card[data-coll][data-id]');
-      if (!card) return;
-      const coll = card.getAttribute('data-coll');
-      const id = card.getAttribute('data-id');
-      if (!coll || !id) return;
+      const meta = getTokenCardMeta(btn);
+      if (!meta) return;
+      const { coll, id } = meta;
 
       try { window.tokensAdmin.openEditModal(coll, id); }
   catch (e) { alert(e.message || window.t('tokens.error.openEditFailed')); }

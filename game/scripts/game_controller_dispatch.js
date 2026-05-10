@@ -3,6 +3,45 @@
     // 工具函数在 game_controller.js 中，通过 _ControllerInternal 共享
     const I = window.Game._ControllerInternal;
 
+    function rememberMoveActor(card, moveRole) {
+        if (card && typeof card === 'object' && moveRole) {
+            card._lastMoveBy = {
+                id: moveRole.id,
+                characterId: moveRole.characterId,
+                name: moveRole.name
+            };
+        }
+    }
+
+    function captureMoveLog(payload, card, sourceArea) {
+        if (!window.Game.UI.MoveLog) return null;
+        return {
+            moveRole: payload.moveRole,
+            card,
+            fromAreaPath: I.getAreaPathForLog(sourceArea, card),
+            cardVisibility: card ? card.visibility : 0,
+            cardVisibleTo: card && card.visibleTo ? [...card.visibleTo] : []
+        };
+    }
+
+    function commitMoveLog(entry, targetArea) {
+        if (!entry || !window.Game.UI.MoveLog) return;
+        window.Game.UI.MoveLog.logMove({
+            ...entry,
+            toAreaPath: I.getAreaPathForLog(targetArea, entry.card),
+            toForOrAgainst: targetArea ? (targetArea.forOrAgainst != null ? targetArea.forOrAgainst : 0) : 0,
+            toOwnerId: targetArea && targetArea.owner ? targetArea.owner.id : null
+        });
+    }
+
+    function runMoveCallbacks(callbacks) {
+        if (!callbacks || typeof callbacks === 'function') return;
+        if (typeof callbacks.onMoveExecuted === 'function') callbacks.onMoveExecuted();
+        setTimeout(() => {
+            if (typeof callbacks.onComplete === 'function') callbacks.onComplete();
+        }, 50);
+    }
+
     // UI 动作的统一调度方法
     function dispatch(actionType, payload) {
         // --- 动作链 ---
@@ -22,8 +61,9 @@
 
         // --- 'move' 的逻辑 ---
         // 如果可能，确保 fromArea 被解析（为了健壮性）
-        if (actionType === 'move' && !payload.fromArea && payload.card) {
-             payload.fromArea = I.findCardSource(payload.card);
+        if (actionType === 'move') {
+            if (!payload.fromArea && payload.card) payload.fromArea = I.findCardSource(payload.card);
+            rememberMoveActor(payload.card, payload.moveRole);
         }
 
         // ── CardMoveAnimator 快照准备 ──
@@ -68,48 +108,13 @@
                     const sourceArea = payload.fromArea || I.resolveArea(payload.fromArea);
 
                     if (targetArea) {
-                        // ── 记录移动者信息到卡牌 (用于处理区显示) ──
-                        if (payload.card && typeof payload.card === 'object' && payload.moveRole) {
-                            payload.card._lastMoveBy = {
-                                id: payload.moveRole.id,
-                                characterId: payload.moveRole.characterId,
-                                name: payload.moveRole.name
-                            };
-                        }
-
-                        // 在移动前捕获可见性快照和来源路径
-                        const preVis = payload.card ? payload.card.visibility : 0;
-                        const preVisibleTo = payload.card && payload.card.visibleTo ? [...payload.card.visibleTo] : [];
-                        const fromAreaPath = I.getAreaPathForLog(sourceArea, payload.card);
+                        const moveLog = captureMoveLog(payload, payload.card, sourceArea);
 
                         I.currentEngine.moveCard(payload.card, targetArea, payload.position - 1, sourceArea); 
-                        
-                        // 移动后捕获目标路径（含位置信息）
-                        const toAreaPath = I.getAreaPathForLog(targetArea, payload.card);
-
-                        // ── 移动日志 ──
-                        if (window.Game.UI.MoveLog) {
-                            window.Game.UI.MoveLog.logMove({
-                                moveRole: payload.moveRole,
-                                card: payload.card,
-                                fromAreaPath,
-                                toAreaPath,
-                                cardVisibility: preVis,
-                                cardVisibleTo: preVisibleTo,
-                                toForOrAgainst: targetArea.forOrAgainst != null ? targetArea.forOrAgainst : 0,
-                                toOwnerId: targetArea.owner ? targetArea.owner.id : null
-                            });
-                        }
+                        commitMoveLog(moveLog, targetArea);
 
                         // 触发 UI 回调
-                        if (payload.callbacks) {
-                            if (typeof payload.callbacks.onMoveExecuted === 'function') {
-                                payload.callbacks.onMoveExecuted();
-                            }
-                            setTimeout(() => {
-                               if (typeof payload.callbacks.onComplete === 'function') payload.callbacks.onComplete();
-                            }, 50); 
-                        }
+                        runMoveCallbacks(payload.callbacks);
                         
                         // 触发 CardMoveAnimator 动画（统一动画路径）
                         triggerCardMoveAnimation();
@@ -136,15 +141,6 @@
         } else {
             // 自动/流程模式
              if (actionType === 'move') {
-                 // ── 记录移动者信息到卡牌 (用于处理区显示) ──
-                 if (payload.card && typeof payload.card === 'object' && payload.moveRole) {
-                     payload.card._lastMoveBy = {
-                         id: payload.moveRole.id,
-                         characterId: payload.moveRole.characterId,
-                         name: payload.moveRole.name
-                     };
-                 }
-
                  if (isDragMove) {
                      // ── 拖拽移动：使用同步路径，避免事件栈时序导致的重复动画 ──
                      // 拖拽操作应和沙盒模式一样同步执行，确保动画逻辑一致
@@ -153,65 +149,23 @@
 
                      if (targetArea && payload.card) {
                          const card = payload.card;
-
-                         // 捕获移动前可见性快照
-                         const preVis = card.visibility;
-                         const preVisibleTo = card.visibleTo ? [...card.visibleTo] : [];
-                         const fromAreaPath = I.getAreaPathForLog(sourceArea, card);
+                         const moveLog = captureMoveLog(payload, card, sourceArea);
 
                          const insertIdx = Math.max(0, (payload.position || 1) - 1);
                          window.Game.Models.moveCardToArea(card, targetArea, insertIdx, sourceArea);
-
-                         const toAreaPath = I.getAreaPathForLog(targetArea, card);
-
-                         // ── 移动日志 ──
-                         if (window.Game.UI.MoveLog) {
-                             window.Game.UI.MoveLog.logMove({
-                                 moveRole: payload.moveRole,
-                                 card: card,
-                                 fromAreaPath,
-                                 toAreaPath,
-                                 cardVisibility: preVis,
-                                 cardVisibleTo: preVisibleTo,
-                                 toForOrAgainst: targetArea.forOrAgainst != null ? targetArea.forOrAgainst : 0,
-                                 toOwnerId: targetArea.owner ? targetArea.owner.id : null
-                             });
-                         }
+                         commitMoveLog(moveLog, targetArea);
 
                          // 触发 UI 回调（与沙盒模式一致）
-                         if (payload.callbacks) {
-                             if (typeof payload.callbacks.onMoveExecuted === 'function') {
-                                 payload.callbacks.onMoveExecuted();
-                             }
-                             setTimeout(() => {
-                                 if (typeof payload.callbacks.onComplete === 'function') payload.callbacks.onComplete();
-                             }, 50);
-                         }
+                         runMoveCallbacks(payload.callbacks);
 
                          triggerCardMoveAnimation();
                      }
                  } else {
                      // ── 非拖拽移动：走事件栈 ──
-
-                     // 捕获移动前可见性快照
-                     const preVis = payload.card ? payload.card.visibility : 0;
-                     const preVisibleTo = payload.card && payload.card.visibleTo ? [...payload.card.visibleTo] : [];
-
-                     // ── 移动日志 ──
-                     if (window.Game.UI.MoveLog) {
-                         const fromAreaObj = payload.fromArea || (payload.card && payload.card.lyingArea);
-                         const toAreaObj = I.resolveArea(payload.toArea);
-                         window.Game.UI.MoveLog.logMove({
-                             moveRole: payload.moveRole,
-                             card: payload.card,
-                             fromAreaPath: I.getAreaPathForLog(fromAreaObj, payload.card),
-                             toAreaPath: I.getAreaPathForLog(toAreaObj, payload.card),
-                             cardVisibility: preVis,
-                             cardVisibleTo: preVisibleTo,
-                             toForOrAgainst: toAreaObj ? (toAreaObj.forOrAgainst != null ? toAreaObj.forOrAgainst : 0) : 0,
-                             toOwnerId: toAreaObj && toAreaObj.owner ? toAreaObj.owner.id : null
-                         });
-                     }
+                     commitMoveLog(
+                         captureMoveLog(payload, payload.card, payload.fromArea || (payload.card && payload.card.lyingArea)),
+                         I.resolveArea(payload.toArea)
+                     );
 
                      // 注入动画回调
                      let callbacks = payload.callbacks || {};

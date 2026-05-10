@@ -1,16 +1,31 @@
 /* 波纹按钮样式（使用专用类 .ripple-button） */
 .ripple-button {
     position: relative;
+    top: 0.55em;
+    vertical-align: text-top;
     border-radius: var(--radius-2xl);
     overflow: hidden;
     background: linear-gradient(90deg, hsl(233, 100%, 78%) 0%, hsl(233, 100%, 73%) 100%);
-    transition: background var(--dur-slow) var(--ease-standard), box-shadow var(--dur-normal), transform var(--dur-normal) var(--ease-standard);
+    transition: background 0.15s var(--ease-standard), box-shadow 0.15s var(--ease-standard), transform 0.15s var(--ease-standard);
     user-select: none;
     outline: none;
     display: inline-block;
     box-shadow: 0 2px 8px #8698ff22;
     cursor: pointer;
     border: none;
+}
+.ripple-button::-moz-focus-inner { border: 0; }
+.ripple-button:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+.ripple-button:active { transform: translateY(0); transition-duration: 0.05s; }
+.wave-ripple {
+    position: absolute;
+    transform: translate(-50%, -50%) scale(0);
+    pointer-events: none;
+    border-radius: 50%;
+    opacity: 0.6;
+    z-index: 1;
+    animation: waveRipple 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    will-change: transform, opacity;
 }
 
 .ripple-button.button_color_red {
@@ -21,7 +36,8 @@
     background: linear-gradient(90deg, hsl(150, 52%, 67%) 0%, hsl(150, 52%, 62%) 100%);
 }
 
-@keyframes animate {
-    0% { width: 0; height: 0; opacity: 0.7; }
-    100% { width: 200px; height: 200px; opacity: 0; }
+@keyframes waveRipple {
+    0% { transform: translate(-50%, -50%) scale(0); opacity: 0.6; }
+    50% { opacity: 0.3; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
 }

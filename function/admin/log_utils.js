@@ -4,7 +4,111 @@
 (function(){
   const { formatRel, formatAbsForLang } = window.TimeFmt;
 
-  // V1 — 复制按钮事件委托
+  function esc(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+  function actionsHtml(){
+    return '<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button><button class="btn-inline-action btn-restore" data-i18n="common.restore"></button></div>';
+  }
+
+  function timeHtml(value, escapeFn){
+    const escape = escapeFn || esc, parse = window.TimeFmt && window.TimeFmt.parseTimeValue;
+    const ts = (parse ? parse(value) : Number(value)) ?? Date.now(), rel = formatRel(ts), abs = formatAbsForLang(ts);
+    return `<time class="log-time" datetime="${escape(new Date(ts).toISOString())}" data-ts="${escape(String(ts))}" data-rel="${escape(rel)}" data-abs="${escape(abs)}">${escape(rel)}</time>`;
+  }
+
+  function elem(tag, props){ return Object.assign(document.createElement(tag), props || {}); }
+
+  function bindLogCollapse(header, panel){
+    if (!header || !panel) return;
+    const btn = header.querySelector('.js-log-collapse');
+    if (!btn || btn.__logCollapseBound) return;
+    const anim = window.CollapsibleAnim || {};
+    btn.__logCollapseBound = true;
+    btn.addEventListener('click', (event)=>{
+      const targetBtn = event.currentTarget;
+      const wrap = panel.querySelector('.tokens-log__wrap');
+      if (!wrap || (anim.isAnimating && anim.isAnimating(wrap))) return;
+      const opened = anim.isOpen ? anim.isOpen(wrap) : wrap.classList.contains('is-open');
+      (opened ? anim.closeCollapsible : anim.openCollapsible)?.(wrap);
+      targetBtn.setAttribute('data-i18n', opened ? 'common.expand' : 'common.collapse');
+      targetBtn.classList.toggle('is-expanded', !opened);
+      window.i18n?.applySafe?.(targetBtn);
+    });
+  }
+
+  function ensureLogPanel(options){
+    const opts = options || {};
+    let body = document.getElementById(opts.bodyId);
+    if (body && body.__ready) return body;
+    let panel = document.getElementById(opts.panelId);
+    if (!panel) {
+      panel = elem('div', { id: opts.panelId, className: opts.panelClass || 'tokens-log' });
+      const header = elem('div', { className: 'tokens-log__header' });
+      header.innerHTML = `<div class="tokens-log__title" data-i18n="${esc(opts.titleKey)}"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button></div>`;
+      window.i18n?.applySafe?.(header);
+
+      const wrap = elem('div', { className: 'tokens-log__wrap collapsible is-open' });
+      if (opts.beforeBody) wrap.appendChild(opts.beforeBody);
+
+      body = elem('div', { id: opts.bodyId, className: opts.bodyClass || 'tokens-log__body' });
+      wrap.appendChild(body);
+      panel.append(header, wrap);
+
+      const mount = typeof opts.mount === 'function' ? opts.mount() : opts.mount;
+      if (!mount) return null;
+      if (opts.insertAfter && opts.insertAfter.parentElement === mount) mount.insertBefore(panel, opts.insertAfter.nextSibling);
+      else mount.appendChild(panel);
+    } else {
+      body = document.getElementById(opts.bodyId);
+    }
+    bindLogCollapse(panel.querySelector('.tokens-log__header'), panel);
+    if (body) body.__ready = true;
+    return body || null;
+  }
+
+  function createLogEntry(html, options){
+    const opts = options || {};
+    const row = elem('div', { className: 'tokens-log__entry' + (opts.deleted ? ' is-deleted' : '') + (opts.extraClass ? ' ' + opts.extraClass : '') });
+    Object.entries(opts.attrs || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') row.setAttribute(key, String(value));
+    });
+    row.innerHTML = html || '';
+    window.i18n?.applySafe?.(row);
+    return row;
+  }
+
+  function appendLogEntries(body, items, makeHtml, options){
+    if (!body) return;
+    const opts = options || {};
+    const frag = document.createDocumentFragment();
+    (items || []).forEach(item => frag.appendChild(createLogEntry(makeHtml(item), opts.entryOptions ? opts.entryOptions(item) : {})));
+    if (opts.clear) body.innerHTML = '';
+    body.appendChild(frag);
+    try { body.scrollTop = 0; } catch(_){ }
+  }
+
+  function prependLogEntry(body, row, maxLogs){
+    if (!body || !row) return;
+    const prevTop = body.scrollTop || 0;
+    const atTop = prevTop <= 5;
+    body.insertBefore(row, body.firstChild || null);
+    if (!atTop) {
+      try {
+        let delta = row.offsetHeight || 0;
+        const cs = window.getComputedStyle(row);
+        delta += (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0);
+        body.scrollTop = prevTop + delta;
+      } catch(_){ }
+    } else {
+      try { body.scrollTop = 0; } catch(_){ }
+    }
+    if (maxLogs) {
+      try {
+        while (body.children.length > maxLogs) body.removeChild(body.lastChild);
+      } catch(_){ }
+    }
+  }
+
   function bindLogCopy(root){
     if (!root || root.__copyDelegationBound) return;
     root.__copyDelegationBound = true;
@@ -30,17 +134,6 @@
     });
   }
 
-  function setLogDeleted(entry, deleted){
-    if (!entry) return;
-    entry.classList.toggle('is-deleted', !!deleted);
-    entry.setAttribute('data-log-deleted', deleted ? '1' : '0');
-    const del = entry.querySelector('.btn-del');
-    const restore = entry.querySelector('.btn-restore');
-    if (del) del.hidden = !!deleted;
-    if (restore) restore.hidden = !deleted;
-  }
-
-  // V3 — 删除/恢复按钮事件委托
   function bindLogDelete(root, deleteFn, restoreFn){
     if (!root || root.__delDelegationBound) return;
     root.__delDelegationBound = true;
@@ -64,7 +157,6 @@
     });
   }
 
-  // V2 — 悬浮时间切换（绝对↔相对）+ 定时刷新
   function bindLogTimeHover(root){
     if (!root) return;
     const onOver = (e)=>{ const t = e.target && e.target.closest ? e.target.closest('.log-time') : null; if (t) { const abs = t.getAttribute('data-abs'); if (abs) t.textContent = abs; } };
@@ -100,5 +192,5 @@
     }catch(_){}
   }
 
-  window.LogUtils = { bindLogCopy, bindLogDelete, setLogDeleted, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
+  window.LogUtils = { actionsHtml, timeHtml, bindLogCollapse, ensureLogPanel, createLogEntry, appendLogEntries, prependLogEntry, bindLogCopy, bindLogDelete, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
 })();

@@ -36,38 +36,36 @@
     let _fallbackCardSize = null;
 
     // ─── 区域 → DOM 容器映射 ─────────────────────────────────────────────
+    function getGlobalAreaElement(areaPath) {
+        if (areaPath === 'pile') return document.getElementById('pile-container');
+        if (areaPath === 'discardPile') return document.getElementById('discard-pile-container');
+        if (areaPath === 'treatmentArea') return document.getElementById('treatment-area-container');
+        return null;
+    }
+
+    function getPlayerPathInfo(areaPath) {
+        if (!areaPath) return null;
+        const parts = areaPath.split(':');
+        const gs = window.Game.GameState;
+        if (parts[0] !== 'player' || !gs || !gs.players) return null;
+        const playerIdx = parseInt(parts[1]);
+        const player = gs.players[playerIdx];
+        if (!player) return null;
+        const perspIdx = (gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
+        return { parts, player, isSelf: playerIdx === perspIdx };
+    }
+
     /**
      * 根据 areaPath 返回对应的 DOM 容器元素
      * areaPath 格式: "pile" | "discardPile" | "treatmentArea" | "player:N:hand" | "player:N:judgeArea" | "player:N:equip:M"
      */
     function getContainerForArea(areaPath) {
         if (!areaPath) return null;
-        if (areaPath === 'pile') return document.getElementById('pile-container');
-        if (areaPath === 'discardPile') return document.getElementById('discard-pile-container');
-        if (areaPath === 'treatmentArea') return document.getElementById('treatment-area-container');
+        const globalEl = getGlobalAreaElement(areaPath);
+        if (globalEl) return globalEl;
 
-        const parts = areaPath.split(':');
-        if (parts[0] === 'player') {
-            const gs = window.Game.GameState;
-            if (!gs || !gs.players) return null;
-            const playerIdx = parseInt(parts[1]);
-            const player = gs.players[playerIdx];
-            if (!player) return null;
-
-            const perspIdx = (gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
-            const isSelf = (playerIdx === perspIdx);
-
-            if (parts[2] === 'hand') {
-                if (isSelf) return document.getElementById('hand-cards-container');
-                // 非主视角的手牌没有直接渲染容器 → 返回 null
-                return null;
-            }
-            if (parts[2] === 'judgeArea' || parts[2] === 'equip') {
-                // 判定区 / 装备区 通常渲染在窗口（CardViewer）里，
-                // 没有固定 DOM 容器 → 返回 null
-                return null;
-            }
-        }
+        const info = getPlayerPathInfo(areaPath);
+        if (info && info.parts[2] === 'hand' && info.isSelf) return document.getElementById('hand-cards-container');
         return null;
     }
 
@@ -78,28 +76,18 @@
      */
     function getFallbackAnchor(areaPath) {
         if (!areaPath) return null;
-        if (areaPath === 'pile') return document.getElementById('pile-container');
-        if (areaPath === 'discardPile') return document.getElementById('discard-pile-container');
-        if (areaPath === 'treatmentArea') return document.getElementById('treatment-area-container');
+        const globalEl = getGlobalAreaElement(areaPath);
+        if (globalEl) return globalEl;
 
-        const parts = areaPath.split(':');
-        if (parts[0] === 'player') {
-            const gs = window.Game.GameState;
-            if (!gs || !gs.players) return null;
-            const playerIdx = parseInt(parts[1]);
-            const player = gs.players[playerIdx];
-            if (!player) return null;
-
-            const perspIdx = (gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
-            const isSelf = (playerIdx === perspIdx);
-
-            if (isSelf) {
+        const info = getPlayerPathInfo(areaPath);
+        if (info) {
+            if (info.isSelf) {
                 // 主视角: 用 hand-cards-container 或 char-avatar
-                if (parts[2] === 'hand') return document.getElementById('hand-cards-container');
+                if (info.parts[2] === 'hand') return document.getElementById('hand-cards-container');
                 return document.querySelector('.current-character-panel .char-avatar') || document.getElementById('hand-cards-container');
             }
             // 其他角色: 用角色摘要元素
-            return document.getElementById(`player-summary-${player.id}`);
+            return document.getElementById(`player-summary-${info.player.id}`);
         }
         return null;
     }
@@ -119,6 +107,8 @@
 
     function resolveAreaForPath(areaPath) {
         if (!areaPath) return null;
+        const Models = window.Game.Models || {};
+        if (Models.resolveAreaByPath) return Models.resolveAreaByPath(areaPath);
         const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
         if (SyncMgr && SyncMgr._resolveArea) return SyncMgr._resolveArea(areaPath);
         const Engine = window.Game.UI && window.Game.UI._CardMoveEngine;

@@ -27,10 +27,8 @@
   ];
   let KNOWN_TYPES = new Set(TYPE_GROUPS.flatMap(item => item.types || []));
 
-  const { isAnimating, isOpen, openCollapsible, closeCollapsible } = window.CollapsibleAnim;
-
   // 时间工具：复用全局 TimeFmt
-  const { parseTimeValue, getLocaleFromI18n, formatAbsForLang, formatRel } = window.TimeFmt;
+  const { getLocaleFromI18n } = window.TimeFmt;
   // 让日期输入控件的地区跟随当前语言
   function setDateInputLang(container){
     try{
@@ -142,17 +140,7 @@
 
       let panel = document.getElementById('perms-log-panel');
       if (!panel){
-        panel = document.createElement('div');
-        panel.id = 'perms-log-panel';
-        panel.className = 'tokens-log';
-        const header = document.createElement('div');
-        header.className = 'tokens-log__header';
-        header.innerHTML = '<div class="tokens-log__title" data-i18n="permissions.log.title"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button></div>';
-        window.i18n?.applySafe?.(header);
-        const wrap = document.createElement('div');
-        wrap.className = 'tokens-log__wrap collapsible is-open';
-
-    // 筛选工具条（布局样式移至 style/permissions.css）
+        // 筛选工具条（布局样式移至 style/permissions.css）
         const filters = document.createElement('div');
         filters.className = 'tokens-log__filters';
         filters.innerHTML = [
@@ -170,25 +158,19 @@
         window.i18n?.applySafe?.(filters);
   // 根据语言为日期输入设置地区
         try { setDateInputLang(filters); } catch(_){ }
-        // 对齐/圆角等外观统一由 permissions.css 控制
-        body = document.createElement('div');
-        body.id = 'perms-log';
-        body.className = 'tokens-log__body';
-        wrap.appendChild(filters);
-  // 预览行直接插入到日志体内的首个条目位置，无需单独容器
-        wrap.appendChild(body);
-        panel.appendChild(header);
-        panel.appendChild(wrap);
         const container = parent.querySelector('padding') || parent; // 放在 panel 内
-        container.appendChild(panel);
+        body = LogUtils.ensureLogPanel({
+          panelId: 'perms-log-panel',
+          bodyId: 'perms-log',
+          titleKey: 'permissions.log.title',
+          mount: container,
+          beforeBody: filters
+        });
+        panel = document.getElementById('perms-log-panel');
         try { syncKnownTypes(Array.from(KNOWN_TYPES.values())); } catch(_){ }
 
-        // 绑定按钮
-        header.querySelector('.js-log-collapse')?.addEventListener('click',(e)=>{
-          const btn=e.currentTarget; const w=panel.querySelector('.tokens-log__wrap'); if(!w) return; if(isAnimating(w)) return; if(isOpen(w)){ closeCollapsible(w); if(btn){ btn.setAttribute('data-i18n','common.expand'); window.i18n?.applySafe?.(btn); btn.classList.remove('is-expanded'); } } else { openCollapsible(w); if(btn){ btn.setAttribute('data-i18n','common.collapse'); window.i18n?.applySafe?.(btn); btn.classList.add('is-expanded'); } }
-        });
         // 绑定筛选事件（hydrateUserLogs 在 logs_data.js 中定义，通过命名空间延迟绑定）
-        const apply = ()=>{ try { window.TokensPerm.hydrateUserLogs(true); }catch(_){ } };
+        const apply = ()=>{ try { window.TokensPerm.hydrateUserLogs(); }catch(_){ } };
         filters.querySelector('#perms-log-apply')?.addEventListener('click', apply);
         filters.querySelector('#perms-log-reset')?.addEventListener('click', ()=>{
           try{
@@ -225,6 +207,9 @@
             el.addEventListener(evt, apply);
           });
         });
+      } else {
+        body = document.getElementById('perms-log');
+        LogUtils.bindLogCollapse(panel.querySelector('.tokens-log__header'), panel);
       }
       if (body) body.__ready = true;
       return body || null;
@@ -267,11 +252,7 @@
   function makeRow(log){
     try{
       const ts = log && log.createdAt;
-      const t = parseTimeValue(ts) ?? Date.now();
-      const iso = new Date(t).toISOString();
-      const abs = formatAbsForLang(t);
-      const rel = formatRel(t);
-      const timeHtml = `<time class="log-time" datetime="${iso}" data-ts="${t}" data-rel="${rel}" data-abs="${abs}">${rel}</time>`;
+      const timeHtml = LogUtils.timeHtml(ts);
       const k = typeKey(log && log.type);
       const cls = typeCls(log && log.type);
       const who = (log && log.actorName) ? log.actorName : '';
@@ -299,7 +280,7 @@
   }
   const detail = '';
     // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
-    const actions = `<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button><button class="btn-inline-action btn-restore" data-i18n="common.restore"></button></div>`;
+    const actions = LogUtils.actionsHtml();
     return `<div class="log-row">${timeHtml}${k? pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${detail? `<i class=\"log-val\">${detail}</i>`:''}${actions}</div>`;
     }catch(_){ return ''; }
   }

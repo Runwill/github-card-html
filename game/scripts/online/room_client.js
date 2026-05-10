@@ -122,52 +122,36 @@
         currentRoomId = null;
     }
 
-    /**
-     * 创建房间
-     */
-    function createRoom(roomId) {
+    function requestRoom(eventName, roomId, fallbackError) {
         return new Promise((resolve, reject) => {
             if (!socket || !socket.connected) {
                 reject(new Error('未连接到服务器'));
                 return;
             }
 
-            socket.emit('room:create', {
-                roomId,
-                userInfo: getUserInfo()
-            }, (response) => {
+            socket.emit(eventName, { roomId, userInfo: getUserInfo() }, (response) => {
                 if (response.success) {
                     currentRoomId = roomId;
                     resolve(response);
                 } else {
-                    reject(new Error(response.error || '创建房间失败'));
+                    reject(new Error(response.error || fallbackError));
                 }
             });
         });
     }
 
     /**
+     * 创建房间
+     */
+    function createRoom(roomId) {
+        return requestRoom('room:create', roomId, '创建房间失败');
+    }
+
+    /**
      * 加入房间
      */
     function joinRoom(roomId) {
-        return new Promise((resolve, reject) => {
-            if (!socket || !socket.connected) {
-                reject(new Error('未连接到服务器'));
-                return;
-            }
-
-            socket.emit('room:join', {
-                roomId,
-                userInfo: getUserInfo()
-            }, (response) => {
-                if (response.success) {
-                    currentRoomId = roomId;
-                    resolve(response);
-                } else {
-                    reject(new Error(response.error || '加入房间失败'));
-                }
-            });
-        });
+        return requestRoom('room:join', roomId, '加入房间失败');
     }
 
     /**
