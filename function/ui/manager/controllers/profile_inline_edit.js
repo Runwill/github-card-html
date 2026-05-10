@@ -25,7 +25,7 @@
 
   // 通用保存辅助: fetch + 错误/busy 状态管理
   // state = { saveFailed, lastTried } 会被函数修改
-  async function trySave(el, url, body, state, onOk) {
+  async function trySave(url, body, state, onOk) {
     try {
       var respJson = await requestJson(url, { method: 'POST', body: body, defaultMessage: t('error.updateFailed') });
       state.saveFailed = false;
@@ -36,7 +36,6 @@
       console.error(e);
       showFlash('error', t('error.networkRetryLater'));
       state.saveFailed = true;
-    } finally {
     }
   }
 
@@ -82,7 +81,7 @@
       if (newIntro.length > 500) { showFlash('error', t('error.introMax')); return; }
       saving = true;
       _introState.lastTried = newIntro;
-      await trySave(introEl, '/intro/change', { userId: id, newIntro: newIntro }, _introState, async function(respJson) {
+      await trySave('/intro/change', { userId: id, newIntro: newIntro }, _introState, async function(respJson) {
         if (respJson && respJson.applied) {
           if (w.localStorage) w.localStorage.setItem('intro', newIntro);
           original = newIntro; introEl.value = newIntro;
@@ -177,7 +176,7 @@
         if (!id) { alert(t('error.noLoginSimple')); cleanup(); return; }
         _saving = true;
         _usernameState.lastTried = newName;
-        await trySave(nameEl, '/username/change', { userId: id, newUsername: newName }, _usernameState, async function(respJson) {
+        await trySave('/username/change', { userId: id, newUsername: newName }, _usernameState, async function(respJson) {
           if (respJson && respJson.applied) {
             if (w.localStorage) w.localStorage.setItem('username', newName);
             refreshUsernameUI(newName);

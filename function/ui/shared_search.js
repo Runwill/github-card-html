@@ -18,11 +18,7 @@
     // 仅当当前位于“将池页”时才真正触发筛选
     input.addEventListener('input', () => {
         try {
-          if (isInCharacterPanel()) {
-            window.filterParagraphs && window.filterParagraphs();
-          } else if (isInSkillPanel()) {
-            window.filterSkills && window.filterSkills();
-          }
+          applyPanelFilter(mountedPanel);
         } catch(_) { /* ignore */ }
     });
 
@@ -30,17 +26,13 @@
     return container;
   };
 
-  const isInCharacterPanel = () => {
-    // 如果搜索框挂在将池面板内则认为在将池页
-    return !!document.querySelector('#panel_character .search-container');
-  };
-    const isInSkillPanel = () => {
-      // 如果搜索框挂在技能面板内则认为在技能页
-      return !!document.querySelector('#panel_skill .search-container');
-    };
-
   let searchContainer = null;
   let mountedPanel = null; // '#panel_character' | '#panel_skill'
+
+  function applyPanelFilter(panelSelector) {
+    if (panelSelector === '#panel_character') window.filterParagraphs && window.filterParagraphs();
+    else if (panelSelector === '#panel_skill') window.filterSkills && window.filterSkills();
+  }
 
   function ensureSearchOnce() {
     if (!searchContainer) {
@@ -94,13 +86,7 @@
       mountedPanel = panelSelector;
 
       // 面板切换时，用当前关键词立即应用一次筛选
-      try {
-        if (panelSelector === '#panel_character') {
-          window.filterParagraphs && window.filterParagraphs();
-        } else if (panelSelector === '#panel_skill') {
-          window.filterSkills && window.filterSkills();
-        }
-      } catch(_) { /* ignore */ }
+      try { applyPanelFilter(panelSelector); } catch(_) { /* ignore */ }
   }
 
   // 当切换页签时，将同一个搜索框移动过去
@@ -111,22 +97,15 @@
       const a = e.target.closest('a.title-a');
       if (!a) return;
       const href = a.getAttribute('href');
-      if (href === '#panel_character') {
-        requestAnimationFrame(()=> mountToPanel('#panel_character'));
-      } else if (href === '#panel_skill') {
-        requestAnimationFrame(()=> mountToPanel('#panel_skill'));
-      }
+      if (href === '#panel_character' || href === '#panel_skill') requestAnimationFrame(()=> mountToPanel(href));
     }, true);
   }
 
   // 初始：默认挂到将池面板（若存在），否则挂到技能面板
   function init(){
     ensureSearchOnce();
-    if (document.querySelector('#panel_character')) {
-      mountToPanel('#panel_character');
-    } else if (document.querySelector('#panel_skill')) {
-      mountToPanel('#panel_skill');
-    }
+    const initialPanel = document.querySelector('#panel_character') ? '#panel_character' : (document.querySelector('#panel_skill') ? '#panel_skill' : null);
+    if (initialPanel) mountToPanel(initialPanel);
     setupTabSync();
   }
 

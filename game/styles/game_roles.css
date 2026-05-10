@@ -5,28 +5,6 @@
    - Avatars & Status
    ========================================================================== */
 
-/* Role List Panel */
-.role-list-panel {
-    flex: 1;
-    background: var(--surface);
-    border-radius: var(--radius-lg) ;
-    padding: var(--role-list-panel-pad, var(--space-3xl));
-    box-shadow: 0 4px 12px var(--shadow-1);
-    border: 1px solid var(--border);
-    min-width: var(--role-list-panel-minw, 250px);
-}
-
-.role-list-panel h4 {
-    margin-top: 0;
-    margin-bottom: var(--role-panel-title-mb, 15px);
-    color: var(--text-muted);
-    font-size: var(--role-panel-title-fs, 1rem);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    border-bottom: 2px solid var(--border);
-    padding-bottom: var(--role-panel-title-pad-b, var(--space-md));
-}
-
 .role-list {
     display: flex;
     flex-direction: column;
@@ -74,17 +52,6 @@
     padding: var(--role-badge-pad-v) var(--role-badge-pad-h);
     border-radius: var(--radius-lg);
     line-height: var(--role-badge-line-h, 1.15);
-}
-
-/* Table Layout (Opponents) */
-.role-table-layout {
-    display: flex;
-    gap: var(--role-table-gap, var(--space-2xl));
-    overflow-x: auto;
-    padding: var(--role-table-pad-y, var(--space-md)) 0;
-    align-items: flex-start;
-    flex-direction: row-reverse; /* Consolidated to the intended layout */
-    justify-content: space-around;
 }
 
 .role-column {
@@ -191,14 +158,12 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
    height: fit-content;
 }
 
-.stat-hp, .char-stats .stat-hp {
-    background-color: rgba(245, 101, 101, 0.15);
-    color: var(--danger, #f56565);
-    border: 1px solid rgba(245, 101, 101, 0.3);
+.player-hand-count,
+.stat-hp,
+.char-stats .stat-hp {
     padding: var(--role-badge-pad-v) var(--role-badge-pad-h);
     border-radius: var(--radius-lg) ;
     min-width: var(--role-summary-badge-minw, 24px);
-    height: auto;
     line-height: var(--role-badge-line-h, 1.15);
     font-weight: 700;
     font-size: var(--role-summary-badge-fs, 0.85rem);
@@ -207,10 +172,17 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--role-badge-gap, var(--space-2xs));
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
     box-shadow: 0 2px 4px var(--shadow-1, rgba(0,0,0,0.1));
+}
+
+.stat-hp, .char-stats .stat-hp {
+    background-color: rgba(245, 101, 101, 0.15);
+    color: var(--danger, #f56565);
+    border: 1px solid rgba(245, 101, 101, 0.3);
+    height: auto;
+    gap: var(--role-badge-gap, var(--space-2xs));
     transition:
         background-color var(--dur-moderate) var(--ease-standard),
         border-color var(--dur-moderate) var(--ease-standard),
@@ -284,10 +256,6 @@ body.is-global-dragging #hand-cards-container {
 
 .timing-badge:empty {
     display: none;
-}
-
-.timing-badge .term-click {
-    border-bottom: none;
 }
 
 /* Character Details Name Row */

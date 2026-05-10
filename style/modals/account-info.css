@@ -56,15 +56,6 @@
   padding-bottom: 0.143em;
 }
 
-.account-info__name-input {
-  font: inherit; color: inherit; line-height: var(--lh-tight); height: 1.2em;
-  border: none; outline: none; background: transparent; padding: 0; margin: 0;
-  display: inline-block; vertical-align: baseline;
-  width: auto; min-width: 2ch;
-  box-sizing: content-box; appearance: none; -webkit-appearance: none; border-radius: var(--radius-none) ; min-height: 0;
-  border-bottom: 2px solid var(--primary-1, #8698ff);
-}
-
 .account-info__role { display: flex; gap: 0.429em; flex-wrap: wrap; }
 .account-info__role .badge {
   font-size: 0.786em; /* 11/14 */

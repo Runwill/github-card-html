@@ -227,11 +227,9 @@
       Object.keys(ACTIONS).forEach(action => {
           const conf = ACTIONS[action];
           const btn = document.getElementById(conf.btnId);
-          if (btn) {
-              const newBtn = btn.cloneNode(true);
-              btn.parentNode.replaceChild(newBtn, btn);
-              
-              newBtn.addEventListener('click', (e) => {
+          if (btn && !btn.__keyBindingBound) {
+            btn.__keyBindingBound = true;
+            btn.addEventListener('click', (e) => {
                   e.stopPropagation();
                   if (isRecording && recordingAction === action) {
                       stopRecording();

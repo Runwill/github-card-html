@@ -2,6 +2,7 @@
   const titles=['程序','技能','牌库','将池','草稿','词元','权限','对局'];
   const changeTitle=n=> document.title='Document丨'+(titles[n]||'');
   const isAdmin=()=>{ try{ return localStorage.getItem('role')==='admin' }catch(_){ return false } };
+  const isAdminPanel=href=> href==='#panel_tokens' || href==='#panel_permissions';
   const getActivePanelId=(fallback)=> document.querySelector('.tabs-panel.is-active')?.id || document.querySelector('#main-tabs .tabs-title.is-active a')?.getAttribute('href')?.replace('#', '') || fallback || null;
   const isPanelActive=(panelId)=>{ const activeId = panelId && getActivePanelId(); return !panelId || !activeId || activeId === (panelId[0] === '#' ? panelId.slice(1) : panelId); };
 
@@ -9,12 +10,11 @@
     document.querySelectorAll('#main-tabs a.title-a').forEach((a,idx)=>{
       a.addEventListener('click',e=>{
         const href=a.getAttribute('href')||'';
+        if(isAdminPanel(href) && !isAdmin()) { e.preventDefault(); return; }
         if(href==='#panel_tokens'){
-          if(!isAdmin()) { e.preventDefault(); return; }
           window.renderTokensDashboard && window.renderTokensDashboard();
         }
         if(href==='#panel_permissions'){
-          if(!isAdmin()) { e.preventDefault(); return; }
           // 打开权限面板时渲染列表：若已预渲染过且存在行，则不重复触发，避免二次动画/重排
           const list = document.getElementById('perm-list');
           const hasRow = !!(list && list.querySelector && list.querySelector('.approval-row'));
@@ -55,7 +55,7 @@
           if(getComputedStyle(tab).display === 'none') return false;
 
           const href = link.getAttribute('href');
-          if(href === '#panel_tokens' || href === '#panel_permissions') {
+            if(isAdminPanel(href)) {
               return isAdmin();
           }
           return true;
@@ -66,9 +66,7 @@
         
         // 查找下一个可用的 tab
         for(let i = 0; i < tabs.length; i++) {
-            nextIndex = nextIndex + direction;
-            if(nextIndex < 0) nextIndex = tabs.length - 1;
-            if(nextIndex >= tabs.length) nextIndex = 0;
+          nextIndex = (nextIndex + direction + tabs.length) % tabs.length;
             
             if(isTabAccessible(tabs[nextIndex])) {
                 break;

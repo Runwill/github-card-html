@@ -43,12 +43,19 @@
     margin: 0;
 }
 
-.game-panel .input-group-label {
+.game-panel .input-group-label,
+.game-panel .input-group-field,
+.game-panel .input-group select,
+.setup-click-toggle {
+    border: 1px solid var(--border);
     background: transparent;
-    color: color-mix(in srgb, var(--text) 86%, var(--bg-end));
     padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
     font-size: var(--game-form-fs, var(--fs-base));
-    border: 1px solid var(--border);
+    box-sizing: border-box;
+}
+
+.game-panel .input-group-label {
+    color: color-mix(in srgb, var(--text) 86%, var(--bg-end));
     border-right: none;
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
     white-space: nowrap;
@@ -57,24 +64,18 @@
     line-height: normal;
     display: inline-flex;
     align-items: center;
-    box-sizing: border-box;
 }
 
 .game-panel .input-group-field,
 .game-panel .input-group select {
-    border: 1px solid var(--border);
-    background: transparent;
     color: var(--text);
-    padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    font-size: var(--game-form-fs, var(--fs-base));
     outline: none;
     transition:
         background var(--dur-normal) var(--ease-default),
         border-color var(--dur-normal) var(--ease-default),
         box-shadow var(--dur-normal) var(--ease-default),
         color var(--dur-normal) var(--ease-default);
-    box-sizing: border-box;
 }
 
 .game-panel .input-group-field:hover,
@@ -147,12 +148,8 @@
     align-items: center;
     justify-content: center;
     min-width: var(--game-setup-toggle-minw, 48px);
-    border: 1px solid var(--border);
-    background: transparent;
     color: var(--text);
-    padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important; /* override Foundation :last-child reset */
-    font-size: var(--game-form-fs, var(--fs-base));
     cursor: pointer;
     user-select: none;
     transition:
@@ -160,7 +157,6 @@
         border-color var(--dur-normal) var(--ease-default),
         color var(--dur-normal) var(--ease-default),
         opacity var(--dur-normal) var(--ease-default);
-    box-sizing: border-box;
 }
 
 .setup-click-toggle.is-active {

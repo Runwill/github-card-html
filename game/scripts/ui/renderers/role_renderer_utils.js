@@ -169,7 +169,6 @@
                 openHandInspector();
             });
             
-            element.addEventListener('mousemove', () => {});
             element.addEventListener('mouseleave', cancelPress);
             element.addEventListener('touchmove', cancelPress, { passive: true });
         }

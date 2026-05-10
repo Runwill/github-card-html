@@ -118,35 +118,15 @@
 }
 
 .player-hand-count {
-    font-size: var(--role-summary-badge-fs, 0.85rem);
-    font-weight: 700;
-    
     /* Modern Adaptive Colors */
     color: var(--text, #e5e7eb); 
     background-color: var(--surface-soft, rgba(0,0,0,0.6));
     border: 1px solid var(--border, rgba(255,255,255,0.1));
     
     /* Shape & Box */
-    padding: var(--role-badge-pad-v) var(--role-badge-pad-h);
-    border-radius: var(--radius-lg) ;
     margin-right: var(--role-badge-gap, var(--space-xs)); /* Changed from margin-left to margin-right */
     margin-left: 0;
-    min-width: var(--role-summary-badge-minw, 24px);
     text-align: center;
-    
-    /* Modern Effects (Matched with .stat-hp) */
-    box-shadow: 0 2px 4px var(--shadow-1, rgba(0,0,0,0.1));
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    
-    /* Typography */
-    font-variant-numeric: tabular-nums;
-    letter-spacing: var(--role-badge-letter-spacing, 0.5px);
-    line-height: var(--role-badge-line-h, 1.15);
-    
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .player-seat {
@@ -289,49 +269,4 @@ html[data-theme="light"] .player-judge-count {
 .character-info .equip-name-tag {
     max-width: var(--main-equip-name-tag-maxw, 80px);
     font-size: var(--main-equip-name-tag-fs, var(--fs-xs, 11px));
-}
-
-.role-summary--spectator {
-    z-index: 20;
-    opacity: 0.55;
-    filter: grayscale(0.3);
-    pointer-events: auto;
-    transition: opacity 0.3s ease, filter 0.3s ease;
-}
-
-.role-summary--spectator:hover {
-    opacity: 0.85;
-    filter: grayscale(0);
-}
-
-/* Enter animation */
-.role-summary--spectator.spectator-enter {
-    animation: spectatorEnter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-/* Exit animation */
-.role-summary--spectator.spectator-exit {
-    animation: spectatorExit 0.3s ease forwards;
-}
-
-@keyframes spectatorEnter {
-    from {
-        opacity: 0;
-        transform: scale(0.8) translateY(8px);
-    }
-    to {
-        opacity: 0.55;
-        transform: scale(1) translateY(0);
-    }
-}
-
-@keyframes spectatorExit {
-    from {
-        opacity: 0.55;
-        transform: scale(1) translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: scale(0.8) translateY(8px);
-    }
 }

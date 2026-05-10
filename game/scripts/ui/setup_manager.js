@@ -10,22 +10,29 @@
     /** Current mode value: 'auto' or 'sandbox' */
     let currentMode = 'sandbox';
 
+    function byId(id) { return document.getElementById(id); }
+
+    function bind(id, event, handler) {
+        const el = byId(id);
+        if (el) el.addEventListener(event, handler);
+        return el;
+    }
+
+    function setToggle(toggle, active, label) {
+        if (!toggle) return;
+        toggle.dataset.value = active ? 'true' : 'false';
+        toggle.textContent = label;
+        toggle.classList.toggle('is-active', active);
+    }
+
     function init() {
-        const setupBtn = document.getElementById('btn-show-setup');
-        const startBtn = document.getElementById('btn-start-game');
-        
         // 绑定"游戏设置"按钮（点击切换：再次点击=取消）
-        if (setupBtn) {
-            setupBtn.addEventListener('click', toggleSetupPanel);
-        }
+        bind('btn-show-setup', 'click', toggleSetupPanel);
 
         // 绑定"确认开始"按钮
-        const confirmBtn = document.getElementById('btn-confirm-setup');
-        if (confirmBtn) {
-            confirmBtn.addEventListener('click', confirmSetup);
-        }
+        bind('btn-confirm-setup', 'click', confirmSetup);
 
-        const countSelect = document.getElementById('setup-player-count-select');
+        const countSelect = byId('setup-player-count-select');
         if (countSelect) {
             countSelect.addEventListener('change', (e) => {
                 renderPlayerSlots(parseInt(e.target.value));
@@ -33,7 +40,7 @@
         }
 
         // 自动时机 click-toggle
-        const modeToggle = document.getElementById('setup-mode-toggle');
+        const modeToggle = byId('setup-mode-toggle');
         if (modeToggle) {
             modeToggle.addEventListener('click', () => {
                 // 在线房间内锁定为"否"，不可切换
@@ -43,14 +50,12 @@
 
                 if (currentMode === 'sandbox') {
                     currentMode = 'auto';
+                    setToggle(modeToggle, true, t('game.setup.autoTimingYes'));
                     modeToggle.dataset.value = 'auto';
-                    modeToggle.textContent = t('game.setup.autoTimingYes');
-                    modeToggle.classList.add('is-active');
                 } else {
                     currentMode = 'sandbox';
+                    setToggle(modeToggle, false, t('game.setup.autoTimingNo'));
                     modeToggle.dataset.value = 'sandbox';
-                    modeToggle.textContent = t('game.setup.autoTimingNo');
-                    modeToggle.classList.remove('is-active');
                 }
                 // 更新座位数选项
                 updateSeatCountOptions();
@@ -58,13 +63,11 @@
         }
 
         // 允许旁观 click-toggle
-        const spectateToggle = document.getElementById('setup-allow-spectate-toggle');
+    const spectateToggle = byId('setup-allow-spectate-toggle');
         if (spectateToggle) {
             spectateToggle.addEventListener('click', () => {
                 const newVal = spectateToggle.dataset.value !== 'true';
-                spectateToggle.dataset.value = String(newVal);
-                spectateToggle.textContent = newVal ? '是' : '否';
-                spectateToggle.classList.toggle('is-active', newVal);
+        setToggle(spectateToggle, newVal, newVal ? '是' : '否');
 
                 // 广播到房间
                 if (window.Game.Online && window.Game.Online.RoomUI) {
@@ -87,7 +90,7 @@
      * 否(sandbox) → 1-10, 是(auto) → 2-10
      */
     function updateSeatCountOptions() {
-        const countSelect = document.getElementById('setup-player-count-select');
+        const countSelect = byId('setup-player-count-select');
         if (!countSelect) return;
         const prevValue = parseInt(countSelect.value) || 4;
         const min = (currentMode === 'auto') ? 2 : 1;
@@ -134,21 +137,20 @@
 
         // 在线模式检测
         const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
-        const modeToggle = document.getElementById('setup-mode-toggle');
+        const modeToggle = byId('setup-mode-toggle');
 
         // 在线模式下锁定自动时机为"否"
         if (isOnline && modeToggle) {
             currentMode = 'sandbox';
+            setToggle(modeToggle, false, t('game.setup.autoTimingNo'));
             modeToggle.dataset.value = 'sandbox';
-            modeToggle.textContent = t('game.setup.autoTimingNo');
-            modeToggle.classList.remove('is-active');
             modeToggle.classList.add('is-locked');
         } else if (modeToggle) {
             modeToggle.classList.remove('is-locked');
         }
 
         // 允许旁观 toggle: 仅在线 + 房主 + 在自己房间时显示
-        const spectateGroup = document.getElementById('setup-allow-spectate-group');
+        const spectateGroup = byId('setup-allow-spectate-group');
         if (spectateGroup) {
             let showSpectate = false;
             if (isOnline && window.Game.Online && window.Game.Online.RoomUI) {
@@ -158,12 +160,10 @@
                     const myId = localStorage.getItem('id');
                     showSpectate = (room.host === myId);
                     // 同步当前值
-                    const toggle = document.getElementById('setup-allow-spectate-toggle');
+                    const toggle = byId('setup-allow-spectate-toggle');
                     if (toggle) {
                         const allowed = room.allowSpectate !== false;
-                        toggle.dataset.value = String(allowed);
-                        toggle.textContent = allowed ? '是' : '否';
-                        toggle.classList.toggle('is-active', allowed);
+                        setToggle(toggle, allowed, allowed ? '是' : '否');
                     }
                 }
             }
@@ -191,7 +191,7 @@
         }
 
         // 初始渲染
-        const countSelect = document.getElementById('setup-player-count-select');
+        const countSelect = byId('setup-player-count-select');
         const count = countSelect ? parseInt(countSelect.value) : 4;
         renderPlayerSlots(count);
     }
@@ -204,7 +204,7 @@
     }
 
     function renderPlayerSlots(count) {
-        const list = document.getElementById('setup-players-list');
+        const list = byId('setup-players-list');
         if (!list) return;
         list.innerHTML = '';
 
@@ -251,22 +251,11 @@
         }
     }
 
+    function repeatCard(card, count) { return Array(count).fill(card); }
+
     function generateDeck(preset) {
-        let deck = [];
-        if (preset === '80sha80shan') {
-            // Updated to lowercase to match panel_card definitions (attack, dodge)
-            for(let i=0; i<80; i++) deck.push('attack');
-            for(let i=0; i<80; i++) deck.push('dodge');
-        } else {
-            // Standard fallback (mock standard deck)
-            // Updated to lowercase to match panel_card definitions
-            const basic = ['attack', 'dodge', 'peach', 'wine'];
-            // 简单的每种20张用于测试
-            basic.forEach(card => {
-                for(let i=0; i<20; i++) deck.push(card);
-            });
-        }
-        return deck;
+        if (preset === '80sha80shan') return repeatCard('attack', 80).concat(repeatCard('dodge', 80));
+        return ['attack', 'dodge', 'peach', 'wine'].flatMap(card => repeatCard(card, 20));
     }
 
     function confirmSetup() {
@@ -296,27 +285,16 @@
         });
 
         // 获取牌堆预设
-        const presetSelect = document.getElementById('setup-card-preset-select');
+        const presetSelect = byId('setup-card-preset-select');
         const preset = presetSelect ? presetSelect.value : 'standard';
         const deck = generateDeck(preset);
 
-        // 获取模式预设 (from toggle state)
-        let mode = currentMode; // 'auto' or 'sandbox'
-
         // Online: force sandbox mode (自动时机 = 否)
         const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
-        if (isOnline) {
-            mode = 'sandbox';
-        }
+        const mode = isOnline ? 'sandbox' : currentMode;
 
         // 隐藏设置面板
         hideSetupPanel();
-
-        // 显示游戏面板（StartGame 内部会进一步处理 UI 状态，但我们需要确保容器可见）
-        const board = document.getElementById('game-board-panel');
-        const main = document.getElementById('game-main-area');
-        // if (board) board.classList.remove('hidden'); // Let GameState handle this?
-        // if (main) main.classList.remove('hidden');
 
         // 开始游戏
         const gameConfig = { mode: mode, players: playersConfig, deck: deck };

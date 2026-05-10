@@ -287,7 +287,6 @@ html.force-landscape {
   border-color: color-mix(in srgb, var(--primary-2) 55%, var(--border));
 }
 
-#panel_draft .editor-status,
 #panel_draft .editor-node-tag,
 #panel_draft .editor-node-attrs,
 #panel_draft .editor-log__entry,

@@ -6,7 +6,6 @@
    ========================================================================== */
 
 /* Term Click Styling (Global Utility) */
-.term-click,
 .crumb span[data-term] {
     cursor: pointer;
     font-weight: 600;
