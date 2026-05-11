@@ -13,9 +13,10 @@
         document.body.appendChild(contextMenuEl);
         
         // 点击外部关闭
-        document.addEventListener('click', () => {
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.custom-context-menu')) return;
             contextMenuEl.classList.remove('visible');
-        });
+        }, true);
         
         return contextMenuEl;
     }

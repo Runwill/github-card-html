@@ -425,7 +425,7 @@
             if (!e.target.closest('.' + WRAP_CLASS) && !e.target.closest('.' + DROPDOWN_CLASS)) {
                 _closeAll();
             }
-        });
+        }, true);
     }
 
     /* ── Expose ────────────────────────────────────────────────────── */
