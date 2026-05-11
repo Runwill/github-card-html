@@ -129,16 +129,6 @@
     text-align: center;
 }
 
-.player-seat {
-    font-size: 0.9em;
-    font-weight: bold;
-    color: #FFD700;
-    background: rgba(0,0,0,0.5);
-    padding: 0 var(--role-badge-gap, var(--space-2xs));
-    border-radius: var(--radius-xs);
-    margin-right: var(--role-badge-gap, var(--space-2xs));
-}
-
 .player-stats-row {
     display: flex;
     flex-direction: row;

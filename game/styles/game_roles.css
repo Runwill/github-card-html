@@ -5,12 +5,6 @@
    - Avatars & Status
    ========================================================================== */
 
-.role-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--role-list-gap, var(--space-md));
-}
-
 .role-summary {
     padding: var(--role-summary-pad, 12px 15px);
     border-radius: var(--radius-md);
@@ -153,7 +147,6 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
     justify-content: var(--char-stats-justify, flex-start);
 }
 
-.char-stats .player-seat,
 .char-stats .player-hand-count {
    height: fit-content;
 }

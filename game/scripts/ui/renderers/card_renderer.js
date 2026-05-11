@@ -97,29 +97,6 @@
         });
     }
 
-    // 设置观察者以自动触发布局更新
-    const observer = new MutationObserver((mutations) => {
-        let needsUpdate = false;
-        mutations.forEach(m => {
-            if (m.type === 'childList') {
-                // 检查是否是 .area-spread 容器或其子项
-                if (m.target.classList.contains('area-spread')) needsUpdate = true;
-            }
-        });
-        
-        // 使用防抖或 requestAnimationFrame 避免过度计算
-        if (needsUpdate) {
-            requestAnimationFrame(updateSpreadLayouts);
-        }
-    });
-    
-    // 初始化监听
-    // 需要等待 DOM 加载？renderCardList 会在之后运行
-    // 监听整个 document body 或者 具体的容器？
-    // 为了性能，最好不要监听 body。
-    // 我们可以在 renderCardList 里做一次全量检查，或者在 container 创建时 attach。
-    // 简单的方案：在 renderCardList 每次完事后调用 updateSpreadLayouts。
-    
     // 辅助：渲染卡牌列表
     function renderCardList(containerId, cards, dropZoneId, options = {}) {
         if (window.Game.UI.isRenderingSuspended) return;
@@ -250,10 +227,4 @@
     window.Game.UI.getCardRenderState = getCardRenderState;
     window.Game.UI.getCardAppearanceForArea = getCardAppearanceForArea;
 
-    // 辅助：获取区域的渲染配置
-    function getAreaConfig(containerId) {
-        // 简单匹配：通过 DOM 关系或 ID 反查 GameState
-        // 这里暂时通过 dropZoneId/AreaName 约定
-        // 实际上最好 renderCardList 能够直接接收 Area 对象而不是 ID
-    }
 })();

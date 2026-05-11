@@ -67,18 +67,6 @@
     border-color: var(--primary-1) !important;
 }
 
-.card-placeholder.press-active {
-    transform: scale(0.92);
-    background: var(--surface);
-    box-shadow: var(--card-shadow-press, 0 0 10px var(--primary-ring));
-}
-
-.card-placeholder.dragging-source {
-    opacity: 0.6;
-    filter: grayscale(50%);
-    border: 2px dashed var(--border);
-}
-
 /* Card Back Styling */
 .card-placeholder[data-card-key='CardBack'] {
     background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%) !important;
@@ -116,23 +104,6 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
 /* Ensure CardBacks in Spread slots can contain their absolute ::after children */
 .area-spread > .card-placeholder[data-card-key='CardBack'] {
     position: relative;
-}
-
-/* Dragging Ghost/Real Element */
-.drag-ghost {
-    background: var(--surface);
-    border: 2px solid var(--primary-1);
-    box-shadow: var(--card-shadow-drag, 0 20px 40px rgba(0,0,0,0.5));
-    z-index: var(--z-modal);
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    opacity: 0.95;
-    font-size: var(--card-fs, 0.9rem);
-    color: var(--text);
-    background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%);
 }
 
 /* Remote Move Arc-Flight Ghost */

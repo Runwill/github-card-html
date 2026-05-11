@@ -138,11 +138,6 @@
     }
   }
   
-  // Expose API + backward compat (was on window.KeySettings)
-  window.GameSettings = {
-      load: loadGameSettings,
-      initUI: initGameSettingsUI
-  };
   window.KeySettings = window.KeySettings || {};
   window.KeySettings.loadGameSettings = loadGameSettings;
 

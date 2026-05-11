@@ -12,10 +12,15 @@ const path = require('path');
 const ROOT = path.resolve(__dirname, '..');
 const VERSION = (process.argv[2] || getTimestamp());
 
-main().catch(err => { console.error('[bust-version] Failed:', err); process.exit(1); });
+try {
+  main();
+} catch (err) {
+  console.error('[bust-version] Failed:', err);
+  process.exit(1);
+}
 
-async function main(){
-  const htmlFiles = await collectHtmlFiles(ROOT);
+function main(){
+  const htmlFiles = collectHtmlFiles(ROOT);
   let changed = 0;
   for (const file of htmlFiles){
     const before = fs.readFileSync(file, 'utf8');
@@ -40,18 +45,17 @@ function getTimestamp(){
   return `${YYYY}${MM}${DD}${HH}${mm}`;
 }
 
-async function collectHtmlFiles(dir){
+function collectHtmlFiles(dir){
   const out = [];
   const stack = [dir];
+  const skipDirs = new Set(['node_modules', '.git', '.vscode']);
   while (stack.length){
     const cur = stack.pop();
     const entries = fs.readdirSync(cur, { withFileTypes: true });
     for (const e of entries){
       const p = path.join(cur, e.name);
       if (e.isDirectory()){
-        // 跳过常见构建产物或不需要的目录（按需调整）
-        if (['node_modules', '.git', '.vscode'].includes(e.name)) continue;
-        stack.push(p);
+        if (!skipDirs.has(e.name)) stack.push(p);
       } else if (e.isFile() && p.toLowerCase().endsWith('.html')){
         out.push(p);
       }
@@ -61,47 +65,19 @@ async function collectHtmlFiles(dir){
 }
 
 function processHtml(html, version){
-  let result = html;
-
-  // 1) 更新/追加 <meta name="asset-version"> 的值（若存在）
-  result = result.replace(/(<meta\s+name=["']asset-version["']\s+content=)["'][^"']*["'](\s*\/?>)/i, `$1"${version}"$2`);
-
-  // 2) 为 href/src 的本地资源追加/更新 ?v= 版本参数
-  // 匹配规则：
-  // - 属性名：href|src
-  // - 值：不以 http(s):、//、data:、# 开头
-  // - 捕获 path + query（不含 #）
-  const attrRegex = /(href|src)\s*=\s*"(?!https?:|\/\/|data:|#)([^"#]*?)(?:#|\")/gi;
-
-  result = result.replace(attrRegex, (m, attr, urlPath) => {
-    // urlPath 可能包含 query，如 "style.css?x=1"
-    const [pathPart, queryPartRaw = ''] = urlPath.split('?');
-    const queryPart = queryPartRaw ? `?${queryPartRaw}` : '';
-
-    // 跳过空路径或内联脚本片段
-    if (!pathPart || /^\s*$/.test(pathPart)) return m;
-
-    const newQuery = updateQuery(queryPart, version);
-    const rebuilt = `${attr}="${pathPart}${newQuery}"`;
-
-    // 原匹配吃掉了结束引号，这里补上
-    if (m.endsWith('"')){
-      return rebuilt;
-    }
-    return rebuilt + '"';
-  });
-
-  return result;
+  return html
+    .replace(/(<meta\s+name=["']asset-version["']\s+content=)["'][^"']*["'](\s*\/?>)/i, `$1"${version}"$2`)
+    .replace(/\b(href|src)\s*=\s*"(?!https?:|\/\/|data:|#)([^"]*)"/gi, (match, attr, url) => {
+      const nextUrl = updateVersionParam(url, version);
+      return nextUrl === url ? match : `${attr}="${nextUrl}"`;
+    });
 }
 
-function updateQuery(query, version){
-  if (!query){
-    return `?v=${version}`;
-  }
-  // 已有 v= 参数则替换
-  if (/([?&])v=[^&]*/i.test(query)){
-    return query.replace(/([?&])v=[^&]*/i, `$1v=${version}`);
-  }
-  // 没有 v= 则追加
-  return query + (query.includes('?') ? `&v=${version}` : `?v=${version}`);
+function updateVersionParam(url, version){
+  const [beforeHash, hash = ''] = url.split('#');
+  const [assetPath, query = ''] = beforeHash.split('?');
+  if (!assetPath.trim()) return url;
+  const params = new URLSearchParams(query);
+  params.set('v', version);
+  return `${assetPath}?${params.toString()}${hash ? `#${hash}` : ''}`;
 }

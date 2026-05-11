@@ -139,8 +139,6 @@
         // Shuffle the pile before distribution
         shuffle(GameState.pile.cards);
 
-        console.log(`[Game Core] Deck initialized with ${GameState.pile.cards.length} cards.`);
-
         GameState.players = playersData.map((char, index) => {
             const Player = window.Game.Models.Player;
             const player = new Player(char, index);
@@ -185,8 +183,6 @@
     }
 
     function playCard() {
-        // Placeholder logic for playing a card
-        console.log("Player played a card.");
         // In a real implementation, this would handle card selection and effects
     }
 
@@ -356,7 +352,6 @@
 
     function togglePause() {
         GameState.isPaused = !GameState.isPaused;
-        console.log(`[Game] Paused: ${GameState.isPaused}`);
         if (!GameState.isPaused) {
             checkAutoAdvance();
         }

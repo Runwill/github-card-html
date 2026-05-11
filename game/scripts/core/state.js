@@ -34,7 +34,4 @@
         console.error("Game.Models.Area not found during State initialization. Make sure models.js is loaded before state.js");
     }
 
-    // 暴露模拟数据（如果需要可以添加其他数据）
-    window.Game.MockData = {};
-
 })();

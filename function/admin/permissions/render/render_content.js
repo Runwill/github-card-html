@@ -172,8 +172,7 @@
     block.appendChild(editorStack);
 
     const editors = [editor, pwdEditor, roleEditor];
-    const STACK_TRANSITION = 'height 220ms ease, opacity 150ms ease, transform 220ms ease';
-    const STACK_FALLBACK = 380;
+    let hideEditorsTimer = null;
     const isStackOpen = ()=> editorStack.style.display !== 'none' && !editorStack.classList.contains('is-collapsed');
     const isEditorOpen = (target)=> isStackOpen() && editorStack.__activeEditor === target;
     const syncTriggers = (target)=>{
@@ -194,86 +193,24 @@
         ed.style.opacity = '';
       });
     };
-    const measureEditor = (target)=>{
-      if (!target) return 0;
-      const prevDisplay = target.style.display;
-      const prevVisibility = target.style.visibility;
-      const wasCollapsed = target.classList.contains('is-collapsed');
-      target.style.display = 'block';
-      target.style.visibility = 'hidden';
-      target.classList.remove('is-collapsed');
-      target.style.height = '';
-      const rect = target.getBoundingClientRect();
-      const style = getComputedStyle(target);
-      const margin = (parseFloat(style.marginTop) || 0) + (parseFloat(style.marginBottom) || 0);
-      target.style.display = prevDisplay;
-      target.style.visibility = prevVisibility;
-      target.classList.toggle('is-collapsed', wasCollapsed);
-      return rect.height + margin;
-    };
-    const finishStack = (target, focusEl)=>{
-      editorStack.removeEventListener('transitionend', editorStack.__onTransitionEnd || (()=>{}));
-      if (editorStack.__timer) { clearTimeout(editorStack.__timer); editorStack.__timer = null; }
-      editorStack.style.transition = '';
-      editorStack.style.height = '';
-      editorStack.style.opacity = '';
-      editorStack.__animating = false;
-      editorStack.__activeEditor = target || null;
-      syncTriggers(target || null);
-      if (target && focusEl) setTimeout(()=>{ try { focusEl.focus(); } catch{} }, 60);
-    };
     const openEditorStack = (target, focusEl)=>{
-      if (!target || editorStack.__animating) return;
-      const startHeight = isStackOpen() ? editorStack.getBoundingClientRect().height : 0;
-      editorStack.__animating = true;
-      editorStack.style.display = 'block';
-      editorStack.classList.remove('is-collapsed');
-      editorStack.style.transition = 'none';
-      editorStack.style.height = startHeight + 'px';
-      editorStack.style.opacity = '1';
-      const targetHeight = measureEditor(target);
+      if (!target) return;
+      if (hideEditorsTimer) { clearTimeout(hideEditorsTimer); hideEditorsTimer = null; }
       setEditorVisible(target);
+      editorStack.__activeEditor = target;
+      toggleSection(editorStack, true);
       syncTriggers(target);
-      void editorStack.offsetHeight;
-      const done = (e)=>{
-        if (e && e.target !== editorStack) return;
-        if (e && e.propertyName !== 'height') return;
-        finishStack(target, focusEl);
-      };
-      editorStack.__onTransitionEnd = done;
-      editorStack.addEventListener('transitionend', done);
-      editorStack.__timer = setTimeout(()=>done(), STACK_FALLBACK);
-      editorStack.style.transition = STACK_TRANSITION;
-      editorStack.style.height = targetHeight + 'px';
-      editorStack.style.opacity = '1';
+      if (focusEl) setTimeout(()=>{ try { focusEl.focus(); } catch{} }, 60);
     };
     const closeEditorStack = ()=>{
-      if (!isStackOpen() || editorStack.__animating) return;
-      editorStack.__animating = true;
-      editorStack.style.transition = 'none';
-      editorStack.style.height = editorStack.getBoundingClientRect().height + 'px';
-      editorStack.style.opacity = '1';
-      void editorStack.offsetHeight;
-      const done = (e)=>{
-        if (e && e.target !== editorStack) return;
-        if (e && e.propertyName !== 'height') return;
-        editorStack.removeEventListener('transitionend', done);
-        if (editorStack.__timer) { clearTimeout(editorStack.__timer); editorStack.__timer = null; }
-        editorStack.style.transition = '';
-        editorStack.style.height = '';
-        editorStack.style.opacity = '';
-        editorStack.style.display = 'none';
-        editorStack.classList.add('is-collapsed');
-        editorStack.__activeEditor = null;
-        editorStack.__animating = false;
-        setEditorVisible(null);
-        syncTriggers(null);
-      };
-      editorStack.addEventListener('transitionend', done);
-      editorStack.__timer = setTimeout(()=>done(), STACK_FALLBACK);
-      editorStack.style.transition = STACK_TRANSITION;
-      editorStack.style.height = '0px';
-      editorStack.style.opacity = '0';
+      if (!isStackOpen()) return;
+      editorStack.__activeEditor = null;
+      syncTriggers(null);
+      toggleSection(editorStack, false);
+      hideEditorsTimer = setTimeout(()=>{
+        hideEditorsTimer = null;
+        if (!isStackOpen()) setEditorVisible(null);
+      }, 390);
     };
     editorStack.__closeEditorStack = closeEditorStack;
     const openEditor = (target, focusEl)=>{

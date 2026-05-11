@@ -336,8 +336,3 @@ body.is-global-dragging .card-grid {
     z-index: 10; /* Above label (z-index 1) */
 }
 
-/* Clean up old/unused selectors if necessary, or just override above */
-.equip-slot::before {
-    content: none !important;
-}
-

@@ -83,53 +83,7 @@
             const openAreaInspector = (areaType) => {
                 const currentRole = element._inspectorRole;
                 if (!currentRole) return;
-
-                const isJudge = (areaType === 'judge');
-                const areaKey = isJudge ? 'judgeArea' : 'hand';
-                
-                if (!currentRole[areaKey]) return;
-
-                // Visibility Details
-                let forceFaceDown = false;
-                if (!isJudge) {
-                    const gs = window.Game.GameState;
-                    const isManual = (gs && (gs.mode === 'manual' || gs.mode === 'sandbox'));
-                    const perspIdx = (gs && gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
-                    const isSelf = (gs && gs.players && gs.players[perspIdx] === currentRole);
-                    if (!isManual && !isSelf) forceFaceDown = true;
-                }
-
-                const GameText = window.Game.UI.GameText;
-                const titleSuffix = GameText.render(isJudge ? 'judgeArea' : 'hand');
-                const title = `${currentRole.name} ${titleSuffix}`;
-                
-                const prefix = isJudge ? 'role-judge:' : 'role:';
-                const sourceId = `${prefix}${currentRole.id}`;
-                
-                const cards = currentRole[areaKey].cards || [];
-
-                // 优先使用 character 字段 (武将名)，回退使用 role.name
-                let charNameKey = currentRole.character;
-                if (Array.isArray(charNameKey) && charNameKey.length > 0) charNameKey = charNameKey[0];
-                if (!charNameKey) charNameKey = currentRole.name;
-
-                // 使用 GameText 渲染 Character (武将) HTML
-                let ownerNameHtml = charNameKey;
-                if (GameText) {
-                    ownerNameHtml = GameText.render('Character', { id: currentRole.characterId, name: charNameKey });
-                }
-
-                const openOptions = { 
-                    forceFaceDown,
-                    ownerName: ownerNameHtml,
-                    areaName: titleSuffix
-                };
-
-                if (window.Game.UI.toggleCardViewer) {
-                    window.Game.UI.toggleCardViewer(title, cards, sourceId, openOptions);
-                } else if (window.Game.UI.openCardViewer) {
-                    window.Game.UI.openCardViewer(title, cards, sourceId, openOptions);
-                }
+                openRoleAreaViewer(currentRole, areaType, areaType === 'hand' && shouldForceHandFaceDown(currentRole));
             };
 
             // Aliases for Event Handlers
@@ -187,6 +141,38 @@
         return key || (role && role.name) || '';
     }
 
+    function renderRoleOwnerName(role, GameText) {
+        const key = roleCharacterKey(role);
+        return GameText ? GameText.render('Character', { id: role.characterId, name: key }) : key;
+    }
+
+    function shouldForceHandFaceDown(role) {
+        const gs = window.Game.GameState;
+        const isManual = (gs && (gs.mode === 'manual' || gs.mode === 'sandbox'));
+        const perspIdx = (gs && gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
+        const isSelf = (gs && gs.players && gs.players[perspIdx] === role);
+        return !isManual && !isSelf;
+    }
+
+    function openRoleAreaViewer(role, areaType, forceFaceDown) {
+        const isJudge = areaType === 'judge';
+        const areaKey = isJudge ? 'judgeArea' : 'hand';
+        if (!role || !role[areaKey]) return;
+
+        const GameText = window.Game.UI.GameText;
+        const areaName = isJudge ? 'judgeArea' : 'hand';
+        const titleSuffix = GameText ? GameText.render(areaName) : areaName;
+        const sourceId = `${isJudge ? 'role-judge:' : 'role:'}${role.id}`;
+        const cards = role[areaKey].cards || [];
+        const openOptions = {
+            forceFaceDown: !!forceFaceDown,
+            ownerName: renderRoleOwnerName(role, GameText),
+            areaName: titleSuffix
+        };
+        const openViewer = window.Game.UI.toggleCardViewer || window.Game.UI.openCardViewer;
+        if (openViewer) openViewer(`${role.name} ${titleSuffix}`, cards, sourceId, openOptions);
+    }
+
     function updateAvatarImage(img, role) {
         if (!img) return;
         const avatarUrl = resolveAvatarUrl(role);
@@ -233,30 +219,7 @@
      */
     function openJudgeViewer(role) {
         if (!role || !role.judgeArea) return;
-        const GT = window.Game.UI.GameText;
-        const titleSuffix = GT ? GT.render('judgeArea') : 'Judge Area';
-        const title = `${role.name} ${titleSuffix}`;
-        const sourceId = `role-judge:${role.id}`;
-        const cards = role.judgeArea.cards || [];
-
-        const charNameKey = roleCharacterKey(role);
-
-        let ownerNameHtml = charNameKey;
-        if (GT) {
-            ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
-        }
-
-        const openOptions = { 
-            forceFaceDown: false,
-            ownerName: ownerNameHtml,
-            areaName: titleSuffix
-        };
-
-        if (window.Game.UI.toggleCardViewer) {
-            window.Game.UI.toggleCardViewer(title, cards, sourceId, openOptions);
-        } else if (window.Game.UI.openCardViewer) {
-            window.Game.UI.openCardViewer(title, cards, sourceId, openOptions);
-        }
+        openRoleAreaViewer(role, 'judge', false);
     }
 
     /**
@@ -295,9 +258,8 @@
                      equipData = [[], [], [], []]; 
                  }
                  
-                 const charNameKey = roleCharacterKey(role);
                  const GT = GameText || window.Game.UI.GameText;
-                 const ownerNameHtml = GT.render('Character', { id: role.characterId, name: charNameKey });
+                 const ownerNameHtml = renderRoleOwnerName(role, GT);
 
                  const slotsDef = [
                      { index: 0, label: GT.render('weaponSlot') },

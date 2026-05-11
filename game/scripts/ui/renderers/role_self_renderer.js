@@ -70,22 +70,6 @@
         // 血量 (Main View)
         const hpEl = document.getElementById('char-hp-display');
         if (hpEl) {
-             // Main View Seat Number
-             let seatEl = document.getElementById('char-seat-display');
-             if (!seatEl) {
-                 seatEl = document.createElement('span');
-                 seatEl.id = 'char-seat-display';
-                 seatEl.className = 'player-seat';
-                 if (hpEl.parentNode) {
-                     hpEl.parentNode.insertBefore(seatEl, hpEl);
-                 }
-             }
-
-             const realIndex = GameState.players.findIndex(p => p.id === selfRole.id);
-             if (seatEl) seatEl.style.display = 'none';
-
-             if (seatEl.className !== 'player-seat') seatEl.className = 'player-seat';
-            
             const finalHpText = `${selfRole.health}/${selfRole.healthLimit}`;
 
             if (hpEl.textContent !== finalHpText) {
@@ -219,5 +203,4 @@
 
     // 导出
     window.Game.UI.updateSelfRoleInfo = updateSelfRoleInfo;
-    window.Game.UI.updateCharacterInfo = updateSelfRoleInfo;
 })();

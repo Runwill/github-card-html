@@ -85,12 +85,6 @@ padding {
   padding-right: var(--hdr-pad);
 }
 
-.strength_button {
-  padding: 0.4rem;                                        /* 8/20 */
-  margin-left: 0.5%;
-  margin-top: 0.75rem;                                    /* 15/20 */
-}
-
 /* ── 搜索容器 ────────────────────────────────── */
 #search-input {
   position: relative;

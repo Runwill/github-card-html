@@ -111,11 +111,6 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-8px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
 #nav .tabs-title a {
     transition:
         background-color var(--dur-moderate) var(--ease-standard),

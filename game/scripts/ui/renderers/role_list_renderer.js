@@ -115,12 +115,6 @@
                 });
                 avatarContainer.appendChild(judgeCountSpan);
 
-                // === 在线模式：观察者名称容器 ===
-                const viewerLabel = document.createElement('div');
-                viewerLabel.className = 'online-viewer-label';
-                viewerLabel.style.display = 'none';
-                avatarContainer.appendChild(viewerLabel);
-
                 pEl.appendChild(avatarContainer);
 
                 // Equipment names overlay
@@ -136,10 +130,6 @@
                 const statsDiv = document.createElement('div');
                 statsDiv.className = 'player-stats-row';
                 
-                const seatSpan = document.createElement('span');
-                seatSpan.className = 'player-seat';
-                statsDiv.appendChild(seatSpan);
-
                 const handResultSpan = document.createElement('span');
                 handResultSpan.className = 'player-hand-count';
                 statsDiv.appendChild(handResultSpan);
@@ -236,10 +226,6 @@
             }
             setupEquipmentButton(summaryEquipBtn, role, GameText);
 
-            // 座次
-            const seatSpan = pEl.querySelector('.player-seat');
-           if (seatSpan) seatSpan.style.display = 'none';
-
             // 血量
             const hpSpan = pEl.querySelector('.player-hp');
             const finalHpText = `${role.health}/${role.healthLimit}`;
@@ -301,6 +287,4 @@
 
     // 导出
     window.Game.UI.renderRoleList = renderRoleList;
-    window.Game.UI.renderOtherRoles = renderRoleList;
-    window.Game.UI.renderOtherPlayers = renderRoleList;
 })();

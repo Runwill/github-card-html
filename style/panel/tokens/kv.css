@@ -187,14 +187,3 @@
   opacity: .7;
   cursor: progress;
 }
-
-/* JSON 预览 */
-#tokens-content pre.token-json {
-  margin: 0;
-  padding: 0;
-  background: none;
-  border: none;
-  font-family: var(--font-mono);
-  font-size: var(--tp-fs-sm, 12px);
-  color: var(--text);
-}

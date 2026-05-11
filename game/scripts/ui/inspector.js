@@ -18,10 +18,6 @@
             if (!this.tooltip) {
                 this.tooltip = document.createElement('div');
                 this.tooltip.id = 'game-inspector-tooltip';
-                // 基础样式 (仅保留布局相关，移除颜色主题相关)
-                Object.assign(this.tooltip.style, {
-                    // 样式已移至 css
-                });
                 document.body.appendChild(this.tooltip);
             }
 
@@ -33,7 +29,6 @@
             
             // Key Listeners for Toggle Behavior
             document.addEventListener('keydown', (e) => this.handleKeyDown(e));
-            document.addEventListener('keyup', (e) => this.handleKeyUp(e));
         },
 
         injectStyles() {
@@ -141,13 +136,6 @@
             }
         },
 
-        handleKeyUp(e) {
-            // Logic removed to persist tooltip until mouse leave
-            // if (window.KeySettings && window.KeySettings.checkBinding(e, 'inspect_details')) {
-            //     this.hide();
-            // }
-        },
-
         handleMouseOver(e) {
             const target = e.target.closest('[data-inspector-type]');
             if (!target) return;
@@ -178,27 +166,6 @@
             }
         },
         
-        tryShow(target, eventOrContext) {
-            let isHeld = false;
-            
-            if (window.KeySettings) {
-                isHeld = window.KeySettings.isActionActive(eventOrContext, 'inspect_details');
-            } else {
-                // Fallback default: Alt
-                if (eventOrContext instanceof KeyboardEvent) {
-                    isHeld = eventOrContext.key === 'Alt';
-                } else {
-                    isHeld = eventOrContext.altKey;
-                }
-            }
-            
-            if (isHeld) {
-                const x = (eventOrContext.clientX !== undefined) ? eventOrContext.clientX : this.lastMousePosition.x;
-                const y = (eventOrContext.clientY !== undefined) ? eventOrContext.clientY : this.lastMousePosition.y;
-                this._resolveAndShow(target, x, y);
-            }
-        },
-
         positionTooltip(x, y) {
             const offset = 15;
             let left = x + offset;

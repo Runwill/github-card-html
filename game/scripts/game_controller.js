@@ -7,10 +7,6 @@
     let currentEngine = null;
 
     function init() {
-        console.log("[Controller] Initializing Game Controller...");
-        
-        // 暴露启动方法
-        window.Game.startFunction = startGame;
     }
 
     function startGame(config = {}) {
@@ -33,7 +29,6 @@
                 console.error("SandboxEngine not loaded!");
                 return;
             }
-            console.log("[Controller] Starting Sandbox Mode");
             currentEngine = new window.Game.Engines.SandboxEngine();
             currentEngine.init(config);
             
@@ -44,8 +39,6 @@
         } else {
             // 默认 自动/流程模式（旧版 GameRun）
             // 现有的 game_core.js 逻辑基本上就是 "FlowEngine"
-            console.log("[Controller] Starting Auto/Flow Mode");
-            
             if (window.Game.Core && window.Game.Core.startGame) {
                 window.Game.Core.startGame(config);
             }
@@ -54,7 +47,6 @@
     
     function switchMode(mode) {
         currentMode = mode;
-        console.log(`[Controller] Mode switched to ${mode}. Restart game to apply.`);
     }
 
     function setSpeed(ms) {
@@ -63,84 +55,6 @@
             window.Game.Core.setSpeed(ms);
         }
     }
-
-    // 辅助函数：动画逻辑
-    const performFlipAnimation = (startRect, toArea, movedCard, animationHint, cardHTML, passedEl) => {
-        if (!startRect || !window.Game.UI || !window.Game.UI.DragAnimation) return;
-        const DragAnim = window.Game.UI.DragAnimation;
-
-        // -------------------------------------------------------------
-        // 特殊路径：如果指定了动画目标提示（Role Summary 或 Judge Area）
-        // -------------------------------------------------------------
-        if (animationHint && (animationHint.startsWith('role:') || animationHint.startsWith('role-judge:'))) {
-            let container = document.querySelector(`[data-drop-zone="${animationHint}"]`);
-            
-            // Fallback for Judge Area
-            if (!container && animationHint.startsWith('role-judge:')) {
-                const roleId = animationHint.split(':')[1];
-                container = document.querySelector(`[data-drop-zone="role:${roleId}"]`);
-            }
-
-            if (container) {
-                // 使用 shared createGhost，支持传入 element 或 html string
-                const flyer = DragAnim.createGhost(passedEl || cardHTML, startRect);
-                if (!flyer) return;
-
-                // 目标：定位到摘要角色的中心，且保持卡牌原有大小
-                DragAnim.animateDropToPlaceholder(flyer, container, null, { matchSize: false });
-                
-                return; // 动画接管完成
-            }
-        }
-
-        // -------------------------------------------------------------
-        // 2. 标准移动：在容器中找到目标卡牌元素
-        // -------------------------------------------------------------
-            const areaName = toArea.name || toArea;
-            
-            // 查找容器
-            let container = document.querySelector(`
-                .cards-container[data-area-name="${areaName}"], 
-                .cards-container[data-drop-zone="${areaName}"],
-                .card-grid[data-drop-zone="${areaName}"]
-            `);
-
-            if (!container) {
-                 container = document.getElementById(`${areaName}-container`);
-                 if (!container) return; 
-            }
-            
-            // 找到目标卡牌 (通常是最后加入的那张)
-            let targetEl = null;
-
-            if (container.lastElementChild) {
-                targetEl = container.lastElementChild;
-                if (targetEl.className === 'card-placeholder' && !targetEl.hasChildNodes()) {
-                     targetEl = null; 
-                }
-            }
-            
-            // 如果提供了卡牌ID，尝试更精确匹配 (略)
-            // ...
-
-            if (targetEl) {
-                // 使用 shared createGhost (克隆目标，因为目标已经是我们想要的样子)
-                // 这里我们想模拟 "起飞然后降落"。
-                // 此时 startRect 是旧位置。targetEl 是新位置。
-                
-                // 为了视觉连贯，我们应该克隆 targetEl (有正面的样式)，但放在 startRect。
-                // *注意*: 如果是从背面翻到正面，或者样式改变，克隆 targetEl 是对的。
-                const flyer = DragAnim.createGhost(targetEl, startRect);
-                
-                // 隐藏真实目标
-                targetEl.style.visibility = 'hidden';
-                
-                // 执行动画 -> 飞向 targetEl (默认 matchSize=true)
-                DragAnim.animateDropToPlaceholder(flyer, targetEl, () => {
-                    if (targetEl) targetEl.style.visibility = '';
-                });
-            }
-    };
 
     // 辅助函数：查找卡牌当前区域
     const findCardSource = (card) => {
@@ -224,7 +138,6 @@
         startGame,
         switchMode,
         setSpeed,
-        performFlipAnimation,
     };
 
     // Auto-init on load

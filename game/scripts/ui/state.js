@@ -15,15 +15,6 @@
     };
 
     /**
-     * 获取当前回合行动的角色（游戏逻辑层）
-     */
-    window.Game.UI.getCurrentTurnPlayer = function() {
-        const state = window.Game.GameState;
-        if (!state || !state.players) return null;
-        return state.players[state.currentPlayerIndex] || state.players[0];
-    };
-
-    /**
      * 切换主视角到指定玩家索引，然后刷新 UI。
      * @param {number} playerIndex - players 数组中的索引
      */

@@ -8,7 +8,6 @@
         }
 
         init(config) {
-            console.log("[Sandbox] Initializing Manual Mode...");
             this.state.isGameRunning = true;
             this.state.isPaused = false;
             this.state.mode = 'sandbox';
@@ -37,7 +36,6 @@
             if (window.Game.UI && window.Game.UI.updateUI) {
                 window.Game.UI.updateUI();
             }
-            console.log("[Sandbox] Ready.");
         }
 
         _setupPlayers(config) {
@@ -102,8 +100,6 @@
         // Directly move card without event stack
         moveCard(card, toArea, toIndex = -1, fromAreaHint = null) {
              window.Game.Models.moveCardToArea(card, toArea, toIndex, fromAreaHint);
-             
-             console.log(`[Sandbox] Moved card ${card.name || card} to ${toArea.name}`);
              
              if (window.Game.UI.updateUI) window.Game.UI.updateUI();
         }

@@ -13,8 +13,6 @@
 }
 
 .tokens-scheme { grid-column: 1 / -1; display:flex; flex-wrap:wrap; align-items:flex-start; gap:0.444em 0.556em; padding:0.333em 0; border-bottom:1px dashed var(--border) !important; margin-bottom: 0.444em; }
-.tokens-scheme__title { color: var(--text-muted); flex:0 0 auto; font-size: var(--modal-fs-base, var(--fs-base)); padding-top: 0.462em; }
-
 /* Variant sample */
 #tokens-create-hints .variant-sample { margin-top: 1em; padding-top: 1em; border-top: 1px dashed var(--border); }
 #tokens-create-hints .variant-sample__title { font-weight: 600; color: var(--text) !important; margin-bottom: 0.667em; }

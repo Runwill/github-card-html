@@ -31,9 +31,7 @@
             // 步骤: beforeRecover -> whenRecover (动作) -> afterRecover
             this.trigger('Recover', ['beforeRecover', 'whenRecover', 'afterRecover'], { role, value }, (step, ctx) => {
                 if (step === 'whenRecover') {
-                    const oldHealth = ctx.role.health;
                     ctx.role.health = Math.min(ctx.role.health + ctx.value, ctx.role.healthLimit);
-                    console.log(`[Event] Recover: ${ctx.role.name} recovered ${ctx.value} health. (${oldHealth} -> ${ctx.role.health})`);
                 }
             });
         },
@@ -44,10 +42,7 @@
             // 步骤: beforeLoss -> whenLoss (动作) -> afterLoss
             this.trigger('Loss', ['beforeLoss', 'whenLoss', 'afterLoss'], { role, value }, (step, ctx) => {
                 if (step === 'whenLoss') {
-                    const oldHealth = ctx.role.health;
                     ctx.role.health = Math.max(ctx.role.health - ctx.value, 0);
-                    console.log(`[Event] Loss: ${ctx.role.name} lost ${ctx.value} health. (${oldHealth} -> ${ctx.role.health})`);
-                    if (ctx.role.health <= 0) console.log(`[Event] ${ctx.role.name} is dying!`);
                 }
             });
         },
@@ -59,9 +54,7 @@
             const steps = ['beforeCure', 'beforeCured', 'whenCure', 'whenCured', 'afterCure', 'afterCured'];
             this.trigger('Cure', steps, { source, target, value }, (step, ctx) => {
                 if (step === 'whenCured') {
-                    const oldHealth = ctx.target.health;
                     ctx.target.health = Math.min(ctx.target.health + ctx.value, ctx.target.healthLimit);
-                    console.log(`[Event] Cure: ${ctx.source ? ctx.source.name : 'System'} cured ${ctx.target.name} for ${ctx.value}. (${oldHealth} -> ${ctx.target.health})`);
                 }
             });
         },
@@ -73,10 +66,7 @@
             const steps = ['beforeDamage', 'beforeDamaged', 'whenDamage', 'whenDamaged', 'afterDamage', 'afterDamaged'];
             this.trigger('Damage', steps, { source, target, value }, (step, ctx) => {
                 if (step === 'whenDamaged') {
-                    const oldHealth = ctx.target.health;
                     ctx.target.health = Math.max(ctx.target.health - ctx.value, 0);
-                    console.log(`[Event] Damage: ${ctx.source ? ctx.source.name : 'System'} damaged ${ctx.target.name} for ${ctx.value}. (${oldHealth} -> ${ctx.target.health})`);
-                    if (ctx.target.health <= 0) console.log(`[Event] ${ctx.target.name} is dying!`);
                 }
             });
         },
@@ -160,13 +150,6 @@
                          ctx.fromIndex = -1;
                      });
                      
-                     console.log('[Game] Event: Move executed.', { 
-                         cards: cards.length, 
-                         to: ctx.movedInArea.name + (ctx.movedInArea.owner ? ` (${ctx.movedInArea.owner.name})` : ''), 
-                         pos: ctx.movedAtPosition,
-                         from: ctx.fromArea ? (ctx.fromArea.name + (ctx.fromArea.owner ? ` (${ctx.fromArea.owner.name})` : '')) : 'unknown'
-                     });
-
                      // Trigger specific callback if provided
                      if (onMoveExecuted) {
                          onMoveExecuted(ctx);

@@ -6,34 +6,12 @@
     window.Game.UI.viewers = {};
     window.Game.UI.maxViewerZIndex = 11000; // Start higher than base modal
 
-    // Global Click Handler for closing when clicking empty space
-    document.addEventListener('mousedown', (e) => {
-        // If we have no viewers, ignore
-        if (Object.keys(window.Game.UI.viewers).length === 0) return;
-
-        // If click target is inside ANY viewer, bring that viewer to front
+    document.addEventListener('click', (e) => {
         const clickedViewer = e.target.closest('.card-viewer-modal');
         if (clickedViewer) {
             clickedViewer.style.zIndex = ++window.Game.UI.maxViewerZIndex;
             return;
         }
-
-        // If clicking on "Empty Space" (Game board background, not interactive elements)
-        // We define "Empty Space" as strictly document body or specific containers?
-        // Actually, previous logic was: if not inside modal, close.
-        // But now we have multiple.
-        // If I click ANYWHERE outside ALL modals, I should close ALL modals.
-        
-        // HOWEVER: We must distinguish between "Opening a new modal" (e.g. clicking a button) and "Clicking background".
-        // Buttons usually stopPropagation or we check if target is interactive.
-        // Let's rely on the fact that existing logic used 'click' on document.
-        // If we use 'mousedown', we might catch it before buttons.
-        // Use 'click' like before.
-    });
-
-    document.addEventListener('click', (e) => {
-        // If click is inside ANY viewer, do nothing (handled by mousedown z-index logic)
-        if (e.target.closest('.card-viewer-modal')) return;
 
         // Ignore clicks on buttons (likely interactions, or opening other windows)
         if (e.target.closest('button') || e.target.tagName === 'BUTTON') return;
@@ -45,17 +23,9 @@
         const now = Date.now();
         const viewers = Object.values(window.Game.UI.viewers);
         
-        if (viewers.length > 0) {
-            // Close all viewers that have been open for at least 200ms
-            // This prevents immediate closing if the open event bubbles to document
-            viewers.forEach(v => {
-                if (now - v.openedAt > 200) {
-                    if (v.cleanup) v.cleanup();
-                }
-            });
-            
-            // If we closed something, maybe we want to stop propagation? No need.
-        }
+        viewers.forEach(v => {
+            if (now - v.openedAt > 200 && v.cleanup) v.cleanup();
+        });
     });
 
     // Global ESC Handler
@@ -434,7 +404,5 @@
              renderViewerGrid(grid.id, resolveViewerCards(sourceId, GameState), sourceId, options);
         });
     };
-
-    window.Game.UI.createCardViewer = window.Game.UI.openCardViewer;
 
 })();

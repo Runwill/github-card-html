@@ -84,8 +84,7 @@
 
 /* Container Foundations */
 .cards-container, 
-.treatment-container,
-.game-card-area {
+.treatment-container {
     display: flex;
     gap: var(--cards-container-gap, var(--space-2xl));
     flex-wrap: wrap;
@@ -156,8 +155,7 @@
 }
 
 /* Hide mover label on dragged card (clone & source) */
-.dragging-real .card-mover-label,
-.dragging-source .card-mover-label {
+.dragging-real .card-mover-label {
     display: none;
 }
 

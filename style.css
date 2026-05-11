@@ -34,11 +34,6 @@ pronounName {
     color: var(--pronoun-color, #d60000bb);
 }
 
-.glowing {
-    text-shadow: 1px 1px 0 rgb(255, 215, 0, 0.1), -1px -1px 0 rgb(255, 215, 0, 0.1), 
-                 1px -1px 0 rgb(255, 215, 0, 0.1), -1px 1px 0 rgb(255, 215, 0, 0.1);
-}
-
 /* .menu__button 完整样式在 style/menu/panel.css；变量在 style/menu/_variables.css 统一维护 */
 
 /* 容器和角色相关样式 */
@@ -137,17 +132,4 @@ h3 { font-size: 1.0rem; }
     }
 }
 
-.animations-disabled * {
-    animation: none !important;
-    transition: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-}
-
-.animations-disabled .main {
-    transform: none;
-    box-shadow: var(--shadow-soft-2);
-}
-
 .animate-in, .visible { will-change: transform, opacity; }
-.animate-in.animation-complete, .visible.animation-complete { will-change: auto; }

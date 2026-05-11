@@ -173,16 +173,11 @@
         // 3. 渲染角色信息 (Self Role)
         if (window.Game.UI.updateSelfRoleInfo) {
             window.Game.UI.updateSelfRoleInfo(GameState, GameText);
-        } else if (window.Game.UI.updateCharacterInfo) {
-             // Fallback
-             window.Game.UI.updateCharacterInfo(GameState, GameText);
         }
 
         // 4. 渲染角色列表 (Role List)
         if (window.Game.UI.renderRoleList) {
             window.Game.UI.renderRoleList(GameState, GameText);
-        } else if (window.Game.UI.renderOtherRoles) {
-            window.Game.UI.renderOtherRoles(GameState, GameText);
         }
 
         // 5. 渲染公共区域 (Board)
