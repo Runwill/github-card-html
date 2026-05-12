@@ -41,8 +41,6 @@
         if (GameState.treatmentArea) {
             const el = document.getElementById('header-treatment-area');
             if (el) {
-                // Add Inspector
-                el.setAttribute('data-inspector-type', 'area');
                 el.setAttribute('data-area-name', 'treatmentArea');
                 
                 const key = GameState.treatmentArea.name || 'treatmentArea';

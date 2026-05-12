@@ -168,7 +168,7 @@
 
   // 初始化：等待 partials 注入后应用翻译
   const ready = window.partialsReady instanceof Promise ? window.partialsReady : Promise.resolve();
-  ready.then(() => {
+  ready.then(() => Promise.resolve(window.I18N_STRINGS_READY).catch(() => null)).then(() => {
     document.documentElement.setAttribute('data-lang', current());
     apply();
     // 登录后的页面尽早缓存权限，供语言切换使用

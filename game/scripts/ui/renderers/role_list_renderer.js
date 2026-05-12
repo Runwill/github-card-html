@@ -43,8 +43,6 @@
                 pEl = document.createElement('div');
                 pEl.id = `player-summary-${role.id}`;
                 pEl.className = 'role-summary';
-                pEl.setAttribute('data-inspector-type', 'role');
-                pEl.setAttribute('data-role-id', role.id);
                 
                 // Drop Zone Config (Trigger Mode)
                 pEl.setAttribute('data-drop-zone', `role:${role.id}`); 

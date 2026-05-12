@@ -5,8 +5,6 @@
   // Actions Definition
     const ACTIONS = Object.assign({
       'expand_all_terms': { label: 'Expand All Terms', default: null, btnId: 'key-bind-expand-all' },
-      // default: { key: 'Control' } means the key 'Control' itself.
-      'inspect_details': { label: 'Inspect Details (Hold)', default: { key: 'Control' }, btnId: 'key-bind-inspect' },
       'toggle_theme': { label: 'Toggle Theme', default: { key: 'T' }, btnId: 'key-bind-toggle-theme' }
     }, window.CardEditorKeyActions || {});
 
@@ -175,29 +173,6 @@
     return e.key.toLowerCase() === bind.key.toLowerCase();
   }
   
-  /**
-   * Check if the action is currently "active" (held down).
-   * Useful for state checks (is specific key held?).
-   * Supports both KeyboardEvent (is this the key?) and MouseEvent (is the modifier held?).
-   */
-  function isActionActive(e, action) {
-      const bind = getBinding(action);
-      if (!bind) return false;
-
-      const targetKey = bind.key.toLowerCase();
-
-      if (targetKey === 'alt') return e.altKey;
-      if (targetKey === 'control') return e.ctrlKey;
-      if (targetKey === 'shift') return e.shiftKey;
-      if (targetKey === 'meta') return e.metaKey;
-
-      if (e instanceof KeyboardEvent) {
-          return e.key.toLowerCase() === targetKey;
-      }
-
-      return false;
-  }
-
   function expandAllTerms() {
     const panel = document.getElementById('panel_term');
     if (!panel) return;
@@ -268,7 +243,6 @@
   
   // Expose API
   window.KeySettings = {
-      isActionActive,
       checkBinding,
       getBinding,
       getBindingText,

@@ -128,8 +128,6 @@
                 isNewNode = true;
             }
 
-            // 添加 Inspector 所需的元数据
-            cardEl.setAttribute('data-inspector-type', 'card');
             cardEl.setAttribute('data-area-name', dropZoneId);
             cardEl.setAttribute('data-card-index', index);
 

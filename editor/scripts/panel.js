@@ -702,8 +702,6 @@
       var button = event.target.closest('.editor-entry');
       if (button) insertEntryFromButton(button);
     });
-    list.addEventListener('dragstart', onEntryDragStart);
-    list.addEventListener('dragend', onTreeDragEnd);
     list.addEventListener('pointerdown', onEntryPointerDown);
   }
 
@@ -727,23 +725,7 @@
       els.tree.addEventListener('dblclick', onTreeDoubleClick);
       els.tree.addEventListener('keydown', onTreeEditKeydown);
       els.tree.addEventListener('focusout', onTreeEditFocusOut);
-      els.tree.addEventListener('dragstart', onTreeDragStart);
-      els.tree.addEventListener('dragover', onTreeDragOver);
-      els.tree.addEventListener('dragleave', onTreeDragLeave);
-      els.tree.addEventListener('drop', onTreeDrop);
-      els.tree.addEventListener('dragend', onTreeDragEnd);
       els.tree.addEventListener('pointerdown', onTreePointerDown);
-    }
-    if (els.treeDropRoot) {
-      els.treeDropRoot.addEventListener('dragover', function (event) {
-        if (els.tree && els.tree.contains(event.target)) return;
-        onTreeDragOver(event);
-      });
-      els.treeDropRoot.addEventListener('dragleave', onTreeDragLeave);
-      els.treeDropRoot.addEventListener('drop', function (event) {
-        if (els.tree && els.tree.contains(event.target)) return;
-        onTreeDrop(event);
-      });
     }
     if (els.escapeToggle) {
       renderEscapeToggle();
@@ -795,35 +777,6 @@
     if (button) button.addEventListener('click', handler);
   }
 
-  function onEntryDragStart(event) {
-    var button = event.target.closest('.editor-entry');
-    if (!button) return;
-    state.draggingEntryKey = button.dataset.key || '';
-    event.dataTransfer.setData('application/x-card-editor-entry', button.dataset.key || '');
-    event.dataTransfer.setData('text/plain', 'entry:' + (button.dataset.key || ''));
-    event.dataTransfer.effectAllowed = 'copy';
-  }
-
-  function onTreeDragStart(event) {
-    var row = event.target.closest('.editor-node-row');
-    if (!row) return;
-    state.draggingNodeId = row.dataset.id || '';
-    event.dataTransfer.setData('application/x-card-editor-node', row.dataset.id || '');
-    event.dataTransfer.setData('text/plain', 'node:' + (row.dataset.id || ''));
-    event.dataTransfer.effectAllowed = 'move';
-  }
-
-  function dataTransferHas(event, type) {
-    var types = event.dataTransfer && event.dataTransfer.types;
-    return !!(types && Array.prototype.indexOf.call(types, type) !== -1);
-  }
-
-  function hasEditorDrag(event) {
-    return !!(state.draggingNodeId || state.draggingEntryKey
-      || dataTransferHas(event, 'application/x-card-editor-entry')
-      || dataTransferHas(event, 'application/x-card-editor-node'));
-  }
-
   function modeForDropEvent(event, row) {
     if (!row) return 'child';
     if (event.shiftKey) return 'before';
@@ -871,19 +824,6 @@
     return dropTargetForRow(event, rows[rows.length - 1], 'after');
   }
 
-  function getDropTargetFromEvent(event, preferIndicator) {
-    var row = event.target.closest && event.target.closest('.editor-node-row');
-    if (row && els.tree && els.tree.contains(row)) {
-      return dropTargetForRow(event, row);
-    }
-    var nearest = getNearestRowDropTarget(event);
-    if (nearest) return nearest;
-    if (preferIndicator && state.dropMode) {
-      return { targetId: state.dropTargetId || null, mode: state.dropMode || 'child' };
-    }
-    return { targetId: null, mode: 'child' };
-  }
-
   function isInvalidDrop(sourceId, targetId) {
     return !!(sourceId && targetId && (sourceId === targetId || isDescendant(sourceId, targetId)));
   }
@@ -912,30 +852,6 @@
     if (row) row.classList.add(dropClassName(mode));
   }
 
-  function onTreeDragOver(event) {
-    if (!hasEditorDrag(event)) return;
-    var target = getDropTargetFromEvent(event);
-    if (isInvalidDrop(state.draggingNodeId, target.targetId)) {
-      clearDropIndicator();
-      return;
-    }
-    event.preventDefault();
-    event.dataTransfer.dropEffect = state.draggingEntryKey ? 'copy' : 'move';
-    setDropIndicator(target.targetId, target.mode);
-  }
-
-  function onTreeDragLeave(event) {
-    var next = event.relatedTarget;
-    if (next && event.currentTarget && event.currentTarget.contains(next)) return;
-    clearDropIndicator();
-  }
-
-  function onTreeDragEnd() {
-    state.draggingNodeId = '';
-    state.draggingEntryKey = '';
-    clearDropIndicator();
-  }
-
   function applyDropPayload(entryKey, sourceId, target) {
     if (!target) return false;
     clearDropIndicator();
@@ -951,22 +867,6 @@
     insertNodes([moved], target.targetId, target.targetId ? target.mode : 'child');
     renderAll(true);
     return true;
-  }
-
-  function onTreeDrop(event) {
-    event.preventDefault();
-    var target = getDropTargetFromEvent(event, true);
-    var transfer = event.dataTransfer;
-    var textPayload = transfer ? transfer.getData('text/plain') || '' : '';
-    var entryKey = (transfer && transfer.getData('application/x-card-editor-entry'))
-      || state.draggingEntryKey
-      || (textPayload.indexOf('entry:') === 0 ? textPayload.slice(6) : '');
-    var sourceId = (transfer && transfer.getData('application/x-card-editor-node'))
-      || state.draggingNodeId
-      || (textPayload.indexOf('node:') === 0 ? textPayload.slice(5) : '');
-    applyDropPayload(entryKey, sourceId, target);
-    state.draggingEntryKey = '';
-    state.draggingNodeId = '';
   }
 
   function onEntryPointerDown(event) {

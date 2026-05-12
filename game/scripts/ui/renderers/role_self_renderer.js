@@ -16,20 +16,16 @@
         const sandboxTurn = (GameState.mode === 'sandbox' && GameState.sandboxTurnIndex != null && GameState.sandboxTurnIndex >= 0);
         const isTurnOwner = (inTurn && perspIdx === GameState.currentPlayerIndex) || (sandboxTurn && perspIdx === GameState.sandboxTurnIndex);
         
-        // 绑定自身面板的 Inspector
         const currentPanel = document.querySelector('.current-character-panel');
         let isRoleChanged = false;
         
         if (currentPanel) {
-            const oldId = currentPanel.getAttribute('data-role-id');
+            const oldId = currentPanel._roleId;
             if (oldId !== String(selfRole.id)) {
                 isRoleChanged = true;
             }
 
-            if (!currentPanel.hasAttribute('data-inspector-type')) {
-                currentPanel.setAttribute('data-inspector-type', 'role');
-            }
-            currentPanel.setAttribute('data-role-id', selfRole.id);
+            currentPanel._roleId = String(selfRole.id);
             
             setupHandInspector(currentPanel, selfRole);
         }
@@ -163,7 +159,6 @@
         if (selfRole.hand) {
             const el = document.getElementById('header-hand-area');
             if (el) {
-                el.setAttribute('data-inspector-type', 'area');
                 el.setAttribute('data-area-name', 'hand');
 
                 const key = selfRole.hand.name || 'hand';

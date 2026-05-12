@@ -12,14 +12,6 @@
   --viewer-body-pad: clamp(6px, calc(var(--card-w, 100px) * 0.2), 20px);
   --viewer-slot-body-pad: var(--viewer-body-pad);
   --viewer-content-max-h: calc(var(--processing-axis-dvb) * 80);
-  --inspector-fs: clamp(8px, min(calc(var(--processing-axis-inline) * 0.628), calc(var(--processing-axis-block) * 1.266)), 12px);
-  --inspector-pad-y: clamp(4px, min(calc(var(--processing-axis-inline) * 0.418), calc(var(--processing-axis-block) * 0.844)), 8px);
-  --inspector-pad-x: clamp(6px, min(calc(var(--processing-axis-inline) * 0.628), calc(var(--processing-axis-block) * 1.266)), 12px);
-  --inspector-radius: clamp(3px, min(calc(var(--processing-axis-inline) * 0.209), calc(var(--processing-axis-block) * 0.422)), 4px);
-  --inspector-max-w: clamp(260px, calc(var(--processing-axis-inline) * 31.381), 600px);
-  --inspector-max-h: calc(var(--processing-axis-dvb) * 80);
-  --inspector-title-mb: clamp(2px, min(calc(var(--processing-axis-inline) * 0.262), calc(var(--processing-axis-block) * 0.527)), 5px);
-  --inspector-title-pad-b: clamp(1px, min(calc(var(--processing-axis-inline) * 0.105), calc(var(--processing-axis-block) * 0.211)), 2px);
 }
 
 html.force-landscape {
