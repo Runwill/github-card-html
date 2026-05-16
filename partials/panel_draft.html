@@ -1,70 +1,110 @@
 <div class="tabs-panel" id="panel_draft">
-  <main class="draft-page">
-    <section class="draft-live" data-i18n-attr="aria-label" data-i18n-aria-label="nav.draft" aria-label="草稿">
-      <div class="draft-live__grid">
-        <label class="draft-pane draft-pane--input" for="htmlInput" data-i18n-attr="aria-label" data-i18n-aria-label="draft.input.title" aria-label="HTML 输入">
-          <textarea id="htmlInput" data-i18n-attr="placeholder" data-i18n-placeholder="draft.input.placeholder" placeholder="输入HTML代码"></textarea>
-        </label>
-        <section class="draft-pane draft-pane--preview" data-i18n-attr="aria-label" data-i18n-aria-label="draft.preview.title" aria-label="实时预览">
-          <div class="draftBlock"></div>
-        </section>
+  <main class="draft-page" data-editor-view="editor">
+    <header class="draft-module-switch" data-i18n-attr="aria-label" data-i18n-aria-label="editor.viewSwitcher.label" aria-label="HTML 编辑模块">
+      <div class="draft-module-switch__tabs" role="tablist">
+        <button type="button" class="draft-module-tab is-active" id="draft-view-editor-tab" role="tab" aria-selected="true" aria-controls="draft-editor-view" data-editor-view="editor" data-i18n="editor.view.editor">编辑器</button>
+        <button type="button" class="draft-module-tab" id="draft-view-relations-tab" role="tab" aria-selected="false" aria-controls="draft-relations-view" data-editor-view="relations" data-i18n="editor.view.relations">关系图</button>
       </div>
-    </section>
+    </header>
 
-    <section class="editor-shell" aria-labelledby="editor-title">
-      <header class="editor-toolbar">
-        <h2 id="editor-title" data-i18n="editor.title">HTML 编辑器</h2>
-        <div class="editor-toolbar__actions">
-          <button type="button" class="btn btn--sm btn--secondary is-active" id="editor-escape-toggle" aria-pressed="true" data-i18n="editor.action.escapeQuotes">转义引号</button>
-          <button type="button" class="btn btn--sm" id="editor-expand-all" data-i18n="editor.action.expandAll">展开</button>
-          <button type="button" class="btn btn--sm" id="editor-collapse-all" data-i18n="editor.action.collapseAll">折叠</button>
-          <button type="button" class="btn btn--sm" id="editor-import-draft" data-i18n="editor.action.importFromDraft">输入</button>
-          <button type="button" class="btn btn--sm" id="editor-apply-output" data-i18n="editor.action.outputToDraft">输出</button>
-          <button type="button" class="btn btn--sm btn--danger btn--lift" id="editor-clear-tree" data-i18n="editor.action.clearTree">清空</button>
+    <div class="draft-view draft-view--editor" id="draft-editor-view" role="tabpanel" aria-labelledby="draft-view-editor-tab">
+      <section class="draft-live" data-i18n-attr="aria-label" data-i18n-aria-label="nav.draft" aria-label="草稿">
+        <div class="draft-live__grid">
+          <label class="draft-pane draft-pane--input" for="htmlInput" data-i18n-attr="aria-label" data-i18n-aria-label="draft.input.title" aria-label="HTML 输入">
+            <textarea id="htmlInput" data-i18n-attr="placeholder" data-i18n-placeholder="draft.input.placeholder" placeholder="输入HTML代码"></textarea>
+          </label>
+          <section class="draft-pane draft-pane--preview" data-i18n-attr="aria-label" data-i18n-aria-label="draft.preview.title" aria-label="实时预览">
+            <div class="draftBlock"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="editor-shell" aria-labelledby="editor-title">
+        <header class="editor-toolbar">
+          <h2 id="editor-title" data-i18n="editor.title">HTML 编辑器</h2>
+          <div class="editor-toolbar__actions">
+            <button type="button" class="btn btn--sm btn--secondary is-active" id="editor-escape-toggle" aria-pressed="true" data-i18n="editor.action.escapeQuotes">转义引号</button>
+            <button type="button" class="btn btn--sm" id="editor-expand-all" data-i18n="editor.action.expandAll">展开</button>
+            <button type="button" class="btn btn--sm" id="editor-collapse-all" data-i18n="editor.action.collapseAll">折叠</button>
+            <button type="button" class="btn btn--sm" id="editor-import-draft" data-i18n="editor.action.importFromDraft">输入</button>
+            <button type="button" class="btn btn--sm" id="editor-apply-output" data-i18n="editor.action.outputToDraft">输出</button>
+            <button type="button" class="btn btn--sm btn--danger btn--lift" id="editor-clear-tree" data-i18n="editor.action.clearTree">清空</button>
+          </div>
+        </header>
+
+        <div class="editor-workspace">
+          <aside class="editor-pane editor-palette" data-i18n-attr="aria-label" data-i18n-aria-label="editor.palette.title" aria-label="元素库">
+            <div class="editor-search-row admin-input-group">
+              <input id="editor-search" class="admin-input editor-search" type="search" data-i18n-attr="placeholder" data-i18n-placeholder="editor.search.placeholder" placeholder="搜索元素">
+              <button type="button" class="btn btn--secondary admin-input-btn admin-toolbar-action" id="editor-reload-palette" data-i18n="editor.action.reloadPalette">刷新</button>
+            </div>
+            <section id="editor-recommendations" class="editor-recommendations" hidden>
+              <div class="editor-recommendation-head">
+                <div class="editor-subtitle" data-i18n="editor.recommendations.title">相关推荐</div>
+                <button type="button" class="btn btn--sm btn--secondary editor-recommend-direction" id="editor-recommend-direction" data-i18n="editor.recommendation.modeBidirectional">双向</button>
+              </div>
+              <div id="editor-recommendation-list" class="editor-entry-list editor-entry-list--compact"></div>
+            </section>
+            <div id="editor-palette-list" class="editor-entry-list" role="listbox"></div>
+          </aside>
+
+          <section class="editor-pane editor-tree-pane" id="editor-tree-pane" data-i18n-attr="aria-label" data-i18n-aria-label="editor.tree.title" aria-label="结构树">
+            <div id="editor-variant-badge" class="editor-variant-badge" hidden data-i18n="editor.variant.badge">变体</div>
+            <div id="editor-tree" class="editor-tree scrollbar-thin" role="tree"></div>
+          </section>
+
+          <aside class="editor-pane editor-inspector" id="editor-inspector" data-i18n-attr="aria-label" data-i18n-aria-label="editor.inspector.title" aria-label="属性">
+            <label class="editor-field">
+              <span>Class</span>
+              <input id="editor-class-input" class="admin-input" type="text" disabled>
+            </label>
+            <label class="editor-field">
+              <span>epithet</span>
+              <input id="editor-epithet-input" class="admin-input" type="text" disabled>
+            </label>
+            <div class="editor-button-row">
+              <button type="button" class="btn btn--sm" id="editor-convert-node" data-needs-selection data-i18n="editor.action.convertElement">转为元素</button>
+            </div>
+            <section class="editor-log" aria-labelledby="editor-log-title">
+              <div class="editor-log__header">
+                <h4 id="editor-log-title" data-i18n="editor.log.title">日志</h4>
+                <button type="button" class="btn btn--sm" id="editor-clear-log" data-i18n="editor.log.clear">清空</button>
+              </div>
+              <div id="editor-log-list" class="editor-log__list scrollbar-thin" aria-live="polite"></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </div>
+
+    <section class="draft-view draft-view--relations relation-graph-shell" id="draft-relations-view" role="tabpanel" aria-labelledby="draft-view-relations-tab" hidden>
+      <header class="relation-graph-toolbar">
+        <div class="relation-graph-title-group">
+          <h2 id="relation-graph-title" data-i18n="editor.graph.title">词元关系图</h2>
+          <span class="relation-graph-status" id="relation-graph-status"></span>
+        </div>
+        <div class="relation-graph-tools">
+          <input id="relation-graph-search" class="admin-input relation-graph-search" type="search" data-i18n-attr="placeholder" data-i18n-placeholder="editor.graph.search" placeholder="搜索词元">
+          <button type="button" class="btn btn--sm btn--secondary is-active relation-graph-mode-button" id="relation-graph-mode" data-graph-mode="combined" aria-pressed="true">综合</button>
+          <label class="relation-graph-density">
+            <span data-i18n="editor.graph.density">连线数量</span>
+            <input id="relation-graph-density" type="range" min="10" max="100" step="10" value="50">
+            <output class="relation-graph-filter-value" id="relation-graph-filter-value" for="relation-graph-density">50%</output>
+          </label>
+          <button type="button" class="btn btn--sm" id="relation-graph-reset" data-i18n="editor.graph.reset">适配全图</button>
         </div>
       </header>
-
-      <div class="editor-workspace">
-        <aside class="editor-pane editor-palette" data-i18n-attr="aria-label" data-i18n-aria-label="editor.palette.title" aria-label="元素库">
-          <div class="editor-search-row admin-input-group">
-            <input id="editor-search" class="admin-input editor-search" type="search" data-i18n-attr="placeholder" data-i18n-placeholder="editor.search.placeholder" placeholder="搜索元素">
-            <button type="button" class="btn btn--secondary admin-input-btn admin-toolbar-action" id="editor-reload-palette" data-i18n="editor.action.reloadPalette">刷新</button>
-          </div>
-          <section id="editor-recommendations" class="editor-recommendations" hidden>
-            <div class="editor-recommendation-head">
-              <div class="editor-subtitle" data-i18n="editor.recommendations.title">相关推荐</div>
-              <button type="button" class="btn btn--sm btn--secondary editor-recommend-direction" id="editor-recommend-direction" data-i18n="editor.recommendation.modeBidirectional">双向</button>
-            </div>
-            <div id="editor-recommendation-list" class="editor-entry-list editor-entry-list--compact"></div>
-          </section>
-          <div id="editor-palette-list" class="editor-entry-list" role="listbox"></div>
-        </aside>
-
-        <section class="editor-pane editor-tree-pane" id="editor-tree-pane" data-i18n-attr="aria-label" data-i18n-aria-label="editor.tree.title" aria-label="结构树">
-          <div id="editor-variant-badge" class="editor-variant-badge" hidden data-i18n="editor.variant.badge">变体</div>
-          <div id="editor-tree" class="editor-tree scrollbar-thin" role="tree"></div>
-        </section>
-
-        <aside class="editor-pane editor-inspector" id="editor-inspector" data-i18n-attr="aria-label" data-i18n-aria-label="editor.inspector.title" aria-label="属性">
-          <label class="editor-field">
-            <span>Class</span>
-            <input id="editor-class-input" class="admin-input" type="text" disabled>
-          </label>
-          <label class="editor-field">
-            <span>epithet</span>
-            <input id="editor-epithet-input" class="admin-input" type="text" disabled>
-          </label>
-          <div class="editor-button-row">
-            <button type="button" class="btn btn--sm" id="editor-convert-node" data-needs-selection data-i18n="editor.action.convertElement">转为元素</button>
-          </div>
-          <section class="editor-log" aria-labelledby="editor-log-title">
-            <div class="editor-log__header">
-              <h4 id="editor-log-title" data-i18n="editor.log.title">日志</h4>
-              <button type="button" class="btn btn--sm" id="editor-clear-log" data-i18n="editor.log.clear">清空</button>
-            </div>
-            <div id="editor-log-list" class="editor-log__list scrollbar-thin" aria-live="polite"></div>
-          </section>
-        </aside>
+      <div class="relation-graph-stage" id="relation-graph-stage">
+        <canvas id="relation-graph-canvas" data-i18n-attr="aria-label" data-i18n-aria-label="editor.graph.canvas" aria-label="词元关系图"></canvas>
+        <div class="relation-graph-empty" id="relation-graph-empty" hidden data-i18n="editor.graph.empty">暂无关系数据</div>
+        <div class="relation-graph-legend" aria-hidden="true">
+          <span><i class="relation-graph-dot relation-graph-dot--token"></i><span data-i18n="editor.source.token">词元</span></span>
+          <span><i class="relation-graph-dot relation-graph-dot--snippet"></i><span data-i18n="editor.source.snippet">片段</span></span>
+          <span><i class="relation-graph-dot relation-graph-dot--isolated"></i><span data-i18n="editor.graph.isolated">无关联</span></span>
+          <span><i class="relation-graph-dot relation-graph-dot--selected"></i><span data-i18n="editor.graph.selected">选中</span></span>
+          <span class="relation-graph-scale" id="relation-graph-scale"></span>
+        </div>
+        <aside class="relation-graph-detail" id="relation-graph-detail" hidden></aside>
       </div>
     </section>
   </main>

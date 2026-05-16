@@ -24,6 +24,9 @@
     logs: [],
     editingNodeId: '',
     lastRecommendationLogSignature: '',
+    activeView: 'editor',
+    relationGraphVersion: 0,
+    renderedRelationGraphVersion: -1,
     undoStack: [],
     redoStack: []
   };
@@ -520,6 +523,39 @@
     return state.relationIndex;
   }
 
+  function refreshRelationGraph(force) {
+    if (!ns.RelationGraph || !els.relationView) return;
+    if (!force && state.renderedRelationGraphVersion === state.relationGraphVersion) {
+      ns.RelationGraph.activate();
+      return;
+    }
+    var index = state.relationIndex || buildRelationIndex();
+    ns.RelationGraph.update({
+      root: els.relationView,
+      index: index,
+      entries: state.entries
+    });
+    state.renderedRelationGraphVersion = state.relationGraphVersion;
+  }
+
+  function setEditorView(view) {
+    view = view === 'relations' ? 'relations' : 'editor';
+    if (!els.panel) return;
+    state.activeView = view;
+    if (view !== 'editor') setVariantMode(false);
+    if (els.draftPage) els.draftPage.dataset.editorView = view;
+    if (els.editorView) els.editorView.hidden = view !== 'editor';
+    if (els.relationView) els.relationView.hidden = view !== 'relations';
+    (els.viewTabs || []).forEach(function (button) {
+      var active = button.dataset.editorView === view;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    if (view === 'relations') {
+      window.requestAnimationFrame(function () { refreshRelationGraph(false); });
+    }
+  }
+
   function recommendationForKey(key) {
     var index = state.relationIndex || buildRelationIndex();
     return ns.Recommendations ? ns.Recommendations.getForKey(index, state.entries, key, state.bidirectionalMode, 30) : [];
@@ -713,6 +749,7 @@
     renderVariantState();
     renderEscapeToggle();
     updateOutput();
+    if (state.activeView === 'relations') refreshRelationGraph(false);
     if (persist) saveState();
   }
 
@@ -754,6 +791,9 @@
         renderRecommendations();
       });
     }
+    (els.viewTabs || []).forEach(function (button) {
+      button.addEventListener('click', function () { setEditorView(button.dataset.editorView || 'editor'); });
+    });
     if (els.clearLogButton) {
       els.clearLogButton.addEventListener('click', function () {
         state.logs = [];
@@ -1144,6 +1184,8 @@
     state.chineseMap = loaded.chineseMap;
     state.relationCorpus = loaded.relationCorpus || [];
     state.relationIndex = null;
+    state.relationGraphVersion += 1;
+    state.renderedRelationGraphVersion = -1;
     ns.Data.refreshLabels(state.nodes, state.chineseMap);
     logEditor('editor.log.paletteReloaded', { count: state.entries.length });
     renderAll(true);
@@ -1163,7 +1205,7 @@
   }
 
   function handleVariantKey(event, active) {
-    if (!isEditorActive()) return false;
+    if (!isEditorActive() || state.activeView !== 'editor') return false;
     if (!eventMatchesAction(event, 'editor_variant_mode')) return false;
     setVariantMode(active);
     event.preventDefault();
@@ -1172,6 +1214,7 @@
 
   function handleKeydown(event) {
     if (!isEditorActive()) return;
+    if (state.activeView !== 'editor') return;
     if (handleVariantKey(event, true)) return;
     var tagName = (event.target && event.target.tagName || '').toLowerCase();
     var typing = tagName === 'input' || tagName === 'textarea' || tagName === 'select' || event.target.isContentEditable;
@@ -1219,6 +1262,10 @@
   function collectElements() {
     els = {
       panel: byId('panel_draft'),
+      draftPage: document.querySelector('#panel_draft .draft-page'),
+      viewTabs: Array.from(document.querySelectorAll('#panel_draft .draft-module-tab[data-editor-view]')),
+      editorView: byId('draft-editor-view'),
+      relationView: byId('draft-relations-view'),
       search: byId('editor-search'),
       palette: byId('editor-palette-list'),
       recommendations: byId('editor-recommendations'),
@@ -1252,8 +1299,11 @@
     state.chineseMap = loaded.chineseMap;
     state.relationCorpus = loaded.relationCorpus || [];
     state.relationIndex = null;
+    state.relationGraphVersion += 1;
+    state.renderedRelationGraphVersion = -1;
     loadState();
     bindEvents();
+    setEditorView(state.activeView);
     logEditor('editor.log.paletteReady', { count: state.entries.length, corpus: state.relationCorpus.length });
     renderAll(false);
   }

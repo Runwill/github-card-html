@@ -37,6 +37,14 @@ html.force-landscape {
 #panel_draft .draft-page {
   --btn-sm-font-size: var(--tp-fs-base, 13px);
   --btn-sm-padding: 0.462em 0.923em;
+  --relation-graph-token: color-mix(in srgb, var(--success) 76%, var(--primary-2));
+  --relation-graph-snippet: color-mix(in srgb, var(--danger) 44%, var(--primary-3));
+  --relation-graph-selected: color-mix(in srgb, var(--warning, var(--primary-2)) 84%, var(--primary-2));
+  --relation-graph-isolated: color-mix(in srgb, var(--text-subtle) 72%, var(--border));
+  --relation-graph-edge: color-mix(in srgb, var(--text-muted) 30%, transparent);
+  --relation-graph-edge-strong: color-mix(in srgb, var(--primary-2) 70%, var(--text));
+  --relation-graph-label: var(--text);
+  --relation-graph-label-bg: color-mix(in srgb, var(--surface) 82%, transparent);
   --editor-node-guide-1: color-mix(in srgb, var(--primary-2) 42%, var(--border));
   --editor-node-guide-2: color-mix(in srgb, var(--success) 38%, var(--border));
   --editor-node-guide-3: color-mix(in srgb, var(--danger) 30%, var(--border));
@@ -44,13 +52,77 @@ html.force-landscape {
   --editor-node-guide-5: color-mix(in srgb, var(--text-subtle) 60%, var(--border));
   color: var(--text);
   display: grid;
-  grid-template-rows: minmax(0, var(--draft-live-min-h, 220px)) minmax(0, 1fr);
-  gap: 0.778em;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.556em;
   height: var(--draft-page-h, 840px);
   min-height: 0;
   overflow: hidden;
   font-size: var(--draft-fs-page, 18px);
-  padding: 0.667em;
+  padding: 0 0.667em 0.667em;
+}
+
+#panel_draft .draft-module-switch {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+#panel_draft .draft-module-switch__tabs {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0.111em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 94%, var(--bg-soft, var(--surface)));
+}
+
+#panel_draft .draft-module-tab {
+  min-width: 5.4em;
+  margin: 0;
+  padding: 0.389em 0.778em;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: var(--draft-fs-control, 14px);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-default),
+              color var(--dur-fast) var(--ease-default),
+              border-color var(--dur-fast) var(--ease-default),
+              box-shadow var(--dur-fast) var(--ease-default);
+}
+
+#panel_draft .draft-module-tab:hover,
+#panel_draft .draft-module-tab:focus-visible {
+  color: var(--text);
+  background: color-mix(in srgb, var(--primary-2) 8%, var(--surface));
+}
+
+#panel_draft .draft-module-tab.is-active {
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--primary-2) 42%, var(--border));
+  background: color-mix(in srgb, var(--primary-2) 13%, var(--surface));
+  box-shadow: inset 0 0 0 0.071em color-mix(in srgb, var(--primary-2) 22%, transparent);
+}
+
+#panel_draft .draft-view {
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+#panel_draft .draft-view[hidden] {
+  display: none;
+}
+
+#panel_draft .draft-view--editor {
+  display: grid;
+  grid-template-rows: minmax(0, var(--draft-live-min-h, 220px)) minmax(0, 1fr);
+  gap: 0.778em;
 }
 
 #panel_draft .editor-shell {
@@ -61,6 +133,270 @@ html.force-landscape {
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--surface) 94%, var(--bg-soft, var(--surface)));
   box-shadow: var(--shadow-panel);
+}
+
+#panel_draft .relation-graph-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface) 94%, var(--bg-soft, var(--surface)));
+  box-shadow: var(--shadow-panel);
+}
+
+#panel_draft .relation-graph-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.556em;
+  padding: 0.5em;
+  border-bottom: 1px solid var(--border);
+}
+
+#panel_draft .relation-graph-title-group {
+  min-width: 11em;
+  display: flex;
+  align-items: baseline;
+  gap: 0.556em;
+}
+
+#panel_draft .relation-graph-title-group h2 {
+  margin: 0;
+  font-size: var(--tp-fs-xl, 16px);
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+}
+
+#panel_draft .relation-graph-status {
+  color: var(--text-muted);
+  font-size: var(--tp-fs-sm, 12px);
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+}
+
+#panel_draft .relation-graph-tools {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.389em;
+  flex-wrap: wrap;
+}
+
+#panel_draft .relation-graph-search {
+  width: min(18em, 24vw);
+  min-width: 10em;
+  height: var(--admin-input-h, 36px);
+  margin: 0;
+  padding: 0.571em 0.714em;
+  font-size: var(--draft-fs-control, 14px);
+}
+
+#panel_draft .relation-graph-mode-button {
+  min-width: 5.6em;
+}
+
+#panel_draft .relation-graph-density {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.389em;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--draft-fs-control, 14px);
+  line-height: var(--lh-tight);
+  white-space: nowrap;
+}
+
+#panel_draft .relation-graph-density input {
+  width: 6.8em;
+  margin: 0;
+  accent-color: var(--primary-2);
+}
+
+#panel_draft .relation-graph-filter-value {
+  min-width: 2.6em;
+  color: var(--text);
+  font-size: var(--tp-fs-sm, 12px);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  text-align: left;
+}
+
+#panel_draft .relation-graph-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 97%, var(--bg-soft, var(--surface)));
+}
+
+#panel_draft #relation-graph-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+#panel_draft #relation-graph-canvas:active {
+  cursor: grabbing;
+}
+
+#panel_draft #relation-graph-canvas.is-hovering-node {
+  cursor: pointer;
+}
+
+#panel_draft .relation-graph-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-subtle);
+  font-size: var(--draft-fs-control, 14px);
+  pointer-events: none;
+}
+
+#panel_draft .relation-graph-empty[hidden],
+#panel_draft .relation-graph-detail[hidden] {
+  display: none;
+}
+
+#panel_draft .relation-graph-legend {
+  position: absolute;
+  left: 0.667em;
+  bottom: 0.667em;
+  display: flex;
+  align-items: center;
+  gap: 0.667em;
+  padding: 0.389em 0.556em;
+  border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  color: var(--text-muted);
+  font-size: var(--tp-fs-sm, 12px);
+  line-height: var(--lh-tight);
+  pointer-events: none;
+}
+
+#panel_draft .relation-graph-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.333em;
+  white-space: nowrap;
+}
+
+#panel_draft .relation-graph-scale {
+  padding-left: 0.667em;
+  border-left: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+
+#panel_draft .relation-graph-dot {
+  width: 0.778em;
+  height: 0.778em;
+  border-radius: var(--radius-full);
+  display: inline-block;
+}
+
+#panel_draft .relation-graph-dot--token {
+  background: var(--relation-graph-token);
+}
+
+#panel_draft .relation-graph-dot--snippet {
+  background: var(--relation-graph-snippet);
+}
+
+#panel_draft .relation-graph-dot--isolated {
+  background: var(--relation-graph-isolated);
+  opacity: 0.58;
+}
+
+#panel_draft .relation-graph-dot--selected {
+  background: var(--relation-graph-selected);
+}
+
+#panel_draft .relation-graph-detail {
+  position: absolute;
+  z-index: 2;
+  width: min(24em, calc(100% - 1.334em));
+  max-height: min(30em, calc(100% - 1.334em));
+  overflow: auto;
+  padding: 0.667em;
+  border: 1px solid color-mix(in srgb, var(--primary-2) 34%, var(--border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  color: var(--text);
+  box-shadow: var(--shadow-panel);
+  font-size: var(--draft-fs-control, 14px);
+}
+
+#panel_draft .relation-graph-detail__title {
+  margin: 0 0 0.333em;
+  padding: 0;
+  font-size: 1em;
+  line-height: var(--lh-tight);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+#panel_draft .relation-graph-detail__meta,
+#panel_draft .relation-graph-detail__score,
+#panel_draft .relation-graph-detail__empty {
+  color: var(--text-muted);
+  font-size: var(--tp-fs-sm, 12px);
+  line-height: var(--lh-normal);
+}
+
+#panel_draft .relation-graph-detail__score {
+  margin-top: 0.25em;
+}
+
+#panel_draft .relation-graph-detail__subtitle {
+  margin-top: 0.556em;
+  color: var(--text);
+  font-size: var(--tp-fs-sm, 12px);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+}
+
+#panel_draft .relation-graph-detail__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.333em;
+  margin-top: 0.389em;
+}
+
+#panel_draft .relation-graph-detail__item {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.444em;
+  padding: 0.357em 0.5em;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface) 88%, var(--bg-soft, var(--surface)));
+  color: var(--text);
+  font-size: var(--tp-fs-sm, 12px);
+  line-height: var(--lh-tight);
+  text-align: left;
+  cursor: pointer;
+}
+
+#panel_draft .relation-graph-detail__item:hover,
+#panel_draft .relation-graph-detail__item:focus-visible {
+  border-color: color-mix(in srgb, var(--primary-2) 46%, var(--border));
+  background: color-mix(in srgb, var(--primary-2) 9%, var(--surface));
+}
+
+#panel_draft .relation-graph-detail__item span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #panel_draft .draft-live {

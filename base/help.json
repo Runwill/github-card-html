@@ -91,6 +91,7 @@
     ],
     "panel_draft": [
       { "keys": ["输入区"], "desc": "help.draft.input" },
+      { "keys": ["编辑器 / 关系图"], "desc": "help.editor.viewSwitch" },
       { "keys": ["元素库"], "desc": "help.editor.palette" },
       { "keys": ["点击元素"], "desc": "help.editor.insert" },
       { "keys": ["拖拽位置"], "desc": "help.editor.dragInsert" },
@@ -98,6 +99,10 @@
       { "keys": ["结构树"], "desc": "help.editor.editInline" },
       { "keys": ["属性栏"], "desc": "help.editor.attrs" },
       { "keys": ["单向 / 双向"], "desc": "help.editor.recommendationMode" },
+      { "keys": ["关系图搜索"], "desc": "help.editor.graphSearch" },
+      { "keys": ["关系类型"], "desc": "help.editor.graphMode" },
+      { "keys": ["连线数量"], "desc": "help.editor.graphLinks" },
+      { "keys": ["关系图节点"], "desc": "help.editor.graphNavigate" },
       { "keys": ["输入 / 输出"], "desc": "help.editor.io" },
       { "keys": ["拖动节点"], "desc": "help.editor.move" },
       { "actions": ["editor_focus_search"], "desc": "help.editor.key.focusSearch" },

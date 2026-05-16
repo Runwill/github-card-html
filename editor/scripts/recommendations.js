@@ -141,8 +141,112 @@
     return result;
   }
 
+  function spanStart(span) {
+    return span && span.isPair ? span.os : span.cs;
+  }
+
+  function spanEnd(span) {
+    return span && span.isPair ? span.xe : span.ce;
+  }
+
+  function relationMetricsForSpans(text, sourceSpans, targetSpans) {
+    var nested = 0;
+    var adjacent = 0;
+    sourceSpans.forEach(function (sourceSpan) {
+      targetSpans.forEach(function (targetSpan) {
+        if (containsSpan(sourceSpan, targetSpan)) nested += 1;
+        if (containsSpan(targetSpan, sourceSpan)) nested += 1;
+        if (isAdjacentGap(text, spanEnd(sourceSpan), spanStart(targetSpan))) adjacent += 1;
+        if (isAdjacentGap(text, spanEnd(targetSpan), spanStart(sourceSpan))) adjacent += 1;
+      });
+    });
+    return { nested: nested, adjacent: adjacent, score: nested + adjacent };
+  }
+
+  function buildGraph(index, entries) {
+    if (!index) return { nodes: [], edges: [], maxScore: 0 };
+    index.cache = index.cache || {};
+    if (index.cache.graph) return index.cache.graph;
+    var nodes = entries.map(function (entry, indexValue) {
+      return {
+        id: entry.key,
+        key: entry.key,
+        label: entry.key,
+        source: entry.source || 'token',
+        index: indexValue,
+        degree: 0,
+        score: 0,
+        nested: 0,
+        adjacent: 0
+      };
+    });
+    var keyToIndex = {};
+    nodes.forEach(function (node) { keyToIndex[node.key] = node.index; });
+    var edgeMap = {};
+    (index.corpus || []).forEach(function (textValue) {
+      var text = String(textValue || '');
+      if (!text) return;
+      var present = [];
+      entries.forEach(function (entry) {
+        var pattern = index.patterns && index.patterns[entry.key];
+        if (!pattern) return;
+        var spans = spansForPattern(text, pattern);
+        if (spans.length) present.push({ entry: entry, spans: spans });
+      });
+      for (var outer = 0; outer < present.length; outer++) {
+        for (var inner = outer + 1; inner < present.length; inner++) {
+          var metrics = relationMetricsForSpans(text, present[outer].spans, present[inner].spans);
+          if (!metrics.score) continue;
+          var sourceIndex = keyToIndex[present[outer].entry.key];
+          var targetIndex = keyToIndex[present[inner].entry.key];
+          if (sourceIndex == null || targetIndex == null) continue;
+          var source = Math.min(sourceIndex, targetIndex);
+          var target = Math.max(sourceIndex, targetIndex);
+          var pairKey = source + '|' + target;
+          if (!edgeMap[pairKey]) {
+            edgeMap[pairKey] = {
+              id: pairKey,
+              source: source,
+              target: target,
+              sourceKey: nodes[source].key,
+              targetKey: nodes[target].key,
+              score: 0,
+              nested: 0,
+              adjacent: 0
+            };
+          }
+          edgeMap[pairKey].score += metrics.score;
+          edgeMap[pairKey].nested += metrics.nested;
+          edgeMap[pairKey].adjacent += metrics.adjacent;
+        }
+      }
+    });
+    var edges = Object.keys(edgeMap).map(function (key) { return edgeMap[key]; })
+      .sort(function (a, b) {
+        return b.score - a.score || b.nested - a.nested || b.adjacent - a.adjacent || a.sourceKey.localeCompare(b.sourceKey, 'zh-Hans-CN');
+      });
+    var maxScore = 0;
+    edges.forEach(function (edge) {
+      maxScore = Math.max(maxScore, edge.score);
+      var sourceNode = nodes[edge.source];
+      var targetNode = nodes[edge.target];
+      if (!sourceNode || !targetNode) return;
+      sourceNode.degree += 1;
+      targetNode.degree += 1;
+      sourceNode.score += edge.score;
+      targetNode.score += edge.score;
+      sourceNode.nested += edge.nested;
+      targetNode.nested += edge.nested;
+      sourceNode.adjacent += edge.adjacent;
+      targetNode.adjacent += edge.adjacent;
+    });
+    index.cache.graph = { nodes: nodes, edges: edges, maxScore: maxScore };
+    return index.cache.graph;
+  }
+
   ns.Recommendations = {
     buildIndex: buildIndex,
-    getForKey: getForKey
+    getForKey: getForKey,
+    buildGraph: buildGraph
   };
 })();
