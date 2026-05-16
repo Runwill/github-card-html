@@ -26,6 +26,8 @@
             }
 
             currentPanel._roleId = String(selfRole.id);
+            currentPanel.setAttribute('data-inspector-type', 'role');
+            currentPanel.setAttribute('data-role-id', selfRole.id);
             
             setupHandInspector(currentPanel, selfRole);
         }
@@ -136,6 +138,8 @@
         // 上下文菜单绑定
         const charInfoPanel = document.querySelector('.character-info');
         if (charInfoPanel) {
+            charInfoPanel.setAttribute('data-inspector-type', 'role');
+            charInfoPanel.setAttribute('data-role-id', selfRole.id);
             charInfoPanel.oncontextmenu = (e) => {
                 e.preventDefault();
                 if (window.Game.UI.showContextMenu) {
@@ -160,6 +164,7 @@
             const el = document.getElementById('header-hand-area');
             if (el) {
                 el.setAttribute('data-area-name', 'hand');
+                el.setAttribute('data-inspector-type', 'area');
 
                 const key = selfRole.hand.name || 'hand';
                 const renderKey = `area:${key}`;
@@ -170,6 +175,8 @@
             
             const container = document.getElementById('hand-cards-container');
             if (container) {
+                container.setAttribute('data-inspector-type', 'area');
+                container.setAttribute('data-area-name', 'hand');
                 const isStacked = selfRole.hand.apartOrTogether === 1;
                 const isCentered = selfRole.hand.centered === 1;
                 

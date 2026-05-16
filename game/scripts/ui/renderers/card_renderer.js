@@ -130,6 +130,7 @@
 
             cardEl.setAttribute('data-area-name', dropZoneId);
             cardEl.setAttribute('data-card-index', index);
+            cardEl.setAttribute('data-inspector-type', 'card');
 
             // 标记堆叠模式下的顶牌 (Top Card Logic)
             if (index === cards.length - 1) {

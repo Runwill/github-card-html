@@ -184,6 +184,7 @@
       <div class="key-settings-categories" role="tablist" data-i18n-attr="aria-label" data-i18n-aria-label="keySettings.categories" aria-label="按键分类">
         <button type="button" class="btn btn--sm btn--secondary key-settings-tab is-active" id="key-settings-tab-global" data-key-settings-category="global" role="tab" aria-selected="true" aria-controls="key-settings-pane-global" data-i18n="keySettings.category.global">全局</button>
         <button type="button" class="btn btn--sm btn--secondary key-settings-tab" id="key-settings-tab-terms" data-key-settings-category="terms" role="tab" aria-selected="false" aria-controls="key-settings-pane-terms" data-i18n="keySettings.category.terms">术语</button>
+        <button type="button" class="btn btn--sm btn--secondary key-settings-tab" id="key-settings-tab-game" data-key-settings-category="game" role="tab" aria-selected="false" aria-controls="key-settings-pane-game" data-i18n="keySettings.category.game">对局</button>
         <button type="button" class="btn btn--sm btn--secondary key-settings-tab" id="key-settings-tab-draft" data-key-settings-category="draft" role="tab" aria-selected="false" aria-controls="key-settings-pane-draft" data-i18n="keySettings.category.draft">草稿</button>
       </div>
       <section class="key-settings-pane is-active" id="key-settings-pane-global" data-key-settings-pane="global" role="tabpanel" aria-labelledby="key-settings-tab-global">
@@ -196,6 +197,12 @@
         <div class="info-row">
           <span class="info-label" data-i18n="keySettings.expandAll">展开所有术语</span>
           <button id="key-bind-expand-all" class="btn btn--sm key-bind-btn">未设置</button>
+        </div>
+      </section>
+      <section class="key-settings-pane" id="key-settings-pane-game" data-key-settings-pane="game" role="tabpanel" aria-labelledby="key-settings-tab-game">
+        <div class="info-row">
+          <span class="info-label" data-i18n="keySettings.inspectDetails">显示属性</span>
+          <button id="key-bind-inspect" class="btn btn--sm key-bind-btn">Ctrl</button>
         </div>
       </section>
       <section class="key-settings-pane" id="key-settings-pane-draft" data-key-settings-pane="draft" role="tabpanel" aria-labelledby="key-settings-tab-draft">

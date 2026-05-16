@@ -10,6 +10,8 @@
         
         const container = document.getElementById(containerId);
         if (container) {
+            container.setAttribute('data-inspector-type', 'area');
+            container.setAttribute('data-area-name', dropZoneId);
             // Mark the container if it enforces face-down cards (for Drag Animation Logic)
             if (isFaceDown) {
                 container.setAttribute('data-force-facedown', 'true');
@@ -42,6 +44,7 @@
             const el = document.getElementById('header-treatment-area');
             if (el) {
                 el.setAttribute('data-area-name', 'treatmentArea');
+                el.setAttribute('data-inspector-type', 'area');
                 
                 const key = GameState.treatmentArea.name || 'treatmentArea';
                 const renderKey = `area:${key}`;
@@ -54,6 +57,8 @@
                 // 应用对齐方式
                 const container = document.getElementById('treatment-area-container');
                 if (container && GameState.treatmentArea) {
+                    container.setAttribute('data-inspector-type', 'area');
+                    container.setAttribute('data-area-name', 'treatmentArea');
                     if (GameState.treatmentArea.centered) {
                         container.classList.add('area-centered');
                         container.classList.remove('area-left');
@@ -80,6 +85,8 @@
         if (GameState.pile) {
             const el = document.getElementById('header-pile');
             if (el) {
+                el.setAttribute('data-inspector-type', 'area');
+                el.setAttribute('data-area-name', 'pile');
                 window.Game.UI.safeRender(el, GameText.render('pile'), 'area:pile');
             }
         }
@@ -89,6 +96,8 @@
         if (GameState.discardPile) {
             const el = document.getElementById('header-discard-pile');
             if (el) {
+                el.setAttribute('data-inspector-type', 'area');
+                el.setAttribute('data-area-name', 'discardPile');
                 window.Game.UI.safeRender(el, GameText.render('discardPile'), 'area:discardPile');
             }
         }
@@ -112,6 +121,8 @@
         // 绑定数据到 wrapper
         wrapper._inspectorCards = cards;
         wrapper._inspectorForceBack = forceBack;
+        wrapper.setAttribute('data-inspector-type', 'area');
+        wrapper.setAttribute('data-area-name', container.getAttribute('data-area-name') || container.getAttribute('data-drop-zone') || '');
 
         // 防止重复绑定
         if (!wrapper.hasAttribute('data-click-bound')) {

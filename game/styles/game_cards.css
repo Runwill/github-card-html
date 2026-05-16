@@ -5,6 +5,28 @@
    - Inspector Tools
    ========================================================================== */
 
+:root {
+    --game-inspector-gap: clamp(6px, 0.523vw, 10px);
+    --game-inspector-window-gap: 0.35rem;
+    --game-inspector-summary-width: clamp(7.5rem, 16vw, 11rem);
+    --game-inspector-raw-width: clamp(13rem, 34vw, 34rem);
+    --game-inspector-group-width: calc(var(--game-inspector-summary-width) + var(--game-inspector-raw-width) + var(--game-inspector-window-gap));
+    --game-inspector-pad: 0.45rem;
+    --game-inspector-radius: 6px;
+    --game-inspector-fs: 0.625rem;
+    --game-inspector-raw-fs: 0.5625rem;
+    --game-inspector-viewport-w: 100dvw;
+    --game-inspector-viewport-h: 100dvh;
+    --game-inspector-z: 20100;
+}
+
+html.force-landscape {
+    --game-inspector-summary-width: clamp(7.5rem, 24vh, 11rem);
+    --game-inspector-raw-width: clamp(13rem, 48vh, 34rem);
+    --game-inspector-viewport-w: 100dvh;
+    --game-inspector-viewport-h: 100dvw;
+}
+
 .card-placeholder {
     width: var(--card-w, 100px);
     height: var(--card-h, 140px);
@@ -152,4 +174,171 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
                 box-shadow var(--dur-normal) var(--ease-default),
                 transform var(--dur-normal) var(--ease-default);
     will-change: transform, box-shadow;
+}
+
+.game-inspector-panel {
+    --game-inspector-window-pointer: none;
+    --game-inspector-window-border: 1px solid color-mix(in srgb, var(--primary-2) 28%, var(--border));
+    --game-inspector-window-shadow: var(--shadow-elev-4);
+    --game-inspector-header-bg: color-mix(in srgb, var(--panel-header-bg, var(--surface)) 82%, var(--primary-1) 18%);
+    --game-inspector-title-color: var(--text);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--game-inspector-viewport-w);
+    height: var(--game-inspector-viewport-h);
+    z-index: var(--game-inspector-z);
+    overflow: visible;
+    font-size: var(--game-inspector-fs);
+    line-height: 1.32;
+    color: var(--text);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--dur-fast, 120ms) var(--ease-standard, ease);
+}
+
+.game-inspector-panel.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.game-inspector-panel.is-pinned {
+    --game-inspector-window-pointer: auto;
+    --game-inspector-window-border: 1px solid color-mix(in srgb, var(--primary-2) 64%, var(--border));
+    --game-inspector-window-shadow: var(--shadow-elev-4), 0 0 0 1px color-mix(in srgb, var(--primary-2) 28%, transparent), 0 0 0.85rem color-mix(in srgb, var(--primary-1) 24%, transparent);
+    --game-inspector-header-bg: color-mix(in srgb, var(--panel-header-bg, var(--surface)) 66%, var(--primary-1) 34%);
+    --game-inspector-title-color: var(--primary-3);
+}
+
+.game-inspector-window {
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    min-width: 0;
+    max-height: calc(var(--game-inspector-viewport-h) - (var(--game-inspector-gap) + var(--game-inspector-gap)));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    pointer-events: var(--game-inspector-window-pointer);
+    color: var(--text);
+    background: color-mix(in srgb, var(--surface) 94%, var(--bg-end));
+    border: var(--game-inspector-window-border);
+    border-radius: var(--game-inspector-radius);
+    box-shadow: var(--game-inspector-window-shadow);
+    transform: translate(-9999px, -9999px);
+    transition: border-color var(--dur-fast, 120ms) var(--ease-standard, ease), box-shadow var(--dur-fast, 120ms) var(--ease-standard, ease);
+}
+
+.game-inspector-window--summary {
+    width: min(var(--game-inspector-summary-width), calc(var(--game-inspector-viewport-w) - (var(--game-inspector-gap) + var(--game-inspector-gap))));
+}
+
+.game-inspector-window--raw {
+    width: min(var(--game-inspector-raw-width), calc(var(--game-inspector-viewport-w) - (var(--game-inspector-gap) + var(--game-inspector-gap))));
+}
+
+.game-inspector-header {
+    flex: 0 0 auto;
+    padding: var(--game-inspector-pad);
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
+    background: var(--game-inspector-header-bg);
+    transition: background var(--dur-fast, 120ms) var(--ease-standard, ease);
+}
+
+.game-inspector-title {
+    font-weight: 700;
+    color: var(--game-inspector-title-color);
+    line-height: 1.2;
+    transition: color var(--dur-fast, 120ms) var(--ease-standard, ease);
+}
+
+.game-inspector-hint {
+    margin-top: 0.18em;
+    color: var(--text-muted);
+    font-size: 0.86em;
+}
+
+.game-inspector-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: var(--game-inspector-pad);
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--border) 62%, transparent) transparent;
+}
+
+.game-inspector-raw-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: var(--game-inspector-pad);
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--border) 62%, transparent) transparent;
+}
+
+.game-inspector-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    margin-bottom: 0.45em;
+}
+
+.game-inspector-type {
+    flex: 0 0 auto;
+    padding: 0.08em 0.38em;
+    border-radius: 999px;
+    color: var(--primary-3);
+    background: color-mix(in srgb, var(--primary-1) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--primary-2) 32%, transparent);
+}
+
+.game-inspector-name {
+    min-width: 0;
+    color: var(--text);
+    overflow-wrap: anywhere;
+}
+
+.game-inspector-id {
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.game-inspector-list {
+    display: grid;
+    grid-template-columns: minmax(4.9em, max-content) minmax(0, 1fr);
+    gap: 0.16em 0.45em;
+    margin: 0;
+}
+
+.game-inspector-list dt {
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.game-inspector-list dd {
+    margin: 0;
+    min-width: 0;
+    color: var(--text);
+    overflow-wrap: anywhere;
+}
+
+.game-inspector-section-title {
+    margin: 0.45em 0 0.25em;
+    color: var(--text-muted);
+    font-weight: 700;
+}
+
+.game-inspector-raw {
+    margin: 0;
+    padding: 0.45em;
+    overflow: visible;
+    font-size: var(--game-inspector-raw-fs);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: var(--text);
+    background: color-mix(in srgb, var(--bg-end) 12%, var(--surface));
+    border: 1px solid color-mix(in srgb, var(--border) 84%, transparent);
+    border-radius: calc(var(--game-inspector-radius) - 2px);
 }

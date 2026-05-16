@@ -164,6 +164,8 @@
             
             setupHandInspector(pEl, role);
             pEl._role = role;
+            pEl.setAttribute('data-inspector-type', 'role');
+            pEl.setAttribute('data-role-id', role.id);
             
             // 当前回合标识
             const avatarWrap = pEl.querySelector('.char-avatar');

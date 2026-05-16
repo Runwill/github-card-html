@@ -27,6 +27,7 @@
     "key-settings-modal": [
       { "keys": ["展开所有术语"], "desc": "help.keybind.expandAll" },
       { "keys": ["切换主题"], "desc": "help.keybind.theme" },
+      { "actions": ["inspect_details"], "desc": "help.keybind.inspect" },
       { "keys": ["草稿编辑器"], "desc": "help.keybind.editor" },
       { "keys": ["Esc / Backspace"], "desc": "help.keybind.hint" }
     ],
@@ -159,6 +160,7 @@
         { "keys": ["右键卡牌"], "desc": "help.game.cardContext" },
         { "keys": ["右键角色"], "desc": "help.game.roleContext" },
         { "keys": ["玩家徽标"], "desc": "help.game.viewerBadges" },
+        { "actions": ["inspect_details"], "desc": "help.game.inspect" },
         { "keys": ["时机/日志"], "desc": "help.game.timing" }
       ]
     }

@@ -4,6 +4,7 @@
   
   // Actions Definition
     const ACTIONS = Object.assign({
+      'inspect_details': { label: 'Inspect Details (Toggle)', default: { key: 'Control' }, btnId: 'key-bind-inspect' },
       'expand_all_terms': { label: 'Expand All Terms', default: null, btnId: 'key-bind-expand-all' },
       'toggle_theme': { label: 'Toggle Theme', default: { key: 'T' }, btnId: 'key-bind-toggle-theme' }
     }, window.CardEditorKeyActions || {});
