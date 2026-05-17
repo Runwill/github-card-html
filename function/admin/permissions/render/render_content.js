@@ -149,8 +149,8 @@
     const pwdForm = document.createElement('form'); pwdForm.autocomplete='off'; pwdForm.addEventListener('submit', e => e.preventDefault());
     const pwdHead = makeEditorHead('permissions.editor.passwordTitle', t('permissions.changePassword', '修改密码'));
     const pwdList = makeEl('div', 'perm-editor__form-grid');
-    const inputNew = document.createElement('input'); inputNew.type='password'; inputNew.className='admin-input'; inputNew.autocomplete='new-password'; inputNew.placeholder = t('modal.password.new','新密码');
-    const inputConfirm = document.createElement('input'); inputConfirm.type='password'; inputConfirm.className='admin-input'; inputConfirm.autocomplete='new-password'; inputConfirm.placeholder = t('modal.password.confirm','确认新密码');
+    const inputNew = document.createElement('input'); inputNew.type='password'; inputNew.className='ui-field admin-input'; inputNew.autocomplete='new-password'; inputNew.placeholder = t('modal.password.new','新密码');
+    const inputConfirm = document.createElement('input'); inputConfirm.type='password'; inputConfirm.className='ui-field admin-input'; inputConfirm.autocomplete='new-password'; inputConfirm.placeholder = t('modal.password.confirm','确认新密码');
     pwdList.appendChild(makeEditorField('modal.password.new', t('modal.password.new','新密码'), inputNew));
     pwdList.appendChild(makeEditorField('modal.password.confirm', t('modal.password.confirm','确认新密码'), inputConfirm));
     const { actions: pwdActions, cancel: btnPwdCancel, save: btnPwdSave } = makeEditorActions();
@@ -162,7 +162,7 @@
     const roleEditor = makeHiddenEditor('perm-editor perm-editor--form');
     const roleHead = makeEditorHead('permissions.editor.roleTitle', t('permissions.changeRole', '修改角色'));
     const roleList = makeEl('div', 'perm-editor__form-grid');
-    const select = document.createElement('select'); select.className='admin-input';
+    const select = document.createElement('select'); select.className='ui-field admin-input';
     const ROLES = [ { v: 'admin', k: 'role.admin' }, { v: 'moderator', k: 'role.moderator' }, { v: 'user', k: 'role.user' }, { v: 'guest', k: 'role.guest' } ];
     ROLES.forEach(r => { const opt = document.createElement('option'); opt.value = r.v; setText(opt, r.k, r.v); if (String(u.role) === r.v) opt.selected = true; select.appendChild(opt); });
     roleList.appendChild(makeEditorField('permissions.user.roleLabel', t('permissions.user.roleLabel', '角色：'), select));

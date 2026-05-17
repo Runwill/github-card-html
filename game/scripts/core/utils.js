@@ -11,5 +11,15 @@
         }
     }
 
+    /** DOM helper */
+    var byId = function(id) { return document.getElementById(id); };
+
+    /** localStorage helpers */
+    var myId = function() { return localStorage.getItem('id') || ''; };
+    var myUsername = function() { return localStorage.getItem('username') || ''; };
+
     window.Game.Utils.shuffle = shuffle;
+    window.Game.Utils.byId = byId;
+    window.Game.Utils.myId = myId;
+    window.Game.Utils.myUsername = myUsername;
 })();

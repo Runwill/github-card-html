@@ -7,9 +7,9 @@
             <div id="game-view-setup" class="game-view hidden">
                 <div id="game-setup-ui" class="game-panel setup-panel">
                     <div class="row">
-                         <div class="input-group">
-                            <span class="input-group-label" data-i18n="game.setup.playerCount">座位数</span>
-                            <select id="setup-player-count-select" class="input-group-field">
+                                 <div class="ui-input-group input-group">
+                                     <span class="ui-input-label input-group-label" data-i18n="game.setup.playerCount">座位数</span>
+                                     <select id="setup-player-count-select" class="ui-field ui-input-field input-group-field">
                                 <option value="2">2</option>
                                 <option value="3">3</option>
                                 <option value="4" selected>4</option>
@@ -18,24 +18,24 @@
                             </select>
                          </div>
                          <!-- Allow Spectate Toggle (only visible for host in room) -->
-                         <div class="input-group hidden" id="setup-allow-spectate-group">
-                            <span class="input-group-label" data-i18n="online.allowSpectate">允许旁观</span>
-                            <span id="setup-allow-spectate-toggle" class="setup-click-toggle is-active" data-value="true">是</span>
+                                 <div class="ui-input-group input-group hidden" id="setup-allow-spectate-group">
+                                     <span class="ui-input-label input-group-label" data-i18n="online.allowSpectate">允许旁观</span>
+                                     <span id="setup-allow-spectate-toggle" class="ui-choice ui-input-action setup-click-toggle is-active" data-value="true" role="button" tabindex="0" aria-pressed="true">是</span>
                          </div>
                     </div>
                     <div class="row">
-                         <div class="input-group">
-                            <span class="input-group-label" data-i18n="game.setup.cardPreset">Card Preset</span>
-                            <select id="setup-card-preset-select" class="input-group-field">
+                                 <div class="ui-input-group input-group">
+                                     <span class="ui-input-label input-group-label" data-i18n="game.setup.cardPreset">Card Preset</span>
+                                     <select id="setup-card-preset-select" class="ui-field ui-input-field input-group-field">
                                 <option value="standard" data-i18n="game.setup.preset.standard">Standard</option>
                                 <option value="80sha80shan" data-i18n="game.setup.preset.80sha80shan">80 Sha 80 Shan</option>
                             </select>
                          </div>
                          
                          <!-- Mode Toggle (click to switch) -->
-                         <div class="input-group">
-                            <span class="input-group-label" data-i18n="game.setup.autoTiming">自动时机</span>
-                            <span id="setup-mode-toggle" class="setup-click-toggle" data-value="sandbox" data-i18n="game.setup.autoTimingNo">否</span>
+                                 <div class="ui-input-group input-group">
+                                     <span class="ui-input-label input-group-label" data-i18n="game.setup.autoTiming">自动时机</span>
+                                     <span id="setup-mode-toggle" class="ui-choice ui-input-action setup-click-toggle" data-value="sandbox" role="button" tabindex="0" aria-pressed="false" data-i18n="game.setup.autoTimingNo">否</span>
                          </div>
                     </div>
                     <div id="setup-players-list">
@@ -58,9 +58,9 @@
                     <!-- 大厅视图 -->
                     <div id="online-lobby">
                         <div class="online-create-row">
-                            <div class="input-group">
-                                <span class="input-group-label" data-i18n="online.roomId">房间ID</span>
-                                <input type="text" id="input-room-id" class="input-group-field" placeholder="输入房间名" maxlength="20">
+                            <div class="ui-input-group input-group">
+                                <span class="ui-input-label input-group-label" data-i18n="online.roomId">房间ID</span>
+                                <input type="text" id="input-room-id" class="ui-field ui-input-field input-group-field" placeholder="输入房间名" maxlength="20">
                             </div>
                             <button id="btn-create-room" class="btn btn--success btn--lift btn--sm" data-i18n="online.create">创建房间</button>
                             <button id="btn-refresh-rooms" class="btn btn--secondary btn--sm" data-i18n="online.refresh">刷新</button>
@@ -81,7 +81,7 @@
                         </div>
                         <div id="room-user-list" class="online-user-list"></div>
                         <div class="text-center online-actions">
-                            <button id="btn-spectate" class="btn btn--secondary btn--sm hidden" data-i18n="online.spectate">旁观</button>
+                            <button id="btn-spectate" class="btn btn--secondary btn--sm hidden" aria-pressed="false" data-i18n="online.spectate">旁观</button>
                             <button id="btn-back-lobby" class="btn btn--secondary btn--sm" data-i18n="online.backToLobby">返回大厅</button>
                             <button id="btn-leave-room" class="btn btn--danger btn--lift btn--sm" data-i18n="online.leave">离开房间</button>
                         </div>

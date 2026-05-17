@@ -48,8 +48,8 @@
             wrapper.classList.add('custom-select--block');
         }
 
-        // Transfer classes from select to wrapper (except input-group-field)
-        const keepOnSelect = ['input-group-field', 'setup-char-select', 'admin-input'];
+        // Transfer layout classes to wrapper, keep field styling on the visible trigger.
+        const keepOnSelect = ['input-group-field', 'setup-char-select', 'admin-input', 'ui-field'];
         sel.classList.forEach(cls => {
             if (!keepOnSelect.includes(cls)) {
                 wrapper.classList.add(cls);
@@ -58,7 +58,7 @@
 
         // Build trigger button
         const trigger = document.createElement('div');
-        trigger.className = TRIGGER_CLASS;
+        trigger.className = TRIGGER_CLASS + ' ui-field';
         trigger.tabIndex = 0;
         trigger.setAttribute('role', 'combobox');
         trigger.setAttribute('aria-haspopup', 'listbox');

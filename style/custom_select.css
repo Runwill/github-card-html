@@ -10,6 +10,11 @@
     position: relative;
     display: inline-flex;
     /* inherit width behavior from original select */
+    --ui-field-h: var(--custom-select-trigger-h, auto);
+    --ui-field-pad-y: var(--custom-select-trigger-pad-y, var(--space-sm));
+    --ui-field-pad-x: var(--custom-select-trigger-pad-x, var(--space-lg));
+    --ui-field-radius: var(--custom-select-trigger-radius, var(--radius-sm));
+    --ui-field-lh: var(--custom-select-trigger-lh, var(--lh-normal));
 }
 
 .custom-select.custom-select--block {
@@ -41,17 +46,6 @@
     font-size: inherit;
     font-family: inherit;
     font-weight: inherit;
-    color: var(--text);
-    background: transparent;
-    border: 1px solid var(--border);
-    height: var(--custom-select-trigger-h, auto);
-    padding: var(--custom-select-trigger-pad-y, var(--space-sm)) var(--custom-select-trigger-pad-x, var(--space-lg));
-    border-radius: var(--custom-select-trigger-radius, var(--radius-sm));
-    outline: none;
-    transition: background var(--dur-normal) var(--ease-default),
-                border-color var(--dur-normal) var(--ease-default),
-                box-shadow var(--dur-normal) var(--ease-default);
-    line-height: var(--custom-select-trigger-lh, var(--lh-normal));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -66,20 +60,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.custom-select__trigger:hover {
-    background: color-mix(in srgb, var(--surface) 96%, transparent);
-    border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
-}
-
-.custom-select__trigger:focus,
-.custom-select.is-open .custom-select__trigger {
-    border-color: var(--primary-2);
-    box-shadow: none;
-    outline: 1px solid var(--primary-ring);
-    outline-offset: -1px;
-    background: var(--surface);
 }
 
 /* Chevron arrow */
@@ -195,34 +175,15 @@
     font-weight: 600;
 }
 
-/* ── Inside input-group: inherit border-radius from context ────────── */
+/* ── Inside input-group: width only; geometry is owned by ui_controls.css ─── */
 
 .input-group .custom-select {
     flex: 1 1 0;
     min-width: 0;
 }
 
-.input-group .custom-select .custom-select__trigger {
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    margin-left: -1px;
-    position: relative;
-}
-
-/* Ensure trigger border is visible above the label border on hover/focus */
-.input-group .custom-select.is-open .custom-select__trigger,
-.input-group .custom-select .custom-select__trigger:hover,
-.input-group .custom-select .custom-select__trigger:focus {
-    z-index: 1;
-}
-
 /* Game form trigger inside game-panel input-group */
 .game-panel .input-group .custom-select .custom-select__trigger {
     font-size: var(--game-form-fs, var(--fs-base));
     line-height: normal;
-    padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
-}
-
-/* Dynamic character select (full-width standalone) */
-.custom-select--block .custom-select__trigger {
-    border-radius: var(--radius-sm);
 }

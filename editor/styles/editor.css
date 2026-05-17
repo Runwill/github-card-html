@@ -29,10 +29,11 @@ html.force-landscape {
   --editor-inspector-w: clamp(240px, 18.305vh, 360px);
 }
 
-#panel_draft,
-#panel_draft * {
+#panel_draft {
   color: inherit;
 }
+/* #panel_draft * 已删除——通配符 color:inherit 会压过按钮变体的文字颜色（如 .btn--danger color:#fff），
+   草稿页内的文字颜色由 .draft-page 的 color:var(--text) 正常继承即可 */
 
 #panel_draft .draft-page {
   --btn-sm-font-size: var(--tp-fs-base, 13px);
@@ -188,10 +189,6 @@ html.force-landscape {
 #panel_draft .relation-graph-search {
   width: min(18em, 24vw);
   min-width: 10em;
-  height: var(--admin-input-h, 36px);
-  margin: 0;
-  padding: 0.571em 0.714em;
-  font-size: var(--draft-fs-control, 14px);
 }
 
 #panel_draft .relation-graph-mode-button {
@@ -209,10 +206,9 @@ html.force-landscape {
   white-space: nowrap;
 }
 
-#panel_draft .relation-graph-density input {
+#panel_draft .relation-graph-range {
   width: 6.8em;
   margin: 0;
-  accent-color: var(--primary-2);
 }
 
 #panel_draft .relation-graph-filter-value {
@@ -405,7 +401,6 @@ html.force-landscape {
 }
 
 #panel_draft .editor-toolbar,
-#panel_draft .editor-search-row,
 #panel_draft .editor-log__header {
   display: flex;
   align-items: center;
@@ -442,8 +437,20 @@ html.force-landscape {
   line-height: var(--lh-tight);
 }
 
-#panel_draft #htmlInput,
-#panel_draft .admin-input {
+#panel_draft {
+  --ui-field-h: var(--admin-input-h, 36px);
+  --ui-field-bg: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
+  --ui-field-radius: var(--radius-md);
+  --ui-field-pad-y: 0.571em;
+  --ui-field-pad-x: 0.714em;
+  --ui-field-fs: var(--draft-fs-control, 14px);
+  --ui-action-h: var(--admin-input-h, 36px);
+  --ui-action-pad-y: 0;
+  --ui-action-pad-x: 0.857em;
+  --ui-action-fs: var(--draft-fs-control, 14px);
+}
+
+#panel_draft #htmlInput {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
@@ -478,13 +485,11 @@ html.force-landscape {
   font-family: var(--font-ui, inherit);
 }
 
-#panel_draft #htmlInput:hover,
-#panel_draft .admin-input:hover {
+#panel_draft #htmlInput:hover {
   border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
 }
 
-#panel_draft #htmlInput:focus,
-#panel_draft .admin-input:focus {
+#panel_draft #htmlInput:focus {
   border-color: var(--primary-2);
   background: var(--surface);
   box-shadow: none;
@@ -505,8 +510,6 @@ html.force-landscape {
   padding: 0;
   background: transparent;
   line-height: var(--lh-relaxed);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
 
 #panel_draft .editor-shell {
@@ -576,10 +579,12 @@ html.force-landscape {
 #panel_draft .editor-search,
 #panel_draft .editor-field .admin-input {
   width: 100%;
-  height: var(--admin-input-h, 36px);
+}
+
+#panel_draft .editor-search,
+#panel_draft .relation-graph-search,
+#panel_draft .editor-field .admin-input {
   margin: 0;
-  font-size: var(--draft-fs-control, 14px);
-  padding: 0.571em 0.714em;
 }
 
 #panel_draft .editor-field .admin-input:disabled {
@@ -598,29 +603,7 @@ html.force-landscape {
 #panel_draft .admin-input-group.editor-search-row {
   width: 100%;
   max-width: 100%;
-  display: inline-flex;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap: 0;
-}
-
-#panel_draft .admin-input-group .editor-search {
-  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-}
-
-#panel_draft .admin-input-group .admin-input-btn {
-  height: var(--admin-input-h, 36px);
-  flex: 0 0 auto;
-  padding: 0 0.857em;
-  border: 1px solid var(--border);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: var(--draft-fs-control, 14px);
-  line-height: var(--lh-tight);
-  white-space: nowrap;
-}
-
-#panel_draft .admin-input-group:focus-within .admin-input-btn {
-  border-color: color-mix(in srgb, var(--primary-2) 55%, var(--border));
+  --ui-field-radius: var(--radius-sm);
 }
 
 #panel_draft .editor-node-tag,
@@ -629,25 +612,6 @@ html.force-landscape {
 #panel_draft .editor-log__empty {
   color: var(--text-muted);
   font-size: var(--tp-fs-sm, 12px);
-}
-
-#panel_draft .editor-entry-list,
-#panel_draft .editor-inspector,
-#panel_draft .editor-workspace,
-#panel_draft #htmlInput {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-#panel_draft .draftBlock::-webkit-scrollbar,
-#panel_draft .editor-entry-list::-webkit-scrollbar,
-#panel_draft .editor-inspector::-webkit-scrollbar,
-#panel_draft .editor-workspace::-webkit-scrollbar {
-  display: none;
-}
-
-#panel_draft #htmlInput::-webkit-scrollbar {
-  display: none;
 }
 
 #panel_draft :is(.editor-tree, .editor-log__list) {

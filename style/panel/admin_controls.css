@@ -1,69 +1,31 @@
 /* style/panel/admin_controls.css -- 管理面板共享输入组与分段控件 */
 
-/* 输入组（搜索 + 动作按钮） */
-.admin-panel .admin-input-group {
-  display: inline-flex;
-  align-items: stretch;
-  max-width: 60vw;
+.admin-panel {
+  --ui-input-group-max-w: 60vw;
+  --ui-field-h: var(--admin-input-h, 36px);
+  --ui-field-pad-y: 0.571em;
+  --ui-field-pad-x: 0.714em;
+  --ui-field-fs: var(--tp-fs-md, 14px);
+  --ui-action-h: var(--admin-input-h, 36px);
+  --ui-action-pad-y: 0;
+  --ui-action-pad-x: 0.857em;
+  --ui-action-fs: var(--tp-fs-md, 14px);
 }
-
-.admin-input-group > :is(.admin-input, .admin-input-btn, .btn, button, .custom-select) {
-  position: relative;
-}
-
-.admin-input-group > :is(.admin-input, .admin-input-btn, .btn, button, .custom-select) + :is(.admin-input, .admin-input-btn, .btn, button, .custom-select) {
-  margin-left: -1px;
-}
-
-.admin-input-group > .admin-input:hover,
-.admin-input-group > .admin-input:focus { z-index: 3; }
-
-.admin-input-group > :is(.admin-input-btn, .btn, button):hover,
-.admin-input-group > :is(.admin-input-btn, .btn, button):focus,
-.admin-input-group > .custom-select:hover,
-.admin-input-group > .custom-select:focus-within,
-.admin-input-group > .custom-select.is-open { z-index: 2; }
 
 .admin-panel .admin-input {
-  height: var(--admin-input-h, 36px);
   flex: 1 1 17.143em;
-  padding: 0.571em 0.714em;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-  font-size: var(--tp-fs-md, 14px);
-  color: var(--text);
-  background: var(--surface);
-  box-shadow: none;
   line-height: var(--lh-tight);
-  transition:
-    border-color var(--dur-normal) var(--ease-default),
-    box-shadow var(--dur-normal) var(--ease-default);
 }
 
-.admin-panel .admin-input::placeholder { color: var(--text-subtle); }
-
 .admin-panel .admin-input-btn {
-  height: var(--admin-input-h, 36px);
-  padding: 0 0.857em;
-  border: 1px solid var(--border);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: var(--tp-fs-md, 14px);
-  line-height: var(--lh-tight);
   display: inline-flex;
   align-items: center;
 }
 
-.admin-panel .admin-input-group .admin-input-btn { border-radius: var(--radius-none); }
-.admin-panel .admin-input-group .admin-input-btn:last-of-type { border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
-
-.admin-panel .admin-input-btn:focus,
-.admin-panel .btn:focus { outline: none; box-shadow: none; }
-
-.admin-panel .admin-input-btn:focus-visible,
-.admin-panel .btn:focus-visible {
-  outline: 1px solid color-mix(in srgb, var(--primary-2) 72%, var(--border));
-  outline-offset: 2px;
-  box-shadow: none;
+.admin-panel .admin-input-group > :is(.admin-input-btn, .btn, button) {
+  flex: 0 0 auto;
+  justify-content: center;
+  white-space: nowrap;
 }
 
 .admin-panel .mode-toggle {

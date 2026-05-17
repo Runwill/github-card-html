@@ -36,61 +36,27 @@
     font-size: var(--game-online-panel-fs, var(--fs-base));
 }
 
+.game-panel {
+    --ui-field-pad-y: var(--game-form-pad-y, var(--space-sm));
+    --ui-field-pad-x: var(--game-form-pad-x, var(--space-lg));
+    --ui-field-fs: var(--game-form-fs, var(--fs-base));
+    --ui-field-lh: normal;
+    --ui-label-pad-y: var(--game-form-pad-y, var(--space-sm));
+    --ui-label-pad-x: var(--game-form-pad-x, var(--space-lg));
+    --ui-label-color: color-mix(in srgb, var(--text) 86%, var(--bg-end));
+    --ui-action-pad-y: var(--game-form-pad-y, var(--space-sm));
+    --ui-action-pad-x: var(--game-form-pad-x, var(--space-lg));
+    --ui-action-fs: var(--game-form-fs, var(--fs-base));
+}
+
 .game-panel .input-group {
-    display: flex;
-    align-items: stretch;
-    gap: 0;
     margin: 0;
 }
 
-.game-panel .input-group-label,
-.game-panel .input-group-field,
-.game-panel .input-group select,
-.setup-click-toggle {
-    border: 1px solid var(--border);
-    background: transparent;
-    padding: var(--game-form-pad-y, var(--space-sm)) var(--game-form-pad-x, var(--space-lg));
-    font-size: var(--game-form-fs, var(--fs-base));
-    box-sizing: border-box;
-}
-
 .game-panel .input-group-label {
-    color: color-mix(in srgb, var(--text) 86%, var(--bg-end));
-    border-right: none;
-    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
     white-space: nowrap;
     font-weight: 500;
     letter-spacing: 0.3px;
-    line-height: normal;
-    display: inline-flex;
-    align-items: center;
-}
-
-.game-panel .input-group-field,
-.game-panel .input-group select {
-    color: var(--text);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-    outline: none;
-    transition:
-        background var(--dur-normal) var(--ease-default),
-        border-color var(--dur-normal) var(--ease-default),
-        box-shadow var(--dur-normal) var(--ease-default),
-        color var(--dur-normal) var(--ease-default);
-}
-
-.game-panel .input-group-field:hover,
-.game-panel .input-group select:hover {
-    background: color-mix(in srgb, var(--surface) 96%, transparent);
-    border-color: color-mix(in srgb, var(--primary-2) 32%, var(--border));
-}
-
-.game-panel .input-group-field:focus,
-.game-panel .input-group select:focus {
-    border-color: var(--primary-2);
-    box-shadow: none;
-    outline: 1px solid var(--primary-ring);
-    outline-offset: -1px;
-    background: var(--surface);
 }
 
 /* Setup panel rows: inline input-groups, not stretched */
@@ -144,30 +110,15 @@
 /* 基础尺寸与 .input-group-field (select) 保持一致；状态由 is-active / is-locked 表达 */
 
 .setup-click-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: var(--game-setup-toggle-minw, 48px);
-    color: var(--text);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0 !important; /* override Foundation :last-child reset */
-    cursor: pointer;
-    user-select: none;
-    transition:
-        background var(--dur-normal) var(--ease-default),
-        border-color var(--dur-normal) var(--ease-default),
-        color var(--dur-normal) var(--ease-default),
-        opacity var(--dur-normal) var(--ease-default);
-}
-
-.setup-click-toggle.is-active {
-    background: rgba(var(--success-rgb, 34, 197, 94), 0.12);
-    color: var(--success, #22c55e);
-    border-color: rgba(var(--success-rgb, 34, 197, 94), 0.4);
+    --ui-choice-min-w: var(--game-setup-toggle-minw, 48px);
+    --ui-choice-active-bg: rgba(var(--success-rgb, 34, 197, 94), 0.12);
+    --ui-choice-active-color: var(--success, #22c55e);
+    --ui-choice-active-border: rgba(var(--success-rgb, 34, 197, 94), 0.4);
+    --ui-choice-active-hover-bg: rgba(var(--success-rgb, 34, 197, 94), 0.18);
+    --ui-choice-disabled-opacity: 0.45;
 }
 
 .setup-click-toggle.is-locked {
-    opacity: 0.45;
-    cursor: not-allowed;
     pointer-events: none;
 }
 

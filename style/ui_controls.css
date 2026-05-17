@@ -1,0 +1,361 @@
+/* style/ui_controls.css -- shared form/control owners */
+
+.ui-field,
+:is(
+  .modal-form input,
+  .intro-textarea,
+  .admin-panel .admin-input,
+  .game-panel .input-group-field,
+  .game-panel .input-group select,
+  .custom-select__trigger
+),
+#login-form input {
+  width: var(--ui-field-w, auto);
+  min-width: 0;
+  height: var(--ui-field-h, auto);
+  min-height: var(--ui-field-min-h, var(--ui-field-h, auto));
+  margin: 0;
+  padding: var(--ui-field-pad-y, 0.571em) var(--ui-field-pad-x, 0.714em);
+  border: 1px solid var(--ui-field-border, var(--border));
+  border-radius: var(--ui-field-radius, var(--radius-sm));
+  background: var(--ui-field-bg, transparent);
+  color: var(--ui-field-color, var(--text));
+  box-shadow: var(--ui-field-shadow, none);
+  outline: none;
+  box-sizing: border-box;
+  font-size: var(--ui-field-fs, inherit);
+  line-height: var(--ui-field-lh, var(--lh-tight));
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default),
+    box-shadow var(--dur-normal) var(--ease-default),
+    color var(--dur-normal) var(--ease-default);
+}
+
+.ui-field:hover,
+:is(
+  .modal-form input,
+  .intro-textarea,
+  .admin-panel .admin-input,
+  .game-panel .input-group-field,
+  .game-panel .input-group select,
+  .custom-select__trigger
+):hover,
+#login-form input:hover {
+  background: var(--ui-field-hover-bg, color-mix(in srgb, var(--surface) 96%, transparent));
+  border-color: var(--ui-field-hover-border, color-mix(in srgb, var(--primary-2) 32%, var(--border)));
+}
+
+.ui-field:focus,
+:is(
+  .modal-form input,
+  .intro-textarea,
+  .admin-panel .admin-input,
+  .game-panel .input-group-field,
+  .game-panel .input-group select,
+  .custom-select__trigger
+):focus,
+#login-form input:focus,
+.custom-select.is-open .custom-select__trigger {
+  background: var(--ui-field-focus-bg, var(--surface));
+  border-color: var(--ui-field-focus-border, var(--primary-2));
+  box-shadow: var(--ui-field-focus-shadow, none);
+  outline: 1px solid var(--ui-field-focus-ring, var(--primary-ring));
+  outline-offset: -1px;
+}
+
+.ui-field::placeholder,
+:is(
+  .modal-form input,
+  .intro-textarea,
+  .admin-panel .admin-input,
+  .game-panel .input-group-field,
+  .game-panel .input-group select,
+  .custom-select__trigger
+)::placeholder,
+#login-form input::placeholder {
+  color: var(--ui-field-placeholder, var(--text-subtle));
+  opacity: 0.8;
+}
+
+.ui-field:disabled,
+:is(.modal-form input, .admin-panel .admin-input, .game-panel .input-group-field):disabled,
+#login-form input:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+  background: var(--ui-field-disabled-bg, color-mix(in srgb, var(--border) 28%, transparent));
+  color: var(--ui-field-disabled-color, var(--text-subtle));
+}
+
+.ui-input-group,
+.admin-panel .admin-input-group,
+.game-panel .input-group {
+  display: inline-flex;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  max-width: var(--ui-input-group-max-w, none);
+}
+
+.ui-input-label,
+.game-panel .input-group-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-width: max-content;
+  height: var(--ui-field-h, auto);
+  min-height: var(--ui-field-min-h, var(--ui-field-h, auto));
+  margin: 0;
+  padding: var(--ui-label-pad-y, var(--ui-field-pad-y, 0.571em)) var(--ui-label-pad-x, var(--ui-field-pad-x, 0.714em));
+  border: 1px solid var(--ui-label-border, var(--ui-field-border, var(--border)));
+  border-radius: var(--ui-field-radius, var(--radius-sm));
+  background: var(--ui-label-bg, color-mix(in srgb, var(--surface) 94%, var(--border) 6%));
+  color: var(--ui-label-color, var(--text-muted));
+  box-sizing: border-box;
+  font-size: var(--ui-label-fs, var(--ui-field-fs, inherit));
+  line-height: var(--ui-field-lh, var(--lh-tight));
+  white-space: nowrap;
+}
+
+.ui-input-action,
+.admin-panel .admin-input-btn,
+.setup-click-toggle {
+  min-height: var(--ui-action-h, var(--ui-field-h, auto));
+  padding: var(--ui-action-pad-y, var(--ui-field-pad-y, 0.571em)) var(--ui-action-pad-x, var(--ui-field-pad-x, 0.714em));
+  font-size: var(--ui-action-fs, var(--ui-field-fs, inherit));
+  line-height: var(--ui-field-lh, var(--lh-tight));
+}
+
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > :is(
+  .ui-field,
+  .ui-input-field,
+  .ui-input-label,
+  .ui-input-action,
+  .admin-input,
+  .admin-input-btn,
+  .input-group-label,
+  .input-group-field,
+  .custom-select,
+  .setup-click-toggle,
+  .btn,
+  button
+) {
+  position: relative;
+  margin: 0;
+}
+
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > :is(
+  .ui-field,
+  .ui-input-field,
+  .ui-input-label,
+  .ui-input-action,
+  .admin-input,
+  .admin-input-btn,
+  .input-group-label,
+  .input-group-field,
+  .custom-select,
+  .setup-click-toggle,
+  .btn,
+  button
+) + :is(
+  .ui-field,
+  .ui-input-field,
+  .ui-input-label,
+  .ui-input-action,
+  .admin-input,
+  .admin-input-btn,
+  .input-group-label,
+  .input-group-field,
+  .custom-select,
+  .setup-click-toggle,
+  .btn,
+  button
+) {
+  margin-left: -1px;
+}
+
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > :is(
+  .ui-field,
+  .ui-input-field,
+  .ui-input-label,
+  .ui-input-action,
+  .admin-input,
+  .admin-input-btn,
+  .input-group-label,
+  .input-group-field,
+  .custom-select,
+  .setup-click-toggle,
+  .btn,
+  button
+):not(:first-child):not(:last-child),
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > .custom-select:not(:first-child):not(:last-child) .custom-select__trigger {
+  border-radius: var(--radius-none);
+}
+
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > :is(
+  .ui-field,
+  .ui-input-field,
+  .ui-input-label,
+  .ui-input-action,
+  .admin-input,
+  .admin-input-btn,
+  .input-group-label,
+  .input-group-field,
+  .custom-select,
+  .setup-click-toggle,
+  .btn,
+  button
+):first-child:not(:last-child),
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > .custom-select:first-child:not(:last-child) .custom-select__trigger {
+  border-radius: var(--ui-input-group-radius, var(--ui-field-radius, var(--radius-sm))) var(--radius-none) var(--radius-none) var(--ui-input-group-radius, var(--ui-field-radius, var(--radius-sm)));
+}
+
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > :is(
+  .ui-field,
+  .ui-input-field,
+  .ui-input-label,
+  .ui-input-action,
+  .admin-input,
+  .admin-input-btn,
+  .input-group-label,
+  .input-group-field,
+  .custom-select,
+  .setup-click-toggle,
+  .btn,
+  button
+):last-child:not(:first-child),
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > .custom-select:last-child:not(:first-child) .custom-select__trigger {
+  border-radius: var(--radius-none) var(--ui-input-group-radius, var(--ui-field-radius, var(--radius-sm))) var(--ui-input-group-radius, var(--ui-field-radius, var(--radius-sm))) var(--radius-none);
+}
+
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > .custom-select {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > .custom-select .custom-select__trigger {
+  width: 100%;
+  height: var(--ui-field-h, 100%);
+}
+
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > :is(
+  .ui-field,
+  .ui-input-field,
+  .ui-input-label,
+  .ui-input-action,
+  .admin-input,
+  .admin-input-btn,
+  .input-group-label,
+  .input-group-field,
+  .custom-select,
+  .setup-click-toggle,
+  .btn,
+  button
+):hover,
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > :is(
+  .ui-field,
+  .ui-input-field,
+  .ui-input-label,
+  .ui-input-action,
+  .admin-input,
+  .admin-input-btn,
+  .input-group-label,
+  .input-group-field,
+  .custom-select,
+  .setup-click-toggle,
+  .btn,
+  button
+):focus-within,
+:is(.ui-input-group, .admin-input-group, .game-panel .input-group) > .custom-select.is-open {
+  z-index: 2;
+}
+
+.ui-choice,
+.setup-click-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-choice-gap, 0.429em);
+  min-width: var(--ui-choice-min-w, auto);
+  min-height: var(--ui-choice-min-h, var(--ui-action-h, var(--ui-field-h, auto)));
+  padding: var(--ui-choice-pad-y, var(--ui-action-pad-y, 0.429em)) var(--ui-choice-pad-x, var(--ui-action-pad-x, 0.714em));
+  border: 1px solid var(--ui-choice-border, var(--border));
+  border-radius: var(--ui-choice-radius, var(--radius-sm));
+  background: var(--ui-choice-bg, transparent);
+  color: var(--ui-choice-color, color-mix(in srgb, var(--text) 86%, var(--bg-end)));
+  box-shadow: var(--ui-choice-shadow, none);
+  box-sizing: border-box;
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  font-size: var(--ui-choice-fs, inherit);
+  font-weight: var(--ui-choice-weight, inherit);
+  line-height: var(--ui-choice-lh, var(--lh-tight));
+  text-align: center;
+  transition:
+    background var(--dur-normal) var(--ease-default),
+    background-position var(--dur-moderate) var(--ease-default),
+    border-color var(--dur-normal) var(--ease-default),
+    box-shadow var(--dur-normal) var(--ease-default),
+    color var(--dur-normal) var(--ease-default),
+    transform var(--dur-fast) var(--ease-default);
+}
+
+.ui-choice:hover,
+.setup-click-toggle:hover {
+  background: var(--ui-choice-hover-bg, color-mix(in srgb, var(--border) 24%, transparent));
+  border-color: var(--ui-choice-hover-border, color-mix(in srgb, var(--primary-2) 28%, var(--border)));
+  color: var(--ui-choice-hover-color, var(--text));
+}
+
+.ui-choice:focus-visible,
+.setup-click-toggle:focus-visible {
+  outline: 1px solid var(--ui-choice-focus-ring, var(--primary-ring));
+  outline-offset: 2px;
+}
+
+.ui-choice.is-active,
+.ui-choice[aria-pressed="true"],
+.setup-click-toggle.is-active {
+  background: var(--ui-choice-active-bg, transparent);
+  color: var(--ui-choice-active-color, var(--primary-2));
+  border-color: var(--ui-choice-active-border, var(--primary-2));
+  box-shadow: var(--ui-choice-active-shadow, none);
+}
+
+.ui-choice.is-active:hover,
+.ui-choice[aria-pressed="true"]:hover,
+.setup-click-toggle.is-active:hover {
+  background: var(--ui-choice-active-hover-bg, color-mix(in srgb, var(--primary-2) 10%, transparent));
+  color: var(--ui-choice-active-hover-color, var(--ui-choice-active-color, var(--primary-2)));
+}
+
+.ui-choice:disabled,
+.ui-choice.is-disabled,
+.ui-choice[aria-disabled="true"],
+.setup-click-toggle.is-locked {
+  cursor: not-allowed;
+  opacity: var(--ui-choice-disabled-opacity, 0.62);
+  transform: none;
+}
+
+.btn.is-active {
+  background: var(--ui-choice-active-bg, transparent);
+  color: var(--ui-choice-active-color, var(--_btn-accent, var(--primary-2)));
+  border-color: var(--ui-choice-active-border, var(--_btn-accent, var(--primary-2)));
+  box-shadow: var(--ui-choice-active-shadow, none);
+}
+
+.btn.is-active:hover {
+  background: var(--ui-choice-active-hover-bg, color-mix(in srgb, var(--_btn-accent-soft, var(--_btn-accent, var(--primary-2))) 10%, transparent));
+  color: var(--ui-choice-active-hover-color, var(--ui-choice-active-color, var(--_btn-accent, var(--primary-2))));
+}
+
+.btn:disabled,
+.btn.is-disabled {
+  background: var(--ui-choice-disabled-bg, color-mix(in srgb, var(--border) 70%, transparent));
+  color: var(--ui-choice-disabled-color, var(--text-subtle));
+  border-color: var(--ui-choice-disabled-border, var(--border));
+  box-shadow: none;
+}

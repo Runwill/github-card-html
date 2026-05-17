@@ -79,28 +79,19 @@
 }
 
 /* Form Elements */
-.modal-form { display: flex; flex-direction: column; gap: 0.889em; }
-
-.modal-form input {
-  width: 100%;
-  padding: 0.8em 1.067em;
-  border: 1px solid var(--border, #e2e8f0);
-  border-radius: var(--radius-lg);
-  box-sizing: border-box;
-  font-size: var(--modal-fs-lg, var(--fs-lg));
-  line-height: var(--lh-normal);
-  transition:
-    background var(--dur-normal) var(--ease-default),
-    border-color var(--dur-normal) var(--ease-default),
-    box-shadow var(--dur-normal) var(--ease-default),
-    color var(--dur-normal) var(--ease-default);
-  background: transparent;
-  color: var(--text, #2d3748);
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.889em;
+  --ui-field-w: 100%;
+  --ui-field-pad-y: 0.8em;
+  --ui-field-pad-x: 1.067em;
+  --ui-field-radius: var(--radius-lg);
+  --ui-field-fs: var(--modal-fs-lg, var(--fs-lg));
+  --ui-field-lh: var(--lh-normal);
 }
 
-/* :hover / :focus 统一由 theme.css 覆盖 */
-
-.modal-form input::placeholder { color: var(--text-subtle, #a0aec0); }
+.modal-form input { width: 100%; }
 
 /* Messages */
 .modal-message {

@@ -1,11 +1,11 @@
 /* style/menu/settings.css — 设置菜单专属样式
  *
- * 作用域：仅 #settings-menu 及其内部表单控件
+ * 作用域：#settings-menu 及其内部表单控件；.ui-range 为跨设置菜单/关系图复用的滑块 owner
  *
  * 包含：
  *   - 容器溢出覆盖     #settings-menu { overflow: visible }
  *   - 视窗尺寸提示     .settings-menu__viewport-info
- *   - 滑块            .setting-slider
+ *   - 共享滑块         .ui-range / .setting-slider
  *   - 箭头选择器       .arrow-selector / .arrow-btn / .arrow-value
  *
  * 通用菜单容器/按钮见 panel.css；侧边栏专属见 sidebar.css。
@@ -39,6 +39,7 @@ html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewpo
 /* =========================================
    Slider
    ========================================= */
+.ui-range,
 .setting-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -49,10 +50,12 @@ html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewpo
   cursor: pointer;
 }
 
+.ui-range:focus,
 .setting-slider:focus {
   outline: none;
 }
 
+.ui-range::-webkit-slider-thumb,
 .setting-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 0.8em;
@@ -64,10 +67,12 @@ html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewpo
   transition: transform var(--dur-normal) var(--ease-default);
 }
 
+.ui-range:hover::-webkit-slider-thumb,
 .setting-slider:hover::-webkit-slider-thumb {
   transform: scale(1.15);
 }
 
+.ui-range::-moz-range-thumb,
 .setting-slider::-moz-range-thumb {
   width: 0.8em;
   height: 0.8em;
@@ -77,6 +82,7 @@ html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewpo
   cursor: pointer;
 }
 
+.ui-range::-moz-range-track,
 .setting-slider::-moz-range-track {
   height: 0.2em;
   background: var(--border, #e2e8f0);

@@ -74,9 +74,9 @@ user-invocable: true
 - 发现 `!important` 链、重复断点、重复 font-size、硬编码 3px ring 等，优先回到原定义清理。
 - 删除 `!important` 前必须先查同属性的所有候选 owner，并比较选择器 specificity 和加载顺序；如果组件特化选择器（如页面/区域名 + 子控件）会压过模式 owner，应删除或降级这个特化选择器，而不是把 `!important` 加回去。
 - 清理模式类（如 `is-*`、`area-*`、`mode-*`）时，要验证每个模式组合的 computed style；至少覆盖“基础类 + 模式类 + 页面特化父类”的组合，防止净删后被旧 selector 抢回布局、间距、定位或显隐。
-- 审查树、表格、两栏列表、输入组等固定格式控件时，重点搜索“同一几何结果的多重来源”：CSS token、元素真实 margin/padding/border、JS 测量值、内联 style、兼容 class 若同时参与同一列宽或间距，应收敛为单一 owner，并删除旧变量/旧类回退。
-
-## JS / 架构专项规则
+- 审查树、表格、两栏列表、输入组等固定格式控件时，重点搜索"同一几何结果的多重来源"：CSS token、元素真实 margin/padding/border、JS 测量值、内联 style、兼容 class 若同时参与同一列宽或间距，应收敛为单一 owner，并删除旧变量/旧类回退。
+- 共享 owner 的 `:is()` 基础规则严禁包含 ID 选择器（如 `#login-form input`）。`:is()` 特异度取括号内最高值，一个 ID 就会让所有 class 级消费者获得 ID 级特异度，压过后续 class 级覆盖（如输入组拼接圆角）。正确做法是把 ID 选择器拆到 `:is()` 外面用逗号分隔。排查时在 DevTools 对比"划掉规则"和"生效规则"的特异度三值，若 class 级规则被 ID 级压过，追溯到 `:is()` 里查藏匿的 ID 或元素选择器。
+- 页面级 `* { color: inherit }` 通配符会压过全局按钮变体的文字颜色（`.btn--danger { color: #fff }` 特异度 (0,1,0) 打不赢 `#panel * { color: inherit }` 的 (1,0,1)）。表现为"红底黑字看不清"等对比度问题。修复：删除通配符 `color` 声明，让父容器已有的 `color: var(--text)` 正常继承；若确需范围覆盖，收窄为 `:not(.btn):not(.btn--primary):not(...)`。排查时用 `grep -rn "\* \s*\{" --include="*.css"` 扫全站，重点看含 `color:` 的 `*` 规则。
 
 - 重复事件绑定、重复 DOM 查询、重复状态同步和重复渲染分支，优先收敛到一个模块或 helper。
 - JS 不应为了修 CSS 结果而复制 CSS 常量。确需运行时测量时，读取真实 computed style 或 DOM 几何，并让测量函数同时拥有相关派生值；不要拆成“宽度函数、缩进函数、下一帧补偿函数”等多套口径。

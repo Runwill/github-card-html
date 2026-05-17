@@ -10,7 +10,7 @@
     /** Current mode value: 'auto' or 'sandbox' */
     let currentMode = 'sandbox';
 
-    function byId(id) { return document.getElementById(id); }
+    const byId = window.Game.Utils.byId;
 
     function bind(id, event, handler) {
         const el = byId(id);
@@ -23,6 +23,17 @@
         toggle.dataset.value = active ? 'true' : 'false';
         toggle.textContent = label;
         toggle.classList.toggle('is-active', active);
+        toggle.setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+
+    function bindClickToggle(toggle, handler) {
+        if (!toggle) return;
+        toggle.addEventListener('click', handler);
+        toggle.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();
+            toggle.click();
+        });
     }
 
     function init() {
@@ -42,7 +53,7 @@
         // 自动时机 click-toggle
         const modeToggle = byId('setup-mode-toggle');
         if (modeToggle) {
-            modeToggle.addEventListener('click', () => {
+            bindClickToggle(modeToggle, () => {
                 // 在线房间内锁定为"否"，不可切换
                 const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
                 if (isOnline) return;
@@ -63,11 +74,11 @@
         }
 
         // 允许旁观 click-toggle
-    const spectateToggle = byId('setup-allow-spectate-toggle');
+        const spectateToggle = byId('setup-allow-spectate-toggle');
         if (spectateToggle) {
-            spectateToggle.addEventListener('click', () => {
+            bindClickToggle(spectateToggle, () => {
                 const newVal = spectateToggle.dataset.value !== 'true';
-        setToggle(spectateToggle, newVal, newVal ? '是' : '否');
+                setToggle(spectateToggle, newVal, newVal ? '是' : '否');
 
                 // 广播到房间
                 if (window.Game.Online && window.Game.Online.RoomUI) {
@@ -145,8 +156,10 @@
             setToggle(modeToggle, false, t('game.setup.autoTimingNo'));
             modeToggle.dataset.value = 'sandbox';
             modeToggle.classList.add('is-locked');
+            modeToggle.setAttribute('aria-disabled', 'true');
         } else if (modeToggle) {
             modeToggle.classList.remove('is-locked');
+            modeToggle.setAttribute('aria-disabled', 'false');
         }
 
         // 允许旁观 toggle: 仅在线 + 房主 + 在自己房间时显示
@@ -210,14 +223,14 @@
 
         for (let i = 0; i < count; i++) {
             const group = document.createElement('div');
-            group.className = 'input-group';
+            group.className = 'ui-input-group input-group';
 
             const label = document.createElement('span');
-            label.className = 'input-group-label';
+            label.className = 'ui-input-label input-group-label';
             label.textContent = `Role ${i + 1}`;
 
             const select = document.createElement('select');
-            select.className = 'input-group-field setup-char-select';
+            select.className = 'ui-field ui-input-field input-group-field setup-char-select';
             select.dataset.playerIndex = i;
             
             // 填充选项

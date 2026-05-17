@@ -57,9 +57,9 @@
   function choiceGroupHtml(kind, labelKey, labelFallback, ariaLabel, items, activeValue){
     const buttons = items.map(item => {
       const active = item.value === activeValue;
-      return `<button type="button" class="admin-segmented__btn perms-log-choice__btn${active ? ' is-active' : ''}" role="radio" aria-checked="${active ? 'true' : 'false'}" data-value="${item.value}"><span data-i18n="${item.key}">${item.fallback}</span></button>`;
+      return `<button type="button" class="ui-choice admin-segmented__btn perms-log-choice__btn${active ? ' is-active' : ''}" role="radio" aria-checked="${active ? 'true' : 'false'}" data-value="${item.value}"><span data-i18n="${item.key}">${item.fallback}</span></button>`;
     }).join('');
-    return `<div class="admin-segmented perms-log-choice perms-log-choice--${kind}" role="radiogroup" aria-label="${ariaLabel}"><span class="admin-segmented__label perms-log-choice__label" data-i18n="${labelKey}">${labelFallback}</span>${buttons}</div>`;
+    return `<div class="ui-choice-group admin-segmented perms-log-choice perms-log-choice--${kind}" role="radiogroup" aria-label="${ariaLabel}"><span class="admin-segmented__label perms-log-choice__label" data-i18n="${labelKey}">${labelFallback}</span>${buttons}</div>`;
   }
 
   function choiceValue(root, kind, fallback){
@@ -144,12 +144,12 @@
         const filters = document.createElement('div');
         filters.className = 'tokens-log__filters';
         filters.innerHTML = [
-          '<div class="tokens-log__filters-main admin-input-group">',
-            '<input id="perms-log-q" class="admin-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
-            '<input id="perms-log-from" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.from" placeholder="起始日期" />',
-            '<input id="perms-log-to" class="admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.to" placeholder="结束日期" />',
-            '<button id="perms-log-apply" class="btn btn--secondary admin-input-btn admin-toolbar-action" data-i18n="permissions.log.filter.apply">筛选</button>',
-            '<button id="perms-log-reset" class="btn btn--secondary admin-input-btn" data-i18n="permissions.log.filter.reset">重置</button>',
+          '<div class="tokens-log__filters-main ui-input-group admin-input-group">',
+            '<input id="perms-log-q" class="ui-field ui-input-field admin-input" type="text" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.keyword" placeholder="按申请人/审核人/内容搜索" />',
+            '<input id="perms-log-from" class="ui-field ui-input-field admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.from" placeholder="起始日期" />',
+            '<input id="perms-log-to" class="ui-field ui-input-field admin-input" type="date" data-i18n-attr="placeholder" data-i18n-placeholder="permissions.log.filter.to" placeholder="结束日期" />',
+            '<button id="perms-log-apply" class="btn btn--secondary ui-input-action admin-input-btn admin-toolbar-action" data-i18n="permissions.log.filter.apply">筛选</button>',
+            '<button id="perms-log-reset" class="btn btn--secondary ui-input-action admin-input-btn" data-i18n="permissions.log.filter.reset">重置</button>',
           '</div>',
           choiceGroupHtml('type', 'permissions.log.filter.typeLabel', '类型', '日志类型', TYPE_FILTERS, 'all'),
           choiceGroupHtml('outcome', 'permissions.log.filter.outcomeLabel', '结果', '处理结果', OUTCOME_FILTERS, 'any'),

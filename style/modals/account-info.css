@@ -273,30 +273,20 @@
   display: flex;
   flex-direction: column;
   gap: 0.571em;
+  --ui-field-w: 100%;
+  --ui-field-min-h: var(--account-intro-min-h, 100px);
+  --ui-field-pad-y: 0.857em;
+  --ui-field-pad-x: 1.143em;
+  --ui-field-radius: var(--radius-lg);
+  --ui-field-lh: var(--lh-relaxed);
 }
 
 .intro-textarea {
   width: 100%;
-  min-height: var(--account-intro-min-h, 100px);
   resize: vertical;
-  padding: 0.857em 1.143em;
-  border: 1px solid var(--border, #e2e8f0);
-  border-radius: var(--radius-lg);
-  background: transparent;
-  color: var(--text, #2d3748);
   font-size: inherit;
-  line-height: var(--lh-relaxed);
-  transition:
-    background var(--dur-normal) var(--ease-default),
-    border-color var(--dur-normal) var(--ease-default),
-    box-shadow var(--dur-normal) var(--ease-default),
-    color var(--dur-normal) var(--ease-default);
   font-family: inherit;
 }
-
-.intro-textarea::placeholder { color: var(--text-subtle, #a0aec0); opacity: 0.8; }
-
-/* :hover / :focus 统一由 theme.css 覆盖 */
 
 /* Messages */
 /* Base styles handled by base.css (animation/layout) */

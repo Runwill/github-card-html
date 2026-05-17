@@ -39,8 +39,15 @@ body {
 }
 .shake { animation: shake var(--dur-slower); }
 
-#login-container { width: var(--login-panel-w); max-width: 92vw; margin: 0; }
-#login-container .modal-form input { margin-bottom: 0.533em; padding: 0.533em; border: 1px solid var(--border); border-radius: var(--radius-xs); }
+#login-container {
+    width: var(--login-panel-w);
+    max-width: 92vw;
+    margin: 0;
+    --ui-field-radius: var(--radius-xs);
+    --ui-field-pad-y: 0.533em;
+    --ui-field-pad-x: 0.533em;
+}
+#login-container .modal-form input { margin-bottom: 0.533em; }
 #login-container .btn { width: 100%; padding: 0.533em; border-radius: var(--radius-xs); }
 #login-message:not(:empty) { margin-top: 0.533em; }
 #login-message.success { color: var(--success, #38a169); }

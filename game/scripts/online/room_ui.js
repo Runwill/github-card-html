@@ -15,7 +15,8 @@
         return (window.i18n && window.i18n.t) ? window.i18n.t(key) : key;
     }
 
-    function byId(id) { return document.getElementById(id); }
+    const byId = window.Game.Utils.byId;
+    const myId = window.Game.Utils.myId;
 
     function bind(id, event, handler) {
         const el = byId(id);
@@ -407,6 +408,7 @@
                 spectateBtn.classList.remove('hidden');
                 spectateBtn.textContent = isSpectating ? t('online.cancelSpectate') : t('online.spectate');
                 spectateBtn.classList.toggle('is-active', isSpectating);
+                spectateBtn.setAttribute('aria-pressed', isSpectating ? 'true' : 'false');
             } else {
                 spectateBtn.classList.add('hidden');
                 // 如果旁观被关闭，重置旁观状态
@@ -493,6 +495,7 @@
                 toggle.dataset.value = String(!!data.value);
                 toggle.textContent = data.value ? '是' : '否';
                 toggle.classList.toggle('is-active', !!data.value);
+                toggle.setAttribute('aria-pressed', data.value ? 'true' : 'false');
             }
         }
         renderRoomInfo();
