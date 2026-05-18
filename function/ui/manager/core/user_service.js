@@ -44,6 +44,7 @@
       var next = data.avatar || '';
       if (old !== next && w.localStorage) w.localStorage.setItem('avatar', next);
       var resolveAvatarUrl = d.resolveAvatarUrl || function(u){ return u || ''; };
+      var setImageSrc = d.setImageSrc;
       var resolved = resolveAvatarUrl(next);
 
       // Best-effort update of common avatar UIs
@@ -52,12 +53,8 @@
         var sidebarPrev = $('sidebar-avatar-preview');
         var headerAvatar = $('header-avatar');
         var modalPrev = $('avatar-modal-preview');
-        if (sidebarPrev && resolved) { sidebarPrev.src = resolved; sidebarPrev.style.display = 'inline-block'; }
-        if (headerAvatar && resolved) { headerAvatar.src = resolved; headerAvatar.style.display = 'inline-block'; }
-        if (modalPrev) {
-          if (resolved) { modalPrev.src = resolved; modalPrev.style.display = 'inline-block'; }
-          else { try { modalPrev.removeAttribute('src'); } catch(_){} modalPrev.style.display = 'none'; }
-        }
+        if (resolved) { setImageSrc(sidebarPrev, resolved); setImageSrc(headerAvatar, resolved); }
+        setImageSrc(modalPrev, resolved);
       } catch(_){ }
     } catch(_){ }
   }

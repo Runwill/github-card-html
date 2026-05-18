@@ -6,6 +6,7 @@
   const dom = Core.dom;
   const $ = dom.$;
   const resolveAvatarUrl = dom.resolveAvatarUrl;
+  const setImageSrc = dom.setImageSrc;
 
   const t = (typeof window.t === 'function') ? window.t : (k)=>k;
 
@@ -56,7 +57,7 @@
         if (introEl.tagName === 'TEXTAREA') introEl.value = intro || '';
         else introEl.textContent = intro || ph;
       }
-      if (avatarEl) { if (resolvedAvatar) { avatarEl.src = resolvedAvatar; avatarEl.style.display = 'inline-block'; } else { try { avatarEl.removeAttribute('src'); } catch {} avatarEl.style.display = 'none'; } }
+      if (avatarEl) setImageSrc(avatarEl, resolvedAvatar);
       if (roleEl) {
         const roleText = t('role.'+role);
         roleEl.textContent = roleText;

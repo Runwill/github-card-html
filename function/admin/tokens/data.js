@@ -35,44 +35,41 @@
   function pushDocToState(collection, doc) {
     if (collection === 'skill') {
       ensureArraysForSkills();
-      const s = Number(doc && doc.strength);
-      if (s === 1) state.data.s1.unshift(doc);
-      else if (s === 2) state.data.s2.unshift(doc);
-      else state.data.s0.unshift(doc);
+      const bucket = Number(doc && doc.strength) === 1 ? state.data.s1 : Number(doc && doc.strength) === 2 ? state.data.s2 : state.data.s0;
+      bucket.unshift(doc);
     } else {
       const arrs = getArrays(collection);
       if (arrs[0]) arrs[0].unshift(doc);
     }
   }
 
-  function updateDocInState(collection, id, updater) {
-    if (!state.data) return false;
-    const sid = String(id);
-    for (const arr of getArrays(collection)) {
-      const d = arr.find(d => d && String(d._id) === sid);
-      if (d) { updater(d); return true; }
-    }
-    return false;
-  }
-
-  function removeDocFromState(collection, id) {
-    if (!state.data) return false;
-    const sid = String(id);
-    for (const arr of getArrays(collection)) {
-      const i = arr.findIndex(d => d && String(d._id) === sid);
-      if (i >= 0) { arr.splice(i, 1); return true; }
-    }
-    return false;
-  }
-
-  function findDocInState(collection, id) {
+  function findDocEntry(collection, id) {
     if (!state.data) return null;
     const sid = String(id);
     for (const arr of getArrays(collection)) {
-      const hit = arr.find(d => d && String(d._id) === sid);
-      if (hit) return hit;
+      const index = arr.findIndex(d => d && String(d._id) === sid);
+      if (index >= 0) return { arr, index, doc: arr[index] };
     }
     return null;
+  }
+
+  function updateDocInState(collection, id, updater) {
+    const entry = findDocEntry(collection, id);
+    if (!entry) return false;
+    updater(entry.doc);
+    return true;
+  }
+
+  function removeDocFromState(collection, id) {
+    const entry = findDocEntry(collection, id);
+    if (!entry) return false;
+    entry.arr.splice(entry.index, 1);
+    return true;
+  }
+
+  function findDocInState(collection, id) {
+    const entry = findDocEntry(collection, id);
+    return entry ? entry.doc : null;
   }
 
   // 递归包含判断（限制深度，忽略隐藏字段）

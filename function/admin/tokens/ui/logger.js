@@ -3,6 +3,14 @@
 
   const T = window.tokensAdmin;
   const esc = T.esc;
+  const COLLECTION_LABEL_KEYS = { 'term-fixed': 'tokens.section.termFixed', 'term-dynamic': 'tokens.section.termDynamic', card: 'tokens.section.card', character: 'tokens.section.character', skill: 'tokens.section.skill' };
+
+  async function mutateLog(id, suffix, method, toastKey) {
+    const auth = T.getAuth ? T.getAuth() : { canEdit:false };
+    if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
+    if (id && T.apiJson) await T.apiJson(`/tokens/logs/${encodeURIComponent(id)}${suffix}`, { method, auth: true });
+    T.showToast(window.t(toastKey));
+  }
 
   function ensureTokensLogArea() {
     try {
@@ -23,23 +31,10 @@
       try {
         if (body) {
           LogUtils.bindLogCopy(body);
-          LogUtils.bindLogDelete(body, async (id) => {
-              const auth = T.getAuth ? T.getAuth() : { canEdit:false };
-              if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
-              if (id) {
-                if (T.apiJson) {
-                  await T.apiJson(`/tokens/logs/${encodeURIComponent(id)}`, { method: 'DELETE', auth: true });
-                }
-              }
-              T.showToast(window.t('tokens.toast.deleted'));
-          }, async (id) => {
-              const auth = T.getAuth ? T.getAuth() : { canEdit:false };
-              if (!auth.canEdit) { T.showToast(window.t('common.noPermission')); return; }
-              if (id && T.apiJson) {
-                await T.apiJson(`/tokens/logs/${encodeURIComponent(id)}/restore`, { method: 'PATCH', auth: true });
-              }
-              T.showToast(window.t('tokens.toast.restored'));
-          });
+          LogUtils.bindLogDelete(body,
+            id => mutateLog(id, '', 'DELETE', 'tokens.toast.deleted'),
+            id => mutateLog(id, '/restore', 'PATCH', 'tokens.toast.restored')
+          );
         }
       } catch (_) {}
 
@@ -56,18 +51,7 @@
     }catch(_){ return undefined; }
   }
 
-  function mapCollectionKey(coll) {
-    try {
-      switch (coll) {
-        case 'term-fixed': return 'tokens.section.termFixed';
-        case 'term-dynamic': return 'tokens.section.termDynamic';
-        case 'card': return 'tokens.section.card';
-        case 'character': return 'tokens.section.character';
-        case 'skill': return 'tokens.section.skill';
-        default: return '';
-      }
-    } catch (_) { return ''; }
-  }
+  function mapCollectionKey(coll) { return COLLECTION_LABEL_KEYS[coll] || ''; }
 
   function pickField(v, keys){
     try{ for (const key of keys) if (v && v[key] !== undefined) return v[key]; }catch(_){ }

@@ -11,6 +11,7 @@
   var abs = dom.abs;
   var api = dom.api;
   var resolveAvatarUrl = dom.resolveAvatarUrl;
+  var setImageSrc = dom.setImageSrc;
   var showMessage = messages.showMessage;
   var parseErrorResponse = errors.parseErrorResponse;
   var requestJson = w.endpoints && w.endpoints.requestJson;
@@ -64,10 +65,8 @@
         msg.className = 'modal-message error';
       }
     };
-    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-    $('avatar-crop-cancel').addEventListener('click', onCancel);
-    $('avatar-crop-confirm').addEventListener('click', onConfirm);
+    cancelBtn.onclick = onCancel;
+    confirmBtn.onclick = onConfirm;
   }
 
   async function handleCroppedUpload(file, messageEl){
@@ -84,9 +83,7 @@
       if (data && data.applied) {
         if (typeof data.relativeUrl === 'string' && w.localStorage) w.localStorage.setItem('avatar', data.relativeUrl);
         var resolved = resolveAvatarUrl(w.localStorage ? w.localStorage.getItem('avatar') : '');
-        ['avatar-modal-preview', 'sidebar-avatar-preview', 'header-avatar'].forEach(function(id){
-          var el = $(id); if (el && resolved) { el.src = resolved; el.style.display = 'inline-block'; }
-        });
+        if (resolved) ['avatar-modal-preview', 'sidebar-avatar-preview', 'header-avatar'].forEach(function(id){ setImageSrc($(id), resolved); });
         showMessage($('avatar-modal-message'), t('success.avatarUpdatedImmediate'), 'success');
         if (messageEl) messageEl.textContent = t('status.updated');
         var wrap = $('avatar-pending-wrap'); if (wrap) wrap.style.display = 'none';
@@ -110,7 +107,7 @@
       var img = $('avatar-pending-preview');
       if (!userId || !wrap || !img) return;
       var data = await requestJson('/avatar/pending/me?userId=' + encodeURIComponent(userId));
-      if (data && data.url) { img.src = abs(data.url); wrap.style.display = 'flex'; }
+      if (data && data.url) { setImageSrc(img, abs(data.url)); wrap.style.display = 'flex'; }
       else { wrap.style.display = 'none'; }
     } catch(_){ var wrap2 = $('avatar-pending-wrap'); if (wrap2) wrap2.style.display = 'none'; }
   }

@@ -94,10 +94,8 @@
   function extractPlaceholders(tmpl){
     try{ const out=[]; if(!tmpl) return out; tmpl.replace(/\{([\w]+)\}/g,(_,p)=>{ if(!out.includes(p)) out.push(p); return ''; }); return out; }catch(_){ return []; }
   }
+  function mapRoleLabel(val){ try { const code = String(val || ''); if (!code) return code; const key = 'role.' + code; const tr = (window.t && window.t(key)) || null; return tr || code; } catch(_) { return String(val||''); } }
   // 不兼容旧日志：仅返回同名字段，不做别名/推断兜底
-  function paramFallback(key, data, _log){
-    try { return (data && data[key]) ?? ''; } catch(_){ return ''; }
-  }
   // 基于模板占位符构建消息参数（填补缺失字段）
   function buildMsgParamsForLog(log){
     try{
@@ -109,22 +107,13 @@
       const out = { ...d };
       needs.forEach(key=>{
         const v = out[key];
-        if (v===undefined || v===null || v==='') out[key] = paramFallback(key, d, log);
+        if (v===undefined || v===null || v==='') out[key] = '';
       });
       // 细化：角色变更日志中将 oldRole/newRole 从代码映射为本地化名称
       try {
         if (String(log && log.type) === 'role-changed') {
-          const mapRole = (val)=>{
-            try {
-              const code = String(val || '');
-              if (!code) return code;
-              const key = 'role.' + code;
-              const tr = (window.t && window.t(key)) || null;
-              return tr || code;
-            } catch(_) { return String(val||''); }
-          };
-          if (out.oldRole != null) out.oldRole = mapRole(out.oldRole);
-          if (out.newRole != null) out.newRole = mapRole(out.newRole);
+          if (out.oldRole != null) out.oldRole = mapRoleLabel(out.oldRole);
+          if (out.newRole != null) out.newRole = mapRoleLabel(out.newRole);
         }
       } catch(_){ }
       return JSON.stringify(out);
@@ -392,6 +381,7 @@
     syncKnownTypes,
     updateFormatPreview,
     makeRow,
+    mapRoleLabel,
     setDateInputLang,
     buildQuery,
   };

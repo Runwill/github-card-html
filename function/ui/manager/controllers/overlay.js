@@ -106,8 +106,6 @@
     } else if (panelId === 'approve-user-modal') {
       if (typeof w.renderApprovals === 'function') w.renderApprovals();
       if (refresh) refresh();
-    } else if (panelId === 'permissions-modal') {
-      if (typeof w.renderPermissionsPanel === 'function') w.renderPermissionsPanel('');
     } else if (panelId === 'sidebar-menu' || panelId === 'account-menu') {
       if (refresh) refresh();
     }

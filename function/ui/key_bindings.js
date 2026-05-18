@@ -10,7 +10,6 @@
     }, window.CardEditorKeyActions || {});
 
   let bindings = {};
-  let isRecording = false;
   let recordingAction = null;
 
   function loadBindings() {
@@ -130,7 +129,6 @@
   }
 
   function startRecording(action) {
-    isRecording = true;
     recordingAction = action;
     
     const conf = ACTIONS[action];
@@ -145,7 +143,6 @@
   }
 
   function stopRecording() {
-    isRecording = false;
     recordingAction = null;
     
     document.removeEventListener('keydown', handleRecord, { capture: true });
@@ -207,10 +204,10 @@
             btn.__keyBindingBound = true;
             btn.addEventListener('click', (e) => {
                   e.stopPropagation();
-                  if (isRecording && recordingAction === action) {
+                    if (recordingAction === action) {
                       stopRecording();
                   } else {
-                      if (isRecording) stopRecording();
+                      if (recordingAction) stopRecording();
                       startRecording(action);
                   }
               });
@@ -228,7 +225,7 @@
 
     // Global Key Listener
     document.addEventListener('keydown', (e) => {
-      if (isRecording) return; 
+      if (recordingAction) return;
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
 
       if (checkBinding(e, 'expand_all_terms')) {

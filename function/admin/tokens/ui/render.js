@@ -63,7 +63,7 @@
   }
 
   // 以键值对树形形式渲染对象；支持缩略模式
-  function renderKV(obj, level=0, accent=null, basePath=''){
+  function renderKV(obj, accent=null, basePath=''){
     const isObj=(v)=> v && typeof v==='object' && !Array.isArray(v);
     if(!obj || typeof obj!=='object'){
       const bp=esc(basePath);
@@ -98,7 +98,7 @@
           if(isObj(it) || Array.isArray(it)){
             const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
             const idxHtml = state.compactMode ? '' : `<div class="arr-index">#${idx}</div>`;
-            return `<div class="arr-item">${idxHtml}<div class="token-card"${style}>${renderKV(it, level+1, accent, `${curPath}.${idx}`)}</div></div>`;
+            return `<div class="arr-item">${idxHtml}<div class="token-card"${style}>${renderKV(it, accent, `${curPath}.${idx}`)}</div></div>`;
           }
           const keyHtml = state.compactMode ? '' : `<div class="kv-key">[${idx}]</div>`;
           return `<div class="kv-row" data-path="${esc(curPath)}.${idx}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}.${idx}" data-type="${typeof it}">${esc(it)}</div><div class="kv-actions"><button class="btn-inline-action btn-del">删除</button></div></div>`;
@@ -111,7 +111,7 @@
         // 缩略模式下也展开
         const style = accent? ` style=\"--token-accent:${esc(accent)}\"`: '';
         const titleHtml = hideLabel ? '' : `<div class="nest-title">${esc(k)}</div>`;
-        parts.push(`<div class="nest-block"${style}>${titleHtml}<div class="nest-body">${renderKV(v, level+1, accent, curPath)}</div></div>`);
+        parts.push(`<div class="nest-block"${style}>${titleHtml}<div class="nest-body">${renderKV(v, accent, curPath)}</div></div>`);
       } else {
         const keyHtml = hideLabel ? '' : `<div class="kv-key">${esc(k)}</div>`;
         parts.push(`<div class="kv-row" data-path="${esc(curPath)}">${keyHtml}<div class="kv-val" data-path="${esc(curPath)}" data-type="${typeof v}">${esc(v)}</div><div class="kv-actions"><button class="btn-inline-action btn-del">删除</button></div></div>`);
@@ -132,11 +132,7 @@
     </div>`;
     return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${toolbar}${innerHtml}</div>`;
   }
-  const termFixedItem=(t)=> cardShell('term-fixed', t, renderKV(t,0,getAccent(t),'') );
-  const termDynamicItem=(t)=> cardShell('term-dynamic', t, renderKV(t,0,getAccent(t),'') );
-  const cardItem=(c)=> cardShell('card', c, renderKV(c,0,getAccent(c),'') );
-  const characterItem=(ch)=> cardShell('character', ch, renderKV(ch,0,getAccent(ch),'') );
-  const skillItem=(s)=> cardShell('skill', s, renderKV(s,0,getAccent(s),'') );
+  const renderCollectionItem = (coll, doc)=> cardShell(coll, doc, renderKV(doc, getAccent(doc), ''));
   // 拉取集合数据（含技能三强度合并）并缓存于 state
   async function getCollectionData(collection){
     try{
@@ -159,7 +155,7 @@
     }catch(_){ return []; }
   }
   // 区段：抬头（数量、展开按钮）+ 列表（首屏+更多）
-  function section(type,titleKey,items,renderItem, canEdit){
+  function section(type,titleKey,items,renderItem){
     const id='sec-'+Math.random().toString(36).slice(2,8);
     const total=Array.isArray(items)? items.length: 0;
     const markedOpen = !!(state.openTypes && state.openTypes.has && state.openTypes.has(type));
@@ -204,7 +200,7 @@
         // 更新统计值后也重新应用（防止列表被重建导致样式丢失）
         applyTypeTileTheme();
       }
-  const q=state.q; const sections=[ { type:'term-fixed', titleKey:'tokens.section.termFixed', items:Array.isArray(termFixed)? filterByQuery(termFixed,q): [], render: termFixedItem }, { type:'term-dynamic', titleKey:'tokens.section.termDynamic', items:Array.isArray(termDynamic)? filterByQuery(termDynamic,q): [], render: termDynamicItem }, { type:'card', titleKey:'tokens.section.card', items:Array.isArray(cards)? filterByQuery(cards,q): [], render: cardItem }, { type:'character', titleKey:'tokens.section.character', items:Array.isArray(characters)? filterByQuery(characters,q): [], render: characterItem }, { type:'skill', titleKey:'tokens.section.skill', items:Array.isArray(skills)? filterByQuery(skills,q): [], render: skillItem } ]; const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.titleKey,s.items,s.render, canEdit)).join(''); window.i18n?.applySafe?.(contentEl); try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
+  const q=state.q; const sections=[ { type:'term-fixed', titleKey:'tokens.section.termFixed', items:Array.isArray(termFixed)? filterByQuery(termFixed,q): [], render: doc=> renderCollectionItem('term-fixed', doc) }, { type:'term-dynamic', titleKey:'tokens.section.termDynamic', items:Array.isArray(termDynamic)? filterByQuery(termDynamic,q): [], render: doc=> renderCollectionItem('term-dynamic', doc) }, { type:'card', titleKey:'tokens.section.card', items:Array.isArray(cards)? filterByQuery(cards,q): [], render: doc=> renderCollectionItem('card', doc) }, { type:'character', titleKey:'tokens.section.character', items:Array.isArray(characters)? filterByQuery(characters,q): [], render: doc=> renderCollectionItem('character', doc) }, { type:'skill', titleKey:'tokens.section.skill', items:Array.isArray(skills)? filterByQuery(skills,q): [], render: doc=> renderCollectionItem('skill', doc) } ]; const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.titleKey,s.items,s.render)).join(''); window.i18n?.applySafe?.(contentEl); try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
 
       // 点击区段抬头，等效于点击“展开/收起”按钮
       if(!contentEl.__sectionHeaderToggleBound){

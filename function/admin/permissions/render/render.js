@@ -179,6 +179,16 @@
     } catch { return fallbackH; }
   }
 
+  function isVisible(el, fallbackVisible){
+    try{
+      if (!el) return fallbackVisible !== false;
+      const style = window.getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+      const rect = el.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    }catch(_){ return fallbackVisible !== false ? true : !!(el && el.offsetParent); }
+  }
+
   // 旧行淡出
   function animateExitRows(rows){
     return new Promise(resolve => {
@@ -245,6 +255,7 @@
   ns._RenderUI = {
     ensureSearchBindings,
     measureNewHeight,
+    isVisible,
     animateExitRows,
     animateEnterRows,
     t, setI18nAttr, setText, toast,

@@ -9,13 +9,13 @@
   var requestJson = w.endpoints && w.endpoints.requestJson;
   var showMessage = messages.showMessage;
 
+  function fieldValue(id){ var el = $(id); return ((el && el.value) || '').trim(); }
+
   async function handleUpdateFormSubmit(event){
     event.preventDefault();
     var id = (w.localStorage && w.localStorage.getItem('id')) || '';
     var token = (w.localStorage && w.localStorage.getItem('token')) || '';
-    var oldPassword = (($('oldPassword') && $('oldPassword').value) || '').trim();
-    var newPassword = (($('newPassword') && $('newPassword').value) || '').trim();
-    var confirmPassword = (($('confirmPassword') && $('confirmPassword').value) || '').trim();
+    var oldPassword = fieldValue('oldPassword'), newPassword = fieldValue('newPassword'), confirmPassword = fieldValue('confirmPassword');
     var responseMessage = $('response-message');
     if (!id || !token) { showMessage(responseMessage, t('error.noLogin'), 'error'); return; }
     if (!oldPassword || !newPassword || !confirmPassword) { showMessage(responseMessage, t('error.fillAll'), 'error'); return; }

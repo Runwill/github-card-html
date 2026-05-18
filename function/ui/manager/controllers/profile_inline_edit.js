@@ -4,10 +4,12 @@
   'use strict';
   var w = window;
   var dom = w.CardUI.Manager.Core.dom;
-  var messages = w.CardUI.Manager.Core.messages;
 
   var $ = dom.$;
   var requestJson = w.endpoints && w.endpoints.requestJson;
+
+  function currentUserId(){ return w.localStorage ? w.localStorage.getItem('id') : ''; }
+  function clearPendingHtml(el){ collapsePending(el, function(){ el.innerHTML = ''; }); }
 
   // 共享 flash message 辅助
   function showFlash(type, text){
@@ -72,7 +74,7 @@
     var saving = false;
     var _introState = { saveFailed: false, lastTried: '' };
     var doSave = async function(){
-      var id = w.localStorage ? w.localStorage.getItem('id') : '';
+      var id = currentUserId();
       if (!id) { alert(t('error.noLoginSimple')); return; }
       var newIntro = (introEl.value || '').trim();
       if (_introState.saveFailed && newIntro === _introState.lastTried) { try { introEl.focus(); } catch(_){ } return; }
@@ -85,7 +87,7 @@
           if (w.localStorage) w.localStorage.setItem('intro', newIntro);
           original = newIntro; introEl.value = newIntro;
           showFlash('success', t('success.introUpdatedImmediate'));
-          try { var wrap = document.getElementById('account-info-intro-pending'); if (wrap) collapsePending(wrap, function(){ wrap.innerHTML = ''; }); } catch(_){ }
+          try { var wrap = $('account-info-intro-pending'); if (wrap) clearPendingHtml(wrap); } catch(_){ }
         } else {
           showFlash('success', t('success.introSubmitted'));
           introEl.value = original;
@@ -108,11 +110,11 @@
     var container = $('account-info-intro-pending');
     if (!container) return;
     try {
-      var id = w.localStorage ? w.localStorage.getItem('id') : '';
+      var id = currentUserId();
       if (!id) return;
       var data = await requestJson('/intro/pending/me?userId=' + encodeURIComponent(id));
       if (!(data && typeof data.newIntro === 'string')) {
-        collapsePending(container, function(){ container.innerHTML = ''; });
+        clearPendingHtml(container);
         return;
       }
       var full = (data.newIntro || '').replace(/\s+/g, ' ');
@@ -128,13 +130,13 @@
       container.appendChild(btn);
       expandPending(container);
     } catch(_){
-      collapsePending(container, function(){ container.innerHTML = ''; });
+      clearPendingHtml(container);
     }
   }
 
   async function cancelPendingIntroChange(){
     try {
-      var id = w.localStorage ? w.localStorage.getItem('id') : '';
+      var id = currentUserId();
       if (!id) return;
       await requestJson('/intro/cancel', { method: 'POST', body: { userId: id }, defaultMessage: t('error.revokeFailed') });
       await loadPendingIntroBadge();
@@ -169,7 +171,7 @@
           try { nameEl.focus(); } catch(_){ }
           return;
         }
-        var id = w.localStorage ? w.localStorage.getItem('id') : '';
+        var id = currentUserId();
         if (!id) { alert(t('error.noLoginSimple')); cleanup(); return; }
         _saving = true;
         _usernameState.lastTried = newName;
@@ -206,7 +208,7 @@
     var cancelBtn = $('account-info-username-cancel-inline');
     if (!wrap || !tag) return;
     try {
-      var id = w.localStorage ? w.localStorage.getItem('id') : '';
+      var id = currentUserId();
       if (!id) return;
       var data = await requestJson('/username/pending/me?userId=' + encodeURIComponent(id));
       if (data && data.newUsername) {
@@ -229,7 +231,7 @@
 
   async function cancelPendingUsernameChange(){
     try {
-      var id = w.localStorage ? w.localStorage.getItem('id') : '';
+      var id = currentUserId();
       if (!id) return;
       await requestJson('/username/cancel', { method: 'POST', body: { userId: id }, defaultMessage: t('error.revokeFailed') });
       loadPendingUsernameBadge();

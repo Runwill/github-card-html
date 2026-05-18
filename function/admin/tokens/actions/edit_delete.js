@@ -31,6 +31,9 @@
     } catch (_) {}
   }
 
+  function hasCtrlIntent(ev) { return !!(ev && ev.ctrlKey) || document.body.classList.contains('ctrl-down'); }
+  function requireCtrlIntent(ev, toastKey) { if (hasCtrlIntent(ev)) return true; T.showToast(window.t(toastKey)); return false; }
+
 
   // 行内编辑（单击 kv 值触发）
   function bindInlineEdit(rootEl) {
@@ -323,10 +326,7 @@
       const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del-doc') : null;
       if (!btn) return;
 
-      if (!ev.ctrlKey && !document.body.classList.contains('ctrl-down')) {
-  T.showToast(window.t('tokens.toast.useCtrlToDelete'));
-        return;
-      }
+      if (!requireCtrlIntent(ev, 'tokens.toast.useCtrlToDelete')) return;
 
       const meta = getTokenCardMeta(btn);
       if (!meta) return;
@@ -355,10 +355,7 @@
       const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-edit-doc') : null;
       if (!btn) return;
 
-      if (!ev.ctrlKey && !document.body.classList.contains('ctrl-down')) {
-  T.showToast(window.t('tokens.toast.useCtrlToEdit'));
-        return;
-      }
+      if (!requireCtrlIntent(ev, 'tokens.toast.useCtrlToEdit')) return;
 
       const meta = getTokenCardMeta(btn);
       if (!meta) return;

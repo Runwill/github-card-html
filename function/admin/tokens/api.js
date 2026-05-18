@@ -45,12 +45,7 @@
   async function fetchTokenLogs(params){
     const q = new URLSearchParams();
     if (params) {
-      if (params.page) q.set('page', String(params.page));
-      if (params.pageSize) q.set('pageSize', String(params.pageSize));
-      if (params.since) q.set('since', String(params.since));
-      if (params.until) q.set('until', String(params.until));
-      if (params.collection) q.set('collection', String(params.collection));
-      if (params.docId) q.set('docId', String(params.docId));
+      ['page','pageSize','since','until','collection','docId'].forEach(key => { if (params[key]) q.set(key, String(params[key])); });
       if (params.includeDeleted) q.set('includeDeleted', 'true');
     }
     return apiJson('/tokens/logs' + (q.toString()? ('?' + q.toString()) : ''), { auth: true });

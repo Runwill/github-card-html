@@ -5,7 +5,7 @@
   const S = ns.state;
   const API = ns.API || {};
   const { makeEl, tag, bindPermTooltip, spinnerBtn, toggleSection } = ns.UI || {};
-  const { t, setI18nAttr, setText, toast, ensureSearchBindings, measureNewHeight, animateExitRows, animateEnterRows, getUsersData, getMasterData, searchKeyFromInput, DEFAULT_SEARCH_KEY } = ns._RenderUI;
+  const { t, setI18nAttr, setText, toast, ensureSearchBindings, measureNewHeight, isVisible, animateExitRows, animateEnterRows, getUsersData, getMasterData, searchKeyFromInput } = ns._RenderUI;
 
   // 单个用户块（行 + 三个编辑器）
   function createUserBlocks(u, allPerms){
@@ -331,17 +331,8 @@
 
     // 若面板当前不可见（如首次后台预渲染）或无旧内容，跳过进出场动画以提升首屏响应
     const panelEl = document.getElementById('panel_permissions');
-    const isVisible = (el)=>{
-      try{
-        if (!el) return true; // 保守认为可见
-        const style = window.getComputedStyle(el);
-        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
-        const rect = el.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0;
-      }catch(_){ return true; }
-    };
     const noOldContent = !box.hasChildNodes();
-    const skipAnim = !isVisible(panelEl) || noOldContent;
+    const skipAnim = !isVisible(panelEl, true) || noOldContent;
     if (skipAnim){
       box.innerHTML = '';
       box.appendChild(frag);

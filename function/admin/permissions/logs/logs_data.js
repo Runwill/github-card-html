@@ -3,6 +3,7 @@
   // UI factory 在 logs.js 中，通过 TokensPerm._LogsUI 共享
   const { jsonGet: apiGet, jsonDelete: apiDelete, jsonPatch: apiPatch } = window.TokensPerm.API;
   const UI = window.TokensPerm._LogsUI;
+  const RenderUI = window.TokensPerm._RenderUI || {};
 
   async function hydrateUserLogs(){
     try{
@@ -64,15 +65,7 @@
         const panel = document.getElementById('panel_permissions');
         if (panel && !panel.__permsLogObsBound){
           panel.__permsLogObsBound = true;
-          const isVisible = (el)=>{
-            try{
-              if (!el) return false;
-              const style = window.getComputedStyle(el);
-              if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
-              const rect = el.getBoundingClientRect();
-              return rect.width > 0 && rect.height > 0;
-            }catch(_){ return !!(el && el.offsetParent); }
-          };
+          const isVisible = (el)=> RenderUI.isVisible ? RenderUI.isVisible(el, false) : !!(el && el.offsetParent);
           let wasVisible = isVisible(panel);
           const check = ()=>{
             try{
@@ -111,9 +104,6 @@
       try{ UI.updateFormatPreview(); }catch(_){ }
       // 语言变化时重新本地化角色变更消息中的角色名
       try{
-        const mapRole = (code)=>{
-          try{ const key='role.'+String(code||''); const tr=(window.t && window.t(key))||null; return tr || String(code||''); }catch(_){ return String(code||''); }
-        };
         const rows = document.querySelectorAll('#perms-log .tokens-log__entry[data-type="role-changed"] .log-msg span[data-old-role-code]');
         rows.forEach(span=>{
           try{
@@ -122,8 +112,8 @@
             const raw = span.getAttribute('data-i18n-params');
             let params = {};
             try { params = raw ? JSON.parse(raw) : {}; } catch(_) { params = {}; }
-            params.oldRole = mapRole(oldCode);
-            params.newRole = mapRole(newCode);
+            params.oldRole = UI.mapRoleLabel(oldCode);
+            params.newRole = UI.mapRoleLabel(newCode);
             span.setAttribute('data-i18n-params', JSON.stringify(params));
           }catch(_){ }
         });
