@@ -217,7 +217,6 @@
       try { const panel = document.getElementById('tokens-log-panel'); if (panel) window.i18n?.applySafe?.(panel); } catch (_){ }
       LogUtils.refreshLogTimes('.log-time[data-ts]');
     }
-    try{ document.addEventListener('i18n:changed', onI18nChanged); }catch(_){ }
     try{ window.addEventListener && window.addEventListener('i18n:changed', onI18nChanged); }catch(_){ }
   });
 })();

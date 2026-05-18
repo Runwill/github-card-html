@@ -6,22 +6,13 @@
   var dom = w.CardUI.Manager.Core.dom;
   var $ = dom.$;
   var qs = dom.qs;
-  var api = dom.api;
 
   async function onApproveClick(){
-    var token = (w.localStorage && w.localStorage.getItem('token')) || '';
-    var headers = token ? { 'Authorization': 'Bearer ' + token } : {};
     try {
-      var reqs = await Promise.all([
-        fetch(api('/api/pending-users'), { headers: headers }),
-        fetch(api('/api/avatar/pending'), { headers: headers }),
-        fetch(api('/api/username/pending'), { headers: headers }),
-        fetch(api('/api/intro/pending'), { headers: headers })
-      ]);
-      var toJson = async function(r){ return (r && r.ok) ? (await r.json()) : []; };
-      var arr = await Promise.all(reqs.map(toJson));
-      var total = arr.reduce(function(sum,a){ return sum + (Array.isArray(a) ? a.length : 0); }, 0);
+      var groups = typeof w.fetchPendingApprovalGroups === 'function' ? await w.fetchPendingApprovalGroups() : null;
+      var total = typeof w.countPendingApprovalGroups === 'function' ? w.countPendingApprovalGroups(groups) : 0;
       if (total > 0) {
+        try { if (typeof w.setPendingApprovalGroupsCache === 'function') w.setPendingApprovalGroupsCache(groups); } catch(_){ }
         try { w.CardUI.Manager.Controllers.overlay.open('approve-user-modal'); } catch(_){ }
       } else {
         var msg = t('toast.noRequests');

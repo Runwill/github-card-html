@@ -29,10 +29,23 @@
   function makeFetchPending(path, label){
     return async function(){ try { const arr = await jsonGet(path); return Array.isArray(arr) ? arr : []; } catch(e){ console.error(label, e); return []; } };
   }
-  window.fetchPendingUsers     = makeFetchPending('/pending-users',    '获取未激活用户失败:');
-  window.fetchPendingAvatars   = makeFetchPending('/avatar/pending',   '获取待审头像失败:');
-  window.fetchPendingUsernames = makeFetchPending('/username/pending', '获取待审用户名失败:');
-  window.fetchPendingIntros    = makeFetchPending('/intro/pending',    '获取待审简介失败:');
+  const fetchPendingUsers     = makeFetchPending('/pending-users',    '获取未激活用户失败:');
+  const fetchPendingAvatars   = makeFetchPending('/avatar/pending',   '获取待审头像失败:');
+  const fetchPendingUsernames = makeFetchPending('/username/pending', '获取待审用户名失败:');
+  const fetchPendingIntros    = makeFetchPending('/intro/pending',    '获取待审简介失败:');
+  Object.assign(window, { fetchPendingUsers, fetchPendingAvatars, fetchPendingUsernames, fetchPendingIntros });
+
+  let pendingApprovalGroupsCache = null;
+  async function fetchPendingApprovalGroups(){
+    const [users, avatars, usernames, intros] = await Promise.all([fetchPendingUsers(), fetchPendingAvatars(), fetchPendingUsernames(), fetchPendingIntros()]);
+    return { users, avatars, usernames, intros };
+  }
+  function countPendingApprovalGroups(groups){
+    groups = groups || {};
+    return ['users', 'avatars', 'usernames', 'intros'].reduce((sum, key) => sum + (Array.isArray(groups[key]) ? groups[key].length : 0), 0);
+  }
+  function setPendingApprovalGroupsCache(groups){ pendingApprovalGroupsCache = groups || null; }
+  Object.assign(window, { fetchPendingApprovalGroups, countPendingApprovalGroups, setPendingApprovalGroupsCache });
 
   function removeApprovalRowFromTrigger(trigger){
     try {
@@ -87,20 +100,21 @@
     }
   }
 
-  window.handleUserApproval = function(userId, action, trigger){
+  function handleUserApproval(userId, action, trigger){
     return handleApproval('/approve', { userId, action }, trigger, () => {
       try { if (window.TokensPerm && window.TokensPerm.refreshUsers) window.TokensPerm.refreshUsers(true); } catch(_){ }
     });
-  };
-  window.handleAvatarApproval = function(recordId, action, trigger){
+  }
+  function handleAvatarApproval(recordId, action, trigger){
     return handleApproval('/avatar/approve', { recordId, action }, trigger, refreshUser);
-  };
-  window.handleUsernameApproval = function(recordId, action, trigger){
+  }
+  function handleUsernameApproval(recordId, action, trigger){
     return handleApproval('/username/approve', { recordId, action }, trigger, refreshUser);
-  };
-  window.handleIntroApproval = function(recordId, action, trigger){
+  }
+  function handleIntroApproval(recordId, action, trigger){
     return handleApproval('/intro/approve', { recordId, action }, trigger, refreshUser);
-  };
+  }
+  Object.assign(window, { handleUserApproval, handleAvatarApproval, handleUsernameApproval, handleIntroApproval });
 
   const HANDLER = { register: handleUserApproval, avatar: handleAvatarApproval, username: handleUsernameApproval, intro: handleIntroApproval };
 
@@ -110,7 +124,10 @@
     container.innerHTML = '';
     container.style.position = 'relative';
     try {
-  const [users, avatars, usernames, intros] = await Promise.all([fetchPendingUsers(), fetchPendingAvatars(), fetchPendingUsernames(), fetchPendingIntros()]);
+      const cachedGroups = pendingApprovalGroupsCache;
+      pendingApprovalGroupsCache = null;
+      const groups = cachedGroups || await fetchPendingApprovalGroups();
+      const { users, avatars, usernames, intros } = groups;
       const items = [];
       (users||[]).forEach(u => items.push({ type:'register', id:u._id, createdAt: createdAtDate(u.createdAt), username: u.username }));
       (avatars||[]).forEach(a => items.push({ type:'avatar', id:a._id, createdAt: createdAtDate(a.createdAt), username: (a.user && a.user.username) ? a.user.username : (a.user || ''), url: a.url }));

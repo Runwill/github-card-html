@@ -7,7 +7,6 @@
   var messages = w.CardUI.Manager.Core.messages;
 
   var $ = dom.$;
-  var api = dom.api;
   var requestJson = w.endpoints && w.endpoints.requestJson;
 
   // 共享 flash message 辅助
@@ -111,9 +110,7 @@
     try {
       var id = w.localStorage ? w.localStorage.getItem('id') : '';
       if (!id) return;
-      var resp = await fetch(api('/api/intro/pending/me?userId=' + encodeURIComponent(id)));
-      if (!resp.ok) { collapsePending(container, function(){ container.innerHTML = ''; }); return; }
-      var data = await resp.json();
+      var data = await requestJson('/intro/pending/me?userId=' + encodeURIComponent(id));
       if (!(data && typeof data.newIntro === 'string')) {
         collapsePending(container, function(){ container.innerHTML = ''; });
         return;
@@ -211,9 +208,7 @@
     try {
       var id = w.localStorage ? w.localStorage.getItem('id') : '';
       if (!id) return;
-      var resp = await fetch(api('/api/username/pending/me?userId=' + encodeURIComponent(id)));
-      if (!resp.ok) return;
-      var data = await resp.json();
+      var data = await requestJson('/username/pending/me?userId=' + encodeURIComponent(id));
       if (data && data.newUsername) {
         // 填充内容
         tag.textContent = t('account.info.pending') + data.newUsername;

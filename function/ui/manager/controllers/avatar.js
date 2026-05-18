@@ -13,6 +13,7 @@
   var resolveAvatarUrl = dom.resolveAvatarUrl;
   var showMessage = messages.showMessage;
   var parseErrorResponse = errors.parseErrorResponse;
+  var requestJson = w.endpoints && w.endpoints.requestJson;
 
   var cropper = null;
 
@@ -108,9 +109,7 @@
       var wrap = $('avatar-pending-wrap');
       var img = $('avatar-pending-preview');
       if (!userId || !wrap || !img) return;
-      var resp = await fetch(api('/api/avatar/pending/me?userId=' + encodeURIComponent(userId)));
-      if (!resp.ok) throw new Error('load pending failed');
-      var data = await resp.json();
+      var data = await requestJson('/avatar/pending/me?userId=' + encodeURIComponent(userId));
       if (data && data.url) { img.src = abs(data.url); wrap.style.display = 'flex'; }
       else { wrap.style.display = 'none'; }
     } catch(_){ var wrap2 = $('avatar-pending-wrap'); if (wrap2) wrap2.style.display = 'none'; }

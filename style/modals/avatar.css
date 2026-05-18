@@ -70,7 +70,7 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-#avatar-modal .modal-message { margin-top: 0; width: 100%; }
+#avatar-modal .modal-message { width: 100%; }
 
 /* Cropper Modal Content */
 #avatar-crop-modal {

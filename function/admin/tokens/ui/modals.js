@@ -22,21 +22,42 @@
       } else { toast((e && e.message) || window.t(fallbackKey)); }
     }catch(_){ toast(window.t(fallbackKey)); }
   }
-  // 新建弹窗：懒加载构建 DOM 节点
-  function ensureCreateModal(){
-    let backdrop=document.getElementById('tokens-create-backdrop');
-    let modal=document.getElementById('tokens-create-modal');
-    if(!backdrop){ backdrop=document.createElement('div'); backdrop.id='tokens-create-backdrop'; backdrop.className='modal-backdrop'; document.body.appendChild(backdrop); }
+
+  function ensureTokenModal(prefix, html, hide){
+    let backdrop=document.getElementById(prefix+'-backdrop');
+    let modal=document.getElementById(prefix+'-modal');
+    if(!backdrop){ backdrop=document.createElement('div'); backdrop.id=prefix+'-backdrop'; backdrop.className='modal-backdrop'; document.body.appendChild(backdrop); }
     if(!modal){
       modal=document.createElement('div');
-      modal.id='tokens-create-modal';
+      modal.id=prefix+'-modal';
       modal.className='modal tokens-modal';
-      modal.innerHTML=`<div class="modal-header"><h2 data-i18n="tokens.create.title"></h2></div><div class="modal-form"><div id="tokens-create-hints" class="tokens-hints scrollbar-hidden"></div><textarea id="tokens-create-editor" class="tokens-editor"></textarea><div id="tokens-create-actions" class="tokens-actions"><button type="button" class="btn btn--secondary" id="tokens-create-cancel" data-i18n="tokens.create.cancel"></button><button type="button" class="btn btn--primary btn--lift" id="tokens-create-submit" data-i18n="tokens.create.submit"></button></div></div>`;
+      modal.innerHTML=html;
       document.body.appendChild(modal);
-      backdrop.addEventListener('click', hideCreateModal);
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideCreateModal(); });
+      backdrop.addEventListener('click', hide);
+      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hide(); });
     }
     return { backdrop, modal };
+  }
+  function getCanEdit(){
+    const { getAuth } = window.tokensAdmin;
+    const { canEdit } = getAuth ? getAuth() : { canEdit:false };
+    return canEdit;
+  }
+  function setReadonlyButtons(canEdit, buttons){
+    buttons.forEach(button => { try{ if(button) button.classList.toggle('is-disabled', !canEdit); }catch(_){ } });
+  }
+  function readEditorPayload(editor){
+    let payload;
+    try{ payload= JSON.parse(editor.value); }catch(_){ toast(window.t('tokens.error.jsonInvalid')); return undefined; }
+    try{ payload = stripHidden(payload); }catch(_){ }
+    return payload;
+  }
+  function refreshDashboard(){ if(window.renderTokensDashboard) window.renderTokensDashboard(false); }
+
+  // 新建弹窗：懒加载构建 DOM 节点
+  const createModalHtml = `<div class="modal-header"><h2 data-i18n="tokens.create.title"></h2></div><div class="modal-form"><div id="tokens-create-hints" class="tokens-hints scrollbar-hidden"></div><textarea id="tokens-create-editor" class="tokens-editor"></textarea><div id="tokens-create-actions" class="tokens-actions"><button type="button" class="btn btn--secondary" id="tokens-create-cancel" data-i18n="tokens.create.cancel"></button><button type="button" class="btn btn--primary btn--lift" id="tokens-create-submit" data-i18n="tokens.create.submit"></button></div></div>`;
+  function ensureCreateModal(){
+    return ensureTokenModal('tokens-create', createModalHtml, hideCreateModal);
   }
   function hideModal(prefix){
     const backdrop=document.getElementById(prefix+'-backdrop');
@@ -58,8 +79,7 @@
     const hints= modal.querySelector('#tokens-create-hints');
     const btnCancel= modal.querySelector('#tokens-create-cancel');
     const btnSubmit= modal.querySelector('#tokens-create-submit');
-    const { getAuth } = window.tokensAdmin;
-    const { canEdit } = getAuth ? getAuth() : { canEdit:false };
+    const canEdit = getCanEdit();
     const schemeBoxId='tokens-create-variants';
     let schemeBox= modal.querySelector('#'+schemeBoxId);
     if(!schemeBox){ const form = modal.querySelector('.modal-form'); schemeBox=document.createElement('div'); schemeBox.id=schemeBoxId; schemeBox.className='tokens-scheme'; form.insertBefore(schemeBox, form.firstElementChild); }
@@ -87,40 +107,25 @@
   const submit= async ()=>{
   if(!canEdit){ toast(window.t('common.noPermission')); return; }
       try{
-        let payload;
-  try{ payload= JSON.parse(editor.value); }catch(_){ toast(window.t('tokens.error.jsonInvalid')); return; }
-        // 创建时也过滤隐藏键，避免用户手动输入 py 等
-        try{ payload = stripHidden(payload); }catch(_){ }
+        const payload = readEditorPayload(editor);
+        if(payload === undefined) return;
         const out= await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: payload } });
         const doc= out && out.doc;
         try{ window.tokensAdmin.pushDocToState(collection, doc); }catch(_){}
     T.logChange('create', { collection, id: doc && doc._id, doc });
   hideCreateModal();
   try{ toast(window.t('tokens.toast.created')); }catch(_){ }
-        if(window.renderTokensDashboard) window.renderTokensDashboard(false);
+        refreshDashboard();
       }catch(e){ toastError(e, 'tokens.error.createFailed'); }
     };
   btnCancel.onclick= hideCreateModal; btnSubmit.onclick= submit;
-  // 只读用户：仅做禁用视觉，去掉悬浮提示，点击再弹 toast
-  if(!canEdit){ try{ btnSubmit.classList.add('is-disabled'); }catch(_){ } }
-  else { try{ btnSubmit.classList.remove('is-disabled'); }catch(_){ } }
+  setReadonlyButtons(canEdit, [btnSubmit]);
     showModalAnim(backdrop, modal, editor);
   }
   // 编辑弹窗：与新建弹窗布局一致，含“另存”按钮
+  const editModalHtml = `<div class="modal-header"><h2 data-i18n="tokens.edit.title"></h2></div><div class="modal-form"><div id="tokens-edit-hints" class="tokens-hints scrollbar-hidden"></div><textarea id="tokens-edit-editor" class="tokens-editor"></textarea><div class="tokens-actions"><button type="button" class="btn btn--secondary" id="tokens-edit-cancel" data-i18n="tokens.edit.cancel"></button><button type="button" class="btn btn--secondary" id="tokens-edit-saveas" data-i18n="tokens.edit.saveas"></button><button type="button" class="btn btn--primary btn--lift" id="tokens-edit-submit" data-i18n="tokens.edit.submit"></button></div></div>`;
   function ensureEditModal(){
-    let backdrop=document.getElementById('tokens-edit-backdrop');
-    let modal=document.getElementById('tokens-edit-modal');
-    if(!backdrop){ backdrop=document.createElement('div'); backdrop.id='tokens-edit-backdrop'; backdrop.className='modal-backdrop'; document.body.appendChild(backdrop); }
-    if(!modal){
-      modal=document.createElement('div');
-      modal.id='tokens-edit-modal';
-      modal.className='modal tokens-modal';
-      modal.innerHTML=`<div class="modal-header"><h2 data-i18n="tokens.edit.title"></h2></div><div class="modal-form"><div id="tokens-edit-hints" class="tokens-hints scrollbar-hidden"></div><textarea id="tokens-edit-editor" class="tokens-editor"></textarea><div class="tokens-actions"><button type="button" class="btn btn--secondary" id="tokens-edit-cancel" data-i18n="tokens.edit.cancel"></button><button type="button" class="btn btn--secondary" id="tokens-edit-saveas" data-i18n="tokens.edit.saveas"></button><button type="button" class="btn btn--primary btn--lift" id="tokens-edit-submit" data-i18n="tokens.edit.submit"></button></div></div>`;
-      document.body.appendChild(modal);
-      backdrop.addEventListener('click', hideEditModal);
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hideEditModal(); });
-    }
-    return { backdrop, modal };
+    return ensureTokenModal('tokens-edit', editModalHtml, hideEditModal);
   }
   function hideEditModal(){ hideModal('tokens-edit'); }
   // 打开编辑弹窗：显示结构提示；保存与“另存”为新
@@ -141,26 +146,23 @@
       window.i18n?.applySafe?.(hints);
     }catch(_){ hints.innerHTML=''; }
     editor.value= JSON.stringify(orig, null, 2);
-    const { getAuth } = window.tokensAdmin;
-    const { canEdit } = getAuth ? getAuth() : { canEdit:false };
+    const canEdit = getCanEdit();
     const submit= async ()=>{
   if(!canEdit){ toast(window.t('common.noPermission')); return; }
-  let next; try{ next = JSON.parse(editor.value); }catch(_){ toast(window.t('tokens.error.jsonInvalid')); return; }
-      // 编辑提交时，强制过滤掉隐藏键（含 py）
-      try{ next = stripHidden(next); }catch(_){ }
+  const next = readEditorPayload(editor);
+  if(next === undefined) return;
       try{
         const detailed = await window.tokensAdmin.applyObjectEdits(collection, id, orig, next);
         T.logChange('save-edits', { collection, id, sets: detailed && detailed.sets, dels: detailed && detailed.dels });
         hideEditModal();
   try{ toast(window.t('status.updated')); }catch(_){ }
-        if(window.renderTokensDashboard) window.renderTokensDashboard(false);
+        refreshDashboard();
       }catch(e){ toastError(e, 'tokens.error.updateFailed'); }
     };
     const saveAs = async ()=>{
   if(!canEdit){ toast(window.t('common.noPermission')); return; }
-  let next; try{ next = JSON.parse(editor.value); }catch(_){ toast(window.t('tokens.error.jsonInvalid')); return; }
-      // 另存为新对象时同样过滤隐藏键（含 py）
-      try{ next = stripHidden(next); }catch(_){ }
+  const next = readEditorPayload(editor);
+  if(next === undefined) return;
       try{
         const out = await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: next } });
         const newDoc = out && out.doc;
@@ -168,18 +170,11 @@
         T.logChange('create', { collection, id: newDoc && newDoc._id, doc: newDoc });
         hideEditModal();
   try{ toast(window.t('tokens.toast.savedAs')); }catch(_){ }
-        if(window.renderTokensDashboard) window.renderTokensDashboard(false);
+        refreshDashboard();
       }catch(e){ toastError(e, 'tokens.error.createFailed'); }
     };
     btnCancel.onclick= hideEditModal; btnSubmit.onclick= submit; if(btnSaveAs) btnSaveAs.onclick = saveAs;
-    // 只读用户：仅做禁用视觉，去掉悬浮提示，点击再弹 toast
-    if(!canEdit){
-      try{ btnSubmit.classList.add('is-disabled'); }catch(_){ }
-      try{ if(btnSaveAs){ btnSaveAs.classList.add('is-disabled'); } }catch(_){ }
-    } else {
-      try{ btnSubmit.classList.remove('is-disabled'); }catch(_){ }
-      try{ if(btnSaveAs){ btnSaveAs.classList.remove('is-disabled'); } }catch(_){ }
-    }
+    setReadonlyButtons(canEdit, [btnSubmit, btnSaveAs]);
     showModalAnim(backdrop, modal, editor);
   }
   Object.assign(window.tokensAdmin, { showCreateModal, hideCreateModal, openEditModal, hideEditModal });
