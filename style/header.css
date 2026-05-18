@@ -1,7 +1,7 @@
 #header {
-    background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+    background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 92%, transparent) 100%);
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+    box-shadow: var(--shadow-header);
     display: flex;
     left: 0;
     right: 0;
@@ -14,7 +14,7 @@
         transform var(--dur-moderate) var(--ease-standard),
         border-color var(--dur-moderate) var(--ease-standard);
     backdrop-filter: blur(8px) saturate(1.1);
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    border-bottom: 1px solid var(--border);
     align-items: center;
     padding-right: 2.2rem;
     position: sticky;
@@ -37,7 +37,7 @@
 
 #sidebar .title-a {
     text-decoration: none;
-    color: #2d3748;
+    color: var(--text);
     transition: color var(--dur-moderate) var(--ease-standard), transform var(--dur-moderate) var(--ease-standard);
     position: relative;
     padding: 0.2em 0;
@@ -50,13 +50,13 @@
     left: 50%;
     width: 0;
     height: 2px;
-    background: #2d3748;
+    background: var(--text);
     transition: width var(--dur-moderate) var(--ease-standard), opacity var(--dur-moderate) var(--ease-standard);
     transform: translateX(-50%);
 }
 
 #sidebar .title-a:hover {
-    color: #2d3748;
+    color: var(--text);
     transform: translateY(-1px);
 }
 
@@ -73,7 +73,7 @@
     transition-duration: var(--dur-fast);
 }
 
-#sidebar { background: #fff; padding: 0; z-index: calc(var(--z-header) + 7); }
+#sidebar { background: inherit; padding: 0; z-index: calc(var(--z-header) + 7); }
 
 #header-avatar {
     position: absolute;
@@ -81,7 +81,7 @@
     object-fit: cover;
     border: 1px solid var(--border);
     background: var(--surface);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: var(--shadow-avatar);
     cursor: pointer;
     display: none;
     transition: transform var(--dur-normal) ease, box-shadow var(--dur-normal) var(--ease-default);

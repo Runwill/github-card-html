@@ -50,6 +50,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 0.556em;           /* 10/18 */
+  overflow: hidden;
 }
 #tokens-summary .type-tile__label {
   font-size: var(--tp-fs-sm, 12px);

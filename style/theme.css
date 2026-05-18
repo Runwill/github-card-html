@@ -381,29 +381,11 @@ html[data-theme="dark"] .btn--accent {
   color: var(--text);
 }
 
-/* 顶部 Header 与导航 */
-#header {
-  background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 92%, transparent) 100%) !important;
-  border-bottom: 1px solid var(--border) !important;
-  box-shadow: var(--shadow-header) !important;
-}
-#sidebar .title-a { color: var(--text) !important; }
-#sidebar .title-a::after { background: var(--text) !important; }
-#sidebar { background: inherit !important; }
-#header-avatar { border-color: var(--border) !important; background: var(--surface) !important; box-shadow: var(--shadow-avatar) !important; }
-
-
-
-/* 菜单按钮文字色（主题自适应，作用于侧边栏/账号/设置三菜单）*/
-.menu__button { color: var(--text) !important; }
-
 /* Tokens 页：容器与卡片/分区 */
 #tokens-summary .type-tile {
   border-color: var(--border) !important;
   background: color-mix(in srgb, var(--surface) 92%, transparent);
 }
-#tokens-summary .type-tile__label { color: var(--text-muted) !important; }
-#tokens-summary .type-tile__value { color: var(--text) !important; }
 
 .tabs.nav[data-tabs],
 #main-tabs {
@@ -414,27 +396,11 @@ html[data-theme="dark"] .btn--accent {
 .tabs-content { border-bottom: none !important; }
 
 .tokens-section { border-color: var(--border) !important; background: var(--surface) !important; }
-.tokens-section__header { background: var(--panel-header-bg) !important; border-bottom: 1px solid var(--border) !important; }
-.tokens-section__title { color: var(--text) !important; }
-.tokens-empty { color: var(--text-subtle) !important; }
 
 #termContainer {
   background: var(--surface) !important;
   color: var(--text) !important;
 }
-
-/* 将池/技能 搜索框主题适配 */
-#panel_character #search-input,
-#panel_skill #search-input {
-  background-color: var(--surface) !important;
-  color: var(--text) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-sm) !important;
-}
-#panel_character #search-input::placeholder,
-#panel_skill #search-input::placeholder { color: var(--text-subtle) !important; }
-#panel_character #search-input:focus,
-#panel_skill #search-input:focus { border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important; }
 
 :root {
   --character-placeholder-min-h: clamp(280px, 52.743vh, 500px);
@@ -460,36 +426,16 @@ html.force-landscape {
   border: 1px solid var(--border) !important;
   border-left-color: var(--token-accent, var(--border)) !important;
 }
-#tokens-content .token-list > .token-card:nth-child(odd) {
-  --token-bg: var(--token-odd-bg);
-  --token-accent: var(--token-accent-blue);
-}
-#tokens-content .token-list > .token-card:nth-child(even) {
-  --token-bg: var(--token-even-bg);
-  --token-accent: var(--token-accent-green);
-}
 
-#tokens-content .kv-row { border-bottom-color: var(--border) !important; }
-#tokens-content .kv-key { color: var(--text-muted) !important; }
-#tokens-content .kv-val { color: var(--text) !important; }
 #tokens-content .kv-val:not(.is-editing):hover { background: color-mix(in srgb, var(--border) 30%, transparent) !important; }
 #tokens-content .kv-val.is-editing { background: color-mix(in srgb, var(--surface) 92%, transparent) !important; box-shadow: var(--shadow-inset-border) !important; }
 
-.tokens-log { background: var(--log-bg) !important; border-color: var(--log-border) !important; }
-.tokens-log__header { background: var(--log-header-bg) !important; border-bottom-color: var(--log-border) !important; }
-.tokens-log__title, .tokens-log .log-row, .tokens-log .log-val { color: var(--text) !important; }
 .tokens-log .log-time, .tokens-log .log-ctx { color: var(--text-subtle) !important; }
-.tokens-log code.log-code { background: var(--panel-header-bg) !important; border-color: var(--border) !important; color: var(--text) !important; }
 
 /* Tokens 主面板占满可视高度，避免底部露出背景色差 */
 :root { --header-height: calc(var(--fs-root, 20px) * 3.2); }
 #panel_tokens { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
 #panel_permissions { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
-
-/* Toast 样式 */
-.tokens-toast { background: var(--toast-ok-bg) !important; border-color: var(--toast-ok-border) !important; color: var(--toast-ok-text) !important; }
-.tokens-toast.tokens-toast--error { background: var(--toast-err-bg) !important; border-color: var(--toast-err-border) !important; color: var(--toast-err-text) !important; }
-.tokens-toast.tokens-toast--error > svg { color: var(--toast-err-icon) !important; }
 
 /* 审核窗口列表项（暗色/浅色自适应） */
 .approval-row {

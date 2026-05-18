@@ -11,6 +11,7 @@
 
     const input = document.createElement('input');
     input.type = 'text';
+    input.className = 'ui-field';
     input.id = 'search-input';
     input.placeholder = '检索';
     input.autocomplete = 'off';

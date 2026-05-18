@@ -187,8 +187,9 @@ html.force-landscape {
 }
 
 #panel_draft .relation-graph-search {
+  --draft-field-width: min(18em, 24vw);
   width: min(18em, 24vw);
-  min-width: 10em;
+  min-width: min(10em, 100%);
 }
 
 #panel_draft .relation-graph-mode-button {
@@ -451,27 +452,24 @@ html.force-landscape {
 }
 
 #panel_draft #htmlInput {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
-  color: var(--text);
-  box-shadow: none;
-  transition: border-color var(--dur-fast) var(--ease-default),
-              background-color var(--dur-fast) var(--ease-default),
-              box-shadow var(--dur-fast) var(--ease-default);
-}
-
-#panel_draft #htmlInput {
   width: 100%;
   flex: 1 1 auto;
   min-height: 0;
   margin: 0;
   overflow: auto;
   resize: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
+  color: var(--text);
+  box-shadow: none;
   font-family: var(--font-mono);
   font-size: var(--draft-fs-control, 14px);
   line-height: var(--lh-relaxed);
   padding: 0.714em 0.857em;
+  transition: border-color var(--dur-fast) var(--ease-default),
+              background-color var(--dur-fast) var(--ease-default),
+              box-shadow var(--dur-fast) var(--ease-default);
 }
 
 #panel_draft #htmlInput::placeholder {
@@ -492,12 +490,6 @@ html.force-landscape {
 #panel_draft #htmlInput:focus {
   border-color: var(--primary-2);
   background: var(--surface);
-  box-shadow: none;
-  outline: 0.071em solid var(--primary-ring);
-  outline-offset: -0.071em;
-}
-
-#panel_draft #htmlInput:focus {
   box-shadow: none;
   outline: 0.071em solid var(--primary-ring);
   outline-offset: -0.071em;
@@ -577,13 +569,9 @@ html.force-landscape {
 }
 
 #panel_draft .editor-search,
-#panel_draft .editor-field .admin-input {
-  width: 100%;
-}
-
-#panel_draft .editor-search,
 #panel_draft .relation-graph-search,
 #panel_draft .editor-field .admin-input {
+  width: var(--draft-field-width, 100%);
   margin: 0;
 }
 

@@ -35,6 +35,12 @@
   var POINTER_DRAG_THRESHOLD = 6;
   var HISTORY_LIMIT = 80;
   var GUIDE_COLOR_COUNT = 5;
+  var EDGE_SCROLL_ACCELERATION = 0.25;
+  var EDGE_SCROLL_FRICTION = 0.82;
+  var EDGE_SCROLL_MAX_SPEED = 18;
+  var EDGE_SCROLL_ZONE_RATIO = 0.08;
+  var EDGE_SCROLL_MIN_ZONE = 12;
+  var EDGE_SCROLL_MAX_ZONE = 28;
 
   function t(key, params) {
     return window.t ? window.t(key, params) : key;
@@ -652,9 +658,9 @@
     var velocityY = 0;
     var directionX = 0;
     var directionY = 0;
-    var acceleration = 4.6;
-    var friction = 0.86;
-    var maxSpeed = 96;
+    var acceleration = EDGE_SCROLL_ACCELERATION;
+    var friction = EDGE_SCROLL_FRICTION;
+    var maxSpeed = EDGE_SCROLL_MAX_SPEED;
 
     function canScrollX() {
       return element.scrollWidth > element.clientWidth + 1;
@@ -691,7 +697,7 @@
 
     element.addEventListener('mousemove', function (event) {
       var rect = element.getBoundingClientRect();
-      var edge = Math.max(24, Math.min(56, Math.min(rect.width, rect.height) * 0.16));
+      var edge = Math.max(EDGE_SCROLL_MIN_ZONE, Math.min(EDGE_SCROLL_MAX_ZONE, Math.min(rect.width, rect.height) * EDGE_SCROLL_ZONE_RATIO));
       var pointerX = event.clientX - rect.left;
       var pointerY = event.clientY - rect.top;
       directionX = 0;

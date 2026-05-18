@@ -14,6 +14,9 @@
 body { overflow-x: hidden; margin: 0; font-size: .9rem; }
 .hidden { display: none; }
 
+/* 菜单按钮基础色（登录页/主站通用） */
+.menu__button { color: var(--text); }
+
 /* 标题和特殊元素样式 */
 .strength_title {
     line-height: 1;
@@ -69,9 +72,6 @@ pronounName {
 .container:hover .role_icon.dominator { opacity: 0.025; left: 5%; }
 .container:hover .role_icon.not_dominator { opacity: 0.025; left: 4.5%; }
 
-/* 说明：原先这里使用全局 span 选择器实现“水波动画”，会影响所有 span 文本元素。
-   已移除该全局样式，避免导致全站 span 出现异常放大动画。若需要点击水波效果，
-   请使用 function/button/wave.js 中的 .wave-ripple 专有动画。 */
 
 /* 缩进和布局样式 */
 .indent {
@@ -79,11 +79,11 @@ pronounName {
     line-height: var(--indent-lh, 1.9em);
     position: relative;
     transform: translateX(0);
-    /* 仅对 transform/box-shadow/背景边线启用过渡，避免主题变量变动造成全局动画 */
-    transition: transform var(--dur-slow) var(--ease-standard), background-color var(--dur-normal) var(--ease-default), border-left-color var(--dur-normal) var(--ease-default), box-shadow var(--dur-normal) var(--ease-default);
+    transition: transform var(--dur-slow) var(--ease-standard),
+                background-color var(--dur-normal) var(--ease-default),
+                border-left-color var(--dur-normal) var(--ease-default);
     border-left: 3px solid transparent;
     padding-left: 0;
-    /* 降低 will-change 范围，避免持续的合成层开销 */
     will-change: transform;
 }
 
