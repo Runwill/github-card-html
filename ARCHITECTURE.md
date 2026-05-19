@@ -595,6 +595,9 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `touch_scroll.js` | 旋转容器触摸滚动：在 transform 父元素内恢复触摸滚动+惯性 | `window.TouchScrollManager`（`install`） |
 | `color_utils.js` | 颜色工具：解析/反转/混合（支持 hex/rgb/hsl） | `window.ColorUtils` |
 | `include_loader.js` | `data-include` 局部模板加载器：扫描→fetch→替换→移除占位 | `window.partialsReady`（Promise） |
+| `preload/manager.js` | 启动后预热调度：等待 DOM/partials、按空闲期执行任务、缓存静态 JSON 和资源 | `window.AppPreload` |
+| `preload/resources.js` | 资源预准备：登录页字体预取，主站字体、静态 JSON、常用图片预热 | 注册到 `window.AppPreload` |
+| `preload/ui_prewarm.js` | UI 预准备：公告、帮助等首次打开前的轻量预渲染/预加载 | 注册到 `window.AppPreload` |
 | `toast.js` | 全局 Toast 通知（成功/错误，自动消失） | `window.showToast()` |
 | `tabs.js` | Tab 切换逻辑：标题更新、管理员面板控制、鼠标滚轮切换 Tab | IIFE 内部 |
 | `event_bindings.js` | 全局按钮事件绑定（strength、pronoun、include 等切换按钮） | IIFE 内部 |
@@ -925,6 +928,7 @@ window.TouchScrollManager            # 旋转容器触摸滚动
 window.CollapsibleTransition         # 折叠/展开过渡动画
 window.KeySettings                   # 快捷键设置
 window.ThemeToggle                   # 主题切换
+window.AppPreload                    # 启动后预热调度与静态资源缓存
 window.scrollActions                 # 滚动工具
 window.term_status                   # 术语状态
 window.partialsReady                 # partials 加载完成 Promise

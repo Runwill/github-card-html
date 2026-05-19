@@ -60,8 +60,12 @@
   async function loadData() {
     if (data) return data;
     try {
-      const resp = await fetch('base/help.json');
-      data = await resp.json();
+      if (window.AppPreload && typeof window.AppPreload.json === 'function') {
+        data = await window.AppPreload.json('base/help.json');
+      } else {
+        const resp = await fetch('base/help.json');
+        data = await resp.json();
+      }
     } catch (e) {
       console.warn('[Help] Failed to load help.json', e);
       data = { global: [], panels: {} };
@@ -257,4 +261,5 @@
   }
 
   window.openHelpPanel = toggleHelp;
+  window.preloadHelpPanel = loadData;
 })();

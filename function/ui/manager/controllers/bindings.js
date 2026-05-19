@@ -49,8 +49,8 @@
     bindClick('account-info-button', () => C.accountInfo?.openAccountInfo?.());
     bindClick('approve-request-button', () => C.approvals?.onApproveClick?.());
     bindClick('announcements-button', () => {
-      try { window.loadAnnouncements?.(); } catch(_){}
       OV?.open?.('announcements-modal');
+      requestAnimationFrame(() => { try { window.loadAnnouncements?.({ afterOpen: true }); } catch(_){} });
     });
     bindClick('logout-button', () => C.session?.handleLogout?.());
 

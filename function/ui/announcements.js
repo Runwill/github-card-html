@@ -2,6 +2,11 @@
   const t = (typeof window.t==='function') ? window.t : (k)=>k;
   const $ = (id)=> document.getElementById(id);
   const h = (tag, cls, text)=> { const e = document.createElement(tag); if(cls) e.className = cls; if(text!==undefined) e.textContent = text; return e; };
+  const ANN_URL = 'base/announcements.json';
+  const OPEN_RENDER_DELAY = 280;
+  let dataCache = null;
+  let dataPromise = null;
+  let renderSeq = 0;
   // 前端直读：使用相对路径，不再通过后端基址
 
   // 鼠标位置追踪（用于滚动时计算悬浮态）
@@ -36,13 +41,24 @@
     container.addEventListener('mouseleave', clear, {passive:true});
   }
 
-  async function fetchAnnouncements(){
-    const url = 'base/announcements.json';
-    const res = await fetch(url, { cache: 'no-cache' });
-    if (!res.ok) throw new Error('HTTP '+res.status);
-    const data = await res.json();
-    // 仅支持规范结构：{ announcements: [] }
-    return (data && Array.isArray(data.announcements)) ? data.announcements : [];
+  function delay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
+
+  async function fetchAnnouncements(force){
+    if (!force && dataCache) return dataCache;
+    if (!force && dataPromise) return dataPromise;
+    const loader = window.AppPreload?.json
+      ? window.AppPreload.json(ANN_URL, { cache: 'no-cache' })
+      : fetch(ANN_URL, { cache: 'no-cache' }).then(res => {
+          if (!res.ok) throw new Error('HTTP '+res.status);
+          return res.json();
+        });
+    dataPromise = Promise.resolve(loader)
+      .then(data => {
+        dataCache = (data && Array.isArray(data.announcements)) ? data.announcements : [];
+        return dataCache;
+      })
+      .finally(() => { dataPromise = null; });
+    return dataPromise;
   }
 
   function render(list){
@@ -50,6 +66,7 @@
     if (!container) return;
     if (!Array.isArray(list) || list.length === 0){
       container.replaceChildren(h('div','ann-empty',t('announcements.empty')));
+      container.dataset.announcementsRendered = '1';
       return;
     }
     const frag = document.createDocumentFragment();
@@ -126,25 +143,47 @@
       frag.append(card);
     });
     container.replaceChildren(frag);
+    container.dataset.announcementsRendered = '1';
   }
 
-  async function load(){
+  function showLoading(container){
+    if (!container || container.dataset.announcementsRendered === '1') return;
+    container.replaceChildren(h('div','ann-loading','...'));
+  }
+
+  async function load(options){
+    const opts = options || {};
     const container = $('announcements-content');
     if (!container) return;
     attachScrollHover(container);
-  container.replaceChildren(h('div','ann-loading','...'));
+    if (dataCache && container.dataset.announcementsRendered === '1') return;
+    showLoading(container);
+    const seq = ++renderSeq;
     try {
       const data = await fetchAnnouncements();
+      if (opts.afterOpen) await delay(OPEN_RENDER_DELAY);
+      if (seq !== renderSeq) return;
       render(data);
     } catch(err){
+      if (seq !== renderSeq) return;
       container.replaceChildren(h('div','ann-empty',t('announcements.error.loadFailed')));
     }
   }
 
+  function preload(){
+    const container = $('announcements-content');
+    if (!container) return;
+    attachScrollHover(container);
+    fetchAnnouncements().then(data => {
+      if (container.dataset.announcementsRendered !== '1') render(data);
+    }).catch(()=>{});
+  }
+
   // 暴露给 bindings 调用
   window.loadAnnouncements = function(){
-    return load();
+    return load.apply(null, arguments);
   };
+  window.preloadAnnouncements = preload;
 
   // 可选：当语言切换时重新应用容器中的 i18n（内容本身不翻译）
   try { window.addEventListener('i18n:changed', ()=>{ const el=$('announcements-modal'); if(el) window.i18n?.applySafe?.(el); }); } catch(_){ }

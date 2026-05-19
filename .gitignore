@@ -1,2 +1,5 @@
 # Local VS Code workspace entry files
 *.code-workspace
+
+# Local npm dependencies
+node_modules/
