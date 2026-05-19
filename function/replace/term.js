@@ -159,6 +159,10 @@ function replace_term(path, mode, paragraphs = document) {
     pronounCheck(); // 触发页面更新
   }
 
+    function forEachPronounNode(paragraphs, callback){
+        for(const i of [1, 2, 3]) $(paragraphs).find('pronoun'+i).each(function(){ callback(this, i); });
+    }
+
   /**
    * 根据当前状态检查并更新页面中的代词显示
    * @param {HTMLElement|Document} paragraphs 作用范围，默认为 document
@@ -174,13 +178,7 @@ function replace_term(path, mode, paragraphs = document) {
       return;
     }
     // 关闭：移除已添加的 <pronounName>（DOM 级删除）
-    for(const i of [1, 2, 3]){
-      // 查找所有代词标签
-      $(paragraphs).find('pronoun'+i).each(function(){
-        // 删除所有子级中的 <pronounName>
-        this.querySelectorAll('pronounName').forEach(node => node.remove());
-      });
-    }
+        forEachPronounNode(paragraphs, node => node.querySelectorAll('pronounName').forEach(child => child.remove()));
   }
 
   /**
@@ -189,16 +187,13 @@ function replace_term(path, mode, paragraphs = document) {
    */
   function add_pronoun(paragraphs = document){
     const pronounName = ['甲','乙','丙'];
-    for(const i of [1, 2, 3]){
-      $(paragraphs).find('pronoun'+i).each(function(){
-        // 若不存在 <pronounName> 子节点，则添加一个；存在则不重复添加
-        if(!this.querySelector('pronounName')){
+        forEachPronounNode(paragraphs, (el, i) => {
+                if(!el.querySelector('pronounName')){
           const node = document.createElement('pronounName');
           node.textContent = pronounName[i-1];
-          this.appendChild(node);
+                    el.appendChild(node);
         }
-      });
-    }
+        });
   }
 
   // 暴露到全局以兼容现有调用

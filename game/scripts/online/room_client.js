@@ -122,21 +122,31 @@
         currentRoomId = null;
     }
 
-    function requestRoom(eventName, roomId, fallbackError) {
+    function socketRequest(eventName, payload, handler) {
         return new Promise((resolve, reject) => {
             if (!socket || !socket.connected) {
                 reject(new Error('未连接到服务器'));
                 return;
             }
+            const done = (response) => handler(response, resolve, reject);
+            if (payload === undefined) socket.emit(eventName, done);
+            else socket.emit(eventName, payload, done);
+        });
+    }
 
-            socket.emit(eventName, { roomId, userInfo: getUserInfo() }, (response) => {
-                if (response.success) {
-                    currentRoomId = roomId;
-                    resolve(response);
-                } else {
-                    reject(new Error(response.error || fallbackError));
-                }
-            });
+    function emitInRoom(eventName, payload) {
+        if (!socket || !socket.connected || !currentRoomId) return;
+        socket.emit(eventName, payload);
+    }
+
+    function requestRoom(eventName, roomId, fallbackError) {
+        return socketRequest(eventName, { roomId, userInfo: getUserInfo() }, (response, resolve, reject) => {
+            if (response.success) {
+                currentRoomId = roomId;
+                resolve(response);
+            } else {
+                reject(new Error(response.error || fallbackError));
+            }
         });
     }
 
@@ -176,23 +186,13 @@
      * 解散房间（房主专用）
      */
     function dissolveRoom(roomId) {
-        return new Promise((resolve, reject) => {
-            if (!socket || !socket.connected) {
-                reject(new Error('未连接到服务器'));
-                return;
+        return socketRequest('room:dissolve', { roomId }, (response, resolve, reject) => {
+            if (response.success) {
+                if (currentRoomId === roomId) currentRoomId = null;
+                resolve(response);
+            } else {
+                reject(new Error(response.error || '解散房间失败'));
             }
-
-            socket.emit('room:dissolve', { roomId }, (response) => {
-                if (response.success) {
-                    // 如果自己在这个房间，清除 currentRoomId
-                    if (currentRoomId === roomId) {
-                        currentRoomId = null;
-                    }
-                    resolve(response);
-                } else {
-                    reject(new Error(response.error || '解散房间失败'));
-                }
-            });
         });
     }
 
@@ -200,32 +200,21 @@
      * 获取房间列表
      */
     function listRooms() {
-        return new Promise((resolve, reject) => {
-            if (!socket || !socket.connected) {
-                reject(new Error('未连接到服务器'));
-                return;
-            }
-
-            socket.emit('room:list', (rooms) => {
-                resolve(rooms);
-            });
-        });
+        return socketRequest('room:list', undefined, (rooms, resolve) => resolve(rooms));
     }
 
     /**
      * 设置视角
      */
     function setPerspective(perspectiveIndex) {
-        if (!socket || !socket.connected || !currentRoomId) return;
-        socket.emit('room:set-perspective', { perspectiveIndex });
+        emitInRoom('room:set-perspective', { perspectiveIndex });
     }
 
     /**
      * 广播游戏动作
      */
     function broadcastAction(actionType, payload) {
-        if (!socket || !socket.connected || !currentRoomId) return;
-        socket.emit('game:action', {
+        emitInRoom('game:action', {
             actionType,
             payload,
             timestamp: Date.now()
@@ -236,16 +225,14 @@
      * 同步完整游戏状态
      */
     function syncFullState(gameState) {
-        if (!socket || !socket.connected || !currentRoomId) return;
-        socket.emit('game:sync-state', { gameState });
+        emitInRoom('game:sync-state', { gameState });
     }
 
     /**
      * 通知游戏开始
      */
     function notifyGameStart(gameConfig, gameState) {
-        if (!socket || !socket.connected || !currentRoomId) return;
-        socket.emit('room:start-game', {
+        emitInRoom('room:start-game', {
             roomId: currentRoomId,
             gameConfig,
             gameState
@@ -256,16 +243,14 @@
      * 更新房间选项（如允许旁观）
      */
     function updateRoomOption(key, value) {
-        if (!socket || !socket.connected || !currentRoomId) return;
-        socket.emit('room:update-option', { key, value });
+        emitInRoom('room:update-option', { key, value });
     }
 
     /**
      * 更新游戏配置
      */
     function updateConfig(config) {
-        if (!socket || !socket.connected || !currentRoomId) return;
-        socket.emit('room:update-config', {
+        emitInRoom('room:update-config', {
             roomId: currentRoomId,
             config
         });

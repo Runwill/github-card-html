@@ -7,15 +7,18 @@
   const $ = dom.$;
   const resolveAvatarUrl = dom.resolveAvatarUrl;
   const setImageSrc = dom.setImageSrc;
+  const setImagesSrc = dom.setImagesSrc;
   const userService = Core.userService;
 
   function init(){
     const OV = C.overlay; // 统一覆盖层系统
+    const bindClick = (id, handler) => $(id)?.addEventListener('click', handler);
+    const storedAvatarUrl = () => resolveAvatarUrl(localStorage.getItem('avatar'));
 
     // ── 全局交互 ──
 
     // 背景点击：返回上一级
-    $('modal-backdrop')?.addEventListener('click', () => OV?.back?.());
+    bindClick('modal-backdrop', () => OV?.back?.());
 
     // ESC：关闭所有
     document.addEventListener('keydown', (e) => {
@@ -29,44 +32,44 @@
     (OV?.panelIds || []).forEach(id => $(id)?.addEventListener('click', (e) => e.stopPropagation()));
 
     // ── 侧边栏主菜单 ──
-    $('menu-toggle')?.addEventListener('click', (e) => {
+    bindClick('menu-toggle', (e) => {
       e.stopPropagation();
       if (OV?.isAnyOpen?.()) OV.closeAll(); else OV?.open?.('sidebar-menu');
     });
-    $('header-avatar')?.addEventListener('click', (e) => { e.stopPropagation(); OV?.open?.('sidebar-menu'); });
+    bindClick('header-avatar', (e) => { e.stopPropagation(); OV?.open?.('sidebar-menu'); });
 
     // ── 菜单导航按钮 ──
     [['open-account-menu-button', 'account-menu'], ['settings-button', 'settings-menu'], ['update-account-button', 'update-account-modal']]
-      .forEach(([id, panelId]) => $(id)?.addEventListener('click', () => OV?.open?.(panelId)));
+      .forEach(([id, panelId]) => bindClick(id, () => OV?.open?.(panelId)));
     ['account-menu-back', 'settings-menu-back', 'avatar-modal-close']
-      .forEach(id => $(id)?.addEventListener('click', () => OV?.back?.()));
-    $('help-button')?.addEventListener('click', () => window.openHelpPanel?.());
+      .forEach(id => bindClick(id, () => OV?.back?.()));
+    bindClick('help-button', () => window.openHelpPanel?.());
 
     // ── 弹窗打开按钮 ──
-    $('account-info-button')?.addEventListener('click', () => C.accountInfo?.openAccountInfo?.());
-    $('approve-request-button')?.addEventListener('click', () => C.approvals?.onApproveClick?.());
-    $('announcements-button')?.addEventListener('click', () => {
+    bindClick('account-info-button', () => C.accountInfo?.openAccountInfo?.());
+    bindClick('approve-request-button', () => C.approvals?.onApproveClick?.());
+    bindClick('announcements-button', () => {
       try { window.loadAnnouncements?.(); } catch(_){}
       OV?.open?.('announcements-modal');
     });
-    $('logout-button')?.addEventListener('click', () => C.session?.handleLogout?.());
+    bindClick('logout-button', () => C.session?.handleLogout?.());
 
     // ── 头像弹窗 ──
     const fileInput = $('upload-avatar-input');
-    $('avatar-modal-upload')?.addEventListener('click', () => fileInput?.click());
+    bindClick('avatar-modal-upload', () => fileInput?.click());
     fileInput?.addEventListener('change', (e) => C.avatar?.openAvatarCropper?.(e));
-    $('upload-avatar-button')?.addEventListener('click', async () => {
+    bindClick('upload-avatar-button', async () => {
       try { await userService?.refreshCurrentUserFromServer?.(); } catch {}
       const preview = $('avatar-modal-preview');
-      const resolved = resolveAvatarUrl(localStorage.getItem('avatar'));
+      const resolved = storedAvatarUrl();
       setImageSrc(preview, resolved);
       C.avatar?.loadPendingAvatarPreview?.();
       OV?.open?.('avatar-modal');
     });
 
     // ── 初始化头像显示 ──
-    const resolved = resolveAvatarUrl(localStorage.getItem('avatar'));
-    if (resolved) { setImageSrc($('sidebar-avatar-preview'), resolved); setImageSrc($('header-avatar'), resolved); }
+    const resolved = storedAvatarUrl();
+    if (resolved) setImagesSrc(['sidebar-avatar-preview', 'header-avatar'], resolved);
 
     // ── 角色权限可见性 ──
     const role = localStorage.getItem('role');

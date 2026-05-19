@@ -12,11 +12,13 @@
   var api = dom.api;
   var resolveAvatarUrl = dom.resolveAvatarUrl;
   var setImageSrc = dom.setImageSrc;
+  var setImagesSrc = dom.setImagesSrc;
   var showMessage = messages.showMessage;
   var parseErrorResponse = errors.parseErrorResponse;
   var requestJson = w.endpoints && w.endpoints.requestJson;
 
   var cropper = null;
+  function storageValue(key){ return w.localStorage ? (w.localStorage.getItem(key) || '') : ''; }
 
   function openAvatarCropper(event){
     var file = (event && event.target && event.target.files && event.target.files[0]) || null;
@@ -70,7 +72,7 @@
   }
 
   async function handleCroppedUpload(file, messageEl){
-    var id = (w.localStorage && w.localStorage.getItem('id')) || '';
+    var id = storageValue('id');
     if (!id) { alert(t('alert.loginFirst')); return; }
     var form = new FormData();
     form.append('avatar', file);
@@ -82,8 +84,8 @@
       if (!resp.ok) { var err = await parseErrorResponse(resp); throw new Error(err.message || (data && data.message) || t('error.uploadFailed')); }
       if (data && data.applied) {
         if (typeof data.relativeUrl === 'string' && w.localStorage) w.localStorage.setItem('avatar', data.relativeUrl);
-        var resolved = resolveAvatarUrl(w.localStorage ? w.localStorage.getItem('avatar') : '');
-        if (resolved) ['avatar-modal-preview', 'sidebar-avatar-preview', 'header-avatar'].forEach(function(id){ setImageSrc($(id), resolved); });
+        var resolved = resolveAvatarUrl(storageValue('avatar'));
+        if (resolved) setImagesSrc(['avatar-modal-preview', 'sidebar-avatar-preview', 'header-avatar'], resolved);
         showMessage($('avatar-modal-message'), t('success.avatarUpdatedImmediate'), 'success');
         if (messageEl) messageEl.textContent = t('status.updated');
         var wrap = $('avatar-pending-wrap'); if (wrap) wrap.style.display = 'none';
@@ -102,7 +104,7 @@
 
   async function loadPendingAvatarPreview(){
     try {
-      var userId = w.localStorage ? w.localStorage.getItem('id') : '';
+      var userId = storageValue('id');
       var wrap = $('avatar-pending-wrap');
       var img = $('avatar-pending-preview');
       if (!userId || !wrap || !img) return;

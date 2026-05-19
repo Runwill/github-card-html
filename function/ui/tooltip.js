@@ -14,7 +14,7 @@
   }
   function place(el, anchor){
     const rect = anchor.getBoundingClientRect();
-    const w = el.offsetWidth; const h = el.offsetHeight; // eslint-disable-line no-unused-vars
+    const w = el.offsetWidth;
     let left = rect.left + rect.width/2 - w/2 + window.scrollX;
     left = Math.max(8 + window.scrollX, Math.min(left, window.scrollX + window.innerWidth - w - 8));
     const top = rect.bottom + MARGIN + window.scrollY;

@@ -30,21 +30,18 @@
      */
     function renderMenu(x, y, title, actions) {
         const menu = createContextMenu();
-        menu.innerHTML = ''; // 清除之前的内容
         
-        // 标题
         const header = document.createElement('div');
         header.className = 'context-menu-header';
         header.textContent = title;
-        menu.appendChild(header);
+        const nodes = [header];
 
-        // 动作列表
         actions.forEach(item => {
             // 分隔线
             if (!item.action && item.label && item.label.startsWith('───')) {
                 const sep = document.createElement('div');
                 sep.className = 'context-menu-separator';
-                menu.appendChild(sep);
+                nodes.push(sep);
                 return;
             }
 
@@ -56,8 +53,9 @@
                 if (item.action) item.action();
                 menu.classList.remove('visible');
             };
-            menu.appendChild(el);
+            nodes.push(el);
         });
+        menu.replaceChildren(...nodes);
 
         // 定位并显示
         menu.style.left = `${x}px`;
@@ -72,6 +70,20 @@
         if (rect.bottom > window.innerHeight) {
             menu.style.top = `${window.innerHeight - rect.height - 10}px`;
         }
+    }
+
+    function updateGameUI() {
+        if (window.Game.UI && window.Game.UI.updateUI) window.Game.UI.updateUI();
+    }
+
+    function setSandboxTurn(gs, playerIndex) {
+        gs.sandboxTurnIndex = playerIndex;
+        if (playerIndex >= 0) document.documentElement.style.setProperty('--turn-ring-color', '#48bb78');
+        if (gs.onlineMode) {
+            const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
+            if (SyncMgr && SyncMgr.interceptDispatch) SyncMgr.interceptDispatch('setSandboxTurn', { playerIndex });
+        }
+        updateGameUI();
     }
 
     function showContextMenu(x, y, player) {
@@ -100,36 +112,12 @@
                 if (!isSandboxTurn) {
                     actions.push({
                         label: '设为当前回合角色',
-                        action: () => {
-                            gs.sandboxTurnIndex = playerIdx;
-                            document.documentElement.style.setProperty('--turn-ring-color', '#48bb78');
-                            // 广播到其他客戶端
-                            if (gs.onlineMode) {
-                                const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
-                                if (SyncMgr && SyncMgr.interceptDispatch) {
-                                    SyncMgr.interceptDispatch('setSandboxTurn', { playerIndex: playerIdx });
-                                }
-                            }
-                            if (window.Game.UI && window.Game.UI.updateUI) {
-                                window.Game.UI.updateUI();
-                            }
-                        }
+                        action: () => setSandboxTurn(gs, playerIdx)
                     });
                 } else {
                     actions.push({
                         label: '取消当前回合角色',
-                        action: () => {
-                            gs.sandboxTurnIndex = -1;
-                            if (gs.onlineMode) {
-                                const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
-                                if (SyncMgr && SyncMgr.interceptDispatch) {
-                                    SyncMgr.interceptDispatch('setSandboxTurn', { playerIndex: -1 });
-                                }
-                            }
-                            if (window.Game.UI && window.Game.UI.updateUI) {
-                                window.Game.UI.updateUI();
-                            }
-                        }
+                        action: () => setSandboxTurn(gs, -1)
                     });
                 }
             }

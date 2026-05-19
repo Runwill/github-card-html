@@ -71,8 +71,7 @@
         arrow.className = ARROW_CLASS;
         arrow.innerHTML = CHEVRON_SVG;
 
-        trigger.appendChild(label);
-        trigger.appendChild(arrow);
+        trigger.append(label, arrow);
 
         // Build dropdown
         const dropdown = document.createElement('div');
@@ -81,9 +80,7 @@
 
         // Insert DOM structure
         sel.parentNode.insertBefore(wrapper, sel);
-        wrapper.appendChild(sel);
-        wrapper.appendChild(trigger);
-        wrapper.appendChild(dropdown);
+        wrapper.append(sel, trigger, dropdown);
 
         // Build context object
         const ctx = { sel, wrapper, trigger, label, dropdown, focusIdx: -1, dropdownHome: wrapper };
@@ -134,43 +131,30 @@
      * so that programmatic assignments (e.g. sel.value = 'all') also
      * update the custom trigger label.
      */
-    function _hookValueSetter(ctx) {
-        const sel = ctx.sel;
-        const proto = HTMLSelectElement.prototype;
-        const valDesc = Object.getOwnPropertyDescriptor(proto, 'value');
-        const idxDesc = Object.getOwnPropertyDescriptor(proto, 'selectedIndex');
+    function _hookSelectProp(ctx, prop) {
+        const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, prop);
+        if (!desc || !desc.set) return;
+        Object.defineProperty(ctx.sel, prop, {
+            get: function () { return desc.get.call(this); },
+            set: function (v) { desc.set.call(this, v); _syncLabel(ctx); },
+            configurable: true
+        });
+    }
 
-        if (valDesc && valDesc.set) {
-            Object.defineProperty(sel, 'value', {
-                get: function () { return valDesc.get.call(this); },
-                set: function (v) { valDesc.set.call(this, v); _syncLabel(ctx); },
-                configurable: true
-            });
-        }
-        if (idxDesc && idxDesc.set) {
-            Object.defineProperty(sel, 'selectedIndex', {
-                get: function () { return idxDesc.get.call(this); },
-                set: function (v) { idxDesc.set.call(this, v); _syncLabel(ctx); },
-                configurable: true
-            });
-        }
+    function _hookValueSetter(ctx) {
+        _hookSelectProp(ctx, 'value');
+        _hookSelectProp(ctx, 'selectedIndex');
     }
 
     function _buildOptions(ctx) {
         const { sel, dropdown, label } = ctx;
-        dropdown.innerHTML = '';
 
-        Array.from(sel.options).forEach((opt, i) => {
+        const items = Array.from(sel.options).map((opt, i) => {
             const item = document.createElement('div');
             item.className = OPTION_CLASS;
             item.dataset.index = i;
             item.textContent = opt.textContent;
             item.setAttribute('role', 'option');
-
-            if (opt.selected) {
-                item.classList.add(SEL_CLASS);
-                item.setAttribute('aria-selected', 'true');
-            }
 
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -183,9 +167,9 @@
                 item.classList.add(FOCUS_CLASS);
                 ctx.focusIdx = i;
             });
-
-            dropdown.appendChild(item);
+            return item;
         });
+        dropdown.replaceChildren(...items);
 
         _syncLabel(ctx);
 
@@ -222,11 +206,7 @@
     }
 
     function _toggle(ctx) {
-        if (ctx.wrapper.classList.contains(OPEN_CLASS)) {
-            _close(ctx);
-        } else {
-            _open(ctx);
-        }
+        (ctx.wrapper.classList.contains(OPEN_CLASS) ? _close : _open)(ctx);
     }
 
     function _open(ctx) {
@@ -262,9 +242,7 @@
             document.body.appendChild(dropdown);
         }
         const triggerStyle = getComputedStyle(trigger);
-        dropdown.style.fontSize = triggerStyle.fontSize;
-        dropdown.style.fontFamily = triggerStyle.fontFamily;
-        dropdown.style.fontWeight = triggerStyle.fontWeight;
+        Object.assign(dropdown.style, { fontSize: triggerStyle.fontSize, fontFamily: triggerStyle.fontFamily, fontWeight: triggerStyle.fontWeight });
         dropdown.classList.add(PORTAL_CLASS);
         dropdown.dataset.csPortal = '1';
         _positionDropdown(ctx);
@@ -276,14 +254,8 @@
         const { dropdown, dropdownHome } = ctx;
         dropdown.classList.remove(PORTAL_CLASS);
         delete dropdown.dataset.csPortal;
-        dropdown.style.left = '';
-        dropdown.style.top = '';
-        dropdown.style.right = '';
-        dropdown.style.width = '';
-        dropdown.style.maxHeight = '';
-        dropdown.style.fontSize = '';
-        dropdown.style.fontFamily = '';
-        dropdown.style.fontWeight = '';
+        ['left', 'top', 'right', 'width', 'maxHeight', 'fontSize', 'fontFamily', 'fontWeight']
+            .forEach(prop => { dropdown.style[prop] = ''; });
         if (dropdownHome && dropdown.parentElement !== dropdownHome) {
             dropdownHome.appendChild(dropdown);
         }
@@ -312,11 +284,7 @@
             ? Math.max(margin, rect.top - gap - panelHeight)
             : Math.min(rect.bottom + gap, viewportH - margin - panelHeight);
 
-        dropdown.style.left = left + 'px';
-        dropdown.style.top = Math.max(margin, top) + 'px';
-        dropdown.style.right = 'auto';
-        dropdown.style.width = width + 'px';
-        dropdown.style.maxHeight = maxHeight + 'px';
+        Object.assign(dropdown.style, { left: left + 'px', top: Math.max(margin, top) + 'px', right: 'auto', width: width + 'px', maxHeight: maxHeight + 'px' });
     }
 
     function _scrollFocusedIntoView(ctx) {
@@ -334,10 +302,7 @@
     }
 
     function _closeAll() {
-        document.querySelectorAll('.' + WRAP_CLASS + '.' + OPEN_CLASS).forEach(w => {
-            const sel = w.querySelector('select');
-            if (sel && sel[DATA_KEY]) _close(sel[DATA_KEY]);
-        });
+        _forEachOpenContext(_close);
     }
 
     function _clearFocus(ctx) {
@@ -410,9 +375,13 @@
     }
 
     function _positionOpenDropdowns() {
+        _forEachOpenContext(_positionDropdown);
+    }
+
+    function _forEachOpenContext(callback) {
         document.querySelectorAll('.' + WRAP_CLASS + '.' + OPEN_CLASS).forEach(w => {
             const sel = w.querySelector('select');
-            if (sel && sel[DATA_KEY]) _positionDropdown(sel[DATA_KEY]);
+            if (sel && sel[DATA_KEY]) callback(sel[DATA_KEY]);
         });
     }
 

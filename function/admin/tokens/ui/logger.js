@@ -3,7 +3,7 @@
 
   const T = window.tokensAdmin;
   const esc = T.esc;
-  const COLLECTION_LABEL_KEYS = { 'term-fixed': 'tokens.section.termFixed', 'term-dynamic': 'tokens.section.termDynamic', card: 'tokens.section.card', character: 'tokens.section.character', skill: 'tokens.section.skill' };
+  const { COLLECTIONS } = T;
 
   async function mutateLog(id, suffix, method, toastKey) {
     const auth = T.getAuth ? T.getAuth() : { canEdit:false };
@@ -51,7 +51,7 @@
     }catch(_){ return undefined; }
   }
 
-  function mapCollectionKey(coll) { return COLLECTION_LABEL_KEYS[coll] || ''; }
+  function mapCollectionKey(coll) { return (COLLECTIONS[coll] && COLLECTIONS[coll].sectionKey) || ''; }
 
   function pickField(v, keys){
     try{ for (const key of keys) if (v && v[key] !== undefined) return v[key]; }catch(_){ }

@@ -12,6 +12,7 @@
     const block = document.createDocumentFragment();
     const userId = u._id || u.id;
     const current = Array.isArray(u.permissions) ? [...u.permissions] : [];
+    const refreshLogs = ()=>{ if (ns.refreshLogs) ns.refreshLogs(); };
 
     // 行
     const row = makeEl('div', 'approval-row');
@@ -30,24 +31,24 @@
       }
     } catch(_) { roleValue.textContent = (u && u.role) || '-'; }
   try { meta.classList.add('is-editable'); meta.setAttribute('tabindex', '0'); meta.setAttribute('data-perm-trigger',''); meta.style.cursor='pointer'; } catch {}
-    sub.appendChild(roleValue);
+    sub.append(roleValue);
     
     // 注册时间
     if (u.createdAt) {
       const dateSpan = makeEl('span', 'approval-sub__date');
       dateSpan.textContent = w.TimeFmt.formatAbsOrRaw(u.createdAt);
-      sub.appendChild(dateSpan);
+      sub.append(dateSpan);
     }
 
-    meta.appendChild(title); meta.appendChild(sub);
+    meta.append(title, sub);
 
     const tagsWrap = makeEl('div', 'perm-tags');
-    left.appendChild(meta); left.appendChild(tagsWrap);
+    left.append(meta, tagsWrap);
     const renderPermissionTags = ()=>{
-      tagsWrap.innerHTML = '';
-      current.slice(0, ns.constants.MAX_TAGS_SHOWN).forEach(p => { const el = tag(p, false); bindPermTooltip(el, p); tagsWrap.appendChild(el); });
+      const tags = current.slice(0, ns.constants.MAX_TAGS_SHOWN).map(p => { const el = tag(p, false); bindPermTooltip(el, p); return el; });
       const extra = current.slice(ns.constants.MAX_TAGS_SHOWN);
-      if (extra.length) tagsWrap.appendChild(tag('+' + extra.length, true, extra.join('、')));
+      if (extra.length) tags.push(tag('+' + extra.length, true, extra.join('、')));
+      tagsWrap.replaceChildren(...tags);
     };
     renderPermissionTags();
 
@@ -57,9 +58,9 @@
   const pwdBtn = makeEl('button', 'btn btn--secondary btn--sm');
     setI18nAttr(pwdBtn, 'permissions.changePassword', t('permissions.changePassword', '修改密码'));
   try { editBtn.setAttribute('data-perm-trigger', ''); pwdBtn.setAttribute('data-perm-trigger', ''); } catch {}
-    right.appendChild(editBtn); right.appendChild(pwdBtn);
-    row.appendChild(left); row.appendChild(right);
-    block.appendChild(row);
+    right.append(editBtn, pwdBtn);
+    row.append(left, right);
+    block.append(row);
 
     const editorStack = makeEl('div', 'perm-editor-stack');
     editorStack.style.display = 'none';
@@ -70,12 +71,12 @@
       const main = makeEl('div', 'perm-editor__head-main');
       const titleEl = makeEl('div', 'perm-editor__title');
       setI18nAttr(titleEl, titleKey, fallback);
-      main.appendChild(titleEl);
-      head.appendChild(main);
+      main.append(titleEl);
+      head.append(main);
       if (tool) {
         const tools = makeEl('div', 'perm-editor__tools');
-        tools.appendChild(tool);
-        head.appendChild(tools);
+        tools.append(tool);
+        head.append(tools);
       }
       return { head, main };
     };
@@ -87,7 +88,7 @@
         input.setAttribute('data-i18n-attr', 'aria-label');
         input.setAttribute('data-i18n-aria-label', labelKey);
       } catch(_) {}
-      field.appendChild(input);
+      field.append(input);
       return field;
     };
 
@@ -104,8 +105,15 @@
       const save = makeEl('button', 'btn btn--primary btn--lift');
       setI18nAttr(cancel, 'common.cancel', t('common.cancel', '取消'));
       setI18nAttr(save, 'common.save', t('common.save', '保存'));
-      actions.appendChild(cancel); actions.appendChild(save);
+      actions.append(cancel, save);
       return { actions, cancel, save };
+    };
+
+    const saveWithSpinner = async (button, fallback, task, closeAfter)=>{
+      spinnerBtn(button, true);
+      try { await task(); }
+      catch(e) { toast((e && e.message) ? e.message : fallback, 'error'); }
+      finally { spinnerBtn(button, false); if (closeAfter) closeEditorStack(); }
     };
 
     // 权限编辑器
@@ -114,7 +122,7 @@
     const btnSelectAll = makeEl('button', 'btn btn--secondary btn--sm admin-toolbar-action');
     setI18nAttr(btnSelectAll, 'permissions.selectAll', t('permissions.selectAll', '全选'));
     const editorHead = makeEditorHead('permissions.editor.permissionsTitle', t('permissions.edit', '编辑权限'), btnSelectAll);
-    editorHead.main.appendChild(selectedCounter);
+    editorHead.main.append(selectedCounter);
     const list = makeEl('div', 'perm-editor__list perm-editor__list--permissions');
     const permissionCheckboxes = ()=> Array.from(list.querySelectorAll('input[type="checkbox"]'));
     const checkedPermissionValues = ()=> permissionCheckboxes().filter(cb => cb.checked).map(cb => cb.value);
@@ -127,49 +135,51 @@
       setText(btnSelectAll, selected === total && total > 0 ? 'permissions.clearAll' : 'permissions.selectAll', selected === total && total > 0 ? '清空' : '全选');
     };
     const renderChecklist = ()=>{
-      list.innerHTML = '';
-      allPerms.forEach(p => {
+      list.replaceChildren(...allPerms.map(p => {
         const item = makeEl('label', 'perm-editor__option');
         bindPermTooltip(item, p);
-        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.value = p; cb.checked = current.includes(p);
+        const cb = makeEl('input', { type:'checkbox', value:p, checked:current.includes(p) });
         cb.addEventListener('change', updatePermissionSummary);
         const text = makeEl('span', 'perm-editor__item-text', p);
-        item.appendChild(cb); item.appendChild(text); list.appendChild(item);
-      });
+        item.append(cb, text);
+        return item;
+      }));
       updatePermissionSummary();
     };
     renderChecklist();
 
     const { actions, cancel: btnCancel, save: btnSave } = makeEditorActions();
-    editor.appendChild(editorHead.head); editor.appendChild(list); editor.appendChild(actions);
-    editorStack.appendChild(editor);
+    editor.append(editorHead.head, list, actions);
+    editorStack.append(editor);
 
     // 密码编辑器（用 <form> 包裹以满足浏览器 DOM 规范要求）
     const pwdEditor = makeHiddenEditor('perm-editor perm-editor--form');
-    const pwdForm = document.createElement('form'); pwdForm.autocomplete='off'; pwdForm.addEventListener('submit', e => e.preventDefault());
+    const pwdForm = makeEl('form', { autocomplete:'off' }); pwdForm.addEventListener('submit', e => e.preventDefault());
     const pwdHead = makeEditorHead('permissions.editor.passwordTitle', t('permissions.changePassword', '修改密码'));
     const pwdList = makeEl('div', 'perm-editor__form-grid');
-    const inputNew = document.createElement('input'); inputNew.type='password'; inputNew.className='ui-field admin-input'; inputNew.autocomplete='new-password'; inputNew.placeholder = t('modal.password.new','新密码');
-    const inputConfirm = document.createElement('input'); inputConfirm.type='password'; inputConfirm.className='ui-field admin-input'; inputConfirm.autocomplete='new-password'; inputConfirm.placeholder = t('modal.password.confirm','确认新密码');
-    pwdList.appendChild(makeEditorField('modal.password.new', t('modal.password.new','新密码'), inputNew));
-    pwdList.appendChild(makeEditorField('modal.password.confirm', t('modal.password.confirm','确认新密码'), inputConfirm));
+    const inputNew = makeEl('input', { type:'password', className:'ui-field admin-input', autocomplete:'new-password', placeholder:t('modal.password.new','新密码') });
+    const inputConfirm = makeEl('input', { type:'password', className:'ui-field admin-input', autocomplete:'new-password', placeholder:t('modal.password.confirm','确认新密码') });
+    pwdList.append(
+      makeEditorField('modal.password.new', t('modal.password.new','新密码'), inputNew),
+      makeEditorField('modal.password.confirm', t('modal.password.confirm','确认新密码'), inputConfirm)
+    );
     const { actions: pwdActions, cancel: btnPwdCancel, save: btnPwdSave } = makeEditorActions();
-    pwdForm.appendChild(pwdHead.head); pwdForm.appendChild(pwdList); pwdForm.appendChild(pwdActions);
-    pwdEditor.appendChild(pwdForm);
-    editorStack.appendChild(pwdEditor);
+    pwdForm.append(pwdHead.head, pwdList, pwdActions);
+    pwdEditor.append(pwdForm);
+    editorStack.append(pwdEditor);
 
     // 角色编辑器
     const roleEditor = makeHiddenEditor('perm-editor perm-editor--form');
     const roleHead = makeEditorHead('permissions.editor.roleTitle', t('permissions.changeRole', '修改角色'));
     const roleList = makeEl('div', 'perm-editor__form-grid');
-    const select = document.createElement('select'); select.className='ui-field admin-input';
+    const select = makeEl('select', 'ui-field admin-input');
     const ROLES = [ { v: 'admin', k: 'role.admin' }, { v: 'moderator', k: 'role.moderator' }, { v: 'user', k: 'role.user' }, { v: 'guest', k: 'role.guest' } ];
-    ROLES.forEach(r => { const opt = document.createElement('option'); opt.value = r.v; setText(opt, r.k, r.v); if (String(u.role) === r.v) opt.selected = true; select.appendChild(opt); });
-    roleList.appendChild(makeEditorField('permissions.user.roleLabel', t('permissions.user.roleLabel', '角色：'), select));
+    select.replaceChildren(...ROLES.map(r => { const opt = makeEl('option', { value:r.v, selected:String(u.role) === r.v }); setText(opt, r.k, r.v); return opt; }));
+    roleList.append(makeEditorField('permissions.user.roleLabel', t('permissions.user.roleLabel', '角色：'), select));
     const { actions: roleActions, cancel: btnRoleCancel, save: btnRoleSave } = makeEditorActions();
-    roleEditor.appendChild(roleHead.head); roleEditor.appendChild(roleList); roleEditor.appendChild(roleActions);
-    editorStack.appendChild(roleEditor);
-    block.appendChild(editorStack);
+    roleEditor.append(roleHead.head, roleList, roleActions);
+    editorStack.append(roleEditor);
+    block.append(editorStack);
 
     const editors = [editor, pwdEditor, roleEditor];
     let hideEditorsTimer = null;
@@ -177,12 +187,11 @@
     const isEditorOpen = (target)=> isStackOpen() && editorStack.__activeEditor === target;
     const syncTriggers = (target)=>{
       const expanded = !!target && isStackOpen();
-      editBtn.classList.toggle('is-active', expanded && target === editor);
-      pwdBtn.classList.toggle('is-active', expanded && target === pwdEditor);
-      meta.classList.toggle('is-active', expanded && target === roleEditor);
-      editBtn.setAttribute('aria-expanded', expanded && target === editor ? 'true' : 'false');
-      pwdBtn.setAttribute('aria-expanded', expanded && target === pwdEditor ? 'true' : 'false');
-      meta.setAttribute('aria-expanded', expanded && target === roleEditor ? 'true' : 'false');
+      [[editBtn, editor], [pwdBtn, pwdEditor], [meta, roleEditor]].forEach(([trigger, editorEl])=>{
+        const active = expanded && target === editorEl;
+        trigger.classList.toggle('is-active', active);
+        trigger.setAttribute('aria-expanded', active ? 'true' : 'false');
+      });
     };
     const setEditorVisible = (target)=>{
       editors.forEach(ed => {
@@ -236,16 +245,12 @@
       const toGrant = selected.filter(p => !curSet.has(p));
       const toRevoke = current.filter(p => !selSet.has(p));
       if (!toGrant.length && !toRevoke.length) { closeEditorStack(); return; }
-      spinnerBtn(btnSave, true);
-      try {
+      await saveWithSpinner(btnSave, 'permissions.saveFailed', async ()=>{
         for (const p of toGrant) { await API.grant(userId, p); if (!curSet.has(p)) { curSet.add(p); current.push(p); } }
         for (const p of toRevoke) { await API.revoke(userId, p); if (curSet.has(p)) { curSet.delete(p); const idx = current.indexOf(p); if (idx>-1) current.splice(idx,1); } }
-        // 局部更新标签展示，不刷新整页
         renderPermissionTags();
-        // 自动刷新日志
-        if (ns.refreshLogs) ns.refreshLogs();
-      } catch(e) { toast((e && e.message) ? e.message : 'permissions.saveFailed', 'error'); }
-      finally { spinnerBtn(btnSave, false); closeEditorStack(); }
+        refreshLogs();
+      }, true);
     });
 
     // 交互绑定 —— 密码
@@ -258,14 +263,11 @@
       if (!p1 || !p2) { toast('error.fillAll', 'error'); return; }
       if (p1.length < 6) { toast('error.pwdMin', 'error'); return; }
       if (p1 !== p2) { toast('error.pwdNotMatch', 'error'); return; }
-      spinnerBtn(btnPwdSave, true);
-      try {
+      await saveWithSpinner(btnPwdSave, 'error.updateFailed', async ()=>{
         await API.setPassword(userId, p1);
         toast('status.updated'); inputNew.value=''; inputConfirm.value=''; closeEditorStack();
-        // 自动刷新日志
-        if (ns.refreshLogs) ns.refreshLogs();
-      } catch(e) { toast(e && e.message ? e.message : 'error.updateFailed', 'error'); }
-      finally { spinnerBtn(btnPwdSave, false); }
+        refreshLogs();
+      }, false);
     });
 
     // 交互绑定 —— 角色
@@ -278,15 +280,11 @@
     btnRoleCancel.addEventListener('click', closeEditorStack);
     btnRoleSave.addEventListener('click', async ()=>{
       const newRole = select.value; if (!newRole) { closeEditorStack(); return; }
-      spinnerBtn(btnRoleSave, true);
-      try {
+      await saveWithSpinner(btnRoleSave, 'error.updateFailed', async ()=>{
         await API.setRole(userId, newRole); toast('status.updated');
-        // 自动刷新日志
-        if (ns.refreshLogs) ns.refreshLogs();
-        // 局部更新角色文本，不刷新整页
+        refreshLogs();
         try { roleValue.textContent = select.options[select.selectedIndex]?.textContent || newRole; } catch { roleValue.textContent = newRole; }
-      } catch(e) { toast(e && e.message ? e.message : 'error.updateFailed', 'error'); }
-      finally { spinnerBtn(btnRoleSave, false); closeEditorStack(); }
+      }, true);
     });
 
   return block;
@@ -323,7 +321,7 @@
     // 构建新内容
     const frag = document.createDocumentFragment();
     if (!users.length){
-      const p = document.createElement('p'); p.className = 'empty-hint'; setI18nAttr(p, 'common.empty', t('common.empty','暂无数据'));
+      const p = makeEl('p', 'empty-hint'); setI18nAttr(p, 'common.empty', t('common.empty','暂无数据'));
       frag.appendChild(p);
     } else {
       users.forEach(u => frag.appendChild(createUserBlocks(u, allPerms)));
@@ -334,8 +332,7 @@
     const noOldContent = !box.hasChildNodes();
     const skipAnim = !isVisible(panelEl, true) || noOldContent;
     if (skipAnim){
-      box.innerHTML = '';
-      box.appendChild(frag);
+      box.replaceChildren(frag);
       w.i18n?.applySafe?.(box);
       return;
     }
@@ -359,8 +356,7 @@
     if (thisSeq !== S.renderSeq) return;
 
     // 替换内容并淡入新行
-    box.innerHTML = '';
-    box.appendChild(frag);
+    box.replaceChildren(frag);
     w.i18n?.applySafe?.(box);
     const newRows = Array.from(box.children || []).filter(el => el?.classList?.contains('approval-row'));
     animateEnterRows(newRows);

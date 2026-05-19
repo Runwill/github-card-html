@@ -53,11 +53,11 @@
 
   // 统一的集合元信息
   const COLLECTIONS = Object.freeze({
-    'term-fixed': { key: 'termFixed', url: '/term-fixed' },
-    'term-dynamic': { key: 'termDynamic', url: '/term-dynamic' },
-    'card': { key: 'cards', url: '/card' },
-    'character': { key: 'characters', url: '/character' },
-    'skill': { key: 'skills', url: '/skill' },
+    'term-fixed': { key: 'termFixed', url: '/term-fixed', summaryKey: 'tokens.summary.termFixed', sectionKey: 'tokens.section.termFixed' },
+    'term-dynamic': { key: 'termDynamic', url: '/term-dynamic', summaryKey: 'tokens.summary.termDynamic', sectionKey: 'tokens.section.termDynamic' },
+    'card': { key: 'cards', url: '/card', summaryKey: 'tokens.summary.card', sectionKey: 'tokens.section.card' },
+    'character': { key: 'characters', url: '/character', summaryKey: 'tokens.summary.character', sectionKey: 'tokens.section.character' },
+    'skill': { key: 'skills', url: '/skill', summaryKey: 'tokens.summary.skill', sectionKey: 'tokens.section.skill' },
   });
   const COLLECTION_TYPES = Object.freeze(Object.keys(COLLECTIONS));
 

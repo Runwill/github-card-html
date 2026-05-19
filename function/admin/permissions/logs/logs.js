@@ -33,8 +33,9 @@
   function setDateInputLang(container){
     try{
       const locale = getLocaleFromI18n();
+      const scope = (container && container.querySelector) ? container : document;
       ['#perms-log-from', '#perms-log-to'].forEach(sel=>{
-        const el = (container && container.querySelector) ? container.querySelector(sel) : document.querySelector(sel);
+        const el = scope.querySelector(sel);
         if (el) el.setAttribute('lang', locale);
       });
     }catch(_){ }
@@ -63,13 +64,13 @@
   }
 
   function choiceValue(root, kind, fallback){
-    const group = root && root.querySelector ? root.querySelector(`.perms-log-choice--${kind}`) : null;
+    const group = root?.querySelector?.(`.perms-log-choice--${kind}`);
     const active = group && group.querySelector('.perms-log-choice__btn.is-active');
     return (active && active.getAttribute('data-value')) || fallback;
   }
 
   function setChoiceValue(root, kind, value){
-    const group = root && root.querySelector ? root.querySelector(`.perms-log-choice--${kind}`) : null;
+    const group = root?.querySelector?.(`.perms-log-choice--${kind}`);
     if (!group) return;
     let found = false;
     group.querySelectorAll('.perms-log-choice__btn').forEach(btn => {
@@ -163,12 +164,10 @@
         filters.querySelector('#perms-log-apply')?.addEventListener('click', apply);
         filters.querySelector('#perms-log-reset')?.addEventListener('click', ()=>{
           try{
-            const q = filters.querySelector('#perms-log-q'); if(q) q.value = '';
+            ['#perms-log-q', '#perms-log-from', '#perms-log-to'].forEach(sel=>{ const el = filters.querySelector(sel); if(el) el.value = ''; });
             setChoiceValue(filters, 'type', 'all');
             setChoiceValue(filters, 'outcome', 'any');
             setChoiceValue(filters, 'scope', 'active');
-            const f = filters.querySelector('#perms-log-from'); if(f) f.value = '';
-            const t = filters.querySelector('#perms-log-to'); if(t) t.value = '';
           }catch(_){ }
           apply();
         });
@@ -187,13 +186,7 @@
         ['change','keyup'].forEach(evt=>{
           filters.querySelector('#perms-log-q')?.addEventListener(evt, (e)=>{ if(evt==='keyup' && e.key!=='Enter') return; apply(); });
         });
-        ['change'].forEach(evt=>{
-          ['#perms-log-from','#perms-log-to'].forEach(sel=>{
-            const el = filters.querySelector(sel);
-            if (!el) return;
-            el.addEventListener(evt, apply);
-          });
-        });
+        ['#perms-log-from','#perms-log-to'].forEach(sel=> filters.querySelector(sel)?.addEventListener('change', apply));
       } else {
         body = document.getElementById('perms-log');
         LogUtils.bindLogCollapse(panel.querySelector('.tokens-log__header'), panel);
@@ -204,35 +197,41 @@
   }
 
   // ── 日志类型 → CSS 类名 / i18n key / 消息 key 映射表 ──
-  var TYPE_CLS = {
-    'register':'is-green','user-registered':'is-green','user-approved':'is-green','user-rejected':'is-red',
-    'password-change':'is-indigo','role-changed':'is-indigo',
-    'avatar-submitted':'is-indigo','avatar-approved':'is-green','avatar-rejected':'is-red',
-    'username-submitted':'is-indigo','username-approved':'is-green','username-rejected':'is-red','username-cancelled':'is-blue',
-    'intro-submitted':'is-indigo','intro-approved':'is-green','intro-rejected':'is-red','intro-cancelled':'is-blue',
-    'permissions-granted':'is-green','permissions-revoked':'is-red','permissions-replaced':'is-indigo'
-  };
-  var TYPE_KEY = {
-    'register':'permissions.log.register','user-registered':'permissions.log.register',
-    'password-change':'permissions.log.passwordChanged','role-changed':'permissions.log.roleChanged',
-    'avatar-submitted':'permissions.log.avatarSubmitted','avatar-approved':'permissions.log.avatarApproved','avatar-rejected':'permissions.log.avatarRejected',
-    'username-submitted':'permissions.log.usernameSubmitted','username-approved':'permissions.log.usernameApproved','username-rejected':'permissions.log.usernameRejected','username-cancelled':'permissions.log.usernameCancelled',
-    'intro-submitted':'permissions.log.introSubmitted','intro-approved':'permissions.log.introApproved','intro-rejected':'permissions.log.introRejected','intro-cancelled':'permissions.log.introCancelled',
-    'user-approved':'permissions.log.userApproved','user-rejected':'permissions.log.userRejected',
-    'permissions-granted':'permissions.log.granted','permissions-revoked':'permissions.log.revoked','permissions-replaced':'permissions.log.replaced'
-  };
-  var MSG_KEY = {
-    'user-registered':'permissions.msg.userRegistered','user-approved':'permissions.msg.userApproved','user-rejected':'permissions.msg.userRejected',
-    'password-change':'permissions.msg.passwordChanged','role-changed':'permissions.msg.roleChanged',
-    'avatar-submitted':'permissions.msg.avatarSubmitted','avatar-approved':'permissions.msg.avatarApproved','avatar-rejected':'permissions.msg.avatarRejected',
-    'username-submitted':'permissions.msg.usernameSubmitted','username-approved':'permissions.msg.usernameApproved','username-rejected':'permissions.msg.usernameRejected','username-cancelled':'permissions.msg.usernameCancelled',
-    'intro-submitted':'permissions.msg.introSubmitted','intro-approved':'permissions.msg.introApproved','intro-rejected':'permissions.msg.introRejected','intro-cancelled':'permissions.msg.introCancelled',
-    'permissions-granted':'permissions.msg.granted','permissions-revoked':'permissions.msg.revoked','permissions-replaced':'permissions.msg.replaced'
+  const logMeta = (cls, typeKey, msgKey) => ({ cls, typeKey, msgKey });
+  const TYPE_META = {
+    'register': logMeta('is-green','permissions.log.register',''),
+    'user-registered': logMeta('is-green','permissions.log.register','permissions.msg.userRegistered'),
+    'user-approved': logMeta('is-green','permissions.log.userApproved','permissions.msg.userApproved'),
+    'user-rejected': logMeta('is-red','permissions.log.userRejected','permissions.msg.userRejected'),
+    'password-change': logMeta('is-indigo','permissions.log.passwordChanged','permissions.msg.passwordChanged'),
+    'role-changed': logMeta('is-indigo','permissions.log.roleChanged','permissions.msg.roleChanged'),
+    'avatar-submitted': logMeta('is-indigo','permissions.log.avatarSubmitted','permissions.msg.avatarSubmitted'),
+    'avatar-approved': logMeta('is-green','permissions.log.avatarApproved','permissions.msg.avatarApproved'),
+    'avatar-rejected': logMeta('is-red','permissions.log.avatarRejected','permissions.msg.avatarRejected'),
+    'username-submitted': logMeta('is-indigo','permissions.log.usernameSubmitted','permissions.msg.usernameSubmitted'),
+    'username-approved': logMeta('is-green','permissions.log.usernameApproved','permissions.msg.usernameApproved'),
+    'username-rejected': logMeta('is-red','permissions.log.usernameRejected','permissions.msg.usernameRejected'),
+    'username-cancelled': logMeta('is-blue','permissions.log.usernameCancelled','permissions.msg.usernameCancelled'),
+    'intro-submitted': logMeta('is-indigo','permissions.log.introSubmitted','permissions.msg.introSubmitted'),
+    'intro-approved': logMeta('is-green','permissions.log.introApproved','permissions.msg.introApproved'),
+    'intro-rejected': logMeta('is-red','permissions.log.introRejected','permissions.msg.introRejected'),
+    'intro-cancelled': logMeta('is-blue','permissions.log.introCancelled','permissions.msg.introCancelled'),
+    'permissions-granted': logMeta('is-green','permissions.log.granted','permissions.msg.granted'),
+    'permissions-revoked': logMeta('is-red','permissions.log.revoked','permissions.msg.revoked'),
+    'permissions-replaced': logMeta('is-indigo','permissions.log.replaced','permissions.msg.replaced')
   };
 
-  function typeCls(t){ return TYPE_CLS[String(t||'')] || ''; }
-  function typeKey(t){ return TYPE_KEY[String(t||'')] || ''; }
-  function msgKey(t){ return MSG_KEY[String(t||'')] || ''; }
+  function metaForType(type){ return TYPE_META[String(type||'')] || {}; }
+  function typeCls(type){ return metaForType(type).cls || ''; }
+  function typeKey(type){ return metaForType(type).typeKey || ''; }
+  function msgKey(type){ return metaForType(type).msgKey || ''; }
+
+  function roleCodeAttrs(log){
+    if (String(log && log.type) !== 'role-changed') return '';
+    const raw = (log && log.data) ? log.data : {};
+    const esc = LogUtils.esc;
+    return ` data-old-role-code='${esc(raw.oldRole != null ? raw.oldRole : '')}' data-new-role-code='${esc(raw.newRole != null ? raw.newRole : '')}'`;
+  }
 
   function makeRow(log){
     try{
@@ -243,25 +242,8 @@
       const who = (log && log.actorName) ? log.actorName : '';
   const msgK = msgKey(log && log.type);
   const msgParams = buildMsgParamsForLog(log);
-  let msg = '';
-  if (msgK) {
-    // 若是角色变更，保留原始角色代码，便于语言切换时重新本地化
-    if (String(log && log.type) === 'role-changed') {
-      try {
-        const rawParams = (log && log.data) ? { ...log.data } : {};
-        const oldCode = rawParams.oldRole != null ? String(rawParams.oldRole) : '';
-        const newCode = rawParams.newRole != null ? String(rawParams.newRole) : '';
-        // msgParams 当前已是本地化版本，但我们仍保留代码以便后续重算
-        msg = `<span data-i18n="${msgK}" data-i18n-params='${msgParams}' data-old-role-code='${oldCode}' data-new-role-code='${newCode}'></span>`;
-      } catch(_) {
-        msg = `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'></span>`;
-      }
-    } else {
-      msg = `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'></span>`;
-    }
-  } else if (log && log.message) {
-    msg = `<span>${String(log.message)}</span>`;
-  }
+  let msg = msgK ? `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'${roleCodeAttrs(log)}></span>` : '';
+  if (!msg && log && log.message) msg = `<span>${String(log.message)}</span>`;
     // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
     const actions = LogUtils.actionsHtml();
     return `<div class="log-row">${timeHtml}${k? LogUtils.pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${actions}</div>`;
@@ -280,6 +262,11 @@
     }catch(_){ return false; }
   }
 
+  function queryTypesForFilter(typeV, ocV){
+    const matched = typeV === 'all' ? Array.from(KNOWN_TYPES.values()) : resolveTypeFilter(typeV);
+    return ocV === 'any' ? matched : matched.filter(t => outcomeMatches(t, ocV));
+  }
+
   function buildQuery(){
     const panel = document.getElementById('perms-log-panel');
     const filters = panel ? panel.querySelector('.tokens-log__filters') : null;
@@ -295,16 +282,9 @@
       const scopeV = choiceValue(filters, 'scope', 'active');
       if (scopeV === 'trash') p.set('deletedOnly', 'true');
       // 按动态类型与结果构建 types 参数
-      if (typeV === 'all'){
-        if (ocV !== 'any'){
-          const all = Array.from(KNOWN_TYPES.values());
-          const subset = all.filter(t => outcomeMatches(t, ocV));
-          if (subset.length) p.set('types', subset.join(',')); else p.set('types','__none__');
-        }
-      } else {
-        const matched = resolveTypeFilter(typeV);
-        const subset = ocV === 'any' ? matched : matched.filter(t => outcomeMatches(t, ocV));
-        if (subset.length) p.set('types', subset.join(',')); else p.set('types','__none__');
+      if (typeV !== 'all' || ocV !== 'any'){
+        const subset = queryTypesForFilter(typeV, ocV);
+        p.set('types', subset.length ? subset.join(',') : '__none__');
       }
       const fv = from && from.value; if (fv) p.set('since', fv);
       const tv = to && to.value; if (tv) p.set('until', tv);
@@ -332,26 +312,16 @@
       let preview = body.querySelector('#perms-log-preview');
       const ensurePreview = ()=>{
         if (!preview) {
-          preview = document.createElement('div');
-          preview.className = 'tokens-log__entry tokens-log__entry--preview';
-          preview.id = 'perms-log-preview';
-          const row = document.createElement('div');
-          row.className = 'log-row';
-          const msg = document.createElement('i');
-          msg.className = 'log-msg';
-          const span = document.createElement('span');
-          span.className = 'fmt-one';
-          msg.appendChild(span);
-          row.appendChild(msg);
-          preview.appendChild(row);
+          const span = LogUtils.elem('span', 'fmt-one');
+          const msg = LogUtils.elem('i', 'log-msg', span);
+          const row = LogUtils.elem('div', 'log-row', msg);
+          preview = LogUtils.elem('div', { id: 'perms-log-preview', className: 'tokens-log__entry tokens-log__entry--preview' }, row);
           body.insertBefore(preview, body.firstChild || null);
         }
         return preview;
       };
-      if (!val || val==='all') { if (preview) try{ preview.remove(); }catch(_){ } return; }
-      const key = msgKey(val);
-      if (!key) { if (preview) try{ preview.remove(); }catch(_){ } return; }
-      const tmpl = getI18nString(key) || '';
+      const key = val && val !== 'all' ? msgKey(val) : '';
+      const tmpl = key ? getI18nString(key) || '' : '';
       if (!tmpl.trim()) { if (preview) try{ preview.remove(); }catch(_){ } return; }
       const esc = LogUtils.esc;
       // 构造 HTML：非占位符部分做 HTML 转义，占位符使用样式突出显示

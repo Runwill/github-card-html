@@ -4,7 +4,7 @@
   const T = window.tokensAdmin;
   const { state } = T;
   const { esc, getAccent, computeTint } = T;
-  const { apiJson, COLLECTIONS, getAuth } = T;
+  const { apiJson, COLLECTIONS, COLLECTION_TYPES, getAuth } = T;
   const { filterByQuery, HIDE_KEYS } = T;
 
   // 类型摘要卡（type-tile）的浅色基色映射（与 CSS 中保持一致）
@@ -192,7 +192,7 @@
           s2: bucket(allSkills,2)
         };
       }
-  const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const tiles=[ { type:'term-fixed', i18nKey:'tokens.summary.termFixed', value:Array.isArray(termFixed)? termFixed.length: 0 }, { type:'term-dynamic', i18nKey:'tokens.summary.termDynamic', value:Array.isArray(termDynamic)? termDynamic.length: 0 }, { type:'card', i18nKey:'tokens.summary.card', value:Array.isArray(cards)? cards.length: 0 }, { type:'character', i18nKey:'tokens.summary.character', value:Array.isArray(characters)? characters.length: 0 }, { type:'skill', i18nKey:'tokens.summary.skill', value:Array.isArray(skills)? skills.length: 0 } ]; if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" tabindex="0"><div class="type-tile__label" data-i18n="${t.i18nKey}"></div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); window.i18n?.applySafe?.(summaryEl); summaryEl.__initialized=true;
+  const { termFixed, termDynamic, cards, characters, s0, s1, s2 } = state.data; const skills=[].concat(s0||[], s1||[], s2||[]); const dataByType={ 'term-fixed':termFixed, 'term-dynamic':termDynamic, card:cards, character:characters, skill:skills }; const tiles=COLLECTION_TYPES.map(type=>{ const items=dataByType[type]; return { type, i18nKey:COLLECTIONS[type].summaryKey, value:Array.isArray(items)? items.length: 0 }; }); if(!summaryEl.__initialized || forceReload){ summaryEl.innerHTML = tiles.map(t=>{ const isActive= state.activeType===t.type; const active=isActive? ' is-active': ''; const dim= state.activeType && !isActive? ' is-dim': ''; return `<div class="type-tile${active}${dim}" data-type="${t.type}" tabindex="0"><div class="type-tile__label" data-i18n="${t.i18nKey}"></div><div class="type-tile__value">${t.value}</div></div>`; }).join(''); window.i18n?.applySafe?.(summaryEl); summaryEl.__initialized=true;
         // 初次渲染后应用主题色，并绑定主题观察者
         applyTypeTileTheme();
         ensureThemeObserverForTiles();
@@ -200,7 +200,7 @@
         // 更新统计值后也重新应用（防止列表被重建导致样式丢失）
         applyTypeTileTheme();
       }
-  const q=state.q; const sections=[ { type:'term-fixed', titleKey:'tokens.section.termFixed', items:Array.isArray(termFixed)? filterByQuery(termFixed,q): [], render: doc=> renderCollectionItem('term-fixed', doc) }, { type:'term-dynamic', titleKey:'tokens.section.termDynamic', items:Array.isArray(termDynamic)? filterByQuery(termDynamic,q): [], render: doc=> renderCollectionItem('term-dynamic', doc) }, { type:'card', titleKey:'tokens.section.card', items:Array.isArray(cards)? filterByQuery(cards,q): [], render: doc=> renderCollectionItem('card', doc) }, { type:'character', titleKey:'tokens.section.character', items:Array.isArray(characters)? filterByQuery(characters,q): [], render: doc=> renderCollectionItem('character', doc) }, { type:'skill', titleKey:'tokens.section.skill', items:Array.isArray(skills)? filterByQuery(skills,q): [], render: doc=> renderCollectionItem('skill', doc) } ]; const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.titleKey,s.items,s.render)).join(''); window.i18n?.applySafe?.(contentEl); try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
+  const q=state.q; const sections=COLLECTION_TYPES.map(type=>{ const items=dataByType[type]; return { type, titleKey:COLLECTIONS[type].sectionKey, items:Array.isArray(items)? filterByQuery(items,q): [], render: doc=> renderCollectionItem(type, doc) }; }); const filtered= state.activeType? sections.filter(s=> s.type===state.activeType): sections; contentEl.innerHTML = filtered.map(s=> section(s.type,s.titleKey,s.items,s.render)).join(''); window.i18n?.applySafe?.(contentEl); try{ contentEl.querySelectorAll('.token-card').forEach((el,i)=>{ const d=Math.min(i,12)*40; el.style.setProperty('--enter-delay', d+'ms'); }); }catch(_){ }
 
       // 点击区段抬头，等效于点击“展开/收起”按钮
       if(!contentEl.__sectionHeaderToggleBound){

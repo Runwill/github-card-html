@@ -49,22 +49,16 @@
                 ? GameText.render('Character', { id: player.characterId, name: player.name })
                 : `P${playerIdx + 1}`;
 
+            const areaWithPosition = (termKey, index) => GameText.render(termKey) + (index != null ? posHTML(parseInt(index)) : '');
             let areaTermHTML = '';
-            let posStr = '';
 
             // hand 或 hand:N
             const handMatch = rest.match(/^hand(?::(\d+))?$/);
-            if (handMatch) {
-                areaTermHTML = GameText.render('hand');
-                if (handMatch[1] != null) posStr = posHTML(parseInt(handMatch[1]));
-            }
+            if (handMatch) areaTermHTML = areaWithPosition('hand', handMatch[1]);
 
             // judgeArea 或 judgeArea:N
             const judgeMatch = !handMatch && rest.match(/^judgeArea(?::(\d+))?$/);
-            if (judgeMatch) {
-                areaTermHTML = GameText.render('judgeArea');
-                if (judgeMatch[1] != null) posStr = posHTML(parseInt(judgeMatch[1]));
-            }
+            if (judgeMatch) areaTermHTML = areaWithPosition('judgeArea', judgeMatch[1]);
 
             // equip:slotIdx 或 equip:slotIdx:N（slotIdx 本身就是位置，无需额外标注）
             const equipMatch = !handMatch && !judgeMatch && rest.match(/^equip:(\d+)/);
@@ -75,7 +69,7 @@
             }
 
             if (areaTermHTML) {
-                return playerNameHTML + areaTermHTML + posStr;
+                return playerNameHTML + areaTermHTML;
             }
         }
 
@@ -155,9 +149,7 @@
         logEntries.push(entry);
 
         // 限制日志条数
-        if (logEntries.length > MAX_LOG_ENTRIES) {
-            logEntries = logEntries.slice(-MAX_LOG_ENTRIES);
-        }
+        if (logEntries.length > MAX_LOG_ENTRIES) logEntries = logEntries.slice(-MAX_LOG_ENTRIES);
 
         renderLog();
     }
@@ -186,8 +178,7 @@
             logEntries.forEach(entry => {
                 fragment.appendChild(createLogEntry(entry, GameText));
             });
-            container.innerHTML = '';
-            container.appendChild(fragment);
+            container.replaceChildren(fragment);
         }
         // 否则不变（新条目已由上面的 count mismatch 路径处理）
 
@@ -237,7 +228,7 @@
         logEntries = [];
         _lastPerspective = -1;
         const container = document.getElementById('game-move-log');
-        if (container) container.innerHTML = '';
+        if (container) container.replaceChildren();
     }
 
     // 导出

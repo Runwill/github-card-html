@@ -43,6 +43,7 @@
     } catch { return DEFAULT_SEARCH_KEY; }
   };
   const searchValueFromKey = (key)=> key === DEFAULT_SEARCH_KEY ? '' : key;
+  const staggerFallback = (base, rows, step, extra)=> base + (rows.length > 0 ? (rows.length - 1) * step : 0) + (extra || 0);
   const getUsersData = (key, forceRefresh)=>{
     try {
       const store = prefetchState.users;
@@ -109,6 +110,11 @@
       const btn = document.getElementById('perm-search-btn');
       const input = document.getElementById('perm-search-input');
       const toggle = document.getElementById('perm-mode-toggle');
+      const syncModeToggle = ()=>{
+        if (!toggle) return;
+        setI18nAttr(toggle, (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all', (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all');
+        toggle.classList.toggle('is-active', S.permMode === 'all');
+      };
       if (btn && !btn.__permBound) {
         btn.__permBound = true;
         btn.addEventListener('click', ()=> w.renderPermissionsPanel((input?.value || '').trim(), { forceRefresh: true }));
@@ -123,15 +129,11 @@
         toggle.__permBound = true;
         toggle.addEventListener('click', ()=>{
           S.permMode = (S.permMode === 'partial') ? 'all' : 'partial';
-          setI18nAttr(toggle, (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all', (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all');
-          toggle.classList.toggle('is-active', S.permMode === 'all');
+          syncModeToggle();
           w.renderPermissionsPanel((input?.value || '').trim(), { forceRefresh: true });
         });
       }
-      if (toggle) {
-        setI18nAttr(toggle, (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all', (S.permMode === 'partial') ? 'permissions.mode.partial' : 'permissions.mode.all');
-        toggle.classList.toggle('is-active', S.permMode === 'all');
-      }
+      syncModeToggle();
 
       // 点击空白处：收起全部编辑器（仅绑定一次）
       if (!S.__docClickBound) {
@@ -207,7 +209,7 @@
             animations.push(anim.finished.catch(()=>{}).then(()=>{ try { el.style.willChange = ''; } catch{} }));
           } catch {}
         });
-        const fallback = 220 + (rows.length > 0 ? (rows.length - 1) * STAGGER_EXIT : 0) + 80;
+        const fallback = staggerFallback(220, rows, STAGGER_EXIT, 80);
         const timer = new Promise(r => setTimeout(r, fallback));
         Promise.race([Promise.all(animations), timer]).then(resolve);
       } else {
@@ -221,7 +223,7 @@
             el.addEventListener('transitionend', onEnd);
           } catch { done(); }
         });
-        const fallback = 220 + (rows.length > 0 ? (rows.length - 1) * STAGGER_EXIT : 0) + 80;
+        const fallback = staggerFallback(220, rows, STAGGER_EXIT, 80);
         setTimeout(resolve, fallback);
       }
     });
@@ -244,7 +246,7 @@
       rows.forEach((el, idx)=>{ try { el.classList.add('perm-row-enter'); el.style.transitionDelay = (idx * STAGGER_ENTER) + 'ms'; } catch{} });
       requestAnimationFrame(()=>{
         rows.forEach(el => { try { el.classList.add('perm-row-enter-active'); } catch{} });
-        const maxDelay = (rows.length > 0 ? (rows.length - 1) * STAGGER_ENTER : 0);
+        const maxDelay = staggerFallback(0, rows, STAGGER_ENTER, 0);
         const tidy = ()=> rows.forEach(el => { try { el.classList.remove('perm-row-enter'); el.classList.remove('perm-row-enter-active'); el.style.transitionDelay=''; } catch{} });
         setTimeout(tidy, 260 + maxDelay);
       });

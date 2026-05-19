@@ -74,6 +74,13 @@
     return window.TabsUI?.getActivePanelId?.('panel_term') || 'panel_term';
   }
 
+  function node(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
+
   // ── DOM 创建 ──
   function ensurePopover() {
     if (popoverEl) return popoverEl;
@@ -141,20 +148,14 @@
     // Separator + global tips
     var globalTips = data.global || [];
     if (globalTips.length > 0) {
-      var sep = document.createElement('div');
-      sep.className = 'help-popover__separator';
-      sep.textContent = t('help.global');
-      body.appendChild(sep);
+      body.appendChild(node('div', 'help-popover__separator', t('help.global')));
       for (var j = 0; j < globalTips.length; j++) {
         body.appendChild(renderRow(globalTips[j], t));
       }
     }
 
     if (panelTips.length === 0 && globalTips.length === 0) {
-      var empty = document.createElement('div');
-      empty.className = 'help-popover__empty';
-      empty.textContent = t('help.empty');
-      body.appendChild(empty);
+      body.appendChild(node('div', 'help-popover__empty', t('help.empty')));
     }
 
     // Hint
@@ -168,36 +169,21 @@
   }
 
   function tipKeys(tip) {
-    var keys = [];
-    if (Array.isArray(tip.actions)) {
-      for (var actionIndex = 0; actionIndex < tip.actions.length; actionIndex++) {
-        keys.push(getActionKeyText(tip.actions[actionIndex]));
-      }
-    }
-    if (Array.isArray(tip.keys)) {
-      for (var keyIndex = 0; keyIndex < tip.keys.length; keyIndex++) {
-        keys.push(tip.keys[keyIndex]);
-      }
-    }
+    var keys = (Array.isArray(tip.actions) ? tip.actions.map(getActionKeyText) : [])
+      .concat(Array.isArray(tip.keys) ? tip.keys : []);
     return keys.length ? keys : [''];
   }
 
   function renderRow(tip, t) {
-    var row = document.createElement('div');
-    row.className = 'help-row';
+    var row = node('div', 'help-row');
 
-    var keysEl = document.createElement('span');
-    keysEl.className = 'help-keys';
+    var keysEl = node('span', 'help-keys');
     var keys = tipKeys(tip);
     for (var i = 0; i < keys.length; i++) {
-      var kbd = document.createElement('kbd');
-      kbd.textContent = keys[i];
-      keysEl.appendChild(kbd);
+      keysEl.appendChild(node('kbd', '', keys[i]));
     }
 
-    var descEl = document.createElement('span');
-    descEl.className = 'help-desc';
-    descEl.textContent = t(tip.desc);
+    var descEl = node('span', 'help-desc', t(tip.desc));
 
     row.appendChild(keysEl);
     row.appendChild(descEl);

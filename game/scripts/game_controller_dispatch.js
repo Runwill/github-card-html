@@ -96,6 +96,14 @@
             }
         };
 
+        const runDirectMove = (targetArea, sourceArea, moveFn) => {
+            const moveLog = captureMoveLog(payload, payload.card, sourceArea);
+            moveFn();
+            commitMoveLog(moveLog, targetArea);
+            runMoveCallbacks(payload.callbacks);
+            triggerCardMoveAnimation();
+        };
+
         if (I.currentMode === 'manual' || I.currentMode === 'sandbox') {
             if (I.currentEngine) {
                 if (actionType === 'move') {
@@ -108,16 +116,7 @@
                     const sourceArea = payload.fromArea || I.resolveArea(payload.fromArea);
 
                     if (targetArea) {
-                        const moveLog = captureMoveLog(payload, payload.card, sourceArea);
-
-                        I.currentEngine.moveCard(payload.card, targetArea, payload.position - 1, sourceArea); 
-                        commitMoveLog(moveLog, targetArea);
-
-                        // 触发 UI 回调
-                        runMoveCallbacks(payload.callbacks);
-                        
-                        // 触发 CardMoveAnimator 动画（统一动画路径）
-                        triggerCardMoveAnimation();
+                        runDirectMove(targetArea, sourceArea, () => I.currentEngine.moveCard(payload.card, targetArea, payload.position - 1, sourceArea));
                     } else {
                         console.warn("[Controller] Manual Move Skipped: Invalid target area", payload.toArea);
                     }
@@ -149,16 +148,8 @@
 
                      if (targetArea && payload.card) {
                          const card = payload.card;
-                         const moveLog = captureMoveLog(payload, card, sourceArea);
-
                          const insertIdx = Math.max(0, (payload.position || 1) - 1);
-                         window.Game.Models.moveCardToArea(card, targetArea, insertIdx, sourceArea);
-                         commitMoveLog(moveLog, targetArea);
-
-                         // 触发 UI 回调（与沙盒模式一致）
-                         runMoveCallbacks(payload.callbacks);
-
-                         triggerCardMoveAnimation();
+                         runDirectMove(targetArea, sourceArea, () => window.Game.Models.moveCardToArea(card, targetArea, insertIdx, sourceArea));
                      }
                  } else {
                      // ── 非拖拽移动：走事件栈 ──

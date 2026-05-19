@@ -4,9 +4,7 @@
 
   window.tokensAdmin = window.tokensAdmin || {};
 
-  function esc(s) {
-    return (s == null ? '' : String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])));
-  }
+  const esc = window.LogUtils?.esc || (value => String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
 
   function showToast(message, type) {
     if (typeof window.showToast === 'function') window.showToast(message, type);

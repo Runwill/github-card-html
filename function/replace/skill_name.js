@@ -15,6 +15,16 @@
             }
         });
 
+        const resolveLoreRole = (cls) => {
+            const match = cls.match(/^(.+)LoreCharacterID(\d+)$/);
+            if (!match) return null;
+            const skObj = nameToSkill.get(match[1]);
+            if (!skObj || !skObj.role) return null;
+            const rid = parseInt(match[2], 10);
+            const roleIdx = skObj.role.findIndex(r => r.id == rid);
+            return roleIdx === -1 ? null : { skObj, roleIdx };
+        };
+
         // Tooltip 单例初始化
         if (!window._loreTooltipAppended) {
             window._loreTooltipAppended = true;
@@ -50,25 +60,9 @@
                  // CASE B: Lore Tooltip 绑定
                  // 格式: {name}LoreCharacterID{id}
                  if (cls.includes('LoreCharacterID')) {
-                     const match = cls.match(/^(.+)LoreCharacterID(\d+)$/);
-                     if (match) {
-                         const name = match[1];
-                         const rid = parseInt(match[2], 10);
-                         
-                         if (nameToSkill.has(name)) {
-                             const skObj = nameToSkill.get(name);
-                             // 查找 role 索引
-                             let roleIdx = -1;
-                             if(skObj.role) {
-                                 for(let k=0; k<skObj.role.length; k++) {
-                                     if(skObj.role[k].id == rid) {
-                                         roleIdx = k;
-                                         break;
-                                     }
-                                 }
-                             }
-
-                             if (roleIdx !== -1) {
+                     const lore = resolveLoreRole(cls);
+                     if (lore) {
+                                 const { skObj, roleIdx } = lore;
                                  // 设置属性
                                  $node.prop('loreSkillPosition', skill.indexOf(skObj));
                                  $node.prop('loreRolePosition', roleIdx);
@@ -134,8 +128,6 @@
                                 $node.on('mouseleave', function () {
                                     $tooltip.removeClass('show from-left from-right')
                                 });
-                             }
-                         }
                      }
                  }
              }
@@ -151,17 +143,7 @@
                 const cls = node.classList[i];
                 if (validSkillNames.has(cls)) return true;
                 if (cls.includes('LoreCharacterID')) {
-                     const match = cls.match(/^(.+)LoreCharacterID(\d+)$/);
-                     if(match) {
-                        const name = match[1];
-                        if (nameToSkill.has(name)) {
-                             const rid = parseInt(match[2], 10);
-                             const skObj = nameToSkill.get(name);
-                             if(skObj.role && skObj.role.some(r => r.id === rid)) {
-                                 return true;
-                             }
-                        }
-                     }
+                     if (resolveLoreRole(cls)) return true;
                 }
             }
             return false;

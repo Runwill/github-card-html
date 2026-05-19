@@ -13,45 +13,33 @@
         const pauseBtn = document.getElementById('btn-pause-game');
 
         if (startBtn) {
-            // startBtn.addEventListener('click', window.Game.Core.startGame);
-            // 修改为使用控制器，默认启用 'auto' 模式
             startBtn.addEventListener('click', () => {
-                 if (window.Game.Controller && window.Game.Controller.startGame) {
-                     window.Game.Controller.startGame();
-                 } else {
-                     window.Game.Core.startGame();
-                 }
+                const controller = window.Game.Controller;
+                if (controller?.startGame) {
+                    controller.startGame();
+                } else {
+                    window.Game.Core.startGame();
+                }
             });
         }
         
         // Initialize Custom Select dropdowns for static selects
-        if (window.CustomSelect) {
-            window.CustomSelect.init(document.querySelector('.game-panel'));
-        }
+        window.CustomSelect?.init(document.querySelector('.game-panel'));
 
         // Initialize Setup Manager if available
-        if (window.Game.Setup && window.Game.Setup.init) {
-            window.Game.Setup.init();
-        }
+        window.Game.Setup?.init?.();
 
         // Initialize Online Room modules if available
         if (window.Game.Online) {
-            if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.init) {
-                window.Game.Online.SyncManager.init();
-            }
-            if (window.Game.Online.RoomUI && window.Game.Online.RoomUI.init) {
-                window.Game.Online.RoomUI.init();
-            }
+            window.Game.Online.SyncManager?.init?.();
+            window.Game.Online.RoomUI?.init?.();
         }
         
         // Load saved game settings (speed, inertia)
-        if (window.KeySettings && window.KeySettings.loadGameSettings) {
-            window.KeySettings.loadGameSettings();
-        }
+        window.KeySettings?.loadGameSettings?.();
 
         if (pauseBtn) {
             pauseBtn.addEventListener('click', () => {
-                // window.Game.Core.togglePause();
                 window.Game.Controller.togglePause();
             });
         }

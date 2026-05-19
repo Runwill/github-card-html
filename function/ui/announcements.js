@@ -24,11 +24,8 @@
       requestAnimationFrame(()=>{
         clear();
         try {
-          const el = document.elementFromPoint(gMx, gMy);
-          if (el) {
-            const card = el.closest('.ann-card');
-            if (card && container.contains(card)) card.classList.add('is-hovered');
-          }
+          const card = document.elementFromPoint(gMx, gMy)?.closest?.('.ann-card');
+          if (card && container.contains(card)) card.classList.add('is-hovered');
         } catch(_){}
         container._ticking = false;
       });
@@ -51,9 +48,8 @@
   function render(list){
     const container = $('announcements-content');
     if (!container) return;
-    container.innerHTML = '';
     if (!Array.isArray(list) || list.length === 0){
-      container.appendChild(h('div','ann-empty',t('announcements.empty')));
+      container.replaceChildren(h('div','ann-empty',t('announcements.empty')));
       return;
     }
     const frag = document.createDocumentFragment();
@@ -97,20 +93,18 @@
         });
 
         order.forEach(key => {
-          if (buckets.has(key)) {
-            const list = buckets.get(key);
-            if (list.length > 0) {
+          const list = buckets.get(key);
+          if (list && list.length > 0) {
               const liGroup = h('li','ann-group');
-              liGroup.appendChild(h('span',`ann-group-label ann-label-${key}`, key));
+              liGroup.append(h('span',`ann-group-label ann-label-${key}`, key));
               const subUl = h('ul','ann-sub-list');
               list.forEach(text => {
                 const subLi = document.createElement('li');
                 subLi.innerHTML = text;
-                subUl.appendChild(subLi);
+                subUl.append(subLi);
               });
-              liGroup.appendChild(subUl);
-              ul.appendChild(liGroup);
-            }
+              liGroup.append(subUl);
+              ul.append(liGroup);
           }
         });
 
@@ -124,28 +118,26 @@
             else if (ch.title) li.textContent = String(ch.title);
             else li.textContent = '';
           } else { li.textContent = ''; }
-          ul.appendChild(li);
+          ul.append(li);
         });
-        body.appendChild(ul);
+        body.append(ul);
       }
-      card.appendChild(title); card.appendChild(meta); card.appendChild(body);
-      frag.appendChild(card);
+      card.append(title, meta, body);
+      frag.append(card);
     });
-    container.appendChild(frag);
+    container.replaceChildren(frag);
   }
 
   async function load(){
     const container = $('announcements-content');
     if (!container) return;
     attachScrollHover(container);
-  container.textContent = '';
-  container.appendChild(h('div','ann-loading','...'));
+  container.replaceChildren(h('div','ann-loading','...'));
     try {
       const data = await fetchAnnouncements();
       render(data);
     } catch(err){
-      container.innerHTML = '';
-      container.appendChild(h('div','ann-empty',t('announcements.error.loadFailed')));
+      container.replaceChildren(h('div','ann-empty',t('announcements.error.loadFailed')));
     }
   }
 

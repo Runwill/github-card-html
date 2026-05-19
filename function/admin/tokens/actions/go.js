@@ -4,6 +4,13 @@
 
   const T = window.tokensAdmin;
 
+  function tryScroll(method, ...args) {
+    const actions = window.scrollActions;
+    if (!actions || typeof actions[method] !== 'function') return false;
+    actions[method](...args, { behavior: 'smooth', stop: true });
+    return true;
+  }
+
   function bindGo(rootEl) {
     if (rootEl.__goDocBound) return;
     rootEl.__goDocBound = true;
@@ -23,34 +30,22 @@
       try {
         if (coll === 'term-fixed' || coll === 'term-dynamic') {
           const tag = (doc && typeof doc.en === 'string') ? doc.en : null;
-          if (tag && window.scrollActions && typeof window.scrollActions.scrollToTagAndFlash === 'function') {
-            window.scrollActions.scrollToTagAndFlash('panel_term', tag, { behavior: 'smooth', stop: true });
-            return;
-          }
+          if (tag && tryScroll('scrollToTagAndFlash', 'panel_term', tag)) return;
         }
 
         if (coll === 'card') {
           const tagSel = (doc && typeof doc.en === 'string') ? (doc.en + '.scroll') : null;
-          if (tagSel && window.scrollActions && typeof window.scrollActions.scrollToSelectorAndFlash === 'function') {
-            window.scrollActions.scrollToSelectorAndFlash('panel_card', tagSel, { behavior: 'smooth', stop: true });
-            return;
-          }
+          if (tagSel && tryScroll('scrollToSelectorAndFlash', 'panel_card', tagSel)) return;
         }
 
         if (coll === 'character') {
           const cls = (doc && (typeof doc.id === 'number' || typeof doc.id === 'string')) ? ('characterID' + String(doc.id)) : null;
-          if (cls && window.scrollActions && typeof window.scrollActions.scrollToClassWithCenter === 'function') {
-            window.scrollActions.scrollToClassWithCenter('panel_character', cls, '.container', { behavior: 'smooth', stop: true });
-            return;
-          }
+          if (cls && tryScroll('scrollToClassWithCenter', 'panel_character', cls, '.container')) return;
         }
 
-  if (coll === 'skill') {
+        if (coll === 'skill') {
           const skillClass = (doc && typeof doc.name === 'string') ? doc.name : null;
-          if (skillClass && window.scrollActions && typeof window.scrollActions.scrollToClassAndFlash === 'function') {
-            window.scrollActions.scrollToClassAndFlash('panel_skill', skillClass, { behavior: 'smooth', stop: true });
-            return;
-          }
+          if (skillClass && tryScroll('scrollToClassAndFlash', 'panel_skill', skillClass)) return;
         }
       } catch (_) {}
 

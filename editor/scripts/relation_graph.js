@@ -55,6 +55,13 @@
     return document.getElementById(id);
   }
 
+  function createEl(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
+
   function hashText(text) {
     var hash = 2166136261;
     String(text || '').split('').forEach(function (ch) {
@@ -713,52 +720,36 @@
   function renderDetail() {
     if (!state.detail) return;
     var node = state.selectedNode;
-    state.detail.innerHTML = '';
     state.detail.hidden = !node;
-    if (!node) return;
+    if (!node) {
+      state.detail.replaceChildren();
+      return;
+    }
     var titleText = displayLabel(node);
-    var title = document.createElement('div');
-    title.className = 'relation-graph-detail__title';
-    title.textContent = titleText || sourceLabel(node.source);
-    state.detail.appendChild(title);
+    var title = createEl('div', 'relation-graph-detail__title', titleText || sourceLabel(node.source));
 
-    var meta = document.createElement('div');
-    meta.className = 'relation-graph-detail__meta';
-    meta.textContent = sourceLabel(node.source) + ' · ' + t('editor.graph.nodeStats', { degree: node.degree || 0, score: node.score || 0 });
-    state.detail.appendChild(meta);
+    var meta = createEl('div', 'relation-graph-detail__meta', sourceLabel(node.source) + ' · ' + t('editor.graph.nodeStats', { degree: node.degree || 0, score: node.score || 0 }));
 
-    var score = document.createElement('div');
-    score.className = 'relation-graph-detail__score';
-    score.textContent = t('editor.graph.scoreDetail', { score: node.score || 0, nested: node.nested || 0, adjacent: node.adjacent || 0 });
-    state.detail.appendChild(score);
+    var score = createEl('div', 'relation-graph-detail__score', t('editor.graph.scoreDetail', { score: node.score || 0, nested: node.nested || 0, adjacent: node.adjacent || 0 }));
 
-    var listTitle = document.createElement('div');
-    listTitle.className = 'relation-graph-detail__subtitle';
-    listTitle.textContent = t('editor.graph.related');
-    state.detail.appendChild(listTitle);
+    var listTitle = createEl('div', 'relation-graph-detail__subtitle', t('editor.graph.related'));
 
-    var list = document.createElement('div');
-    list.className = 'relation-graph-detail__list';
+    var list = createEl('div', 'relation-graph-detail__list');
     relatedEdges(node).slice(0, 8).forEach(function (item) {
-      var row = document.createElement('button');
+      var row = createEl('button', 'relation-graph-detail__item');
       row.type = 'button';
-      row.className = 'relation-graph-detail__item';
       row.dataset.nodeIndex = String(item.node.index);
-      var name = document.createElement('span');
-      name.textContent = displayLabel(item.node);
-      var value = document.createElement('span');
-      value.textContent = String(item.score);
+      var name = createEl('span', '', displayLabel(item.node));
+      var value = createEl('span', '', String(item.score));
       row.appendChild(name);
       row.appendChild(value);
       list.appendChild(row);
     });
     if (!list.children.length) {
-      var empty = document.createElement('div');
-      empty.className = 'relation-graph-detail__empty';
-      empty.textContent = t('editor.graph.noRelated');
+      var empty = createEl('div', 'relation-graph-detail__empty', t('editor.graph.noRelated'));
       list.appendChild(empty);
     }
-    state.detail.appendChild(list);
+    state.detail.replaceChildren(title, meta, score, listTitle, list);
     updateDetailPosition();
   }
 

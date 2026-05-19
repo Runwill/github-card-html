@@ -25,7 +25,7 @@
     } catch(_){ }
   }
 
-  function makeEl(tag, cls, text){ const el=document.createElement(tag); if (cls) el.className=cls; if (text!=null) el.textContent=text; return el; }
+  const makeEl = w.LogUtils.elem;
 
   function tag(text, more=false, tip){
     const s = makeEl('span', 'perm-tag' + (more ? ' perm-tag--more' : ''), text);

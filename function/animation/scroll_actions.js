@@ -46,36 +46,35 @@
     return Math.max(0, elemTop - (winH/2) + (elemHeight/2) + (Number.isFinite(bias) ? bias : 0))
   }
 
+  function viewportHeight(){ return window.innerHeight || document.documentElement.clientHeight }
+
+  function parseScrollLength(raw, allowPercent){
+    if (!raw) return null
+    if (raw.endsWith('px')) return parseFloat(raw)
+    if (raw.endsWith('vh') || (allowPercent && raw.endsWith('%'))) return viewportHeight() * (parseFloat(raw)/100)
+    const num = parseFloat(raw)
+    return Number.isFinite(num) ? num : null
+  }
+
+  function readScrollLengthVar(name, allowPercent){
+    try { return parseScrollLength(getComputedStyle(document.documentElement).getPropertyValue(name).trim(), allowPercent) }
+    catch(e) { return null }
+  }
+
   // 解析偏移：优先 opts.centerBias（数值，px），其次 CSS 变量 --scroll-center-bias（支持 px/vh/%），否则默认 48px（略偏下）
   function resolveCenterBias(opts){
     if (opts && typeof opts.centerBias === 'number' && Number.isFinite(opts.centerBias)) return opts.centerBias
-    try {
-      const raw = getComputedStyle(document.documentElement).getPropertyValue('--scroll-center-bias').trim()
-      if (raw) {
-        if (raw.endsWith('px')) return parseFloat(raw)
-        if (raw.endsWith('vh')) return (window.innerHeight || document.documentElement.clientHeight) * (parseFloat(raw)/100)
-        if (raw.endsWith('%')) return (window.innerHeight || document.documentElement.clientHeight) * (parseFloat(raw)/100)
-        const num = parseFloat(raw)
-        if (Number.isFinite(num)) return num
-      }
-    } catch(e) { /* 忽略 */ }
+    const cssValue = readScrollLengthVar('--scroll-center-bias', true)
+    if (cssValue != null) return cssValue
     return 48 // 默认向下偏移 48 像素
   }
 
   // 解析最大滚动距离上限：优先 opts.maxScrollDistance，其次 CSS 变量 --max-scroll-distance（支持 px/vh），否则默认 2×视口高度
   function resolveMaxScrollDistance(opts){
     if (opts && typeof opts.maxScrollDistance === 'number' && Number.isFinite(opts.maxScrollDistance)) return opts.maxScrollDistance
-    try {
-      const raw = getComputedStyle(document.documentElement).getPropertyValue('--max-scroll-distance').trim()
-      if (raw) {
-        if (raw.endsWith('px')) return parseFloat(raw)
-        if (raw.endsWith('vh')) return (window.innerHeight || document.documentElement.clientHeight) * (parseFloat(raw) / 100)
-        const num = parseFloat(raw)
-        if (Number.isFinite(num)) return num
-      }
-    } catch(e) { /* 忽略 */ }
-    const vh = window.innerHeight || document.documentElement.clientHeight
-    return vh * 4  // 默认 4 倍视口高度
+    const cssValue = readScrollLengthVar('--max-scroll-distance', false)
+    if (cssValue != null) return cssValue
+    return viewportHeight() * 4  // 默认 4 倍视口高度
   }
 
   // 带距离上限的滚动：若距离超过上限，先瞬移至上限距离处，再平滑滚动剩余距离
@@ -166,30 +165,24 @@
     const behavior = (opts && opts.behavior) || 'smooth'
     const center = (opts && Object.prototype.hasOwnProperty.call(opts, 'center')) ? !!opts.center : true
     if (center) {
-      // 居中滚动
-      const bias = resolveCenterBias(opts)
-      const top = centerOffsetFor(targetElem, bias)
-      if (switching) {
-        cappedScrollTo(top, behavior)
-      } else {
-        window.scrollTo({ top, behavior })
-      }
-    } else {
-      // 顶部对齐（仅在显式 center:false 时）
-      if (switching) {
-        const rect = targetElem.getBoundingClientRect()
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
-        cappedScrollTo(rect.top + scrollTop, behavior)
-      } else {
-        try { targetElem.scrollIntoView({ behavior }) } catch(e) { targetElem.scrollIntoView() }
-      }
+      const top = centerOffsetFor(targetElem, resolveCenterBias(opts))
+      if (switching) cappedScrollTo(top, behavior)
+      else window.scrollTo({ top, behavior })
+      return
     }
+    if (switching) {
+      const rect = targetElem.getBoundingClientRect()
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0
+      cappedScrollTo(rect.top + scrollTop, behavior)
+      return
+    }
+    try { targetElem.scrollIntoView({ behavior }) } catch(e) { targetElem.scrollIntoView() }
   }
 
   // 内部抽象：调度高亮条显示（管理延迟与生命周期）
   function scheduleRowHighlight(scrollTarget, panelId, switching, opts) {
     const enableRowHighlight = !(opts && opts.highlightRow === false)
-    if (scrollTarget && enableRowHighlight) {
+    if (!scrollTarget || !enableRowHighlight) return
       const behavior = (opts && opts.behavior) || 'smooth'
       const myOpId = ++__opSeq
       const fire = () => {
@@ -211,7 +204,6 @@
         const remover = (isPanelActive(panelId)) ? (highlightRowAtElement(scrollTarget, opts) || null) : null
         __currentOp = { id: ++__opSeq, panelId, settle: { cancel: function(){} }, removeOverlay: remover }
       }
-    }
   }
 
   // 内部抽象：执行核心滚动动作序列
@@ -270,12 +262,8 @@
           node.style.height = 'auto'
           // 同步更新对应按钮状态（按钮在 wrapper 前一个兄弟节点的 heading 内）
           const heading = node.previousElementSibling
-          if (heading) {
-            const btn = heading.querySelector && heading.querySelector('.collapsible__toggle')
-            if (btn) {
-              btn.classList.remove('is-collapsed')
-            }
-          }
+          const btn = heading && heading.querySelector && heading.querySelector('.collapsible__toggle')
+          if (btn) btn.classList.remove('is-collapsed')
         }
         node = node.parentElement
       }

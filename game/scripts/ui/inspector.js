@@ -34,6 +34,11 @@
         return node;
     }
 
+    function appendChildren(parent, children) {
+        parent.append(...children.filter(Boolean));
+        return parent;
+    }
+
     function richValue(html, key) {
         return { html, key: key || html };
     }
@@ -104,22 +109,20 @@
         summaryWindow = createElement('section', 'game-inspector-window game-inspector-window--summary');
         const header = createElement('div', 'game-inspector-header');
         const titleGroup = createElement('div', 'game-inspector-heading');
-        titleGroup.appendChild(createElement('div', 'game-inspector-title', translate('game.inspector.properties', 'Properties')));
-        titleGroup.appendChild(createElement('div', 'game-inspector-hint', translate('game.inspector.hint', 'Press the inspect key to toggle debug mode, then hover game objects.')));
+        appendChildren(titleGroup, [
+            createElement('div', 'game-inspector-title', translate('game.inspector.properties', 'Properties')),
+            createElement('div', 'game-inspector-hint', translate('game.inspector.hint', 'Press the inspect key to toggle debug mode, then hover game objects.'))
+        ]);
         header.appendChild(titleGroup);
         summaryBody = createElement('div', 'game-inspector-body');
-        summaryWindow.appendChild(header);
-        summaryWindow.appendChild(summaryBody);
+        appendChildren(summaryWindow, [header, summaryBody]);
 
         rawWindow = createElement('section', 'game-inspector-window game-inspector-window--raw');
         const rawHeader = createElement('div', 'game-inspector-header game-inspector-header--raw');
         rawHeader.appendChild(createElement('div', 'game-inspector-title', translate('game.inspector.raw', 'Raw data')));
         rawBody = createElement('div', 'game-inspector-raw-body');
-        rawWindow.appendChild(rawHeader);
-        rawWindow.appendChild(rawBody);
-
-        panel.appendChild(summaryWindow);
-        panel.appendChild(rawWindow);
+        appendChildren(rawWindow, [rawHeader, rawBody]);
+        appendChildren(panel, [summaryWindow, rawWindow]);
 
         [summaryWindow, rawWindow].forEach(windowNode => {
             windowNode.addEventListener('pointerenter', () => { panelPointer = true; });
@@ -180,8 +183,9 @@
         if (!path) return null;
         const GameState = getGameState();
         if (!GameState) return null;
+        const pathText = String(path);
 
-        const slotMatch = String(path).match(/^(.*):slot:(\d+)$/);
+        const slotMatch = pathText.match(/^(.*):slot:(\d+)$/);
         if (slotMatch) {
             const basePath = slotMatch[1];
             const slotIndex = parseInt(slotMatch[2], 10);
@@ -201,13 +205,13 @@
         if (path === 'discardPile') return GameState.discardPile || null;
         if (path === 'treatmentArea') return GameState.treatmentArea || null;
 
-        if (String(path).startsWith('role-judge:')) {
-            const roleId = String(path).replace('role-judge:', '').split(':')[0];
+        if (pathText.startsWith('role-judge:')) {
+            const roleId = pathText.replace('role-judge:', '').split(':')[0];
             const player = findPlayer(roleId);
             return player ? player.judgeArea : null;
         }
-        if (String(path).startsWith('role:')) {
-            const parts = String(path).split(':');
+        if (pathText.startsWith('role:')) {
+            const parts = pathText.split(':');
             const player = findPlayer(parts[1]);
             if (!player) return null;
             if (parts[2] === 'equip') return player.equipArea || null;
@@ -354,15 +358,15 @@
         rawBody.replaceChildren();
 
         const meta = createElement('div', 'game-inspector-meta');
-        meta.appendChild(createElement('span', 'game-inspector-type', info.typeLabel));
+        const typeNode = createElement('span', 'game-inspector-type', info.typeLabel);
         const titleNode = createElement('strong', 'game-inspector-name');
         renderValue(titleNode, info.title || translate('game.inspector.noTarget', 'No target'));
-        meta.appendChild(titleNode);
-        summaryBody.appendChild(meta);
+        appendChildren(meta, [typeNode, titleNode]);
+        summaryBody.replaceChildren(meta);
 
         appendRows(summaryBody, info.rows || []);
 
-        rawBody.appendChild(createElement('pre', 'game-inspector-raw', stringifyRaw(info.raw)));
+        rawBody.replaceChildren(createElement('pre', 'game-inspector-raw', stringifyRaw(info.raw)));
     }
 
     function syncLayer() {
@@ -575,10 +579,9 @@
             toggle(lastPoint);
         }, true);
 
-        document.addEventListener('pointerover', refreshTargetFromPointer, true);
-        document.addEventListener('pointermove', refreshTargetFromPointer, true);
-        document.addEventListener('mouseover', refreshTargetFromPointer, true);
-        document.addEventListener('mousemove', refreshTargetFromPointer, true);
+        ['pointerover', 'pointermove', 'mouseover', 'mousemove'].forEach(type => {
+            document.addEventListener(type, refreshTargetFromPointer, true);
+        });
         document.addEventListener('click', handlePinClick, true);
 
         document.addEventListener('pointerout', event => {

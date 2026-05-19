@@ -1,7 +1,7 @@
 ;(function(){
   const titles=['程序','技能','牌库','将池','草稿','词元','权限','对局'];
   const changeTitle=n=> document.title='Document丨'+(titles[n]||'');
-  const isAdmin=()=>{ try{ return localStorage.getItem('role')==='admin' }catch(_){ return false } };
+  const isAdmin=()=> !!window.TokensPerm?.API?.isAdmin?.();
   const isAdminPanel=href=> href==='#panel_tokens' || href==='#panel_permissions';
   const getActivePanelId=(fallback)=> document.querySelector('.tabs-panel.is-active')?.id || document.querySelector('#main-tabs .tabs-title.is-active a')?.getAttribute('href')?.replace('#', '') || fallback || null;
   const isPanelActive=(panelId)=>{ const activeId = panelId && getActivePanelId(); return !panelId || !activeId || activeId === (panelId[0] === '#' ? panelId.slice(1) : panelId); };
@@ -29,10 +29,6 @@
         changeTitle(idx);
       });
     });
-    document.getElementById('tokens-refresh-btn')?.addEventListener('click',()=>{
-      (window.tokensRefresh?.() || window.renderTokensDashboard?.());
-    });
-
     const header = document.getElementById('header');
     if(header){
       let lastSwitch = 0;
@@ -84,5 +80,4 @@
     }
   });
   window.TabsUI = Object.assign(window.TabsUI || {}, { changeTitle, getActivePanelId, isPanelActive });
-  window.changeTitle=changeTitle;
 })()

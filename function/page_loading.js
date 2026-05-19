@@ -64,6 +64,9 @@ window.addEventListener('resize', applyLoadingTitleSpacing)
 // domReady/resourcesReady/fontsReady/replacementsReady：四条件满足且 canComplete=true 时触发完成
 let domReady=false, resourcesReady=false, fontsReady=false, replacementsReady=false, canComplete=false, completionStarted=false
 
+function finishReplacements(){ replacementsReady=true; attemptCompletion() }
+function finishFonts(){ fontsReady=true; attemptCompletion() }
+
 // 状态描述：进度条停留超过一定时间后显示当前等待项
 let statusTimer=null
 function updateStatus(){
@@ -118,11 +121,10 @@ window.addEventListener('load', ()=>{ resourcesReady=true; scheduleStatus(); att
             clearTimeout(fallbackTimer)
             const timeout = new Promise(resolve=>setTimeout(resolve, 8000))
             if(p && typeof p.then === 'function'){
-                Promise.race([p, timeout]).then(()=>{ replacementsReady=true; attemptCompletion() })
-                 .catch(()=>{ replacementsReady=true; attemptCompletion() })
+                Promise.race([p, timeout]).then(finishReplacements).catch(finishReplacements)
             }else{
                 // 未提供 Promise，视作不阻塞
-                replacementsReady=true; attemptCompletion()
+                finishReplacements()
             }
         }
 
@@ -137,7 +139,7 @@ window.addEventListener('load', ()=>{ resourcesReady=true; scheduleStatus(); att
                 set(v){ _val = v; hook(v) }
             })
         }
-    }catch(_){ replacementsReady=true; attemptCompletion() }
+    }catch(_){ finishReplacements() }
 })()
 
 // 字体加载完成（使用 FontFaceSet API；若不支持则回退为已就绪）
@@ -147,13 +149,13 @@ window.addEventListener('load', ()=>{ resourcesReady=true; scheduleStatus(); att
             // 严格等待：全局字体就绪 + 关键字体（康熙）加载完毕
             const allFontsReady = document.fonts.ready
             const keyFontPromise = document.fonts.load("1em '康熙'").catch(()=>{})
-            Promise.all([allFontsReady, keyFontPromise]).then(()=>{ applyLoadingTitleSpacing(); fontsReady=true; attemptCompletion() })
+            Promise.all([allFontsReady, keyFontPromise]).then(()=>{ applyLoadingTitleSpacing(); finishFonts() })
         } else {
             // 不支持 FontFaceSet：不阻塞完成
-            fontsReady=true; attemptCompletion()
+            finishFonts()
         }
     }catch(e){
-        fontsReady=true; attemptCompletion()
+        finishFonts()
     }
 })()
 

@@ -62,9 +62,37 @@
     return document.getElementById(id);
   }
 
+  function createEl(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text !== undefined) el.textContent = text;
+    return el;
+  }
+
   function isEditorActive() {
     var panel = byId('panel_draft');
     return !!(panel && panel.classList.contains('is-active'));
+  }
+
+  function isTypingTarget(target) {
+    var tagName = (target && target.tagName || '').toLowerCase();
+    return tagName === 'input' || tagName === 'textarea' || tagName === 'select' || !!(target && target.isContentEditable);
+  }
+
+  function syncInspectorInput(input, disabled, value) {
+    if (!input) return;
+    input.disabled = disabled;
+    input.value = value || '';
+  }
+
+  function applyLoadedElementData(loaded) {
+    state.entries = loaded.entries;
+    state.defaultElements = loaded.defaultElements;
+    state.chineseMap = loaded.chineseMap;
+    state.relationCorpus = loaded.relationCorpus || [];
+    state.relationIndex = null;
+    state.relationGraphVersion += 1;
+    state.renderedRelationGraphVersion = -1;
   }
 
   function walk(nodes, callback, parent, list) {
@@ -369,22 +397,17 @@
 
   function renderTree() {
     if (!els.tree) return;
-    els.tree.innerHTML = '';
     if (!state.nodes.length) {
-      var empty = document.createElement('div');
-      empty.className = 'editor-empty';
-      empty.textContent = t('editor.tree.empty');
-      els.tree.appendChild(empty);
+      els.tree.replaceChildren(createEl('div', 'editor-empty', t('editor.tree.empty')));
       return;
     }
-    els.tree.appendChild(renderNodeList(state.nodes, 0));
+    els.tree.replaceChildren(renderNodeList(state.nodes, 0));
     applyTreeColumns();
     scheduleTreeColumns();
   }
 
   function renderNodeList(nodes, depth) {
-    var list = document.createElement('ul');
-    list.className = 'editor-node-list';
+    var list = createEl('ul', 'editor-node-list');
     list.setAttribute('role', depth ? 'group' : 'tree');
     if (depth) {
       list.style.setProperty('--editor-node-guide-color', 'var(--editor-node-guide-' + (((depth - 1) % GUIDE_COLOR_COUNT) + 1) + ')');
@@ -396,16 +419,14 @@
   }
 
   function renderNode(node, depth) {
-    var item = document.createElement('li');
-    item.className = 'editor-node';
+    var item = createEl('li', 'editor-node');
     item.dataset.id = node.id;
 
-    var row = document.createElement('div');
-    row.className = 'editor-node-row'
+    var row = createEl('div', 'editor-node-row'
       + (node.id === state.selectedId ? ' is-selected' : '')
       + (node.id === state.editingNodeId ? ' is-editing' : '')
       + (!node.element ? ' is-text' : '')
-      + (node.id === state.dropTargetId && state.dropMode ? ' ' + dropClassName(state.dropMode) : '');
+      + (node.id === state.dropTargetId && state.dropMode ? ' ' + dropClassName(state.dropMode) : ''));
     row.dataset.id = node.id;
     row.draggable = false;
     row.style.setProperty('--node-depth', String(depth));
@@ -414,59 +435,46 @@
 
     var hasToggle = !!(node.element && node.children && node.children.length);
 
-    var main = document.createElement('span');
-    main.className = 'editor-node-main';
+    var main = createEl('span', 'editor-node-main');
     if (!hasToggle) main.style.setProperty('--node-toggle-space', '1.4em');
     if (hasToggle) {
-      var toggle = document.createElement('button');
+      var toggle = createEl('button', 'editor-node-toggle', node.expanded === false ? '▸' : '▾');
       toggle.type = 'button';
-      toggle.className = 'editor-node-toggle';
       toggle.dataset.action = 'toggle';
-      toggle.textContent = node.expanded === false ? '▸' : '▾';
       toggle.setAttribute('aria-label', t('editor.action.toggleNode'));
-      main.appendChild(toggle);
+      main.append(toggle);
     }
 
-    var side = document.createElement('span');
-    side.className = 'editor-node-side';
+    var side = createEl('span', 'editor-node-side');
 
     if (state.editingNodeId === node.id) {
-      var editingLabel = document.createElement('span');
-      editingLabel.className = 'editor-node-label';
-      editingLabel.textContent = nodeAutoLabel(node);
-      main.appendChild(editingLabel);
+      var editingLabel = createEl('span', 'editor-node-label', nodeAutoLabel(node));
+      main.append(editingLabel);
 
-      var editInput = document.createElement('input');
-      editInput.className = 'editor-node-edit admin-input';
+      var editInput = createEl('input', 'editor-node-edit admin-input');
       editInput.type = 'text';
       editInput.value = nodeValueText(node);
       editInput.dataset.id = node.id;
-      side.appendChild(editInput);
+      side.append(editInput);
     } else {
-      var label = document.createElement('span');
-      label.className = 'editor-node-label';
-      label.textContent = nodeAutoLabel(node) || t('editor.node.textEmpty');
-      main.appendChild(label);
+      var label = createEl('span', 'editor-node-label', nodeAutoLabel(node) || t('editor.node.textEmpty'));
+      main.append(label);
 
-      var tag = document.createElement('span');
-      tag.className = 'editor-node-tag';
-      tag.textContent = nodeValueText(node) || t('editor.node.textEmpty');
-      side.appendChild(tag);
+      var tag = createEl('span', 'editor-node-tag', nodeValueText(node) || t('editor.node.textEmpty'));
+      side.append(tag);
     }
 
-    var attr = document.createElement('span');
-    attr.className = 'editor-node-attrs';
+    var attr = createEl('span', 'editor-node-attrs');
     var attrParts = [];
     if (node.attrs && node.attrs.class_name) attrParts.push('.' + node.attrs.class_name);
     if (node.attrs && node.attrs.epithet) attrParts.push('epithet=' + node.attrs.epithet);
     attr.textContent = attrParts.join(' ');
-    side.appendChild(attr);
-    row.appendChild(main);
-    row.appendChild(side);
+    side.append(attr);
+    row.append(main, side);
 
-    item.appendChild(row);
+    item.append(row);
     if (node.element && node.children && node.children.length && node.expanded !== false) {
-      item.appendChild(renderNodeList(node.children, depth + 1));
+      item.append(renderNodeList(node.children, depth + 1));
     }
     return item;
   }
@@ -483,31 +491,23 @@
       }
       return true;
     });
-    els.palette.innerHTML = '';
-    results.forEach(function (entry) {
-      els.palette.appendChild(renderEntryButton(entry, 'palette'));
-    });
+    els.palette.replaceChildren.apply(els.palette, results.map(function (entry) { return renderEntryButton(entry, 'palette'); }));
   }
 
   function renderEntryButton(entry, area) {
     var recommendation = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-    var button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'editor-entry'
+    var button = createEl('button', 'editor-entry'
       + (entry.hasVariant ? ' has-variant' : '')
-      + (entry.hasVariant && state.variantMode ? ' is-variant-active' : '');
+      + (entry.hasVariant && state.variantMode ? ' is-variant-active' : ''));
+    button.type = 'button';
     button.dataset.key = entry.key;
     button.dataset.area = area;
     if (recommendation) button.dataset.score = String(recommendation.score || 0);
     button.draggable = false;
 
-    var name = document.createElement('span');
-    name.className = 'editor-entry__name';
-    name.textContent = entry.key;
-    button.appendChild(name);
+    var name = createEl('span', 'editor-entry__name', entry.key);
 
-    var meta = document.createElement('span');
-    meta.className = 'editor-entry__meta';
+    var meta = createEl('span', 'editor-entry__meta');
     var metaParts = [ns.Data.sourceLabel(entry.source)];
     if (entry.hasVariant) metaParts.push(t('editor.variant.short'));
     if (recommendation) {
@@ -518,7 +518,7 @@
       }));
     }
     meta.textContent = metaParts.join(' · ');
-    button.appendChild(meta);
+    button.append(name, meta);
     return button;
   }
 
@@ -569,9 +569,9 @@
 
   function renderRecommendations() {
     if (!els.recommendations || !els.recommendationList) return;
-    els.recommendationList.innerHTML = '';
     var key = state.lastInsertedKey;
     if (!key) {
+      els.recommendationList.replaceChildren();
       els.recommendations.hidden = true;
       return;
     }
@@ -588,9 +588,7 @@
       els.recommendations.hidden = true;
       return;
     }
-    scored.forEach(function (item) {
-      els.recommendationList.appendChild(renderEntryButton(item.entry, 'recommendation', item));
-    });
+    els.recommendationList.replaceChildren.apply(els.recommendationList, scored.map(function (item) { return renderEntryButton(item.entry, 'recommendation', item); }));
     els.recommendations.hidden = false;
   }
 
@@ -599,14 +597,10 @@
     var info = getSelectedInfo();
     var disabled = !info;
     els.inspector.classList.toggle('is-empty', disabled);
-    if (els.classInput) {
-      els.classInput.disabled = disabled || !info.node.element;
-      els.classInput.value = info && info.node.attrs ? info.node.attrs.class_name || '' : '';
-    }
-    if (els.epithetInput) {
-      els.epithetInput.disabled = disabled || !info.node.element;
-      els.epithetInput.value = info && info.node.attrs ? info.node.attrs.epithet || '' : '';
-    }
+    var attrs = info && info.node.attrs ? info.node.attrs : {};
+    var attrDisabled = disabled || !info.node.element;
+    syncInspectorInput(els.classInput, attrDisabled, attrs.class_name);
+    syncInspectorInput(els.epithetInput, attrDisabled, attrs.epithet);
     Array.from(els.inspector.querySelectorAll('[data-needs-selection]')).forEach(function (button) {
       button.disabled = disabled;
     });
@@ -633,20 +627,11 @@
 
   function renderLog() {
     if (!els || !els.logList) return;
-    els.logList.innerHTML = '';
     if (!state.logs.length) {
-      var empty = document.createElement('div');
-      empty.className = 'editor-log__empty';
-      empty.textContent = t('editor.log.empty');
-      els.logList.appendChild(empty);
+      els.logList.replaceChildren(createEl('div', 'editor-log__empty', t('editor.log.empty')));
       return;
     }
-    state.logs.slice().reverse().forEach(function (line) {
-      var item = document.createElement('div');
-      item.className = 'editor-log__entry';
-      item.textContent = line;
-      els.logList.appendChild(item);
-    });
+    els.logList.replaceChildren.apply(els.logList, state.logs.slice().reverse().map(function (line) { return createEl('div', 'editor-log__entry', line); }));
   }
 
   function setupEdgeScroll(element) {
@@ -939,15 +924,19 @@
       startY: event.clientY,
       active: false
     };
-    document.addEventListener('pointermove', onDocumentPointerMove);
-    document.addEventListener('pointerup', onDocumentPointerUp);
-    document.addEventListener('pointercancel', cancelPointerDrag);
+    syncPointerDragListeners('addEventListener');
   }
 
   function removePointerDragListeners() {
-    document.removeEventListener('pointermove', onDocumentPointerMove);
-    document.removeEventListener('pointerup', onDocumentPointerUp);
-    document.removeEventListener('pointercancel', cancelPointerDrag);
+    syncPointerDragListeners('removeEventListener');
+  }
+
+  function syncPointerDragListeners(method) {
+    [
+      ['pointermove', onDocumentPointerMove],
+      ['pointerup', onDocumentPointerUp],
+      ['pointercancel', cancelPointerDrag]
+    ].forEach(function (item) { document[method](item[0], item[1]); });
   }
 
   function activatePointerDrag() {
@@ -1185,13 +1174,7 @@
 
   async function reloadPalette() {
     var loaded = await ns.Data.loadElementData();
-    state.entries = loaded.entries;
-    state.defaultElements = loaded.defaultElements;
-    state.chineseMap = loaded.chineseMap;
-    state.relationCorpus = loaded.relationCorpus || [];
-    state.relationIndex = null;
-    state.relationGraphVersion += 1;
-    state.renderedRelationGraphVersion = -1;
+    applyLoadedElementData(loaded);
     ns.Data.refreshLabels(state.nodes, state.chineseMap);
     logEditor('editor.log.paletteReloaded', { count: state.entries.length });
     renderAll(true);
@@ -1222,42 +1205,36 @@
     if (!isEditorActive()) return;
     if (state.activeView !== 'editor') return;
     if (handleVariantKey(event, true)) return;
-    var tagName = (event.target && event.target.tagName || '').toLowerCase();
-    var typing = tagName === 'input' || tagName === 'textarea' || tagName === 'select' || event.target.isContentEditable;
-    if (typing) return;
-    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key && event.key.toLowerCase() === 'z') {
-      event.preventDefault();
-      if (event.shiftKey) redoTreeChange();
-      else undoTreeChange();
-      return;
-    }
-    if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key && event.key.toLowerCase() === 'y') {
-      event.preventDefault();
-      redoTreeChange();
-      return;
+    if (isTypingTarget(event.target)) return;
+    if ((event.ctrlKey || event.metaKey) && !event.altKey && event.key) {
+      var shortcutKey = event.key.toLowerCase();
+      if (shortcutKey === 'z' || (!event.shiftKey && shortcutKey === 'y')) {
+        event.preventDefault();
+        if (event.shiftKey && shortcutKey === 'z') redoTreeChange();
+        else if (shortcutKey === 'z') undoTreeChange();
+        else redoTreeChange();
+        return;
+      }
     }
     var keySettings = window.KeySettings;
     var matches = keySettings && typeof keySettings.checkBinding === 'function'
       ? function (action) { return keySettings.checkBinding(event, action); }
       : function () { return false; };
-    if (matches('editor_focus_search') || (!keySettings && (event.key === 'f' || event.key === 'F'))) {
+    var key = event.key || '';
+    var lowerKey = key.toLowerCase();
+    var shortcuts = [
+      ['editor_focus_search', !keySettings && lowerKey === 'f', function () { if (els.search) els.search.focus(); }],
+      ['editor_clear_selection', !keySettings && lowerKey === 'q', function () { selectNode(null); }],
+      ['editor_delete_selected', !keySettings && key === 'Delete', deleteSelected],
+      ['editor_add_child', !keySettings && lowerKey === 'z', function () { addText('child'); }],
+      ['editor_add_sibling', !keySettings && lowerKey === 'x', function () { addText('after'); }],
+      ['editor_edit_selected', !keySettings && key === '/', function () { startInlineEdit(state.selectedId); }]
+    ];
+    for (var i = 0; i < shortcuts.length; i++) {
+      if (!matches(shortcuts[i][0]) && !shortcuts[i][1]) continue;
       event.preventDefault();
-      if (els.search) els.search.focus();
-    } else if (matches('editor_clear_selection') || (!keySettings && (event.key === 'q' || event.key === 'Q'))) {
-      event.preventDefault();
-      selectNode(null);
-    } else if (matches('editor_delete_selected') || (!keySettings && event.key === 'Delete')) {
-      event.preventDefault();
-      deleteSelected();
-    } else if (matches('editor_add_child') || (!keySettings && (event.key === 'z' || event.key === 'Z'))) {
-      event.preventDefault();
-      addText('child');
-    } else if (matches('editor_add_sibling') || (!keySettings && (event.key === 'x' || event.key === 'X'))) {
-      event.preventDefault();
-      addText('after');
-    } else if (matches('editor_edit_selected') || (!keySettings && event.key === '/')) {
-      event.preventDefault();
-      startInlineEdit(state.selectedId);
+      shortcuts[i][2]();
+      return;
     }
   }
 
@@ -1300,13 +1277,7 @@
     if (!els.panel || !ns.Data) return;
     if (els.paletteStatus) els.paletteStatus.textContent = t('editor.palette.loading');
     var loaded = await ns.Data.loadElementData();
-    state.entries = loaded.entries;
-    state.defaultElements = loaded.defaultElements;
-    state.chineseMap = loaded.chineseMap;
-    state.relationCorpus = loaded.relationCorpus || [];
-    state.relationIndex = null;
-    state.relationGraphVersion += 1;
-    state.renderedRelationGraphVersion = -1;
+    applyLoadedElementData(loaded);
     loadState();
     bindEvents();
     setEditorView(state.activeView);

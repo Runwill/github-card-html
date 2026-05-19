@@ -87,6 +87,7 @@ padding {
 
 /* ── 搜索容器 ────────────────────────────────── */
 #search-input {
+  --ui-field-w: 100%;
   --ui-field-focus-border: color-mix(in srgb, var(--text-subtle) 60%, transparent);
   position: relative;
   right: -95%;

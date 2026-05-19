@@ -16,25 +16,18 @@
   const DEFAULT_SPEED = 0;
   const DEFAULT_INERTIA_INDEX = 3; // 默认中等
   let currentInertiaIndex = DEFAULT_INERTIA_INDEX;
+  const $ = id => document.getElementById(id);
 
   function optionLabel(opt) {
     return String(window.i18n.t(opt.labelKey)).replace(/^\s*[\d.]+\s*-\s*/, '');
   }
 
-  // 替换元素并绑定新监听器（消除 cloneNode 样板）
-  function rebind(id, event, handler) {
-    const el = document.getElementById(id);
-    if (!el) return null;
-    const fresh = el.cloneNode(true);
-    el.parentNode.replaceChild(fresh, el);
-    fresh.addEventListener(event, handler);
-    return fresh;
-  }
+  function bindControl(id, event, handler) { const el = $(id); if (el) el['on' + event] = handler; }
 
   // 应用速度值到 UI + 存储 + 控制器
   function applySpeed(val) {
-    const range = document.getElementById('game-speed-range');
-    const display = document.getElementById('game-speed-val');
+    const range = $('game-speed-range');
+    const display = $('game-speed-val');
     if (range) range.value = val;
     if (display) display.textContent = `${val}ms`;
     localStorage.setItem(STORAGE_KEY_SPEED, val);
@@ -57,9 +50,9 @@
   }
 
   function updateInertiaDisplay() {
-    const inertiaValue = document.getElementById('inertia-value');
-    const inertiaPrev = document.getElementById('inertia-prev');
-    const inertiaNext = document.getElementById('inertia-next');
+    const inertiaValue = $('inertia-value');
+    const inertiaPrev = $('inertia-prev');
+    const inertiaNext = $('inertia-next');
     if (inertiaValue && INERTIA_OPTIONS[currentInertiaIndex]) {
       inertiaValue.textContent = optionLabel(INERTIA_OPTIONS[currentInertiaIndex]);
     }
@@ -80,21 +73,21 @@
     const savedSpeed = localStorage.getItem(STORAGE_KEY_SPEED);
     if (savedSpeed !== null) applySpeed(parseInt(savedSpeed, 10));
 
-    rebind('game-speed-range', 'input', (e) => applySpeed(parseInt(e.target.value, 10)));
+    bindControl('game-speed-range', 'input', (e) => applySpeed(parseInt(e.target.value, 10)));
 
     // === Inertia Arrow Selector ===
     loadInertiaIndex();
     updateInertiaDisplay();
 
-    rebind('inertia-prev', 'click', () => {
+    bindControl('inertia-prev', 'click', () => {
       if (currentInertiaIndex > 0) { currentInertiaIndex--; saveAndApplyInertia(); }
     });
-    rebind('inertia-next', 'click', () => {
+    bindControl('inertia-next', 'click', () => {
       if (currentInertiaIndex < INERTIA_OPTIONS.length - 1) { currentInertiaIndex++; saveAndApplyInertia(); }
     });
 
     // === Reset Button ===
-    rebind('game-settings-reset', 'click', () => {
+    bindControl('game-settings-reset', 'click', () => {
       applySpeed(DEFAULT_SPEED);
       currentInertiaIndex = DEFAULT_INERTIA_INDEX;
       saveAndApplyInertia();
@@ -114,7 +107,7 @@
   function init() {
     const setupUI = () => {
       // === Game Settings Modal ===
-      const gameSettingsBtn = document.getElementById(GAME_SETTINGS_BUTTON_ID);
+      const gameSettingsBtn = $(GAME_SETTINGS_BUTTON_ID);
       if (gameSettingsBtn) {
         gameSettingsBtn.addEventListener('click', () => {
           var OV = window.CardUI?.Manager?.Controllers?.overlay;

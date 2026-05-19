@@ -7,7 +7,7 @@
 
   // V7: 弹窗打开动画（display→show→animate-in→focus）
   function showModalAnim(backdrop, modal, editor){
-    backdrop.style.display='block'; modal.style.display='block';
+    backdrop.style.display = modal.style.display = 'block';
     try{ const h2=modal.querySelector('.modal-header h2'); if(h2){ h2.classList.remove('animate-in','visible'); void h2.offsetWidth; h2.classList.add('animate-in'); } }catch(_){ }
     requestAnimationFrame(()=>{ backdrop.classList.add('show'); modal.classList.add('show'); });
     setTimeout(()=>{ try{ editor.focus(); }catch(_){} }, 80);
@@ -25,13 +25,10 @@
   function ensureTokenModal(prefix, html, hide){
     let backdrop=document.getElementById(prefix+'-backdrop');
     let modal=document.getElementById(prefix+'-modal');
-    if(!backdrop){ backdrop=document.createElement('div'); backdrop.id=prefix+'-backdrop'; backdrop.className='modal-backdrop'; document.body.appendChild(backdrop); }
+    if(!backdrop){ backdrop=Object.assign(document.createElement('div'), { id:prefix+'-backdrop', className:'modal-backdrop' }); document.body.append(backdrop); }
     if(!modal){
-      modal=document.createElement('div');
-      modal.id=prefix+'-modal';
-      modal.className='modal tokens-modal';
-      modal.innerHTML=html;
-      document.body.appendChild(modal);
+      modal=Object.assign(document.createElement('div'), { id:prefix+'-modal', className:'modal tokens-modal', innerHTML:html });
+      document.body.append(modal);
       backdrop.addEventListener('click', hide);
       document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') hide(); });
     }
@@ -60,6 +57,14 @@
     try{ toast(window.t(toastKey)); }catch(_){ }
     window.renderTokensDashboard?.(false);
   }
+
+  async function runEditorAction(canEdit, editor, action, errorKey){
+    if(!canEdit){ toast(window.t('common.noPermission')); return; }
+    const payload = readEditorPayload(editor);
+    if(payload === undefined) return;
+    try{ await action(payload); }
+    catch(e){ toastError(e, errorKey); }
+  }
   // 新建弹窗：懒加载构建 DOM 节点
   const createModalHtml = `<div class="modal-header"><h2 data-i18n="tokens.create.title"></h2></div><div class="modal-form"><div id="tokens-create-hints" class="tokens-hints scrollbar-hidden"></div><textarea id="tokens-create-editor" class="tokens-editor"></textarea><div id="tokens-create-actions" class="tokens-actions"><button type="button" class="btn btn--secondary" id="tokens-create-cancel" data-i18n="tokens.create.cancel"></button><button type="button" class="btn btn--primary btn--lift" id="tokens-create-submit" data-i18n="tokens.create.submit"></button></div></div>`;
   function ensureCreateModal(){
@@ -71,10 +76,8 @@
     if(backdrop) backdrop.classList.remove('show');
     if(modal) modal.classList.remove('show');
     setTimeout(()=>{
-      const bd=document.getElementById(prefix+'-backdrop');
-      const md=document.getElementById(prefix+'-modal');
-      if(bd && !bd.classList.contains('show')) bd.style.display='none';
-      if(md && !md.classList.contains('show')) md.style.display='none';
+      [document.getElementById(prefix+'-backdrop'), document.getElementById(prefix+'-modal')]
+        .forEach(el=>{ if(el && !el.classList.contains('show')) el.style.display='none'; });
     }, 320);
   }
   function hideCreateModal(){ hideModal('tokens-create'); }
@@ -110,14 +113,7 @@
     renderSchemeSelector(variants);
     renderHintsFromVariants(tpl, variants);
     editor.value = JSON.stringify(tpl||{}, null, 2);
-  const submit= async ()=>{
-  if(!canEdit){ toast(window.t('common.noPermission')); return; }
-      try{
-        const payload = readEditorPayload(editor);
-        if(payload === undefined) return;
-        await createDocFromPayload(collection, payload, hideCreateModal, 'tokens.toast.created');
-      }catch(e){ toastError(e, 'tokens.error.createFailed'); }
-    };
+  const submit= ()=> runEditorAction(canEdit, editor, payload => createDocFromPayload(collection, payload, hideCreateModal, 'tokens.toast.created'), 'tokens.error.createFailed');
   btnCancel.onclick= hideCreateModal; btnSubmit.onclick= submit;
   setReadonlyButtons(canEdit, [btnSubmit]);
     showModalAnim(backdrop, modal, editor);
@@ -147,26 +143,14 @@
     }catch(_){ hints.innerHTML=''; }
     editor.value= JSON.stringify(orig, null, 2);
     const canEdit = getCanEdit();
-    const submit= async ()=>{
-  if(!canEdit){ toast(window.t('common.noPermission')); return; }
-  const next = readEditorPayload(editor);
-  if(next === undefined) return;
-      try{
+    const submit= ()=> runEditorAction(canEdit, editor, async next => {
         const detailed = await window.tokensAdmin.applyObjectEdits(collection, id, orig, next);
         T.logChange('save-edits', { collection, id, sets: detailed && detailed.sets, dels: detailed && detailed.dels });
         hideEditModal();
   try{ toast(window.t('status.updated')); }catch(_){ }
         window.renderTokensDashboard?.(false);
-      }catch(e){ toastError(e, 'tokens.error.updateFailed'); }
-    };
-    const saveAs = async ()=>{
-  if(!canEdit){ toast(window.t('common.noPermission')); return; }
-  const next = readEditorPayload(editor);
-  if(next === undefined) return;
-      try{
-          await createDocFromPayload(collection, next, hideEditModal, 'tokens.toast.savedAs');
-      }catch(e){ toastError(e, 'tokens.error.createFailed'); }
-    };
+    }, 'tokens.error.updateFailed');
+    const saveAs = ()=> runEditorAction(canEdit, editor, next => createDocFromPayload(collection, next, hideEditModal, 'tokens.toast.savedAs'), 'tokens.error.createFailed');
     btnCancel.onclick= hideEditModal; btnSubmit.onclick= submit; if(btnSaveAs) btnSaveAs.onclick = saveAs;
     setReadonlyButtons(canEdit, [btnSubmit, btnSaveAs]);
     showModalAnim(backdrop, modal, editor);

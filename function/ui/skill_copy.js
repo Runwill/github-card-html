@@ -7,8 +7,7 @@
     const roleLc = roleRaw.toLowerCase();
   const external = Array.isArray(window.skillCopyAllowedRoles) ? window.skillCopyAllowedRoles : null;
   const baseList = external || ['admin','moderator'];
-    const baseListLc = baseList.map(r => String(r).toLowerCase());
-    const isAllowed = baseListLc.includes(roleLc) || baseList.includes(roleRaw);
+    const isAllowed = baseList.some(r => String(r).toLowerCase() === roleLc || r === roleRaw);
     if (!isAllowed) { return; }
   } catch (_) { /* 容错：异常时默认禁用 */ return; }
 

@@ -79,9 +79,22 @@
         DragState.startY = p.y;
         DragState.isDragging = false; 
 
-        document.addEventListener('pointermove', handlePointerMove);
-        document.addEventListener('pointerup', handlePointerUp);
-        document.addEventListener('pointercancel', handlePointerUp);
+        syncPointerListeners(document, 'addEventListener');
+    }
+
+    function syncPointerListeners(target, method) {
+        if (!target || !target[method]) return;
+        [
+            ['pointermove', handlePointerMove],
+            ['pointerup', handlePointerUp],
+            ['pointercancel', handlePointerUp]
+        ].forEach(([eventName, handler]) => target[method](eventName, handler));
+    }
+
+    function clearTempRevealedCard() {
+        if (!DragState.tempRevealedCard) return;
+        DragState.tempRevealedCard.classList.remove('is-top-card');
+        DragState.tempRevealedCard = null;
     }
 
     function startDrag(e) {
@@ -209,22 +222,14 @@
     }
 
     function cancelDrag(e) {
-        // Cleanup temp revealed card
-        if (DragState.tempRevealedCard) {
-            DragState.tempRevealedCard.classList.remove('is-top-card');
-            DragState.tempRevealedCard = null;
-        }
+        clearTempRevealedCard();
 
         const el = DragState.dragElement;
         
-        document.removeEventListener('pointermove', handlePointerMove);
-        document.removeEventListener('pointerup', handlePointerUp);
-        document.removeEventListener('pointercancel', handlePointerUp);
+        syncPointerListeners(document, 'removeEventListener');
 
         if (el) {
-            el.removeEventListener('pointermove', handlePointerMove);
-            el.removeEventListener('pointerup', handlePointerUp);
-            el.removeEventListener('pointercancel', handlePointerUp);
+            syncPointerListeners(el, 'removeEventListener');
             
             const isGhost = el.classList.contains('dragging-real');
             if (isGhost && DragState.placeholderElement && DragState.placeholderElement.parentNode) {
@@ -252,16 +257,12 @@
         const el = DragState.dragElement; 
         const placeholder = DragState.placeholderElement; 
         
-        document.removeEventListener('pointermove', handlePointerMove);
-        document.removeEventListener('pointerup', handlePointerUp);
-        document.removeEventListener('pointercancel', handlePointerUp);
+           syncPointerListeners(document, 'removeEventListener');
         if (DragState.rafId) cancelAnimationFrame(DragState.rafId);
 
         if (el) {
              try { el.releasePointerCapture(e.pointerId); } catch(err){}
-             el.removeEventListener('pointermove', handlePointerMove);
-             el.removeEventListener('pointerup', handlePointerUp);
-             el.removeEventListener('pointercancel', handlePointerUp);
+               syncPointerListeners(el, 'removeEventListener');
         }
 
         let dropZone = DragState.currentDropZone;
@@ -315,10 +316,7 @@
                 if (isLogicFinished && isAnimationFinished) {
                     // Cleanup temporary reveal logic BEFORE updating UI. 
                     // This allows the renderer (updateUI) to be the final source of truth for 'is-top-card'.
-                    if (DragState.tempRevealedCard) {
-                        DragState.tempRevealedCard.classList.remove('is-top-card'); 
-                        DragState.tempRevealedCard = null;
-                    }
+                    clearTempRevealedCard();
 
                     window.Game.UI.isRenderingSuspended = false;
                     if (window.Game.UI.updateUI) window.Game.UI.updateUI();

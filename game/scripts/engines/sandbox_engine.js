@@ -7,6 +7,17 @@
             this.state = window.Game.GameState;
         }
 
+        _updateUI() {
+            if (window.Game.UI.updateUI) window.Game.UI.updateUI();
+        }
+
+        _modifyPlayerField(roleId, field, delta, minValue) {
+            const player = this.state.players.find(p => p.id === roleId);
+            if (!player) return;
+            player[field] = Math.max(player[field] + delta, minValue);
+            this._updateUI();
+        }
+
         init(config) {
             this.state.isGameRunning = true;
             this.state.isPaused = false;
@@ -33,9 +44,7 @@
             // 在沙盒中，所有区域都可以视为开放或由此用户管理
             // 不需要启动任何流程堆栈
             
-            if (window.Game.UI && window.Game.UI.updateUI) {
-                window.Game.UI.updateUI();
-            }
+            this._updateUI();
         }
 
         _setupPlayers(config) {
@@ -100,24 +109,15 @@
         // Directly move card without event stack
         moveCard(card, toArea, toIndex = -1, fromAreaHint = null) {
              window.Game.Models.moveCardToArea(card, toArea, toIndex, fromAreaHint);
-             
-             if (window.Game.UI.updateUI) window.Game.UI.updateUI();
+             this._updateUI();
         }
         
         modifyHealth(roleId, delta) {
-            const player = this.state.players.find(p => p.id === roleId);
-            if (player) {
-                player.health = Math.max(player.health + delta, 0);
-                if (window.Game.UI.updateUI) window.Game.UI.updateUI();
-            }
+            this._modifyPlayerField(roleId, 'health', delta, 0);
         }
 
         modifyMaxHealth(roleId, delta) {
-            const player = this.state.players.find(p => p.id === roleId);
-            if (player) {
-                player.healthLimit = Math.max(player.healthLimit + delta, 1);
-                if (window.Game.UI.updateUI) window.Game.UI.updateUI();
-            }
+            this._modifyPlayerField(roleId, 'healthLimit', delta, 1);
         }
     }
 

@@ -110,12 +110,6 @@
       }
     });
 
-    // 仅允许点击图标触发折叠；点击标题文字不触发
-    h.addEventListener('click', (e) => {
-      if (!e.target.closest('.collapsible__toggle')) return;
-      // Click on the toggle icon will be handled by the button listener
-    });
-
     return btn;
   }
 

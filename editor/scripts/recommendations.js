@@ -117,21 +117,12 @@
         if (!targetPattern) return;
         var targetSpans = spansForPattern(text, targetPattern);
         if (!targetSpans.length) return;
-        var nested = 0;
-        var adjacent = 0;
-        sourceSpans.forEach(function (sourceSpan) {
-          targetSpans.forEach(function (targetSpan) {
-            if (containsSpan(sourceSpan, targetSpan)) nested += 1;
-            if (bidirectionalMode && containsSpan(targetSpan, sourceSpan)) nested += 1;
-            if (isAdjacentGap(text, sourceSpan.isPair ? sourceSpan.xe : sourceSpan.ce, targetSpan.isPair ? targetSpan.os : targetSpan.cs)) adjacent += 1;
-            if (bidirectionalMode && isAdjacentGap(text, targetSpan.isPair ? targetSpan.xe : targetSpan.ce, sourceSpan.isPair ? sourceSpan.os : sourceSpan.cs)) adjacent += 1;
-          });
-        });
-        if (!nested && !adjacent) return;
+        var metrics = relationMetricsForSpans(text, sourceSpans, targetSpans, bidirectionalMode);
+        if (!metrics.score) return;
         if (!byKey[entry.key]) byKey[entry.key] = { entry: entry, score: 0, nested: 0, adjacent: 0 };
-        byKey[entry.key].nested += nested;
-        byKey[entry.key].adjacent += adjacent;
-        byKey[entry.key].score += nested + adjacent;
+        byKey[entry.key].nested += metrics.nested;
+        byKey[entry.key].adjacent += metrics.adjacent;
+        byKey[entry.key].score += metrics.score;
       });
     });
     var result = Object.keys(byKey).map(function (itemKey) { return byKey[itemKey]; })
@@ -149,15 +140,16 @@
     return span && span.isPair ? span.xe : span.ce;
   }
 
-  function relationMetricsForSpans(text, sourceSpans, targetSpans) {
+  function relationMetricsForSpans(text, sourceSpans, targetSpans, bidirectionalMode) {
     var nested = 0;
     var adjacent = 0;
+    var bidirectional = bidirectionalMode !== false;
     sourceSpans.forEach(function (sourceSpan) {
       targetSpans.forEach(function (targetSpan) {
         if (containsSpan(sourceSpan, targetSpan)) nested += 1;
-        if (containsSpan(targetSpan, sourceSpan)) nested += 1;
+        if (bidirectional && containsSpan(targetSpan, sourceSpan)) nested += 1;
         if (isAdjacentGap(text, spanEnd(sourceSpan), spanStart(targetSpan))) adjacent += 1;
-        if (isAdjacentGap(text, spanEnd(targetSpan), spanStart(sourceSpan))) adjacent += 1;
+        if (bidirectional && isAdjacentGap(text, spanEnd(targetSpan), spanStart(sourceSpan))) adjacent += 1;
       });
     });
     return { nested: nested, adjacent: adjacent, score: nested + adjacent };

@@ -6,24 +6,7 @@
   const jsonPost = (path, body)=> endpoints.requestJson(path, { method:'POST', auth: 'always', body: body || {} });
 
   const createdAtDate = value => new Date((window.TimeFmt?.parseTimeValue?.(value) ?? Date.parse(value)) || 0);
-
-  // 极简 DOM 工厂
-  function el(tag, attrs, children){
-    const e = document.createElement(tag);
-    if (attrs) {
-      for (const k of Object.keys(attrs)) {
-        if (k === 'text')        e.textContent = attrs[k];
-        else if (k === 'cls')    e.className = attrs[k];
-        else if (k === 'onclick') e.onclick = attrs[k];
-        else if (k === 'style' && typeof attrs[k] === 'object') Object.assign(e.style, attrs[k]);
-        else e[k] = attrs[k];
-      }
-    }
-    if (children) {
-      (Array.isArray(children) ? children : [children]).forEach(c => { if (c) e.appendChild(c); });
-    }
-    return e;
-  }
+  const el = window.LogUtils.elem;
 
   // ── fetchPending 工厂 ──
   function makeFetchPending(path, label){
@@ -33,7 +16,6 @@
   const fetchPendingAvatars   = makeFetchPending('/avatar/pending',   '获取待审头像失败:');
   const fetchPendingUsernames = makeFetchPending('/username/pending', '获取待审用户名失败:');
   const fetchPendingIntros    = makeFetchPending('/intro/pending',    '获取待审简介失败:');
-  Object.assign(window, { fetchPendingUsers, fetchPendingAvatars, fetchPendingUsernames, fetchPendingIntros });
 
   let pendingApprovalGroupsCache = null;
   async function fetchPendingApprovalGroups(){
@@ -45,7 +27,6 @@
     return ['users', 'avatars', 'usernames', 'intros'].reduce((sum, key) => sum + (Array.isArray(groups[key]) ? groups[key].length : 0), 0);
   }
   function setPendingApprovalGroupsCache(groups){ pendingApprovalGroupsCache = groups || null; }
-  Object.assign(window, { fetchPendingApprovalGroups, countPendingApprovalGroups, setPendingApprovalGroupsCache });
 
   function removeApprovalRowFromTrigger(trigger){
     try {
@@ -68,10 +49,7 @@
           // 若已无剩余项，展示“空”覆盖层（绝对定位），不影响容器高度
           if (container && !container.querySelector('.approval-row')) {
             container.style.position = 'relative';
-            const empty = document.createElement('p');
-            empty.className = 'empty-hint empty-overlay';
-            Object.assign(empty.style, { position:'absolute', inset:'0', display:'flex', alignItems:'center', justifyContent:'center', margin:'0', opacity:'0', transition:'opacity 180ms ease' });
-            empty.textContent = '空';
+            const empty = el('p', { cls:'empty-hint empty-overlay', text:'空', style:{ position:'absolute', inset:'0', display:'flex', alignItems:'center', justifyContent:'center', margin:'0', opacity:'0', transition:'opacity 180ms ease' } });
             container.appendChild(empty);
             requestAnimationFrame(() => { requestAnimationFrame(() => { empty.style.opacity = '1'; }); });
           }
@@ -97,25 +75,16 @@
     }
   }
 
-  function handleUserApproval(userId, action, trigger){
-    return handleApproval('/approve', { userId, action }, trigger, () => {
-      try { if (window.TokensPerm && window.TokensPerm.refreshUsers) window.TokensPerm.refreshUsers(true); } catch(_){ }
-    });
-  }
-  function handleAvatarApproval(recordId, action, trigger){
-    return handleApproval('/avatar/approve', { recordId, action }, trigger, refreshUser);
-  }
-  function handleUsernameApproval(recordId, action, trigger){
-    return handleApproval('/username/approve', { recordId, action }, trigger, refreshUser);
-  }
-  function handleIntroApproval(recordId, action, trigger){
-    return handleApproval('/intro/approve', { recordId, action }, trigger, refreshUser);
-  }
-  Object.assign(window, { handleUserApproval, handleAvatarApproval, handleUsernameApproval, handleIntroApproval });
+  const refreshPermissionUsers = () => { try { if (window.TokensPerm && window.TokensPerm.refreshUsers) window.TokensPerm.refreshUsers(true); } catch(_){ } };
+  const makeApprovalHandler = (apiPath, idKey, postSuccess)=> (recordId, action, trigger)=> handleApproval(apiPath, { [idKey]: recordId, action }, trigger, postSuccess);
+  const handleUserApproval = makeApprovalHandler('/approve', 'userId', refreshPermissionUsers);
+  const handleAvatarApproval = makeApprovalHandler('/avatar/approve', 'recordId', refreshUser);
+  const handleUsernameApproval = makeApprovalHandler('/username/approve', 'recordId', refreshUser);
+  const handleIntroApproval = makeApprovalHandler('/intro/approve', 'recordId', refreshUser);
 
   const HANDLER = { register: handleUserApproval, avatar: handleAvatarApproval, username: handleUsernameApproval, intro: handleIntroApproval };
 
-  window.renderApprovals = async function(){
+  async function renderApprovals(){
     const container = document.getElementById('pending-approvals-modal-content');
     if (!container) return;
     container.innerHTML = '';
@@ -171,5 +140,12 @@
       console.error('渲染审核项失败:', e);
       container.innerHTML = '<p class="empty-hint error">加载失败，请重试</p>';
     }
-  };
+  }
+
+  Object.assign(window, {
+    fetchPendingUsers, fetchPendingAvatars, fetchPendingUsernames, fetchPendingIntros,
+    fetchPendingApprovalGroups, countPendingApprovalGroups, setPendingApprovalGroupsCache,
+    handleUserApproval, handleAvatarApproval, handleUsernameApproval, handleIntroApproval,
+    renderApprovals
+  });
 })();

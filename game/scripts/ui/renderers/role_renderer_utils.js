@@ -89,14 +89,15 @@
             // Aliases for Event Handlers
             const openJudgeInspector = () => openAreaInspector('judge');
             const openHandInspector = () => openAreaInspector('hand');
+            const isEquipControl = target => target.closest('#btn-equip-detail') || target.closest('.equip-detail-btn');
             
             // Events
             element.addEventListener('mousedown', (e) => {
-                if (e.target.closest('#btn-equip-detail') || e.target.closest('.equip-detail-btn')) return;
+                if (isEquipControl(e.target)) return;
                 startPress(e);
             });
             element.addEventListener('touchstart', (e) => {
-                if (e.target.closest('#btn-equip-detail') || e.target.closest('.equip-detail-btn')) return;
+                if (isEquipControl(e.target)) return;
                 startPress(e);
             }, {passive: true});
 
@@ -109,7 +110,7 @@
             });
             
             element.addEventListener('click', (e) => {
-                if (e.target.closest('#btn-equip-detail') || e.target.closest('.equip-detail-btn')) return;
+                if (isEquipControl(e.target)) return;
 
                 if (isLongPress) {
                     e.stopImmediatePropagation();
@@ -160,8 +161,7 @@
         if (!role || !role[areaKey]) return;
 
         const GameText = window.Game.UI.GameText;
-        const areaName = isJudge ? 'judgeArea' : 'hand';
-        const titleSuffix = GameText ? GameText.render(areaName) : areaName;
+        const titleSuffix = GameText ? GameText.render(areaKey) : areaKey;
         const sourceId = `${isJudge ? 'role-judge:' : 'role:'}${role.id}`;
         const cards = role[areaKey].cards || [];
         const openOptions = {
@@ -241,39 +241,19 @@
 
         btn.onclick = (e) => {
              e.stopPropagation();
-             
-             if (window.Game.UI.openCardViewer) {
-                 const viewerSourceId = `role:${role.id}:equip`;
-                 const existing = window.Game.UI.viewers && window.Game.UI.viewers[viewerSourceId];
-                 
-                 if (existing) {
-                     existing.cleanup();
-                     return;
-                 }
+             if (!window.Game.UI.openCardViewer) return;
+             const viewerSourceId = `role:${role.id}:equip`;
+             const existing = window.Game.UI.viewers && window.Game.UI.viewers[viewerSourceId];
+             if (existing) { existing.cleanup(); return; }
 
-                 let equipData = [];
-                 if (role.equipSlots) {
-                     equipData = role.equipSlots.map(slot => slot.cards || []);
-                 } else {
-                     equipData = [[], [], [], []]; 
-                 }
-                 
-                 const GT = GameText || window.Game.UI.GameText;
-                 const ownerNameHtml = renderRoleOwnerName(role, GT);
-
-                 const slotsDef = [
-                     { index: 0, label: GT.render('weaponSlot') },
-                     { index: 1, label: GT.render('armorSlot') },
-                     { index: 2, label: GT.render('defensiveSlot') },
-                     { index: 3, label: GT.render('offensiveSlot') }
-                 ];
-
-                 window.Game.UI.openCardViewer(null, equipData, viewerSourceId, {
-                     ownerName: ownerNameHtml,
-                     areaName: GT.render('equipArea'),
-                     slots: slotsDef
-                 });
-             }
+             const GT = GameText || window.Game.UI.GameText;
+             const equipData = role.equipSlots ? role.equipSlots.map(slot => slot.cards || []) : [[], [], [], []];
+             const slotsDef = ['weaponSlot', 'armorSlot', 'defensiveSlot', 'offensiveSlot'].map((key, index) => ({ index, label: GT.render(key) }));
+             window.Game.UI.openCardViewer(null, equipData, viewerSourceId, {
+                 ownerName: renderRoleOwnerName(role, GT),
+                 areaName: GT.render('equipArea'),
+                 slots: slotsDef
+             });
         };
     }
 

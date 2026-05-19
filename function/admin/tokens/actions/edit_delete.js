@@ -170,8 +170,7 @@
       const cleanup = () => {
         committing = false;
         target.removeAttribute('data-editing');
-        target.classList.remove('is-editing');
-        target.classList.remove('is-saving');
+        target.classList.remove('is-editing', 'is-saving');
         target.removeAttribute('data-old-text');
         if (revertTimer) {
           clearTimeout(revertTimer);
@@ -243,15 +242,17 @@
         }
       };
 
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+      const handleCommitKey = (e) => {
+        if (e.key === 'Enter' && !(e.currentTarget === input && e.shiftKey)) {
           e.preventDefault();
           commit();
         } else if (e.key === 'Escape') {
           e.preventDefault();
           revert();
         }
-      });
+      };
+
+      input.addEventListener('keydown', handleCommitKey);
 
       const safeBlur = () => {
         if (committing) return;
@@ -264,10 +265,7 @@
 
       input.addEventListener('blur', safeBlur);
       if (colorPicker) {
-        colorPicker.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') { e.preventDefault(); commit(); }
-          else if (e.key === 'Escape') { e.preventDefault(); revert(); }
-        });
+        colorPicker.addEventListener('keydown', handleCommitKey);
         colorPicker.addEventListener('blur', safeBlur);
       }
     });
@@ -279,17 +277,14 @@
     rootEl.__inlineDeleteBound = true;
 
     rootEl.addEventListener('click', async function (ev) {
-      if (ev.ctrlKey || document.body.classList.contains('ctrl-down')) {
-        const maybe = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
-        if (maybe) {
-          T.showToast(window.t('tokens.toast.useCtrlToDelete'));
-          ev.preventDefault();
-          return;
-        }
-      }
-
       const btn = ev.target && ev.target.closest ? ev.target.closest('.btn-del') : null;
       if (!btn) return;
+
+      if (hasCtrlIntent(ev)) {
+        T.showToast(window.t('tokens.toast.useCtrlToDelete'));
+        ev.preventDefault();
+        return;
+      }
 
       const row = btn.closest('.kv-row');
       if (!row) return;

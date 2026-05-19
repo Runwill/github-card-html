@@ -6,10 +6,18 @@
     window.Game.UI.viewers = {};
     window.Game.UI.maxViewerZIndex = 11000; // Start higher than base modal
 
+    function bringToFront(modal) {
+        if (modal) modal.style.zIndex = ++window.Game.UI.maxViewerZIndex;
+    }
+
+    function cardsFromArea(area) {
+        return (area && area.cards) ? area.cards : [];
+    }
+
     document.addEventListener('click', (e) => {
         const clickedViewer = e.target.closest('.card-viewer-modal');
         if (clickedViewer) {
-            clickedViewer.style.zIndex = ++window.Game.UI.maxViewerZIndex;
+            bringToFront(clickedViewer);
             return;
         }
 
@@ -36,10 +44,7 @@
     });
 
     window.Game.UI.closeAllViewers = function() {
-        Object.keys(window.Game.UI.viewers).forEach(key => {
-            const v = window.Game.UI.viewers[key];
-            if (v && v.cleanup) v.cleanup();
-        });
+        Object.values(window.Game.UI.viewers).forEach(v => { if (v && v.cleanup) v.cleanup(); });
     };
 
     window.Game.UI.toggleCardViewer = function(title, cards, sourceId, options = {}) {
@@ -66,7 +71,7 @@
             if (e.target.closest('.card-placeholder') || e.target.closest('button')) return;
             
             // Bring to front
-            modal.style.zIndex = ++window.Game.UI.maxViewerZIndex;
+            bringToFront(modal);
 
             isDragging = true;
             startX = e.clientX;
@@ -133,16 +138,14 @@
     }
 
     function resolveViewerCards(sourceId, GameState) {
-        if (sourceId === 'pile') return (GameState.pile && GameState.pile.cards) ? GameState.pile.cards : [];
-        if (sourceId === 'discardPile') return (GameState.discardPile && GameState.discardPile.cards) ? GameState.discardPile.cards : [];
-        if (sourceId === 'treatmentArea') return (GameState.treatmentArea && GameState.treatmentArea.cards) ? GameState.treatmentArea.cards : [];
+        if (sourceId === 'pile' || sourceId === 'discardPile' || sourceId === 'treatmentArea') return cardsFromArea(GameState[sourceId]);
         if (!sourceId.startsWith('role:') && !sourceId.startsWith('role-judge:')) return [];
 
         const isJudge = sourceId.startsWith('role-judge:');
         const roleId = parseInt(sourceId.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));
         const player = GameState.players.find(p => p.id === roleId);
         const area = player && (isJudge ? player.judgeArea : player.hand);
-        return (area && area.cards) ? area.cards : [];
+        return cardsFromArea(area);
     }
 
     // --- Card Viewer Modal Logic ---
@@ -151,7 +154,7 @@
         if (window.Game.UI.viewers[sourceId]) {
             const v = window.Game.UI.viewers[sourceId];
             // Bring to front
-            v.modal.style.zIndex = ++window.Game.UI.maxViewerZIndex;
+            bringToFront(v.modal);
             // Highlight effect?
             const content = v.modal.querySelector('.modal-content');
             if (content) {
@@ -169,7 +172,7 @@
         const modal = document.createElement('div');
         modal.className = 'card-viewer-modal modal show' + (isSlotViewer ? ' card-viewer-modal--slots' : '');
         modal.id = `card-viewer-modal-${sourceId}`;
-        modal.style.zIndex = ++window.Game.UI.maxViewerZIndex;
+        bringToFront(modal);
         
         // Offset slightly to prevent total overlap
         const count = Object.keys(window.Game.UI.viewers).length;
@@ -348,9 +351,7 @@
              modal.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
              
              modal.classList.add('closing');
-             const onAnimEnd = () => {
-                 if (modal.parentNode) modal.parentNode.removeChild(modal);
-             };
+             const onAnimEnd = () => { modal.remove(); };
              modal.addEventListener('animationend', onAnimEnd);
              setTimeout(onAnimEnd, 250); 
         };

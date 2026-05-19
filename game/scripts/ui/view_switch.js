@@ -36,6 +36,11 @@
     let currentView = 'none';
     let previousView = 'none';
 
+    function setHidden(id, hidden) {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', hidden);
+    }
+
     /**
      * 切换到指定视图，隐藏其他所有视图
      * @param {'setup'|'online'|'play'|'none'} viewName
@@ -44,46 +49,29 @@
         // 记录前一个视图（用于取消时恢复）
         previousView = currentView;
         // 隐藏所有 view 容器
-        Object.values(VIEW_IDS).forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
-        });
+        Object.values(VIEW_IDS).forEach(id => setHidden(id, true));
 
         // 更新按钮 active 状态
         Object.entries(VIEW_BTN_MAP).forEach(([view, btnId]) => {
             const btn = document.getElementById(btnId);
-            if (btn) {
-                if (view === viewName) {
-                    btn.classList.add('is-active');
-                } else {
-                    btn.classList.remove('is-active');
-                }
-            }
+            if (btn) btn.classList.toggle('is-active', view === viewName);
         });
 
         // 如果不是 play 视图，隐藏对局相关元素
         if (viewName !== 'play') {
-            PLAY_ELEMENTS.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.add('hidden');
-            });
+            PLAY_ELEMENTS.forEach(id => setHidden(id, true));
         }
 
         // 显示目标视图
         if (viewName && viewName !== 'none' && VIEW_IDS[viewName]) {
-            const el = document.getElementById(VIEW_IDS[viewName]);
-            if (el) el.classList.remove('hidden');
+            setHidden(VIEW_IDS[viewName], false);
         }
 
         // play 视图：同时显示对局子面板
         if (viewName === 'play') {
-            PLAY_ELEMENTS.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.remove('hidden');
-            });
+            PLAY_ELEMENTS.forEach(id => setHidden(id, false));
             // 隐藏 start 按钮（对局已开始）
-            const startBtn = document.getElementById('btn-start-game');
-            if (startBtn) startBtn.classList.add('hidden');
+            setHidden('btn-start-game', true);
         }
 
         currentView = viewName;

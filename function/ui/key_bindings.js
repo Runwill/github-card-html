@@ -15,9 +15,7 @@
   function loadBindings() {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        bindings = JSON.parse(saved);
-      }
+      if (saved) bindings = JSON.parse(saved);
       if (Object.prototype.hasOwnProperty.call(bindings, 'toggle_theme') && bindings.toggle_theme === null) {
         delete bindings.toggle_theme;
         saveBindings();
@@ -46,10 +44,14 @@
     return bind.key.toUpperCase();
   }
 
+  function actionButton(action) {
+    const conf = ACTIONS[action];
+    return conf && document.getElementById(conf.btnId);
+  }
+
   function updateUI() {
     Object.keys(ACTIONS).forEach(action => {
-        const conf = ACTIONS[action];
-        const btn = document.getElementById(conf.btnId);
+        const btn = actionButton(action);
         if (btn) {
             btn.textContent = getBindingText(action);
             btn.classList.remove('btn--primary');
@@ -102,28 +104,9 @@
     e.stopPropagation();
     
     if (!recordingAction) return;
-
-    // Backspace: Clear binding (not assigned)
-    if (e.key === 'Backspace') {
-      bindings[recordingAction] = null;
-      saveBindings();
-      stopRecording();
-      return;
-    }
-    
-    // Escape: Reset to default
-    if (e.key === 'Escape') {
-      delete bindings[recordingAction]; // Remove custom, will use default
-      saveBindings();
-      stopRecording();
-      return;
-    }
-
-    const binding = {
-      key: e.key
-    };
-
-    bindings[recordingAction] = binding;
+    if (e.key === 'Backspace') bindings[recordingAction] = null;
+    else if (e.key === 'Escape') delete bindings[recordingAction];
+    else bindings[recordingAction] = { key: e.key };
     saveBindings();
     stopRecording();
   }
@@ -131,8 +114,7 @@
   function startRecording(action) {
     recordingAction = action;
     
-    const conf = ACTIONS[action];
-    const btn = document.getElementById(conf.btnId);
+    const btn = actionButton(action);
     if (btn) {
       btn.textContent = window.i18n ? window.i18n.t('keySettings.pressKey') : 'Press key...';
       btn.classList.add('btn--primary');
@@ -151,10 +133,7 @@
   }
 
   function cancelRecording(e) {
-    if (recordingAction) {
-        const conf = ACTIONS[recordingAction];
-        if (e.target.id === conf.btnId) return;
-    }
+    if (recordingAction && e.target === actionButton(recordingAction)) return;
     stopRecording();
   }
 
@@ -198,8 +177,7 @@
 
       // Bind record buttons
       Object.keys(ACTIONS).forEach(action => {
-          const conf = ACTIONS[action];
-          const btn = document.getElementById(conf.btnId);
+          const btn = actionButton(action);
           if (btn && !btn.__keyBindingBound) {
             btn.__keyBindingBound = true;
             btn.addEventListener('click', (e) => {

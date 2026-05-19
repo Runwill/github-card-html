@@ -33,6 +33,8 @@
   // ─── 核心函数 ───
 
   function getBackdrop() { return $(BACKDROP_ID); }
+  function panelType(panelId) { return (PANELS[panelId] || {}).type || ''; }
+  function isModal(panelId) { return panelType(panelId) === 'modal'; }
 
   /** 显示 backdrop */
   function showBackdrop() {
@@ -65,8 +67,7 @@
   function showElement(panelId) {
     var el = $(panelId);
     if (!el) return;
-    var cfg = PANELS[panelId];
-    if (cfg && cfg.type === 'modal') {
+    if (isModal(panelId)) {
       // modal: display:none → block，再触发过渡
       el.style.display = 'block';
       void el.offsetWidth; // 强制重排，让浏览器先渲染 opacity:0 状态
@@ -82,8 +83,7 @@
     var el = $(panelId);
     if (!el) return;
     el.classList.remove('show');
-    var cfg = PANELS[panelId];
-    if (cfg && cfg.type === 'modal') {
+    if (isModal(panelId)) {
       // modal 需要延迟设 display:none，等过渡动画结束
       setTimeout(function(){ el.style.display = 'none'; }, ANIM_DURATION);
     }
@@ -126,13 +126,11 @@
     }
 
     // 已经是栈顶，不重复打开
-    if (stack.length > 0 && stack[stack.length - 1] === panelId) return;
+    var top = current();
+    if (top === panelId) return;
 
     // 隐藏当前栈顶元素（不从栈中移除，保留在栈中以便返回）
-    if (stack.length > 0) {
-      var currentTop = stack[stack.length - 1];
-      hideElement(currentTop);
-    }
+    if (top) hideElement(top);
 
     // 推入新面板
     stack.push(panelId);

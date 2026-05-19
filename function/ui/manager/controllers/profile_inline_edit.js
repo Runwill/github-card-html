@@ -9,7 +9,17 @@
   var requestJson = w.endpoints && w.endpoints.requestJson;
 
   function currentUserId(){ return w.localStorage ? w.localStorage.getItem('id') : ''; }
+  function setLocalValue(key, value){ if (w.localStorage) w.localStorage.setItem(key, value); }
+  function currentUserIdOrAlert(){ var id = currentUserId(); if (!id) alert(t('error.noLoginSimple')); return id; }
   function clearPendingHtml(el){ collapsePending(el, function(){ el.innerHTML = ''; }); }
+
+  function makeInlinePendingButton(id, text, handler) {
+    var btn = document.createElement('button');
+    btn.id = id;
+    btn.textContent = text;
+    btn.onclick = handler;
+    return btn;
+  }
 
   // 共享 flash message 辅助
   function showFlash(type, text){
@@ -48,16 +58,7 @@
   function collapsePending(el, callback) {
     if (!el || !el.classList.contains('is-expanded')) { if (callback) callback(); return; }
     el.classList.remove('is-expanded');
-    var called = false;
-    var done = function() { if (called) return; called = true; if (callback) callback(); };
-    var onEnd = function(e) {
-      if (e.target !== el) return;
-      el.removeEventListener('transitionend', onEnd);
-      done();
-    };
-    el.addEventListener('transitionend', onEnd);
-    // Fallback timeout in case transitionend doesn't fire
-    setTimeout(function() { el.removeEventListener('transitionend', onEnd); done(); }, 400);
+    window.CollapsibleAnim.onTransitionEnd(el, callback, 400, function(e){ return e.target === el; });
   }
 
   function refreshUsernameUI(newName){
@@ -70,12 +71,14 @@
   function setupIntroInlineEdit(){
     var introEl = $('account-info-intro');
     if (!introEl || introEl.tagName !== 'TEXTAREA') return;
+    if (introEl.__profileInlineEditBound) return;
+    introEl.__profileInlineEditBound = true;
     var original = introEl.value || '';
     var saving = false;
     var _introState = { saveFailed: false, lastTried: '' };
     var doSave = async function(){
-      var id = currentUserId();
-      if (!id) { alert(t('error.noLoginSimple')); return; }
+      var id = currentUserIdOrAlert();
+      if (!id) return;
       var newIntro = (introEl.value || '').trim();
       if (_introState.saveFailed && newIntro === _introState.lastTried) { try { introEl.focus(); } catch(_){ } return; }
       if (newIntro === original) { return; }
@@ -84,7 +87,7 @@
       _introState.lastTried = newIntro;
       await trySave('/intro/change', { userId: id, newIntro: newIntro }, _introState, async function(respJson) {
         if (respJson && respJson.applied) {
-          if (w.localStorage) w.localStorage.setItem('intro', newIntro);
+          setLocalValue('intro', newIntro);
           original = newIntro; introEl.value = newIntro;
           showFlash('success', t('success.introUpdatedImmediate'));
           try { var wrap = $('account-info-intro-pending'); if (wrap) clearPendingHtml(wrap); } catch(_){ }
@@ -118,33 +121,32 @@
         return;
       }
       var full = (data.newIntro || '').replace(/\s+/g, ' ');
-      container.innerHTML = '';
       var span = document.createElement('span');
       span.id = 'account-info-intro-pending-inline';
       span.textContent = t('account.info.pending') + full;
-      var btn = document.createElement('button');
-      btn.id = 'account-info-intro-cancel-inline';
-      btn.textContent = t('account.info.cancel');
-      btn.onclick = function(){ cancelPendingIntroChange(); };
-      container.appendChild(span);
-      container.appendChild(btn);
+      var btn = makeInlinePendingButton('account-info-intro-cancel-inline', t('account.info.cancel'), cancelPendingIntroChange);
+      container.replaceChildren(span, btn);
       expandPending(container);
     } catch(_){
       clearPendingHtml(container);
     }
   }
 
-  async function cancelPendingIntroChange(){
+  async function cancelPendingChange(endpoint, reload) {
     try {
       var id = currentUserId();
       if (!id) return;
-      await requestJson('/intro/cancel', { method: 'POST', body: { userId: id }, defaultMessage: t('error.revokeFailed') });
-      await loadPendingIntroBadge();
+      await requestJson(endpoint, { method: 'POST', body: { userId: id }, defaultMessage: t('error.revokeFailed') });
+      await reload();
     } catch(e){ alert(e && e.status ? (e.message || t('error.revokeFailed')) : t('error.networkRevokeFailed')); }
   }
 
+  async function cancelPendingIntroChange(){ return cancelPendingChange('/intro/cancel', loadPendingIntroBadge); }
+
   function setupUsernameInlineEdit(){
     var nameEl = $('account-info-username-main'); if (!nameEl) return;
+    if (nameEl.__profileInlineEditBound) return;
+    nameEl.__profileInlineEditBound = true;
     try { nameEl.classList.add('is-editable'); } catch(_){ }
     var _isEditing = false; var _usernameState = { saveFailed: false, lastTried: '' }; var _saving = false;
 
@@ -171,13 +173,13 @@
           try { nameEl.focus(); } catch(_){ }
           return;
         }
-        var id = currentUserId();
-        if (!id) { alert(t('error.noLoginSimple')); cleanup(); return; }
+        var id = currentUserIdOrAlert();
+        if (!id) { cleanup(); return; }
         _saving = true;
         _usernameState.lastTried = newName;
         await trySave('/username/change', { userId: id, newUsername: newName }, _usernameState, async function(respJson) {
           if (respJson && respJson.applied) {
-            if (w.localStorage) w.localStorage.setItem('username', newName);
+            setLocalValue('username', newName);
             refreshUsernameUI(newName);
             showFlash('success', t('success.usernameUpdatedImmediate'));
             try { var wrap = $('account-info-username-pending-wrap'); if (wrap) collapsePending(wrap, function(){ var t2 = $('account-info-username-pending-inline'); if (t2) t2.textContent = ''; }); } catch(_){ }
@@ -230,12 +232,7 @@
   }
 
   async function cancelPendingUsernameChange(){
-    try {
-      var id = currentUserId();
-      if (!id) return;
-      await requestJson('/username/cancel', { method: 'POST', body: { userId: id }, defaultMessage: t('error.revokeFailed') });
-      loadPendingUsernameBadge();
-    } catch(e){ alert(e && e.status ? (e.message || t('error.revokeFailed')) : t('error.networkRevokeFailed')); }
+    return cancelPendingChange('/username/cancel', loadPendingUsernameBadge);
   }
 
   w.CardUI.Manager.Controllers.profileInlineEdit = {

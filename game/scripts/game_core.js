@@ -18,6 +18,22 @@
         // console.log(`[Game] Speed set to ${ms}ms`);
     }
 
+    function updateGameUI() {
+        if (window.Game.UI && window.Game.UI.updateUI) window.Game.UI.updateUI();
+    }
+
+    function switchToPlayView() {
+        if (window.Game.UI.switchGameView) window.Game.UI.switchGameView('play');
+    }
+
+    function pushFirstLeafFrom(node) {
+        while (node && (node.type === 'process' || node.type === 'ticking')) {
+             if (!node.children || node.children.length === 0) break;
+             GameState.flowStack.push(0);
+             node = node.children[0];
+        }
+    }
+
     // 辅助函数：从堆栈获取当前节点
     function getCurrentNode() {
         // 优先级 1：事件堆栈
@@ -164,21 +180,12 @@
         // Initialize Flow Stack to point to the first leaf node
         // Root is RoundProcess -> beforeRoundStart
         GameState.flowStack = [];
-        let node = window.Game.Def.GAME_FLOW;
-        while (node && (node.type === 'process' || node.type === 'ticking')) {
-             if (!node.children || node.children.length === 0) break;
-             GameState.flowStack.push(0);
-             node = node.children[0];
-        } 
+        pushFirstLeafFrom(window.Game.Def.GAME_FLOW);
 
         // 切换到对局视图
-        if (window.Game.UI.switchGameView) {
-            window.Game.UI.switchGameView('play');
-        }
+        switchToPlayView();
 
-        if (window.Game.UI && window.Game.UI.updateUI) {
-            window.Game.UI.updateUI();
-        }
+        updateGameUI();
         checkAutoAdvance();
     }
 
@@ -209,9 +216,7 @@
                 }
             }
 
-            if (window.Game.UI && window.Game.UI.updateUI) {
-                window.Game.UI.updateUI();
-            }
+            updateGameUI();
             checkAutoAdvance();
             return; // Don't advance flow stack if we processed an event
         }
@@ -233,16 +238,10 @@
                     GameState.flowStack.push(currentIdx); // Push TurnProcess index back
                     
                     // Drill down to start of TurnProcess
-                    let node = parentNode.children[currentIdx];
-                    while (node.type === 'process' || node.type === 'ticking') {
-                        GameState.flowStack.push(0);
-                        node = node.children[0];
-                    }
+                    pushFirstLeafFrom(parentNode.children[currentIdx]);
                     foundNext = true;
                     // Trigger UI update to reflect player change
-                    if (window.Game.UI && window.Game.UI.updateUI) {
-                        window.Game.UI.updateUI();
-                    }
+                    updateGameUI();
                     break; 
                 } else {
                     // Round finished (all players done)
@@ -261,11 +260,7 @@
                 GameState.flowStack.push(currentIdx); // Push RoundProcess index back
                 
                 // Drill down to start of RoundProcess
-                let node = parentNode.children[currentIdx];
-                while (node.type === 'process' || node.type === 'ticking') {
-                    GameState.flowStack.push(0);
-                    node = node.children[0];
-                }
+                pushFirstLeafFrom(parentNode.children[currentIdx]);
                 foundNext = true;
                 break;
             }
@@ -275,11 +270,7 @@
                 GameState.flowStack.push(currentIdx + 1);
                 
                 // Drill down to first leaf
-                let node = getNodeByStack(GameState.flowStack);
-                while (node.type === 'process' || node.type === 'ticking') {
-                    GameState.flowStack.push(0); // Enter first child
-                    node = node.children[0];
-                }
+                pushFirstLeafFrom(getNodeByStack(GameState.flowStack));
                 foundNext = true;
             } else {
                 // No more siblings, loop continues to pop up
@@ -298,20 +289,12 @@
             // Restart game loop (RoundProcess)
              GameState.flowStack = [0]; 
              // Logic above handles drilling down
-             let node = window.Game.Def.GAME_FLOW;
-             while (node.type === 'process' || node.type === 'ticking') {
-                GameState.flowStack.push(0);
-                node = node.children[0];
-             }
+             pushFirstLeafFrom(window.Game.Def.GAME_FLOW);
              
-             if (window.Game.UI && window.Game.UI.updateUI) {
-                window.Game.UI.updateUI();
-             }
+             updateGameUI();
              checkAutoAdvance();
         } else {
-            if (window.Game.UI && window.Game.UI.updateUI) {
-                window.Game.UI.updateUI();
-            }
+            updateGameUI();
             checkAutoAdvance();
         }
     }
@@ -355,9 +338,7 @@
         if (!GameState.isPaused) {
             checkAutoAdvance();
         }
-        if (window.Game.UI && window.Game.UI.updateUI) {
-            window.Game.UI.updateUI();
-        }
+        updateGameUI();
         return GameState.isPaused;
     }
 

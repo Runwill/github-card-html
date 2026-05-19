@@ -189,10 +189,7 @@
                 window.Game.UI.switchGameView('play');
             }
 
-            // 更新 UI
-            if (window.Game.UI && window.Game.UI.updateUI) {
-                window.Game.UI.updateUI();
-            }
+            refreshGameUI();
         } finally {
             isApplyingRemote = false;
         }
@@ -388,14 +385,8 @@
         const gs = window.Game.GameState;
         if (!gs) return null;
 
-        // 搜索所有区域
-        const areas = [gs.pile, gs.discardPile, gs.treatmentArea];
-        if (gs.players) {
-            gs.players.forEach(p => {
-                areas.push(p.hand, p.judgeArea);
-                if (p.equipSlots) p.equipSlots.forEach(s => areas.push(s));
-            });
-        }
+        const roleAreas = (gs.players || []).flatMap(p => [p.hand, p.judgeArea].concat(p.equipSlots || []));
+        const areas = [gs.pile, gs.discardPile, gs.treatmentArea].concat(roleAreas);
 
         for (const area of areas) {
             if (!area || !area.cards) continue;

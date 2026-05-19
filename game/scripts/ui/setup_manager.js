@@ -18,6 +18,13 @@
         return el;
     }
 
+    function createEl(tag, className, text) {
+        const el = document.createElement(tag);
+        if (className) el.className = className;
+        if (text !== undefined) el.textContent = text;
+        return el;
+    }
+
     function setToggle(toggle, active, label) {
         if (!toggle) return;
         toggle.dataset.value = active ? 'true' : 'false';
@@ -107,13 +114,13 @@
         const min = (currentMode === 'auto') ? 2 : 1;
         const max = 10;
 
-        countSelect.innerHTML = '';
+        const options = [];
         for (let i = min; i <= max; i++) {
-            const opt = document.createElement('option');
+            const opt = createEl('option', '', i);
             opt.value = i;
-            opt.textContent = i;
-            countSelect.appendChild(opt);
+            options.push(opt);
         }
+        countSelect.replaceChildren(...options);
 
         // 保持之前选择值（如果仍然有效），否则选第一个有效值
         if (prevValue >= min && prevValue <= max) {
@@ -219,44 +226,33 @@
     function renderPlayerSlots(count) {
         const list = byId('setup-players-list');
         if (!list) return;
-        list.innerHTML = '';
+        const groups = [];
 
         for (let i = 0; i < count; i++) {
-            const group = document.createElement('div');
-            group.className = 'ui-input-group input-group';
-
-            const label = document.createElement('span');
-            label.className = 'ui-input-label input-group-label';
-            label.textContent = `Role ${i + 1}`;
-
-            const select = document.createElement('select');
-            select.className = 'ui-field ui-input-field input-group-field setup-char-select';
+            const group = createEl('div', 'ui-input-group input-group');
+            const label = createEl('span', 'ui-input-label input-group-label', `Role ${i + 1}`);
+            const select = createEl('select', 'ui-field ui-input-field input-group-field setup-char-select');
             select.dataset.playerIndex = i;
             
-            // 填充选项
-            if (characterCache && characterCache.length) {
-                characterCache.forEach(char => {
-                    const opt = document.createElement('option');
+            const options = characterCache && characterCache.length
+                ? characterCache.map(char => {
+                    const opt = createEl('option', '', `${char.name} (HP:${char.health})`);
                     opt.value = char.id || char._id;
                     opt.dataset.charData = JSON.stringify(char);
-                    opt.textContent = `${char.name} (HP:${char.health})`;
-                    select.appendChild(opt);
-                });
-            } else {
-                const opt = document.createElement('option');
-                opt.textContent = 'Loading or No Data...';
-                select.appendChild(opt);
-            }
+                    return opt;
+                })
+                : [createEl('option', '', 'Loading or No Data...')];
+            select.replaceChildren(...options);
             
             // 简单随机默认选择
             if (select.options.length > i) {
                 select.selectedIndex = i % select.options.length;
             }
 
-            group.appendChild(label);
-            group.appendChild(select);
-            list.appendChild(group);
+            group.append(label, select);
+            groups.push(group);
         }
+        list.replaceChildren(...groups);
 
         // Wrap dynamic selects with custom dropdown component
         if (window.CustomSelect) {

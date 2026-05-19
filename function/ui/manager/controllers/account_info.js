@@ -9,49 +9,73 @@
   const setImageSrc = dom.setImageSrc;
 
   const t = (typeof window.t === 'function') ? window.t : (k)=>k;
+  const localValue = key => localStorage.getItem(key) || '';
+  const ROLE_CLS_MAP = { admin: 'badge-admin', moderator: 'badge-moderator', user: 'badge-user', guest: 'badge-guest' };
+
+  function setTextById(id, text){ const el = $(id); if (el) el.textContent = text; return el; }
+
+  function bindCopyUsername(nameTextEl){
+    const row = nameTextEl && nameTextEl.closest('.info-row');
+    if (!row || row.__copyBound) return;
+    row.__copyBound = true;
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', function() {
+      const text = nameTextEl.textContent || '';
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(function() {
+        if (window.showToast) window.showToast(t('common.copied'));
+      }).catch(function() {});
+    });
+  }
+
+  function renderCreatedAt(createdAtEl){
+    if (!createdAtEl) return;
+    const ca = localValue('createdAt');
+    if (ca) { createdAtEl.textContent = window.TimeFmt.formatAbsOrRaw(ca); return; }
+    createdAtEl.textContent = '-';
+    if (Core.userService && Core.userService.refreshCurrentUserFromServer) {
+      Core.userService.refreshCurrentUserFromServer().then(()=>{
+        const next = localValue('createdAt');
+        if (next) createdAtEl.textContent = window.TimeFmt.formatAbsOrRaw(next);
+      });
+    }
+  }
+
+  function renderPermissionBadges(container){
+    if (!container) return;
+    Array.from(container.querySelectorAll('.badge-permission')).forEach(n => n.remove());
+    const permRaw = localValue('permissions');
+    const perms = permRaw ? JSON.parse(permRaw) : [];
+    if (!Array.isArray(perms) || !perms.length) return;
+    const PERM_DESC = { '仪同三司': t('perm.tooltip.仪同三司'), '赞拜不名': t('perm.tooltip.赞拜不名') };
+    perms.forEach(raw => {
+      const p = String(raw);
+      const badge = document.createElement('span');
+      badge.className = 'badge badge-permission';
+      badge.textContent = p;
+      badge.setAttribute('data-tooltip', PERM_DESC[p] || t('perm.tooltip.prefix', { name: p }));
+      container.appendChild(badge);
+    });
+  }
+
+  function resetAccountMessage(){
+    const msg = $('account-info-message');
+    if (msg) { msg.textContent = ''; msg.className = 'modal-message'; msg.classList.remove('msg-flash'); }
+  }
 
   function openAccountInfo(){
     try {
-      const name = localStorage.getItem('username') || '';
-      const id = localStorage.getItem('id') || '';
-      const avatar = localStorage.getItem('avatar') || '';
-      const intro = localStorage.getItem('intro') || '';
+      const name = localValue('username');
+      const id = localValue('id');
+      const avatar = localValue('avatar');
+      const intro = localValue('intro');
       const resolvedAvatar = resolveAvatarUrl(avatar);
-      const role = (localStorage.getItem('role') || '').toLowerCase();
-      const roleClsMap = { admin: 'badge-admin', moderator: 'badge-moderator', user: 'badge-user', guest: 'badge-guest' };
-      const roleCls = roleClsMap[role] || 'badge-user';
-      const nameMainEl = $('account-info-username-main'); const nameTextEl = $('account-info-username-text'); const roleEl = $('account-info-role'); const idEl = $('account-info-id'); const introEl = $('account-info-intro'); const avatarEl = $('account-info-avatar');
-      const createdAtEl = $('account-info-createdAt');
-      if (nameMainEl) nameMainEl.textContent = name; if (nameTextEl) nameTextEl.textContent = name; if (idEl) idEl.textContent = id;
-      // 点击用户名行复制
-      if (nameTextEl) {
-        var row = nameTextEl.closest('.info-row');
-        if (row && !row.__copyBound) {
-          row.__copyBound = true;
-          row.style.cursor = 'pointer';
-          row.addEventListener('click', function() {
-            var text = nameTextEl.textContent || '';
-            if (!text) return;
-            navigator.clipboard.writeText(text).then(function() {
-              if (window.showToast) window.showToast(t('common.copied'));
-            }).catch(function() {});
-          });
-        }
-      }
-      if (createdAtEl) {
-        const ca = localStorage.getItem('createdAt');
-        if (ca) { createdAtEl.textContent = window.TimeFmt.formatAbsOrRaw(ca); }
-        else {
-          createdAtEl.textContent = '-';
-          // 尝试异步获取
-          if (Core.userService && Core.userService.refreshCurrentUserFromServer) {
-            Core.userService.refreshCurrentUserFromServer().then(()=>{
-              const n = localStorage.getItem('createdAt');
-              if (n) { createdAtEl.textContent = window.TimeFmt.formatAbsOrRaw(n); }
-            });
-          }
-        }
-      }
+      const role = localValue('role').toLowerCase();
+      const nameTextEl = setTextById('account-info-username-text', name);
+      const roleEl = $('account-info-role'); const introEl = $('account-info-intro'); const avatarEl = $('account-info-avatar');
+      setTextById('account-info-username-main', name); setTextById('account-info-id', id);
+      bindCopyUsername(nameTextEl);
+      renderCreatedAt($('account-info-createdAt'));
       if (introEl) {
         const ph = t('account.info.placeholder.intro');
         if (introEl.tagName === 'TEXTAREA') introEl.value = intro || '';
@@ -61,39 +85,18 @@
       if (roleEl) {
         const roleText = t('role.'+role);
         roleEl.textContent = roleText;
-        roleEl.className = 'badge ' + roleCls;
+        roleEl.className = 'badge ' + (ROLE_CLS_MAP[role] || 'badge-user');
       }
       // 权限徽标（每个权限一个徽标，不合并）
-      try {
-        const permRaw = localStorage.getItem('permissions');
-        const perms = permRaw ? JSON.parse(permRaw) : [];
-        const container = roleEl && roleEl.parentElement;
-        if (container) Array.from(container.querySelectorAll('.badge-permission')).forEach(n => n.remove());
-        if (container && Array.isArray(perms) && perms.length) {
-          const PERM_DESC = {
-            '仪同三司': t('perm.tooltip.仪同三司'),
-            '赞拜不名': t('perm.tooltip.赞拜不名')
-          };
-          perms.forEach(raw => {
-            const p = String(raw);
-            const badge = document.createElement('span');
-            badge.className = 'badge badge-permission';
-            badge.textContent = p;
-            const tipPrefix = t('perm.tooltip.prefix', { name: p });
-            const tip = PERM_DESC[p] || tipPrefix;
-            badge.setAttribute('data-tooltip', tip);
-            container.appendChild(badge);
-          });
-        }
-      } catch {}
-      const msg = $('account-info-message'); if (msg) { msg.textContent = ''; msg.className = 'modal-message'; msg.classList.remove('msg-flash'); }
+      try { renderPermissionBadges(roleEl && roleEl.parentElement); } catch {}
+      resetAccountMessage();
       // 绑定/刷新内联编辑
       try {
         const pli = Ctrls.profileInlineEdit;
         if (pli) {
-          if (!window.__bindUsernameInlineEditOnce) { window.__bindUsernameInlineEditOnce = true; pli.setupUsernameInlineEdit && pli.setupUsernameInlineEdit(); }
+          pli.setupUsernameInlineEdit && pli.setupUsernameInlineEdit();
           pli.loadPendingUsernameBadge && pli.loadPendingUsernameBadge();
-          if (!window.__bindIntroInlineEditOnce) { window.__bindIntroInlineEditOnce = true; pli.setupIntroInlineEdit && pli.setupIntroInlineEdit(); }
+          pli.setupIntroInlineEdit && pli.setupIntroInlineEdit();
           pli.loadPendingIntroBadge && pli.loadPendingIntroBadge();
         }
       } catch {}

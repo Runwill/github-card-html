@@ -23,9 +23,10 @@
   }
 
   function setImageSrc(el, src, display){ if (!el) return; if (src) { el.src = src; el.style.display = display || 'inline-block'; } else { try { el.removeAttribute('src'); } catch(_){} el.style.display = 'none'; } }
+  function setImagesSrc(ids, src, display){ (ids || []).forEach(function(id){ setImageSrc($(id), src, display); }); }
 
   function show(el, display){ if (el) el.style.display = (display == null ? 'block' : display); }
   function hide(el){ if (el) el.style.display = 'none'; }
 
-  ns.dom = { $, qs, abs, api, resolveAvatarUrl, setImageSrc, show, hide };
+  ns.dom = { $, qs, abs, api, resolveAvatarUrl, setImageSrc, setImagesSrc, show, hide };
 })();

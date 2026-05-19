@@ -18,7 +18,26 @@
     return `<time class="log-time" datetime="${escape(new Date(ts).toISOString())}" data-ts="${escape(String(ts))}" data-rel="${escape(rel)}" data-abs="${escape(abs)}">${escape(rel)}</time>`;
   }
 
-  function elem(tag, props){ return Object.assign(document.createElement(tag), props || {}); }
+  function elem(tag, props, children){
+    const node = document.createElement(tag);
+    const append = items => (Array.isArray(items) ? items : [items]).forEach(item => {
+      if (item == null) return;
+      node.appendChild(item.nodeType ? item : document.createTextNode(String(item)));
+    });
+    if (typeof props === 'string') {
+      if (props) node.className = props;
+      if (children != null) Array.isArray(children) || children.nodeType ? append(children) : node.textContent = children;
+      return node;
+    }
+    Object.entries(props || {}).forEach(([key, value]) => {
+      if (key === 'cls') node.className = value;
+      else if (key === 'text') node.textContent = value;
+      else if (key === 'style' && value && typeof value === 'object') Object.assign(node.style, value);
+      else node[key] = value;
+    });
+    if (children) append(children);
+    return node;
+  }
 
   function bindLogCollapse(header, panel){
     if (!header || !panel) return;
@@ -194,5 +213,5 @@
     }catch(_){}
   }
 
-  window.LogUtils = { esc, pill, actionsHtml, timeHtml, bindLogCollapse, ensureLogPanel, createLogEntry, appendLogEntries, prependLogEntry, bindLogCopy, bindLogDelete, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
+  window.LogUtils = { esc, elem, pill, actionsHtml, timeHtml, bindLogCollapse, ensureLogPanel, createLogEntry, appendLogEntries, prependLogEntry, bindLogCopy, bindLogDelete, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
 })();

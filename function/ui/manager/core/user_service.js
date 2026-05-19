@@ -45,15 +45,14 @@
       if (old !== next && w.localStorage) w.localStorage.setItem('avatar', next);
       var resolveAvatarUrl = d.resolveAvatarUrl || function(u){ return u || ''; };
       var setImageSrc = d.setImageSrc;
+      var setImagesSrc = d.setImagesSrc;
       var resolved = resolveAvatarUrl(next);
 
       // Best-effort update of common avatar UIs
       try {
         var $ = d.$ || function(id){ return document.getElementById(id); };
-        var sidebarPrev = $('sidebar-avatar-preview');
-        var headerAvatar = $('header-avatar');
         var modalPrev = $('avatar-modal-preview');
-        if (resolved) { setImageSrc(sidebarPrev, resolved); setImageSrc(headerAvatar, resolved); }
+        if (resolved) setImagesSrc(['sidebar-avatar-preview', 'header-avatar'], resolved);
         setImageSrc(modalPrev, resolved);
       } catch(_){ }
     } catch(_){ }

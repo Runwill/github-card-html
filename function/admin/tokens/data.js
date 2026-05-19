@@ -7,9 +7,7 @@
 
   function ensureArraysForSkills() {
     if (!state.data) state.data = {};
-    if (!Array.isArray(state.data.s0)) state.data.s0 = [];
-    if (!Array.isArray(state.data.s1)) state.data.s1 = [];
-    if (!Array.isArray(state.data.s2)) state.data.s2 = [];
+    ['s0', 's1', 's2'].forEach(k => { if (!Array.isArray(state.data[k])) state.data[k] = []; });
   }
 
   // collection → state 数组映射
@@ -25,7 +23,7 @@
     if (key) return [state.data[key] ||= []];
     if (collection === 'skill') {
       ensureArraysForSkills();
-      return [state.data.s0, state.data.s1, state.data.s2];
+      return ['s0', 's1', 's2'].map(k => state.data[k]);
     }
     return Object.keys(state.data)
       .map(k => state.data[k])

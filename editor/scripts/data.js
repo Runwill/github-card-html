@@ -7,11 +7,13 @@
   var EDITOR_DATA_BASE = 'editor/data/';
   var editorStaticDataPromise = null;
 
+  function responseJson(response) {
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    return response.json();
+  }
+
   function fetchEditorJson(fileName, fallback) {
-    return fetch(EDITOR_DATA_BASE + fileName).then(function (response) {
-      if (!response.ok) throw new Error('HTTP ' + response.status);
-      return response.json();
-    }).catch(function () { return fallback; });
+    return fetch(EDITOR_DATA_BASE + fileName).then(responseJson).catch(function () { return fallback; });
   }
 
   function loadStaticEditorData() {
@@ -33,12 +35,18 @@
   function fetchList(url) {
     if (!url) return Promise.resolve([]);
     var cached = window.fetchJsonCached || function (path) {
-      return fetch(path).then(function (response) {
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        return response.json();
-      });
+      return fetch(path).then(responseJson);
     };
     return cached(url).catch(function () { return []; });
+  }
+
+  function partsForSource(item, sourceType) {
+    if (!Array.isArray(item.part) || !item.part.length) return [];
+    return sourceType === 'dynamic' ? item.part.slice(0, 1) : item.part;
+  }
+
+  function epithetText(item, fallback) {
+    return fallback || (Array.isArray(item.epithet) ? item.epithet.map(function (ep) { return ep && ep.cn; }).filter(Boolean).join('/') : '');
   }
 
   function isVariantValue(value) {
@@ -114,8 +122,8 @@
       var cn = item.cn || '';
       if (cn) result[cn] = ['<' + en + '>', '</' + en + '>'];
 
-      if (Array.isArray(item.part) && item.part.length) {
-        var parts = sourceType === 'dynamic' ? item.part.slice(0, 1) : item.part;
+      var parts = partsForSource(item, sourceType);
+      if (parts.length) {
         parts.forEach(function (sub) {
           if (!sub || typeof sub !== 'object') return;
           if (sub.cn) result[sub.cn] = ['<' + (sub.en || '') + '>', '</' + (sub.en || '') + '>'];
@@ -123,7 +131,7 @@
       }
 
       if (Array.isArray(item.epithet) && item.epithet.length) {
-        var text = item.epithet.map(function (ep) { return ep && ep.cn; }).filter(Boolean).join('/');
+        var text = epithetText(item, '');
         if (text) result[text] = ['<' + en + '>', '</' + en + '>'];
       }
 
@@ -142,9 +150,9 @@
       var color = item.color || '';
       if (!en) return;
 
-      if (Array.isArray(item.part) && item.part.length) {
+      var parts = partsForSource(item, sourceType);
+      if (parts.length) {
         if (cn) result[en] = { label: cn, color: color, py: item.py || '', abbr: item.pyAbbr || '' };
-        var parts = sourceType === 'dynamic' ? item.part.slice(0, 1) : item.part;
         parts.forEach(function (sub) {
           if (!sub || typeof sub !== 'object') return;
           var partEn = String(sub.en || '').toLowerCase();
@@ -158,8 +166,7 @@
           };
         });
       } else if (Array.isArray(item.epithet) && item.epithet.length) {
-        var epithetText = cn || item.epithet.map(function (ep) { return ep && ep.cn; }).filter(Boolean).join('/');
-        result[en] = { label: epithetText, color: color, py: item.py || '', abbr: item.pyAbbr || '' };
+        result[en] = { label: epithetText(item, cn), color: color, py: item.py || '', abbr: item.pyAbbr || '' };
       } else {
         result[en] = { label: cn, color: color, py: item.py || '', abbr: item.pyAbbr || '' };
       }

@@ -78,12 +78,7 @@
       case 'null': return '';
       case 'unknown': return '';
       case 'empty': return [];
-      case 'arr': {
-        const elem = s.elem || { kind: 'str' };
-        if (elem.kind === 'obj') return [skeletonFromSchema(elem)];
-        if (elem.kind === 'arr') return [skeletonFromSchema(elem)];
-        return [skeletonFromSchema(elem)];
-      }
+      case 'arr': return [skeletonFromSchema(s.elem || { kind: 'str' })];
       case 'obj': {
         const out = {};
         const keys = Object.keys(s.fields || {}).sort();
@@ -183,28 +178,22 @@
 
   function applyCollectionDefaults(collection, obj, shape) {
     try {
+      const setDefaults = (defs) => Object.keys(defs).forEach(k => { if (obj[k] == null) obj[k] = defs[k]; });
+      const ensureArray = (key) => { if (!Array.isArray(obj[key])) obj[key] = []; };
       if (collection === 'character') {
         if (shape && shape.suggest && shape.suggest.nextId != null && obj.id == null) obj.id = shape.suggest.nextId;
-        if (obj.name == null) obj.name = '新武将';
-        if (obj.health == null) obj.health = 1;
-        if (obj.dominator == null) obj.dominator = 0;
+        setDefaults({ name: '新武将', health: 1, dominator: 0 });
       } else if (collection === 'card') {
-        if (obj.en == null) obj.en = 'new_card_en';
-        if (obj.cn == null) obj.cn = '新卡牌';
-        if (obj.type == null) obj.type = '';
+        setDefaults({ en: 'new_card_en', cn: '新卡牌', type: '' });
       } else if (collection === 'term-fixed') {
-        if (obj.en == null) obj.en = 'term_key';
-        if (obj.cn == null) obj.cn = '术语中文';
-        if (!Array.isArray(obj.part)) obj.part = [];
-        if (!Array.isArray(obj.epithet)) obj.epithet = [];
+        setDefaults({ en: 'term_key', cn: '术语中文' });
+        ensureArray('part'); ensureArray('epithet');
       } else if (collection === 'term-dynamic') {
-        if (obj.en == null) obj.en = 'term_key';
-        if (!Array.isArray(obj.part)) obj.part = [];
+        setDefaults({ en: 'term_key' });
+        ensureArray('part');
       } else if (collection === 'skill') {
-        if (obj.name == null) obj.name = '新技能';
-        if (obj.content == null) obj.content = '技能描述';
-        if (obj.strength == null) obj.strength = 0;
-        if (!Array.isArray(obj.role)) obj.role = [];
+        setDefaults({ name: '新技能', content: '技能描述', strength: 0 });
+        ensureArray('role');
       }
     } catch (_) {}
     return obj;

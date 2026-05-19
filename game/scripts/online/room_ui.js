@@ -50,13 +50,15 @@
         // 注册事件回调
         const client = Client();
         if (client) {
-            client.on('userJoined', onUserJoined);
-            client.on('userLeft', onUserLeft);
-            client.on('perspectivesUpdated', onPerspectivesUpdated);
-            client.on('roomOptionUpdated', onRoomOptionUpdated);
-            client.on('gameStarted', onRemoteGameStarted);
-            client.on('disconnected', onDisconnected);
-            client.on('roomDissolved', onRoomDissolved);
+            [
+                ['userJoined', onUserJoined],
+                ['userLeft', onUserLeft],
+                ['perspectivesUpdated', onPerspectivesUpdated],
+                ['roomOptionUpdated', onRoomOptionUpdated],
+                ['gameStarted', onRemoteGameStarted],
+                ['disconnected', onDisconnected],
+                ['roomDissolved', onRoomDissolved]
+            ].forEach(([event, handler]) => client.on(event, handler));
         }
     }
 
@@ -90,10 +92,10 @@
 
             // 优先进入当前所在的房间，否则显示大厅
             if (currentRoom) {
-                showInRoom();
+                setRoomView(true);
                 renderRoomInfo();
             } else {
-                showLobby();
+                setRoomView(false);
             }
 
             await refreshRoomList();
@@ -114,20 +116,6 @@
             clearInterval(refreshTimer);
             refreshTimer = null;
         }
-    }
-
-    /**
-     * 显示大厅视图
-     */
-    function showLobby() {
-        setRoomView(false);
-    }
-
-    /**
-     * 显示房间内视图
-     */
-    function showInRoom() {
-        setRoomView(true);
     }
 
     function setRoomView(inRoomVisible) {
@@ -214,7 +202,7 @@
             const item = btn.closest('.room-item');
             const roomId = item && item.dataset.roomId;
             if (btn.classList.contains('btn-enter-room')) {
-                showInRoom();
+                setRoomView(true);
                 renderRoomInfo();
             } else if (roomId && btn.classList.contains('btn-join-room')) {
                 handleJoinRoom(roomId);
@@ -229,6 +217,10 @@
             try { await client.leaveRoom(); } catch (_) { /* ignore */ }
             currentRoom = null;
         }
+        clearOnlinePerspectives();
+    }
+
+    function clearOnlinePerspectives() {
         if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
             window.Game.Online.SyncManager.clearPerspectives();
         }
@@ -242,17 +234,15 @@
         if (currentRoom.perspectives && window.Game.Online.SyncManager) {
             window.Game.Online.SyncManager.onPerspectivesChanged(currentRoom.perspectives);
         }
-        showInRoom();
+        setRoomView(true);
         renderRoomInfo();
     }
 
     function returnToLobbyAfterRoomExit() {
         currentRoom = null;
         setOnlineMode(false);
-        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
-            window.Game.Online.SyncManager.clearPerspectives();
-        }
-        showLobby();
+        clearOnlinePerspectives();
+        setRoomView(false);
     }
 
     /**
@@ -337,7 +327,7 @@
      * 返回大厅（不离开房间）
      */
     function handleBackToLobby() {
-        showLobby();
+        setRoomView(false);
         refreshRoomList();
     }
 

@@ -28,8 +28,7 @@
     function update(){
       ticking = false;
       var y = window.pageYOffset || document.documentElement.scrollTop || 0;
-      if (y > minY) btn.classList.add('is-visible');
-      else btn.classList.remove('is-visible');
+      btn.classList.toggle('is-visible', y > minY);
     }
 
     function onScroll(){

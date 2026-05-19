@@ -7,6 +7,6 @@
       const ready = window.partialsReady instanceof Promise ? window.partialsReady : Promise.resolve();
       ready.then(boot);
     }catch(_){ }
-    try{ const setCtrl=(down)=>{ if(down) document.body.classList.add('ctrl-down'); else document.body.classList.remove('ctrl-down'); }; let ctrlLatch=false; window.addEventListener('keydown',(e)=>{ if(e.ctrlKey && !ctrlLatch){ ctrlLatch=true; setCtrl(true); } }); window.addEventListener('keyup',(e)=>{ if(!e.ctrlKey){ ctrlLatch=false; setCtrl(false); } }); window.addEventListener('blur',()=>{ ctrlLatch=false; setCtrl(false); }); }catch(_){ }
+    try{ const setCtrl=(down)=> document.body.classList.toggle('ctrl-down', down); let ctrlLatch=false; window.addEventListener('keydown',(e)=>{ if(e.ctrlKey && !ctrlLatch){ ctrlLatch=true; setCtrl(true); } }); window.addEventListener('keyup',(e)=>{ if(!e.ctrlKey){ ctrlLatch=false; setCtrl(false); } }); window.addEventListener('blur',()=>{ ctrlLatch=false; setCtrl(false); }); }catch(_){ }
   });
 })();

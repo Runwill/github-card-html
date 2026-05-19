@@ -139,10 +139,7 @@
       inv = { r: 255-src.r, g: 255-src.g, b: 255-src.b, a: src.a };
     } else {
       const hsl = rgbToHsl(src.r, src.g, src.b);
-      const invH = hsl.h; // keep hue
-      const invS = hsl.s; // keep saturation
-      const invL = 1 - hsl.l; // invert luminance
-      const rgb = hslToRgb(invH, invS, invL);
+      const rgb = hslToRgb(hsl.h, hsl.s, 1 - hsl.l);
       inv = { r: rgb.r, g: rgb.g, b: rgb.b, a: src.a };
     }
     const out = blend(src, inv, clamp01(o.amount));
