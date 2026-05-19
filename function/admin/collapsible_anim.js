@@ -4,6 +4,19 @@
 (function(){
   function isAnimating(el){ return !!(el && (el.classList.contains('is-opening') || el.classList.contains('is-closing'))); }
   function isOpen(el){ return !!(el && el.classList.contains('is-open')); }
+  function onTransitionEnd(el, callback, timeoutMs, filter){
+    if (!el) { if (callback) callback(); return; }
+    let called = false;
+    const done = (event)=>{
+      if (called) return;
+      if (filter && event && !filter(event)) return;
+      called = true;
+      el.removeEventListener('transitionend', done);
+      if (callback) callback(event);
+    };
+    el.addEventListener('transitionend', done);
+    if (timeoutMs) setTimeout(()=>done(), timeoutMs);
+  }
   function openCollapsible(el){
     try{
       if (!el || isAnimating(el) || isOpen(el)) return;
@@ -13,14 +26,11 @@
       void el.offsetHeight;
       const targetH = el.scrollHeight;
       el.style.height = targetH + 'px';
-      const onEnd = (e)=>{
-        if (e && e.target !== el) return;
-        el.removeEventListener('transitionend', onEnd);
+      onTransitionEnd(el, ()=>{
         el.classList.remove('is-opening');
         el.classList.add('is-open');
         el.style.height = 'auto';
-      };
-      el.addEventListener('transitionend', onEnd);
+      }, 0, e => e.target === el);
     }catch(_){ }
   }
   function closeCollapsible(el){
@@ -32,13 +42,10 @@
       el.classList.add('is-closing');
       el.classList.remove('is-open');
       el.style.height = '0px';
-      const onEnd = (e)=>{
-        if (e && e.target !== el) return;
-        el.removeEventListener('transitionend', onEnd);
+      onTransitionEnd(el, ()=>{
         el.classList.remove('is-closing');
-      };
-      el.addEventListener('transitionend', onEnd);
+      }, 0, e => e.target === el);
     }catch(_){ }
   }
-  window.CollapsibleAnim = { isAnimating, isOpen, openCollapsible, closeCollapsible };
+  window.CollapsibleAnim = { isAnimating, isOpen, onTransitionEnd, openCollapsible, closeCollapsible };
 })();

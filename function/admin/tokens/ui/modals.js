@@ -2,10 +2,9 @@
 // 统一的“新建/编辑”弹窗；与渲染保持布局一致；支持“另存”
 (function(){
   const T = window.tokensAdmin;
-  const { esc, setByPath, stripHidden } = T;
+  const { esc, setByPath, stripHidden, showToast: toast } = T;
   const { apiJson } = T;
 
-  function toast(msg){ try{ T.showToast(msg); }catch(_){} }
   // V7: 弹窗打开动画（display→show→animate-in→focus）
   function showModalAnim(backdrop, modal, editor){
     backdrop.style.display='block'; modal.style.display='block';
@@ -52,8 +51,15 @@
     try{ payload = stripHidden(payload); }catch(_){ }
     return payload;
   }
-  function refreshDashboard(){ if(window.renderTokensDashboard) window.renderTokensDashboard(false); }
-
+  async function createDocFromPayload(collection, payload, close, toastKey){
+    const out = await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: payload } });
+    const doc = out && out.doc;
+    if(doc){ try{ window.tokensAdmin.pushDocToState(collection, doc); }catch(_){ } }
+    T.logChange('create', { collection, id: doc && doc._id, doc });
+    close();
+    try{ toast(window.t(toastKey)); }catch(_){ }
+    window.renderTokensDashboard?.(false);
+  }
   // 新建弹窗：懒加载构建 DOM 节点
   const createModalHtml = `<div class="modal-header"><h2 data-i18n="tokens.create.title"></h2></div><div class="modal-form"><div id="tokens-create-hints" class="tokens-hints scrollbar-hidden"></div><textarea id="tokens-create-editor" class="tokens-editor"></textarea><div id="tokens-create-actions" class="tokens-actions"><button type="button" class="btn btn--secondary" id="tokens-create-cancel" data-i18n="tokens.create.cancel"></button><button type="button" class="btn btn--primary btn--lift" id="tokens-create-submit" data-i18n="tokens.create.submit"></button></div></div>`;
   function ensureCreateModal(){
@@ -109,13 +115,7 @@
       try{
         const payload = readEditorPayload(editor);
         if(payload === undefined) return;
-        const out= await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: payload } });
-        const doc= out && out.doc;
-        try{ window.tokensAdmin.pushDocToState(collection, doc); }catch(_){}
-    T.logChange('create', { collection, id: doc && doc._id, doc });
-  hideCreateModal();
-  try{ toast(window.t('tokens.toast.created')); }catch(_){ }
-        refreshDashboard();
+        await createDocFromPayload(collection, payload, hideCreateModal, 'tokens.toast.created');
       }catch(e){ toastError(e, 'tokens.error.createFailed'); }
     };
   btnCancel.onclick= hideCreateModal; btnSubmit.onclick= submit;
@@ -156,7 +156,7 @@
         T.logChange('save-edits', { collection, id, sets: detailed && detailed.sets, dels: detailed && detailed.dels });
         hideEditModal();
   try{ toast(window.t('status.updated')); }catch(_){ }
-        refreshDashboard();
+        window.renderTokensDashboard?.(false);
       }catch(e){ toastError(e, 'tokens.error.updateFailed'); }
     };
     const saveAs = async ()=>{
@@ -164,13 +164,7 @@
   const next = readEditorPayload(editor);
   if(next === undefined) return;
       try{
-        const out = await apiJson('/tokens/create', { method:'POST', auth:true, body:{ collection, data: next } });
-        const newDoc = out && out.doc;
-        if(newDoc){ try{ window.tokensAdmin.pushDocToState(collection, newDoc); }catch(_){ } }
-        T.logChange('create', { collection, id: newDoc && newDoc._id, doc: newDoc });
-        hideEditModal();
-  try{ toast(window.t('tokens.toast.savedAs')); }catch(_){ }
-        refreshDashboard();
+          await createDocFromPayload(collection, next, hideEditModal, 'tokens.toast.savedAs');
       }catch(e){ toastError(e, 'tokens.error.createFailed'); }
     };
     btnCancel.onclick= hideEditModal; btnSubmit.onclick= submit; if(btnSaveAs) btnSaveAs.onclick = saveAs;

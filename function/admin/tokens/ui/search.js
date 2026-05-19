@@ -3,7 +3,7 @@
   // 搜索与刷新、缩略开关（放在搜索框旁）
 
   const T = window.tokensAdmin;
-  const { state, SEARCH_DELAY_MS } = T;
+  const { state, SEARCH_DELAY_MS, COLLECTION_TYPES } = T;
 
   function setupSearch() {
     try {
@@ -62,7 +62,7 @@
           state.q = saved;
           // 恢复时若有内容，自动展开所有类型以便搜索
           if (saved.trim()) {
-             state.openTypes = new Set(['term-fixed', 'term-dynamic', 'card', 'character', 'skill']);
+             state.openTypes = new Set(COLLECTION_TYPES);
           }
           // 恢复后立即触发一次重绘以应用过滤
           if (window.renderTokensDashboard) window.renderTokensDashboard(false);
@@ -81,7 +81,7 @@
               if (!state.searchBackupOpenTypes) {
                 state.searchBackupOpenTypes = new Set(state.openTypes ? Array.from(state.openTypes) : []);
               }
-              state.openTypes = new Set(['term-fixed', 'term-dynamic', 'card', 'character', 'skill']);
+                state.openTypes = new Set(COLLECTION_TYPES);
             } else {
               if (state.searchBackupOpenTypes) {
                 state.openTypes = new Set(Array.from(state.searchBackupOpenTypes));

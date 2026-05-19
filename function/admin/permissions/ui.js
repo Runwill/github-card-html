@@ -1,8 +1,6 @@
 (function(w){
   const ns = w.TokensPerm = w.TokensPerm || {};
 
-  function showToast(message, type){ w.showToast(message, type); }
-
   function bindPermTooltip(el, permName){
     try {
       if (!el) return;
@@ -85,18 +83,13 @@
         panel.classList.remove('is-collapsed');
         panel.style.height = target + 'px';
         panel.style.opacity = '1';
-        let timer = setTimeout(()=>done(), FALLBACK);
-        const done = (e)=>{
-          if (e && e.target !== panel) return;
-          if (e && e.propertyName !== 'height') return;
-          panel.removeEventListener('transitionend', done);
-          if (timer) { clearTimeout(timer); timer = null; }
+        const done = ()=>{
           panel.style.transition = prevTransition || '';
           panel.style.height = '';
           panel.style.opacity = '';
           panel.__animating = false;
         };
-        panel.addEventListener('transitionend', done);
+        w.CollapsibleAnim.onTransitionEnd(panel, done, FALLBACK, e => e.target === panel && e.propertyName === 'height');
       });
     } else {
       const start = panel.getBoundingClientRect().height || panel.scrollHeight;
@@ -107,21 +100,16 @@
       panel.style.height = '0px';
       panel.style.opacity = '0';
       panel.classList.add('is-collapsed');
-      let timer = setTimeout(()=>done(), FALLBACK);
-      const done = (e)=>{
-        if (e && e.target !== panel) return;
-        if (e && e.propertyName !== 'height') return;
-        panel.removeEventListener('transitionend', done);
-        if (timer) { clearTimeout(timer); timer = null; }
+      const done = ()=>{
         panel.style.transition = '';
         panel.style.height = '';
         panel.style.opacity = '';
         panel.style.display = 'none';
         panel.__animating = false;
       };
-      panel.addEventListener('transitionend', done);
+      w.CollapsibleAnim.onTransitionEnd(panel, done, FALLBACK, e => e.target === panel && e.propertyName === 'height');
     }
   }
 
-  ns.UI = { showToast, bindPermTooltip, makeEl, tag, spinnerBtn, toggleSection };
+  ns.UI = { bindPermTooltip, makeEl, tag, spinnerBtn, toggleSection };
 })(window);

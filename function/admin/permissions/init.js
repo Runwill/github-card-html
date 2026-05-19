@@ -2,7 +2,7 @@
   const ns = w.TokensPerm = w.TokensPerm || {};
 
   const onReady = fn => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', fn) : (()=>{ try { fn(); } catch(_){ } })();
-  const isAdmin = ()=>{ try{ return localStorage.getItem('role') === 'admin'; } catch(_){ return false; } };
+  const API = ns.API || {};
 
   // 确保暴露全局入口（模块加载顺序不确定时重试直至渲染函数就绪）
   (function ensureExpose(){
@@ -22,7 +22,7 @@
     try {
       const ready = (w.partialsReady instanceof Promise) ? w.partialsReady : Promise.resolve();
       ready.then(()=>{
-        if (!isAdmin()) return;
+        if (!API.isAdmin?.()) return;
         // 若面板节点存在且渲染入口已就绪，则进行一次预渲染
         const panel = document.getElementById('panel_permissions');
         const list = document.getElementById('perm-list');

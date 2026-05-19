@@ -76,10 +76,7 @@
             requestAnimationFrame(() => { requestAnimationFrame(() => { empty.style.opacity = '1'; }); });
           }
       };
-      let done = false;
-      const onEnd = () => { if (done) return; done = true; row.removeEventListener('transitionend', onEnd); finish(); };
-      row.addEventListener('transitionend', onEnd);
-      setTimeout(onEnd, 320); // 兜底
+      window.CollapsibleAnim.onTransitionEnd(row, finish, 320);
     } catch(_){}
   }
 

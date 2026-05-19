@@ -7,7 +7,7 @@
   // 依赖
   const UI = ns.UI || {};
   const API = ns.API || {};
-  const { makeEl, tag, bindPermTooltip, spinnerBtn, toggleSection, showToast } = UI;
+  const { makeEl, tag, bindPermTooltip, spinnerBtn, toggleSection } = UI;
 
   // 工具：i18n/文本/提示
   const t = (key, fallback) => {
@@ -26,8 +26,9 @@
     catch { el.textContent = fallback || ''; }
   };
   const toast = (keyOrText, type) => {
-    try { showToast((w.t && w.t(keyOrText)) || keyOrText || '', type); }
-    catch { showToast('', type); }
+    let message = keyOrText || '';
+    try { message = (w.t && w.t(keyOrText)) || message; } catch {}
+    try { w.showToast(message, type); } catch {}
   };
 
   // 预加载用户列表与权限清单，避免面板首次打开时短暂空白导致布局抖动

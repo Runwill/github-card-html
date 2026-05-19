@@ -262,7 +262,7 @@
       const expanded=root.getAttribute('data-expanded')==='1';
       const transitionMs=400;
   const setBtn=(isOpen)=>{ if(btn){ btn.setAttribute('data-i18n', isOpen? 'common.collapse':'common.expand'); window.i18n?.applySafe?.(btn); btn.classList.toggle('is-expanded', isOpen); } };
-      const onEnd=(cb)=>{ let called=false; const handler=()=>{ if(called) return; called=true; more.removeEventListener('transitionend',handler); cb&&cb(); }; more.addEventListener('transitionend', handler, { once:true }); setTimeout(handler, transitionMs+50); };
+      const onEnd=(cb)=> window.CollapsibleAnim.onTransitionEnd(more, cb, transitionMs+50);
       if(!expanded){
         more.style.display='block';
         more.classList.add('is-opening');

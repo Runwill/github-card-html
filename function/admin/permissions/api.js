@@ -22,6 +22,8 @@
     jsonPost,
     jsonDelete,
     jsonPatch,
+    isAdmin(){ try { return localStorage.getItem('role') === 'admin'; } catch(_){ return false; } },
+    hasToken(){ try { return !!localStorage.getItem('token'); } catch(_){ return false; } },
     setPassword(userId, newPassword){ return jsonPost('/user/password/set', { userId, newPassword }); },
     async fetchUsers(search){
       const q = search ? ('?search=' + encodeURIComponent(search)) : '';

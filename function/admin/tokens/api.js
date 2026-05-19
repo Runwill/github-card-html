@@ -59,6 +59,7 @@
     'character': { key: 'characters', url: '/character' },
     'skill': { key: 'skills', url: '/skill' },
   });
+  const COLLECTION_TYPES = Object.freeze(Object.keys(COLLECTIONS));
 
-  Object.assign(window.tokensAdmin, { getAuth, apiJson, COLLECTIONS, CLIENT_ID, fetchTokenLogs });
+  Object.assign(window.tokensAdmin, { getAuth, apiJson, COLLECTIONS, COLLECTION_TYPES, CLIENT_ID, fetchTokenLogs });
 })();

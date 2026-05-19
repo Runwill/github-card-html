@@ -1,7 +1,7 @@
 (function(){
   // permissions/logs/logs_data — 数据层: 日志获取、事件绑定、语言切换
   // UI factory 在 logs.js 中，通过 TokensPerm._LogsUI 共享
-  const { jsonGet: apiGet, jsonDelete: apiDelete, jsonPatch: apiPatch } = window.TokensPerm.API;
+  const { jsonGet: apiGet, jsonDelete: apiDelete, jsonPatch: apiPatch, isAdmin, hasToken } = window.TokensPerm.API;
   const UI = window.TokensPerm._LogsUI;
   const RenderUI = window.TokensPerm._RenderUI || {};
 
@@ -40,8 +40,6 @@
 
   document.addEventListener('DOMContentLoaded', function(){
     const ready = (window.partialsReady instanceof Promise) ? window.partialsReady : Promise.resolve();
-    const isAdmin = ()=>{ try{ return localStorage.getItem('role') === 'admin'; } catch(_){ return false; } };
-    const hasToken = ()=>{ try{ return !!localStorage.getItem('token'); } catch(_){ return false; } };
     // 封装一次性绑定：在 #perms-log 出现后再绑定事件委托，避免绑定时机早于 DOM 创建
     function bindDeleteDelegation(){
       try{
