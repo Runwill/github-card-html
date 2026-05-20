@@ -18,13 +18,15 @@
 // 轻量 JSON 缓存，避免相同 URL 重复请求
 const __jsonCache = new Map()
 function fetchJsonCached(url, options){
-  if (__jsonCache.has(url)) return __jsonCache.get(url)
+  const cacheMode = options && options.cache
+  const bypassCache = cacheMode === 'no-cache' || cacheMode === 'reload' || cacheMode === 'no-store'
+  if (!bypassCache && __jsonCache.has(url)) return __jsonCache.get(url)
   const p = fetch(url, options).then(r => {
     if (!r.ok) throw new Error('HTTP '+r.status+' for '+url)
     return r.json()
   })
   .catch(err => { __jsonCache.delete(url); throw err })
-  __jsonCache.set(url, p)
+  if (cacheMode !== 'no-store') __jsonCache.set(url, p)
   return p
 }
 

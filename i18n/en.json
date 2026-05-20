@@ -141,6 +141,7 @@
   "help.editor.graphMode": "Click the relation type button to cycle combined, nested, or adjacent links",
   "help.editor.graphLinks": "Shown links filters drawn lines by percentage: 10% minimum, 100% for all links; it does not change zoom or node count",
   "help.editor.graphNavigate": "Drag to pan and scroll to zoom; fit graph scales to the node bounds",
+  "help.editor.graphNode": "Click a node to inspect related items; click a detail row to jump again",
   "help.editor.io": "Input from the draft box into the tree, or output back to the draft box",
   "help.editor.move": "Drag tree nodes to change nesting or sibling order",
   "help.editor.key.focusSearch": "Focus the element search box",

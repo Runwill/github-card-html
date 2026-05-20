@@ -89,31 +89,38 @@
       { "keys": ["技能名悬停"], "desc": "help.character.lore" },
       { "keys": ["悬停 / 双击标签"], "desc": "help.character.dynamic" }
     ],
-    "panel_draft": [
-      { "keys": ["输入区"], "desc": "help.draft.input" },
-      { "keys": ["编辑器 / 关系图"], "desc": "help.editor.viewSwitch" },
-      { "keys": ["元素库"], "desc": "help.editor.palette" },
-      { "keys": ["点击元素"], "desc": "help.editor.insert" },
-      { "keys": ["拖拽位置"], "desc": "help.editor.dragInsert" },
-      { "actions": ["editor_variant_mode"], "desc": "help.editor.variant" },
-      { "keys": ["结构树"], "desc": "help.editor.editInline" },
-      { "keys": ["属性栏"], "desc": "help.editor.attrs" },
-      { "keys": ["单向 / 双向"], "desc": "help.editor.recommendationMode" },
-      { "keys": ["关系图搜索"], "desc": "help.editor.graphSearch" },
-      { "keys": ["关系类型"], "desc": "help.editor.graphMode" },
-      { "keys": ["连线数量"], "desc": "help.editor.graphLinks" },
-      { "keys": ["关系图节点"], "desc": "help.editor.graphNavigate" },
-      { "keys": ["输入 / 输出"], "desc": "help.editor.io" },
-      { "keys": ["拖动节点"], "desc": "help.editor.move" },
-      { "actions": ["editor_focus_search"], "desc": "help.editor.key.focusSearch" },
-      { "actions": ["editor_clear_selection"], "desc": "help.editor.key.clearSelection" },
-      { "actions": ["editor_add_child"], "desc": "help.editor.key.addChild" },
-      { "actions": ["editor_add_sibling"], "desc": "help.editor.key.addSibling" },
-      { "actions": ["editor_edit_selected"], "desc": "help.editor.key.editSelected" },
-      { "actions": ["editor_delete_selected"], "desc": "help.editor.key.deleteSelected" },
-      { "keys": ["Ctrl+Z / Ctrl+Y"], "desc": "help.editor.key.undoRedo" },
-      { "actions": ["editor_variant_mode"], "desc": "help.editor.key.variant" }
-    ],
+    "panel_draft": {
+      "common": [
+        { "keys": ["编辑器 / 关系图"], "desc": "help.editor.viewSwitch" }
+      ],
+      "editor": [
+        { "keys": ["输入区"], "desc": "help.draft.input" },
+        { "keys": ["元素库"], "desc": "help.editor.palette" },
+        { "keys": ["点击元素"], "desc": "help.editor.insert" },
+        { "keys": ["拖拽位置"], "desc": "help.editor.dragInsert" },
+        { "actions": ["editor_variant_mode"], "desc": "help.editor.variant" },
+        { "keys": ["结构树"], "desc": "help.editor.editInline" },
+        { "keys": ["属性栏"], "desc": "help.editor.attrs" },
+        { "keys": ["单向 / 双向"], "desc": "help.editor.recommendationMode" },
+        { "keys": ["输入 / 输出"], "desc": "help.editor.io" },
+        { "keys": ["拖动节点"], "desc": "help.editor.move" },
+        { "actions": ["editor_focus_search"], "desc": "help.editor.key.focusSearch" },
+        { "actions": ["editor_clear_selection"], "desc": "help.editor.key.clearSelection" },
+        { "actions": ["editor_add_child"], "desc": "help.editor.key.addChild" },
+        { "actions": ["editor_add_sibling"], "desc": "help.editor.key.addSibling" },
+        { "actions": ["editor_edit_selected"], "desc": "help.editor.key.editSelected" },
+        { "actions": ["editor_delete_selected"], "desc": "help.editor.key.deleteSelected" },
+        { "keys": ["Ctrl+Z / Ctrl+Y"], "desc": "help.editor.key.undoRedo" },
+        { "actions": ["editor_variant_mode"], "desc": "help.editor.key.variant" }
+      ],
+      "relations": [
+        { "keys": ["关系图搜索"], "desc": "help.editor.graphSearch" },
+        { "keys": ["关系类型"], "desc": "help.editor.graphMode" },
+        { "keys": ["连线数量"], "desc": "help.editor.graphLinks" },
+        { "keys": ["拖拽 / 滚轮"], "desc": "help.editor.graphNavigate" },
+        { "keys": ["关系图节点"], "desc": "help.editor.graphNode" }
+      ]
+    },
     "panel_tokens": [
       { "keys": ["搜索框"], "desc": "help.tokens.search" },
       { "keys": ["刷新"], "desc": "help.tokens.refresh" },

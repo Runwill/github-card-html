@@ -141,6 +141,7 @@
   "help.editor.graphMode": "点击关系类型按钮循环切换综合、嵌套或相连关系",
   "help.editor.graphLinks": "连线数量按百分比筛选画出的线条，最低 10%，最高显示全部，不改变缩放或节点数量",
   "help.editor.graphNavigate": "拖动画布平移，滚轮缩放；适配全图会按节点范围缩放",
+  "help.editor.graphNode": "点击节点查看关联详情，点击详情条目继续定位",
   "help.editor.io": "从草稿框输入到结构树，或输出回草稿框",
   "help.editor.move": "拖拽结构树节点调整层级或同级顺序",
   "help.editor.key.focusSearch": "聚焦元素库搜索框",

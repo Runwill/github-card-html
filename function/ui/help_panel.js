@@ -33,15 +33,32 @@
     'announcements-modal': 'help.overlay.announcements'
   };
 
-  // Game 面板子视图 → i18n key
-  var GAME_VIEW_LABEL = {
-    setup: 'help.game.viewSetup',
-    online: 'help.game.viewOnline',
-    play: 'help.game.viewPlay'
+  // 面板子视图 → i18n key
+  var PANEL_VIEW_LABEL = {
+    panel_draft: {
+      editor: 'editor.view.editor',
+      relations: 'editor.view.relations'
+    },
+    panel_game: {
+      setup: 'help.game.viewSetup',
+      online: 'help.game.viewOnline',
+      play: 'help.game.viewPlay'
+    }
   };
 
   function getGameView() {
     try { return window.Game.UI.getCurrentView(); } catch (_) { return 'none'; }
+  }
+
+  function getDraftView() {
+    var page = document.querySelector('#panel_draft .draft-page');
+    return page && page.dataset.editorView === 'relations' ? 'relations' : 'editor';
+  }
+
+  function getPanelView(panelId) {
+    if (panelId === 'panel_game') return getGameView();
+    if (panelId === 'panel_draft') return getDraftView();
+    return null;
   }
 
   // ── 当前上下文检测（overlay 优先于面板） ──
@@ -61,9 +78,9 @@
     if (data) return data;
     try {
       if (window.AppPreload && typeof window.AppPreload.json === 'function') {
-        data = await window.AppPreload.json('base/help.json');
+        data = await window.AppPreload.json('base/help.json', { cache: 'no-cache' });
       } else {
-        const resp = await fetch('base/help.json');
+        const resp = await fetch('base/help.json', { cache: 'no-cache' });
         data = await resp.json();
       }
     } catch (e) {
@@ -123,16 +140,15 @@
       var panelId = ctx.id;
       var navKey = PANEL_NAV_KEY[panelId] || 'nav.term';
       title = t(navKey);
-      var gameView = panelId === 'panel_game' ? getGameView() : null;
-      if (gameView) {
-        var labelKey = GAME_VIEW_LABEL[gameView];
+      var panelView = getPanelView(panelId);
+      if (panelView) {
+        var labelKey = PANEL_VIEW_LABEL[panelId] && PANEL_VIEW_LABEL[panelId][panelView];
         if (labelKey) title += ' · ' + t(labelKey);
       }
 
       var panelData = data.panels && data.panels[panelId];
       if (panelData && !Array.isArray(panelData)) {
-        var view = gameView || getGameView();
-        panelTips = (panelData[view] || []).concat(panelData.common || []);
+        panelTips = (panelData[panelView] || []).concat(panelData.common || []);
       } else {
         panelTips = panelData || [];
       }

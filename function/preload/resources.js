@@ -22,7 +22,6 @@
   preload.register('prefetch-static-json', function(){
     return Promise.all([
       preload.json('base/announcements.json', { cache: 'no-cache' }),
-      preload.json('base/help.json'),
       preload.json('base/compression.json')
     ]);
   }, { context: 'app', priority: 30, delay: 160, timeout: 2200 });
