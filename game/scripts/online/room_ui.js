@@ -8,7 +8,6 @@
 
     const Client = () => window.Game.Online.RoomClient;
     let currentRoom = null;
-    let refreshTimer = null;
     let isSpectating = false;
 
     function t(key) {
@@ -16,7 +15,6 @@
     }
 
     const byId = window.Game.Utils.byId;
-    const myId = window.Game.Utils.myId;
 
     function bind(id, event, handler) {
         const el = byId(id);
@@ -111,10 +109,6 @@
         // 恢复到之前的视图（如果对局在进行中则回到对局）
         if (window.Game.UI.restorePreviousView) {
             window.Game.UI.restorePreviousView();
-        }
-        if (refreshTimer) {
-            clearInterval(refreshTimer);
-            refreshTimer = null;
         }
     }
 

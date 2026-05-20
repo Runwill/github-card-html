@@ -133,10 +133,18 @@
     return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${toolbar}${innerHtml}</div>`;
   }
   const renderCollectionItem = (coll, doc)=> cardShell(coll, doc, renderKV(doc, getAccent(doc), ''));
+  function hasLoadedDashboardData(){
+    const data = state.data;
+    if(!data) return false;
+    return COLLECTION_TYPES.every(type => {
+      if(type === 'skill') return ['s0','s1','s2'].every(key => Array.isArray(data[key]));
+      const conf = COLLECTIONS[type];
+      return conf && Array.isArray(data[conf.key]);
+    });
+  }
   // 拉取集合数据（含技能三强度合并）并缓存于 state
   async function getCollectionData(collection){
     try{
-      if(!state.data) state.data={};
       const conf=COLLECTIONS[collection];
       if(!conf) return [];
       if(collection==='skill'){
@@ -173,7 +181,7 @@
     const { canEdit }=getAuth();
     try{
       // 需要时并行拉取所有集合
-      if(!state.data || forceReload){
+      if(!hasLoadedDashboardData() || forceReload){
         const [termFixed, termDynamic, cards, characters, allSkills] = await Promise.all([
           apiJson('/term-fixed'),
           apiJson('/term-dynamic'),
@@ -288,7 +296,7 @@
       }
     }catch(_){ }
   }
-  function tokensRefresh(){ state.data=null; renderTokensDashboard(true); }
+  function tokensRefresh(){ state.data={}; renderTokensDashboard(true); }
   async function tokensOpenCreate(collection){ try{ const dataArr= await getCollectionData(collection); const variants= computeCollectionVariants(collection, dataArr||[]); if(variants && variants.length>0){ window.tokensAdmin.showCreateModal(collection, null, variants[0].tpl, variants); return; } const shape = await apiJson(`/tokens/shape?collection=${encodeURIComponent(collection)}`, { auth:true }); const tpl = window.tokensAdmin.buildTemplate(collection, shape); window.tokensAdmin.showCreateModal(collection, shape, tpl, null); }catch(e){ alert(e.message || '获取结构失败'); } }
   function computeCollectionVariants(collection, arr){ const map=new Map(); for(const doc of (Array.isArray(arr)? arr:[])){ const schema=window.tokensAdmin.deriveSchema(doc||{}); const sig=window.tokensAdmin.schemaSignature(schema); let cur=map.get(sig); if(!cur){ cur={schema, count:0, samples:[]}; map.set(sig, cur); } cur.count+=1; if(cur.samples.length<3) cur.samples.push(doc); } const list= Array.from(map.values()).map((it,idx)=>{ const base=window.tokensAdmin.skeletonFromSchema(it.schema); const tpl=base; const hints= window.tokensAdmin.flattenHintsFromSchema(it.schema); return { id:`scheme-${idx+1}`, count:it.count, schema:it.schema, tpl, hints, samples:it.samples }; }); list.sort((a,b)=>{ const ak=a.hints.length, bk=b.hints.length; if(bk!==ak) return bk-ak; return b.count-a.count; }); return list; }
   Object.assign(window, { renderTokensDashboard, toggleTokensSection, tokensRefresh, tokensOpenCreate });

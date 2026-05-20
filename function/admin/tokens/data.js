@@ -6,7 +6,6 @@
   const { state, HIDE_KEYS } = T;
 
   function ensureArraysForSkills() {
-    if (!state.data) state.data = {};
     ['s0', 's1', 's2'].forEach(k => { if (!Array.isArray(state.data[k])) state.data[k] = []; });
   }
 
@@ -18,7 +17,6 @@
     'character':    'characters',
   };
   function getArrays(collection) {
-    if (!state.data) state.data = {};
     const key = COL_MAP[collection];
     if (key) return [state.data[key] ||= []];
     if (collection === 'skill') {
@@ -42,7 +40,6 @@
   }
 
   function findDocEntry(collection, id) {
-    if (!state.data) return null;
     const sid = String(id);
     for (const arr of getArrays(collection)) {
       const index = arr.findIndex(d => d && String(d._id) === sid);

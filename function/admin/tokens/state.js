@@ -5,7 +5,7 @@
   window.tokensAdmin = window.tokensAdmin || {};
 
   const state = {
-    data: null,
+    data: {},
     q: '',
     timer: null,
     activeType: null,
