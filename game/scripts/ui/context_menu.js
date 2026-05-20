@@ -73,22 +73,21 @@
     }
 
     function updateGameUI() {
-        if (window.Game.UI && window.Game.UI.updateUI) window.Game.UI.updateUI();
+        window.Game.UI?.updateUI?.();
     }
 
     function setSandboxTurn(gs, playerIndex) {
         gs.sandboxTurnIndex = playerIndex;
         if (playerIndex >= 0) document.documentElement.style.setProperty('--turn-ring-color', '#48bb78');
         if (gs.onlineMode) {
-            const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
-            if (SyncMgr && SyncMgr.interceptDispatch) SyncMgr.interceptDispatch('setSandboxTurn', { playerIndex });
+            window.Game.Online?.SyncManager?.interceptDispatch?.('setSandboxTurn', { playerIndex });
         }
         updateGameUI();
     }
 
     function showContextMenu(x, y, player) {
         let actions = [];
-        const isSandbox = window.Game.GameState && window.Game.GameState.mode === 'sandbox';
+        const isSandbox = window.Game.GameState?.mode === 'sandbox';
 
         // ── 视角 / 回合角色（始终可用）──
         const gs = window.Game.GameState;
@@ -99,9 +98,7 @@
                 actions.push({
                     label: '👁 切换视角到此角色',
                     action: () => {
-                        if (window.Game.UI.setPerspective) {
-                            window.Game.UI.setPerspective(playerIdx);
-                        }
+                        window.Game.UI.setPerspective?.(playerIdx);
                     }
                 });
             }

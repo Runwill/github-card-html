@@ -83,7 +83,7 @@
 
   function resolveLabel(collection, id, fallback) {
     try{
-      const doc = (window.tokensAdmin && window.tokensAdmin.findDocInState) ? window.tokensAdmin.findDocInState(collection, id) : null;
+      const doc = window.tokensAdmin?.findDocInState?.(collection, id) || null;
       const label = doc ? pickUnique(doc) : (fallback || '');
       return label || ('#' + shortId(id));
     }catch(_){ return ('#' + shortId(id)); }
@@ -99,17 +99,8 @@
     const actions = LogUtils.actionsHtml();
     if (type === 'create') {
       const label = pickUnique(payload && payload.doc) || (payload && payload.id ? ('#' + shortId(payload.id)) : '');
-      const msg = (function(){
-        try{
-          const d = payload && payload.doc;
-          if (!d || typeof d !== 'object') return '';
-          if (d.cn) return String(d.cn);
-          if (d.en) return String(d.en);
-          if (d.name) return String(d.name);
-          if (d.id != null) return String(d.id);
-          return '';
-        }catch(_){ return ''; }
-      })();
+      const msgValue = pickField(payload && payload.doc, ['cn','en','name','id']);
+      const msg = msgValue == null ? '' : String(msgValue);
   return `<div class="log-row is-create">${timeHtml}${LogUtils.pill('tokens.log.create','is-green')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(label)}]</i><i class="log-msg">${code(msg)}</i>${actions}</div>`;
     }
     if (type === 'delete-doc') {
@@ -128,10 +119,9 @@
       const sets = pickList(payload, 'sets');
       const dels = pickList(payload, 'dels');
     const head = `${timeHtml}${LogUtils.pill('tokens.edit.submit','is-indigo')}<i class="log-ctx">${cKey? `<span data-i18n="${cKey}"></span>`:''} [${esc(tag)}]</i><span class="log-summary" data-i18n="tokens.log.saveSummary" data-i18n-params='${esc(JSON.stringify({ sets: sets.length, dels: dels.length }))}'></span>`;
-      const pick = (val) => (val && typeof val === 'object') ? JSON.stringify(val) : val;
       const detail = [];
-      sets.slice(0, 10).forEach(s => { detail.push(`<span class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(pick(s.from))} → `:''}${code(pick(s.to))}</span>`); });
-    dels.slice(0, 10).forEach(d => { detail.push(`<span class="log-sub is-del"><span data-i18n="common.delete"></span> ${code(d.path)}${d.from!==undefined? ` (<span data-i18n="tokens.log.prev"></span>${code(pick(d.from))})`:''}</span>`); });
+      sets.slice(0, 10).forEach(s => { detail.push(`<span class="log-sub">${code(s.path)}：${s.from!==undefined? `${code(json(s.from))} → `:''}${code(json(s.to))}</span>`); });
+    dels.slice(0, 10).forEach(d => { detail.push(`<span class="log-sub is-del"><span data-i18n="common.delete"></span> ${code(d.path)}${d.from!==undefined? ` (<span data-i18n="tokens.log.prev"></span>${code(json(d.from))})`:''}</span>`); });
       return `<div class="log-row is-save">${head}${detail.join('')}${actions}</div>`;
     }
   return `<div class=\"log-row\">${timeHtml}${LogUtils.pill(type)}${actions}</div>`;
@@ -190,9 +180,8 @@
     }catch(_){ }
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
-    const ready = (window.partialsReady instanceof Promise) ? window.partialsReady : Promise.resolve();
-    ready.then(()=>{ try{ hydrateLogs(); }catch(_){ } }).then(()=>{
+  whenDOMReady().then(()=>{
+    whenPartialsReady().then(()=>{ try{ hydrateLogs(); }catch(_){ } }).then(()=>{
       try{ LogUtils.startRelTimeRefresh('.log-time[data-ts]', '__tokensLogRelTimer'); }catch(_){ }
         try{ LogUtils.bindLogTimeHover(document.getElementById('tokens-log') || document); }catch(_){ }
     });

@@ -17,12 +17,8 @@
                 onFinish: onFinish
             });
             // 立即触发 UI 更新以显示事件开始
-            if (window.Game.UI && window.Game.UI.updateUI) {
-                window.Game.UI.updateUI();
-            }
-            if (window.Game.Core.checkAutoAdvance) {
-                window.Game.Core.checkAutoAdvance(); // 开始处理
-            }
+            window.Game.UI?.updateUI?.();
+            window.Game.Core.checkAutoAdvance?.(); // 开始处理
         },
 
         // recover: 角色回复 value 点体力

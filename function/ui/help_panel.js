@@ -78,12 +78,7 @@
     return window.TabsUI?.getActivePanelId?.('panel_term') || 'panel_term';
   }
 
-  function node(tag, className, text) {
-    var el = document.createElement(tag);
-    if (className) el.className = className;
-    if (text !== undefined) el.textContent = text;
-    return el;
-  }
+  const node = window.LogUtils.elem;
 
   // ── DOM 创建 ──
   function ensurePopover() {
@@ -212,9 +207,7 @@
     if (visible) hideHelp(); else showHelp();
   }
 
-  // ── 初始化 ──
-  function init() {
-    // ? 快捷键
+  whenDOMReady().then(()=> whenPartialsReady().then(()=>{
     document.addEventListener('keydown', function (e) {
       var tag = (e.target.tagName || '').toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
@@ -252,13 +245,7 @@
     window.addEventListener('i18n:changed', function () {
       if (visible) renderContent(getActiveContext());
     });
-  }
-
-  if (window.partialsReady) {
-    window.partialsReady.then(init);
-  } else {
-    document.addEventListener('DOMContentLoaded', init);
-  }
+  }));
 
   window.openHelpPanel = toggleHelp;
   window.preloadHelpPanel = loadData;

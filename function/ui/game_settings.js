@@ -104,35 +104,16 @@
     if (savedInertia !== null) applyInertiaConfig(parseFloat(savedInertia));
   }
 
-  function init() {
-    const setupUI = () => {
-      // === Game Settings Modal ===
-      const gameSettingsBtn = $(GAME_SETTINGS_BUTTON_ID);
-      if (gameSettingsBtn) {
-        gameSettingsBtn.addEventListener('click', () => {
-          var OV = window.CardUI?.Manager?.Controllers?.overlay;
-          if (OV) {
-            OV.open('game-settings-modal');
-          }
-          initGameSettingsUI();
-        });
-      }
-
-      // Initialize game settings controls
+  whenDOMReady().then(()=> whenPartialsReady().then(()=>{
+    const gameSettingsBtn = $(GAME_SETTINGS_BUTTON_ID);
+    if (gameSettingsBtn) gameSettingsBtn.addEventListener('click', () => {
+      var OV = window.CardUI?.Manager?.Controllers?.overlay;
+      if (OV) OV.open('game-settings-modal');
       initGameSettingsUI();
-    };
-
-    if (window.partialsReady) {
-      window.partialsReady.then(setupUI);
-    } else if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupUI);
-    } else {
-      setupUI();
-    }
-  }
+    });
+    initGameSettingsUI();
+  }));
   
   window.KeySettings = window.KeySettings || {};
   window.KeySettings.loadGameSettings = loadGameSettings;
-
-  init();
 })();

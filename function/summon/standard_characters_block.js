@@ -47,5 +47,5 @@ function CharacterReplace(character, skill) {
     // 仅渲染角色内容本体；共享筛选框由 function/ui/shared_search.js 负责挂载
     $('.standardCharactersBlock').html(`<br>${out}`)
         // 渲染后若搜索框有关键字，应用将池筛选
-        try { window.filterParagraphs && window.filterParagraphs() } catch(_) {}
+        try { window.filterParagraphs?.() } catch(_) {}
 }

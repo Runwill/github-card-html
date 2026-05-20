@@ -1,12 +1,13 @@
 // 审核模块：统一管理注册与头像审核（管理员/版主）
 (function(){
-  const refreshUser = () => { try { const us = window.CardUI && window.CardUI.Manager && window.CardUI.Manager.Core && window.CardUI.Manager.Core.userService; if (us && us.refreshCurrentUserFromServer) us.refreshCurrentUserFromServer(); } catch(_){} };
+  const refreshUser = () => { try { window.CardUI?.Manager?.Core?.userService?.refreshCurrentUserFromServer?.(); } catch(_){} };
 
   const jsonGet = path => endpoints.requestJson(path, { auth: 'always', preferJsonMessage: false });
   const jsonPost = (path, body)=> endpoints.requestJson(path, { method:'POST', auth: 'always', body: body || {} });
 
   const createdAtDate = value => new Date((window.TimeFmt?.parseTimeValue?.(value) ?? Date.parse(value)) || 0);
   const el = window.LogUtils.elem;
+  const emptyOverlay = opacity => el('p', { cls:'empty-hint empty-overlay', text:'空', style:{ position:'absolute', inset:'0', display:'flex', alignItems:'center', justifyContent:'center', margin:'0', opacity:String(opacity), transition: opacity ? '' : 'opacity 180ms ease' } });
 
   // ── fetchPending 工厂 ──
   function makeFetchPending(path, label){
@@ -49,7 +50,7 @@
           // 若已无剩余项，展示“空”覆盖层（绝对定位），不影响容器高度
           if (container && !container.querySelector('.approval-row')) {
             container.style.position = 'relative';
-            const empty = el('p', { cls:'empty-hint empty-overlay', text:'空', style:{ position:'absolute', inset:'0', display:'flex', alignItems:'center', justifyContent:'center', margin:'0', opacity:'0', transition:'opacity 180ms ease' } });
+            const empty = emptyOverlay(0);
             container.appendChild(empty);
             requestAnimationFrame(() => { requestAnimationFrame(() => { empty.style.opacity = '1'; }); });
           }
@@ -68,21 +69,16 @@
       await jsonPost(apiPath, body);
       removeApprovalRowFromTrigger(trigger);
       if (postSuccess) postSuccess();
-      try { if (window.TokensPerm && window.TokensPerm.refreshLogs) window.TokensPerm.refreshLogs(); } catch(_){ }
+      try { window.TokensPerm?.refreshLogs?.(); } catch(_){ }
     } catch(e){
       alert(e.message || '操作失败');
       setRowButtonsDisabled(row, false);
     }
   }
 
-  const refreshPermissionUsers = () => { try { if (window.TokensPerm && window.TokensPerm.refreshUsers) window.TokensPerm.refreshUsers(true); } catch(_){ } };
+  const refreshPermissionUsers = () => { try { window.TokensPerm?.refreshUsers?.(true); } catch(_){ } };
   const makeApprovalHandler = (apiPath, idKey, postSuccess)=> (recordId, action, trigger)=> handleApproval(apiPath, { [idKey]: recordId, action }, trigger, postSuccess);
-  const handleUserApproval = makeApprovalHandler('/approve', 'userId', refreshPermissionUsers);
-  const handleAvatarApproval = makeApprovalHandler('/avatar/approve', 'recordId', refreshUser);
-  const handleUsernameApproval = makeApprovalHandler('/username/approve', 'recordId', refreshUser);
-  const handleIntroApproval = makeApprovalHandler('/intro/approve', 'recordId', refreshUser);
-
-  const HANDLER = { register: handleUserApproval, avatar: handleAvatarApproval, username: handleUsernameApproval, intro: handleIntroApproval };
+  const HANDLER = { register: makeApprovalHandler('/approve', 'userId', refreshPermissionUsers), avatar: makeApprovalHandler('/avatar/approve', 'recordId', refreshUser), username: makeApprovalHandler('/username/approve', 'recordId', refreshUser), intro: makeApprovalHandler('/intro/approve', 'recordId', refreshUser) };
 
   async function renderApprovals(){
     const container = document.getElementById('pending-approvals-modal-content');
@@ -101,12 +97,7 @@
       (intros||[]).forEach(rec => items.push({ type:'intro', id:rec._id, createdAt: createdAtDate(rec.createdAt), username: (rec.user && rec.user.username) ? rec.user.username : '', newIntro: rec.newIntro || '' }));
       items.sort((a,b)=> b.createdAt - a.createdAt);
         if (!items.length) {
-          container.appendChild(el('p', {
-            cls: 'empty-hint empty-overlay', text: '空',
-            style: { position:'absolute', inset:'0', display:'flex',
-                     alignItems:'center', justifyContent:'center',
-                     margin:'0', opacity:'1' }
-          }));
+          container.appendChild(emptyOverlay(1));
           return;
         }
       // 清理可能存在的空态覆盖
@@ -143,9 +134,7 @@
   }
 
   Object.assign(window, {
-    fetchPendingUsers, fetchPendingAvatars, fetchPendingUsernames, fetchPendingIntros,
     fetchPendingApprovalGroups, countPendingApprovalGroups, setPendingApprovalGroupsCache,
-    handleUserApproval, handleAvatarApproval, handleUsernameApproval, handleIntroApproval,
     renderApprovals
   });
 })();

@@ -25,12 +25,7 @@ function elementReplaceCheck(key, name, event){
         }
     };
 
-    const setStatus = (v) => { term_status[name] = v; };
-
-    // 引入缓存的数据源
-    const getData = () => fetchJsonCached(endpoints.termDynamic());
-
-    getData().then(term => {
+    fetchJsonCached(endpoints.termDynamic()).then(term => {
         const targetObject = term.find(item => item.en === key);
         const partLength = targetObject ? targetObject.part.length : 0;
         const cur = Number(term_status[name] || 0);
@@ -39,7 +34,7 @@ function elementReplaceCheck(key, name, event){
         if(!partLength || partLength <= 1){
             const next = cur ^ 1;
             ButtonUtils.applyButtonState(clickedButton, next === 0);
-            setStatus(next);
+            term_status[name] = next;
             doReplace(name + String(cur), name + String(next));
             return;
         }
@@ -47,7 +42,7 @@ function elementReplaceCheck(key, name, event){
         // 多段循环切换：0 -> 1 -> ... -> N-1 -> 0
         const next = (cur + 1) % partLength;
         ButtonUtils.applyButtonState(clickedButton, next === 0);
-        setStatus(next);
+        term_status[name] = next;
         doReplace(name + String(cur), name + String(next));
     });
 }

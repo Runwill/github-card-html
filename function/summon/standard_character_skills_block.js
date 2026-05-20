@@ -28,5 +28,5 @@ function CharacterSkillReplace(character, skill) {
         }).join('')
     $('.standardCharacterSkillsBlock').html(html)
     // 渲染后若搜索框有关键字，应用技能筛选
-    try { window.filterSkills && window.filterSkills() } catch(_) {}
+    try { window.filterSkills?.() } catch(_) {}
 }

@@ -170,7 +170,7 @@
     const shouldPreOpen= ((state.activeType===type) || markedOpen) && total>1;
     const allItemsHtml=(items||[]).map(renderItem).join('');
     const collapsedAreaHtml = (total>1)? '': (allItemsHtml || '<div class="tokens-empty" data-i18n="common.empty"></div>');
-  return `<div class="tokens-section" data-type="${type}"><div class="tokens-section__header"><div class=\"tokens-section__title\"><span data-i18n="${titleKey}"></span> <span class=\"count-badge\">(${total})</span></div><div class=\"tokens-section__ops\"><button class=\"btn btn--secondary btn--sm\" onclick=\"tokensOpenCreate('${type}')\" data-i18n="tokens.section.new"></button>${total>1? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen? ' is-expanded':''}\" onclick=\"toggleTokensSection('${id}')\" data-i18n="${shouldPreOpen? 'common.collapse':'common.expand'}"></button>`: ''}</div></div><div id="${id}" data-type="${type}" data-expanded="${shouldPreOpen? '1':'0'}" class="tokens-section__body"><div class="token-list">${collapsedAreaHtml}</div>${total>1? `<div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen? ' is-open':''}\">${allItemsHtml}</div>`: ''}</div></div>`;
+  return `<div class="tokens-section" data-type="${type}"><div class="tokens-section__header"><div class=\"tokens-section__title\"><span data-i18n="${titleKey}"></span> <span class=\"count-badge\">(${total})</span></div><div class=\"tokens-section__ops\"><button class=\"btn btn--secondary btn--sm\" onclick=\"window.tokensAdmin.tokensOpenCreate('${type}')\" data-i18n="tokens.section.new"></button>${total>1? `<button id=\"btn-${id}\" class=\"btn btn--secondary btn--sm expand-btn${shouldPreOpen? ' is-expanded':''}\" onclick=\"window.tokensAdmin.toggleTokensSection('${id}')\" data-i18n="${shouldPreOpen? 'common.collapse':'common.expand'}"></button>`: ''}</div></div><div id="${id}" data-type="${type}" data-expanded="${shouldPreOpen? '1':'0'}" class="tokens-section__body"><div class="token-list">${collapsedAreaHtml}</div>${total>1? `<div id=\"more-${id}\" class=\"js-more token-list collapsible tokens-section__more${shouldPreOpen? ' is-open':''}\">${allItemsHtml}</div>`: ''}</div></div>`;
   }
   async function renderTokensDashboard(forceReload=false){
     const summaryEl=document.getElementById('tokens-summary');
@@ -225,9 +225,7 @@
             const body = section.querySelector('.tokens-section__body');
             if(!body || !body.id) return;
             // 触发展开/收起
-            if(typeof window.toggleTokensSection === 'function'){
-              window.toggleTokensSection(body.id);
-            }
+            toggleTokensSection(body.id);
           }catch(_){ }
         });
       }
@@ -299,5 +297,5 @@
   function tokensRefresh(){ state.data={}; renderTokensDashboard(true); }
   async function tokensOpenCreate(collection){ try{ const dataArr= await getCollectionData(collection); const variants= computeCollectionVariants(collection, dataArr||[]); if(variants && variants.length>0){ window.tokensAdmin.showCreateModal(collection, null, variants[0].tpl, variants); return; } const shape = await apiJson(`/tokens/shape?collection=${encodeURIComponent(collection)}`, { auth:true }); const tpl = window.tokensAdmin.buildTemplate(collection, shape); window.tokensAdmin.showCreateModal(collection, shape, tpl, null); }catch(e){ alert(e.message || '获取结构失败'); } }
   function computeCollectionVariants(collection, arr){ const map=new Map(); for(const doc of (Array.isArray(arr)? arr:[])){ const schema=window.tokensAdmin.deriveSchema(doc||{}); const sig=window.tokensAdmin.schemaSignature(schema); let cur=map.get(sig); if(!cur){ cur={schema, count:0, samples:[]}; map.set(sig, cur); } cur.count+=1; if(cur.samples.length<3) cur.samples.push(doc); } const list= Array.from(map.values()).map((it,idx)=>{ const base=window.tokensAdmin.skeletonFromSchema(it.schema); const tpl=base; const hints= window.tokensAdmin.flattenHintsFromSchema(it.schema); return { id:`scheme-${idx+1}`, count:it.count, schema:it.schema, tpl, hints, samples:it.samples }; }); list.sort((a,b)=>{ const ak=a.hints.length, bk=b.hints.length; if(bk!==ak) return bk-ak; return b.count-a.count; }); return list; }
-  Object.assign(window, { renderTokensDashboard, toggleTokensSection, tokensRefresh, tokensOpenCreate });
+  Object.assign(window.tokensAdmin, { renderTokensDashboard, toggleTokensSection, tokensRefresh, tokensOpenCreate });
 })();

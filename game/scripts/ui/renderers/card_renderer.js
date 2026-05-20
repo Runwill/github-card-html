@@ -15,11 +15,8 @@
     }
 
     function getCardWidth(cards) {
-        if (cards[0]) {
-            const rectWidth = cards[0].getBoundingClientRect().width;
-            if (rectWidth > 0) return rectWidth;
-        }
-        return 100;
+        const rectWidth = cards[0]?.getBoundingClientRect().width || 0;
+        return rectWidth > 0 ? rectWidth : 100;
     }
 
     function hasVisibleRole(visibleTo, roleId) {
@@ -31,22 +28,20 @@
     }
 
     function isCardVisibleToPerspective(card, visibilityState) {
-        const visibility = visibilityState && visibilityState.visibility !== undefined
-            ? visibilityState.visibility
-            : card && card.visibility;
+        const visibility = visibilityState?.visibility ?? card?.visibility;
 
         if (visibility !== 1) return true;
 
         const GameState = window.Game.GameState;
-        const perspIdx = GameState && GameState.perspectiveIndex != null ? GameState.perspectiveIndex : 0;
-        const mainPlayer = GameState && GameState.players && GameState.players[perspIdx];
-        const visibleTo = visibilityState && visibilityState.visibleTo ? visibilityState.visibleTo : card && card.visibleTo;
+        const perspIdx = GameState?.perspectiveIndex ?? 0;
+        const mainPlayer = GameState?.players?.[perspIdx];
+        const visibleTo = visibilityState?.visibleTo || card?.visibleTo;
 
         return !!(mainPlayer && hasVisibleRole(visibleTo, mainPlayer.id));
     }
 
     function getCardRenderState(card, options = {}) {
-        const originalName = card && (card.name || card.key) || 'CardBack';
+        const originalName = card?.name || card?.key || 'CardBack';
         const visibilityState = options.visibilityState || null;
         const showBack = !!options.forceFaceDown || !isCardVisibleToPerspective(card, visibilityState);
         const renderName = showBack ? 'CardBack' : originalName;
@@ -60,10 +55,7 @@
     }
 
     function getCardAppearanceForArea(card, area, options = {}) {
-        const Models = window.Game.Models;
-        const visibilityState = Models && Models.getCardVisibilityForArea
-            ? Models.getCardVisibilityForArea(area)
-            : null;
+        const visibilityState = window.Game.Models?.getCardVisibilityForArea?.(area) || null;
         const state = getCardRenderState(card, { ...options, visibilityState });
         return {
             innerHTML: state.htmlContent,
@@ -111,6 +103,7 @@
         const currentChildren = Array.from(container.children).filter(c => 
             c.classList.contains('card-placeholder')
         );
+        container.classList.toggle('is-ordered-list', !!options.showIndex);
 
         // 差量更新 (Diffing) 策略：复用现有 DOM 节点，避免暴力清空导致的闪烁和 Hover 状态丢失
         cards.forEach((card, index) => {
@@ -133,11 +126,7 @@
             cardEl.setAttribute('data-inspector-type', 'card');
 
             // 标记堆叠模式下的顶牌 (Top Card Logic)
-            if (index === cards.length - 1) {
-                cardEl.classList.add('is-top-card');
-            } else {
-                cardEl.classList.remove('is-top-card');
-            }
+            cardEl.classList.toggle('is-top-card', index === cards.length - 1);
 
             // 检查内容是否需要更新 (Dirty Checking)
             // 准备渲染内容
@@ -146,13 +135,6 @@
             // 注入位置序号 (如果开启)
             // REFACTOR: Moved to CSS Counter in game_viewer.css for cleaner drag handling.
             // When dragged out, the counter style won't apply, effectively removing the badge.
-            if (options.showIndex) {
-                 // Mark container as ordered to trigger CSS counters
-                 container.classList.add('is-ordered-list');
-            } else {
-                 container.classList.remove('is-ordered-list');
-            }
-
             // 使用标准化 SafeRender 替代手动 data-card-key 检查
             window.Game.UI.safeRender(cardEl, htmlContent, renderName);
 
@@ -172,8 +154,7 @@
                 window.Game.UI.safeRender(moverLabel, moverHTML, moverKey);
             } else {
                 // 不在处理区或无移动者信息时移除标签
-                const existingLabel = cardEl.querySelector('.card-mover-label');
-                if (existingLabel) existingLabel.remove();
+                cardEl.querySelector('.card-mover-label')?.remove();
             }
 
             // 兼容 CSS: game_cards.css 依赖 [data-card-key='CardBack'] 选择器来显示牌背
@@ -184,11 +165,7 @@
 
             // 总是更新交互元数据 (例如 index 可能变化)
             // 注意：依赖 initDrag 的实现能够处理重复调用 (例如覆盖 ondragstart 属性而非不断 addEventListener)
-            if (window.Game.UI.Interactions && window.Game.UI.Interactions.initDrag) {
-                // 关键点：即使渲染为卡背，通过 initDrag 传递的仍是**真实的 card 对象**
-                // 这样拖拽逻辑中使用的数据是真实的，放置时也是真实的。
-                window.Game.UI.Interactions.initDrag(cardEl, card, dropZoneId, index);
-            }
+            window.Game.UI.Interactions?.initDrag?.(cardEl, card, dropZoneId, index);
         });
 
         // 移除多余的节点

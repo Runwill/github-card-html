@@ -20,10 +20,8 @@
     let lastPoint = { x: 0, y: 0 };
 
     function translate(key, fallback) {
-        if (window.i18n && typeof window.i18n.t === 'function') {
-            const text = window.i18n.t(key);
-            if (text && text !== key) return text;
-        }
+        const text = window.i18n?.t?.(key);
+        if (text && text !== key) return text;
         return fallback;
     }
 
@@ -44,7 +42,7 @@
     }
 
     function gameText() {
-        return window.Game && window.Game.UI ? window.Game.UI.GameText : null;
+        return window.Game?.UI?.GameText || null;
     }
 
     function renderGameText(key, data) {
@@ -55,8 +53,8 @@
     }
 
     function roleCharacterKey(role) {
-        const utils = window.Game && window.Game.UI ? window.Game.UI._RoleUtils : null;
-        if (utils && typeof utils.roleCharacterKey === 'function') return utils.roleCharacterKey(role);
+        const utils = window.Game?.UI?._RoleUtils;
+        if (utils?.roleCharacterKey) return utils.roleCharacterKey(role);
         let key = role && role.character;
         if (Array.isArray(key) && key.length > 0) key = key[0];
         return key || (role && role.name) || '';
@@ -86,7 +84,7 @@
     function renderValue(node, value) {
         if (value && typeof value === 'object' && value.html !== undefined) {
             node.classList.add('game-inspector-rich-value');
-            if (window.Game && window.Game.UI && typeof window.Game.UI.safeRender === 'function') {
+            if (window.Game?.UI?.safeRender) {
                 window.Game.UI.safeRender(node, value.html, value.key || value.html);
             } else {
                 node.innerHTML = value.html;
@@ -143,11 +141,7 @@
     }
 
     function matchesInspectKey(event) {
-        const KeySettings = window.KeySettings;
-        if (KeySettings && typeof KeySettings.checkBinding === 'function') {
-            return KeySettings.checkBinding(event, ACTION);
-        }
-        return event.key === DEFAULT_KEY;
+        return window.KeySettings?.checkBinding ? window.KeySettings.checkBinding(event, ACTION) : event.key === DEFAULT_KEY;
     }
 
     function findInspectable(target) {
@@ -163,7 +157,7 @@
     }
 
     function getGameState() {
-        return window.Game && window.Game.GameState ? window.Game.GameState : null;
+        return window.Game?.GameState || null;
     }
 
     function findPlayer(roleId) {
@@ -218,8 +212,8 @@
             return player.hand || null;
         }
 
-        const Models = window.Game && window.Game.Models;
-        return Models && typeof Models.resolveAreaByPath === 'function'
+        const Models = window.Game?.Models;
+        return Models?.resolveAreaByPath
             ? Models.resolveAreaByPath(path, GameState)
             : null;
     }
@@ -371,9 +365,7 @@
 
     function syncLayer() {
         if (!panel) return;
-        const viewerLayer = window.Game && window.Game.UI
-            ? parseInt(window.Game.UI.maxViewerZIndex, 10)
-            : NaN;
+        const viewerLayer = parseInt(window.Game?.UI?.maxViewerZIndex, 10);
         const layer = Math.max(20100, Number.isFinite(viewerLayer) ? viewerLayer + 100 : 20100);
         panel.style.zIndex = String(layer);
     }

@@ -68,7 +68,7 @@
 
         // ── CardMoveAnimator 快照准备 ──
         // 跳过拖拽产生的移动（拖拽有自己的动画系统）
-        const Animator = window.Game.UI && window.Game.UI.CardMoveAnimator;
+        const Animator = window.Game.UI?.CardMoveAnimator;
         let animPayload = null;
         const isDragMove = !!(payload.isDrag || payload.dragElement || payload.startRect);
 
@@ -88,7 +88,7 @@
 
         // ── 动画触发辅助 ──
         const triggerCardMoveAnimation = () => {
-            if (window.Game.UI && window.Game.UI.updateUI) window.Game.UI.updateUI();
+            window.Game.UI?.updateUI?.();
             if (Animator && animPayload) {
                 requestAnimationFrame(() => {
                     Animator.animateAfterMove(animPayload);
@@ -133,9 +133,7 @@
                 }
 
                 // Online sync: broadcast action to other room members
-                if (window.Game.Online && window.Game.Online.SyncManager) {
-                    try { window.Game.Online.SyncManager.interceptDispatch(actionType, payload); } catch(e) { console.warn('[Online] sync error', e); }
-                }
+                try { window.Game.Online?.SyncManager?.interceptDispatch?.(actionType, payload); } catch(e) { console.warn('[Online] sync error', e); }
             }
         } else {
             // 自动/流程模式

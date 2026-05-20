@@ -49,6 +49,28 @@ function bindDblclickAndHighlight($elements, options){
   })
 }
 
+function runTextReplacers(root){
+  if (!root || !window.endpoints) return
+  const endpoint = window.endpoints
+  const calls = [
+    ['replace_character_name', endpoint.character?.()],
+    ['replace_skill_name', endpoint.skill?.()],
+    ['replace_card_name', endpoint.card?.()],
+    ['replace_term', endpoint.termDynamic?.(), 1],
+    ['replace_term', endpoint.termFixed?.(), 1]
+  ]
+  calls.forEach(item => {
+    try {
+      const fn = window[item[0]]
+      if (!fn || !item[1]) return
+      const result = fn.apply(window, item.slice(1).concat(root))
+      if (result && typeof result.catch === 'function') result.catch(function(){})
+    } catch(_) {}
+  })
+  setTimeout(function(){ try { window.pronounCheck?.(root) } catch(_) {} }, 50)
+}
+
 // 暴露到全局，保持与现有模块风格一致
 window.bindDblclickAndHighlight = bindDblclickAndHighlight
 window.fetchJsonCached = fetchJsonCached
+window.runTextReplacers = runTextReplacers

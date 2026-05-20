@@ -45,6 +45,8 @@
         nameEl.style.fontSize = newSize + 'px';
     }
 
+    function isCardDragging() { return !!window.Game.UI.DragState?.isDragging; }
+
     /**
      * 设置手牌检视器 (Hand Inspector)
      * 类似 PileInspector，允许点击角色头像/摘要查看其手牌
@@ -66,7 +68,7 @@
             const startPress = (e) => {
                  // Check valid left click & no drag
                  if (e.button !== 0) return;
-                 if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
+                 if (isCardDragging()) return;
                  
                  isLongPress = false;
                  pressTimer = setTimeout(() => {
@@ -119,7 +121,7 @@
                     return;
                 }
                 
-                if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
+                if (isCardDragging()) return;
                 e.stopPropagation();
                 openHandInspector();
             });
@@ -149,10 +151,8 @@
 
     function shouldForceHandFaceDown(role) {
         const gs = window.Game.GameState;
-        const isManual = (gs && (gs.mode === 'manual' || gs.mode === 'sandbox'));
-        const perspIdx = (gs && gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
-        const isSelf = (gs && gs.players && gs.players[perspIdx] === role);
-        return !isManual && !isSelf;
+        const isManual = gs?.mode === 'manual' || gs?.mode === 'sandbox';
+        return !isManual && gs?.players?.[gs.perspectiveIndex ?? 0] !== role;
     }
 
     function openRoleAreaViewer(role, areaType, forceFaceDown) {
@@ -243,7 +243,7 @@
              e.stopPropagation();
              if (!window.Game.UI.openCardViewer) return;
              const viewerSourceId = `role:${role.id}:equip`;
-             const existing = window.Game.UI.viewers && window.Game.UI.viewers[viewerSourceId];
+             const existing = window.Game.UI.viewers?.[viewerSourceId];
              if (existing) { existing.cleanup(); return; }
 
              const GT = GameText || window.Game.UI.GameText;
@@ -269,21 +269,18 @@
             topRow.classList.toggle('has-online-viewers', !!topRow.querySelector('.online-viewer-labels'));
         };
         
+        let container = avatarContainer.querySelector('.online-viewer-labels');
         const gs = window.Game.GameState;
-        if (!gs || !gs.onlineMode) {
-            const existing = avatarContainer.querySelector('.online-viewer-labels');
-            if (existing) existing.remove();
+        if (!gs?.onlineMode) {
+            container?.remove();
             syncTopRowReserve();
             return;
         }
         
-        const SyncManager = window.Game.Online && window.Game.Online.SyncManager;
-        const viewers = SyncManager ? SyncManager.getViewersForPlayer(playerIndex) : [];
-
-        let container = avatarContainer.querySelector('.online-viewer-labels');
+        const viewers = window.Game.Online?.SyncManager?.getViewersForPlayer?.(playerIndex) || [];
 
         if (viewers.length === 0) {
-            if (container) container.remove();
+            container?.remove();
             syncTopRowReserve();
             return;
         }
@@ -316,7 +313,8 @@
         setupJudgeButton,
         setupEquipmentButton,
         updateViewerLabels,
-        openJudgeViewer
+        openJudgeViewer,
+        isCardDragging
     };
 
     // 窗口尺寸变化时重新适配所有摘要角色名

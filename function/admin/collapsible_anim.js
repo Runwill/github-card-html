@@ -5,17 +5,20 @@
   function isAnimating(el){ return !!(el && (el.classList.contains('is-opening') || el.classList.contains('is-closing'))); }
   function isOpen(el){ return !!(el && el.classList.contains('is-open')); }
   function onTransitionEnd(el, callback, timeoutMs, filter){
-    if (!el) { if (callback) callback(); return; }
+    if (!el) { if (callback) callback(); return function(){}; }
     let called = false;
+    let timer = null;
     const done = (event)=>{
       if (called) return;
       if (filter && event && !filter(event)) return;
       called = true;
       el.removeEventListener('transitionend', done);
+      if (timer) clearTimeout(timer);
       if (callback) callback(event);
     };
     el.addEventListener('transitionend', done);
-    if (timeoutMs) setTimeout(()=>done(), timeoutMs);
+    if (timeoutMs) timer = setTimeout(()=>done(), timeoutMs);
+    return ()=>{ if (!called) { called = true; el.removeEventListener('transitionend', done); if (timer) clearTimeout(timer); } };
   }
   function openCollapsible(el){
     try{

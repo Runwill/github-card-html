@@ -9,11 +9,6 @@
         return button;
     }
 
-    function appendChildren(parent, children) {
-        parent.append(...children.filter(Boolean));
-        return parent;
-    }
-
     /**
      * 渲染角色列表 (Role List)
      * 场上所有角色的列表
@@ -118,7 +113,7 @@
                 // Equipment names overlay
                 const equipNamesEl = document.createElement('div');
                 equipNamesEl.className = 'player-equip-names';
-                appendChildren(avatarContainer, [avatarImg, judgeCountSpan, equipNamesEl]);
+                avatarContainer.append(avatarImg, judgeCountSpan, equipNamesEl);
 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'player-name';
@@ -138,9 +133,9 @@
 
                 const summaryJudgeBtn = createSummaryButton('judge-detail-btn summary-judge-btn', '判');
                 const summaryEquipBtn = createSummaryButton('equip-detail-btn summary-equip-btn', '備', 'Equipment');
-                appendChildren(btnGroup, [summaryJudgeBtn, summaryEquipBtn]);
-                appendChildren(statsDiv, [handResultSpan, hpSpan, btnGroup]);
-                appendChildren(pEl, [avatarContainer, nameSpan, statsDiv]);
+                btnGroup.append(summaryJudgeBtn, summaryEquipBtn);
+                statsDiv.append(handResultSpan, hpSpan, btnGroup);
+                pEl.append(avatarContainer, nameSpan, statsDiv);
                 
                 pEl.classList.add('role-moving');
                 
@@ -163,9 +158,8 @@
             // 当前回合标识
             const avatarWrap = pEl.querySelector('.char-avatar');
             if (avatarWrap) {
-                const inTurn = window.Game.Core.isInTurn && window.Game.Core.isInTurn();
-                const sandboxTurn = (GameState.mode === 'sandbox' && GameState.sandboxTurnIndex != null && GameState.sandboxTurnIndex >= 0);
-                avatarWrap.classList.toggle('is-current-turn', (inTurn && index === GameState.currentPlayerIndex) || (sandboxTurn && index === GameState.sandboxTurnIndex));
+                avatarWrap.classList.toggle('is-current-turn', (window.Game.Core.isInTurn?.() && index === GameState.currentPlayerIndex)
+                    || (GameState.mode === 'sandbox' && index === GameState.sandboxTurnIndex));
                 updateViewerLabels(avatarWrap, index);
             }
             
@@ -235,10 +229,7 @@
             // 手牌数
             const handCountSpan = pEl.querySelector('.player-hand-count');
             if (handCountSpan) {
-                let count = 0;
-                if (role.hand && role.hand.cards) {
-                    count = role.hand.cards.length;
-                }
+                const count = role.hand?.cards?.length || 0;
                 
                 const handText = ` ${count}`;
                 if (handCountSpan.textContent !== handText) {
@@ -254,9 +245,7 @@
             // 右键菜单
             pEl.oncontextmenu = (e) => {
                 e.preventDefault();
-                if (window.Game.UI.showContextMenu) {
-                    window.Game.UI.showContextMenu(e.clientX, e.clientY, role);
-                }
+                window.Game.UI.showContextMenu?.(e.clientX, e.clientY, role);
             };
         });
         

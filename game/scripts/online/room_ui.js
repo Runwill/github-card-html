@@ -11,7 +11,7 @@
     let isSpectating = false;
 
     function t(key) {
-        return (window.i18n && window.i18n.t) ? window.i18n.t(key) : key;
+        return window.i18n?.t?.(key) || key;
     }
 
     const byId = window.Game.Utils.byId;
@@ -77,9 +77,7 @@
 
     async function showOnlinePanel() {
         // 切换到在线房间视图（互斥隐藏其他视图）
-        if (window.Game.UI.switchGameView) {
-            window.Game.UI.switchGameView('online');
-        }
+        window.Game.UI.switchGameView?.('online');
 
         setStatus(t('online.connecting'));
 
@@ -107,9 +105,7 @@
      */
     function hideOnlinePanel() {
         // 恢复到之前的视图（如果对局在进行中则回到对局）
-        if (window.Game.UI.restorePreviousView) {
-            window.Game.UI.restorePreviousView();
-        }
+        window.Game.UI.restorePreviousView?.();
     }
 
     function setRoomView(inRoomVisible) {
@@ -215,9 +211,7 @@
     }
 
     function clearOnlinePerspectives() {
-        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
-            window.Game.Online.SyncManager.clearPerspectives();
-        }
+        window.Game.Online.SyncManager?.clearPerspectives?.();
     }
 
     function setOnlineMode(enabled) { if (window.Game.GameState) window.Game.GameState.onlineMode = enabled; }
@@ -225,9 +219,7 @@
     function enterRoom(result) {
         currentRoom = result.room;
         setOnlineMode(true);
-        if (currentRoom.perspectives && window.Game.Online.SyncManager) {
-            window.Game.Online.SyncManager.onPerspectivesChanged(currentRoom.perspectives);
-        }
+        if (currentRoom.perspectives) window.Game.Online.SyncManager?.onPerspectivesChanged?.(currentRoom.perspectives);
         setRoomView(true);
         renderRoomInfo();
     }
@@ -285,7 +277,7 @@
             setStatus(t('online.joined'));
 
             // 如果游戏已经开始，通过引擎初始化 + 状态覆盖恢复
-            if (currentRoom.gameStarted && window.Game.Online.SyncManager) {
+            if (currentRoom.gameStarted && window.Game.Online.SyncManager?.onRemoteGameStart) {
                 const gameConfig = result.gameConfig || currentRoom.gameConfig;
                 window.Game.Online.SyncManager.onRemoteGameStart(
                     gameConfig,
@@ -356,10 +348,7 @@
         }
 
         // 更新本地 perspectives 中的旁观标记（使 viewer label 渲染旁观样式）
-        const SyncManager = window.Game.Online && window.Game.Online.SyncManager;
-        if (SyncManager && SyncManager.updateLocalSpectating) {
-            SyncManager.updateLocalSpectating(isSpectating);
-        }
+        window.Game.Online?.SyncManager?.updateLocalSpectating?.(isSpectating);
 
         // 广播旁观状态给房间
         const client = Client();
@@ -369,9 +358,7 @@
 
         renderRoomInfo();
         // 刷新游戏 UI 以更新头像上的 viewer label
-        if (window.Game.UI && window.Game.UI.updateUI) {
-            window.Game.UI.updateUI();
-        }
+        window.Game.UI?.updateUI?.();
     }
 
     /**
@@ -453,9 +440,7 @@
             currentRoom = data.room;
             renderRoomInfo();
         }
-        if (data.userId && window.Game.Online.SyncManager && window.Game.Online.SyncManager.removeUserFromPerspectives) {
-            window.Game.Online.SyncManager.removeUserFromPerspectives(data.userId);
-        }
+        if (data.userId) window.Game.Online.SyncManager?.removeUserFromPerspectives?.(data.userId);
         setStatus(`${data.username} ${t('online.hasLeft')}`);
     }
 
@@ -464,9 +449,7 @@
             currentRoom.perspectives = data.perspectives;
         }
         // 触发 UI 更新钩子
-        if (window.Game.Online.SyncManager && window.Game.Online.SyncManager.onPerspectivesChanged) {
-            window.Game.Online.SyncManager.onPerspectivesChanged(data.perspectives);
-        }
+        window.Game.Online.SyncManager?.onPerspectivesChanged?.(data.perspectives);
     }
 
     function onRoomOptionUpdated(data) {

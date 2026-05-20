@@ -22,11 +22,8 @@
             container.classList.add('area-stacked');
             container.classList.remove('area-spread');
 
-            if (window.Game.UI.renderCardList) {
-                // 仅当明确要求面朝下时才传递 options
-                const options = isFaceDown ? { forceFaceDown: true } : {};
-                window.Game.UI.renderCardList(containerId, pileData.cards || [], dropZoneId, options);
-            }
+            const options = isFaceDown ? { forceFaceDown: true } : {};
+            window.Game.UI.renderCardList?.(containerId, pileData.cards || [], dropZoneId, options);
             // 绑定点击检视器
             setupPileInspector(container, pileData.cards || [], isFaceDown);
         }
@@ -53,32 +50,18 @@
                 window.Game.UI.safeRender(el, GameText.render(key), renderKey);
             }
             // 渲染卡牌
-            if (window.Game.UI.renderCardList) {
-                // 应用对齐方式
-                const container = document.getElementById('treatment-area-container');
-                if (container && GameState.treatmentArea) {
-                    container.setAttribute('data-inspector-type', 'area');
-                    container.setAttribute('data-area-name', 'treatmentArea');
-                    if (GameState.treatmentArea.centered) {
-                        container.classList.add('area-centered');
-                        container.classList.remove('area-left');
-                    } else {
-                        container.classList.add('area-left');
-                        container.classList.remove('area-centered');
-                    }
-                    
-                    if (GameState.treatmentArea.apartOrTogether === 1) { // 1 = 堆叠
-                         container.classList.add('area-stacked');
-                         container.classList.remove('area-spread');
-                    } else { // 0 = 平铺
-                         container.classList.add('area-spread');
-                         container.classList.remove('area-stacked');
-                    }
-                }
-
-                // 注意：Treatment Area 是公共区域，不属于任何特定 Role，dropZoneId 设为 'treatmentArea'
-                window.Game.UI.renderCardList('treatment-area-container', GameState.treatmentArea.cards || [], 'treatmentArea');
+            const container = document.getElementById('treatment-area-container');
+            if (container && GameState.treatmentArea) {
+                container.setAttribute('data-inspector-type', 'area');
+                container.setAttribute('data-area-name', 'treatmentArea');
+                const isCentered = !!GameState.treatmentArea.centered;
+                const isStacked = GameState.treatmentArea.apartOrTogether === 1;
+                container.classList.toggle('area-centered', isCentered);
+                container.classList.toggle('area-left', !isCentered);
+                container.classList.toggle('area-stacked', isStacked);
+                container.classList.toggle('area-spread', !isStacked);
             }
+            window.Game.UI.renderCardList?.('treatment-area-container', GameState.treatmentArea.cards || [], 'treatmentArea');
         }
 
         // 2. 牌堆 (Draw Pile)
@@ -131,7 +114,7 @@
 
             wrapper.addEventListener('click', (e) => {
                 // 如果正在拖拽，不触发
-                if (window.Game && window.Game.UI && window.Game.UI.DragState && window.Game.UI.DragState.isDragging) return;
+                if (window.Game.UI._RoleUtils?.isCardDragging?.()) return;
 
                 // Stop propagation to prevent global "Click Outside" handlers from closing existing windows immediately
                 e.stopPropagation();
@@ -151,11 +134,9 @@
                     areaName: title
                 };
 
-                if (window.Game.UI.toggleCardViewer) {
-                    window.Game.UI.toggleCardViewer(title, currentCards, sourceId, openOptions);
-                } else if (window.Game.UI.openCardViewer) {
-                    window.Game.UI.openCardViewer(title, currentCards, sourceId, openOptions);
-                } else {
+                const openViewer = window.Game.UI.toggleCardViewer || window.Game.UI.openCardViewer;
+                if (openViewer) openViewer(title, currentCards, sourceId, openOptions);
+                else {
                     console.warn("Game.UI.openCardViewer not ready");
                 }
             });

@@ -1,5 +1,4 @@
 ;(function(){
-  const onReady=cb=> document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', cb, {once:true}) : cb();
   async function load(){
     const nodes=[...document.querySelectorAll('[data-include]')]; if(!nodes.length) return;
     await Promise.all(nodes.map(async el=>{
@@ -11,5 +10,5 @@
       }catch(_){ try{ el.innerHTML='<!-- include failed: '+(url||'')+' -->' }catch(_){} }
     }));
   }
-  window.partialsReady=new Promise(r=>onReady(()=>load().then(r)));
+  window.partialsReady=whenDOMReady().then(load);
 })()

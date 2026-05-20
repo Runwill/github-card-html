@@ -9,22 +9,12 @@
 
     function getTermData(key) {
         if (!cachedData) return null;
-        
-        // 1. 直接匹配
-        if (cachedData[key]) return cachedData[key];
-        
-        // 2. 不区分大小写的搜索
         const lowerKey = key.toLowerCase();
         for (let k in cachedData) {
-            if (k.toLowerCase() === lowerKey) return cachedData[k];
-        }
-
-        // 3. 在部件内部搜索（如果有）
-        for (let k in cachedData) {
             const item = cachedData[k];
+            if (k === key || k.toLowerCase() === lowerKey) return item;
             if (item.partMap) {
                if (item.partMap[key]) return item.partMap[key];
-               // 部件小写检查
                for(let pKey in item.partMap) {
                    if(pKey.toLowerCase() === lowerKey) return item.partMap[pKey];
                }
@@ -64,7 +54,7 @@
     function refreshTerms() {
          if (!cachedData) return;
          populateTerms(cachedData);
-         if (window.Game.UI.updateUI) window.Game.UI.updateUI();
+         window.Game.UI.updateUI?.();
     }
 
     function loadTermColors() {
@@ -81,21 +71,11 @@
             window.Game.UI.termData = cachedData;
 
             // Updated to check Game.GameState directly as per refactoring
-            const isGameRunning = window.Game.GameState && window.Game.GameState.isGameRunning;
-            if (isGameRunning && window.Game.UI.updateUI) {
-                window.Game.UI.updateUI();
-            }
+            if (window.Game.GameState?.isGameRunning) window.Game.UI.updateUI?.();
         }).catch(e => console.error("Failed to load terms", e));
     }
 
-    // Theme Observer
-    const observer = new MutationObserver((mutations) => {
-        for(let m of mutations) {
-            if (m.type === 'attributes' && m.attributeName === 'data-theme') {
-                refreshTerms();
-            }
-        }
-    });
+    const observer = new MutationObserver(refreshTerms);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     window.Game.UI.loadTermColors = loadTermColors;

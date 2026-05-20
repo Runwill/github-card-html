@@ -30,9 +30,7 @@
     }
 
     function refreshGameUI() {
-        if (window.Game.UI && window.Game.UI.updateUI) {
-            window.Game.UI.updateUI();
-        }
+        window.Game.UI?.updateUI?.();
     }
 
     function clearPerspectives() {
@@ -185,9 +183,7 @@
             gs.onlineMode = true;
 
             // 切换到对局视图（隐藏设置/在线面板，显示对局内容）
-            if (window.Game.UI.switchGameView) {
-                window.Game.UI.switchGameView('play');
-            }
+            window.Game.UI.switchGameView?.('play');
 
             refreshGameUI();
         } finally {
@@ -235,7 +231,7 @@
 
         try {
             const { actionType, payload } = data;
-            const Animator = window.Game.UI && window.Game.UI.CardMoveAnimator;
+            const Animator = window.Game.UI?.CardMoveAnimator;
 
             if (actionType === 'moveCard') {
                 // ── 动画快照：在修改数据之前记录牌的当前 DOM 位置 ──
@@ -270,7 +266,7 @@
                             name: payload.moveRole.name
                         };
                     }
-                    if (window.Game.UI.MoveLog) {
+                    if (window.Game.UI.MoveLog?.logMove) {
                         const fromPath = animPayload ? animPayload.fromAreaPath : null;
                         const toArea = movedCard ? movedCard.lyingArea : null;
                         window.Game.UI.MoveLog.logMove({
@@ -325,7 +321,7 @@
                         }
                     }
                     // 同步房间用户列表数据
-                    if (window.Game.Online && window.Game.Online.RoomUI) {
+                    if (window.Game.Online?.RoomUI) {
                         const roomUI = window.Game.Online.RoomUI;
                         if (roomUI.currentRoom && roomUI.currentRoom.users && data.from) {
                             const ru = roomUI.currentRoom.users[data.from.userId];
@@ -446,9 +442,7 @@
             const config = Object.assign({}, gameConfig || {}, { mode: 'sandbox' });
 
             // 2. 用 gameConfig 里的 players/deck 让引擎初始化一次（创建 GameState 结构）
-            if (window.Game.Controller && window.Game.Controller.startGame) {
-                window.Game.Controller.startGame(config);
-            }
+            window.Game.Controller?.startGame?.(config);
 
             // 3. 用房主传过来的完整状态覆盖（牌序、血量等）
             if (gameState) {

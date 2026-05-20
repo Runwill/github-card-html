@@ -55,7 +55,7 @@
     T.logChange('create', { collection, id: doc && doc._id, doc });
     close();
     try{ toast(window.t(toastKey)); }catch(_){ }
-    window.renderTokensDashboard?.(false);
+    window.tokensAdmin.renderTokensDashboard?.(false);
   }
 
   async function runEditorAction(canEdit, editor, action, errorKey){
@@ -148,7 +148,7 @@
         T.logChange('save-edits', { collection, id, sets: detailed && detailed.sets, dels: detailed && detailed.dels });
         hideEditModal();
   try{ toast(window.t('status.updated')); }catch(_){ }
-        window.renderTokensDashboard?.(false);
+          window.tokensAdmin.renderTokensDashboard?.(false);
     }, 'tokens.error.updateFailed');
     const saveAs = ()=> runEditorAction(canEdit, editor, next => createDocFromPayload(collection, next, hideEditModal, 'tokens.toast.savedAs'), 'tokens.error.createFailed');
     btnCancel.onclick= hideEditModal; btnSubmit.onclick= submit; if(btnSaveAs) btnSaveAs.onclick = saveAs;

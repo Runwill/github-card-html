@@ -364,8 +364,4 @@
     // 清理容器内联样式
     try { box.style.transition=''; box.style.height=''; box.style.overflow=''; } catch {}
   };
-
-
-  // 兼容：在 window 级别暴露
-  w.renderPermissionsPanel = ns.renderPermissionsPanel;
 })(window);

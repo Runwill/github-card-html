@@ -71,7 +71,7 @@
             
             // Generate a simple key based on content if none exists
             // Or just rely on content diffing in safeRender
-            if (window.Game.UI && window.Game.UI.safeRender) {
+            if (window.Game.UI?.safeRender) {
                 window.Game.UI.safeRender(container, html);
             } else {
                 container.innerHTML = html;

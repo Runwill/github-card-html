@@ -12,16 +12,7 @@
     }
     // 已有 fade-out class → 监听 transitionend
     if (overlay.classList.contains('fade-out')) {
-      var done = false;
-      var onEnd = function(e) {
-        if (done || (e && e.propertyName !== 'opacity')) return;
-        done = true;
-        overlay.removeEventListener('transitionend', onEnd);
-        callback();
-      };
-      overlay.addEventListener('transitionend', onEnd);
-      // 兜底 2s（transition 1.2s + 余量）
-      setTimeout(function(){ if (!done) { done = true; callback(); } }, 2000);
+      window.CollapsibleAnim.onTransitionEnd(overlay, callback, 2000, function(e){ return e.target === overlay && e.propertyName === 'opacity'; });
       return;
     }
     // 还没开始淡出 → 用 MutationObserver 监听 fade-out class 出现
@@ -113,10 +104,7 @@
     // 4) 首次进入页面时，等待 partials 加载 + Foundation 初始化完成后恢复滚动位置
     //    bind() 在 DOMContentLoaded 执行，但面板 DOM 可能在 partialsReady 之后才存在，
     //    Foundation 的 is-active 在 $(document).foundation() 之后才设置
-    const waitPartials = window.partialsReady && window.partialsReady.then
-      ? window.partialsReady.catch(function(){})
-      : Promise.resolve();
-    waitPartials.then(function(){
+    whenPartialsReady().then(function(){
       // partialsReady 之后 app_bootstrap 会同步调用 $(document).foundation()
       // 使用 setTimeout(0) 确保在同一微任务队列的 foundation() 之后执行
       setTimeout(function(){
@@ -148,9 +136,5 @@
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bind);
-  } else {
-    bind();
-  }
+  whenDOMReady().then(bind);
 })();

@@ -34,10 +34,7 @@
 
   function fetchList(url) {
     if (!url) return Promise.resolve([]);
-    var cached = window.fetchJsonCached || function (path) {
-      return fetch(path).then(responseJson);
-    };
-    return cached(url).catch(function () { return []; });
+    return window.fetchJsonCached(url).catch(function () { return []; });
   }
 
   function partsForSource(item, sourceType) {

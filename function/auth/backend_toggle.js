@@ -8,7 +8,6 @@
   var msg = document.getElementById('login-message');
 
   function isPublic(u) { return typeof u === 'string' && u.indexOf('120.55.7.7') >= 0; }
-  function normalize(u) { return String(u || '').replace(/\/$/, ''); }
 
   function applyStyle(current) {
     var publicBase = isPublic(current);
@@ -25,7 +24,7 @@
     var b = currentBase();
     if (msg) {
       msg.className = 'modal-message';
-      msg.textContent = window.t('login.backend.currentPrefix', { url: normalize(b) });
+      msg.textContent = window.t('login.backend.currentPrefix', { url: String(b || '').replace(/\/$/, '') });
     }
   }
 

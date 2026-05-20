@@ -159,9 +159,7 @@
         DragState.targetY = 0;
         
         // Use Module: Start Loop
-        if (window.Game.UI.DragAnimation) {
-            window.Game.UI.DragAnimation.startAnimationLoop();
-        }
+        window.Game.UI.DragAnimation?.startAnimationLoop?.();
     }
 
     function handlePointerMove(e) {
@@ -199,15 +197,16 @@
             DragState.currentDropZone = dropZone;
         }
         
-        if (dropZone && window.Game.UI.DragSorting) {
+        const DragSorting = dropZone && window.Game.UI.DragSorting;
+        if (DragSorting) {
              const acceptPlaceholder = dropZone.getAttribute('data-accept-placeholder') !== 'false';
              
              if (acceptPlaceholder) {
-                 window.Game.UI.DragSorting.updatePlaceholderPosition(dropZone, targetEl, vp.x, vp.y);
+                 DragSorting.updatePlaceholderPosition(dropZone, targetEl, vp.x, vp.y);
              } 
              else if (DragState.placeholderElement) {
                  if (DragState.placeholderElement.parentNode !== dropZone) {
-                     window.Game.UI.DragSorting.performPlaceholderMove(dropZone, null, true); 
+                     DragSorting.performPlaceholderMove(dropZone, null, true);
                  }
              }
         }
@@ -234,9 +233,7 @@
             const isGhost = el.classList.contains('dragging-real');
             if (isGhost && DragState.placeholderElement && DragState.placeholderElement.parentNode) {
                  const placeholder = DragState.placeholderElement;
-                 if (window.Game.UI.DragAnimation) {
-                     window.Game.UI.DragAnimation.animateDropToPlaceholder(el, placeholder, () => {});
-                 }
+                 window.Game.UI.DragAnimation?.animateDropToPlaceholder?.(el, placeholder);
                  DragState.placeholderElement = null; 
             } else if (isGhost) {
                 el.remove();
@@ -319,7 +316,7 @@
                     clearTempRevealedCard();
 
                     window.Game.UI.isRenderingSuspended = false;
-                    if (window.Game.UI.updateUI) window.Game.UI.updateUI();
+                    window.Game.UI.updateUI?.();
 
                     if (DragState.dragElement === el) {
                         document.body.classList.remove('is-global-dragging');
@@ -333,7 +330,7 @@
             };
 
             const playDropAnimation = () => {
-                if (window.Game.UI.DragAnimation) {
+                     if (window.Game.UI.DragAnimation?.animateDropToPlaceholder) {
                      window.Game.UI.DragAnimation.animateDropToPlaceholder(el, placeholder, () => {
                         finishAnimation();
                     });
@@ -391,7 +388,7 @@
                             // Force UI update to ensure target existence (hidden initially by logic below)
                             const wasSuspended = window.Game.UI.isRenderingSuspended;
                             window.Game.UI.isRenderingSuspended = false;
-                            if (window.Game.UI.updateUI) window.Game.UI.updateUI();
+                            window.Game.UI.updateUI?.();
                             window.Game.UI.isRenderingSuspended = true;
 
                             if (useRemoteAnimation) {

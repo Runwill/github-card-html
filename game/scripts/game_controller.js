@@ -6,9 +6,6 @@
     let currentMode = 'auto'; 
     let currentEngine = null;
 
-    function init() {
-    }
-
     function startGame(config = {}) {
         // 决定模式
         const mode = config.mode || currentMode;
@@ -17,12 +14,8 @@
         window.Game.GameState.isGameRunning = false; // 先重置状态
 
         // 清空移动日志
-        if (window.Game.UI.MoveLog) {
-            window.Game.UI.MoveLog.clear();
-        }
-        if (!window.Game.GameState.onlineMode && window.Game.Online && window.Game.Online.SyncManager && window.Game.Online.SyncManager.clearPerspectives) {
-            window.Game.Online.SyncManager.clearPerspectives();
-        }
+        window.Game.UI.MoveLog?.clear?.();
+        if (!window.Game.GameState.onlineMode) window.Game.Online?.SyncManager?.clearPerspectives?.();
         
         if (mode === 'manual' || mode === 'sandbox') {
             if (!window.Game.Engines || !window.Game.Engines.SandboxEngine) {
@@ -39,9 +32,7 @@
         } else {
             // 默认 自动/流程模式（旧版 GameRun）
             // 现有的 game_core.js 逻辑基本上就是 "FlowEngine"
-            if (window.Game.Core && window.Game.Core.startGame) {
-                window.Game.Core.startGame(config);
-            }
+            window.Game.Core?.startGame?.(config);
         }
     }
     
@@ -51,9 +42,7 @@
 
     function setSpeed(ms) {
         // 转发给 Core 或 Engine
-        if (window.Game.Core && window.Game.Core.setSpeed) {
-            window.Game.Core.setSpeed(ms);
-        }
+        window.Game.Core?.setSpeed?.(ms);
     }
 
     // 辅助函数：查找卡牌当前区域
@@ -119,8 +108,8 @@
         return null;
     };
 
-    const getAreaPath = (area) => window.Game.Models && window.Game.Models.getAreaPath ? window.Game.Models.getAreaPath(area) : null;
-    const getAreaPathForLog = (area, card) => window.Game.Models && window.Game.Models.getAreaPathForLog ? window.Game.Models.getAreaPathForLog(area, card) : getAreaPath(area);
+    const getAreaPath = area => window.Game.Models?.getAreaPath?.(area) || null;
+    const getAreaPathForLog = (area, card) => window.Game.Models?.getAreaPathForLog ? window.Game.Models.getAreaPathForLog(area, card) : getAreaPath(area);
 
 
     // ── 内部 API 供 game_controller_dispatch.js 使用 ──
@@ -134,17 +123,9 @@
     };
 
     window.Game.Controller = {
-        init,
         startGame,
         switchMode,
         setSpeed,
     };
-
-    // Auto-init on load
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
 
 })();

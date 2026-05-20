@@ -17,13 +17,15 @@
 
   const jsonPatch = (path, body)=> request(path, { method: 'PATCH', body: body || {} });
 
+  const storageValue = key => { try { return localStorage.getItem(key); } catch(_){ return null; } };
+
   ns.API = {
     jsonGet,
     jsonPost,
     jsonDelete,
     jsonPatch,
-    isAdmin(){ try { return localStorage.getItem('role') === 'admin'; } catch(_){ return false; } },
-    hasToken(){ try { return !!localStorage.getItem('token'); } catch(_){ return false; } },
+    isAdmin(){ return storageValue('role') === 'admin'; },
+    hasToken(){ return !!storageValue('token'); },
     setPassword(userId, newPassword){ return jsonPost('/user/password/set', { userId, newPassword }); },
     async fetchUsers(search){
       const q = search ? ('?search=' + encodeURIComponent(search)) : '';

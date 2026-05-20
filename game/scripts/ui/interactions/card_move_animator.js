@@ -109,10 +109,10 @@
         if (!areaPath) return null;
         const Models = window.Game.Models || {};
         if (Models.resolveAreaByPath) return Models.resolveAreaByPath(areaPath);
-        const SyncMgr = window.Game.Online && window.Game.Online.SyncManager;
-        if (SyncMgr && SyncMgr._resolveArea) return SyncMgr._resolveArea(areaPath);
-        const Engine = window.Game.UI && window.Game.UI._CardMoveEngine;
-        if (Engine && Engine.resolveAreaLocal) return Engine.resolveAreaLocal(areaPath);
+        const SyncMgr = window.Game.Online?.SyncManager;
+        if (SyncMgr?._resolveArea) return SyncMgr._resolveArea(areaPath);
+        const Engine = window.Game.UI?._CardMoveEngine;
+        if (Engine?.resolveAreaLocal) return Engine.resolveAreaLocal(areaPath);
         return null;
     }
 

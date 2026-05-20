@@ -181,9 +181,5 @@
     mo.observe(container, { childList: true, subtree: true });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryInit);
-  } else {
-    tryInit();
-  }
+  whenDOMReady().then(tryInit);
 })();

@@ -199,7 +199,7 @@
       };
 
       const commit = async () => {
-        const canEdit = (window.tokensAdmin && window.tokensAdmin.getAuth && window.tokensAdmin.getAuth().canEdit) || false;
+        const canEdit = window.tokensAdmin?.getAuth?.()?.canEdit || false;
         const txt = input.value;
         if (txt === oldText) { revert(); return; }
 

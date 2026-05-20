@@ -43,7 +43,7 @@
                 }, { passive: true });
             });
         };
-        if (window.partialsReady && window.partialsReady.then) {
+        if (window.partialsReady?.then) {
             window.partialsReady.then(hook).catch(hook);
         } else {
             hook();

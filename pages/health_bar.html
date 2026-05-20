@@ -270,6 +270,19 @@
       return div
     }
 
+    function syncSymbolNode(child, symbol, pulse) {
+      const charChanged = child.textContent !== symbol.ch
+      child.className = 's ' + symbol.cls
+      if (!charChanged) return
+      if (pulse) { child.style.transition = 'none'; child.style.transform = 'scale(0.78)' }
+      child.textContent = symbol.ch
+      if (pulse) { child.offsetHeight; child.style.transition = ''; child.style.transform = '' }
+    }
+
+    function addSymbols(list, count, ch, cls) {
+      for (let i = 0; i < count; i++) list.push({ ch, cls })
+    }
+
     function health_bar_check() {
       const point = parseInt(localStorage.getItem('health_point'))
       const limit = parseInt(localStorage.getItem('health_limit'))
@@ -287,20 +300,20 @@
       const symbols = []
       if (point < limit) {
         if (point <= 0) {
-          for (let i = 0; i < -point; i++) symbols.push({ ch: '·', cls: 's-n' })
+          addSymbols(symbols, -point, '·', 's-n')
           if (limit > 0) {
-            for (let i = 0; i < limit; i++) symbols.push({ ch: '·', cls: 's-e' })
+            addSymbols(symbols, limit, '·', 's-e')
           }
         } else {
-          for (let i = 0; i < point; i++) symbols.push({ ch: '○', cls: 's-f' })
-          for (let i = 0; i < limit - point; i++) symbols.push({ ch: '·', cls: 's-e' })
+          addSymbols(symbols, point, '○', 's-f')
+          addSymbols(symbols, limit - point, '·', 's-e')
         }
       } else {
         if (point <= 0) {
-          for (let i = 0; i < -point; i++) symbols.push({ ch: '·', cls: 's-n' })
+          addSymbols(symbols, -point, '·', 's-n')
         } else {
-          for (let i = 0; i < limit; i++) symbols.push({ ch: '○', cls: 's-f' })
-          for (let i = 0; i < point - limit; i++) symbols.push({ ch: '○', cls: 's-o' })
+          addSymbols(symbols, limit, '○', 's-f')
+          addSymbols(symbols, point - limit, '○', 's-o')
         }
       }
 
@@ -326,24 +339,12 @@
       } else if (oldLen === newLen) {
         // 数量相同：原地更新 + 字符变化脉冲
         for (let i = 0; i < newLen; i++) {
-          const child = live[i]
-          const charChanged = child.textContent !== symbols[i].ch
-          child.className = 's ' + symbols[i].cls
-          if (charChanged) {
-            child.style.transition = 'none'
-            child.style.transform = 'scale(0.78)'
-            child.textContent = symbols[i].ch
-            child.offsetHeight
-            child.style.transition = ''
-            child.style.transform = ''
-          }
+          syncSymbolNode(live[i], symbols[i], true)
         }
       } else if (newLen > oldLen) {
         // 新增符号：先更新已有的，再追加新的（带入场动画）
         for (let i = 0; i < oldLen; i++) {
-          const child = live[i]
-          child.className = 's ' + symbols[i].cls
-          if (child.textContent !== symbols[i].ch) child.textContent = symbols[i].ch
+          syncSymbolNode(live[i], symbols[i], false)
         }
         for (let i = oldLen; i < newLen; i++) {
           const div = createSymbolNode(symbols[i], 'is-enter', (i - oldLen) * ENTER_STAGGER_MS)
@@ -356,9 +357,7 @@
       } else {
         // 减少符号：先更新保留的，再退场多余的
         for (let i = 0; i < newLen; i++) {
-          const child = live[i]
-          child.className = 's ' + symbols[i].cls
-          if (child.textContent !== symbols[i].ch) child.textContent = symbols[i].ch
+          syncSymbolNode(live[i], symbols[i], false)
         }
         const toRemove = live.slice(newLen)
         toRemove.forEach((child, idx) => {

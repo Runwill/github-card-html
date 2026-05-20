@@ -23,7 +23,7 @@
     const baseColor = (opts && opts.rowColor) || defaultColor
   const alpha = (opts && typeof opts.rowAlpha === 'number') ? opts.rowAlpha : 0.1
     const rgba = `rgba(${parseInt(baseColor.slice(1,3),16)}, ${parseInt(baseColor.slice(3,5),16)}, ${parseInt(baseColor.slice(5,7),16)}, ${alpha})`
-    const prefersReduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const prefersReduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     const fadeIn = (opts && typeof opts.rowFadeIn === 'number') ? opts.rowFadeIn : (prefersReduce ? 0 : 400)
     const hold   = (opts && typeof opts.rowHold   === 'number') ? opts.rowHold   : (prefersReduce ? 0 : 400)
     const fadeOut= (opts && typeof opts.rowFadeOut=== 'number') ? opts.rowFadeOut: (prefersReduce ? 0 : 600)

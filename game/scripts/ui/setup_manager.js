@@ -5,7 +5,7 @@
     let characterCache = null;
 
     /** i18n helper */
-    function t(key) { return (window.i18n && window.i18n.t) ? window.i18n.t(key) : key; }
+    function t(key) { return window.i18n?.t?.(key) || key; }
 
     /** Current mode value: 'auto' or 'sandbox' */
     let currentMode = 'sandbox';
@@ -62,7 +62,7 @@
         if (modeToggle) {
             bindClickToggle(modeToggle, () => {
                 // 在线房间内锁定为"否"，不可切换
-                const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
+                const isOnline = !!window.Game.GameState?.onlineMode;
                 if (isOnline) return;
                 if (modeToggle.classList.contains('is-locked')) return;
 
@@ -88,7 +88,7 @@
                 setToggle(spectateToggle, newVal, newVal ? '是' : '否');
 
                 // 广播到房间
-                if (window.Game.Online && window.Game.Online.RoomUI) {
+                if (window.Game.Online?.RoomUI) {
                     const roomUI = window.Game.Online.RoomUI;
                     if (roomUI.currentRoom) {
                         roomUI.currentRoom.allowSpectate = newVal;
@@ -146,15 +146,13 @@
 
     async function showSetupPanel() {
         // 切换到设置视图（互斥隐藏其他视图）
-        if (window.Game.UI.switchGameView) {
-            window.Game.UI.switchGameView('setup');
-        }
+        window.Game.UI.switchGameView?.('setup');
 
         // 面板可见后重新计算 CustomSelect 选项字体缩放
-        if (window.CustomSelect) window.CustomSelect.refreshAll();
+        window.CustomSelect?.refreshAll?.();
 
         // 在线模式检测
-        const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
+        const isOnline = !!window.Game.GameState?.onlineMode;
         const modeToggle = byId('setup-mode-toggle');
 
         // 在线模式下锁定自动时机为"否"
@@ -173,7 +171,7 @@
         const spectateGroup = byId('setup-allow-spectate-group');
         if (spectateGroup) {
             let showSpectate = false;
-            if (isOnline && window.Game.Online && window.Game.Online.RoomUI) {
+            if (isOnline && window.Game.Online?.RoomUI) {
                 const roomUI = window.Game.Online.RoomUI;
                 const room = roomUI.currentRoom;
                 if (room) {
@@ -218,9 +216,7 @@
 
     function hideSetupPanel() {
         // 恢复到之前的视图（如果对局在进行中则回到对局）
-        if (window.Game.UI.restorePreviousView) {
-            window.Game.UI.restorePreviousView();
-        }
+        window.Game.UI.restorePreviousView?.();
     }
 
     function renderPlayerSlots(count) {
@@ -255,9 +251,7 @@
         list.replaceChildren(...groups);
 
         // Wrap dynamic selects with custom dropdown component
-        if (window.CustomSelect) {
-            window.CustomSelect.init(list);
-        }
+        window.CustomSelect?.init?.(list);
     }
 
     function repeatCard(card, count) { return Array(count).fill(card); }
@@ -299,7 +293,7 @@
         const deck = generateDeck(preset);
 
         // Online: force sandbox mode (自动时机 = 否)
-        const isOnline = !!(window.Game.GameState && window.Game.GameState.onlineMode);
+        const isOnline = !!window.Game.GameState?.onlineMode;
         const mode = isOnline ? 'sandbox' : currentMode;
 
         // 隐藏设置面板
@@ -307,17 +301,17 @@
 
         // 开始游戏
         const gameConfig = { mode: mode, players: playersConfig, deck: deck };
-        if (window.Game.Controller && window.Game.Controller.startGame) {
+        if (window.Game.Controller?.startGame) {
             window.Game.Controller.startGame(gameConfig);
-        } else if (window.Game.Core && window.Game.Core.startGame) {
+        } else if (window.Game.Core?.startGame) {
             window.Game.Core.startGame({ players: playersConfig, deck: deck });
         }
 
         // Online: broadcast game start to room members
-        if (isOnline && window.Game.Online) {
+        if (isOnline) {
             try {
-                const syncMgr = window.Game.Online.SyncManager;
-                const client = window.Game.Online.RoomClient;
+            const syncMgr = window.Game.Online?.SyncManager;
+            const client = window.Game.Online?.RoomClient;
                 if (syncMgr && client) {
                     const serializedState = syncMgr.serializeGameState();
                     client.notifyGameStart(gameConfig, serializedState);

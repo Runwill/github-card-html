@@ -157,65 +157,41 @@
     toggles.forEach(btn => btn.click());
   }
 
-  function init() {
-    loadBindings();
-
-    const setupUI = () => {
-      // === Key Settings Modal ===
-      const keySettingsBtn = document.getElementById(KEY_SETTINGS_BUTTON_ID);
-      if (keySettingsBtn) {
-        keySettingsBtn.addEventListener('click', () => {
-          var OV = window.CardUI?.Manager?.Controllers?.overlay;
-          if (OV) {
-            OV.open('key-settings-modal');
-          }
-          updateUI();
+  loadBindings();
+  whenDOMReady().then(()=> whenPartialsReady().then(()=>{
+    const keySettingsBtn = document.getElementById(KEY_SETTINGS_BUTTON_ID);
+    if (keySettingsBtn) keySettingsBtn.addEventListener('click', () => {
+      var OV = window.CardUI?.Manager?.Controllers?.overlay;
+      if (OV) OV.open('key-settings-modal');
+      updateUI();
+    });
+    setupCategoryTabs();
+    Object.keys(ACTIONS).forEach(action => {
+      const btn = actionButton(action);
+      if (btn && !btn.__keyBindingBound) {
+        btn.__keyBindingBound = true;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (recordingAction === action) stopRecording();
+          else { if (recordingAction) stopRecording(); startRecording(action); }
         });
       }
-
-      setupCategoryTabs();
-
-      // Bind record buttons
-      Object.keys(ACTIONS).forEach(action => {
-          const btn = actionButton(action);
-          if (btn && !btn.__keyBindingBound) {
-            btn.__keyBindingBound = true;
-            btn.addEventListener('click', (e) => {
-                  e.stopPropagation();
-                    if (recordingAction === action) {
-                      stopRecording();
-                  } else {
-                      if (recordingAction) stopRecording();
-                      startRecording(action);
-                  }
-              });
-          }
-      });
-    };
-
-    if (window.partialsReady) {
-      window.partialsReady.then(setupUI);
-    } else if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupUI);
-    } else {
-      setupUI();
-    }
-
-    // Global Key Listener
-    document.addEventListener('keydown', (e) => {
-      if (recordingAction) return;
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
-
-      if (checkBinding(e, 'expand_all_terms')) {
-        e.preventDefault();
-        expandAllTerms();
-      }
-      if (checkBinding(e, 'toggle_theme')) {
-        e.preventDefault();
-        if (window.ThemeToggle?.toggle) window.ThemeToggle.toggle();
-      }
     });
-  }
+  }));
+
+  document.addEventListener('keydown', (e) => {
+    if (recordingAction) return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+
+    if (checkBinding(e, 'expand_all_terms')) {
+      e.preventDefault();
+      expandAllTerms();
+    }
+    if (checkBinding(e, 'toggle_theme')) {
+      e.preventDefault();
+      if (window.ThemeToggle?.toggle) window.ThemeToggle.toggle();
+    }
+  });
   
   // Expose API
   window.KeySettings = {
@@ -225,5 +201,4 @@
       ACTIONS
   };
 
-  init();
 })();

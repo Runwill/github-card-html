@@ -2,7 +2,7 @@
     window.Game = window.Game || {};
     
     // 确保模型已加载
-    const Area = window.Game.Models && window.Game.Models.Area;
+    const Area = window.Game.Models?.Area;
 
     // 游戏状态
     window.Game.GameState = {

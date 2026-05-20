@@ -55,6 +55,8 @@
     return document.getElementById(id);
   }
 
+  function now() { return window.performance?.now ? window.performance.now() : Date.now(); }
+
   function createEl(tag, className, text) {
     var el = document.createElement(tag);
     if (className) el.className = className;
@@ -293,11 +295,10 @@
       item.node.vx = 0;
       item.node.vy = 0;
     });
-    var start = window.performance && window.performance.now ? window.performance.now() : Date.now();
+    var start = now();
     var duration = 240;
     function step() {
-      var now = window.performance && window.performance.now ? window.performance.now() : Date.now();
-      var elapsed = Math.min(1, (now - start) / duration);
+      var elapsed = Math.min(1, (now() - start) / duration);
       var eased = 1 - Math.pow(1 - elapsed, 3);
       items.forEach(function (item) {
         item.node.x = item.fromX + (item.toX - item.fromX) * eased;
@@ -464,9 +465,9 @@
   }
 
   function updateVisuals(targets) {
-    var now = window.performance && window.performance.now ? window.performance.now() : Date.now();
-    var delta = state.lastVisualTime ? Math.max(0, Math.min(80, now - state.lastVisualTime)) : 16;
-    state.lastVisualTime = now;
+    var time = now();
+    var delta = state.lastVisualTime ? Math.max(0, Math.min(80, time - state.lastVisualTime)) : 16;
+    state.lastVisualTime = time;
     var mix = 1 - Math.exp(-delta / 120);
     var active = false;
     var seen = {};
@@ -786,11 +787,10 @@
       draw();
       return;
     }
-    var start = window.performance && window.performance.now ? window.performance.now() : Date.now();
+    var start = now();
     var duration = 180;
     function step() {
-      var now = window.performance && window.performance.now ? window.performance.now() : Date.now();
-      var elapsed = Math.min(1, (now - start) / duration);
+      var elapsed = Math.min(1, (now() - start) / duration);
       var eased = 1 - Math.pow(1 - elapsed, 3);
       state.panX = fromPanX + (targetPanX - fromPanX) * eased;
       state.panY = fromPanY + (targetPanY - fromPanY) * eased;

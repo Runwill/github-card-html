@@ -38,8 +38,7 @@
   // 暴露给 logs.js 中 filter apply 按钮的延迟绑定
   window.TokensPerm.hydrateUserLogs = hydrateUserLogs;
 
-  document.addEventListener('DOMContentLoaded', function(){
-    const ready = (window.partialsReady instanceof Promise) ? window.partialsReady : Promise.resolve();
+  whenDOMReady().then(()=>{
     // 封装一次性绑定：在 #perms-log 出现后再绑定事件委托，避免绑定时机早于 DOM 创建
     function bindDeleteDelegation(){
       try{
@@ -56,7 +55,7 @@
     }
 
     // 首次分片就绪后渲染日志，并在渲染后绑定删除委托（仅管理员且已登录）
-    ready.then(()=>{ try{ if (hasToken() && isAdmin()) hydrateUserLogs(); }catch(_){ } }).then(()=>{
+    whenPartialsReady().then(()=>{ try{ if (hasToken() && isAdmin()) hydrateUserLogs(); }catch(_){ } }).then(()=>{
       try { bindDeleteDelegation(); } catch(_){ }
       // 进入权限页时自动刷新：监听面板可见性变化
       try{

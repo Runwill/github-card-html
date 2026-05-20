@@ -2,42 +2,15 @@
   var STORAGE_KEY = 'draftBlockContent';
   var inputEl, previewEl;
 
-  function safe(fn){ try { return fn && fn(); } catch(_) {} }
-
-  function $(sel){ return document.querySelector(sel); }
-
   function debounce(fn, wait){
     var t; return function(){ var c=this,a=arguments; clearTimeout(t); t=setTimeout(function(){ fn.apply(c,a); }, wait); };
-  }
-
-  function callReplacers(root){
-    if (!root || !window.endpoints) return;
-    var reps = [
-      ['replace_character_name', window.endpoints.character()],
-      ['replace_skill_name', window.endpoints.skill()],
-      ['replace_card_name', window.endpoints.card()],
-      ['replace_term', window.endpoints.termDynamic(), 1],
-      ['replace_term', window.endpoints.termFixed(), 1]
-    ];
-    for (var i=0;i<reps.length;i++) (function(it){
-      safe(function(){
-        var fn = window[it[0]];
-        if(!fn || !it[1]) return;
-        var args = it.slice(1);
-        args.push(root);
-        var result = fn.apply(window, args);
-        if (result && typeof result.catch === 'function') result.catch(function(){});
-        return result;
-      });
-    })(reps[i]);
-    setTimeout(function(){ safe(function(){ return window.pronounCheck && window.pronounCheck(root); }); }, 50);
   }
 
   function render(html){
     if (!previewEl) return;
     try {
       previewEl.innerHTML = (html || '').replace(/\\/g, '');
-      callReplacers(previewEl);
+      window.runTextReplacers?.(previewEl);
     } catch(_) {}
   }
 
@@ -61,7 +34,7 @@
     inputEl.value = val;
     render(val);
     save(val);
-    safe(autosizeNow);
+    autosizeNow();
   }
 
   function isVisible(el){
@@ -77,22 +50,20 @@
   }
 
   function autosizeNow(){
-    if (!inputEl) return;
-    if (!isVisible(inputEl)) return;
-    if (usesFixedEditorLayout()) {
-      inputEl.style.height = '';
-      inputEl.style.overflow = 'auto';
+    try {
+      if (!inputEl || !isVisible(inputEl)) return;
+      var fixed = usesFixedEditorLayout();
+      inputEl.style.height = fixed ? '' : 'auto';
+      inputEl.style.overflow = fixed ? 'auto' : 'hidden';
       inputEl.style.resize = 'none';
-      return;
+      if (!fixed) inputEl.style.height = Math.max(80, inputEl.scrollHeight) + 'px';
+    } catch(_) {
     }
-    inputEl.style.height = 'auto';
-    var next = Math.max(80, inputEl.scrollHeight);
-    inputEl.style.height = next + 'px';
   }
 
   function init(){
-    inputEl = $('#htmlInput');
-    previewEl = $('.draftBlock');
+    inputEl = document.querySelector('#htmlInput');
+    previewEl = document.querySelector('.draftBlock');
     if (!inputEl || !previewEl) return;
 
     var saved = load();
@@ -110,10 +81,10 @@
 
     var debouncedRender = debounce(onInput, 250);
     inputEl.addEventListener('input', function(e){
-      safe(autosizeNow);
+      autosizeNow();
       debouncedRender();
     });
-    window.addEventListener('resize', function(){ safe(autosizeNow); });
+    window.addEventListener('resize', autosizeNow);
 
     try {
       if ('IntersectionObserver' in window) {
@@ -130,24 +101,11 @@
     } catch(_) {}
   }
 
-  function whenDOMReady(){
-    return document.readyState === 'loading'
-      ? new Promise(function(r){ document.addEventListener('DOMContentLoaded', r, { once: true }); })
-      : Promise.resolve();
-  }
-
-  function whenPartialsReady(){
-    if (!window.partialsReady || typeof window.partialsReady.then !== 'function') {
-      return Promise.resolve();
-    }
-    return window.partialsReady.catch(function(){});
-  }
-
   (async function boot(){
     await whenDOMReady();
     await whenPartialsReady();
     init();
   })();
 
-  window.draftPanel = { render: render, save: save, load: load, init: init, setContent: setContent, autosize: function(){ safe(autosizeNow); } };
+  window.draftPanel = { setContent: setContent, autosize: autosizeNow };
 })();

@@ -93,7 +93,7 @@
   }
   // 提取模板占位符
   function extractPlaceholders(tmpl){
-    try{ const out=[]; if(!tmpl) return out; tmpl.replace(/\{([\w]+)\}/g,(_,p)=>{ if(!out.includes(p)) out.push(p); return ''; }); return out; }catch(_){ return []; }
+    try{ return tmpl ? Array.from(new Set(Array.from(tmpl.matchAll(/\{([\w]+)\}/g), match => match[1]))) : []; }catch(_){ return []; }
   }
   function mapRoleLabel(val){ try { const code = String(val || ''); if (!code) return code; const key = 'role.' + code; const tr = (window.t && window.t(key)) || null; return tr || code; } catch(_) { return String(val||''); } }
   // 不兼容旧日志：仅返回同名字段，不做别名/推断兜底
@@ -111,12 +111,10 @@
         if (v===undefined || v===null || v==='') out[key] = '';
       });
       // 细化：角色变更日志中将 oldRole/newRole 从代码映射为本地化名称
-      try {
-        if (String(log && log.type) === 'role-changed') {
-          if (out.oldRole != null) out.oldRole = mapRoleLabel(out.oldRole);
-          if (out.newRole != null) out.newRole = mapRoleLabel(out.newRole);
-        }
-      } catch(_){ }
+      if (String(log && log.type) === 'role-changed') {
+        if (out.oldRole != null) out.oldRole = mapRoleLabel(out.oldRole);
+        if (out.newRole != null) out.newRole = mapRoleLabel(out.newRole);
+      }
       return JSON.stringify(out);
     }catch(_){ return JSON.stringify((log&&log.data)||{}); }
   }
@@ -273,10 +271,8 @@
     const p = new URLSearchParams();
     p.set('page','1'); p.set('pageSize', String(MAX_LOGS));
     if (filters){
-      const q = filters.querySelector('#perms-log-q');
-      const from = filters.querySelector('#perms-log-from');
-      const to = filters.querySelector('#perms-log-to');
-      const qv = q && q.value && q.value.trim(); if(qv) p.set('q', qv);
+      const fieldValue = sel => filters.querySelector(sel)?.value || '';
+      const qv = fieldValue('#perms-log-q').trim(); if(qv) p.set('q', qv);
       const typeV = choiceValue(filters, 'type', 'all');
       const ocV = choiceValue(filters, 'outcome', 'any');
       const scopeV = choiceValue(filters, 'scope', 'active');
@@ -286,8 +282,8 @@
         const subset = queryTypesForFilter(typeV, ocV);
         p.set('types', subset.length ? subset.join(',') : '__none__');
       }
-      const fv = from && from.value; if (fv) p.set('since', fv);
-      const tv = to && to.value; if (tv) p.set('until', tv);
+      const fv = fieldValue('#perms-log-from'); if (fv) p.set('since', fv);
+      const tv = fieldValue('#perms-log-to'); if (tv) p.set('until', tv);
     }
     return p;
   }

@@ -14,7 +14,7 @@
 
   function getLocaleFromI18n(){
     try{
-      const lang = (window.i18n && window.i18n.getLang && window.i18n.getLang()) || 'zh';
+      const lang = window.i18n?.getLang?.() || 'zh';
       if (lang === 'zh') return 'zh-CN';
       if (lang === 'en') return 'en-US';
       return 'en-US';

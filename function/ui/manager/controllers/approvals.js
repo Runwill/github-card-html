@@ -9,10 +9,10 @@
 
   async function onApproveClick(){
     try {
-      var groups = typeof w.fetchPendingApprovalGroups === 'function' ? await w.fetchPendingApprovalGroups() : null;
-      var total = typeof w.countPendingApprovalGroups === 'function' ? w.countPendingApprovalGroups(groups) : 0;
+      var groups = await w.fetchPendingApprovalGroups?.();
+      var total = w.countPendingApprovalGroups?.(groups) || 0;
       if (total > 0) {
-        try { if (typeof w.setPendingApprovalGroupsCache === 'function') w.setPendingApprovalGroupsCache(groups); } catch(_){ }
+        try { w.setPendingApprovalGroupsCache?.(groups); } catch(_){ }
         try { w.CardUI.Manager.Controllers.overlay.open('approve-user-modal'); } catch(_){ }
       } else {
         var msg = t('toast.noRequests');
@@ -28,13 +28,13 @@
     var approveBtn = $('approve-request-button');
     if (approveBtn) approveBtn.style.display = (role === 'admin' || role === 'moderator') ? '' : 'none';
 
-    var tokensTab = (qs('a[href="#panel_tokens"]').parentElement) || null;
+    var tokensTab = qs('a[href="#panel_tokens"]')?.parentElement || null;
     var tokensPanel = $('panel_tokens');
     var canViewTokens = (role === 'admin' || role === 'moderator');
     if (tokensTab) tokensTab.style.display = canViewTokens ? '' : 'none';
     if (tokensPanel) tokensPanel.style.display = canViewTokens ? '' : 'none';
 
-    var permTabEl = (qs('a[href="#panel_permissions"]').parentElement) || null;
+    var permTabEl = qs('a[href="#panel_permissions"]')?.parentElement || null;
     var permPanelEl = $('panel_permissions');
     var canViewPerms = (role === 'admin');
     if (permTabEl) permTabEl.style.display = canViewPerms ? '' : 'none';

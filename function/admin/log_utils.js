@@ -13,7 +13,7 @@
   }
 
   function timeHtml(value, escapeFn){
-    const escape = escapeFn || esc, parse = window.TimeFmt && window.TimeFmt.parseTimeValue;
+    const escape = escapeFn || esc, parse = window.TimeFmt?.parseTimeValue;
     const ts = (parse ? parse(value) : Number(value)) ?? Date.now(), rel = formatRel(ts), abs = formatAbsForLang(ts);
     return `<time class="log-time" datetime="${escape(new Date(ts).toISOString())}" data-ts="${escape(String(ts))}" data-rel="${escape(rel)}" data-abs="${escape(abs)}">${escape(rel)}</time>`;
   }

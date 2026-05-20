@@ -87,7 +87,7 @@
 
   function dict(){
     const lang = current();
-    const pack = (window.I18N_STRINGS && window.I18N_STRINGS[lang]) || {};
+    const pack = window.I18N_STRINGS?.[lang] || {};
     // debug 是 Proxy，但也可直接使用
     return pack;
   }

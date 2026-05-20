@@ -13,7 +13,7 @@
       // 刷新按钮
       if (btn && !btn.__bound) {
         btn.__bound = true;
-        btn.addEventListener('click', () => window.tokensRefresh && window.tokensRefresh());
+        btn.addEventListener('click', () => T.tokensRefresh && T.tokensRefresh());
       }
 
       // 缩略模式切换，嵌入刷新按钮旁
@@ -40,7 +40,7 @@
           tgl.addEventListener('click', () => {
             state.compactMode = !state.compactMode;
             sync();
-            if (window.renderTokensDashboard) window.renderTokensDashboard(false);
+            if (T.renderTokensDashboard) T.renderTokensDashboard(false);
           });
 
           sync();
@@ -65,7 +65,7 @@
              state.openTypes = new Set(COLLECTION_TYPES);
           }
           // 恢复后立即触发一次重绘以应用过滤
-          if (window.renderTokensDashboard) window.renderTokensDashboard(false);
+          if (T.renderTokensDashboard) T.renderTokensDashboard(false);
         }
       } catch (_) {}
 
@@ -90,7 +90,7 @@
             }
           } catch (_) {}
           state.q = text;
-          if (window.renderTokensDashboard) window.renderTokensDashboard(false);
+          if (T.renderTokensDashboard) T.renderTokensDashboard(false);
         }, SEARCH_DELAY_MS);
       };
 

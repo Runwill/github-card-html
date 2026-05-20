@@ -117,12 +117,12 @@
       };
       if (btn && !btn.__permBound) {
         btn.__permBound = true;
-        btn.addEventListener('click', ()=> w.renderPermissionsPanel((input?.value || '').trim(), { forceRefresh: true }));
+        btn.addEventListener('click', ()=> ns.renderPermissionsPanel((input?.value || '').trim(), { forceRefresh: true }));
       }
       if (input && !input.__permBound) {
         input.__permBound = true;
         input.addEventListener('keydown', (e)=>{
-          if (e.key === 'Enter') w.renderPermissionsPanel((input.value || '').trim(), { forceRefresh: true });
+          if (e.key === 'Enter') ns.renderPermissionsPanel((input.value || '').trim(), { forceRefresh: true });
         });
       }
       if (toggle && !toggle.__permBound) {
@@ -130,7 +130,7 @@
         toggle.addEventListener('click', ()=>{
           S.permMode = (S.permMode === 'partial') ? 'all' : 'partial';
           syncModeToggle();
-          w.renderPermissionsPanel((input?.value || '').trim(), { forceRefresh: true });
+          ns.renderPermissionsPanel((input?.value || '').trim(), { forceRefresh: true });
         });
       }
       syncModeToggle();
@@ -219,8 +219,7 @@
           try {
             el.style.transitionDelay = (idx * STAGGER_EXIT) + 'ms';
             el.classList.add('perm-row-exit');
-            const onEnd = (e)=>{ if (e && e.target !== el) return; el.removeEventListener('transitionend', onEnd); try { el.style.transitionDelay=''; } catch{} done(); };
-            el.addEventListener('transitionend', onEnd);
+            window.CollapsibleAnim.onTransitionEnd(el, ()=>{ try { el.style.transitionDelay=''; } catch{} done(); }, 0, e => e.target === el);
           } catch { done(); }
         });
         const fallback = staggerFallback(220, rows, STAGGER_EXIT, 80);

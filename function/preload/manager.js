@@ -5,7 +5,6 @@
   var started = false;
   var activeContext = null;
   var readyPromise = null;
-  var jsonCache = new Map();
   var resourceCache = new Set();
 
   function detectContext(){
@@ -26,7 +25,7 @@
 
   function whenReady(context){
     return whenDomReady().then(function(){
-      if (context === 'app' && window.partialsReady && typeof window.partialsReady.then === 'function') {
+      if (context === 'app' && typeof window.partialsReady?.then === 'function') {
         return window.partialsReady.catch(function(){});
       }
     });
@@ -84,20 +83,7 @@
   }
 
   function json(url, options){
-    if (!url) return Promise.resolve(null);
-    if (jsonCache.has(url)) return jsonCache.get(url);
-    var loader = window.fetchJsonCached || function(path, fetchOptions){
-      return fetch(path, fetchOptions).then(function(resp){
-        if (!resp.ok) throw new Error('HTTP ' + resp.status + ' for ' + path);
-        return resp.json();
-      });
-    };
-    var promise = Promise.resolve(loader(url, options)).catch(function(err){
-      jsonCache.delete(url);
-      throw err;
-    });
-    jsonCache.set(url, promise);
-    return promise;
+    return url ? window.fetchJsonCached(url, options) : Promise.resolve(null);
   }
 
   function prefetch(url, asType){

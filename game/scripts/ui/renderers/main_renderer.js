@@ -171,35 +171,23 @@
         }
 
         // 3. 渲染角色信息 (Self Role)
-        if (window.Game.UI.updateSelfRoleInfo) {
-            window.Game.UI.updateSelfRoleInfo(GameState, GameText);
-        }
+        window.Game.UI.updateSelfRoleInfo?.(GameState, GameText);
 
         // 4. 渲染角色列表 (Role List)
-        if (window.Game.UI.renderRoleList) {
-            window.Game.UI.renderRoleList(GameState, GameText);
-        }
+        window.Game.UI.renderRoleList?.(GameState, GameText);
 
         // 5. 渲染公共区域 (Board)
-        if (window.Game.UI.renderBoard) {
-            window.Game.UI.renderBoard(GameState, GameText);
-        }
+        window.Game.UI.renderBoard?.(GameState, GameText);
 
         // 6. 更新控件
-        if (window.Game.UI.updateControls) {
-            window.Game.UI.updateControls(GameState);
-        }
+        window.Game.UI.updateControls?.(GameState);
 
         // 7. 更新所有打开的详情窗口 (Inspect Viewers)
         // 这一步确保拖拽等操作后，窗口内容实时同步
-        if (window.Game.UI.updateAllViewers) {
-            window.Game.UI.updateAllViewers();
-        }
+        window.Game.UI.updateAllViewers?.();
 
         // 8. 刷新移动日志（视角切换时重新渲染以更新可见性显示）
-        if (window.Game.UI.MoveLog && window.Game.UI.MoveLog.renderLog) {
-            window.Game.UI.MoveLog.renderLog();
-        }
+        window.Game.UI.MoveLog?.renderLog?.();
     }
 
     // 导出
@@ -279,7 +267,7 @@
 
             // cardData 是 Card 对象 (or String)
             // Delegate to Controller to handle mode-specific logic
-            if (window.Game.Controller && window.Game.Controller.dispatch) {
+            if (window.Game.Controller?.dispatch) {
                 // 用于动画接管的起始位置
                 const startRect = (options && options.startRect) ? options.startRect : null;
                 const cardHTML = (options && options.cardHTML) ? options.cardHTML : null;

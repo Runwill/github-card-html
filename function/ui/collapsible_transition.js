@@ -2,15 +2,13 @@
 ;(function () {
   'use strict';
 
-  function onTransitionEnd(e, el) {
-    if (e.propertyName !== 'height') return;
+  function finishTransition(el) {
     // 展开完成后，将高度改为 auto 以适配内容动态变化
     if (!el.classList.contains('is-collapsed')) {
       el.style.height = 'auto';
       // 展开完成后允许可见溢出，避免内容被裁剪
       el.style.overflow = '';
     }
-    el.removeEventListener('transitionend', el._collapseTEnd);
     el._collapseTEnd = null;
   }
 
@@ -18,9 +16,8 @@
     el.style.height = fromHeight + 'px';
     void el.offsetHeight;
     el.style.overflow = 'hidden';
-    el._collapseTEnd && el.removeEventListener('transitionend', el._collapseTEnd);
-    el._collapseTEnd = function (ev) { onTransitionEnd(ev, el); };
-    el.addEventListener('transitionend', el._collapseTEnd);
+    if (el._collapseTEnd) el._collapseTEnd();
+    el._collapseTEnd = window.CollapsibleAnim.onTransitionEnd(el, function () { finishTransition(el); }, 0, function (e) { return e.target === el && e.propertyName === 'height'; });
   }
 
   function collapse(el, btn) {

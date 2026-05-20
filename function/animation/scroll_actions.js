@@ -144,19 +144,11 @@
   // “文本进场动画”的固定时长（毫秒），用于延迟高亮出现时间
   // 说明：按当前样式约定取 600ms，不再做动态读取；若用户开启减少动态则为 0。
   function textEnterDurationMs(){
-    try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return 0 } catch(_) {}
+    try { if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return 0 } catch(_) {}
     return 600
   }
 
-  // 行高亮条改为独立模块（function/animation/row_highlight.js）
-  function highlightRowAtElement(elem, opts){
-    if (!elem) return function(){}
-    if (window.rowHighlight && typeof window.rowHighlight.highlightRowAtElement === 'function') {
-      return window.rowHighlight.highlightRowAtElement(elem, opts)
-    }
-    // 兜底：若模块未加载，返回空函数避免报错
-    return function(){}
-  }
+  const highlightRowAtElement = (elem, opts)=> window.rowHighlight?.highlightRowAtElement?.(elem, opts) || function(){}
 
   // 执行滚动：默认改为居中；若需顶部对齐，可传 opts.center === false
   // switching 为 true 时（跨面板跳转），应用滚动距离上限

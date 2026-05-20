@@ -12,11 +12,7 @@
     const input = Object.assign(document.createElement('input'), { type: 'text', className: 'ui-field', id: 'search-input', placeholder: '检索', autocomplete: 'off' });
 
     // 仅当当前位于“将池页”时才真正触发筛选
-    input.addEventListener('input', () => {
-        try {
-          applyPanelFilter(mountedPanel);
-        } catch(_) { /* ignore */ }
-    });
+    input.addEventListener('input', () => { try { applyPanelFilter(mountedPanel); } catch(_) {} });
 
     container.appendChild(input);
     return container;
@@ -26,8 +22,8 @@
   let mountedPanel = null; // '#panel_character' | '#panel_skill'
 
   function applyPanelFilter(panelSelector) {
-    if (panelSelector === '#panel_character') window.filterParagraphs && window.filterParagraphs();
-    else if (panelSelector === '#panel_skill') window.filterSkills && window.filterSkills();
+    if (panelSelector === '#panel_character') window.filterParagraphs?.();
+    else if (panelSelector === '#panel_skill') window.filterSkills?.();
   }
 
   function ensureSearchOnce() {
@@ -97,25 +93,12 @@
     }, true);
   }
 
-  // 初始：默认挂到将池面板（若存在），否则挂到技能面板
-  function init(){
+  whenDOMReady().then(()=> whenPartialsReady().then(()=>{
     ensureSearchOnce();
     const initialPanel = document.querySelector('#panel_character') ? '#panel_character' : (document.querySelector('#panel_skill') ? '#panel_skill' : null);
     if (initialPanel) mountToPanel(initialPanel);
     setupTabSync();
-  }
-
-  // 等待 partials 注入完成
-  if (window.partialsReady && typeof window.partialsReady.then === 'function') {
-    window.partialsReady.then(init);
-  } else {
-    // 兜底
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-  }
+  }));
 
   // 简单的“将池页”筛选：根据输入内容隐藏/显示 <characterParagraph>
   // 通用筛选工厂：根据关键词隐藏/显示匹配元素，可选处理相邻节点

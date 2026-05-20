@@ -19,11 +19,11 @@
     }
 
     function updateGameUI() {
-        if (window.Game.UI && window.Game.UI.updateUI) window.Game.UI.updateUI();
+        window.Game.UI?.updateUI?.();
     }
 
     function switchToPlayView() {
-        if (window.Game.UI.switchGameView) window.Game.UI.switchGameView('play');
+        window.Game.UI.switchGameView?.('play');
     }
 
     function pushFirstLeafFrom(node) {

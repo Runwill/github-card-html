@@ -8,7 +8,7 @@
         }
 
         _updateUI() {
-            if (window.Game.UI.updateUI) window.Game.UI.updateUI();
+            window.Game.UI.updateUI?.();
         }
 
         _modifyPlayerField(roleId, field, delta, minValue) {
@@ -36,9 +36,7 @@
             this._distributeCards(config);
             
             // --- UI 可见性处理：切换到对局视图 ---
-            if (window.Game.UI.switchGameView) {
-                window.Game.UI.switchGameView('play');
-            }
+            window.Game.UI.switchGameView?.('play');
             // -------------------------------
             
             // 在沙盒中，所有区域都可以视为开放或由此用户管理

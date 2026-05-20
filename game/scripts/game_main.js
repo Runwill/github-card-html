@@ -56,26 +56,10 @@
         }
 
         // Listen for theme changes to update colors
-        const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
-                    window.Game.UI.updateUI();
-                }
-            });
-        });
+        const observer = new MutationObserver(() => window.Game.UI.updateUI());
         observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     }
 
-    // Hook into window load or wait for partials
-    document.addEventListener('DOMContentLoaded', () => {
-        // Simple check to see if partials are loaded, or just retry
-        // Since the app uses a custom loader, we might need to wait for that.
-        const checkInterval = setInterval(() => {
-            if (document.getElementById('panel_game')) {
-                clearInterval(checkInterval);
-                initGame();
-            }
-        }, 500);
-    });
+    whenDOMReady().then(() => whenPartialsReady().then(initGame));
 
 })();

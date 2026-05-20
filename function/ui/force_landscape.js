@@ -132,11 +132,6 @@
       var s = getPhysicalSize();
       return { x: physicalY, y: s.w - physicalX };
     };
-    // 反向：视觉坐标 → 物理坐标
-    window.__flInversePoint = function (visualX, visualY) {
-      var s = getPhysicalSize();
-      return { x: s.w - visualY, y: visualX };
-    };
     // 矩形转换：物理 BoundingClientRect → 视觉坐标矩形
     window.__flTransformRect = function (rect) {
       var s = getPhysicalSize();

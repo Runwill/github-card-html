@@ -45,18 +45,7 @@
     update();
   }
 
-  function ready(fn){
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, { once: true });
-    else fn();
-  }
-
   // 若页面使用了 partials 异步插入，等待其完成再挂载，避免布局抖动
   var boot = function(){ bind(createButton()); };
-  try {
-    if (window.partialsReady && typeof window.partialsReady.then === 'function') {
-      window.partialsReady.then(function(){ ready(boot); });
-    } else {
-      ready(boot);
-    }
-  } catch(_) { ready(boot); }
+  whenDOMReady().then(()=> whenPartialsReady().then(boot)).catch(boot);
 })();

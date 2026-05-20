@@ -46,10 +46,6 @@
     return window.t ? window.t(key, params) : key;
   }
 
-  function safe(fn) {
-    try { return fn && fn(); } catch (_) { return undefined; }
-  }
-
   function logEditor(key, params) {
     var text = t(key, params || {});
     var stamp = new Date().toLocaleTimeString('zh-CN', { hour12: false });
@@ -256,48 +252,23 @@
   }
 
   function saveState() {
-    safe(function () {
+    try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         nodes: state.nodes,
         escapeQuotes: state.escapeQuotes
       }));
-    });
+    } catch (_) {}
   }
 
   function loadState() {
-    safe(function () {
+    try {
       var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       var parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.nodes)) state.nodes = parsed.nodes;
       if (parsed && parsed.escapeQuotes === false) state.escapeQuotes = false;
-    });
+    } catch (_) {}
     ns.Data.refreshLabels(state.nodes, state.chineseMap);
-  }
-
-  function callReplacers(root) {
-    if (!root || !window.endpoints) return;
-    var calls = [
-      ['replace_character_name', window.endpoints.character && window.endpoints.character()],
-      ['replace_skill_name', window.endpoints.skill && window.endpoints.skill()],
-      ['replace_card_name', window.endpoints.card && window.endpoints.card()],
-      ['replace_term', window.endpoints.termDynamic && window.endpoints.termDynamic(), 1],
-      ['replace_term', window.endpoints.termFixed && window.endpoints.termFixed(), 1]
-    ];
-    calls.forEach(function (item) {
-      safe(function () {
-        var fn = window[item[0]];
-        if (!fn || !item[1]) return;
-        var args = item.slice(1);
-        args.push(root);
-        var result = fn.apply(window, args);
-        if (result && typeof result.catch === 'function') result.catch(function () {});
-        return result;
-      });
-    });
-    setTimeout(function () {
-      safe(function () { return window.pronounCheck && window.pronounCheck(root); });
-    }, 50);
   }
 
   function updateOutput() {
@@ -306,7 +277,7 @@
     if (els.output) els.output.value = raw;
     if (els.preview) {
       els.preview.innerHTML = raw.replace(/\\"/g, '"');
-      callReplacers(els.preview);
+      if (window.runTextReplacers) window.runTextReplacers(els.preview);
     }
   }
 
@@ -1180,12 +1151,6 @@
     renderAll(true);
   }
 
-  function eventMatchesAction(event, action) {
-    var keySettings = window.KeySettings;
-    if (keySettings && typeof keySettings.checkBinding === 'function') return keySettings.checkBinding(event, action);
-    return action === 'editor_variant_mode' && event.key === 'Control';
-  }
-
   function setVariantMode(active) {
     active = !!active;
     if (state.variantMode === active) return;
@@ -1195,7 +1160,8 @@
 
   function handleVariantKey(event, active) {
     if (!isEditorActive() || state.activeView !== 'editor') return false;
-    if (!eventMatchesAction(event, 'editor_variant_mode')) return false;
+    var keySettings = window.KeySettings;
+    if (!(keySettings && typeof keySettings.checkBinding === 'function' ? keySettings.checkBinding(event, 'editor_variant_mode') : event.key === 'Control')) return false;
     setVariantMode(active);
     event.preventDefault();
     return true;

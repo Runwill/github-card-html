@@ -11,10 +11,8 @@
         if (!selfRole) return;
 
         // 标记主视角角色是否正处于当前回合（仅在流程真正进入 TurnProcess 时才算）
-        const inTurn = window.Game.Core.isInTurn && window.Game.Core.isInTurn();
-        // 沙盒模式：支持手动设置的当前回合角色
-        const sandboxTurn = (GameState.mode === 'sandbox' && GameState.sandboxTurnIndex != null && GameState.sandboxTurnIndex >= 0);
-        const isTurnOwner = (inTurn && perspIdx === GameState.currentPlayerIndex) || (sandboxTurn && perspIdx === GameState.sandboxTurnIndex);
+        const isTurnOwner = (window.Game.Core.isInTurn?.() && perspIdx === GameState.currentPlayerIndex)
+            || (GameState.mode === 'sandbox' && perspIdx === GameState.sandboxTurnIndex);
         
         const currentPanel = document.querySelector('.current-character-panel');
         let isRoleChanged = false;
@@ -124,10 +122,7 @@
                 }
             }
 
-            let count = 0;
-            if (selfRole.hand && selfRole.hand.cards) {
-                count = selfRole.hand.cards.length;
-            }
+            const count = selfRole.hand?.cards?.length || 0;
 
             const handText = ` ${count}`;
             if (handCountEl.textContent !== handText) {
@@ -142,9 +137,7 @@
             charInfoPanel.setAttribute('data-role-id', selfRole.id);
             charInfoPanel.oncontextmenu = (e) => {
                 e.preventDefault();
-                if (window.Game.UI.showContextMenu) {
-                    window.Game.UI.showContextMenu(e.clientX, e.clientY, selfRole);
-                }
+                window.Game.UI.showContextMenu?.(e.clientX, e.clientY, selfRole);
             };
 
             // 主视角装备区卡牌名称
@@ -180,26 +173,14 @@
                 const isStacked = selfRole.hand.apartOrTogether === 1;
                 const isCentered = selfRole.hand.centered === 1;
                 
-                if (isCentered) {
-                    container.classList.add('area-centered');
-                    container.classList.remove('area-left');
-                } else {
-                    container.classList.add('area-left');
-                    container.classList.remove('area-centered');
-                }
+                container.classList.toggle('area-centered', isCentered);
+                container.classList.toggle('area-left', !isCentered);
                 
-                if (isStacked) {
-                     container.classList.add('area-stacked');
-                     container.classList.remove('area-spread');
-                } else { 
-                     container.classList.add('area-spread');
-                     container.classList.remove('area-stacked');
-                }
+                container.classList.toggle('area-stacked', isStacked);
+                container.classList.toggle('area-spread', !isStacked);
             }
 
-            if (window.Game.UI.renderCardList) {
-                window.Game.UI.renderCardList('hand-cards-container', handCards, 'hand');
-            }
+            window.Game.UI.renderCardList?.('hand-cards-container', handCards, 'hand');
         }
     }
 

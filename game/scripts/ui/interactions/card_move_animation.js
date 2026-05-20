@@ -259,19 +259,10 @@
                     el.style.transition = `transform ${CONFIG.layoutDuration}ms ${CONFIG.easing}`;
                     el.style.transform = '';
 
-                    let cleanupTimer = null;
-                    const cleanup = () => {
-                        if (cleanupTimer != null) {
-                            clearTimeout(cleanupTimer);
-                            cleanupTimer = null;
-                        }
+                    window.CollapsibleAnim.onTransitionEnd(el, () => {
                         el.style.transition = '';
                         el.style.transform = '';
-                        el.removeEventListener('transitionend', cleanup);
-                    };
-                    el.addEventListener('transitionend', cleanup, { once: true });
-                    // Fallback cleanup
-                    cleanupTimer = setTimeout(cleanup, CONFIG.layoutDuration + 50);
+                    }, CONFIG.layoutDuration + 50, event => event.target === el && event.propertyName === 'transform');
                 });
             });
         });

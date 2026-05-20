@@ -82,12 +82,7 @@
                     delete el.dataset.flipping;
                     el.style.transform = '';
                     el.style.transition = `transform ${DRAG_CONFIG.swapAnimationDuration}ms cubic-bezier(0.2, 0, 0, 1)`;
-                    
-                    const endHandler = () => {
-                         el.style.transition = '';
-                         el.removeEventListener('transitionend', endHandler);
-                    };
-                    el.addEventListener('transitionend', endHandler, {once: true});
+                    window.CollapsibleAnim.onTransitionEnd(el, () => { el.style.transition = ''; }, DRAG_CONFIG.swapAnimationDuration + 50, event => event.target === el && event.propertyName === 'transform');
                 }
             });
         });
