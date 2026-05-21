@@ -68,10 +68,15 @@
             const p = gs.players.find(pl => pl.id === roleId);
             if (p) {
                 if (isJudge) return p.judgeArea;
-                if (isEquip && p.equipSlots) {
+                if (isEquip) {
                     const slotMatch = areaOrId.match(/:slot:(\d+)/);
-                    const slotIndex = slotMatch ? parseInt(slotMatch[1]) : 0;
-                    return p.equipSlots[slotIndex] || null;
+                    const slotIndex = slotMatch ? parseInt(slotMatch[1], 10) : -1;
+                    if (slotIndex >= 0) {
+                        return p.equipArea?.getChildArea?.(slotIndex)
+                            || (p.equipSlots ? p.equipSlots[slotIndex] : null)
+                            || null;
+                    }
+                    return window.Game.Models?.getDefaultChildArea?.(p.equipArea) || p.equipSlots?.[0] || p.equipArea || null;
                 }
                 return p.hand;
             }

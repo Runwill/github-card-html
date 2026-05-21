@@ -56,13 +56,10 @@
 
         if (gs.players) {
             for (let p of gs.players) {
-                if (p.hand && p.hand.cards.includes(card)) return p.hand;
-                if (p.equipSlots) {
-                    for (const slot of p.equipSlots) {
-                        if (slot && slot.cards.includes(card)) return slot;
-                    }
+                const areas = window.Game.Models?.getPlayerAreas?.(p) || [p.hand, p.judgeArea].concat(p.equipSlots || []);
+                for (const area of areas) {
+                    if (area && area.cards && area.cards.includes(card)) return area;
                 }
-                if (p.judgeArea && p.judgeArea.cards.includes(card)) return p.judgeArea;
             }
         }
         if (gs.pile && gs.pile.cards.includes(card)) return gs.pile;
@@ -95,9 +92,20 @@
         // 'role-judge:X' -> 玩家 X 判定区
         if (typeof identifier === 'string' && (identifier.startsWith('role:') || identifier.startsWith('role-judge:'))) {
             const isJudge = identifier.startsWith('role-judge:');
+            const isEquip = identifier.includes(':equip');
             const roleId = parseInt(identifier.split(':')[1]);
             const p = gs.players.find(pl => pl.id === roleId);
             if (p) {
+                if (isEquip) {
+                    const slotMatch = identifier.match(/:slot:(\d+)/);
+                    const slotIndex = slotMatch ? parseInt(slotMatch[1], 10) : -1;
+                    if (slotIndex >= 0) {
+                        return p.equipArea?.getChildArea?.(slotIndex)
+                            || (p.equipSlots ? p.equipSlots[slotIndex] : null)
+                            || null;
+                    }
+                    return window.Game.Models?.getDefaultChildArea?.(p.equipArea) || p.equipSlots?.[0] || p.equipArea || null;
+                }
                 return isJudge ? p.judgeArea : p.hand;
             }
         }

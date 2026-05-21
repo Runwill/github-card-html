@@ -64,7 +64,8 @@
             const equipMatch = !handMatch && !judgeMatch && rest.match(/^equip:(\d+)/);
             if (equipMatch) {
                 const slotIdx = parseInt(equipMatch[1]);
-                const termKey = EQUIP_SLOT_TERMS[slotIdx] || 'equipArea';
+                const area = window.Game.Models?.resolveAreaByPath?.(`player:${playerIdx}:equip:${slotIdx}`, gs);
+                const termKey = area?.labelKey || area?.slotKey || EQUIP_SLOT_TERMS[slotIdx] || 'equipArea';
                 areaTermHTML = GameText.render(termKey);
             }
 

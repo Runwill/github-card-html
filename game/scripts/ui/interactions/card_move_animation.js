@@ -281,19 +281,7 @@
     // ─── 工具 ─────────────────────────────────────────────────────────────
 
     function _resolveAreaLocal(path) {
-        if (!path) return null;
-        const gs = window.Game.GameState;
-        if (!gs) return null;
-        if (gs[path]) return gs[path];
-        const parts = path.split(':');
-        if (parts[0] === 'player' && gs.players) {
-            const p = gs.players[parseInt(parts[1])];
-            if (!p) return null;
-            if (parts[2] === 'hand') return p.hand;
-            if (parts[2] === 'judgeArea') return p.judgeArea;
-            if (parts[2] === 'equip' && p.equipSlots) return p.equipSlots[parseInt(parts[3])];
-        }
-        return null;
+        return window.Game.Models?.resolveAreaByPath?.(path, window.Game.GameState) || null;
     }
 
     function _cleanup() {

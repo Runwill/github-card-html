@@ -101,14 +101,11 @@
                     // 检查玩家
                     if (gs.players) {
                         for (let p of gs.players) {
-                            if (p.hand && p.hand.cards.includes(card)) { fromArea = p.hand; break; }
-                            if (p.equipSlots) {
-                                for (const slot of p.equipSlots) {
-                                    if (slot && slot.cards.includes(card)) { fromArea = slot; break; }
-                                }
-                                if (fromArea) break;
+                            const areas = window.Game.Models?.getPlayerAreas?.(p) || [p.hand, p.judgeArea].concat(p.equipSlots || []);
+                            for (const area of areas) {
+                                if (area && area.cards && area.cards.includes(card)) { fromArea = area; break; }
                             }
-                            if (p.judgeArea && p.judgeArea.cards.includes(card)) { fromArea = p.judgeArea; break; }
+                            if (fromArea) break;
                         }
                     }
                     // 检查牌堆（额外检查是否存在）

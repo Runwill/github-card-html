@@ -198,12 +198,13 @@ body.is-global-dragging .deck-slot {
     max-width: 100%;
 }
 
-.area-spread .card-placeholder {
+.area-spread > :where(.card-placeholder, .area-spread-item) {
     flex-shrink: 0;
     transition: margin-left var(--dur-fast) var(--ease-out);
     margin-left: var(--dynamic-card-margin, var(--spread-card-gap, 10px));
 }
-.area-spread .card-placeholder:first-child {
+
+.area-spread > :where(.card-placeholder, .area-spread-item):first-child {
     margin-left: 0;
 }
 

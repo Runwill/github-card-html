@@ -68,16 +68,7 @@
 
     function resolveAreaForPath(areaPath) {
         if (!areaPath) return null;
-        const gameState = state();
-        if (!gameState) return null;
-        if (gameState[areaPath]) return gameState[areaPath];
-
-        const info = areaPathInfo(areaPath);
-        if (!info) return null;
-        if (info.areaType === 'hand') return info.player.hand;
-        if (info.areaType === 'judgeArea') return info.player.judgeArea;
-        if (info.areaType === 'equip' && info.player.equipSlots) return info.player.equipSlots[info.slotIndex];
-        return null;
+        return window.Game.Models?.resolveAreaByPath?.(areaPath, state()) || null;
     }
 
     function resolveAreaForDropZone(zoneId) {
@@ -91,8 +82,11 @@
         if (!info) return null;
         if (zone.areaType === 'judgeArea') return info.player.judgeArea;
         if (zone.areaType === 'equip') {
-            if (!info.player.equipSlots) return info.player.equipArea || null;
-            return zone.slotIndex >= 0 ? info.player.equipSlots[zone.slotIndex] : info.player.equipSlots[0];
+            const children = window.Game.Models?.getAreaChildren?.(info.player.equipArea) || [];
+            const slots = children.length > 0 ? children : (info.player.equipSlots || []);
+            return zone.slotIndex >= 0
+                ? (info.player.equipArea?.getChildArea?.(zone.slotIndex) || slots[zone.slotIndex] || null)
+                : (window.Game.Models?.getDefaultChildArea?.(info.player.equipArea) || slots[0] || info.player.equipArea || null);
         }
         return info.player.hand;
     }

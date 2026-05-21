@@ -6,16 +6,21 @@
         return Math.max(min, Math.min(max, value));
     }
 
-    function getVisibleCards(container) {
-        return Array.from(container.children).filter(c =>
-            c.classList.contains('card-placeholder') &&
-            c.style.display !== 'none' &&
-            !c.classList.contains('drag-placeholder-hidden')
+    function getSpreadItemSelector(container) {
+        return container.getAttribute('data-spread-item-selector') || '.card-placeholder';
+    }
+
+    function getVisibleSpreadItems(container) {
+        const selector = getSpreadItemSelector(container);
+        return Array.from(container.children).filter(child =>
+            child.matches(selector) &&
+            child.style.display !== 'none' &&
+            !child.classList.contains('drag-placeholder-hidden')
         );
     }
 
-    function getCardWidth(cards) {
-        const rectWidth = cards[0]?.getBoundingClientRect().width || 0;
+    function getSpreadItemWidth(items) {
+        const rectWidth = items[0]?.getBoundingClientRect().width || 0;
         return rectWidth > 0 ? rectWidth : 100;
     }
 
@@ -107,13 +112,13 @@
         return nodeMap;
     }
 
-    // 平铺区域：空间充足时保持常规牌距，空间不足时恢复受控露边重叠。
+    // 平铺区域：空间充足时保持常规牌/槽位间距，空间不足时恢复受控露边重叠。
     function updateSpreadLayouts() {
         const containers = document.querySelectorAll('.area-spread');
         containers.forEach(container => {
-            const cards = getVisibleCards(container);
+            const items = getVisibleSpreadItems(container);
 
-            if (cards.length <= 1) {
+            if (items.length <= 1) {
                 container.style.removeProperty('--dynamic-card-margin');
                 return;
             }
@@ -122,10 +127,10 @@
             const padL = parseFloat(cs.paddingLeft) || 0;
             const padR = parseFloat(cs.paddingRight) || 0;
             const contentWidth = Math.max(0, container.clientWidth - padL - padR);
-            const cardWidth = getCardWidth(cards);
-            const maxGap = clamp(4, cardWidth * 0.1, 10);
-            const minMargin = -cardWidth;
-            const availableMargin = (contentWidth - cards.length * cardWidth) / (cards.length - 1);
+            const itemWidth = getSpreadItemWidth(items);
+            const maxGap = clamp(4, itemWidth * 0.1, 10);
+            const minMargin = -itemWidth;
+            const availableMargin = (contentWidth - items.length * itemWidth) / (items.length - 1);
             const nextMargin = clamp(minMargin, availableMargin, maxGap);
 
             container.style.setProperty('--dynamic-card-margin', `${nextMargin}px`);
@@ -269,5 +274,6 @@
     window.Game.UI.renderCardList = renderCardList;
     window.Game.UI.getCardRenderState = getCardRenderState;
     window.Game.UI.getCardAppearanceForArea = getCardAppearanceForArea;
+    window.Game.UI.updateSpreadLayouts = updateSpreadLayouts;
 
 })();

@@ -251,12 +251,11 @@
              if (existing) { existing.cleanup(); return; }
 
              const GT = GameText || window.Game.UI.GameText;
-             const equipData = role.equipSlots ? role.equipSlots.map(slot => slot.cards || []) : [[], [], [], []];
-             const slotsDef = ['weaponSlot', 'armorSlot', 'defensiveSlot', 'offensiveSlot'].map((key, index) => ({ index, label: GT.render(key) }));
-             window.Game.UI.openCardViewer(null, equipData, viewerSourceId, {
+             const equipArea = role.equipArea || null;
+             window.Game.UI.openCardViewer(null, equipArea ? equipArea.cards : [], viewerSourceId, {
+                 area: equipArea,
                  ownerName: renderRoleOwnerName(role, GT),
-                 areaName: GT.render('equipArea'),
-                 slots: slotsDef
+                 areaName: GT.render('equipArea')
              });
         };
     }

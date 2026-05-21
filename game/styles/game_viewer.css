@@ -49,11 +49,6 @@
     position: relative; /* Essential for Drag functionality (left/top) */
 }
 
-.card-viewer-modal.card-viewer-modal--slots .modal-content {
-    width: auto;
-    max-width: 95vw;
-}
-
 /*Wrapper for scroll view */
 .card-viewer-modal .modal-body {
     flex: 1;
@@ -65,11 +60,6 @@
     position: relative;
     max-width: 100%;
     min-width: 0;
-}
-
-.card-viewer-modal .modal-body--slots {
-    padding: var(--viewer-slot-body-pad, var(--viewer-body-pad, var(--space-3xl)));
-    flex-direction: column;
 }
 
 /* ... gradient masks ... */
@@ -93,22 +83,26 @@
     mask-image: linear-gradient(to right, transparent 0%, black var(--viewer-mask-w, 60px), black calc(100% - var(--viewer-mask-w, 60px)), transparent 100%);
 }
 
-/* The actual scrollable list */
-.card-grid {
+/* The actual viewer item row */
+.card-grid,
+.equipment-slots-container {
     display: flex;
     flex-wrap: nowrap;
-    gap: var(--cards-container-gap, var(--space-2xl));
     justify-content: flex-start;
     padding: var(--cards-container-pad, var(--space-md));
-    
+
     width: 100%; 
     min-height: calc(var(--card-h, 140px) + var(--viewer-grid-extra-h, 20px));
-    
+
     min-width: var(--viewer-grid-minw, 350px);
-    
+
     overflow-x: auto;
     /* scrollbar-hidden via HTML class */
-    
+}
+
+.card-grid {
+    gap: var(--cards-container-gap, var(--space-2xl));
+
     /* Pointer Events Logic for Watermark Interaction */
     pointer-events: none; /* Let events pass to watermark */
 }
@@ -258,12 +252,9 @@ body.is-global-dragging .card-grid {
 
 /* Equipment Viewer Layout */
 .equipment-slots-container {
-    display: flex;
-    flex-wrap: wrap; /* Allow wrapping if small screen */
-    gap: var(--equip-slots-gap, var(--space-3xl));
-    padding: var(--equip-slots-pad, 30px);
+    gap: 0;
     justify-content: center;
-    width: 100%;
+    overflow-x: visible;
 }
 
 /* Base styles that were on .equip-slot are now split/shared */

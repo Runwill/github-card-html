@@ -1,6 +1,6 @@
 # ARCHITECTURE.md — card-html 前端项目架构文档
 
-> **最后更新**: 2026-05-05
+> **最后更新**: 2026-05-22
 > **适用对象**: AI Agent、新开发者快速定位代码
 > **帮助数据源**: `base/help.json` + `i18n/strings.js` 为用户可见的功能速查内容
 
@@ -701,9 +701,11 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | 文件 | 职责 | 命名空间/导出 |
 |---|---|---|
 | `utils.js` | 游戏工具函数（shuffle 等） | `window.Game.Utils` |
-| `models.js` | 数据模型：`Card` 类（名称/花色/点数/可见性）、`Area` 类（区域/配置/固定槽位）| `window.Game.Models`（`Card`, `Area`） |
+| `models.js` | 数据模型：`Card` 类（名称/花色/点数/可见性）、`Area` 类（区域、子区域、固定槽位配置）| `window.Game.Models`（`Card`, `Area`） |
 | `state.js` | 全局游戏状态：玩家列表、回合、流程栈、事件栈、牌堆/弃牌堆/处理区 | `window.Game.GameState`, `window.Game.MockData` |
 | `events.js` | **事件系统核心**：`trigger()`/`recover()`/`loss()`/`cure()`/`damage()` 等，每个事件拆分为 before/when/after 步骤 | `window.Game.Core.Events` |
+
+**区域与槽位约定**：卡牌真实位置始终由 `Card.lyingArea` 和目标 `Area.cards` 共同表达。装备槽等固定槽位不是 UI 假格子，也不在 `cards` 中用 `null` 占位；它们是父 `Area` 的 child Areas。父装备区 `player.equipArea` 是真实区域，`player.equipArea.childAreas` / 兼容别名 `player.equipSlots` 指向四个装备槽区域。空槽是否渲染由子区域的 `renderEmpty` 元数据决定，拖放、同步、日志和调试应尽早解析到具体 child Area，路径使用 `player:N:equip:M` 表示第 M 个装备槽。
 
 #### 4.2.3 `game/scripts/engines/`
 

@@ -64,13 +64,22 @@
 
     function serializeArea(area) {
         if (!area) return null;
+        const childAreas = window.Game.Models?.getAreaChildren?.(area) || [];
         return {
             name: area.name,
             cards: area.cards.map(c => serializeCard(c)),
             apartOrTogether: area.apartOrTogether,
             centered: area.centered,
             forOrAgainst: area.forOrAgainst,
-            fixedSlots: area.fixedSlots
+            fixedSlots: area.fixedSlots,
+            slotIndex: area.slotIndex,
+            slotKey: area.slotKey,
+            labelKey: area.labelKey,
+            renderEmpty: area.renderEmpty,
+            capacity: area.capacity,
+            acceptsDirectCards: area.acceptsDirectCards,
+            isSlotArea: area.isSlotArea,
+            childAreas: childAreas.map(child => serializeArea(child))
         };
     }
 
@@ -105,6 +114,7 @@
             seat: player.seat,
             hand: serializeArea(player.hand),
             judgeArea: serializeArea(player.judgeArea),
+            equipArea: serializeArea(player.equipArea),
             equipSlots: player.equipSlots ? player.equipSlots.map(s => serializeArea(s)) : [],
             hp: player.health,
             maxHp: player.healthLimit,
@@ -167,14 +177,7 @@
                 // 恢复判定区
                 restoreAreaCards(player.judgeArea, pData.judgeArea, Card);
 
-                // 恢复装备栏
-                if (pData.equipSlots) {
-                    pData.equipSlots.forEach((slotData, slotIdx) => {
-                        if (player.equipSlots[slotIdx] && slotData) {
-                            restoreAreaCards(player.equipSlots[slotIdx], slotData, Card);
-                        }
-                    });
-                }
+                restoreEquipmentAreas(player, pData, Card);
 
                 return player;
             });
@@ -197,20 +200,53 @@
             apartOrTogether: data.apartOrTogether,
             centered: data.centered,
             forOrAgainst: data.forOrAgainst,
-            fixedSlots: data.fixedSlots
+            fixedSlots: data.fixedSlots,
+            slotIndex: data.slotIndex,
+            slotKey: data.slotKey,
+            labelKey: data.labelKey,
+            renderEmpty: data.renderEmpty,
+            capacity: data.capacity,
+            acceptsDirectCards: data.acceptsDirectCards,
+            isSlotArea: data.isSlotArea
         });
         area.cards = (data.cards || []).map(c => {
             const card = deserializeCard(c, window.Game.Models.Card);
             if (card) card.lyingArea = area;
             return card;
         }).filter(Boolean);
+        if (Array.isArray(data.childAreas) && data.childAreas.length > 0) {
+            area.setChildAreas(data.childAreas.map((childData, index) => deserializeArea(childData, childData?.name || `${name}_${index}`, Area)));
+        }
         return area;
+    }
+
+    function restoreAreaMetadata(area, data) {
+        if (!area || !data) return;
+        ['apartOrTogether', 'centered', 'forOrAgainst', 'fixedSlots', 'slotIndex', 'slotKey', 'labelKey', 'renderEmpty', 'capacity', 'acceptsDirectCards', 'isSlotArea'].forEach(key => {
+            if (data[key] !== undefined) area[key] = data[key];
+        });
     }
 
     function restoreAreaCards(area, data, Card) {
         if (!area || !data) return;
+        restoreAreaMetadata(area, data);
         area.cards = (data.cards || []).map(c => deserializeCard(c, Card));
         area.cards.forEach(c => { if (c) c.lyingArea = area; });
+    }
+
+    function restoreEquipmentAreas(player, playerData, Card) {
+        if (!player) return;
+        const equipAreaData = playerData?.equipArea || null;
+        if (equipAreaData) restoreAreaMetadata(player.equipArea, equipAreaData);
+
+        const childAreaData = Array.isArray(equipAreaData?.childAreas) && equipAreaData.childAreas.length > 0
+            ? equipAreaData.childAreas
+            : (playerData?.equipSlots || []);
+
+        childAreaData.forEach((slotData, slotIdx) => {
+            const slot = player.equipArea?.getChildArea?.(slotIdx) || player.equipSlots?.[slotIdx];
+            if (slot && slotData) restoreAreaCards(slot, slotData, Card);
+        });
     }
 
     function deserializeCard(data, Card) {
@@ -381,7 +417,7 @@
         const gs = window.Game.GameState;
         if (!gs) return null;
 
-        const roleAreas = (gs.players || []).flatMap(p => [p.hand, p.judgeArea].concat(p.equipSlots || []));
+        const roleAreas = (gs.players || []).flatMap(p => window.Game.Models?.getPlayerAreas?.(p) || [p.hand, p.judgeArea].concat(p.equipSlots || []));
         const areas = [gs.pile, gs.discardPile, gs.treatmentArea].concat(roleAreas);
 
         for (const area of areas) {

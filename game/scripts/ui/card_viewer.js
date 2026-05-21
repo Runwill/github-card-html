@@ -14,6 +14,10 @@
         return (area && area.cards) ? area.cards : [];
     }
 
+    function currentGameState() {
+        return window.Game.Core?.GameState || window.Game.GameState || null;
+    }
+
     document.addEventListener('click', (e) => {
         const clickedViewer = e.target.closest('.card-viewer-modal');
         if (clickedViewer) {
@@ -118,11 +122,75 @@
         return cards[index] ? [cards[index]] : [];
     }
 
-    function renderViewerSlot(sourceId, index, cards) {
+    function getAreaChildren(area) {
+        return window.Game.Models?.getAreaChildren?.(area) || [];
+    }
+
+    function childSlotIndex(childArea, fallbackIndex) {
+        return Number.isFinite(childArea?.slotIndex) ? childArea.slotIndex : fallbackIndex;
+    }
+
+    function resolveViewerArea(sourceId, GameState, options = {}) {
+        if (!sourceId) return options.area || null;
+        if (options.areaPath && window.Game.Models?.resolveAreaByPath) {
+            const area = window.Game.Models.resolveAreaByPath(options.areaPath, GameState);
+            if (area) return area;
+        }
+        if (sourceId === 'pile' || sourceId === 'discardPile' || sourceId === 'treatmentArea') return GameState?.[sourceId] || null;
+        if (sourceId.startsWith('role-judge:')) {
+            const roleId = parseInt(sourceId.split(':')[1], 10);
+            const player = GameState?.players?.find(p => p.id === roleId);
+            return player?.judgeArea || null;
+        }
+        if (sourceId.startsWith('role:')) {
+            const parts = sourceId.split(':');
+            const roleId = parseInt(parts[1], 10);
+            const player = GameState?.players?.find(p => p.id === roleId);
+            if (!player) return null;
+            if (parts[2] === 'equip') return player.equipArea || null;
+            return player.hand || null;
+        }
+        return options.area || null;
+    }
+
+    function resolveViewerChildAreas(area, cards, options = {}) {
+        const children = getAreaChildren(area);
+        if (children.length > 0) return children;
+        if (Array.isArray(options.childAreas) && options.childAreas.length > 0) return options.childAreas;
+        if (Array.isArray(options.slots)) {
+            return options.slots.map(slot => ({
+                cards: slotCardsAt(cards, slot.index),
+                slotIndex: slot.index,
+                labelHTML: slot.label || '',
+                renderEmpty: true,
+                isSlotArea: true
+            }));
+        }
+        return [];
+    }
+
+    function childAreaLabel(childArea, options, fallbackIndex) {
+        const slotIndex = childSlotIndex(childArea, fallbackIndex);
+        const legacySlot = Array.isArray(options.slots) ? options.slots.find(slot => slot.index === slotIndex) : null;
+        if (legacySlot && legacySlot.label) return legacySlot.label;
+        if (childArea?.labelHTML) return childArea.labelHTML;
+        const key = childArea?.labelKey || childArea?.slotKey || childArea?.name || '';
+        if (!key) return '';
+        const GameText = window.Game.UI.GameText;
+        return GameText ? GameText.render(key) : key;
+    }
+
+    function renderViewerSlot(sourceId, childArea, fallbackIndex) {
         if (!window.Game.UI.renderCardList) return;
-        const targetId = `viewer-slot-${sourceId}-${index}`;
-        if (!document.getElementById(targetId)) return;
-        window.Game.UI.renderCardList(targetId, cards, `${sourceId}:slot:${index}`, {
+        const slotIndex = childSlotIndex(childArea, fallbackIndex);
+        const targetId = `viewer-slot-${sourceId}-${slotIndex}`;
+        const target = document.getElementById(targetId);
+        if (!target) return;
+        const dropZoneId = `${sourceId}:slot:${slotIndex}`;
+        target.setAttribute('data-drop-zone', dropZoneId);
+        target.setAttribute('data-area-name', dropZoneId);
+        target.setAttribute('data-inspector-type', 'area');
+        window.Game.UI.renderCardList(targetId, cardsFromArea(childArea), dropZoneId, {
             skipLayout: true,
             forceFaceDown: false
         });
@@ -135,17 +203,6 @@
             showIndex: true,
             forceFaceDown: options && options.forceFaceDown
         });
-    }
-
-    function resolveViewerCards(sourceId, GameState) {
-        if (sourceId === 'pile' || sourceId === 'discardPile' || sourceId === 'treatmentArea') return cardsFromArea(GameState[sourceId]);
-        if (!sourceId.startsWith('role:') && !sourceId.startsWith('role-judge:')) return [];
-
-        const isJudge = sourceId.startsWith('role-judge:');
-        const roleId = parseInt(sourceId.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));
-        const player = GameState.players.find(p => p.id === roleId);
-        const area = player && (isJudge ? player.judgeArea : player.hand);
-        return cardsFromArea(area);
     }
 
     // --- Card Viewer Modal Logic ---
@@ -168,9 +225,12 @@
         }
 
         // 2. Create DOM Structure
-        const isSlotViewer = options.slots && Array.isArray(options.slots);
+        const GameState = currentGameState();
+        const sourceArea = resolveViewerArea(sourceId, GameState, options);
+        const childAreas = resolveViewerChildAreas(sourceArea, cards, options);
+        const isSlotViewer = childAreas.length > 0;
         const modal = document.createElement('div');
-        modal.className = 'card-viewer-modal modal show' + (isSlotViewer ? ' card-viewer-modal--slots' : '');
+        modal.className = 'card-viewer-modal modal show';
         modal.id = `card-viewer-modal-${sourceId}`;
         bringToFront(modal);
         
@@ -184,20 +244,21 @@
         // Determine Layout
         let bodyContent = '';
         if (isSlotViewer) {
-            // Layout: Multi-Slot (e.g. Equipment)
-            // Note: We use a Wrapper for drop targeting and Label display.
-            // The inner .equip-slot is the container for renderCardList but has pointer-events: none to allow pass-through.
-            bodyContent = `<div class="equipment-slots-container">
-                ${options.slots.map(slot => `
-                    <div class="equip-slot-wrapper">
-                        <div id="viewer-slot-${sourceId}-${slot.index}" 
-                             class="equip-slot" 
-                             data-slot="${slot.index}" 
-                             data-drop-zone="${sourceId}:slot:${slot.index}">
-                            <div class="equip-slot-label">${slot.label || ''}</div>
+            bodyContent = `<div class="equipment-slots-container area-spread" data-spread-item-selector=".equip-slot-wrapper" data-drop-zone="${sourceId}" data-area-name="${sourceId}" data-inspector-type="area" data-accept-placeholder="false">
+                ${childAreas.map((childArea, index) => {
+                    const slotIndex = childSlotIndex(childArea, index);
+                    return `
+                    <div class="equip-slot-wrapper area-spread-item">
+                        <div id="viewer-slot-${sourceId}-${slotIndex}"
+                             class="equip-slot"
+                             data-slot="${slotIndex}"
+                             data-area-name="${sourceId}:slot:${slotIndex}"
+                             data-inspector-type="area"
+                             data-drop-zone="${sourceId}:slot:${slotIndex}">
+                            <div class="equip-slot-label">${childAreaLabel(childArea, options, index)}</div>
                         </div>
                     </div>
-                `).join('')}
+                `;}).join('')}
             </div>`;
         } else {
             // Layout: Standard Grid (Hand, Pile, Judge)
@@ -206,13 +267,9 @@
             bodyContent = `<div id="card-viewer-grid-${sourceId}" class="card-grid scrollbar-hidden" data-drop-zone="${sourceId}"></div>`;
         }
 
-        // Modal Content
-        // Use auto width for slots to fit content tightly
-        const bodyClass = isSlotViewer ? ' modal-body--slots' : '';
-
         modal.innerHTML = `
             <div class="modal-content">
-                <div class="modal-body${bodyClass}">
+                <div class="modal-body">
                     <div id="card-viewer-watermark-${sourceId}" class="area-watermark"></div>
                     ${bodyContent}
                 </div>
@@ -225,7 +282,7 @@
         const modalBody = modal.querySelector('.modal-body');
         const watermarkEl = document.getElementById(`card-viewer-watermark-${sourceId}`);
         // Scroll Target depends on layout
-        const scrollTarget = options.slots ? null : document.getElementById(`card-viewer-grid-${sourceId}`);
+        const scrollTarget = isSlotViewer ? null : document.getElementById(`card-viewer-grid-${sourceId}`);
 
         // Watermark Logic
         if (watermarkEl) {
@@ -252,8 +309,9 @@
         }
 
         // Initial Card Render
-        if (options.slots) {
-            options.slots.forEach(slot => renderViewerSlot(sourceId, slot.index, slotCardsAt(cards, slot.index)));
+        if (isSlotViewer) {
+            childAreas.forEach((childArea, index) => renderViewerSlot(sourceId, childArea, index));
+            window.Game.UI.updateSpreadLayouts?.();
         } else {
             renderViewerGrid(`card-viewer-grid-${sourceId}`, cards, sourceId, options);
         }
@@ -375,26 +433,13 @@
              const { sourceId, modal, options } = viewer;
              if (!sourceId) return;
 
-             // --- Type A: Multi-Slot Viewer (Generic) ---
-             if (options.slots && Array.isArray(options.slots)) {
-                 // Logic: Determine Data Source based on ID, then fill slots
-                 // Currently only supports Role Equipment via 'role:ID:equip' pattern
-                 let allSlotsData = null;
+             const sourceArea = resolveViewerArea(sourceId, GameState, options);
+             const childAreas = resolveViewerChildAreas(sourceArea, [], options);
 
-                 if (sourceId.startsWith('role:') && sourceId.includes(':equip')) {
-                     const roleId = parseInt(sourceId.split(':')[1]);
-                     const player = GameState.players.find(p => p.id === roleId);
-                     if (player && player.equipSlots) {
-                         allSlotsData = player.equipSlots.map(s => s.cards);
-                     }
-                 }
-                 
-                 // Render if we found data
-                 if (allSlotsData) {
-                     options.slots.forEach(slot => {
-                         renderViewerSlot(sourceId, slot.index, slotCardsAt(allSlotsData, slot.index));
-                     });
-                 }
+             // --- Type A: Child-Area Viewer (equipment slots and future fixed child areas) ---
+             if (childAreas.length > 0) {
+                 childAreas.forEach((childArea, index) => renderViewerSlot(sourceId, childArea, index));
+                 window.Game.UI.updateSpreadLayouts?.();
                  return;
              }
 
@@ -402,7 +447,7 @@
              const grid = modal.querySelector('.card-grid');
              if (!grid) return;
 
-             renderViewerGrid(grid.id, resolveViewerCards(sourceId, GameState), sourceId, options);
+             renderViewerGrid(grid.id, cardsFromArea(sourceArea), sourceId, options);
         });
     };
 

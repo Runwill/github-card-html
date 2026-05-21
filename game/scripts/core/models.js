@@ -2,6 +2,8 @@
     window.Game = window.Game || {};
     window.Game.Models = window.Game.Models || {};
 
+    const EQUIP_SLOT_KEYS = ['weaponSlot', 'armorSlot', 'defensiveSlot', 'offensiveSlot'];
+
     // 卡牌类
     class Card {
         constructor(name, type, suit = 'none', number = 0, id = null) {
@@ -42,8 +44,40 @@
             this.apartOrTogether = options.apartOrTogether !== undefined ? options.apartOrTogether : Area.Configs.Generic.apartOrTogether; 
             this.centered = options.centered !== undefined ? options.centered : Area.Configs.Generic.centered;
             
-            // New Flag: Fixed Slots (Sparse Array behavior)
+            // Legacy sparse-slot behavior; new empty slots should be modeled as child Areas.
             this.fixedSlots = options.fixedSlots || false; 
+
+            this.parentArea = options.parentArea || null;
+            this.childAreas = [];
+            this.slotIndex = Number.isFinite(options.slotIndex) ? options.slotIndex : -1;
+            this.slotKey = options.slotKey || '';
+            this.labelKey = options.labelKey || this.slotKey || '';
+            this.renderEmpty = !!options.renderEmpty;
+            this.capacity = Number.isFinite(options.capacity) ? options.capacity : null;
+            this.acceptsDirectCards = options.acceptsDirectCards !== undefined ? !!options.acceptsDirectCards : true;
+            this.isSlotArea = !!options.isSlotArea || this.slotIndex >= 0;
+
+            if (Array.isArray(options.childAreas)) this.setChildAreas(options.childAreas);
+        }
+
+        get children() {
+            return this.childAreas;
+        }
+
+        setChildAreas(childAreas) {
+            this.childAreas = Array.isArray(childAreas) ? childAreas.filter(Boolean) : [];
+            this.childAreas.forEach((area, index) => {
+                area.parentArea = this;
+                if (!Number.isFinite(area.slotIndex) || area.slotIndex < 0) area.slotIndex = index;
+                if (this.owner && !area.owner) area.owner = this.owner;
+            });
+            return this.childAreas;
+        }
+
+        getChildArea(index) {
+            const slotIndex = parseInt(index, 10);
+            if (!Number.isFinite(slotIndex)) return null;
+            return this.childAreas.find(area => area && area.slotIndex === slotIndex) || this.childAreas[slotIndex] || null;
         }
 
         add(card) {
@@ -81,6 +115,51 @@
                 }
             }
         }
+    }
+
+    function getAreaChildren(area) {
+        if (!area || !Array.isArray(area.childAreas)) return [];
+        return area.childAreas.filter(Boolean);
+    }
+
+    function getDefaultChildArea(area, card = null) {
+        const children = getAreaChildren(area);
+        if (children.length === 0) return null;
+        return children.find(child => {
+            if (!child || !Array.isArray(child.cards)) return false;
+            if (card && child.cards.includes(card)) return true;
+            return !Number.isFinite(child.capacity) || child.capacity < 1 || child.cards.length < child.capacity;
+        }) || children[0];
+    }
+
+    function getWritableArea(area, card = null) {
+        if (!area) return null;
+        if (area.acceptsDirectCards === false) return getDefaultChildArea(area, card);
+        return area;
+    }
+
+    function flattenAreaTree(area, output = []) {
+        if (!area || output.includes(area)) return output;
+        output.push(area);
+        getAreaChildren(area).forEach(child => flattenAreaTree(child, output));
+        return output;
+    }
+
+    function getAreaCards(area, options = {}) {
+        if (!area) return [];
+        const ownCards = Array.isArray(area.cards) ? area.cards.filter(Boolean) : [];
+        if (!options.includeChildren) return ownCards;
+        return getAreaChildren(area).reduce((cards, child) => cards.concat(getAreaCards(child, options)), ownCards);
+    }
+
+    function getPlayerAreas(player) {
+        if (!player) return [];
+        const areas = [];
+        flattenAreaTree(player.hand, areas);
+        flattenAreaTree(player.judgeArea, areas);
+        flattenAreaTree(player.equipArea, areas);
+        if (Array.isArray(player.equipSlots)) player.equipSlots.forEach(area => flattenAreaTree(area, areas));
+        return areas;
     }
 
     function getVisibleRoleId(value) {
@@ -131,17 +210,18 @@
     }
 
     function moveCardToArea(card, toArea, toIndex = -1, fromArea = null, fromIndex = -1) {
-        if (!card || !toArea || !Array.isArray(toArea.cards)) return false;
+        const targetArea = getWritableArea(toArea, card);
+        if (!card || !targetArea || !Array.isArray(targetArea.cards)) return false;
 
         const sourceArea = fromArea || (typeof card === 'object' ? card.lyingArea : null);
         if (sourceArea) removeCardFromArea(card, sourceArea, fromIndex);
 
-        const insertIndex = toIndex >= 0 && toIndex < toArea.cards.length ? toIndex : toArea.cards.length;
-        toArea.cards.splice(insertIndex, 0, card);
+        const insertIndex = toIndex >= 0 && toIndex < targetArea.cards.length ? toIndex : targetArea.cards.length;
+        targetArea.cards.splice(insertIndex, 0, card);
 
         if (typeof card === 'object') {
-            card.lyingArea = toArea;
-            applyCardVisibility(card, toArea);
+            card.lyingArea = targetArea;
+            applyCardVisibility(card, targetArea);
         }
 
         return true;
@@ -160,7 +240,13 @@
             if (!player) return null;
             if (parts[2] === 'hand') return player.hand;
             if (parts[2] === 'judgeArea') return player.judgeArea;
-            if (parts[2] === 'equip' && player.equipSlots) return player.equipSlots[parseInt(parts[3])];
+            if (parts[2] === 'equip') {
+                if (parts.length < 4 || parts[3] === '') return player.equipArea || null;
+                const slotIndex = parseInt(parts[3], 10);
+                return player.equipArea?.getChildArea?.(slotIndex)
+                    || (player.equipSlots ? player.equipSlots[slotIndex] : null)
+                    || null;
+            }
         }
         return null;
     }
@@ -179,7 +265,14 @@
                 const player = gs.players[i];
                 if (area === player.hand) return `player:${i}:hand`;
                 if (area === player.judgeArea) return `player:${i}:judgeArea`;
-                if (player.equipSlots) {
+                if (area === player.equipArea) return `player:${i}:equip`;
+
+                const equipSlotAreas = getAreaChildren(player.equipArea);
+                if (equipSlotAreas.length > 0) {
+                    for (let j = 0; j < equipSlotAreas.length; j++) {
+                        if (area === equipSlotAreas[j]) return `player:${i}:equip:${equipSlotAreas[j].slotIndex}`;
+                    }
+                } else if (player.equipSlots) {
                     for (let j = 0; j < player.equipSlots.length; j++) {
                         if (area === player.equipSlots[j]) return `player:${i}:equip:${j}`;
                     }
@@ -190,6 +283,10 @@
     }
 
     function getAreaPathForLog(area, card, gameState) {
+        if (area && area.acceptsDirectCards === false && card && card.lyingArea && card.lyingArea.parentArea === area) {
+            return getAreaPathForLog(card.lyingArea, card, gameState);
+        }
+
         const basePath = getAreaPath(area, gameState);
         if (!card || !area) return basePath;
 
@@ -218,8 +315,8 @@
         
         // 玩家区域
         Hand:           { apartOrTogether: 0, forOrAgainst: 1 }, 
-        EquipArea:      { apartOrTogether: 0, forOrAgainst: 0 }, // Deprecated concept, kept for safety
-        EquipSlot:      { apartOrTogether: 0, forOrAgainst: 0 }, // Use this for slots
+        EquipArea:      { apartOrTogether: 0, forOrAgainst: 0 }, // Parent area for fixed equipment slots
+        EquipSlot:      { apartOrTogether: 0, forOrAgainst: 0 }, // Child area used by each slot
         JudgeArea:      { apartOrTogether: 0, forOrAgainst: 0 }, 
     };
 
@@ -265,44 +362,28 @@
             const Area = window.Game.Models.Area;
             this.hand = new Area('hand', Area.Configs.Hand);
             this.judgeArea = new Area('judgeArea', Area.Configs.JudgeArea);
+            this.equipArea = new Area('equipArea', {
+                ...Area.Configs.EquipArea,
+                acceptsDirectCards: false,
+                renderEmpty: true
+            });
 
             this.hand.owner = this;
             this.judgeArea.owner = this;
+            this.equipArea.owner = this;
             
-            // --- New Equipment Logic: 4 Independent Areas ---
-            this.equipSlots = [
-                new Area('equip_0', Area.Configs.EquipSlot), // Weapon
-                new Area('equip_1', Area.Configs.EquipSlot), // Armor
-                new Area('equip_2', Area.Configs.EquipSlot), // +1
-                new Area('equip_3', Area.Configs.EquipSlot)  // -1
-            ];
-            this.equipSlots.forEach(s => s.owner = this);
-
-            // Backwards Compatibility for 'equipArea' (Read/Write Proxy)
-            // Existing code expects player.equipArea.cards to be a list of equipped cards
-            Object.defineProperty(this, 'equipArea', {
-                get: () => {
-                    const ctx = this;
-                    return {
-                        name: 'equipArea',
-                        owner: ctx,
-                        // flatten active cards
-                        get cards() {
-                             return ctx.equipSlots.flatMap(s => s.cards);
-                        },
-                        // Proxy add/remove
-                        remove: (card) => {
-                            ctx.equipSlots.forEach(s => s.remove(card));
-                        },
-                        add: (card) => { 
-                            // Try find empty slot? Or just default to weapon?
-                            // Safe fallback: equipSlots[0]
-                             console.warn('[Deprecation] Direct add() to equipArea is unsafe. Use equipSlots.');
-                             if (ctx.equipSlots[0].cards.length === 0) ctx.equipSlots[0].add(card);
-                        }
-                    }
-                }
-            });
+            this.equipSlots = EQUIP_SLOT_KEYS.map((slotKey, slotIndex) => new Area(`equip_${slotIndex}`, {
+                ...Area.Configs.EquipSlot,
+                owner: this,
+                parentArea: this.equipArea,
+                slotIndex,
+                slotKey,
+                labelKey: slotKey,
+                renderEmpty: true,
+                capacity: 1,
+                isSlotArea: true
+            }));
+            this.equipArea.setChildAreas(this.equipSlots);
             
             // 默认可见性设置
             // 手牌自己可见
@@ -338,6 +419,12 @@
     window.Game.Models.resolveAreaByPath = resolveAreaByPath;
     window.Game.Models.getAreaPath = getAreaPath;
     window.Game.Models.getAreaPathForLog = getAreaPathForLog;
+    window.Game.Models.getAreaChildren = getAreaChildren;
+    window.Game.Models.getDefaultChildArea = getDefaultChildArea;
+    window.Game.Models.getWritableArea = getWritableArea;
+    window.Game.Models.getAreaCards = getAreaCards;
+    window.Game.Models.getPlayerAreas = getPlayerAreas;
+    window.Game.Models.EQUIP_SLOT_KEYS = EQUIP_SLOT_KEYS;
 
 })();
 

@@ -208,7 +208,15 @@
             const parts = pathText.split(':');
             const player = findPlayer(parts[1]);
             if (!player) return null;
-            if (parts[2] === 'equip') return player.equipArea || null;
+            if (parts[2] === 'equip') {
+                const slotIndex = parts[3] === 'slot' ? parseInt(parts[4], 10) : -1;
+                if (slotIndex >= 0) {
+                    return player.equipArea?.getChildArea?.(slotIndex)
+                        || (player.equipSlots ? player.equipSlots[slotIndex] : null)
+                        || null;
+                }
+                return player.equipArea || null;
+            }
             return player.hand || null;
         }
 
@@ -219,7 +227,8 @@
     }
 
     function countCards(area) {
-        return area && Array.isArray(area.cards) ? area.cards.filter(Boolean).length : 0;
+        const cards = window.Game?.Models?.getAreaCards?.(area, { includeChildren: true }) || (area && Array.isArray(area.cards) ? area.cards : []);
+        return cards.filter(Boolean).length;
     }
 
     function cardName(card) {
@@ -242,7 +251,12 @@
                 ['apartOrTogether', area && area.apartOrTogether],
                 ['centered', area && area.centered],
                 ['forOrAgainst', area && area.forOrAgainst],
-                ['fixedSlots', area && area.fixedSlots]
+                ['fixedSlots', area && area.fixedSlots],
+                ['childAreas', (window.Game?.Models?.getAreaChildren?.(area) || []).length],
+                ['slotIndex', area && area.slotIndex >= 0 ? area.slotIndex : ''],
+                ['slotKey', area && area.slotKey],
+                ['renderEmpty', area && area.renderEmpty],
+                ['capacity', area && area.capacity]
             ],
             raw: { path, area }
         };

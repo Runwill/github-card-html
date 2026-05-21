@@ -201,11 +201,17 @@
     }
 
     function equipAreaFor(player, slot, cardData, mode) {
-        if (slot !== -1 && player.equipSlots) return player.equipSlots[slot];
-        if (mode === 'source' && player.equipSlots) {
-            return player.equipSlots.find(area => area && area.cards.includes(cardData)) || player.equipArea;
+        if (!player) return null;
+        const childAreas = window.Game.Models?.getAreaChildren?.(player.equipArea) || [];
+        const equipSlots = childAreas.length > 0 ? childAreas : (player.equipSlots || []);
+        if (slot !== -1) return equipSlots[slot] || null;
+        if (mode === 'source') {
+            return equipSlots.find(area => area && area.cards && area.cards.includes(cardData)) || player.equipArea || null;
         }
-        return player.equipSlots ? player.equipSlots[0] : player.equipArea;
+        return window.Game.Models?.getDefaultChildArea?.(player.equipArea, cardData)
+            || equipSlots[0]
+            || player.equipArea
+            || null;
     }
 
     function roleAreaFor(player, areaId, slot, cardData, mode) {
@@ -221,9 +227,8 @@
         if (parsed.id === 'hand') result.area = currentPlayer.hand;
         else if (parsed.id === 'equipArea') {
             result.area = mode === 'target'
-                ? (currentPlayer.equipSlots ? currentPlayer.equipSlots[parsed.slot !== -1 ? parsed.slot : 0] : null)
+                ? equipAreaFor(currentPlayer, parsed.slot, cardData, mode)
                 : equipAreaFor(currentPlayer, parsed.slot, cardData, mode);
-            result.appendToEnd = mode === 'target' && parsed.slot === -1 && !!currentPlayer.equipSlots;
         } else if (parsed.id === 'treatmentArea') result.area = GameState.treatmentArea;
         else if (parsed.id && (parsed.id.startsWith('role:') || parsed.id.startsWith('role-judge:'))) {
             const roleId = parseInt(parsed.id.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));
