@@ -116,12 +116,6 @@
         };
     }
 
-    function slotCardsAt(cards, index) {
-        if (!Array.isArray(cards)) return [];
-        if (Array.isArray(cards[index])) return cards[index];
-        return cards[index] ? [cards[index]] : [];
-    }
-
     function getAreaChildren(area) {
         return window.Game.Models?.getAreaChildren?.(area) || [];
     }
@@ -153,27 +147,11 @@
         return options.area || null;
     }
 
-    function resolveViewerChildAreas(area, cards, options = {}) {
-        const children = getAreaChildren(area);
-        if (children.length > 0) return children;
-        if (Array.isArray(options.childAreas) && options.childAreas.length > 0) return options.childAreas;
-        if (Array.isArray(options.slots)) {
-            return options.slots.map(slot => ({
-                cards: slotCardsAt(cards, slot.index),
-                slotIndex: slot.index,
-                labelHTML: slot.label || '',
-                renderEmpty: true,
-                isSlotArea: true
-            }));
-        }
-        return [];
+    function resolveViewerChildAreas(area) {
+        return getAreaChildren(area);
     }
 
-    function childAreaLabel(childArea, options, fallbackIndex) {
-        const slotIndex = childSlotIndex(childArea, fallbackIndex);
-        const legacySlot = Array.isArray(options.slots) ? options.slots.find(slot => slot.index === slotIndex) : null;
-        if (legacySlot && legacySlot.label) return legacySlot.label;
-        if (childArea?.labelHTML) return childArea.labelHTML;
+    function childAreaLabel(childArea, fallbackIndex) {
         const key = childArea?.labelKey || childArea?.slotKey || childArea?.name || '';
         if (!key) return '';
         const GameText = window.Game.UI.GameText;
@@ -227,7 +205,7 @@
         // 2. Create DOM Structure
         const GameState = currentGameState();
         const sourceArea = resolveViewerArea(sourceId, GameState, options);
-        const childAreas = resolveViewerChildAreas(sourceArea, cards, options);
+        const childAreas = resolveViewerChildAreas(sourceArea);
         const isSlotViewer = childAreas.length > 0;
         const modal = document.createElement('div');
         modal.className = 'card-viewer-modal modal show';
@@ -255,7 +233,7 @@
                              data-area-name="${sourceId}:slot:${slotIndex}"
                              data-inspector-type="area"
                              data-drop-zone="${sourceId}:slot:${slotIndex}">
-                            <div class="equip-slot-label">${childAreaLabel(childArea, options, index)}</div>
+                            <div class="equip-slot-label">${childAreaLabel(childArea, index)}</div>
                         </div>
                     </div>
                 `;}).join('')}
@@ -434,7 +412,7 @@
              if (!sourceId) return;
 
              const sourceArea = resolveViewerArea(sourceId, GameState, options);
-             const childAreas = resolveViewerChildAreas(sourceArea, [], options);
+             const childAreas = resolveViewerChildAreas(sourceArea);
 
              // --- Type A: Child-Area Viewer (equipment slots and future fixed child areas) ---
              if (childAreas.length > 0) {

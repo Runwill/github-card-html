@@ -82,11 +82,9 @@
         if (!info) return null;
         if (zone.areaType === 'judgeArea') return info.player.judgeArea;
         if (zone.areaType === 'equip') {
-            const children = window.Game.Models?.getAreaChildren?.(info.player.equipArea) || [];
-            const slots = children.length > 0 ? children : (info.player.equipSlots || []);
             return zone.slotIndex >= 0
-                ? (info.player.equipArea?.getChildArea?.(zone.slotIndex) || slots[zone.slotIndex] || null)
-                : (window.Game.Models?.getDefaultChildArea?.(info.player.equipArea) || slots[0] || info.player.equipArea || null);
+                ? (window.Game.Models?.getEquipSlotArea?.(info.player, zone.slotIndex) || null)
+                : (window.Game.Models?.getDefaultEquipSlotArea?.(info.player) || null);
         }
         return info.player.hand;
     }

@@ -132,6 +132,26 @@
         }) || children[0];
     }
 
+    function getEquipSlotAreas(player) {
+        if (!player) return [];
+        const children = getAreaChildren(player.equipArea);
+        if (children.length > 0) return children;
+        return Array.isArray(player.equipSlots) ? player.equipSlots.filter(Boolean) : [];
+    }
+
+    function getEquipSlotArea(player, slotIndex) {
+        if (!Number.isFinite(slotIndex) || slotIndex < 0) return null;
+        return getEquipSlotAreas(player)[slotIndex] || null;
+    }
+
+    function getDefaultEquipSlotArea(player, card = null) {
+        if (!player) return null;
+        return getDefaultChildArea(player.equipArea, card)
+            || getEquipSlotAreas(player)[0]
+            || player.equipArea
+            || null;
+    }
+
     function getWritableArea(area, card = null) {
         if (!area) return null;
         if (area.acceptsDirectCards === false) return getDefaultChildArea(area, card);
@@ -243,9 +263,7 @@
             if (parts[2] === 'equip') {
                 if (parts.length < 4 || parts[3] === '') return player.equipArea || null;
                 const slotIndex = parseInt(parts[3], 10);
-                return player.equipArea?.getChildArea?.(slotIndex)
-                    || (player.equipSlots ? player.equipSlots[slotIndex] : null)
-                    || null;
+                return getEquipSlotArea(player, slotIndex);
             }
         }
         return null;
@@ -267,15 +285,9 @@
                 if (area === player.judgeArea) return `player:${i}:judgeArea`;
                 if (area === player.equipArea) return `player:${i}:equip`;
 
-                const equipSlotAreas = getAreaChildren(player.equipArea);
-                if (equipSlotAreas.length > 0) {
-                    for (let j = 0; j < equipSlotAreas.length; j++) {
-                        if (area === equipSlotAreas[j]) return `player:${i}:equip:${equipSlotAreas[j].slotIndex}`;
-                    }
-                } else if (player.equipSlots) {
-                    for (let j = 0; j < player.equipSlots.length; j++) {
-                        if (area === player.equipSlots[j]) return `player:${i}:equip:${j}`;
-                    }
+                const equipSlotAreas = getEquipSlotAreas(player);
+                for (let j = 0; j < equipSlotAreas.length; j++) {
+                    if (area === equipSlotAreas[j]) return `player:${i}:equip:${equipSlotAreas[j].slotIndex ?? j}`;
                 }
             }
         }
@@ -421,6 +433,9 @@
     window.Game.Models.getAreaPathForLog = getAreaPathForLog;
     window.Game.Models.getAreaChildren = getAreaChildren;
     window.Game.Models.getDefaultChildArea = getDefaultChildArea;
+    window.Game.Models.getEquipSlotAreas = getEquipSlotAreas;
+    window.Game.Models.getEquipSlotArea = getEquipSlotArea;
+    window.Game.Models.getDefaultEquipSlotArea = getDefaultEquipSlotArea;
     window.Game.Models.getWritableArea = getWritableArea;
     window.Game.Models.getAreaCards = getAreaCards;
     window.Game.Models.getPlayerAreas = getPlayerAreas;

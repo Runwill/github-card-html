@@ -72,11 +72,9 @@
                     const slotMatch = areaOrId.match(/:slot:(\d+)/);
                     const slotIndex = slotMatch ? parseInt(slotMatch[1], 10) : -1;
                     if (slotIndex >= 0) {
-                        return p.equipArea?.getChildArea?.(slotIndex)
-                            || (p.equipSlots ? p.equipSlots[slotIndex] : null)
-                            || null;
+                        return window.Game.Models?.getEquipSlotArea?.(p, slotIndex) || null;
                     }
-                    return window.Game.Models?.getDefaultChildArea?.(p.equipArea) || p.equipSlots?.[0] || p.equipArea || null;
+                    return window.Game.Models?.getDefaultEquipSlotArea?.(p) || null;
                 }
                 return p.hand;
             }

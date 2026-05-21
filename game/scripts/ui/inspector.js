@@ -186,7 +186,7 @@
             const equipMatch = basePath.match(/^role:(\d+):equip$/);
             if (equipMatch) {
                 const player = findPlayer(equipMatch[1]);
-                return player && player.equipSlots ? player.equipSlots[slotIndex] : null;
+                return window.Game.Models?.getEquipSlotArea?.(player, slotIndex) || null;
             }
             return resolveArea(basePath);
         }
@@ -211,9 +211,7 @@
             if (parts[2] === 'equip') {
                 const slotIndex = parts[3] === 'slot' ? parseInt(parts[4], 10) : -1;
                 if (slotIndex >= 0) {
-                    return player.equipArea?.getChildArea?.(slotIndex)
-                        || (player.equipSlots ? player.equipSlots[slotIndex] : null)
-                        || null;
+                    return window.Game.Models?.getEquipSlotArea?.(player, slotIndex) || null;
                 }
                 return player.equipArea || null;
             }

@@ -202,16 +202,12 @@
 
     function equipAreaFor(player, slot, cardData, mode) {
         if (!player) return null;
-        const childAreas = window.Game.Models?.getAreaChildren?.(player.equipArea) || [];
-        const equipSlots = childAreas.length > 0 ? childAreas : (player.equipSlots || []);
-        if (slot !== -1) return equipSlots[slot] || null;
+        const equipSlots = window.Game.Models?.getEquipSlotAreas?.(player) || [];
+        if (slot !== -1) return window.Game.Models?.getEquipSlotArea?.(player, slot) || null;
         if (mode === 'source') {
             return equipSlots.find(area => area && area.cards && area.cards.includes(cardData)) || player.equipArea || null;
         }
-        return window.Game.Models?.getDefaultChildArea?.(player.equipArea, cardData)
-            || equipSlots[0]
-            || player.equipArea
-            || null;
+        return window.Game.Models?.getDefaultEquipSlotArea?.(player, cardData) || null;
     }
 
     function roleAreaFor(player, areaId, slot, cardData, mode) {
