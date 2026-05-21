@@ -90,10 +90,10 @@
         _fallbackCardSize = null;
     }
 
-    function makeCardRectAtAnchor(anchor) {
+    function makeCardRectAtAnchor(anchor, preferredSize = null) {
         if (!anchor) return null;
         const anchorRect = anchor.getBoundingClientRect();
-        const size = getFallbackCardSize();
+        const size = preferredSize || getFallbackCardSize();
         const left = anchorRect.left + anchorRect.width / 2 - size.width / 2;
         const top = anchorRect.top + anchorRect.height / 2 - size.height / 2;
         return {
@@ -106,8 +106,8 @@
         };
     }
 
-    function getFallbackRect(areaPath) {
-        return makeCardRectAtAnchor(getFallbackAnchor(areaPath));
+    function getFallbackRect(areaPath, preferredSize = null) {
+        return makeCardRectAtAnchor(getFallbackAnchor(areaPath), preferredSize);
     }
 
     function targetIndexFromPayload(payload) {
@@ -122,17 +122,26 @@
         }) || null;
     }
 
-    function getCardElementAppearance(el) {
+    function directChildWithClass(parent, className) {
+        return Array.from(parent.children).find(child => child.classList.contains(className)) || null;
+    }
+
+    function composeCardAppearanceHTML(faceHTML, annotationsHTML = '') {
+        return `<div class="card-face-content">${faceHTML || ''}</div>`
+            + `<div class="card-annotations">${annotationsHTML || ''}</div>`;
+    }
+
+    function getCardElementAppearance(el, options = {}) {
         if (!el) return null;
-        let innerHTML = el.innerHTML;
-        if (el.querySelector('.card-mover-label')) {
-            const clone = el.cloneNode(true);
-            clone.querySelectorAll('.card-mover-label').forEach(node => node.remove());
-            innerHTML = clone.innerHTML;
-        }
+        const faceEl = directChildWithClass(el, 'card-face-content');
+        const annotationsEl = directChildWithClass(el, 'card-annotations');
+        const faceHTML = faceEl ? faceEl.innerHTML : el.innerHTML;
+        const hasMoverLabel = !!annotationsEl?.querySelector('.card-mover-label');
+        const annotationsHTML = options.includeMoverLabel && annotationsEl ? annotationsEl.innerHTML : '';
         return {
-            innerHTML,
-            dataCardKey: el.getAttribute('data-card-key') || ''
+            innerHTML: composeCardAppearanceHTML(faceHTML, annotationsHTML),
+            dataCardKey: el.getAttribute('data-card-key') || '',
+            hasMoverLabel
         };
     }
 
@@ -264,12 +273,12 @@
                     }
                 }
             } else {
-                targetRect = makeCardRectAtAnchor(target.target);
+                targetRect = makeCardRectAtAnchor(target.target, snap.rect);
             }
         }
 
         if (!targetRect) {
-            targetRect = getFallbackRect(toAreaPath);
+            targetRect = getFallbackRect(toAreaPath, snap.rect);
         }
 
         if (!targetRect) { E.cleanup(); return; }

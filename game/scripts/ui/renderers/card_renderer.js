@@ -54,14 +54,57 @@
         };
     }
 
+    function composeCardShellHTML(faceHTML, annotationsHTML = '') {
+        return `<div class="card-face-content">${faceHTML || ''}</div>`
+            + `<div class="card-annotations">${annotationsHTML || ''}</div>`;
+    }
+
     function getCardAppearanceForArea(card, area, options = {}) {
         const visibilityState = window.Game.Models?.getCardVisibilityForArea?.(area) || null;
         const state = getCardRenderState(card, { ...options, visibilityState });
         return {
-            innerHTML: state.htmlContent,
+            innerHTML: composeCardShellHTML(state.htmlContent),
             dataCardKey: state.renderName,
             isFaceUp: state.isFaceUp
         };
+    }
+
+    function directChildWithClass(parent, className) {
+        return Array.from(parent.children).find(child => child.classList.contains(className)) || null;
+    }
+
+    function ensureCardShell(cardEl) {
+        let faceEl = directChildWithClass(cardEl, 'card-face-content');
+        let annotationsEl = directChildWithClass(cardEl, 'card-annotations');
+
+        if (!faceEl || !annotationsEl) {
+            cardEl.innerHTML = '';
+            delete cardEl.__lastRenderedContent;
+            cardEl.removeAttribute('data-render-key');
+
+            faceEl = document.createElement('div');
+            faceEl.className = 'card-face-content';
+            annotationsEl = document.createElement('div');
+            annotationsEl.className = 'card-annotations';
+            cardEl.append(faceEl, annotationsEl);
+        }
+
+        return { faceEl, annotationsEl };
+    }
+
+    function getCardDomKey(card, dropZoneId, index) {
+        if (card && card.id !== undefined && card.id !== null) return `card:${String(card.id)}`;
+        const fallbackName = card?.name || card?.key || 'CardBack';
+        return `slot:${dropZoneId}:${index}:${fallbackName}`;
+    }
+
+    function buildCardNodeMap(cardNodes) {
+        const nodeMap = new Map();
+        cardNodes.forEach(cardNode => {
+            const key = cardNode.getAttribute('data-card-dom-key') || cardNode.getAttribute('data-card-id');
+            if (key && !nodeMap.has(key)) nodeMap.set(key, cardNode);
+        });
+        return nodeMap;
     }
 
     // 平铺区域：空间充足时保持常规牌距，空间不足时恢复受控露边重叠。
@@ -103,24 +146,53 @@
         const currentChildren = Array.from(container.children).filter(c => 
             c.classList.contains('card-placeholder')
         );
+        const keyedChildren = buildCardNodeMap(currentChildren);
+        const usedChildren = new Set();
+        const firstCardChild = currentChildren[0] || null;
+        let previousCardChild = null;
         container.classList.toggle('is-ordered-list', !!options.showIndex);
 
-        // 差量更新 (Diffing) 策略：复用现有 DOM 节点，避免暴力清空导致的闪烁和 Hover 状态丢失
+        function placeCardChild(cardEl) {
+            if (previousCardChild) {
+                if (previousCardChild.nextSibling !== cardEl) {
+                    container.insertBefore(cardEl, previousCardChild.nextSibling);
+                }
+            } else if (firstCardChild && firstCardChild !== cardEl) {
+                container.insertBefore(cardEl, firstCardChild);
+            } else if (!firstCardChild && cardEl.parentElement !== container) {
+                container.appendChild(cardEl);
+            }
+            previousCardChild = cardEl;
+        }
+
+        // 差量更新 (Diffing) 策略：按牌 ID 复用 DOM 节点，避免中间插入/删除时牌身份错位。
         cards.forEach((card, index) => {
             const renderState = getCardRenderState(card, options);
             const renderName = renderState.renderName;
+            const cardDomKey = getCardDomKey(card, dropZoneId, index);
+            const cardId = card && card.id !== undefined && card.id !== null ? String(card.id) : '';
             
-            // 尝试复用现有位置的节点
-            let cardEl = currentChildren[index];
-            let isNewNode = false;
-
+            // 尝试复用同一张牌的节点；旧页面首次加载无 key 时，再回退到原 index 复用。
+            let cardEl = keyedChildren.get(cardDomKey);
+            if (cardEl && usedChildren.has(cardEl)) cardEl = null;
+            if (!cardEl) {
+                const indexCandidate = currentChildren[index];
+                if (indexCandidate && !usedChildren.has(indexCandidate) && !indexCandidate.getAttribute('data-card-dom-key')) {
+                    cardEl = indexCandidate;
+                }
+            }
             if (!cardEl) {
                 cardEl = document.createElement('div');
                 cardEl.className = 'card-placeholder';
-                container.appendChild(cardEl);
-                isNewNode = true;
             }
+            usedChildren.add(cardEl);
+            placeCardChild(cardEl);
 
+            const { faceEl, annotationsEl } = ensureCardShell(cardEl);
+
+            cardEl.setAttribute('data-card-dom-key', cardDomKey);
+            if (cardId) cardEl.setAttribute('data-card-id', cardId);
+            else cardEl.removeAttribute('data-card-id');
             cardEl.setAttribute('data-area-name', dropZoneId);
             cardEl.setAttribute('data-card-index', index);
             cardEl.setAttribute('data-inspector-type', 'card');
@@ -136,12 +208,12 @@
             // REFACTOR: Moved to CSS Counter in game_viewer.css for cleaner drag handling.
             // When dragged out, the counter style won't apply, effectively removing the badge.
             // 使用标准化 SafeRender 替代手动 data-card-key 检查
-            window.Game.UI.safeRender(cardEl, htmlContent, renderName);
+            window.Game.UI.safeRender(faceEl, htmlContent, renderName);
 
             // ── 处理区：显示移动者角色名 ──
             // 仅在沙盒/手动模式下，处理区的牌显示上次移动者名称
             if (dropZoneId === 'treatmentArea' && card._lastMoveBy) {
-                let moverLabel = cardEl.querySelector('.card-mover-label');
+                let moverLabel = annotationsEl.querySelector('.card-mover-label');
                 const moverInfo = card._lastMoveBy;
                 const moverHTML = GameText.render('Character', { id: moverInfo.characterId, name: moverInfo.name });
                 const moverKey = `mover:${moverInfo.id}:${moverInfo.name}`;
@@ -149,12 +221,12 @@
                 if (!moverLabel) {
                     moverLabel = document.createElement('div');
                     moverLabel.className = 'card-mover-label';
-                    cardEl.appendChild(moverLabel);
+                    annotationsEl.appendChild(moverLabel);
                 }
                 window.Game.UI.safeRender(moverLabel, moverHTML, moverKey);
             } else {
                 // 不在处理区或无移动者信息时移除标签
-                cardEl.querySelector('.card-mover-label')?.remove();
+                annotationsEl.querySelector('.card-mover-label')?.remove();
             }
 
             // 兼容 CSS: game_cards.css 依赖 [data-card-key='CardBack'] 选择器来显示牌背
@@ -171,14 +243,9 @@
         // 移除多余的节点
         // FIX: 不要直接比较 container.children.length，因为其中可能包含非卡牌元素（如Label标签）
         // 应该只计算和移除 .card-placeholder 类型的元素
-        const extraChildren = Array.from(container.children).filter(c => 
-            c.classList.contains('card-placeholder')
-        );
-        
-        // 从列表末尾开始移除多余的卡牌元素
-        for (let i = cards.length; i < extraChildren.length; i++) {
-            extraChildren[i].remove();
-        }
+        currentChildren.forEach(cardNode => {
+            if (!usedChildren.has(cardNode)) cardNode.remove();
+        });
 
         // 触发布局更新 (如果是平铺区域)
         if (container.classList.contains('area-spread')) {

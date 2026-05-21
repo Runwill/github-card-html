@@ -54,6 +54,10 @@
 - 打开手牌/判定/装备等区域窗口后，窗口里已有真实牌位，但拖到摘要仍没有飞行动画。
 - 拖到主手牌、处理区或区域窗口很顺滑，拖到摘要或长悬停切换区域却突兀，说明不同入口没有共用同一目标解析。
 - 本地拖拽看起来已修好，但在线同步接收端仍飞向摘要；说明拖拽幽灵动画和同步移牌动画还有两套端点解析 owner。
+- 同步移牌到处理区时，真实目标牌会显示“由谁置入”等附加信息，但飞行动画 ghost 不显示，落点才突然出现 label；或 label 被牌面/牌背文本样式影响，和牌名挤在一起。
+- 小屏或非标准窗口下真实牌已缩小，但同步动画飞向角色摘要时 ghost 从小牌变大，说明 fallback 锚点尺寸没有沿用当前牌的实际 rect。
+- 同步动画终点整体比最终牌偏右/偏下一个固定像素值时，检查页面是否启用了 `scrollbar-gutter: stable both-edges` 或其他会改变 fixed 层原点的布局机制。
+- 区域中间移走或插入一张牌时，左侧牌正常、右侧牌整体跳一下，说明列表渲染可能按 index 复用 DOM，而布局 FLIP 却假设 DOM 节点代表同一张牌。
 
 **常见误导**
 
@@ -69,6 +73,10 @@
 - 目标区域窗口打开时，真实牌节点在后追加的 CardViewer 中；第一个匹配的 drop zone 可能是摘要，里面找不到牌。
 - 找不到目标牌后走 fallback 直接移除拖拽幽灵，没有回退到摘要、头像、徽标或主视角锚点。
 - 同步动画使用 `player:N:hand` / `player:N:judgeArea` 模型路径，CardViewer 使用 `role:id` / `role-judge:id` drop-zone；两套命名没通过共享 resolver 对齐。
+- ghost 外观如果只克隆源牌，或读取目标 DOM 时剥掉 `.card-mover-label`，就会漏掉处理区这类目标区域附加信息；如果标注和牌面共用同一个 `innerHTML`，`CardBack` 的透明文字和牌名布局也会影响标注。
+- 非真实牌位锚点如果用 `--card-w` / `--card-h` 造 fallback rect，而不是用起始牌当前 `getBoundingClientRect()` 尺寸，会在动态缩放下出现飞行中变大。
+- `getBoundingClientRect()` 返回视口坐标，但 fixed ghost 的 `left: 0` 在保留滚动槽时可能不是视口物理 0；直接把 rect 坐标写进 fixed transform 会把 fixed 原点偏移叠加一次。
+- `renderCardList()` 如果用“当前位置第 N 个 DOM”承载“新数据第 N 张牌”，中间删除时右侧 DOM 的内容会立刻换成邻居；`animateLayoutShift()` 再按旧 DOM 元素做 FLIP，就不是同一张牌的旧/新位置。
 
 **排查步骤**
 
@@ -85,6 +93,10 @@
 - 把 `player:N:*` 模型路径与 `role:*` / `role-judge:*` / viewer slot drop-zone 的映射收敛到共享 resolver，让拖拽和同步动画共同消费。
 - 没有真实牌位时，飞向角色摘要、主视角头像、判定徽标或手牌容器等稳定锚点，并保持拖拽牌尺寸居中收束。
 - 非卡牌锚点不要按 `.card-placeholder` 处理：不要隐藏目标元素，不要强行恢复占位符样式。
+- 同步 ghost 的最终外观应优先吸收目标区域的可见附加 DOM；牌面/牌背放在 face 层，置入者等标注放在 annotations 层，背面牌也应显示标注。
+- 飞向摘要、头像、徽标等非牌位锚点时，目标矩形使用起始牌实际尺寸居中到锚点，避免动态缩放下从小变大。
+- fixed ghost 使用 `getBoundingClientRect()` 坐标时，先测量一个 `position: fixed; left:0; top:0` 探针的实际 rect，并从 transform 坐标中扣除该 fixed 层原点。
+- 可移动列表中的牌节点必须按 `card.id` 复用并按数据顺序重排 DOM；只有这样布局 FLIP 才是在“同一张牌”的旧 rect 和新 rect 之间动画。
 
 **验证入口**
 

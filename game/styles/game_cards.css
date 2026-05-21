@@ -60,6 +60,46 @@ html.force-landscape {
     overflow: hidden; 
 }
 
+.card-face-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.card-annotations {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    color: var(--text);
+}
+
+.card-placeholder .card-mover-label {
+    position: absolute;
+    bottom: var(--card-mover-label-offset, 2px);
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: var(--card-mover-label-fs, 10px);
+    line-height: 1.2;
+    opacity: 0.45;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 var(--card-mover-label-pad-x, 2px);
+    color: var(--text-muted, #888);
+}
+
+.dragging-real .card-mover-label {
+    display: none;
+}
+
 /* Image Layer Base (Ready to fade in) */
 .card-placeholder::before {
     content: "";
@@ -92,13 +132,16 @@ html.force-landscape {
 /* Card Back Styling */
 .card-placeholder[data-card-key='CardBack'] {
     background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%) !important;
-    color: transparent !important;
-    text-shadow: none !important;
     box-shadow: var(--card-shadow-rest, 0 2px 5px var(--shadow-1));
     position: relative;
     overflow: hidden;
     filter: none !important;
     opacity: 1 !important;
+}
+
+.card-placeholder[data-card-key='CardBack'] .card-face-content {
+    opacity: 0;
+    text-shadow: none;
 }
 
 /* 

@@ -137,28 +137,6 @@
     pointer-events: auto;
 }
 
-/* Treatment area: subtle mover label beneath each card */
-.treatment-container .card-mover-label {
-    position: absolute;
-    bottom: var(--card-mover-label-offset, 2px);
-    left: 0;
-    right: 0;
-    text-align: center;
-    font-size: var(--card-mover-label-fs, 10px);
-    line-height: 1.2;
-    opacity: 0.45;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 var(--card-mover-label-pad-x, 2px);
-    color: var(--text-muted, #888);
-}
-
-/* Hide mover label on dragged card (clone & source) */
-.dragging-real .card-mover-label {
-    display: none;
-}
-
 /* Allow dropping cards into treatment container when dragging */
 body.is-global-dragging .treatment-container,
 body.is-global-dragging .deck-slot {

@@ -35,6 +35,15 @@
         return { x: 0, y: Math.max(fromRect.height * 0.55, 24) };
     }
 
+    function getFixedLayerOrigin() {
+        const probe = document.createElement('div');
+        probe.style.cssText = 'position: fixed; left: 0; top: 0; width: 0; height: 0; margin: 0; padding: 0; border: 0; visibility: hidden; pointer-events: none;';
+        document.body.appendChild(probe);
+        const rect = probe.getBoundingClientRect();
+        probe.remove();
+        return { x: rect.left, y: rect.top };
+    }
+
     // ─── 弧形飞行动画 ─────────────────────────────────────────────────────
 
     /**
@@ -52,16 +61,14 @@
 
         // 移动后目标元素的外观（updateUI 已执行）
         let targetAppearance = null;
-        if (!srcFace) {
-            const toContainer = getContainerForArea(toAreaPath);
-            const toAreaObj = _resolveAreaLocal(toAreaPath);
-            if (toContainer && toAreaObj) {
-                const tEl = findCardElement(toContainer, cardId, toAreaObj);
-                if (tEl) {
-                    const key = tEl.getAttribute('data-card-key');
-                    if (key && key !== 'CardBack') {
-                        targetAppearance = getCardElementAppearance ? getCardElementAppearance(tEl) : { innerHTML: tEl.innerHTML, dataCardKey: key };
-                    }
+        const toContainer = getContainerForArea(toAreaPath);
+        const toAreaObj = _resolveAreaLocal(toAreaPath);
+        if (toContainer && toAreaObj) {
+            const tEl = findCardElement(toContainer, cardId, toAreaObj);
+            if (tEl) {
+                const key = tEl.getAttribute('data-card-key');
+                if (key) {
+                    targetAppearance = getCardElementAppearance ? getCardElementAppearance(tEl, { includeMoverLabel: true }) : { innerHTML: tEl.innerHTML, dataCardKey: key };
                 }
             }
         }
@@ -69,7 +76,9 @@
         // 只要任一端可见就用牌面，否则牌背
         const targetFace = targetAppearance && targetAppearance.dataCardKey && targetAppearance.dataCardKey !== 'CardBack';
         const snapTargetFace = snapTargetAppearance && snapTargetAppearance.dataCardKey && snapTargetAppearance.dataCardKey !== 'CardBack';
-        const finalAppearance = srcFace ? sourceAppearance
+        const targetDecorated = targetAppearance && targetAppearance.hasMoverLabel;
+        const finalAppearance = targetDecorated ? targetAppearance
+            : srcFace ? sourceAppearance
             : targetFace ? targetAppearance
             : snapTargetFace ? snapTargetAppearance
             : targetAppearance ? targetAppearance
@@ -79,6 +88,7 @@
         // 创建幽灵
         const ghost = document.createElement('div');
         ghost.className = 'card-placeholder card-move-ghost';
+        const fixedOrigin = getFixedLayerOrigin();
         // 起始位置：用 transform 直接定位到源卡牌位置，避免在 (0,0) 闪烁
         ghost.style.cssText = `
             position: fixed;
@@ -90,7 +100,7 @@
             will-change: transform, opacity;
             transition: none;
             margin: 0;
-            transform: translate(${fromRect.left}px, ${fromRect.top}px);
+            transform: translate(${fromRect.left - fixedOrigin.x}px, ${fromRect.top - fixedOrigin.y}px);
         `;
 
         ghost.setAttribute('data-card-key', finalAppearance.dataCardKey || 'CardBack');
@@ -179,7 +189,7 @@
             const w = fromRect.width + (tw - fromRect.width) * e;
             const h = fromRect.height + (th - fromRect.height) * e;
 
-            ghost.style.transform = `translate(${px - w / 2}px, ${py - h / 2}px)`;
+            ghost.style.transform = `translate(${px - w / 2 - fixedOrigin.x}px, ${py - h / 2 - fixedOrigin.y}px)`;
             ghost.style.width = w + 'px';
             ghost.style.height = h + 'px';
 
