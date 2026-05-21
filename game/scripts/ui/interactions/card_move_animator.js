@@ -35,38 +35,14 @@
     let _layoutSnapshot = null;
     let _fallbackCardSize = null;
 
-    // ─── 区域 → DOM 容器映射 ─────────────────────────────────────────────
-    function getGlobalAreaElement(areaPath) {
-        if (areaPath === 'pile') return document.getElementById('pile-container');
-        if (areaPath === 'discardPile') return document.getElementById('discard-pile-container');
-        if (areaPath === 'treatmentArea') return document.getElementById('treatment-area-container');
-        return null;
-    }
-
-    function getPlayerPathInfo(areaPath) {
-        if (!areaPath) return null;
-        const parts = areaPath.split(':');
-        const gs = window.Game.GameState;
-        if (parts[0] !== 'player' || !gs || !gs.players) return null;
-        const playerIdx = parseInt(parts[1]);
-        const player = gs.players[playerIdx];
-        if (!player) return null;
-        const perspIdx = (gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
-        return { parts, player, isSelf: playerIdx === perspIdx };
-    }
+    const Targets = window.Game.UI.CardMoveTargets;
 
     /**
      * 根据 areaPath 返回对应的 DOM 容器元素
      * areaPath 格式: "pile" | "discardPile" | "treatmentArea" | "player:N:hand" | "player:N:judgeArea" | "player:N:equip:M"
      */
     function getContainerForArea(areaPath) {
-        if (!areaPath) return null;
-        const globalEl = getGlobalAreaElement(areaPath);
-        if (globalEl) return globalEl;
-
-        const info = getPlayerPathInfo(areaPath);
-        if (info && info.parts[2] === 'hand' && info.isSelf) return document.getElementById('hand-cards-container');
-        return null;
+        return Targets?.getContainerForAreaPath?.(areaPath) || null;
     }
 
     /**
@@ -75,45 +51,18 @@
      * 对于角色的手牌/判定/装备 → 角色摘要卡片
      */
     function getFallbackAnchor(areaPath) {
-        if (!areaPath) return null;
-        const globalEl = getGlobalAreaElement(areaPath);
-        if (globalEl) return globalEl;
-
-        const info = getPlayerPathInfo(areaPath);
-        if (info) {
-            if (info.isSelf) {
-                // 主视角: 用 hand-cards-container 或 char-avatar
-                if (info.parts[2] === 'hand') return document.getElementById('hand-cards-container');
-                return document.querySelector('.current-character-panel .char-avatar') || document.getElementById('hand-cards-container');
-            }
-            // 其他角色: 用角色摘要元素
-            return document.getElementById(`player-summary-${info.player.id}`);
-        }
-        return null;
+        return Targets?.getFallbackAnchorForAreaPath?.(areaPath) || null;
     }
 
     /**
      * 在 area 容器中按 cardId 查找已渲染的 .card-placeholder 元素
      */
     function findCardElement(container, cardId, areaObj) {
-        if (!container || !areaObj || !areaObj.cards) return null;
-        const idx = areaObj.cards.findIndex(c => c && c.id === cardId);
-        if (idx < 0) return null;
-        const children = Array.from(container.children).filter(
-            c => c.classList.contains('card-placeholder')
-        );
-        return children[idx] || null;
+        return Targets?.findCardElement?.(container, cardId, areaObj) || null;
     }
 
     function resolveAreaForPath(areaPath) {
-        if (!areaPath) return null;
-        const Models = window.Game.Models || {};
-        if (Models.resolveAreaByPath) return Models.resolveAreaByPath(areaPath);
-        const SyncMgr = window.Game.Online?.SyncManager;
-        if (SyncMgr?._resolveArea) return SyncMgr._resolveArea(areaPath);
-        const Engine = window.Game.UI?._CardMoveEngine;
-        if (Engine?.resolveAreaLocal) return Engine.resolveAreaLocal(areaPath);
-        return null;
+        return Targets?.resolveAreaForPath?.(areaPath) || null;
     }
 
     function findCardInArea(areaObj, cardId) {
@@ -159,6 +108,18 @@
 
     function getFallbackRect(areaPath) {
         return makeCardRectAtAnchor(getFallbackAnchor(areaPath));
+    }
+
+    function targetIndexFromPayload(payload) {
+        const position = Number(payload && payload.position);
+        return Number.isFinite(position) && position > 0 ? position - 1 : -1;
+    }
+
+    function findAnimationTarget(areaPath, payload) {
+        return Targets?.findAnimationTargetForAreaPath?.(areaPath, {
+            cardId: payload && payload.cardId,
+            targetIndex: targetIndexFromPayload(payload)
+        }) || null;
     }
 
     function getCardElementAppearance(el) {
@@ -267,8 +228,8 @@
         // ── 目标位置 ──
         let targetRect = null;
         let prevStackCard = null; // 堆叠区域底下需要临时显示的卡
-        const toContainer = getContainerForArea(toAreaPath);
-        const toAreaObj = E.resolveAreaLocal(toAreaPath);
+        const target = findAnimationTarget(toAreaPath, payload);
+        const toContainer = target && target.zone ? target.zone : getContainerForArea(toAreaPath);
         const isToStacked = toContainer && toContainer.classList.contains('area-stacked');
 
         // ── 强制跳过 spread 容器内的 margin 过渡，获取最终布局位置 ──
@@ -285,9 +246,9 @@
             void (toContainer || document.body).offsetHeight; // force reflow
         }
 
-        if (toContainer && toAreaObj) {
-            const targetEl = findCardElement(toContainer, cardId, toAreaObj);
-            if (targetEl) {
+        if (target && target.target) {
+            if (target.isCard) {
+                const targetEl = target.target;
                 targetRect = targetEl.getBoundingClientRect();
                 // 暂时隐藏目标元素，等动画结束后恢复
                 targetEl.style.visibility = 'hidden';
@@ -302,6 +263,8 @@
                         prevStackCard = prev;
                     }
                 }
+            } else {
+                targetRect = makeCardRectAtAnchor(target.target);
             }
         }
 

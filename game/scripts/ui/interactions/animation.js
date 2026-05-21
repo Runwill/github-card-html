@@ -262,6 +262,13 @@
                 
                 if (placeholder && placeholder.style) {
                     placeholder.style.visibility = '';
+                    const shouldRestorePlaceholder = placeholder.classList.contains('drag-placeholder')
+                        || placeholder.classList.contains('card-placeholder');
+                    if (!shouldRestorePlaceholder) {
+                        if (onComplete) onComplete();
+                        return;
+                    }
+
                     placeholder.classList.remove('drag-placeholder');
 
                     if (window.getComputedStyle(placeholder).transitionProperty !== 'none') {

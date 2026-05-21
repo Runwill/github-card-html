@@ -45,3 +45,50 @@
 - 用用户当前入口复测，而不只新开空白页面。
 - 浏览器验证时同时断言标题/状态和内容行来自同一版数据。
 - 对缓存类 bug，最终至少验证一次运行时数据 shape 与 UI 渲染结果。
+
+## 移牌动画只查一个入口，忽略拖拽与同步的多 owner
+
+**现象信号**
+
+- 拖牌到角色摘要、头像、区域徽标等“非真实牌位”时，松手后拖拽牌突然消失，目标区域数量直接变化。
+- 打开手牌/判定/装备等区域窗口后，窗口里已有真实牌位，但拖到摘要仍没有飞行动画。
+- 拖到主手牌、处理区或区域窗口很顺滑，拖到摘要或长悬停切换区域却突兀，说明不同入口没有共用同一目标解析。
+- 本地拖拽看起来已修好，但在线同步接收端仍飞向摘要；说明拖拽幽灵动画和同步移牌动画还有两套端点解析 owner。
+
+**常见误导**
+
+- 以为是模型先删除再置入，实际模型移动可能正确，问题在拖拽幽灵找不到动画终点。
+- 只用 `document.querySelector('[data-drop-zone="..."]')` 找第一个区域，忽略同一 `data-drop-zone` 可能同时出现在摘要锚点和打开的 CardViewer 窗口里。
+- 只验证有占位符的容器，不验证 `data-accept-placeholder="false"` 的摘要/头像类目标。
+- 只验证本机拖拽，不验证远端同步的 `snapshotBeforeMove()` / `animateAfterMove()` 路径。
+- 同页手写 `snapshotBeforeMove → moveCardToArea → updateUI → animateAfterMove` 通过后就认为在线同步已通过，漏掉真实 `sync_manager.onRemoteAction()` 的 payload、视角和窗口状态。
+
+**根因模式**
+
+- 摘要类 drop zone 不接收 `.card-placeholder`，移动后不会在摘要内部产生真实牌节点。
+- 目标区域窗口打开时，真实牌节点在后追加的 CardViewer 中；第一个匹配的 drop zone 可能是摘要，里面找不到牌。
+- 找不到目标牌后走 fallback 直接移除拖拽幽灵，没有回退到摘要、头像、徽标或主视角锚点。
+- 同步动画使用 `player:N:hand` / `player:N:judgeArea` 模型路径，CardViewer 使用 `role:id` / `role-judge:id` drop-zone；两套命名没通过共享 resolver 对齐。
+
+**排查步骤**
+
+1. 搜索拖拽收尾逻辑里的 `data-drop-zone` 查询，确认是否只取第一个匹配元素。
+2. 对同一目标区域同时检查摘要锚点和打开的区域窗口：`querySelectorAll('[data-drop-zone]')` 后按属性值过滤。
+3. 验证 `data-accept-placeholder="false"` 分支是否有真实牌位、可见窗口牌位、摘要锚点三层回退。
+4. 搜索同步动画 owner：`CardMoveAnimator.snapshotBeforeMove()`、`animateAfterMove()`、`sync_manager.onRemoteAction()`，确认它们是否也消费同一套端点解析。
+5. 验证同步时优先触发或模拟 `sync_manager.onRemoteAction()` / `RoomClient` 的 `gameAction`，不要只手写模型移动序列。
+6. 用浏览器记录本地拖拽和同步弧线动画的目标元素，确认它是窗口里的 `.card-placeholder` 或摘要/主视角锚点，而不是空目标 fallback。
+
+**修复方向**
+
+- 对远端/摘要类 drop 先查所有同名 drop zone，优先使用包含真实 `.card-placeholder` 的窗口或可见容器。
+- 把 `player:N:*` 模型路径与 `role:*` / `role-judge:*` / viewer slot drop-zone 的映射收敛到共享 resolver，让拖拽和同步动画共同消费。
+- 没有真实牌位时，飞向角色摘要、主视角头像、判定徽标或手牌容器等稳定锚点，并保持拖拽牌尺寸居中收束。
+- 非卡牌锚点不要按 `.card-placeholder` 处理：不要隐藏目标元素，不要强行恢复占位符样式。
+
+**验证入口**
+
+- 导航栏点对局 → 开始沙盒对局 → 打开目标角色手牌窗口 → 从主视角手牌拖到该角色摘要，确认牌飞向手牌窗口里的新增位置。
+- 导航栏点对局 → 打开目标角色判定窗口 → 拖牌到该角色摘要并悬停到“判定区”状态后松手，确认牌飞向判定窗口里的新增位置。
+- 关闭窗口后重复拖到摘要，确认拖拽牌飞向摘要/头像锚点，而不是直接消失。
+- 在线或模拟同步路径：玩家 B 打开玩家 C 的手牌/判定窗口，玩家 A 移牌到玩家 C 对应区域，确认玩家 B 看到飞行动画进入打开窗口；关闭窗口后才飞向玩家 C 摘要。

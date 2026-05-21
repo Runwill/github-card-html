@@ -71,9 +71,10 @@
                     }
                 };
 
-                pEl.addEventListener('mouseenter', () => {
+                const startJudgeHoverTimer = () => {
                     const dragState = window.Game.UI.DragState;
                     if (!dragState || !dragState.isDragging) return;
+                    if (dragHoverTimer || pEl.getAttribute('data-drop-zone') === judgeZoneId) return;
 
                     clearHoverTimer();
                     dragHoverTimer = setTimeout(() => {
@@ -86,8 +87,10 @@
                             nameEl.innerText = "判定区";
                         }
                     }, 400);
-                });
+                };
 
+                pEl.addEventListener('mouseenter', startJudgeHoverTimer);
+                pEl.addEventListener('pointermove', startJudgeHoverTimer);
                 pEl.addEventListener('mouseleave', clearHoverTimer);
                 pEl.addEventListener('mouseup', clearHoverTimer);
                 

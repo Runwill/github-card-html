@@ -98,6 +98,9 @@
                     charImg.parentElement.appendChild(judgeCountEl);
                 }
 
+                judgeCountEl.setAttribute('data-drop-zone', `role-judge:${selfRole.id}`);
+                judgeCountEl.setAttribute('data-accept-placeholder', 'false');
+
                 updateCountBadge(judgeCountEl, selfRole.judgeArea && selfRole.judgeArea.cards ? selfRole.judgeArea.cards.length : 0);
             }
 
@@ -123,6 +126,9 @@
             }
 
             const count = selfRole.hand?.cards?.length || 0;
+
+            handCountEl.setAttribute('data-drop-zone', `role:${selfRole.id}`);
+            handCountEl.setAttribute('data-accept-placeholder', 'false');
 
             const handText = ` ${count}`;
             if (handCountEl.textContent !== handText) {

@@ -357,23 +357,14 @@
                 return prevStackCard;
             };
 
-            const animateToDropTarget = (targetEl, zone) => {
+            const animateToDropTarget = (targetEl, zone, isCardTarget = true) => {
                 if (!targetEl || !window.Game.UI.DragAnimation) { fallbackAnimation(); return; }
-                targetEl.style.visibility = 'hidden';
-                const prevStackCard = revealPreviousStackCard(targetEl, zone);
+                if (isCardTarget) targetEl.style.visibility = 'hidden';
+                const prevStackCard = isCardTarget ? revealPreviousStackCard(targetEl, zone) : null;
                 window.Game.UI.DragAnimation.animateDropToPlaceholder(el, targetEl, () => {
                     if (prevStackCard) prevStackCard.style.display = '';
                     finishAnimation();
-                });
-            };
-
-            const findResultCard = (zone) => {
-                if (!zone) return null;
-                const cardChildren = Array.from(zone.children).filter(c => c.classList.contains('card-placeholder'));
-                if (!cardChildren.length) return null;
-                return (targetIndex >= 0 && targetIndex < cardChildren.length)
-                    ? cardChildren[targetIndex]
-                    : cardChildren[cardChildren.length - 1];
+                }, { matchSize: isCardTarget });
             };
 
             if (window.Game.UI.onCardDrop) {
@@ -394,14 +385,16 @@
                             if (useRemoteAnimation) {
                                 if (placeholder) placeholder.remove(); 
 
-                                const zone = document.querySelector(`[data-drop-zone="${targetZoneId}"]`);
-                                const newTargetEl = findResultCard(zone);
+                                const target = window.Game.UI.CardMoveTargets?.findAnimationTargetForDropZone?.(targetZoneId, {
+                                    cardId: DragState.dragSource.data && DragState.dragSource.data.id,
+                                    targetIndex
+                                });
 
-                                if (!newTargetEl) {
+                                if (!target) {
                                     console.warn(`[DragAnim] Target Element NOT found in zone: ${targetZoneId}`);
                                 }
 
-                                animateToDropTarget(newTargetEl, zone);
+                                animateToDropTarget(target && target.target, target && target.zone, target && target.isCard);
                             } else {
                                 animateToDropTarget(placeholder, placeholder && placeholder.parentNode);
                             }

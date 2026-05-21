@@ -227,6 +227,10 @@
      */
     function setupJudgeButton(btn, role, GameText) {
         if (!btn || !role) return;
+        if (role.id != null) {
+            btn.setAttribute('data-drop-zone', `role-judge:${role.id}`);
+            btn.setAttribute('data-accept-placeholder', 'false');
+        }
         btn.onclick = (e) => {
             e.stopPropagation();
             openJudgeViewer(role);
