@@ -13,10 +13,6 @@
     const MAX_LOG_ENTRIES = 200;
     let logEntries = [];
 
-    function roleCharacterName(role) {
-        return window.Game.UI._RoleUtils?.roleCharacterKey?.(role) || (role && role.name) || '';
-    }
-
     /**
      * 将区域路径转换为包含动态术语标签的 HTML
      * 使用 GameText 渲染区域名和角色名，使其拥有动态术语系统的悬浮/点击交互
@@ -46,8 +42,9 @@
             const rest = playerMatch[2]; // hand:3, judgeArea:1, equip:2
             const gs = window.Game.GameState;
             const player = gs && gs.players ? gs.players[playerIdx] : null;
+            const playerName = window.Game.UI._RoleUtils?.roleCharacterKey?.(player) || (player && player.name) || '';
             const playerNameHTML = player
-                ? GameText.render('Character', { id: player.characterId, name: roleCharacterName(player) })
+                ? GameText.render('Character', { id: player.characterId, name: playerName })
                 : `P${playerIdx + 1}`;
 
             const areaWithPosition = (termKey, index) => GameText.render(termKey) + (index != null ? posHTML(parseInt(index, 10)) : '');
@@ -135,7 +132,7 @@
 
         const entry = {
             timestamp: Date.now(),
-            moverName: moveRole ? roleCharacterName(moveRole) : null,
+            moverName: moveRole ? (window.Game.UI._RoleUtils?.roleCharacterKey?.(moveRole) || moveRole.name || '') : null,
             moverCharacterId: moveRole ? moveRole.characterId : null,
             moverId: moveRole ? moveRole.id : null,
             cardName: card ? (card.name || card.key || 'unknown') : 'unknown',

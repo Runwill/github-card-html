@@ -66,7 +66,7 @@
              }
              if (window.Game.UI.showCardContextMenu) {
                  e.preventDefault();
-                 window.Game.UI.showCardContextMenu(e.clientX, e.clientY, cardData, sourceAreaName, cardElement);
+                 window.Game.UI.showCardContextMenu(e.clientX, e.clientY, cardData);
              }
         };
     }
@@ -395,7 +395,6 @@
                     {
                         onMoveExecuted: () => {
                             // Force UI update to ensure target existence (hidden initially by logic below)
-                            const wasSuspended = window.Game.UI.isRenderingSuspended;
                             window.Game.UI.isRenderingSuspended = false;
                             window.Game.UI.updateUI?.();
                             window.Game.UI.isRenderingSuspended = true;

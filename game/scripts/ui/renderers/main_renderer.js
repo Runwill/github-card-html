@@ -2,9 +2,6 @@
     window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
-    // 占位函数，等待重构
-    // TODO: 实现新的 GameTextRenderer 系统
-    
     /**
      * Helper: Apply term colors to UI elements
      */
@@ -221,7 +218,7 @@
 
     function resolveDropArea(GameState, areaId, currentPlayer, cardData, mode) {
         const parsed = splitSlotAreaId(areaId);
-        const result = { area: null, resolvedId: parsed.id, forcedSlot: parsed.slot, isRoleArea: false, appendToEnd: false };
+        const result = { area: null, forcedSlot: parsed.slot };
         if (parsed.id === 'hand') result.area = currentPlayer.hand;
         else if (parsed.id === 'equipArea') {
             result.area = equipAreaFor(currentPlayer);
@@ -232,7 +229,6 @@
             const targetPlayer = GameState.players.find(p => p.id === roleId);
             result.area = roleAreaFor(targetPlayer, parsed.id);
             if (parsed.id.includes(':equip')) result.forcedSlot = equipSlotFor(targetPlayer, parsed.slot, cardData, mode);
-            result.isRoleArea = !!result.area;
         } else if (GameState[parsed.id]) result.area = GameState[parsed.id];
         return result;
     }
@@ -240,62 +236,62 @@
     // 拖放回调实现：触发核心 Move 事件
     window.Game.UI.onCardDrop = function(cardData, sourceAreaName, targetZoneId, targetIndex, sourceIndex, callbacks, options) {
         const GameState = window.Game.Core.GameState;
-        if (!GameState) return;
+        const rejectDrop = () => {
+            if (typeof callbacks?.onMoveRejected === 'function') callbacks.onMoveRejected();
+            if (typeof callbacks?.onComplete === 'function') callbacks.onComplete();
+        };
+        if (!GameState) { rejectDrop(); return; }
 
-        let targetArea = null;
-        let moveRole = null;
         // 修正：当前操作者应与 UI 显示的"主视角角色"一致（perspectiveIndex）
         const perspIdx = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
         const currentPlayer = GameState.players[perspIdx] || GameState.players[0];
 
         const targetInfo = resolveDropArea(GameState, targetZoneId, currentPlayer, cardData, 'target');
-        targetArea = targetInfo.area;
-        if (targetArea) {
-            moveRole = currentPlayer;
+        const targetArea = targetInfo.area;
+
+        if (!targetArea) {
+            console.warn('[UI] Drop: Target area not found', targetZoneId);
+            rejectDrop();
+            return;
         }
 
-        if (targetArea) {
-            // Game Core movedAtPosition 是 1-based index
-            let finalTargetIndex = targetIndex;
-            if (targetInfo.forcedSlot >= 0) finalTargetIndex = targetInfo.forcedSlot;
-            if (targetInfo.appendToEnd && finalTargetIndex === -1) finalTargetIndex = 9999;
+        // Game Core movedAtPosition 是 1-based index
+        let finalTargetIndex = targetIndex;
+        if (targetInfo.forcedSlot >= 0) finalTargetIndex = targetInfo.forcedSlot;
 
-            // 如果索引无效 (<0)，Core 通常使用 9999 代表追加到末尾
-            // 如果有明确的 finalTargetIndex (且 >=0)，则转换为 1-based position
-            const position = (finalTargetIndex < 0) ? 9999 : (finalTargetIndex + 1); 
-            
-            // Resolve sourceArea based on sourceAreaName
-            const sourceArea = resolveDropArea(GameState, sourceAreaName, currentPlayer, cardData, 'source').area;
+        // 如果索引无效 (<0)，Core 通常使用 9999 代表追加到末尾
+        // 如果有明确的 finalTargetIndex (且 >=0)，则转换为 1-based position
+        const position = (finalTargetIndex < 0) ? 9999 : (finalTargetIndex + 1);
 
-            // cardData 是 Card 对象 (or String)
-            // Delegate to Controller to handle mode-specific logic
-            if (window.Game.Controller?.dispatch) {
-                const isDrag = !!(options && options.isDrag);
+        // Resolve sourceArea based on sourceAreaName
+        const sourceArea = resolveDropArea(GameState, sourceAreaName, currentPlayer, cardData, 'source').area;
 
-                window.Game.Controller.dispatch('move', {
-                    moveRole, 
-                    card: cardData, 
-                    toArea: targetArea, 
-                    position, 
-                    fromArea: sourceArea, 
-                    fromIndex: sourceIndex, 
-                    callbacks,
-                    isDrag // 标记来自拖拽，跳过 CardMoveAnimator
-                });
-            } else {
-                // Fallback to direct event trigger (Legacy/Auto)
-                window.Game.Core.Events.move(
-                    moveRole, 
-                    cardData, 
-                    targetArea, 
-                    position, 
-                    sourceArea, 
-                    sourceIndex, 
-                    callbacks 
-                );
-            }
+        // cardData 是 Card 对象 (or String)
+        // Delegate to Controller to handle mode-specific logic
+        if (window.Game.Controller?.dispatch) {
+            const isDrag = !!(options && options.isDrag);
+
+            window.Game.Controller.dispatch('move', {
+                moveRole: currentPlayer,
+                card: cardData,
+                toArea: targetArea,
+                position,
+                fromArea: sourceArea,
+                fromIndex: sourceIndex,
+                callbacks,
+                isDrag // 标记来自拖拽，跳过 CardMoveAnimator
+            });
         } else {
-             console.warn('[UI] Drop: Target area not found', targetZoneId);
+            // Fallback to direct event trigger (Legacy/Auto)
+            window.Game.Core.Events.move(
+                currentPlayer,
+                cardData,
+                targetArea,
+                position,
+                sourceArea,
+                sourceIndex,
+                callbacks
+            );
         }
     };
 

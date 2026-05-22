@@ -8,7 +8,7 @@
     "use strict";
 
     const I = window.Game.UI._CardMoveInternal;
-    const { CONFIG, getContainerForArea, findCardElement, getFallbackAnchor, getCardElementAppearance } = I;
+    const { CONFIG, getContainerForArea, findCardElement, getFallbackAnchor, resolveAreaForPath, getCardElementAppearance } = I;
 
     function getPlayerIndexFromAreaPath(areaPath) {
         if (!areaPath) return null;
@@ -25,7 +25,7 @@
         const centerDy = Math.abs((fromRect.top + fromRect.height / 2) - (toRect.top + toRect.height / 2));
         if (centerDx > 2 || centerDy > 2) return null;
 
-        const anchor = getFallbackAnchor && getFallbackAnchor(toAreaPath);
+        const anchor = getFallbackAnchor(toAreaPath);
         const summary = anchor && anchor.closest ? anchor.closest('.role-summary') : null;
         if (!summary) return null;
 
@@ -62,7 +62,7 @@
         // 移动后目标元素的外观（updateUI 已执行）
         let targetAppearance = null;
         const toContainer = getContainerForArea(toAreaPath);
-        const toAreaObj = _resolveAreaLocal(toAreaPath);
+        const toAreaObj = resolveAreaForPath(toAreaPath);
         if (toContainer && toAreaObj) {
             const tEl = findCardElement(toContainer, cardId, toAreaObj);
             if (tEl) {
@@ -152,7 +152,7 @@
             if (!endpointCorrected && !loopVector) {
                 endpointCorrected = true;
                 const toContainer2 = getContainerForArea(toAreaPath);
-                const toAreaObj2 = _resolveAreaLocal(toAreaPath);
+                const toAreaObj2 = resolveAreaForPath(toAreaPath);
                 if (toContainer2 && toAreaObj2) {
                     const liveEl = findCardElement(toContainer2, cardId, toAreaObj2);
                     if (liveEl) {
@@ -219,7 +219,7 @@
      */
     function _restoreTarget(cardId, toAreaPath) {
         const container = getContainerForArea(toAreaPath);
-        const areaObj = _resolveAreaLocal(toAreaPath);
+        const areaObj = resolveAreaForPath(toAreaPath);
         if (container && areaObj) {
             const el = findCardElement(container, cardId, areaObj);
             if (el && el._animRestore) {
@@ -281,10 +281,6 @@
 
     // ─── 工具 ─────────────────────────────────────────────────────────────
 
-    function _resolveAreaLocal(path) {
-        return window.Game.Models?.resolveAreaByPath?.(path, window.Game.GameState) || null;
-    }
-
     function findLiveLayoutElement(snapshotItem, fallbackAreaPath) {
         if (!snapshotItem) return null;
         if (snapshotItem.el && snapshotItem.el.isConnected) return snapshotItem.el;
@@ -293,7 +289,7 @@
         const card = window.Game.Models?.findCardById?.(cardId, window.Game.GameState, { playersFirst: true });
         const liveAreaPath = window.Game.Models?.getCardLocationPath?.(card, window.Game.GameState) || fallbackAreaPath;
         const liveContainer = getContainerForArea(liveAreaPath) || getContainerForArea(fallbackAreaPath);
-        const liveArea = _resolveAreaLocal(liveAreaPath) || _resolveAreaLocal(fallbackAreaPath);
+        const liveArea = resolveAreaForPath(liveAreaPath) || resolveAreaForPath(fallbackAreaPath);
         return liveContainer ? findCardElement(liveContainer, cardId, liveArea) : null;
     }
 
@@ -307,7 +303,6 @@
     window.Game.UI._CardMoveEngine = {
         animateArcFlight: _animateArcFlight,
         animateLayoutShift: _animateLayoutShift,
-        resolveAreaLocal: _resolveAreaLocal,
         cleanup: _cleanup,
     };
 

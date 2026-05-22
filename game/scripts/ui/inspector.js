@@ -52,17 +52,9 @@
             : String(data && data.name !== undefined ? data.name : key || '');
     }
 
-    function roleCharacterKey(role) {
-        const utils = window.Game?.UI?._RoleUtils;
-        if (utils?.roleCharacterKey) return utils.roleCharacterKey(role);
-        let key = role && role.character;
-        if (Array.isArray(key) && key.length > 0) key = key[0];
-        return key || (role && role.name) || '';
-    }
-
     function roleValue(role) {
         if (!role) return '';
-        const name = roleCharacterKey(role);
+        const name = window.Game?.UI?._RoleUtils?.roleCharacterKey?.(role) || '';
         const characterId = role.characterId || role.id || '';
         const html = renderGameText('Character', { id: characterId, name });
         const idSuffix = role.id !== undefined ? ` <span class="game-inspector-id">#${role.id}</span>` : '';

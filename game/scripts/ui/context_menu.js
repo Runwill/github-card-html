@@ -142,7 +142,7 @@
         renderMenu(x, y, player.name, actions);
     }
 
-    function showCardContextMenu(x, y, card, currentAreaName, cardElement = null) {
+    function showCardContextMenu(x, y, card) {
         const actions = [];
         const state = window.Game.GameState;
         
@@ -170,8 +170,7 @@
                         window.Game.Controller.dispatch('place', {
                             moveRole: window.Game.UI.getMainPlayer(),
                             card: card,
-                            toArea: area,
-                            element: cardElement
+                            toArea: area
                         });
                     }
                 });

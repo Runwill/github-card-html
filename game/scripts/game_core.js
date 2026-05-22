@@ -15,7 +15,6 @@
 
     function setSpeed(ms) {
         Settings.autoRunDelay = ms;
-        // console.log(`[Game] Speed set to ${ms}ms`);
     }
 
     function updateGameUI() {

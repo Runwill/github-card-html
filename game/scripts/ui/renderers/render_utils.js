@@ -7,12 +7,11 @@
      * 核心机制：使用 data-render-key 进行脏检查，避免不必要的 innerHTML 赋值。
      * 
      * @param {HTMLElement} element - 目标 DOM 元素
-     * @param {string} content - 要设置的新内容 (HTML 或 纯文本)
+        * @param {string} content - 要设置的新 HTML 内容
      * @param {string|null} uniqueKey - 可选。用于判断内容是否变更的唯一键。如果不传，则回退到内容直接对比（不推荐用于 HTML）。
-     * @param {boolean} isText - 是否作为 textContent 处理。默认为 false (innerHTML)。
      * @returns {boolean} - 如果执行了更新返回 true，否则返回 false
      */
-    function safeRender(element, content, uniqueKey = null, isText = false) {
+    function safeRender(element, content, uniqueKey = null) {
         if (!element) return false;
 
         // 策略 1: 基于 Key 的检查 (优先)
@@ -38,11 +37,7 @@
 
         // --- 执行更新 ---
         
-        if (isText) {
-            element.textContent = content;
-        } else {
-            element.innerHTML = content;
-        }
+        element.innerHTML = content;
 
         // 更新状态记录
         element.__lastRenderedContent = content; // 记录"影子"状态
@@ -54,35 +49,7 @@
         return true;
     }
 
-    /**
-     * 批量安全渲染列表
-     * 复用元素并进行脏检查
-     */
-    function safeRenderList(container, items, renderItemFn, keyFn) {
-        if (!container) return;
-        const currentChildren = Array.from(container.children);
-        
-        items.forEach((item, index) => {
-            let el = currentChildren[index];
-            if (!el) {
-                el = document.createElement('div'); // 默认 div，可优化
-                container.appendChild(el);
-            }
-            const key = keyFn(item, index);
-            const content = renderItemFn(item, index);
-            
-            // 假设列表项总是 HTML
-            safeRender(el, content, key);
-        });
-
-        // 移除多余
-        while (container.children.length > items.length) {
-            container.removeChild(container.lastChild);
-        }
-    }
-
     window.Game.UI.safeRender = safeRender;
-    // window.Game.UI.safeRenderList = safeRenderList; // 暂不需要，具体列表逻辑较复杂
 
     /**
      * 获取元素真实的布局 Rect (忽略 Transform 动画的影响)

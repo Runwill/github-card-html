@@ -201,7 +201,8 @@
         };
 
         // ── 布局快照：记录受影响区域中所有牌的当前位置 ──
-        [fromAreaPath, toAreaPath].forEach(ap => {
+        const layoutAreaPaths = Array.isArray(payload.layoutAreaPaths) ? payload.layoutAreaPaths : [fromAreaPath, toAreaPath];
+        layoutAreaPaths.forEach(ap => {
             if (!ap || _layoutSnapshot[ap]) return;
             const container = getContainerForArea(ap);
             if (!container) return;
@@ -323,6 +324,7 @@
         findCardElement,
         getFallbackAnchor,
         getFallbackRect,
+        resolveAreaForPath,
         getCardElementAppearance,
         resetFallbackCardSize,
     };
@@ -333,9 +335,6 @@
         animateAfterMove,
         animateLayoutAfterMove,
         clearSnapshot,
-        getContainerForArea,
-        getFallbackAnchor,
-        CONFIG,
     };
 
 })();

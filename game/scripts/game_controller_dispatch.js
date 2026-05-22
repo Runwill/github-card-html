@@ -86,7 +86,7 @@
             if (cardId && (fromAreaPath || toAreaPath)) {
                 const nextAnimPayload = { cardId, fromAreaPath, toAreaPath, position: payload.position };
                 if (isDragMove && targetIsSlotted) {
-                    Animator.snapshotBeforeMove(nextAnimPayload);
+                    Animator.snapshotBeforeMove({ ...nextAnimPayload, layoutAreaPaths: [toAreaPath] });
                 } else if (!isDragMove) {
                     animPayload = nextAnimPayload;
                     Animator.snapshotBeforeMove(animPayload);
@@ -123,7 +123,7 @@
             if (I.currentEngine) {
                 let actionApplied = true;
                 if (actionType === 'move') {
-                    // payload: { card, toArea, position, fromArea, fromIndex, callbacks, element }
+                    // payload: { card, toArea, position, fromArea, fromIndex, callbacks }
                     
                     // 解析目标区域，确保它是 Area 对象
                     const targetArea = I.resolveArea(payload.toArea);
