@@ -78,12 +78,14 @@
 
             let onComplete = null;
             let onMoveExecuted = null;
+            let onMoveRejected = null;
 
             if (typeof callbacks === 'function') {
                 onComplete = callbacks;
             } else if (typeof callbacks === 'object' && callbacks !== null) {
                 onComplete = callbacks.onComplete;
                 onMoveExecuted = callbacks.onMoveExecuted;
+                onMoveRejected = callbacks.onMoveRejected;
             }
 
             // 如果缺少 fromArea，自动解析（健壮性修复）
@@ -113,16 +115,20 @@
                      
                      // 确保 movedCard 是数组
                      const cards = Array.isArray(ctx.movedCard) ? ctx.movedCard : [ctx.movedCard];
+                     ctx.moveSucceeded = true;
 
                      cards.forEach((card, index) => {
                          const insertIdx = Math.max(0, (ctx.movedAtPosition || 1) - 1) + index;
-                         window.Game.Models.moveCardToArea(card, ctx.movedInArea, insertIdx, ctx.fromArea, ctx.fromIndex);
-                         ctx.fromIndex = -1;
+                         const moved = window.Game.Models.moveCardToArea(card, ctx.movedInArea, insertIdx, ctx.fromArea, ctx.fromIndex);
+                         if (!moved) ctx.moveSucceeded = false;
+                         else ctx.fromIndex = -1;
                      });
                      
                      // Trigger specific callback if provided
-                     if (onMoveExecuted) {
+                     if (ctx.moveSucceeded && onMoveExecuted) {
                          onMoveExecuted(ctx);
+                     } else if (!ctx.moveSucceeded && onMoveRejected) {
+                         onMoveRejected(ctx);
                      }
                  }
             }, onComplete);

@@ -166,66 +166,24 @@
         return GameState.players.find(player => String(player.id) === String(roleId)) || null;
     }
 
-    function currentPlayer() {
-        const GameState = getGameState();
-        if (!GameState || !Array.isArray(GameState.players)) return null;
-        const index = GameState.perspectiveIndex != null ? GameState.perspectiveIndex : 0;
-        return GameState.players[index] || null;
-    }
-
     function resolveArea(path) {
         if (!path) return null;
         const GameState = getGameState();
         if (!GameState) return null;
-        const pathText = String(path);
+        const location = window.Game?._ControllerInternal?.resolveAreaLocation?.(path);
+        if (location?.area) return location.area;
+        return window.Game?.Models?.resolveAreaByPath?.(path, GameState) || null;
+    }
 
-        const slotMatch = pathText.match(/^(.*):slot:(\d+)$/);
-        if (slotMatch) {
-            const basePath = slotMatch[1];
-            const slotIndex = parseInt(slotMatch[2], 10);
-            const equipMatch = basePath.match(/^role:(\d+):equip$/);
-            if (equipMatch) {
-                const player = findPlayer(equipMatch[1]);
-                return window.Game.Models?.getEquipSlotArea?.(player, slotIndex) || null;
-            }
-            return resolveArea(basePath);
-        }
-
-        if (path === 'hand') {
-            const player = currentPlayer();
-            return player ? player.hand : null;
-        }
-        if (path === 'pile') return GameState.pile || null;
-        if (path === 'discardPile') return GameState.discardPile || null;
-        if (path === 'treatmentArea') return GameState.treatmentArea || null;
-
-        if (pathText.startsWith('role-judge:')) {
-            const roleId = pathText.replace('role-judge:', '').split(':')[0];
-            const player = findPlayer(roleId);
-            return player ? player.judgeArea : null;
-        }
-        if (pathText.startsWith('role:')) {
-            const parts = pathText.split(':');
-            const player = findPlayer(parts[1]);
-            if (!player) return null;
-            if (parts[2] === 'equip') {
-                const slotIndex = parts[3] === 'slot' ? parseInt(parts[4], 10) : -1;
-                if (slotIndex >= 0) {
-                    return window.Game.Models?.getEquipSlotArea?.(player, slotIndex) || null;
-                }
-                return player.equipArea || null;
-            }
-            return player.hand || null;
-        }
-
-        const Models = window.Game?.Models;
-        return Models?.resolveAreaByPath
-            ? Models.resolveAreaByPath(path, GameState)
-            : null;
+    function resolveLocation(path) {
+        const GameState = getGameState();
+        return window.Game?.Models?.resolveAreaLocationByPath?.(path, GameState)
+            || window.Game?._ControllerInternal?.resolveAreaLocation?.(path)
+            || { area: resolveArea(path), slotIndex: -1 };
     }
 
     function countCards(area) {
-        const cards = window.Game?.Models?.getAreaCards?.(area, { includeChildren: true }) || (area && Array.isArray(area.cards) ? area.cards : []);
+        const cards = window.Game?.Models?.getAreaCards?.(area) || (area && Array.isArray(area.cards) ? area.cards : []);
         return cards.filter(Boolean).length;
     }
 
@@ -237,34 +195,35 @@
     function describeArea(target) {
         const path = target.dataset.areaName || target.dataset.dropZone || '';
         const area = resolveArea(path);
+        const location = resolveLocation(path);
+        const slot = location?.slotIndex >= 0 ? window.Game?.Models?.getAreaSlot?.(area, location.slotIndex) : null;
         const owner = area && area.owner ? area.owner : null;
         return {
             typeLabel: translate('game.inspector.type.area', 'Area'),
-            title: areaValue(area, path),
+            title: slot ? translate(slot.labelKey || slot.slotKey, slot.labelKey || slot.slotKey) : areaValue(area, path),
             rows: [
                 ['path', path],
                 ['name', areaValue(area, path)],
                 ['owner', roleValue(owner)],
-                ['cards', countCards(area)],
+                ['cards', slot ? (window.Game?.Models?.getSlotCards?.(area, slot.index) || []).length : countCards(area)],
                 ['apartOrTogether', area && area.apartOrTogether],
                 ['centered', area && area.centered],
                 ['forOrAgainst', area && area.forOrAgainst],
                 ['fixedSlots', area && area.fixedSlots],
-                ['childAreas', (window.Game?.Models?.getAreaChildren?.(area) || []).length],
-                ['slotIndex', area && area.slotIndex >= 0 ? area.slotIndex : ''],
-                ['slotKey', area && area.slotKey],
-                ['renderEmpty', area && area.renderEmpty],
-                ['capacity', area && area.capacity]
+                ['slots', (window.Game?.Models?.getAreaSlots?.(area) || []).length],
+                ['slotIndex', slot ? slot.index : ''],
+                ['slotKey', slot ? slot.slotKey : ''],
+                ['renderEmpty', slot ? slot.renderEmpty : ''],
+                ['capacity', slot ? slot.capacity : '']
             ],
-            raw: { path, area }
+            raw: { path, area, slot }
         };
     }
 
     function describeRole(target) {
         const roleId = target.dataset.roleId || (target._role && target._role.id) || target._roleId;
         const role = target._role || findPlayer(roleId);
-        const equipSlots = window.Game?.Models?.getEquipSlotAreas?.(role) || [];
-        const equipCount = equipSlots.reduce((sum, slot) => sum + countCards(slot), 0);
+        const equipCount = role && role.equipArea ? countCards(role.equipArea) : 0;
         return {
             typeLabel: translate('game.inspector.type.role', 'Role'),
             title: role ? roleValue(role) : `#${roleId}`,
@@ -288,8 +247,11 @@
         const areaPath = target.dataset.areaName || target.dataset.dropZone || '';
         const index = parseInt(target.dataset.cardIndex, 10);
         const area = resolveArea(areaPath);
+        const location = resolveLocation(areaPath);
         const cards = area && Array.isArray(area.cards) ? area.cards : [];
-        const card = Number.isFinite(index) ? cards[index] : null;
+        const card = target.dataset.cardId
+            ? window.Game?.Models?.findCardById?.(target.dataset.cardId, getGameState(), { playersFirst: true })
+            : (location?.slotIndex >= 0 ? (window.Game?.Models?.getSlotCards?.(area, location.slotIndex) || [])[0] : (Number.isFinite(index) ? cards[index] : null));
         return {
             typeLabel: translate('game.inspector.type.card', 'Card'),
             title: cardValue(card, target.dataset.cardKey) || cardName(card) || target.dataset.cardKey || translate('game.inspector.type.card', 'Card'),

@@ -11,7 +11,7 @@
     }
 
     function cardsFromArea(area) {
-        return (area && area.cards) ? area.cards : [];
+        return (area && area.cards) ? area.cards.filter(Boolean) : [];
     }
 
     function currentGameState() {
@@ -116,12 +116,12 @@
         };
     }
 
-    function getAreaChildren(area) {
-        return window.Game.Models?.getAreaChildren?.(area) || [];
+    function getAreaSlots(area) {
+        return window.Game.Models?.getAreaSlots?.(area) || [];
     }
 
-    function childSlotIndex(childArea, fallbackIndex) {
-        return Number.isFinite(childArea?.slotIndex) ? childArea.slotIndex : fallbackIndex;
+    function slotIndex(slot, fallbackIndex) {
+        return Number.isFinite(slot?.index) ? slot.index : fallbackIndex;
     }
 
     function resolveViewerArea(sourceId, GameState, options = {}) {
@@ -147,28 +147,25 @@
         return options.area || null;
     }
 
-    function resolveViewerChildAreas(area) {
-        return getAreaChildren(area);
-    }
-
-    function childAreaLabel(childArea, fallbackIndex) {
-        const key = childArea?.labelKey || childArea?.slotKey || childArea?.name || '';
+    function slotLabel(slot) {
+        const key = slot?.labelKey || slot?.slotKey || '';
         if (!key) return '';
         const GameText = window.Game.UI.GameText;
         return GameText ? GameText.render(key) : key;
     }
 
-    function renderViewerSlot(sourceId, childArea, fallbackIndex) {
+    function renderViewerSlot(sourceId, sourceArea, slot, fallbackIndex) {
         if (!window.Game.UI.renderCardList) return;
-        const slotIndex = childSlotIndex(childArea, fallbackIndex);
-        const targetId = `viewer-slot-${sourceId}-${slotIndex}`;
+        const index = slotIndex(slot, fallbackIndex);
+        const targetId = `viewer-slot-${sourceId}-${index}`;
         const target = document.getElementById(targetId);
         if (!target) return;
-        const dropZoneId = `${sourceId}:slot:${slotIndex}`;
+        const dropZoneId = `${sourceId}:slot:${index}`;
         target.setAttribute('data-drop-zone', dropZoneId);
         target.setAttribute('data-area-name', dropZoneId);
+        target.setAttribute('data-accept-placeholder', 'false');
         target.setAttribute('data-inspector-type', 'area');
-        window.Game.UI.renderCardList(targetId, cardsFromArea(childArea), dropZoneId, {
+        window.Game.UI.renderCardList(targetId, window.Game.Models?.getSlotCards?.(sourceArea, index) || [], dropZoneId, {
             skipLayout: true,
             forceFaceDown: false
         });
@@ -205,8 +202,8 @@
         // 2. Create DOM Structure
         const GameState = currentGameState();
         const sourceArea = resolveViewerArea(sourceId, GameState, options);
-        const childAreas = resolveViewerChildAreas(sourceArea);
-        const isSlotViewer = childAreas.length > 0;
+        const slots = getAreaSlots(sourceArea);
+        const isSlotViewer = slots.length > 0;
         const modal = document.createElement('div');
         modal.className = 'card-viewer-modal modal show';
         modal.id = `card-viewer-modal-${sourceId}`;
@@ -223,17 +220,18 @@
         let bodyContent = '';
         if (isSlotViewer) {
             bodyContent = `<div class="equipment-slots-container area-spread" data-spread-item-selector=".equip-slot-wrapper" data-drop-zone="${sourceId}" data-area-name="${sourceId}" data-inspector-type="area" data-accept-placeholder="false">
-                ${childAreas.map((childArea, index) => {
-                    const slotIndex = childSlotIndex(childArea, index);
+                ${slots.map((slot, index) => {
+                    const currentSlotIndex = slotIndex(slot, index);
                     return `
                     <div class="equip-slot-wrapper area-spread-item">
-                        <div id="viewer-slot-${sourceId}-${slotIndex}"
+                        <div id="viewer-slot-${sourceId}-${currentSlotIndex}"
                              class="equip-slot"
-                             data-slot="${slotIndex}"
-                             data-area-name="${sourceId}:slot:${slotIndex}"
+                             data-slot="${currentSlotIndex}"
+                             data-area-name="${sourceId}:slot:${currentSlotIndex}"
                              data-inspector-type="area"
-                             data-drop-zone="${sourceId}:slot:${slotIndex}">
-                            <div class="equip-slot-label">${childAreaLabel(childArea, index)}</div>
+                             data-accept-placeholder="false"
+                             data-drop-zone="${sourceId}:slot:${currentSlotIndex}">
+                            <div class="equip-slot-label">${slotLabel(slot)}</div>
                         </div>
                     </div>
                 `;}).join('')}
@@ -288,7 +286,7 @@
 
         // Initial Card Render
         if (isSlotViewer) {
-            childAreas.forEach((childArea, index) => renderViewerSlot(sourceId, childArea, index));
+            slots.forEach((slot, index) => renderViewerSlot(sourceId, sourceArea, slot, index));
             window.Game.UI.updateSpreadLayouts?.();
         } else {
             renderViewerGrid(`card-viewer-grid-${sourceId}`, cards, sourceId, options);
@@ -412,11 +410,11 @@
              if (!sourceId) return;
 
              const sourceArea = resolveViewerArea(sourceId, GameState, options);
-             const childAreas = resolveViewerChildAreas(sourceArea);
+             const slots = getAreaSlots(sourceArea);
 
-             // --- Type A: Child-Area Viewer (equipment slots and future fixed child areas) ---
-             if (childAreas.length > 0) {
-                 childAreas.forEach((childArea, index) => renderViewerSlot(sourceId, childArea, index));
+             // --- Type A: Slotted Area Viewer (equipment slots) ---
+             if (slots.length > 0) {
+                 slots.forEach((slot, index) => renderViewerSlot(sourceId, sourceArea, slot, index));
                  window.Game.UI.updateSpreadLayouts?.();
                  return;
              }

@@ -23,6 +23,8 @@
         offsetY: 0,
         
         currentDropZone: null,
+        originalParent: null,
+        originalNextSibling: null,
         
         // --- 状态恢复 ---
         originalCssText: '',
@@ -103,6 +105,8 @@
         document.body.classList.add('is-global-dragging');
         
         const originalEl = DragState.dragElement;
+        DragState.originalParent = originalEl.parentNode;
+        DragState.originalNextSibling = originalEl.nextSibling;
         const physRect = originalEl.getBoundingClientRect();
         const rect = _flR(physRect);
         
@@ -247,6 +251,8 @@
         document.body.classList.remove('is-global-dragging');
         DragState.dragElement = null;
         DragState.isDragging = false;
+        DragState.originalParent = null;
+        DragState.originalNextSibling = null;
         if(DragState.rafId) cancelAnimationFrame(DragState.rafId);
     }
 
@@ -299,15 +305,7 @@
             let isAnimationFinished = false;
             
             const useRemoteAnimation = !acceptPlaceholder;
-            let options = { isDrag: true };
-            
-            if (useRemoteAnimation && el) {
-                options.startRect = el.getBoundingClientRect();
-                options.dragElement = el;
-                options.cardHTML = el.outerHTML; 
-                // We wait for onMoveExecuted to complete the animation explicitly
-                isAnimationFinished = false; 
-            }
+            const options = { isDrag: true };
 
             const checkFinish = () => {
                 if (isLogicFinished && isAnimationFinished) {
@@ -326,7 +324,20 @@
                     if (DragState.placeholderElement === placeholder) {
                         DragState.placeholderElement = null; 
                     }
+                    DragState.originalParent = null;
+                    DragState.originalNextSibling = null;
                 }
+            };
+
+            const restorePlaceholderToOrigin = () => {
+                const origin = DragState.originalParent;
+                if (!placeholder || !origin) return;
+                const next = DragState.originalNextSibling;
+                if (next && next.parentNode === origin) origin.insertBefore(placeholder, next);
+                else origin.appendChild(placeholder);
+                placeholder.classList.remove('drag-placeholder-hidden');
+                placeholder.style.display = '';
+                placeholder.style.visibility = 'hidden';
             };
 
             const playDropAnimation = () => {
@@ -359,10 +370,17 @@
 
             const animateToDropTarget = (targetEl, zone, isCardTarget = true) => {
                 if (!targetEl || !window.Game.UI.DragAnimation) { fallbackAnimation(); return; }
-                if (isCardTarget) targetEl.style.visibility = 'hidden';
+                if (isCardTarget) {
+                    targetEl.style.visibility = 'hidden';
+                    targetEl._animRestore = true;
+                }
                 const prevStackCard = isCardTarget ? revealPreviousStackCard(targetEl, zone) : null;
                 window.Game.UI.DragAnimation.animateDropToPlaceholder(el, targetEl, () => {
                     if (prevStackCard) prevStackCard.style.display = '';
+                    if (isCardTarget) {
+                        targetEl.style.visibility = '';
+                        delete targetEl._animRestore;
+                    }
                     finishAnimation();
                 }, { matchSize: isCardTarget });
             };
@@ -395,6 +413,7 @@
                                 }
 
                                 animateToDropTarget(target && target.target, target && target.zone, target && target.isCard);
+                                window.Game.UI.CardMoveAnimator?.animateLayoutAfterMove?.();
                             } else {
                                 animateToDropTarget(placeholder, placeholder && placeholder.parentNode);
                             }
@@ -402,6 +421,10 @@
                         onComplete: () => {
                             isLogicFinished = true;
                             checkFinish();
+                        },
+                        onMoveRejected: () => {
+                            restorePlaceholderToOrigin();
+                            animateToDropTarget(placeholder, placeholder && placeholder.parentNode);
                         }
                     },
                     options

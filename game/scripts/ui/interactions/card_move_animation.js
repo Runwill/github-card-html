@@ -248,9 +248,10 @@
             const snapped = I.layoutSnapshot[areaPath]; // [{el, rect}]
             if (!snapped || !snapped.length) return;
 
-            snapped.forEach(({ el, rect: startRect }) => {
-                // 元素可能已被移除（当前 DOM 中不存在）
-                if (!el.isConnected) return;
+            snapped.forEach(snapshotItem => {
+                const { rect: startRect } = snapshotItem;
+                const el = findLiveLayoutElement(snapshotItem, areaPath);
+                if (!el) return;
                 // 被移动的牌本身（有 _animRestore 标记）不参与 FLIP
                 if (el._animRestore) return;
 
@@ -282,6 +283,18 @@
 
     function _resolveAreaLocal(path) {
         return window.Game.Models?.resolveAreaByPath?.(path, window.Game.GameState) || null;
+    }
+
+    function findLiveLayoutElement(snapshotItem, fallbackAreaPath) {
+        if (!snapshotItem) return null;
+        if (snapshotItem.el && snapshotItem.el.isConnected) return snapshotItem.el;
+        const cardId = snapshotItem.cardId;
+        if (!cardId) return null;
+        const card = window.Game.Models?.findCardById?.(cardId, window.Game.GameState, { playersFirst: true });
+        const liveAreaPath = window.Game.Models?.getCardLocationPath?.(card, window.Game.GameState) || fallbackAreaPath;
+        const liveContainer = getContainerForArea(liveAreaPath) || getContainerForArea(fallbackAreaPath);
+        const liveArea = _resolveAreaLocal(liveAreaPath) || _resolveAreaLocal(fallbackAreaPath);
+        return liveContainer ? findCardElement(liveContainer, cardId, liveArea) : null;
     }
 
     function _cleanup() {

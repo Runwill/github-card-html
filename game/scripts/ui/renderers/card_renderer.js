@@ -145,11 +145,12 @@
         if (!container) return;
 
         container.setAttribute('data-drop-zone', dropZoneId);
+        const renderCards = (cards || []).filter(Boolean);
         
         const GameText = window.Game.UI.GameText;
         // Filter out static content (like labels) so they aren't removed or treated as card slots
         const currentChildren = Array.from(container.children).filter(c => 
-            c.classList.contains('card-placeholder')
+            c.classList.contains('card-placeholder') && !c.classList.contains('drag-placeholder-hidden')
         );
         const keyedChildren = buildCardNodeMap(currentChildren);
         const usedChildren = new Set();
@@ -171,7 +172,7 @@
         }
 
         // 差量更新 (Diffing) 策略：按牌 ID 复用 DOM 节点，避免中间插入/删除时牌身份错位。
-        cards.forEach((card, index) => {
+        renderCards.forEach((card, index) => {
             const renderState = getCardRenderState(card, options);
             const renderName = renderState.renderName;
             const cardDomKey = getCardDomKey(card, dropZoneId, index);

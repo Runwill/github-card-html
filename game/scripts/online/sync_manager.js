@@ -10,7 +10,7 @@
     window.Game.Online = window.Game.Online || {};
 
     const Client = () => window.Game.Online.RoomClient;
-    const AREA_METADATA_KEYS = ['apartOrTogether', 'centered', 'forOrAgainst', 'fixedSlots', 'slotIndex', 'slotKey', 'labelKey', 'renderEmpty', 'capacity', 'acceptsDirectCards', 'isSlotArea'];
+    const AREA_METADATA_KEYS = ['apartOrTogether', 'centered', 'forOrAgainst', 'fixedSlots', 'slots'];
 
     // 当前房间内的视角映射: perspectiveIndex -> [{ userId, username }]
     let perspectives = {};
@@ -73,12 +73,10 @@
 
     function serializeArea(area) {
         if (!area) return null;
-        const childAreas = window.Game.Models?.getAreaChildren?.(area) || [];
         return {
             name: area.name,
             cards: area.cards.map(c => serializeCard(c)),
-            ...areaMetadataFrom(area),
-            childAreas: childAreas.map(child => serializeArea(child))
+            ...areaMetadataFrom(area)
         };
     }
 
@@ -98,7 +96,6 @@
 
     function serializePlayer(player) {
         if (!player) return null;
-        const equipSlots = window.Game.Models?.getEquipSlotAreas?.(player) || (player.equipSlots || []);
         return {
             id: player.id,
             characterId: player.characterId,
@@ -115,7 +112,6 @@
             hand: serializeArea(player.hand),
             judgeArea: serializeArea(player.judgeArea),
             equipArea: serializeArea(player.equipArea),
-            equipSlots: equipSlots.map(s => serializeArea(s)),
             hp: player.health,
             maxHp: player.healthLimit,
             _originalData: player._originalData
@@ -201,10 +197,7 @@
             const card = deserializeCard(c, window.Game.Models.Card);
             if (card) card.lyingArea = area;
             return card;
-        }).filter(Boolean);
-        if (Array.isArray(data.childAreas) && data.childAreas.length > 0) {
-            area.setChildAreas(data.childAreas.map((childData, index) => deserializeArea(childData, childData?.name || `${name}_${index}`, Area)));
-        }
+        });
         return area;
     }
 
@@ -220,20 +213,25 @@
         restoreAreaMetadata(area, data);
         area.cards = (data.cards || []).map(c => deserializeCard(c, Card));
         area.cards.forEach(c => { if (c) c.lyingArea = area; });
+        const slotCount = (window.Game.Models?.getAreaSlots?.(area) || []).length;
+        while (area.fixedSlots && area.cards.length < slotCount) area.cards.push(null);
     }
 
     function restoreEquipmentAreas(player, playerData, Card) {
         if (!player) return;
         const equipAreaData = playerData?.equipArea || null;
-        if (equipAreaData) restoreAreaMetadata(player.equipArea, equipAreaData);
+        if (equipAreaData) restoreAreaCards(player.equipArea, equipAreaData, Card);
 
         const childAreaData = Array.isArray(equipAreaData?.childAreas) && equipAreaData.childAreas.length > 0
             ? equipAreaData.childAreas
             : (playerData?.equipSlots || []);
 
         childAreaData.forEach((slotData, slotIdx) => {
-            const slot = window.Game.Models?.getEquipSlotArea?.(player, slotIdx) || player.equipArea?.getChildArea?.(slotIdx) || player.equipSlots?.[slotIdx];
-            if (slot && slotData) restoreAreaCards(slot, slotData, Card);
+            if (!slotData || !player.equipArea) return;
+            const cardData = Array.isArray(slotData.cards) ? slotData.cards.find(Boolean) : null;
+            const card = deserializeCard(cardData, Card);
+            player.equipArea.cards[slotIdx] = card || player.equipArea.cards[slotIdx] || null;
+            if (card) card.lyingArea = player.equipArea;
         });
     }
 
@@ -267,7 +265,7 @@
                 const preVisibleTo = card && card.visibleTo ? [...card.visibleTo] : [];
 
                 if (Animator) {
-                    const fromAreaPath = card && card.lyingArea ? getAreaPath(card.lyingArea) : null;
+                    const fromAreaPath = card ? getCardLocationPath(card) : null;
                     animPayload = {
                         cardId: payload.cardId,
                         fromAreaPath: fromAreaPath,
@@ -278,7 +276,12 @@
                 }
 
                 // 远程移动卡牌（修改数据模型 + 更新可见性）
-                applyRemoteMove(payload);
+                const moved = applyRemoteMove(payload);
+                if (!moved) {
+                    Animator?.clearSnapshot?.();
+                    refreshGameUI();
+                    return;
+                }
 
                 // ── 记录移动者信息到卡牌 + 移动日志 ──
                 if (payload.moveRole) {
@@ -364,24 +367,25 @@
 
     function applyRemoteMove(payload) {
         const gs = window.Game.GameState;
-        if (!gs) return;
+        if (!gs) return false;
 
         // 找到卡牌
         const card = findCardById(payload.cardId);
         if (!card) {
             console.warn('[Sync] Remote move: card not found', payload.cardId);
-            return;
+            return false;
         }
 
         // 找到目标区域
-        const toArea = resolveAreaByPath(payload.toAreaPath);
+        const location = resolveAreaLocationByPath(payload.toAreaPath);
+        const toArea = location && location.area;
         if (!toArea) {
             console.warn('[Sync] Remote move: target area not found', payload.toAreaPath);
-            return;
+            return false;
         }
 
-        const pos = payload.position > 0 ? payload.position - 1 : payload.position;
-        window.Game.Models.moveCardToArea(card, toArea, pos, card.lyingArea);
+        const pos = location.slotIndex >= 0 ? location.slotIndex : (payload.position > 0 ? payload.position - 1 : payload.position);
+        return window.Game.Models.moveCardToArea(card, toArea, pos, card.lyingArea);
     }
 
     function applyRemoteHealthChange(payload) {
@@ -406,7 +410,10 @@
     }
 
     const resolveAreaByPath = (path) => window.Game.Models?.resolveAreaByPath?.(path) || null;
+    const resolveAreaLocationByPath = (path) => window.Game.Models?.resolveAreaLocationByPath?.(path) || null;
     const getAreaPath = (area) => window.Game.Models?.getAreaPath?.(area) || (area && area.name) || null;
+    const getAreaLocationPath = (area, slotIndex) => window.Game.Models?.getAreaLocationPath?.(area, slotIndex) || getAreaPath(area);
+    const getCardLocationPath = (card) => window.Game.Models?.getCardLocationPath?.(card) || null;
 
     /**
      * 远程状态全量更新
@@ -471,7 +478,10 @@
     window.Game.Online._SyncInternal = {
         Client,
         getAreaPath,
+        getAreaLocationPath,
+        getCardLocationPath,
         resolveAreaByPath,
+        resolveAreaLocationByPath,
         serializeGameState,
         get isApplyingRemote() { return isApplyingRemote; },
         get perspectives() { return perspectives; },
@@ -488,7 +498,10 @@
         clearPerspectives,
         onRemoteGameStart,
         getAreaPath,
+        getAreaLocationPath,
+        getCardLocationPath,
         resolveAreaByPath,
+        resolveAreaLocationByPath,
         _resolveArea: resolveAreaByPath,
         get isApplyingRemote() { return isApplyingRemote; },
         get perspectives() { return perspectives; }

@@ -24,9 +24,11 @@
                 characterId: payload.moveRole.characterId,
                 name: payload.moveRole.name
             } : null;
+            const targetArea = resolveLocalArea(payload.toArea);
+            const targetIndex = payload.position > 0 ? payload.position - 1 : -1;
             client.broadcastAction('moveCard', {
                 cardId: payload.card.id,
-                toAreaPath: I.getAreaPath(resolveLocalArea(payload.toArea)),
+                toAreaPath: I.getCardLocationPath(payload.card) || I.getAreaLocationPath(targetArea, targetIndex),
                 position: payload.position || -1,
                 moveRole: moveRoleData
             });

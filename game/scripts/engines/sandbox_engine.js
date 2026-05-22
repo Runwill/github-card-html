@@ -106,8 +106,9 @@
 
         // Directly move card without event stack
         moveCard(card, toArea, toIndex = -1, fromAreaHint = null) {
-             window.Game.Models.moveCardToArea(card, toArea, toIndex, fromAreaHint);
+               const moved = window.Game.Models.moveCardToArea(card, toArea, toIndex, fromAreaHint);
              this._updateUI();
+               return moved;
         }
         
         modifyHealth(roleId, delta) {

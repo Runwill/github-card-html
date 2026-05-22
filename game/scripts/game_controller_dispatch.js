@@ -34,9 +34,10 @@
         });
     }
 
-    function runMoveCallbacks(callbacks) {
+    function runMoveCallbacks(callbacks, accepted = true) {
         if (!callbacks || typeof callbacks === 'function') return;
-        if (typeof callbacks.onMoveExecuted === 'function') callbacks.onMoveExecuted();
+        const handler = accepted ? callbacks.onMoveExecuted : callbacks.onMoveRejected;
+        if (typeof handler === 'function') handler();
         setTimeout(() => {
             if (typeof callbacks.onComplete === 'function') callbacks.onComplete();
         }, 50);
@@ -70,19 +71,26 @@
         // 跳过拖拽产生的移动（拖拽有自己的动画系统）
         const Animator = window.Game.UI?.CardMoveAnimator;
         let animPayload = null;
-        const isDragMove = !!(payload.isDrag || payload.dragElement || payload.startRect);
+        const isDragMove = !!payload.isDrag;
 
-        if (actionType === 'move' && Animator && payload.card && payload.toArea && !isDragMove) {
+        if (actionType === 'move' && Animator && payload.card && payload.toArea) {
             const card = payload.card;
             const cardId = (typeof card === 'object') ? card.id : card;
             const fromAreaObj = payload.fromArea || I.findCardSource(card);
             const toAreaObj = I.resolveArea(payload.toArea);
-            const fromAreaPath = I.getAreaPath(fromAreaObj);
-            const toAreaPath = I.getAreaPath(toAreaObj);
+            const targetIndex = payload.position > 0 ? payload.position - 1 : -1;
+            const fromAreaPath = I.getAreaPathForLog(fromAreaObj, card);
+            const toAreaPath = I.getAreaLocationPath(toAreaObj, targetIndex);
+            const targetIsSlotted = (window.Game.Models?.getAreaSlots?.(toAreaObj) || []).length > 0;
 
             if (cardId && (fromAreaPath || toAreaPath)) {
-                animPayload = { cardId, fromAreaPath, toAreaPath, position: payload.position };
-                Animator.snapshotBeforeMove(animPayload);
+                const nextAnimPayload = { cardId, fromAreaPath, toAreaPath, position: payload.position };
+                if (isDragMove && targetIsSlotted) {
+                    Animator.snapshotBeforeMove(nextAnimPayload);
+                } else if (!isDragMove) {
+                    animPayload = nextAnimPayload;
+                    Animator.snapshotBeforeMove(animPayload);
+                }
             }
         }
 
@@ -98,14 +106,22 @@
 
         const runDirectMove = (targetArea, sourceArea, moveFn) => {
             const moveLog = captureMoveLog(payload, payload.card, sourceArea);
-            moveFn();
+            const moved = moveFn() !== false;
+            if (!moved) {
+                Animator?.clearSnapshot?.();
+                runMoveCallbacks(payload.callbacks, false);
+                window.Game.UI?.updateUI?.();
+                return false;
+            }
             commitMoveLog(moveLog, targetArea);
             runMoveCallbacks(payload.callbacks);
             triggerCardMoveAnimation();
+            return true;
         };
 
         if (I.currentMode === 'manual' || I.currentMode === 'sandbox') {
             if (I.currentEngine) {
+                let actionApplied = true;
                 if (actionType === 'move') {
                     // payload: { card, toArea, position, fromArea, fromIndex, callbacks, element }
                     
@@ -116,9 +132,10 @@
                     const sourceArea = payload.fromArea || I.resolveArea(payload.fromArea);
 
                     if (targetArea) {
-                        runDirectMove(targetArea, sourceArea, () => I.currentEngine.moveCard(payload.card, targetArea, payload.position - 1, sourceArea));
+                        actionApplied = runDirectMove(targetArea, sourceArea, () => I.currentEngine.moveCard(payload.card, targetArea, payload.position - 1, sourceArea));
                     } else {
                         console.warn("[Controller] Manual Move Skipped: Invalid target area", payload.toArea);
+                        actionApplied = false;
                     }
                 } else if (actionType === 'modifyHealth') {
                     // payload: { roleId, delta }
@@ -133,7 +150,9 @@
                 }
 
                 // Online sync: broadcast action to other room members
-                try { window.Game.Online?.SyncManager?.interceptDispatch?.(actionType, payload); } catch(e) { console.warn('[Online] sync error', e); }
+                if (actionApplied !== false) {
+                    try { window.Game.Online?.SyncManager?.interceptDispatch?.(actionType, payload); } catch(e) { console.warn('[Online] sync error', e); }
+                }
             }
         } else {
             // 自动/流程模式
@@ -148,6 +167,8 @@
                          const card = payload.card;
                          const insertIdx = Math.max(0, (payload.position || 1) - 1);
                          runDirectMove(targetArea, sourceArea, () => window.Game.Models.moveCardToArea(card, targetArea, insertIdx, sourceArea));
+                     } else {
+                         runMoveCallbacks(payload.callbacks, false);
                      }
                  } else {
                      // ── 非拖拽移动：走事件栈 ──

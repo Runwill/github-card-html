@@ -41,7 +41,8 @@
         const playerIndex = parseInt(parts[1], 10);
         if (!Number.isFinite(playerIndex)) return null;
         const info = playerByIndex(playerIndex);
-        return info ? { ...info, areaType: parts[2], slotIndex: parseInt(parts[3], 10) } : null;
+        const slotIndex = parts[3] === 'slot' ? parseInt(parts[4], 10) : parseInt(parts[3], 10);
+        return info ? { ...info, areaType: parts[2], slotIndex } : null;
     }
 
     function resolveAreaForPath(areaPath) {
@@ -116,14 +117,27 @@
         if (zoneId === 'hand') return document.getElementById('hand-cards-container');
         const globalElement = globalAreaElement(zoneId);
         if (globalElement) return globalElement;
-        const area = resolveAreaForDropZone(zoneId);
-        const areaPath = window.Game.Models?.getAreaPath?.(area, state());
+        const location = window.Game._ControllerInternal?.resolveAreaLocation?.(zoneId);
+        const areaPath = window.Game.Models?.getAreaLocationPath?.(location?.area, location?.slotIndex, state());
         return fallbackAnchorForPath(areaPath);
+    }
+
+    function movedCardAreaPathForZone(zoneId, cardId) {
+        if (!zoneId || !cardId) return null;
+        const gameState = state();
+        const card = window.Game.Models?.findCardById?.(cardId, gameState, { playersFirst: true });
+        const areaPath = window.Game.Models?.getCardLocationPath?.(card, gameState);
+        return areaPath && zoneIdsForPath(areaPath).includes(zoneId) ? areaPath : null;
     }
 
     function findCardElement(container, cardId, area, targetIndex = -1) {
         const cards = cardElements(container);
         if (!cards.length) return null;
+
+        if (cardId) {
+            const byId = cards.find(card => card.getAttribute('data-card-id') === String(cardId));
+            if (byId) return byId;
+        }
 
         if (cardId && area?.cards) {
             const cardIndex = area.cards.findIndex(card => card && card.id === cardId);
@@ -169,6 +183,12 @@
     }
 
     function findAnimationTargetForDropZone(zoneId, options = {}) {
+        const movedAreaPath = movedCardAreaPathForZone(zoneId, options.cardId);
+        if (movedAreaPath) {
+            const movedTarget = findAnimationTargetForAreaPath(movedAreaPath, options);
+            if (movedTarget) return movedTarget;
+        }
+
         const zones = zonesById(zoneId);
         const area = resolveAreaForDropZone(zoneId);
         const cardTarget = cardTargetFromZones(zones, options, area);

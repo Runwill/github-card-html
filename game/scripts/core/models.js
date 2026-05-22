@@ -4,6 +4,24 @@
 
     const EQUIP_SLOT_KEYS = ['weaponSlot', 'armorSlot', 'defensiveSlot', 'offensiveSlot'];
 
+    function normalizeSlotDescriptor(slot, fallbackIndex) {
+        const source = typeof slot === 'string' ? { slotKey: slot } : (slot || {});
+        const slotIndex = Number.isFinite(source.index) ? source.index : fallbackIndex;
+        const slotKey = source.slotKey || source.key || '';
+        return {
+            index: slotIndex,
+            slotKey,
+            labelKey: source.labelKey || slotKey,
+            renderEmpty: source.renderEmpty !== undefined ? !!source.renderEmpty : true,
+            capacity: Number.isFinite(source.capacity) ? source.capacity : 1
+        };
+    }
+
+    function normalizeSlotDescriptors(slots) {
+        if (!Array.isArray(slots)) return [];
+        return slots.map((slot, index) => normalizeSlotDescriptor(slot, index));
+    }
+
     // 卡牌类
     class Card {
         constructor(name, type, suit = 'none', number = 0, id = null) {
@@ -44,54 +62,22 @@
             this.apartOrTogether = options.apartOrTogether !== undefined ? options.apartOrTogether : Area.Configs.Generic.apartOrTogether; 
             this.centered = options.centered !== undefined ? options.centered : Area.Configs.Generic.centered;
             
-            // Legacy sparse-slot behavior; new empty slots should be modeled as child Areas.
-            this.fixedSlots = options.fixedSlots || false; 
-
-            this.parentArea = options.parentArea || null;
-            this.childAreas = [];
-            this.slotIndex = Number.isFinite(options.slotIndex) ? options.slotIndex : -1;
-            this.slotKey = options.slotKey || '';
-            this.labelKey = options.labelKey || this.slotKey || '';
-            this.renderEmpty = !!options.renderEmpty;
-            this.capacity = Number.isFinite(options.capacity) ? options.capacity : null;
-            this.acceptsDirectCards = options.acceptsDirectCards !== undefined ? !!options.acceptsDirectCards : true;
-            this.isSlotArea = !!options.isSlotArea || this.slotIndex >= 0;
-
-            if (Array.isArray(options.childAreas)) this.setChildAreas(options.childAreas);
-        }
-
-        get children() {
-            return this.childAreas;
-        }
-
-        setChildAreas(childAreas) {
-            this.childAreas = Array.isArray(childAreas) ? childAreas.filter(Boolean) : [];
-            this.childAreas.forEach((area, index) => {
-                area.parentArea = this;
-                if (!Number.isFinite(area.slotIndex) || area.slotIndex < 0) area.slotIndex = index;
-                if (this.owner && !area.owner) area.owner = this.owner;
-            });
-            return this.childAreas;
-        }
-
-        getChildArea(index) {
-            const slotIndex = parseInt(index, 10);
-            if (!Number.isFinite(slotIndex)) return null;
-            return this.childAreas.find(area => area && area.slotIndex === slotIndex) || this.childAreas[slotIndex] || null;
+            this.slots = normalizeSlotDescriptors(options.slots || []);
+            this.fixedSlots = options.fixedSlots !== undefined ? !!options.fixedSlots : this.slots.length > 0;
+            if (this.fixedSlots && this.slots.length > 0) this.cards = new Array(this.slots.length).fill(null);
         }
 
         add(card) {
             if (this.fixedSlots) {
-                // Determine first empty slot? Or just push? 
-                // Default add() for fixedSlots is ambiguous, try to find first null
-                const emptyIdx = this.cards.findIndex(c => c === null);
-                if (emptyIdx > -1) {
-                    this.cards[emptyIdx] = card;
-                } else {
-                    this.cards.push(card); // Overflow or valid next slot
+                const slotIndex = getDefaultSlotIndex(this, card);
+                if (slotIndex >= 0) {
+                    this.cards[slotIndex] = card;
+                    return true;
                 }
+                return false;
             } else {
                 this.cards.push(card);
+                return true;
             }
         }
 
@@ -117,78 +103,88 @@
         }
     }
 
-    function getAreaChildren(area) {
-        if (!area || !Array.isArray(area.childAreas)) return [];
-        return area.childAreas.filter(Boolean);
+    function getAreaSlots(area) {
+        if (!area || !Array.isArray(area.slots)) return [];
+        return area.slots.filter(Boolean);
     }
 
-    function getDefaultChildArea(area, card = null) {
-        const children = getAreaChildren(area);
-        if (children.length === 0) return null;
-        return children.find(child => {
-            if (!child || !Array.isArray(child.cards)) return false;
-            if (card && child.cards.includes(card)) return true;
-            return !Number.isFinite(child.capacity) || child.capacity < 1 || child.cards.length < child.capacity;
-        }) || children[0];
+    function isSlottedArea(area) {
+        return !!(area && area.fixedSlots && getAreaSlots(area).length > 0);
     }
 
-    function getEquipSlotAreas(player) {
-        if (!player) return [];
-        const children = getAreaChildren(player.equipArea);
-        if (children.length > 0) return children;
-        return Array.isArray(player.equipSlots) ? player.equipSlots.filter(Boolean) : [];
+    function normalizeSlotIndex(slotIndex) {
+        const index = Number(slotIndex);
+        return Number.isInteger(index) && index >= 0 ? index : -1;
     }
 
-    function getEquipSlotArea(player, slotIndex) {
-        if (!Number.isFinite(slotIndex) || slotIndex < 0) return null;
-        return getEquipSlotAreas(player)[slotIndex] || null;
+    function getAreaSlot(area, slotIndex) {
+        const index = normalizeSlotIndex(slotIndex);
+        if (index < 0) return null;
+        return getAreaSlots(area).find(slot => slot && slot.index === index) || getAreaSlots(area)[index] || null;
     }
 
-    function getDefaultEquipSlotArea(player, card = null) {
-        if (!player) return null;
-        return getDefaultChildArea(player.equipArea, card)
-            || getEquipSlotAreas(player)[0]
-            || player.equipArea
-            || null;
+    function getSlotCards(area, slotIndex) {
+        const index = normalizeSlotIndex(slotIndex);
+        if (!area || !Array.isArray(area.cards) || index < 0) return [];
+        const card = area.cards[index];
+        return card ? [card] : [];
     }
 
-    function getWritableArea(area, card = null) {
-        if (!area) return null;
-        if (area.acceptsDirectCards === false) return getDefaultChildArea(area, card);
-        return area;
+    function findCardSlotIndex(area, card) {
+        if (!area || !card || !Array.isArray(area.cards)) return -1;
+        return area.cards.indexOf(card);
     }
 
-    function flattenAreaTree(area, output = []) {
-        if (!area || output.includes(area)) return output;
-        output.push(area);
-        getAreaChildren(area).forEach(child => flattenAreaTree(child, output));
-        return output;
+    function firstEmptySlotIndex(area, excludedIndex = -1) {
+        const slots = getAreaSlots(area);
+        const count = slots.length || (Array.isArray(area?.cards) ? area.cards.length : 0);
+        for (let index = 0; index < count; index++) {
+            if (index === excludedIndex) continue;
+            if (!area.cards[index]) return index;
+        }
+        return -1;
     }
 
-    function getAreaCards(area, options = {}) {
+    function getDefaultSlotIndex(area, card = null) {
+        if (!isSlottedArea(area)) return -1;
+        const existingIndex = findCardSlotIndex(area, card);
+        if (existingIndex >= 0) return existingIndex;
+        return firstEmptySlotIndex(area);
+    }
+
+    function getTargetSlotIndex(area, toIndex, card = null) {
+        const index = normalizeSlotIndex(toIndex);
+        if (index >= 0 && getAreaSlot(area, index)) return index;
+        return getDefaultSlotIndex(area, card);
+    }
+
+    function getEquipSlots(player) {
+        return player ? getAreaSlots(player.equipArea) : [];
+    }
+
+    function getEquipSlot(player, slotIndex) {
+        return player ? getAreaSlot(player.equipArea, slotIndex) : null;
+    }
+
+    function getDefaultEquipSlotIndex(player, card = null) {
+        return player ? getDefaultSlotIndex(player.equipArea, card) : -1;
+    }
+
+    function getAreaCards(area) {
         if (!area) return [];
-        const ownCards = Array.isArray(area.cards) ? area.cards.filter(Boolean) : [];
-        if (!options.includeChildren) return ownCards;
-        return getAreaChildren(area).reduce((cards, child) => cards.concat(getAreaCards(child, options)), ownCards);
+        return Array.isArray(area.cards) ? area.cards.filter(Boolean) : [];
     }
 
     function getPlayerAreas(player) {
-        if (!player) return [];
-        const areas = [];
-        flattenAreaTree(player.hand, areas);
-        flattenAreaTree(player.judgeArea, areas);
-        flattenAreaTree(player.equipArea, areas);
-        if (getAreaChildren(player.equipArea).length === 0) getEquipSlotAreas(player).forEach(area => flattenAreaTree(area, areas));
-        return areas;
+        return player ? [player.hand, player.judgeArea, player.equipArea].filter(Boolean) : [];
     }
 
     function getGameAreas(gameState, options = {}) {
         const gs = gameState || window.Game.GameState;
         if (!gs) return [];
         const playerAreas = [];
-        const globalAreas = [];
+        const globalAreas = [gs.pile, gs.discardPile, gs.treatmentArea].filter(Boolean);
         (gs.players || []).forEach(player => playerAreas.push(...getPlayerAreas(player)));
-        [gs.pile, gs.discardPile, gs.treatmentArea].forEach(area => flattenAreaTree(area, globalAreas));
         return options.playersFirst ? playerAreas.concat(globalAreas) : globalAreas.concat(playerAreas);
     }
 
@@ -255,11 +251,56 @@
     }
 
     function moveCardToArea(card, toArea, toIndex = -1, fromArea = null, fromIndex = -1) {
-        const targetArea = getWritableArea(toArea, card);
+        const targetArea = toArea;
         if (!card || !targetArea || !Array.isArray(targetArea.cards)) return false;
 
         const sourceArea = fromArea || (typeof card === 'object' ? card.lyingArea : null);
-        if (sourceArea) removeCardFromArea(card, sourceArea, fromIndex);
+        const sourceSlotIndex = sourceArea === targetArea ? findCardSlotIndex(sourceArea, card) : -1;
+
+        if (isSlottedArea(targetArea)) {
+            const slotIndex = getTargetSlotIndex(targetArea, toIndex, card);
+            if (slotIndex < 0) return false;
+
+            if (sourceArea === targetArea && sourceSlotIndex === slotIndex) {
+                if (typeof card === 'object') applyCardVisibility(card, targetArea);
+                return true;
+            }
+
+            const existingCard = targetArea.cards[slotIndex];
+            let displacedIndex = -1;
+            if (existingCard && existingCard !== card) {
+                displacedIndex = sourceArea === targetArea && sourceSlotIndex >= 0
+                    ? sourceSlotIndex
+                    : firstEmptySlotIndex(targetArea, slotIndex);
+                if (displacedIndex < 0) return false;
+            }
+
+            if (sourceArea) {
+                const removed = removeCardFromArea(card, sourceArea, fromIndex);
+                if (!removed) return false;
+            }
+
+            if (existingCard && existingCard !== card) {
+                targetArea.cards[displacedIndex] = existingCard;
+                if (typeof existingCard === 'object') {
+                    existingCard.lyingArea = targetArea;
+                    applyCardVisibility(existingCard, targetArea);
+                }
+            }
+
+            targetArea.cards[slotIndex] = card;
+            if (typeof card === 'object') {
+                card.lyingArea = targetArea;
+                applyCardVisibility(card, targetArea);
+            }
+
+            return true;
+        }
+
+        if (sourceArea) {
+            const removed = removeCardFromArea(card, sourceArea, fromIndex);
+            if (!removed) return false;
+        }
 
         const insertIndex = toIndex >= 0 && toIndex < targetArea.cards.length ? toIndex : targetArea.cards.length;
         targetArea.cards.splice(insertIndex, 0, card);
@@ -286,12 +327,21 @@
             if (parts[2] === 'hand') return player.hand;
             if (parts[2] === 'judgeArea') return player.judgeArea;
             if (parts[2] === 'equip') {
-                if (parts.length < 4 || parts[3] === '') return player.equipArea || null;
-                const slotIndex = parseInt(parts[3], 10);
-                return getEquipSlotArea(player, slotIndex);
+                return player.equipArea || null;
             }
         }
         return null;
+    }
+
+    function resolveAreaLocationByPath(path, gameState) {
+        const area = resolveAreaByPath(path, gameState);
+        let slotIndex = -1;
+        const parts = String(path || '').split(':');
+        if (parts[0] === 'player' && parts[2] === 'equip') {
+            if (parts[3] === 'slot') slotIndex = normalizeSlotIndex(parts[4]);
+            else slotIndex = normalizeSlotIndex(parts[3]);
+        }
+        return area ? { area, slotIndex } : null;
     }
 
     function getAreaPath(area, gameState) {
@@ -309,23 +359,32 @@
                 if (area === player.hand) return `player:${i}:hand`;
                 if (area === player.judgeArea) return `player:${i}:judgeArea`;
                 if (area === player.equipArea) return `player:${i}:equip`;
-
-                const equipSlotAreas = getEquipSlotAreas(player);
-                for (let j = 0; j < equipSlotAreas.length; j++) {
-                    if (area === equipSlotAreas[j]) return `player:${i}:equip:${equipSlotAreas[j].slotIndex ?? j}`;
-                }
             }
         }
         return area.name || null;
     }
 
-    function getAreaPathForLog(area, card, gameState) {
-        if (area && area.acceptsDirectCards === false && card && card.lyingArea && card.lyingArea.parentArea === area) {
-            return getAreaPathForLog(card.lyingArea, card, gameState);
-        }
+    function getAreaLocationPath(area, slotIndex = -1, gameState) {
+        const basePath = getAreaPath(area, gameState);
+        const index = normalizeSlotIndex(slotIndex);
+        if (basePath && isSlottedArea(area) && getAreaSlot(area, index)) return `${basePath}:slot:${index}`;
+        return basePath;
+    }
 
+    function getCardLocationPath(card, gameState) {
+        const area = findCardArea(card, gameState);
+        if (!area) return null;
+        return getAreaLocationPath(area, findCardSlotIndex(area, card), gameState);
+    }
+
+    function getAreaPathForLog(area, card, gameState) {
         const basePath = getAreaPath(area, gameState);
         if (!card || !area) return basePath;
+
+        if (isSlottedArea(area)) {
+            const slotIndex = findCardSlotIndex(area, card);
+            return getAreaLocationPath(area, slotIndex, gameState);
+        }
 
         const cards = area.cards || area;
         if (Array.isArray(cards)) {
@@ -352,8 +411,7 @@
         
         // 玩家区域
         Hand:           { apartOrTogether: 0, forOrAgainst: 1 }, 
-        EquipArea:      { apartOrTogether: 0, forOrAgainst: 0 }, // Parent area for fixed equipment slots
-        EquipSlot:      { apartOrTogether: 0, forOrAgainst: 0 }, // Child area used by each slot
+        EquipArea:      { apartOrTogether: 0, forOrAgainst: 0 }, // Area with fixed slot positions
         JudgeArea:      { apartOrTogether: 0, forOrAgainst: 0 }, 
     };
 
@@ -401,26 +459,18 @@
             this.judgeArea = new Area('judgeArea', Area.Configs.JudgeArea);
             this.equipArea = new Area('equipArea', {
                 ...Area.Configs.EquipArea,
-                acceptsDirectCards: false,
-                renderEmpty: true
+                slots: EQUIP_SLOT_KEYS.map((slotKey, slotIndex) => ({
+                    index: slotIndex,
+                    slotKey,
+                    labelKey: slotKey,
+                    renderEmpty: true,
+                    capacity: 1
+                }))
             });
 
             this.hand.owner = this;
             this.judgeArea.owner = this;
             this.equipArea.owner = this;
-            
-            this.equipSlots = EQUIP_SLOT_KEYS.map((slotKey, slotIndex) => new Area(`equip_${slotIndex}`, {
-                ...Area.Configs.EquipSlot,
-                owner: this,
-                parentArea: this.equipArea,
-                slotIndex,
-                slotKey,
-                labelKey: slotKey,
-                renderEmpty: true,
-                capacity: 1,
-                isSlotArea: true
-            }));
-            this.equipArea.setChildAreas(this.equipSlots);
             
             // 默认可见性设置
             // 手牌自己可见
@@ -455,13 +505,17 @@
     window.Game.Models.moveCardToArea = moveCardToArea;
     window.Game.Models.resolveAreaByPath = resolveAreaByPath;
     window.Game.Models.getAreaPath = getAreaPath;
+    window.Game.Models.getAreaLocationPath = getAreaLocationPath;
+    window.Game.Models.getCardLocationPath = getCardLocationPath;
     window.Game.Models.getAreaPathForLog = getAreaPathForLog;
-    window.Game.Models.getAreaChildren = getAreaChildren;
-    window.Game.Models.getDefaultChildArea = getDefaultChildArea;
-    window.Game.Models.getEquipSlotAreas = getEquipSlotAreas;
-    window.Game.Models.getEquipSlotArea = getEquipSlotArea;
-    window.Game.Models.getDefaultEquipSlotArea = getDefaultEquipSlotArea;
-    window.Game.Models.getWritableArea = getWritableArea;
+    window.Game.Models.resolveAreaLocationByPath = resolveAreaLocationByPath;
+    window.Game.Models.getAreaSlots = getAreaSlots;
+    window.Game.Models.getAreaSlot = getAreaSlot;
+    window.Game.Models.getSlotCards = getSlotCards;
+    window.Game.Models.findCardSlotIndex = findCardSlotIndex;
+    window.Game.Models.getEquipSlots = getEquipSlots;
+    window.Game.Models.getEquipSlot = getEquipSlot;
+    window.Game.Models.getDefaultEquipSlotIndex = getDefaultEquipSlotIndex;
     window.Game.Models.getAreaCards = getAreaCards;
     window.Game.Models.getPlayerAreas = getPlayerAreas;
     window.Game.Models.getGameAreas = getGameAreas;

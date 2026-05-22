@@ -77,14 +77,7 @@
             const roleId = parseInt(identifier.split(':')[1], 10);
             const p = gs.players.find(pl => pl.id === roleId);
             if (p) {
-                if (isEquip) {
-                    const slotMatch = identifier.match(/:slot:(\d+)/);
-                    const slotIndex = slotMatch ? parseInt(slotMatch[1], 10) : -1;
-                    if (slotIndex >= 0) {
-                        return window.Game.Models?.getEquipSlotArea?.(p, slotIndex) || null;
-                    }
-                    return window.Game.Models?.getDefaultEquipSlotArea?.(p) || null;
-                }
+                if (isEquip) return p.equipArea || null;
                 return isJudge ? p.judgeArea : p.hand;
             }
         }
@@ -95,7 +88,22 @@
         return null;
     };
 
+    const slotIndexFromIdentifier = (identifier) => {
+        if (typeof identifier !== 'string') return -1;
+        const slotMatch = identifier.match(/:slot:(\d+)/);
+        if (!slotMatch) return -1;
+        const slotIndex = parseInt(slotMatch[1], 10);
+        return Number.isFinite(slotIndex) ? slotIndex : -1;
+    };
+
+    const resolveAreaLocation = (identifier) => ({
+        area: resolveArea(identifier),
+        slotIndex: slotIndexFromIdentifier(identifier)
+    });
+
     const getAreaPath = area => window.Game.Models?.getAreaPath?.(area) || null;
+    const getAreaLocationPath = (area, slotIndex) => window.Game.Models?.getAreaLocationPath?.(area, slotIndex) || getAreaPath(area);
+    const getCardLocationPath = card => window.Game.Models?.getCardLocationPath?.(card) || null;
     const getAreaPathForLog = (area, card) => window.Game.Models?.getAreaPathForLog ? window.Game.Models.getAreaPathForLog(area, card) : getAreaPath(area);
 
 
@@ -105,7 +113,10 @@
         get currentEngine() { return currentEngine; },
         findCardSource,
         resolveArea,
+        resolveAreaLocation,
         getAreaPath,
+        getAreaLocationPath,
+        getCardLocationPath,
         getAreaPathForLog,
     };
 

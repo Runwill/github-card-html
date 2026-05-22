@@ -61,12 +61,12 @@
             const judgeMatch = !handMatch && rest.match(/^judgeArea(?::(\d+))?$/);
             if (judgeMatch) areaTermHTML = areaWithPosition('judgeArea', judgeMatch[1]);
 
-            // equip:slotIdx 或 equip:slotIdx:N（slotIdx 本身就是位置，无需额外标注）
-            const equipMatch = !handMatch && !judgeMatch && rest.match(/^equip:(\d+)/);
+            // equip:slot:slotIdx 或兼容旧 equip:slotIdx（slotIdx 本身就是位置，无需额外标注）
+            const equipMatch = !handMatch && !judgeMatch && rest.match(/^equip(?::slot:(\d+)|:(\d+))?$/);
             if (equipMatch) {
-                const slotIdx = parseInt(equipMatch[1], 10);
-                const area = window.Game.Models?.resolveAreaByPath?.(`player:${playerIdx}:equip:${slotIdx}`, gs);
-                const termKey = area?.labelKey || area?.slotKey || window.Game.Models?.EQUIP_SLOT_KEYS?.[slotIdx] || 'equipArea';
+                const slotIdx = parseInt(equipMatch[1] ?? equipMatch[2], 10);
+                const slot = Number.isFinite(slotIdx) ? window.Game.Models?.getEquipSlot?.(player, slotIdx) : null;
+                const termKey = slot?.labelKey || slot?.slotKey || 'equipArea';
                 areaTermHTML = GameText.render(termKey);
             }
 

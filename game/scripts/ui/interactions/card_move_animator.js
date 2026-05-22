@@ -39,7 +39,7 @@
 
     /**
      * 根据 areaPath 返回对应的 DOM 容器元素
-     * areaPath 格式: "pile" | "discardPile" | "treatmentArea" | "player:N:hand" | "player:N:judgeArea" | "player:N:equip:M"
+    * areaPath 格式: "pile" | "discardPile" | "treatmentArea" | "player:N:hand" | "player:N:judgeArea" | "player:N:equip" | "player:N:equip:slot:M"
      */
     function getContainerForArea(areaPath) {
         return Targets?.getContainerForAreaPath?.(areaPath) || null;
@@ -210,6 +210,7 @@
             );
             _layoutSnapshot[ap] = items.map(el => ({
                 el,
+                cardId: el.getAttribute('data-card-id') || '',
                 rect: el.getBoundingClientRect()
             }));
         });
@@ -299,6 +300,17 @@
         E.cleanup();
     }
 
+    function animateLayoutAfterMove() {
+        if (!_layoutSnapshot) return;
+        window.Game.UI._CardMoveEngine?.animateLayoutShift?.();
+        window.Game.UI._CardMoveEngine?.cleanup?.();
+    }
+
+    function clearSnapshot() {
+        _snapshot = null;
+        _layoutSnapshot = null;
+    }
+
 
     // ── 内部 API 供 card_move_animation.js 使用 ──
     window.Game.UI._CardMoveInternal = {
@@ -319,6 +331,8 @@
     window.Game.UI.CardMoveAnimator = {
         snapshotBeforeMove,
         animateAfterMove,
+        animateLayoutAfterMove,
+        clearSnapshot,
         getContainerForArea,
         getFallbackAnchor,
         CONFIG,

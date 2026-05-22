@@ -200,20 +200,22 @@
         return { id: parts[0], slot: isNaN(slotIdx) ? -1 : slotIdx };
     }
 
-    function equipAreaFor(player, slot, cardData, mode) {
+    function equipAreaFor(player) {
         if (!player) return null;
-        const equipSlots = window.Game.Models?.getEquipSlotAreas?.(player) || [];
-        if (slot !== -1) return window.Game.Models?.getEquipSlotArea?.(player, slot) || null;
-        if (mode === 'source') {
-            return equipSlots.find(area => area && area.cards && area.cards.includes(cardData)) || player.equipArea || null;
-        }
-        return window.Game.Models?.getDefaultEquipSlotArea?.(player, cardData) || null;
+        return player.equipArea || null;
     }
 
-    function roleAreaFor(player, areaId, slot, cardData, mode) {
+    function equipSlotFor(player, slot, cardData, mode) {
+        if (!player || !player.equipArea) return -1;
+        if (slot !== -1) return slot;
+        if (mode === 'source') return window.Game.Models?.findCardSlotIndex?.(player.equipArea, cardData) ?? -1;
+        return window.Game.Models?.getDefaultEquipSlotIndex?.(player, cardData) ?? -1;
+    }
+
+    function roleAreaFor(player, areaId) {
         if (!player) return null;
         if (areaId.startsWith('role-judge:')) return player.judgeArea;
-        if (areaId.includes(':equip')) return equipAreaFor(player, slot, cardData, mode);
+        if (areaId.includes(':equip')) return equipAreaFor(player);
         return player.hand;
     }
 
@@ -222,12 +224,14 @@
         const result = { area: null, resolvedId: parsed.id, forcedSlot: parsed.slot, isRoleArea: false, appendToEnd: false };
         if (parsed.id === 'hand') result.area = currentPlayer.hand;
         else if (parsed.id === 'equipArea') {
-            result.area = equipAreaFor(currentPlayer, parsed.slot, cardData, mode);
+            result.area = equipAreaFor(currentPlayer);
+            result.forcedSlot = equipSlotFor(currentPlayer, parsed.slot, cardData, mode);
         } else if (parsed.id === 'treatmentArea') result.area = GameState.treatmentArea;
         else if (parsed.id && (parsed.id.startsWith('role:') || parsed.id.startsWith('role-judge:'))) {
             const roleId = parseInt(parsed.id.replace('role-judge:', '').replace('role:', '').replace(':equip', ''), 10);
             const targetPlayer = GameState.players.find(p => p.id === roleId);
-            result.area = roleAreaFor(targetPlayer, parsed.id, parsed.slot, cardData, mode);
+            result.area = roleAreaFor(targetPlayer, parsed.id);
+            if (parsed.id.includes(':equip')) result.forcedSlot = equipSlotFor(targetPlayer, parsed.slot, cardData, mode);
             result.isRoleArea = !!result.area;
         } else if (GameState[parsed.id]) result.area = GameState[parsed.id];
         return result;
@@ -240,7 +244,6 @@
 
         let targetArea = null;
         let moveRole = null;
-        let animationHint = null;
         // 修正：当前操作者应与 UI 显示的"主视角角色"一致（perspectiveIndex）
         const perspIdx = (GameState.perspectiveIndex != null) ? GameState.perspectiveIndex : 0;
         const currentPlayer = GameState.players[perspIdx] || GameState.players[0];
@@ -249,12 +252,12 @@
         targetArea = targetInfo.area;
         if (targetArea) {
             moveRole = currentPlayer;
-            if (targetInfo.isRoleArea) animationHint = targetZoneId;
         }
 
         if (targetArea) {
             // Game Core movedAtPosition 是 1-based index
             let finalTargetIndex = targetIndex;
+            if (targetInfo.forcedSlot >= 0) finalTargetIndex = targetInfo.forcedSlot;
             if (targetInfo.appendToEnd && finalTargetIndex === -1) finalTargetIndex = 9999;
 
             // 如果索引无效 (<0)，Core 通常使用 9999 代表追加到末尾
@@ -267,10 +270,6 @@
             // cardData 是 Card 对象 (or String)
             // Delegate to Controller to handle mode-specific logic
             if (window.Game.Controller?.dispatch) {
-                // 用于动画接管的起始位置
-                const startRect = (options && options.startRect) ? options.startRect : null;
-                const cardHTML = (options && options.cardHTML) ? options.cardHTML : null;
-                const dragElement = (options && options.dragElement) ? options.dragElement : null;
                 const isDrag = !!(options && options.isDrag);
 
                 window.Game.Controller.dispatch('move', {
@@ -281,11 +280,7 @@
                     fromArea: sourceArea, 
                     fromIndex: sourceIndex, 
                     callbacks,
-                    isDrag, // 标记来自拖拽，跳过 CardMoveAnimator
-                    startRect,
-                    animationHint, // 显式传递动画目标线索
-                    cardHTML, // 显式传递卡牌外观
-                    dragElement // 显式传递拖拽元素本体
+                    isDrag // 标记来自拖拽，跳过 CardMoveAnimator
                 });
             } else {
                 // Fallback to direct event trigger (Legacy/Auto)
