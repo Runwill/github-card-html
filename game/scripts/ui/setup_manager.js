@@ -53,7 +53,7 @@
         const countSelect = byId('setup-player-count-select');
         if (countSelect) {
             countSelect.addEventListener('change', (e) => {
-                renderPlayerSlots(parseInt(e.target.value));
+                renderPlayerSlots(parseInt(e.target.value, 10));
             });
         }
 
@@ -85,7 +85,7 @@
         if (spectateToggle) {
             bindClickToggle(spectateToggle, () => {
                 const newVal = spectateToggle.dataset.value !== 'true';
-                setToggle(spectateToggle, newVal, newVal ? '是' : '否');
+                setToggle(spectateToggle, newVal, t(newVal ? 'common.yes' : 'common.no'));
 
                 // 广播到房间
                 if (window.Game.Online?.RoomUI) {
@@ -110,7 +110,7 @@
     function updateSeatCountOptions() {
         const countSelect = byId('setup-player-count-select');
         if (!countSelect) return;
-        const prevValue = parseInt(countSelect.value) || 4;
+        const prevValue = parseInt(countSelect.value, 10) || 4;
         const min = (currentMode === 'auto') ? 2 : 1;
         const max = 10;
 
@@ -129,7 +129,7 @@
             countSelect.value = min;
         }
 
-        renderPlayerSlots(parseInt(countSelect.value));
+        renderPlayerSlots(parseInt(countSelect.value, 10));
     }
 
     /**
@@ -181,7 +181,7 @@
                     const toggle = byId('setup-allow-spectate-toggle');
                     if (toggle) {
                         const allowed = room.allowSpectate !== false;
-                        setToggle(toggle, allowed, allowed ? '是' : '否');
+                        setToggle(toggle, allowed, t(allowed ? 'common.yes' : 'common.no'));
                     }
                 }
             }
@@ -210,7 +210,7 @@
 
         // 初始渲染
         const countSelect = byId('setup-player-count-select');
-        const count = countSelect ? parseInt(countSelect.value) : 4;
+        const count = countSelect ? parseInt(countSelect.value, 10) : 4;
         renderPlayerSlots(count);
     }
 

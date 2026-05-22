@@ -82,8 +82,8 @@
             startY = e.clientY;
             
             const style = window.getComputedStyle(modalContent);
-            initialLeft = parseInt(style.left) || 0;
-            initialTop = parseInt(style.top) || 0;
+            initialLeft = parseInt(style.left, 10) || 0;
+            initialTop = parseInt(style.top, 10) || 0;
             
             modalContent.style.cursor = 'grabbing';
             document.body.style.userSelect = 'none';

@@ -178,7 +178,7 @@
         flattenAreaTree(player.hand, areas);
         flattenAreaTree(player.judgeArea, areas);
         flattenAreaTree(player.equipArea, areas);
-        getEquipSlotAreas(player).forEach(area => flattenAreaTree(area, areas));
+        if (getAreaChildren(player.equipArea).length === 0) getEquipSlotAreas(player).forEach(area => flattenAreaTree(area, areas));
         return areas;
     }
 
@@ -187,7 +187,7 @@
         if (!gs) return [];
         const playerAreas = [];
         const globalAreas = [];
-        (gs.players || []).forEach(player => getPlayerAreas(player).forEach(area => flattenAreaTree(area, playerAreas)));
+        (gs.players || []).forEach(player => playerAreas.push(...getPlayerAreas(player)));
         [gs.pile, gs.discardPile, gs.treatmentArea].forEach(area => flattenAreaTree(area, globalAreas));
         return options.playersFirst ? playerAreas.concat(globalAreas) : globalAreas.concat(playerAreas);
     }
@@ -281,7 +281,7 @@
 
         const parts = String(path).split(':');
         if (parts[0] === 'player' && gs.players) {
-            const player = gs.players[parseInt(parts[1])];
+            const player = gs.players[parseInt(parts[1], 10)];
             if (!player) return null;
             if (parts[2] === 'hand') return player.hand;
             if (parts[2] === 'judgeArea') return player.judgeArea;

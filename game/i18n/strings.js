@@ -15,6 +15,8 @@
         'game.endTurn': '结束回合',
         'game.nextStep': '下一步',
         'game.playCard': '使用/打出牌',
+        'common.yes': '是',
+        'common.no': '否',
 
         // Online Room
         'online.room': '在线房间',
@@ -55,6 +57,7 @@
         'online.spectate': '旁观',
         'online.cancelSpectate': '取消旁观',
         'online.spectating': '旁观中',
+        'online.noSpectate': '禁止旁观',
     };
 
     const en = {
@@ -73,6 +76,8 @@
         'game.endTurn': 'End Turn',
         'game.nextStep': 'Next Step',
         'game.playCard': 'Use/Play Card',
+        'common.yes': 'Yes',
+        'common.no': 'No',
 
         // Online Room
         'online.room': 'Online Room',
@@ -113,6 +118,7 @@
         'online.spectate': 'Spectate',
         'online.cancelSpectate': 'Cancel Spectate',
         'online.spectating': 'Spectating',
+        'online.noSpectate': 'No Spectators',
     };
 
     if (window.I18N_STRINGS) {

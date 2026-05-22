@@ -171,7 +171,7 @@
                     <span class="room-item-status">
                         <span class="room-item-users">${room.userCount} ${t('online.players')}</span>
                         ${room.gameStarted ? `<span class="room-item-tag gaming">${t('online.gaming')}</span>` : `<span class="room-item-tag waiting">${t('online.waiting')}</span>`}
-                        ${noSpectate ? `<span class="room-item-tag no-spectate">禁止旁观</span>` : ''}
+                        ${noSpectate ? `<span class="room-item-tag no-spectate">${t('online.noSpectate')}</span>` : ''}
                     </span>
                 </div>
                 <div class="room-item-actions">
@@ -460,7 +460,7 @@
             const toggle = document.getElementById('setup-allow-spectate-toggle');
             if (toggle) {
                 toggle.dataset.value = String(!!data.value);
-                toggle.textContent = data.value ? '是' : '否';
+                toggle.textContent = data.value ? t('common.yes') : t('common.no');
                 toggle.classList.toggle('is-active', !!data.value);
                 toggle.setAttribute('aria-pressed', data.value ? 'true' : 'false');
             }

@@ -14,7 +14,7 @@
         if (!areaPath) return null;
         const parts = areaPath.split(':');
         if (parts[0] !== 'player') return null;
-        const index = parseInt(parts[1]);
+        const index = parseInt(parts[1], 10);
         return Number.isFinite(index) ? index : null;
     }
 

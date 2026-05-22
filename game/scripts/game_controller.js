@@ -74,7 +74,7 @@
         if (typeof identifier === 'string' && (identifier.startsWith('role:') || identifier.startsWith('role-judge:'))) {
             const isJudge = identifier.startsWith('role-judge:');
             const isEquip = identifier.includes(':equip');
-            const roleId = parseInt(identifier.split(':')[1]);
+            const roleId = parseInt(identifier.split(':')[1], 10);
             const p = gs.players.find(pl => pl.id === roleId);
             if (p) {
                 if (isEquip) {

@@ -47,6 +47,12 @@
 
     function isCardDragging() { return !!window.Game.UI.DragState?.isDragging; }
 
+    function escapeHtml(value) {
+        const div = document.createElement('div');
+        div.textContent = value == null ? '' : String(value);
+        return div.innerHTML;
+    }
+
     /**
      * 设置手牌检视器 (Hand Inspector)
      * 类似 PileInspector，允许点击角色头像/摘要查看其手牌
@@ -66,8 +72,8 @@
             let isLongPress = false;
             
             const startPress = (e) => {
-                 // Check valid left click & no drag
-                 if (e.button !== 0) return;
+                  // Check valid left click & no drag
+                  if (e.button != null && e.button !== 0) return;
                  if (isCardDragging()) return;
                  
                  isLongPress = false;
@@ -299,7 +305,7 @@
         if (container.dataset.viewerKey !== key) {
             container.dataset.viewerKey = key;
             container.innerHTML = viewers.map(v =>
-                `<span class="online-viewer-label${v.spectating ? ' is-spectator' : ''}">${v.username}</span>`
+                `<span class="online-viewer-label${v.spectating ? ' is-spectator' : ''}">${escapeHtml(v.username)}</span>`
             ).join('');
         }
         syncTopRowReserve();

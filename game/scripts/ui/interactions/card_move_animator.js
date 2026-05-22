@@ -65,11 +65,6 @@
         return Targets?.resolveAreaForPath?.(areaPath) || null;
     }
 
-    function findCardInArea(areaObj, cardId) {
-        if (!areaObj || !areaObj.cards) return null;
-        return areaObj.cards.find(c => c && c.id === cardId) || null;
-    }
-
     function parseCssPx(value, fallback) {
         const num = parseFloat(value);
         return Number.isFinite(num) && num > 0 ? num : fallback;
@@ -168,7 +163,7 @@
         const fromContainer = getContainerForArea(fromAreaPath);
         const fromAreaObj = resolveAreaForPath(fromAreaPath);
         const toAreaObj = resolveAreaForPath(toAreaPath);
-        const cardObj = findCardInArea(fromAreaObj, cardId);
+        const cardObj = window.Game.Models?.findCardById?.(cardId, window.Game.GameState, { playersFirst: true }) || null;
 
         let cardRect = null;
 

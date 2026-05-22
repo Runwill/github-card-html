@@ -29,6 +29,15 @@
         }
     }
 
+    function renderAreaHeader(elementId, area, fallbackKey, GameText) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        const key = area?.name || fallbackKey;
+        el.setAttribute('data-area-name', fallbackKey);
+        el.setAttribute('data-inspector-type', 'area');
+        window.Game.UI.safeRender(el, GameText.render(key), `area:${key}`);
+    }
+
     /**
      * 渲染公共区域 (Public Board Areas)
      * e.g. 处理区 (Treatment Area), 牌堆 (Pile) 等
@@ -38,17 +47,7 @@
 
         // 1. 处理区 (Treatment Area)
         if (GameState.treatmentArea) {
-            const el = document.getElementById('header-treatment-area');
-            if (el) {
-                el.setAttribute('data-area-name', 'treatmentArea');
-                el.setAttribute('data-inspector-type', 'area');
-                
-                const key = GameState.treatmentArea.name || 'treatmentArea';
-                const renderKey = `area:${key}`;
-
-                // 使用 safeRender 替代手动脏检查，现在 render_utils.js 已确保加载
-                window.Game.UI.safeRender(el, GameText.render(key), renderKey);
-            }
+            renderAreaHeader('header-treatment-area', GameState.treatmentArea, 'treatmentArea', GameText);
             // 渲染卡牌
             const container = document.getElementById('treatment-area-container');
             if (container && GameState.treatmentArea) {
@@ -66,23 +65,13 @@
 
         // 2. 牌堆 (Draw Pile)
         if (GameState.pile) {
-            const el = document.getElementById('header-pile');
-            if (el) {
-                el.setAttribute('data-inspector-type', 'area');
-                el.setAttribute('data-area-name', 'pile');
-                window.Game.UI.safeRender(el, GameText.render('pile'), 'area:pile');
-            }
+            renderAreaHeader('header-pile', GameState.pile, 'pile', GameText);
         }
         renderPileLikeArea('pile-container', GameState.pile, 'pile', true);
 
         // 3. 弃牌堆 (Discard Pile)
         if (GameState.discardPile) {
-            const el = document.getElementById('header-discard-pile');
-            if (el) {
-                el.setAttribute('data-inspector-type', 'area');
-                el.setAttribute('data-area-name', 'discardPile');
-                window.Game.UI.safeRender(el, GameText.render('discardPile'), 'area:discardPile');
-            }
+            renderAreaHeader('header-discard-pile', GameState.discardPile, 'discardPile', GameText);
         }
         renderPileLikeArea('discard-pile-container', GameState.discardPile, 'discardPile', false);
     }

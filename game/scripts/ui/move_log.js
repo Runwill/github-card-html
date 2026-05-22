@@ -13,6 +13,10 @@
     const MAX_LOG_ENTRIES = 200;
     let logEntries = [];
 
+    function roleCharacterName(role) {
+        return window.Game.UI._RoleUtils?.roleCharacterKey?.(role) || (role && role.name) || '';
+    }
+
     /**
      * 将区域路径转换为包含动态术语标签的 HTML
      * 使用 GameText 渲染区域名和角色名，使其拥有动态术语系统的悬浮/点击交互
@@ -25,15 +29,12 @@
         // 辅助：生成位置标签 HTML
         const posHTML = (n) => '<span class="move-log-pos">第' + (n + 1) + '张</span>';
 
-        // 装备槽索引 → 术语映射
-        const EQUIP_SLOT_TERMS = ['weaponSlot', 'armorSlot', 'defensiveSlot', 'offensiveSlot'];
-
         // ── 全局区域：pile:N, discardPile:N, treatmentArea:N ──
         const globalMatch = areaPath.match(/^(pile|discardPile|treatmentArea)(?::(\d+))?$/);
         if (globalMatch) {
             const areaHTML = GameText.render(globalMatch[1]);
             if (globalMatch[2] != null) {
-                return areaHTML + posHTML(parseInt(globalMatch[2]));
+                return areaHTML + posHTML(parseInt(globalMatch[2], 10));
             }
             return areaHTML;
         }
@@ -41,15 +42,15 @@
         // ── 玩家区域：player:X:subArea 或 player:X:subArea:N ──
         const playerMatch = areaPath.match(/^player:(\d+):(.+)$/);
         if (playerMatch && GameText) {
-            const playerIdx = parseInt(playerMatch[1]);
+            const playerIdx = parseInt(playerMatch[1], 10);
             const rest = playerMatch[2]; // hand:3, judgeArea:1, equip:2
             const gs = window.Game.GameState;
             const player = gs && gs.players ? gs.players[playerIdx] : null;
             const playerNameHTML = player
-                ? GameText.render('Character', { id: player.characterId, name: player.name })
+                ? GameText.render('Character', { id: player.characterId, name: roleCharacterName(player) })
                 : `P${playerIdx + 1}`;
 
-            const areaWithPosition = (termKey, index) => GameText.render(termKey) + (index != null ? posHTML(parseInt(index)) : '');
+            const areaWithPosition = (termKey, index) => GameText.render(termKey) + (index != null ? posHTML(parseInt(index, 10)) : '');
             let areaTermHTML = '';
 
             // hand 或 hand:N
@@ -63,9 +64,9 @@
             // equip:slotIdx 或 equip:slotIdx:N（slotIdx 本身就是位置，无需额外标注）
             const equipMatch = !handMatch && !judgeMatch && rest.match(/^equip:(\d+)/);
             if (equipMatch) {
-                const slotIdx = parseInt(equipMatch[1]);
+                const slotIdx = parseInt(equipMatch[1], 10);
                 const area = window.Game.Models?.resolveAreaByPath?.(`player:${playerIdx}:equip:${slotIdx}`, gs);
-                const termKey = area?.labelKey || area?.slotKey || EQUIP_SLOT_TERMS[slotIdx] || 'equipArea';
+                const termKey = area?.labelKey || area?.slotKey || window.Game.Models?.EQUIP_SLOT_KEYS?.[slotIdx] || 'equipArea';
                 areaTermHTML = GameText.render(termKey);
             }
 
@@ -134,7 +135,7 @@
 
         const entry = {
             timestamp: Date.now(),
-            moverName: moveRole ? moveRole.name : null,
+            moverName: moveRole ? roleCharacterName(moveRole) : null,
             moverCharacterId: moveRole ? moveRole.characterId : null,
             moverId: moveRole ? moveRole.id : null,
             cardName: card ? (card.name || card.key || 'unknown') : 'unknown',

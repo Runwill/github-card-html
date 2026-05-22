@@ -10,6 +10,7 @@
     window.Game.Online = window.Game.Online || {};
 
     const Client = () => window.Game.Online.RoomClient;
+    const AREA_METADATA_KEYS = ['apartOrTogether', 'centered', 'forOrAgainst', 'fixedSlots', 'slotIndex', 'slotKey', 'labelKey', 'renderEmpty', 'capacity', 'acceptsDirectCards', 'isSlotArea'];
 
     // 当前房间内的视角映射: perspectiveIndex -> [{ userId, username }]
     let perspectives = {};
@@ -62,23 +63,21 @@
         };
     }
 
+    function areaMetadataFrom(source) {
+        const metadata = {};
+        AREA_METADATA_KEYS.forEach(key => {
+            if (source && source[key] !== undefined) metadata[key] = source[key];
+        });
+        return metadata;
+    }
+
     function serializeArea(area) {
         if (!area) return null;
         const childAreas = window.Game.Models?.getAreaChildren?.(area) || [];
         return {
             name: area.name,
             cards: area.cards.map(c => serializeCard(c)),
-            apartOrTogether: area.apartOrTogether,
-            centered: area.centered,
-            forOrAgainst: area.forOrAgainst,
-            fixedSlots: area.fixedSlots,
-            slotIndex: area.slotIndex,
-            slotKey: area.slotKey,
-            labelKey: area.labelKey,
-            renderEmpty: area.renderEmpty,
-            capacity: area.capacity,
-            acceptsDirectCards: area.acceptsDirectCards,
-            isSlotArea: area.isSlotArea,
+            ...areaMetadataFrom(area),
             childAreas: childAreas.map(child => serializeArea(child))
         };
     }
@@ -197,19 +196,7 @@
 
     function deserializeArea(data, name, Area) {
         if (!data) return new Area(name);
-        const area = new Area(data.name || name, {
-            apartOrTogether: data.apartOrTogether,
-            centered: data.centered,
-            forOrAgainst: data.forOrAgainst,
-            fixedSlots: data.fixedSlots,
-            slotIndex: data.slotIndex,
-            slotKey: data.slotKey,
-            labelKey: data.labelKey,
-            renderEmpty: data.renderEmpty,
-            capacity: data.capacity,
-            acceptsDirectCards: data.acceptsDirectCards,
-            isSlotArea: data.isSlotArea
-        });
+        const area = new Area(data.name || name, areaMetadataFrom(data));
         area.cards = (data.cards || []).map(c => {
             const card = deserializeCard(c, window.Game.Models.Card);
             if (card) card.lyingArea = area;
@@ -223,7 +210,7 @@
 
     function restoreAreaMetadata(area, data) {
         if (!area || !data) return;
-        ['apartOrTogether', 'centered', 'forOrAgainst', 'fixedSlots', 'slotIndex', 'slotKey', 'labelKey', 'renderEmpty', 'capacity', 'acceptsDirectCards', 'isSlotArea'].forEach(key => {
+        AREA_METADATA_KEYS.forEach(key => {
             if (data[key] !== undefined) area[key] = data[key];
         });
     }

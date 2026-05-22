@@ -46,6 +46,74 @@
 - 浏览器验证时同时断言标题/状态和内容行来自同一版数据。
 - 对缓存类 bug，最终至少验证一次运行时数据 shape 与 UI 渲染结果。
 
+## 临时 UI 状态覆盖动态 HTML 词元
+
+**现象信号**
+
+- 角色名、术语、卡牌名等本来由 `GameText.render()` 或替换系统生成，经过 hover、拖拽、临时提示、激活态切换后变成纯文本。
+- 第一次临时状态正常，恢复后再次进入临时状态不更新，或 `data-render-key` 看似正确但 DOM 内容仍停留在旧状态。
+- 使用 `innerText` / `textContent` 临时替换包含动态词元的节点，或手动 `innerHTML` 恢复但没有同步 `safeRender` 的 `__lastRenderedContent`。
+
+**常见误导**
+
+- 只看恢复后的可见文字是否一样，忽略动态词元 HTML、悬停、双击跳转和高亮能力是否还在。
+- 以为恢复 `innerHTML` 和 `data-render-key` 就够了，漏掉 `safeRender()` 还维护影子内容缓存。
+- 只测第一次 hover/drag 状态，不重复进入同一临时状态。
+
+**根因模式**
+
+- 动态词元 DOM 同时受业务 render key、替换系统和临时 UI 状态影响；临时状态若直接写文本，会破坏语义 HTML。
+- `safeRender()` 使用 `data-render-key` 和 `__lastRenderedContent` 跳过重复渲染；手动改 DOM 后若不维护这两个状态，后续可能跳过本该发生的更新。
+
+**排查步骤**
+
+1. 搜索目标区域中的 `innerText =`、`textContent =`、手动 `innerHTML =` 和 `data-render-key` 操作。
+2. 检查临时状态进入前是否保存 `innerHTML`、`data-render-key` 和 `__lastRenderedContent`，恢复时是否三者一起还原。
+3. 重复触发两次临时状态，验证第二次仍会显示临时内容并能恢复动态词元。
+4. 对角色名、术语、卡牌名，验证恢复后 hover、高亮和双击跳转仍由动态 HTML 词元承载。
+
+**修复方向**
+
+- 临时显示也优先用 `GameText.render()` / `safeRender()`，不要用纯文本覆盖动态词元节点。
+- 保存并恢复原始 `innerHTML`、`data-render-key` 和 `__lastRenderedContent`；常规渲染路径也统一消费 `safeRender()`，避免平行状态 owner。
+
+**验证入口**
+
+- 导航栏点对局 → 开始沙盒对局 → 从主视角手牌拖到其他角色摘要并悬停到判定区状态，松开或移出后确认角色名恢复为动态词元。
+- 重复同一悬停流程两次，确认第二次仍显示判定区临时标签，恢复后角色名 hover/双击行为仍正常。
+
+## 共用鼠标/触摸入口时误用 MouseEvent 字段
+
+**现象信号**
+
+- 同一功能桌面点击或长按可用，移动端触摸无响应。
+- 代码同时绑定了 `mousedown` / `touchstart`，但共用 handler 一进入就检查 `event.button`、`event.buttons` 或鼠标专属字段。
+- 没有报错，逻辑只是提前 `return`。
+
+**常见误导**
+
+- 看到 `touchstart` 已绑定就以为移动端入口存在，没有继续检查共用 handler 的第一层 guard。
+- 只在桌面浏览器用鼠标验证长按/拖拽，不模拟触摸事件对象。
+
+**根因模式**
+
+- `TouchEvent` 没有 `button` 字段；写成 `if (event.button !== 0) return` 会把触摸事件当作非左键过滤掉。
+
+**排查步骤**
+
+1. 搜索同时绑定鼠标和触摸事件的函数，检查共用 handler 是否读取鼠标专属字段。
+2. 对 `event.button` 使用存在性判断：只有字段存在时才校验左键。
+3. 用触摸模拟或移动端设备验证长按、拖拽和点击取消路径。
+
+**修复方向**
+
+- 将左键判断写成 `if (event.button != null && event.button !== 0) return`，或为鼠标/触摸拆分输入归一化层。
+- 验证 `touchend` 后的 click 兼容路径，避免长按触发后又执行短按点击。
+
+**验证入口**
+
+- 导航栏点对局 → 移动端/触摸模拟 → 长按角色摘要，确认能打开判定区检视；短按仍打开手牌检视。
+
 ## 移牌动画端点、外观与布局 owner 分裂
 
 **现象信号**

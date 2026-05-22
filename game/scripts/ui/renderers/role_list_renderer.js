@@ -55,6 +55,37 @@
                 const originalZoneId = `role:${role.id}`;
                 const judgeZoneId = `role-judge:${role.id}`;
 
+                const restoreSummaryName = () => {
+                    const nameEl = pEl.querySelector('.player-name');
+                    if (!nameEl || nameEl._origNameHTML == null) return;
+                    nameEl.innerHTML = nameEl._origNameHTML;
+                    nameEl.__lastRenderedContent = nameEl._origRenderedContent != null ? nameEl._origRenderedContent : nameEl._origNameHTML;
+                    if (nameEl._origRenderKey == null) nameEl.removeAttribute('data-render-key');
+                    else nameEl.setAttribute('data-render-key', nameEl._origRenderKey);
+                    delete nameEl._origNameHTML;
+                    delete nameEl._origRenderedContent;
+                    delete nameEl._origRenderKey;
+                    fitSummaryName(nameEl);
+                };
+
+                const showJudgeSummaryName = () => {
+                    const nameEl = pEl.querySelector('.player-name');
+                    if (!nameEl) return;
+                    if (nameEl._origNameHTML == null) {
+                        nameEl._origNameHTML = nameEl.innerHTML;
+                        nameEl._origRenderedContent = nameEl.__lastRenderedContent;
+                        nameEl._origRenderKey = nameEl.getAttribute('data-render-key');
+                    }
+                    const judgeHTML = GameText?.render?.('judgeArea') || '判定区';
+                    const renderKey = `summary-judge:${role.id}`;
+                    if (window.Game.UI.safeRender) window.Game.UI.safeRender(nameEl, judgeHTML, renderKey);
+                    else {
+                        nameEl.innerHTML = judgeHTML;
+                        nameEl.setAttribute('data-render-key', renderKey);
+                    }
+                    fitSummaryName(nameEl);
+                };
+
                 const clearHoverTimer = () => {
                     if (dragHoverTimer) {
                         clearTimeout(dragHoverTimer);
@@ -63,11 +94,7 @@
                     if (pEl.getAttribute('data-drop-zone') === judgeZoneId) {
                          pEl.setAttribute('data-drop-zone', originalZoneId);
                          pEl.classList.remove('judge-area-active');
-                         const nameEl = pEl.querySelector('.player-name');
-                         if (nameEl && nameEl._origName) {
-                             nameEl.innerText = nameEl._origName;
-                             delete nameEl._origName;
-                         }
+                         restoreSummaryName();
                     }
                 };
 
@@ -80,12 +107,7 @@
                     dragHoverTimer = setTimeout(() => {
                         pEl.setAttribute('data-drop-zone', judgeZoneId);
                         pEl.classList.add('judge-area-active');
-                        
-                        const nameEl = pEl.querySelector('.player-name');
-                        if (nameEl) {
-                            nameEl._origName = nameEl.innerText;
-                            nameEl.innerText = "判定区";
-                        }
+                        showJudgeSummaryName();
                     }, 400);
                 };
 
@@ -174,12 +196,16 @@
             const nameSpan = pEl.querySelector('.player-name');
             const key = roleCharacterKey(role);
             const renderKey = role.characterId ? `char:${role.characterId}:${key}` : `char:default:${key}`;
-            if (nameSpan.getAttribute('data-render-key') !== renderKey) {
-                const newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
+            const newNameHtml = GameText.render('Character', { id: role.characterId, name: key });
+            const didRenderName = window.Game.UI.safeRender
+                ? window.Game.UI.safeRender(nameSpan, newNameHtml, renderKey)
+                : nameSpan.getAttribute('data-render-key') !== renderKey;
+            if (didRenderName && !window.Game.UI.safeRender) {
                 nameSpan.innerHTML = newNameHtml;
                 nameSpan.setAttribute('data-render-key', renderKey);
-                fitSummaryName(nameSpan);
+                nameSpan.__lastRenderedContent = newNameHtml;
             }
+            if (didRenderName) fitSummaryName(nameSpan);
             
             // 判定区牌数
             const judgeCountSpan = pEl.querySelector('.player-judge-count');
@@ -259,7 +285,7 @@
         allContainers.forEach(container => {
             if (!container) return;
             Array.from(container.children).forEach(child => {
-                const id = parseInt(child.id.replace('player-summary-', ''));
+                const id = parseInt(child.id.replace('player-summary-', ''), 10);
                 const playerExists = GameState.players.find(p => p.id === id);
                 const isMainNow = perspectivePlayer && perspectivePlayer.id === id;
 

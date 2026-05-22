@@ -35,35 +35,13 @@
         };
     }
 
-    function playerById(roleId) {
-        const players = state()?.players || [];
-        const playerIndex = players.findIndex(player => player && player.id === roleId);
-        return playerIndex >= 0 ? playerByIndex(playerIndex) : null;
-    }
-
     function areaPathInfo(areaPath) {
         const parts = String(areaPath || '').split(':');
         if (parts[0] !== 'player') return null;
-        const playerIndex = parseInt(parts[1]);
+        const playerIndex = parseInt(parts[1], 10);
         if (!Number.isFinite(playerIndex)) return null;
         const info = playerByIndex(playerIndex);
-        return info ? { ...info, areaType: parts[2], slotIndex: parseInt(parts[3]) } : null;
-    }
-
-    function dropZoneInfo(zoneId) {
-        const parts = String(zoneId || '').split(':');
-        if (parts[0] === 'role-judge') {
-            const roleId = parseInt(parts[1]);
-            return Number.isFinite(roleId) ? { roleId, areaType: 'judgeArea', slotIndex: -1 } : null;
-        }
-        if (parts[0] !== 'role') return null;
-        const roleId = parseInt(parts[1]);
-        if (!Number.isFinite(roleId)) return null;
-        if (parts[2] === 'equip') {
-            const slotIndex = parts[3] === 'slot' ? parseInt(parts[4]) : -1;
-            return { roleId, areaType: 'equip', slotIndex: Number.isFinite(slotIndex) ? slotIndex : -1 };
-        }
-        return { roleId, areaType: 'hand', slotIndex: -1 };
+        return info ? { ...info, areaType: parts[2], slotIndex: parseInt(parts[3], 10) } : null;
     }
 
     function resolveAreaForPath(areaPath) {
@@ -72,21 +50,7 @@
     }
 
     function resolveAreaForDropZone(zoneId) {
-        const gameState = state();
-        if (!zoneId || !gameState) return null;
-        if (zoneId === 'hand') return gameState.players?.[gameState.perspectiveIndex ?? 0]?.hand || null;
-        if (gameState[zoneId]) return gameState[zoneId];
-
-        const zone = dropZoneInfo(zoneId);
-        const info = zone && playerById(zone.roleId);
-        if (!info) return null;
-        if (zone.areaType === 'judgeArea') return info.player.judgeArea;
-        if (zone.areaType === 'equip') {
-            return zone.slotIndex >= 0
-                ? (window.Game.Models?.getEquipSlotArea?.(info.player, zone.slotIndex) || null)
-                : (window.Game.Models?.getDefaultEquipSlotArea?.(info.player) || null);
-        }
-        return info.player.hand;
+        return window.Game._ControllerInternal?.resolveArea?.(zoneId) || null;
     }
 
     function zoneIdsForPath(areaPath) {
@@ -152,19 +116,9 @@
         if (zoneId === 'hand') return document.getElementById('hand-cards-container');
         const globalElement = globalAreaElement(zoneId);
         if (globalElement) return globalElement;
-
-        const zone = dropZoneInfo(zoneId);
-        const info = zone && playerById(zone.roleId);
-        if (!info) return null;
-        if (!info.isSelf) return document.getElementById(`player-summary-${info.player.id}`);
-        if (zone.areaType === 'judgeArea') return document.getElementById('char-judge-count')
-            || document.querySelector('.main-judge-btn')
-            || document.querySelector('.current-character-panel .char-avatar')
-            || document.querySelector('.current-character-panel');
-        if (zone.areaType === 'equip') return document.querySelector('.main-equip-btn')
-            || document.querySelector('.current-character-panel .char-avatar')
-            || document.querySelector('.current-character-panel');
-        return document.getElementById('hand-cards-container') || document.querySelector('.current-character-panel');
+        const area = resolveAreaForDropZone(zoneId);
+        const areaPath = window.Game.Models?.getAreaPath?.(area, state());
+        return fallbackAnchorForPath(areaPath);
     }
 
     function findCardElement(container, cardId, area, targetIndex = -1) {

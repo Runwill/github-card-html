@@ -196,7 +196,7 @@
     function splitSlotAreaId(areaId) {
         if (!areaId || !areaId.includes(':slot:')) return { id: areaId, slot: -1 };
         const parts = areaId.split(':slot:');
-        const slotIdx = parseInt(parts[1]);
+        const slotIdx = parseInt(parts[1], 10);
         return { id: parts[0], slot: isNaN(slotIdx) ? -1 : slotIdx };
     }
 
@@ -225,7 +225,7 @@
             result.area = equipAreaFor(currentPlayer, parsed.slot, cardData, mode);
         } else if (parsed.id === 'treatmentArea') result.area = GameState.treatmentArea;
         else if (parsed.id && (parsed.id.startsWith('role:') || parsed.id.startsWith('role-judge:'))) {
-            const roleId = parseInt(parsed.id.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));
+            const roleId = parseInt(parsed.id.replace('role-judge:', '').replace('role:', '').replace(':equip', ''), 10);
             const targetPlayer = GameState.players.find(p => p.id === roleId);
             result.area = roleAreaFor(targetPlayer, parsed.id, parsed.slot, cardData, mode);
             result.isRoleArea = !!result.area;
