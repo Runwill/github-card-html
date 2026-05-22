@@ -197,8 +197,9 @@
     }
 
     function renderEquipNames(container, role, GameText) {
-        if (!container || !role || !role.equipSlots) return;
-        const equipNames = role.equipSlots
+        if (!container || !role) return;
+        const equipSlots = window.Game.Models?.getEquipSlotAreas?.(role) || [];
+        const equipNames = equipSlots
             .map(slot => (slot.cards && slot.cards.length > 0) ? slot.cards[0].name : null)
             .filter(Boolean);
         const equipKey = equipNames.join(',');

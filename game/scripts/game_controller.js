@@ -47,26 +47,7 @@
 
     // 辅助函数：查找卡牌当前区域
     const findCardSource = (card) => {
-        if (!card) return null;
-        if (typeof card === 'object' && card.lyingArea) return card.lyingArea;
-        
-        // 在 GameState 中暴力搜索
-        const gs = window.Game.GameState;
-        if (!gs) return null;
-
-        if (gs.players) {
-            for (let p of gs.players) {
-                const areas = window.Game.Models?.getPlayerAreas?.(p) || [p.hand, p.judgeArea].concat(p.equipSlots || []);
-                for (const area of areas) {
-                    if (area && area.cards && area.cards.includes(card)) return area;
-                }
-            }
-        }
-        if (gs.pile && gs.pile.cards.includes(card)) return gs.pile;
-        if (gs.discardPile && gs.discardPile.cards.includes(card)) return gs.discardPile;
-        if (gs.treatmentArea && gs.treatmentArea.cards.includes(card)) return gs.treatmentArea;
-        
-        return null;
+        return window.Game.Models?.findCardArea?.(card, window.Game.GameState) || null;
     };
 
     // 辅助函数：解析区域标识符为对象 (支持 Manual Mode 直接拖拽)

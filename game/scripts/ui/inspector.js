@@ -263,7 +263,8 @@
     function describeRole(target) {
         const roleId = target.dataset.roleId || (target._role && target._role.id) || target._roleId;
         const role = target._role || findPlayer(roleId);
-        const equipCount = role && role.equipSlots ? role.equipSlots.reduce((sum, slot) => sum + countCards(slot), 0) : 0;
+        const equipSlots = window.Game?.Models?.getEquipSlotAreas?.(role) || [];
+        const equipCount = equipSlots.reduce((sum, slot) => sum + countCards(slot), 0);
         return {
             typeLabel: translate('game.inspector.type.role', 'Role'),
             title: role ? roleValue(role) : `#${roleId}`,

@@ -89,30 +89,7 @@
             // 如果缺少 fromArea，自动解析（健壮性修复）
             if (!fromArea && movedCard) {
                 const card = Array.isArray(movedCard) ? movedCard[0] : movedCard;
-                const gs = window.Game.GameState;
-                
-                // 1. 检查卡牌属性（如果是对象）
-                if (card && typeof card === 'object' && card.lyingArea) {
-                    fromArea = card.lyingArea;
-                }
-                
-                // 2. 在 GameState 中搜索（暴力搜索作为安全网）
-                if (!fromArea && gs) {
-                    // 检查玩家
-                    if (gs.players) {
-                        for (let p of gs.players) {
-                            const areas = window.Game.Models?.getPlayerAreas?.(p) || [p.hand, p.judgeArea].concat(p.equipSlots || []);
-                            for (const area of areas) {
-                                if (area && area.cards && area.cards.includes(card)) { fromArea = area; break; }
-                            }
-                            if (fromArea) break;
-                        }
-                    }
-                    // 检查牌堆（额外检查是否存在）
-                    if (!fromArea && gs.pile && gs.pile.cards.includes(card)) fromArea = gs.pile;
-                    if (!fromArea && gs.discardPile && gs.discardPile.cards.includes(card)) fromArea = gs.discardPile;
-                    if (!fromArea && gs.treatmentArea && gs.treatmentArea.cards.includes(card)) fromArea = gs.treatmentArea;
-                }
+                fromArea = window.Game.Models?.findCardArea?.(card, window.Game.GameState) || null;
             }
 
             // 输入: moveRole (Role/null), movedCard (Array), movedInArea (Area), movedAtPosition (int), fromArea (Area/null)

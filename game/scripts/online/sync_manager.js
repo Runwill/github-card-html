@@ -99,6 +99,7 @@
 
     function serializePlayer(player) {
         if (!player) return null;
+        const equipSlots = window.Game.Models?.getEquipSlotAreas?.(player) || (player.equipSlots || []);
         return {
             id: player.id,
             characterId: player.characterId,
@@ -115,7 +116,7 @@
             hand: serializeArea(player.hand),
             judgeArea: serializeArea(player.judgeArea),
             equipArea: serializeArea(player.equipArea),
-            equipSlots: player.equipSlots ? player.equipSlots.map(s => serializeArea(s)) : [],
+            equipSlots: equipSlots.map(s => serializeArea(s)),
             hp: player.health,
             maxHp: player.healthLimit,
             _originalData: player._originalData
@@ -244,7 +245,7 @@
             : (playerData?.equipSlots || []);
 
         childAreaData.forEach((slotData, slotIdx) => {
-            const slot = player.equipArea?.getChildArea?.(slotIdx) || player.equipSlots?.[slotIdx];
+            const slot = window.Game.Models?.getEquipSlotArea?.(player, slotIdx) || player.equipArea?.getChildArea?.(slotIdx) || player.equipSlots?.[slotIdx];
             if (slot && slotData) restoreAreaCards(slot, slotData, Card);
         });
     }
@@ -414,18 +415,7 @@
     }
 
     function findCardById(cardId) {
-        const gs = window.Game.GameState;
-        if (!gs) return null;
-
-        const roleAreas = (gs.players || []).flatMap(p => window.Game.Models?.getPlayerAreas?.(p) || [p.hand, p.judgeArea].concat(p.equipSlots || []));
-        const areas = [gs.pile, gs.discardPile, gs.treatmentArea].concat(roleAreas);
-
-        for (const area of areas) {
-            if (!area || !area.cards) continue;
-            const card = area.cards.find(c => c && c.id === cardId);
-            if (card) return card;
-        }
-        return null;
+        return window.Game.Models?.findCardById?.(cardId, window.Game.GameState) || null;
     }
 
     const resolveAreaByPath = (path) => window.Game.Models?.resolveAreaByPath?.(path) || null;

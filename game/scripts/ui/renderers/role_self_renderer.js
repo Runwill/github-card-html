@@ -153,9 +153,7 @@
                 mainEquipNames.className = 'player-equip-names';
                 charInfoPanel.appendChild(mainEquipNames);
             }
-            if (selfRole.equipSlots) {
-                renderEquipNames(mainEquipNames, selfRole, GameText);
-            }
+            renderEquipNames(mainEquipNames, selfRole, GameText);
         }
 
         // 手牌

@@ -222,9 +222,7 @@
         const result = { area: null, resolvedId: parsed.id, forcedSlot: parsed.slot, isRoleArea: false, appendToEnd: false };
         if (parsed.id === 'hand') result.area = currentPlayer.hand;
         else if (parsed.id === 'equipArea') {
-            result.area = mode === 'target'
-                ? equipAreaFor(currentPlayer, parsed.slot, cardData, mode)
-                : equipAreaFor(currentPlayer, parsed.slot, cardData, mode);
+            result.area = equipAreaFor(currentPlayer, parsed.slot, cardData, mode);
         } else if (parsed.id === 'treatmentArea') result.area = GameState.treatmentArea;
         else if (parsed.id && (parsed.id.startsWith('role:') || parsed.id.startsWith('role-judge:'))) {
             const roleId = parseInt(parsed.id.replace('role-judge:', '').replace('role:', '').replace(':equip', ''));

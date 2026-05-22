@@ -48,39 +48,7 @@
     }
 
     function resolveLocalArea(areaOrId) {
-        if (!areaOrId) return null;
-        if (typeof areaOrId === 'object') return areaOrId;
-        // If string identifier, use controller's resolveArea concept
-        const gs = window.Game.GameState;
-        if (!gs) return null;
-        if (gs[areaOrId]) return gs[areaOrId];
-
-        if (areaOrId === 'hand') {
-            const perspIdx = (gs.perspectiveIndex != null) ? gs.perspectiveIndex : 0;
-            const p = gs.players && gs.players[perspIdx];
-            return p ? p.hand : null;
-        }
-
-        if (typeof areaOrId === 'string' && (areaOrId.startsWith('role:') || areaOrId.startsWith('role-judge:'))) {
-            const isJudge = areaOrId.startsWith('role-judge:');
-            const isEquip = areaOrId.includes(':equip');
-            const roleId = parseInt(areaOrId.split(':')[1]);
-            const p = gs.players.find(pl => pl.id === roleId);
-            if (p) {
-                if (isJudge) return p.judgeArea;
-                if (isEquip) {
-                    const slotMatch = areaOrId.match(/:slot:(\d+)/);
-                    const slotIndex = slotMatch ? parseInt(slotMatch[1], 10) : -1;
-                    if (slotIndex >= 0) {
-                        return window.Game.Models?.getEquipSlotArea?.(p, slotIndex) || null;
-                    }
-                    return window.Game.Models?.getDefaultEquipSlotArea?.(p) || null;
-                }
-                return p.hand;
-            }
-        }
-
-        return null;
+        return window.Game._ControllerInternal?.resolveArea?.(areaOrId) || null;
     }
 
     /**

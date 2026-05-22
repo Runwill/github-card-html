@@ -24,7 +24,7 @@ user-invocable: true
 
 - 移牌和可见性以 `window.Game.Models.moveCardToArea()` 和 `applyCardVisibility()` 为中心，不在多个入口手写不同逻辑。
 - 牌的真实位置由 `Card.lyingArea` 和区域 `cards` 共同表达；修改后必须保持一致。
-- 装备区真实结构是 `player.equipSlots`。`player.equipArea` 是兼容代理，不应用作新逻辑的主要写入目标。
+- 装备区真实结构是 `player.equipArea` 的 child Areas；`player.equipSlots` 只作为兼容别名和便捷索引。新逻辑应通过 `Models.getEquipSlotAreas()`、`getEquipSlotArea()`、`getDefaultEquipSlotArea()` 或区域 path 解析到具体槽位，不再直接手写 `equipSlots` 解析。
 - 区域路径使用统一格式：`pile`、`discardPile`、`treatmentArea`、`player:N:hand`、`player:N:judgeArea`、`player:N:equip:M`。
 - 在线同步要同时考虑本地发起、远端接收、快照前后、`updateUI()` 后动画四个阶段。
 - 牌面可见性必须尊重区域规则：手牌默认仅拥有者可见，公共区按区域配置显示。

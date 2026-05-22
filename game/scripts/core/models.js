@@ -178,8 +178,33 @@
         flattenAreaTree(player.hand, areas);
         flattenAreaTree(player.judgeArea, areas);
         flattenAreaTree(player.equipArea, areas);
-        if (Array.isArray(player.equipSlots)) player.equipSlots.forEach(area => flattenAreaTree(area, areas));
+        getEquipSlotAreas(player).forEach(area => flattenAreaTree(area, areas));
         return areas;
+    }
+
+    function getGameAreas(gameState, options = {}) {
+        const gs = gameState || window.Game.GameState;
+        if (!gs) return [];
+        const playerAreas = [];
+        const globalAreas = [];
+        (gs.players || []).forEach(player => getPlayerAreas(player).forEach(area => flattenAreaTree(area, playerAreas)));
+        [gs.pile, gs.discardPile, gs.treatmentArea].forEach(area => flattenAreaTree(area, globalAreas));
+        return options.playersFirst ? playerAreas.concat(globalAreas) : globalAreas.concat(playerAreas);
+    }
+
+    function findCardArea(card, gameState) {
+        if (!card) return null;
+        if (typeof card === 'object' && card.lyingArea) return card.lyingArea;
+        return getGameAreas(gameState, { playersFirst: true }).find(area => area && Array.isArray(area.cards) && area.cards.includes(card)) || null;
+    }
+
+    function findCardById(cardId, gameState, options = {}) {
+        if (!cardId) return null;
+        for (const area of getGameAreas(gameState, options)) {
+            const card = area?.cards?.find(c => c && c.id === cardId);
+            if (card) return card;
+        }
+        return null;
     }
 
     function getVisibleRoleId(value) {
@@ -439,6 +464,9 @@
     window.Game.Models.getWritableArea = getWritableArea;
     window.Game.Models.getAreaCards = getAreaCards;
     window.Game.Models.getPlayerAreas = getPlayerAreas;
+    window.Game.Models.getGameAreas = getGameAreas;
+    window.Game.Models.findCardArea = findCardArea;
+    window.Game.Models.findCardById = findCardById;
     window.Game.Models.EQUIP_SLOT_KEYS = EQUIP_SLOT_KEYS;
 
 })();
