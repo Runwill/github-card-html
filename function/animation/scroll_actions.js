@@ -7,7 +7,7 @@
   let __currentOp = null;
   let __opSeq = 0;
 
-  function cancelCurrentOp(reason){
+  function cancelCurrentOp(){
     const op = __currentOp;
     __currentOp = null;
     if (!op) return;
@@ -204,7 +204,7 @@
     if (!scrollTarget) return
 
     // 1. 每次新操作前取消旧操作
-    cancelCurrentOp('new-op')
+    cancelCurrentOp()
 
     // 2. 切换 Tab (并判断是否跨面板)
     const switching = panelId ? !isPanelActive(panelId) : false
@@ -308,7 +308,7 @@
       try {
         const activeId = window.TabsUI?.getActivePanelId?.() || null
         if (__currentOp && activeId && __currentOp.panelId && activeId !== (__currentOp.panelId[0]==='#' ? __currentOp.panelId.slice(1) : __currentOp.panelId)) {
-          cancelCurrentOp('panel-changed')
+          cancelCurrentOp()
         }
       } catch(_) {}
     })

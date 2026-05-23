@@ -100,8 +100,6 @@
           container.appendChild(emptyOverlay(1));
           return;
         }
-      // 清理可能存在的空态覆盖
-      const existEmpty = container.querySelector('.empty-overlay'); if (existEmpty) existEmpty.remove();
       const abs = (u) => (endpoints && endpoints.abs ? endpoints.abs(u) : (u || ''));
       items.forEach(it => {
         let titleText;

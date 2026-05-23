@@ -172,7 +172,6 @@
                 }
               })
             });
-            try { body.scrollTop = 0; } catch(_){ }
             return;
           }
         }catch(_){ }

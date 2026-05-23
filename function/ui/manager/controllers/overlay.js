@@ -177,24 +177,6 @@
     hideBackdrop();
   }
 
-  /**
-   * 关闭指定面板（直接关闭，不返回上级）
-   * 用于背景点击或特殊按钮
-   */
-  function close(panelId) {
-    var idx = stack.indexOf(panelId);
-    if (idx === -1) return;
-
-    // 如果是栈顶，等同于 back()
-    if (idx === stack.length - 1) {
-      back();
-      return;
-    }
-
-    // 不在栈顶，从栈中移除（它已经是隐藏的）
-    stack.splice(idx, 1);
-  }
-
   /** 获取当前栈顶 */
   function current() {
     return stack.length > 0 ? stack[stack.length - 1] : null;
@@ -209,7 +191,6 @@
   w.CardUI.Manager.Controllers.overlay = {
     open: open,
     back: back,
-    close: close,
     closeAll: closeAll,
     current: current,
     isAnyOpen: isAnyOpen,

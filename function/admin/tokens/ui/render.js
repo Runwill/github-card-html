@@ -234,13 +234,13 @@
   if(!summaryEl.__bindTypeFilter){ summaryEl.__bindTypeFilter=true; const handler=(ev)=>{ const t= ev.target && ev.target.closest? ev.target.closest('.type-tile'): null; if(!t) return; const tp=t.getAttribute('data-type'); if(!tp) return; state.activeType = (state.activeType===tp)? null: tp; renderTokensDashboard(false); }; summaryEl.addEventListener('click', handler); summaryEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); handler(e); } }); }
   // 行内删除、整卡删除（仅管理员）
   if(canEdit){
-        if(!contentEl.__inlineDeleteBound){ window.tokensAdmin.bindInlineDelete && window.tokensAdmin.bindInlineDelete(contentEl); contentEl.__inlineDeleteBound=true; }
-        if(!contentEl.__deleteDocBound){ window.tokensAdmin.bindDeleteDoc && window.tokensAdmin.bindDeleteDoc(contentEl); contentEl.__deleteDocBound=true; }
+        window.tokensAdmin.bindInlineDelete?.(contentEl);
+        window.tokensAdmin.bindDeleteDoc?.(contentEl);
       }
   // 行内编辑、Jump 与 编辑弹窗对所有角色开放
-  if(!contentEl.__inlineEditBound){ window.tokensAdmin.bindInlineEdit && window.tokensAdmin.bindInlineEdit(contentEl); contentEl.__inlineEditBound=true; }
-      if(!contentEl.__goDocBound){ window.tokensAdmin.bindGo && window.tokensAdmin.bindGo(contentEl); contentEl.__goDocBound=true; }
-    if(!contentEl.__editDocBound){ window.tokensAdmin.bindEditDoc && window.tokensAdmin.bindEditDoc(contentEl); contentEl.__editDocBound=true; }
+  window.tokensAdmin.bindInlineEdit?.(contentEl);
+      window.tokensAdmin.bindGo?.(contentEl);
+    window.tokensAdmin.bindEditDoc?.(contentEl);
 
     // 只读角色点击删除时给出提示（编辑允许打开但无法保存）
   if(!canEdit && !contentEl.__readonlyToolbarBound){

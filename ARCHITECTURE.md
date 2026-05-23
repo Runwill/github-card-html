@@ -624,7 +624,7 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `index.js` | 初始化命名空间：`CardUI.Manager.Core`、`CardUI.Manager.Controllers` | `window.CardUI.Manager` |
 | `bootstrap.js` | 启动入口：等待 `partialsReady` → 绑定事件 → 刷新用户数据 | — |
 | **core/** | | |
-| `core/dom.js` | DOM/URL 助手：`$`, `qs`, `abs`, `api`, `resolveAvatarUrl`, `show`, `hide` | `CardUI.Manager.Core.dom` |
+| `core/dom.js` | DOM/URL 助手：`$`, `qs`, `abs`, `api`, `resolveAvatarUrl`, `setImageSrc`, `setImagesSrc` | `CardUI.Manager.Core.dom` |
 | `core/errors.js` | 错误处理：解析 HTTP 响应错误 | `CardUI.Manager.Core.errors` |
 | `core/messages.js` | Toast/消息提示工具 | `CardUI.Manager.Core.messages` |
 | `core/user_service.js` | 用户数据刷新服务：从服务端拉取并同步 `localStorage` | `CardUI.Manager.Core.userService` |

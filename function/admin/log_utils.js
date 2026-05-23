@@ -180,6 +180,8 @@
 
   function bindLogTimeHover(root){
     if (!root) return;
+    if (root.__logTimeHoverBound) return;
+    root.__logTimeHoverBound = true;
     const onOver = (e)=>{ const t = e.target && e.target.closest ? e.target.closest('.log-time') : null; if (t) { const abs = t.getAttribute('data-abs'); if (abs) t.textContent = abs; } };
     const onOut  = (e)=>{ const t = e.target && e.target.closest ? e.target.closest('.log-time') : null; if (t) { const rel = t.getAttribute('data-rel'); if (rel) t.textContent = rel; } };
     root.addEventListener('mouseover', onOver);

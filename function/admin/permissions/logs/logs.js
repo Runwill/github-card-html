@@ -101,7 +101,7 @@
   function buildMsgParamsForLog(log){
     try{
       const d = (log && log.data) || {};
-      const k = msgKey(log && log.type);
+      const k = metaForType(log && log.type).msgKey || '';
       const tmpl = getI18nString(k) || '';
       const needs = extractPlaceholders(tmpl);
       if (!needs.length) return JSON.stringify(d||{});
@@ -220,9 +220,6 @@
   };
 
   function metaForType(type){ return TYPE_META[String(type||'')] || {}; }
-  function typeCls(type){ return metaForType(type).cls || ''; }
-  function typeKey(type){ return metaForType(type).typeKey || ''; }
-  function msgKey(type){ return metaForType(type).msgKey || ''; }
 
   function roleCodeAttrs(log){
     if (String(log && log.type) !== 'role-changed') return '';
@@ -235,16 +232,16 @@
     try{
       const ts = log && log.createdAt;
       const timeHtml = LogUtils.timeHtml(ts);
-      const k = typeKey(log && log.type);
-      const cls = typeCls(log && log.type);
+      const meta = metaForType(log && log.type);
+      const k = meta.typeKey || '';
+      const cls = meta.cls || '';
       const who = (log && log.actorName) ? log.actorName : '';
-  const msgK = msgKey(log && log.type);
-  const msgParams = buildMsgParamsForLog(log);
-  let msg = msgK ? `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'${roleCodeAttrs(log)}></span>` : '';
-  if (!msg && log && log.message) msg = `<span>${String(log.message)}</span>`;
-    // 不显示用户ID；增加单条删除按钮（与词元日志一致的样式类名）
-    const actions = LogUtils.actionsHtml();
-    return `<div class="log-row">${timeHtml}${k? LogUtils.pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${actions}</div>`;
+      const msgK = meta.msgKey || '';
+      const msgParams = buildMsgParamsForLog(log);
+      let msg = msgK ? `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'${roleCodeAttrs(log)}></span>` : '';
+      if (!msg && log && log.message) msg = `<span>${String(log.message)}</span>`;
+      const actions = LogUtils.actionsHtml();
+      return `<div class="log-row">${timeHtml}${k? LogUtils.pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${actions}</div>`;
     }catch(_){ return ''; }
   }
 
@@ -303,7 +300,7 @@
       const body = panel.querySelector('#perms-log');
       if (!body) return;
       const selected = choiceValue(panel, 'type', 'all');
-      const val = selected === 'all' ? 'all' : (resolveTypeFilter(selected).find(type => msgKey(type)) || '');
+      const val = selected === 'all' ? 'all' : (resolveTypeFilter(selected).find(type => metaForType(type).msgKey) || '');
       // 查找或创建预览行节点
       let preview = body.querySelector('#perms-log-preview');
       const ensurePreview = ()=>{
@@ -316,7 +313,7 @@
         }
         return preview;
       };
-      const key = val && val !== 'all' ? msgKey(val) : '';
+      const key = val && val !== 'all' ? (metaForType(val).msgKey || '') : '';
       const tmpl = key ? getI18nString(key) || '' : '';
       if (!tmpl.trim()) { if (preview) try{ preview.remove(); }catch(_){ } return; }
       const esc = LogUtils.esc;

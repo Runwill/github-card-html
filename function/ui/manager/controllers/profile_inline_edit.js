@@ -30,8 +30,8 @@
     msgEl.classList.remove('msg-flash');
     void msgEl.offsetWidth;
     msgEl.classList.add('msg-flash');
-    var onEnd = function(){ msgEl.classList.remove('msg-flash'); msgEl.removeEventListener('animationend', onEnd); };
-    msgEl.addEventListener('animationend', onEnd);
+    var onEnd = function(){ msgEl.classList.remove('msg-flash'); };
+    msgEl.addEventListener('animationend', onEnd, { once: true });
   }
 
   // 通用保存辅助: fetch + 错误/busy 状态管理
@@ -155,7 +155,13 @@
       var oldName = nameEl.textContent || '';
       nameEl.setAttribute('contenteditable', 'true'); nameEl.classList.add('is-editing');
       var sel = w.getSelection && w.getSelection(); var range = document.createRange(); range.selectNodeContents(nameEl); if (sel) { sel.removeAllRanges(); sel.addRange(range); } nameEl.focus();
-      var cleanup = function(){ nameEl.removeAttribute('contenteditable'); nameEl.classList.remove('is-editing'); _isEditing = false; };
+      var onKey, onBlur, onInput;
+      var cleanup = function(){
+        nameEl.removeEventListener('keydown', onKey);
+        nameEl.removeEventListener('blur', onBlur);
+        nameEl.removeEventListener('input', onInput);
+        nameEl.removeAttribute('contenteditable'); nameEl.classList.remove('is-editing'); _isEditing = false;
+      };
 
       var doSave = async function(){
         var newName = (nameEl.textContent || '').trim();
@@ -191,11 +197,11 @@
         });
         _saving = false; cleanup();
       };
-      var onKey = function(ev){ if (ev.key === 'Enter' && !ev.shiftKey && !ev.ctrlKey && !ev.metaKey) { ev.preventDefault(); doSave(); } else if (ev.key === 'Escape') { ev.preventDefault(); cleanup(); } };
-      var onBlur = function(){ if (!_saving) cleanup(); };
+      onKey = function(ev){ if (ev.key === 'Enter' && !ev.shiftKey && !ev.ctrlKey && !ev.metaKey) { ev.preventDefault(); doSave(); } else if (ev.key === 'Escape') { ev.preventDefault(); cleanup(); } };
+      onBlur = function(){ if (!_saving) cleanup(); };
       nameEl.addEventListener('keydown', onKey);
       nameEl.addEventListener('blur', onBlur, { once: true });
-      var onInput = function(){ if (_usernameState.saveFailed) { _usernameState.saveFailed = false; } };
+      onInput = function(){ if (_usernameState.saveFailed) { _usernameState.saveFailed = false; } };
       nameEl.addEventListener('input', onInput, { once: false });
     };
 

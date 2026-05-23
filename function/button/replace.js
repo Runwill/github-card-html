@@ -46,4 +46,3 @@ function elementReplaceCheck(key, name, event){
         doReplace(name + String(cur), name + String(next));
     });
 }
-// pronoun* 已拆分到 function/button/pronoun.js 中

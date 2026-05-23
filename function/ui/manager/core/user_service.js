@@ -6,13 +6,11 @@
   var ns = w.CardUI.Manager.Core;
   var USER_CACHE_KEYS = ['id','username','avatar','intro','permissions'];
 
-  function _dom(){ return (ns && ns.dom) || {}; }
-
   async function refreshCurrentUserFromServer(){
     try {
       var id = w.localStorage ? w.localStorage.getItem('id') : '';
       if (!id) return;
-      var d = _dom();
+      var d = ns.dom || {};
       var requestJson = w.endpoints && w.endpoints.requestJson;
       if (!requestJson) return;
       var data;
