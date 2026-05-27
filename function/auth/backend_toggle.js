@@ -1,7 +1,4 @@
 // 登录页后端切换（公网 / 本地）控制器
-(function () {
-  'use strict';
-
   var PUBLIC_URL = 'http://120.55.7.7:3000';
   var LOCAL_URL  = 'http://localhost:3000';
   var btn = document.getElementById('backend-toggle');
@@ -55,4 +52,3 @@
   } else {
     boot();
   }
-})();

@@ -1,4 +1,3 @@
-(function () {
   // tokens/ui/search
   // 搜索与刷新、缩略开关（放在搜索框旁）
 
@@ -99,4 +98,3 @@
   }
 
   Object.assign(window.tokensAdmin, { setupSearch });
-})();

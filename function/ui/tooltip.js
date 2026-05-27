@@ -1,5 +1,4 @@
 // Lightweight tooltip manager using #lore-tooltip styles
-(function(){
   let tipEl = null; let currentTarget = null; const MARGIN = 8;
   function ensureTip(){
     if (!tipEl) {
@@ -53,4 +52,3 @@
   });
   window.addEventListener('resize', ()=>{ if (currentTarget && tipEl) place(tipEl, currentTarget); });
   window.addEventListener('scroll', ()=>{ if (currentTarget && tipEl) place(tipEl, currentTarget); }, { passive: true });
-})();

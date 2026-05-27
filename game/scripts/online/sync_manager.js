@@ -5,8 +5,7 @@
  * - 接收远程操作并应用到本地
  * - 管理视角与用户名映射
  */
-(function () {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.Online = window.Game.Online || {};
 
     const Client = () => window.Game.Online.RoomClient;
@@ -507,4 +506,4 @@
         get perspectives() { return perspectives; }
     };
 
-})();
+    window.dispatchEvent(new CustomEvent('game-sync-manager-ready'));

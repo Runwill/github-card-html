@@ -1,4 +1,4 @@
-(function(w){
+const w = window;
   const ns = w.TokensPerm = w.TokensPerm || {};
 
   function handle401(r){
@@ -45,4 +45,3 @@
       return Array.isArray(arr) ? arr.map(String) : [];
     }
   };
-})(window);

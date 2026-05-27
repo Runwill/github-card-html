@@ -1,5 +1,4 @@
-(function(){
-    const zh = {
+const zh = {
         'game.start': '开始游戏',
         'game.setup': '游戏设置',
         'game.setup.playerCount': '座位数',
@@ -58,9 +57,9 @@
         'online.cancelSpectate': '取消旁观',
         'online.spectating': '旁观中',
         'online.noSpectate': '禁止旁观',
-    };
+};
 
-    const en = {
+const en = {
         'game.start': 'Start Game',
         'game.setup': 'Game Setup',
         'game.setup.playerCount': 'Seats',
@@ -119,12 +118,11 @@
         'online.cancelSpectate': 'Cancel Spectate',
         'online.spectating': 'Spectating',
         'online.noSpectate': 'No Spectators',
-    };
+};
 
-    if (window.I18N_STRINGS) {
-        Object.assign(window.I18N_STRINGS.zh, zh);
-        Object.assign(window.I18N_STRINGS.en, en);
-    } else {
-        console.warn('I18N_STRINGS not found, game strings not loaded');
-    }
-})();
+if (window.I18N_STRINGS) {
+    Object.assign(window.I18N_STRINGS.zh, zh);
+    Object.assign(window.I18N_STRINGS.en, en);
+} else {
+    console.warn('I18N_STRINGS not found, game strings not loaded');
+}

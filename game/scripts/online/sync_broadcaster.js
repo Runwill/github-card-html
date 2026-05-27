@@ -1,21 +1,26 @@
-(function () {
-    // sync_manager — 广播端: 拦截本地操作并广播到房间
-    // 接收端在 sync_manager.js 中，通过 _SyncInternal 共享
-    const I = window.Game.Online._SyncInternal;
-    const SM = window.Game.Online.SyncManager;
-    const Client = I.Client;
+// sync_manager — 广播端: 拦截本地操作并广播到房间
+// 接收端在 sync_manager.js 中，通过 _SyncInternal 共享
+function getInternal() {
+    return window.Game.Online?._SyncInternal || null;
+}
+
+function getClient() {
+    return getInternal()?.Client?.() || null;
+}
 
     /**
      * 拦截本地 dispatch，用于在线模式广播
      * 在 game_controller.js 中调用
      */
     function interceptDispatch(actionType, payload) {
+        const I = getInternal();
+        if (!I) return;
         if (I.isApplyingRemote) return; // 不广播远程操作
 
         const gs = window.Game.GameState;
         if (!gs || !gs.onlineMode) return;
 
-        const client = Client();
+        const client = getClient();
         if (!client || !client.isConnected || !client.currentRoomId) return;
 
         if (actionType === 'move' && payload.card) {
@@ -60,7 +65,7 @@
         const gs = window.Game.GameState;
         if (!gs || !gs.onlineMode) return;
 
-        const client = Client();
+        const client = getClient();
         if (client && client.isConnected) {
             client.setPerspective(perspectiveIndex);
         }
@@ -70,7 +75,7 @@
      * 获取某个角色（玩家索引）的观察者用户名列表
      */
     function getViewersForPlayer(playerIndex) {
-        const perspectives = I.perspectives;
+        const perspectives = getInternal()?.perspectives;
         if (!perspectives) return [];
         const viewers = perspectives[playerIndex];
         if (!viewers || !Array.isArray(viewers)) return [];
@@ -82,7 +87,7 @@
      * 仅修改本机 perspectives 数据（广播由调用方负责）。
      */
     function updateLocalSpectating(isSpectating) {
-        const perspectives = I.perspectives;
+        const perspectives = getInternal()?.perspectives;
         if (!perspectives) return;
         const myId = localStorage.getItem('id');
         if (!myId) return;
@@ -102,7 +107,9 @@
      * 全量同步当前状态到房间（用于游戏开始后或手动触发）
      */
     function pushFullState() {
-        const client = Client();
+        const I = getInternal();
+        const client = getClient();
+        if (!I) return;
         if (!client || !client.isConnected) return;
         const state = I.serializeGameState();
         client.syncFullState(state);
@@ -110,12 +117,21 @@
 
 
     // ===== 扩展导出（广播端）=====
-    Object.assign(SM, {
+const broadcasterApi = {
         interceptDispatch,
         broadcastPerspectiveChange,
         getViewersForPlayer,
         updateLocalSpectating,
         pushFullState,
-    });
+    };
 
-})();
+function attachBroadcasterApi() {
+    const syncManager = window.Game.Online?.SyncManager;
+    if (!syncManager) return false;
+    Object.assign(syncManager, broadcasterApi);
+    return true;
+}
+
+if (!attachBroadcasterApi()) {
+    window.addEventListener('game-sync-manager-ready', attachBroadcasterApi, { once: true });
+}

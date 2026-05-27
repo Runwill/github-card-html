@@ -2,8 +2,7 @@
  * Online Room UI
  * 在线房间的界面管理（大厅、创建/加入房间）
  */
-(function () {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.Online = window.Game.Online || {};
 
     const Client = () => window.Game.Online.RoomClient;
@@ -510,5 +509,3 @@
         get isSpectating() { return isSpectating; },
         set isSpectating(v) { isSpectating = v; }
     };
-
-})();

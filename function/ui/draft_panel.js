@@ -1,4 +1,3 @@
-(function(){
   var STORAGE_KEY = 'draftBlockContent';
   var inputEl, previewEl;
 
@@ -108,4 +107,3 @@
   })();
 
   window.draftPanel = { setContent: setContent, autosize: autosizeNow };
-})();

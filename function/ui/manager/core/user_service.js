@@ -1,6 +1,5 @@
 // 用户数据刷新与本地同步服务（头像、用户名、简介、权限等）。
 // CardUI Manager Core - user service
-(function(){
   'use strict';
   var w = window;
   var ns = w.CardUI.Manager.Core;
@@ -57,4 +56,3 @@
   }
 
   ns.userService = { refreshCurrentUserFromServer: refreshCurrentUserFromServer };
-})();

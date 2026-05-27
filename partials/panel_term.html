@@ -92,11 +92,11 @@
                     <deemAs></deemAs><illegal></illegal>。
                   </div>
                   <padding>
-                    <h3><<role></role>A><<event></event>><cannotTarget class="scroll"><cannotTargetHead></cannotTargetHead><cannotTargetBody></cannotTargetBody><<role></role>B><as></as><cannotTargetEnd></cannotTargetEnd></cannotTarget>/<<role></role>B><cannotTarget><cannotTargetHead></cannotTargetHead><cannotTargetedBody></cannotTargetedBody><<role></role>B><<event></event>>的<cannotTargetEnd></cannotTargetEnd></cannotTarget></h3>
+                    <h3>&lt;<role></role>A&gt;&lt;<event></event>&gt;<cannotTarget class="scroll"><cannotTargetHead></cannotTargetHead><cannotTargetBody></cannotTargetBody>&lt;<role></role>B&gt;<as></as><cannotTargetEnd></cannotTargetEnd></cannotTarget>/&lt;<role></role>B&gt;<cannotTarget><cannotTargetHead></cannotTargetHead><cannotTargetedBody></cannotTargetedBody>&lt;<role></role>B&gt;&lt;<event></event>&gt;的<cannotTargetEnd></cannotTargetEnd></cannotTarget></h3>
                     <div class="indent">
                       前者<this><thishead></thishead><event></event></this><coordination><preclude></preclude>后者，<stativecoordination></stativecoordination><cannot></cannot><or><choose><choosebody></choosebody></choose><orbody></orbody><append><appendbody></appendbody></append></or></coordination>后者。
                     </div>
-                    <h3><cannotTo class="scroll"><cannotToHead></cannotToHead><cannotToTarget class="irreplaceable"><<role></role>></cannotToTarget></cannotTo><<event></event>></h3>
+                    <h3><cannotTo class="scroll"><cannotToHead></cannotToHead><cannotToTarget class="irreplaceable">&lt;<role></role>&gt;</cannotToTarget></cannotTo>&lt;<event></event>&gt;</h3>
                     <div class="indent">
                       <coordination>目标<include><include0></include0>其</include>的<this><thisHead></thisHead><event></event></this><illegal></illegal>，<stativecoordination></stativecoordination><this><thisHead></thisHead><event></event></this><cannotTarget><cannotTargetHead></cannotTargetHead><cannotTargetBody></cannotTargetBody>其<as></as><cannotTargetEnd></cannotTargetEnd></cannotTarget></coordination>。
                     </div>
@@ -1287,7 +1287,7 @@
                     <ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health>不<greater><greaterHead></greaterHead>0</greater>，<ifBody></ifBody><advance></advance><tick></tick>“<whenDying class="scroll bold"></whenDying>”(<ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health><greater><greaterHead></greaterHead>0</greater>，<ifBody></ifBody><thisC><tick></tick></thisC>的<tickLimit></tickLimit>视为不满足</ifC>)，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="scroll bold"></whenExitingDying>”</ifC>。
                   </div>
                   <div class="indent">
-                    <ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health epithet='1'>不<greater><greaterHead></greaterHead>0</greater>，<ifBody></ifBody><die><dieRole class="irreplaceable">其</dieRole><dieEnd></dieEnd></die>，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="bold"></whenExitingDying>”</ifC>。
+                    <ifC><dying><dyingRole></dyingRole></dying><health epithet='1'></health>不<greater><greaterHead></greaterHead>0</greater>，<ifBody></ifBody><die><dieRole class="irreplaceable">其</dieRole><dieEnd></dieEnd></die>，<else></else>，<advance></advance><tick></tick>“<whenExitingDying class="bold"></whenExitingDying>”</ifC>。
                   </div>
                 </div>
               </padding>
@@ -1424,7 +1424,7 @@
               一类<object></object>。<tick></tick>的集合。
             </div>
             <padding>
-              <h3><inTicking class="scroll"><<ticking></ticking>><inEnd /></inTicking></h3>
+              <h3><inTicking class="scroll">&lt;<ticking></ticking>&gt;<inEnd /></inTicking></h3>
               <div class="indent">
                 引用<ticking></ticking>。
               </div>
@@ -1632,7 +1632,7 @@
                 <role></role>的一项<attribute></attribute>。可简称为<reach epithet="1"></reach>。等于1。
               </div>
               <padding>
-                <h3><inReach class="scroll"><<pronoun1><roleDefault></roleDefault></pronoun1>><inHead></inHead><<pronoun2><roleDefault></roleDefault></pronoun2>><inReachEnd></inReachEnd></inReach></h3>
+                <h3><inReach class="scroll">&lt;<pronoun1><roleDefault></roleDefault></pronoun1>&gt;<inHead></inHead>&lt;<pronoun2><roleDefault></roleDefault></pronoun2>&gt;<inReachEnd></inReachEnd></inReach></h3>
                 <div class="indent">
                   <pronoun2>后者</pronoun2>的<reach></reach>不<less><lessHead></lessHead><distance><pronoun2>后者</pronoun2><reciprocalMark></reciprocalMark><pronoun1>前者</pronoun1>的<distanceEnd></distanceEnd></distance></less>。
                 </div>
@@ -1642,7 +1642,7 @@
                 <role></role>的一项<attribute></attribute>。整型变量。
               </div>
               <padding>
-                <h3><roleSeated class="scroll"><<seat></seat>值>号<roleSeatedBody /></roleSeated></h3>
+                <h3><roleSeated class="scroll">&lt;<seat></seat>值&gt;号<roleSeatedBody /></roleSeated></h3>
                 <div class="indent">
                   <seat></seat>为该值的<role></role>。
                 </div>
@@ -1658,7 +1658,7 @@
                 <div class="indent">
                   <seatOrder></seatOrder>中的前某名<living></living><role></role>，前一名则可简称为<previousSeat><previousSeatHead></previousSeatHead><seatEnd></seatEnd></previousSeat>。
                 </div>
-                <h3><distance class="scroll"><<roleDefault></roleDefault>><reciprocalMark></reciprocalMark><<roleDefault></roleDefault>>的<distanceEnd></distanceEnd></distance></h3>
+                <h3><distance class="scroll">&lt;<roleDefault></roleDefault>&gt;<reciprocalMark></reciprocalMark>&lt;<roleDefault></roleDefault>&gt;的<distanceEnd></distanceEnd></distance></h3>
                 <div class="indent">
                   等于<counts><seat></seat><coordination>在<pronoun1 class="highlight">二者</pronoun1>之间<nominalCoordination></nominalCoordination>不在<pronoun1 class="highlight">二者</pronoun1>之间</coordination>的除<pronoun1 class="highlight">其</pronoun1>外<roleDefault></roleDefault><countsEnd></countsEnd></counts>的<minC>值</minC>，<ifC><pronoun1 class="highlight"></pronoun1>不为同一<role></role>，至少为1，<else></else>，至少为0</ifC>。
                 </div>
@@ -1718,19 +1718,19 @@
               <h3><objectInArea class="scroll" /></h3>
               <div class="indent"><area></area>的一项属性。可变数组。
               </div>
-              <h3><inArea class="scroll"><<area></area>><inEnd /></inArea></h3>
+              <h3><inArea class="scroll">&lt;<area></area>&gt;<inEnd /></inArea></h3>
               <div class="indent">
                 在<area></area>的<objectInArea></objectInArea>中。
               </div>
-              <h3><outArea class="scroll"><<area></area>><outAreaEnd /></outArea></h3>
+              <h3><outArea class="scroll">&lt;<area></area>&gt;<outAreaEnd /></outArea></h3>
               <div class="indent">
                 不在<area></area>的<objectInArea></objectInArea>中。
               </div>
-              <h3><top class="scroll"><<area></area>><topEnd /></top></h3>
+              <h3><top class="scroll">&lt;<area></area>&gt;<topEnd /></top></h3>
               <div class="indent">
                 由<area></area><objectInArea></objectInArea>序数小的一侧。
               </div>
-              <h3><bottom class="scroll"><<area></area>><bottomEnd /></bottom></h3>
+              <h3><bottom class="scroll">&lt;<area></area>&gt;<bottomEnd /></bottom></h3>
               <div class="indent">
                 由<area></area><objectInArea></objectInArea>序数大的一侧。
               </div>

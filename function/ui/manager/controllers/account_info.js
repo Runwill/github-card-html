@@ -1,5 +1,4 @@
 // 账户信息弹窗渲染与角色/权限徽章展示控制器。
-(function(){
   'use strict';
   const Core = window.CardUI.Manager.Core;
   const Ctrls = window.CardUI.Manager.Controllers;
@@ -106,4 +105,3 @@
   }
 
   Ctrls.accountInfo = { openAccountInfo };
-})();

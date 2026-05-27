@@ -1,4 +1,3 @@
-(function(){
   const T = window.tokensAdmin;
   const { getAuth } = T;
   whenDOMReady().then(()=> whenPartialsReady().then(()=>{
@@ -7,4 +6,3 @@
   whenDOMReady().then(()=>{
     try{ const setCtrl=(down)=> document.body.classList.toggle('ctrl-down', down); let ctrlLatch=false; window.addEventListener('keydown',(e)=>{ if(e.ctrlKey && !ctrlLatch){ ctrlLatch=true; setCtrl(true); } }); window.addEventListener('keyup',(e)=>{ if(!e.ctrlKey){ ctrlLatch=false; setCtrl(false); } }); window.addEventListener('blur',()=>{ ctrlLatch=false; setCtrl(false); }); }catch(_){ }
   });
-})();

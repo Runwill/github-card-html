@@ -1,7 +1,6 @@
 // 统一 API 端点配置（支持 URL 参数 / localStorage / 环境默认）
 // 暴露 window.endpoints：base/getBase/setBase/api/abs/character/skill/card/termDynamic/termFixed
-;(function(){
-  function storageGet(key){ try { return (typeof localStorage!== 'undefined' && localStorage.getItem(key)) || ''; } catch(e) { return ''; } }
+function storageGet(key){ try { return (typeof localStorage!== 'undefined' && localStorage.getItem(key)) || ''; } catch(e) { return ''; } }
   function storageSet(key, value){ try { if (typeof localStorage!== 'undefined') localStorage.setItem(key, value); } catch(e) {} }
 
   function readQueryApiBase(){
@@ -39,7 +38,7 @@
     }
   }
 
-  var DEFAULT_BASE=(function(){
+let DEFAULT_BASE=(function(){
     // 优先级：URL 参数 > localStorage > 环境默认 > 公网后端
     return readQueryApiBase() || readLocalApiBase() || envDefaultBase() || 'http://120.55.7.7:3000';
   })();
@@ -91,7 +90,7 @@
     return out;
   }
 
-  window.endpoints={
+window.endpoints={
     base,
     getBase,
     setBase,
@@ -104,5 +103,4 @@
     card: function(){ return withBase('/api/card') },
     termDynamic: function(){ return withBase('/api/term-dynamic') },
     termFixed: function(){ return withBase('/api/term-fixed') }
-  }
-})()
+};

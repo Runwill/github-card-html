@@ -1,26 +1,25 @@
 // 对 HTML 标签支持的 i18n 逻辑的覆盖/补充
-(function() {
-    if (!window.Game || !window.Game.UI) return;
-    
+if (window.Game?.UI) {
+
     // 注册 GameText 的模板
     // 键对应于：
     // 1. 面包屑节点名称（Turn, preparing 等）
     // 2. 时机节点名称（beforeTurnStart 等）
     // 3. 区域名称（hand, treatmentArea）
-    
+
     // 逻辑：
     // 如果键存在于术语结构（JSON）中，默认行为（<Key></Key>）工作正常。
     // 如果它需要参数（Round），我们在下面定义它。
-    
+
     const templates = {
         // 动态回合
         'Round': '第 {n}&nbsp;<round></round>',
-        
+
         // 回合（带有玩家信息 - 在 renderers 逻辑中处理，但我们可以在此处定义部分）
         // 但是 renderers.js 目前将“Index Name”和“Turn”分开。
         // 让我们在这里定义原子术语。
-        'Turn': '<turn></turn>', 
-        
+        'Turn': '<turn></turn>',
+
         // 阶段（通常只是术语本身）
         'preparing': '<preparing></preparing>',
         'dealing': '<dealing></dealing>',
@@ -58,7 +57,7 @@
         'attack': '<attack></attack>',
         'dodge': '<dodge></dodge>',
         'deliver': '<deliver></deliver>',
-        
+
         // Game 时机
         'beforeGameStart': '<beforeGameStart></beforeGameStart>',
         'whenGameStart': '<whenGameStart></whenGameStart>',
@@ -163,4 +162,4 @@
         // 对于这一步，这已经是 text_renderer.js 中的默认配置。
         // 我将更新 text_renderer.js 以包含这些扩展的默认值。
     }
-})();
+}

@@ -1,4 +1,4 @@
-function elementReplaceCheck(key, name, event){
+window.elementReplaceCheck = function elementReplaceCheck(key, name, event){
     const clickedButton = event.target;
 
     /**
@@ -15,34 +15,34 @@ function elementReplaceCheck(key, name, event){
             if (el.parentNode) parents.add(el.parentNode);
         });
 
-        ButtonUtils.replaceTag(fromSel, toSel);
+        window.ButtonUtils.replaceTag(fromSel, toSel);
 
         // 清除父级的 termProcessed 标记，使 replace_term 能重新扫描
         parents.forEach(p => { if (p.dataset) delete p.dataset.termProcessed; });
 
-        if(typeof replace_term === 'function'){
-            replace_term(endpoints.termDynamic(), 1);
+        if(typeof window.replace_term === 'function'){
+            window.replace_term(window.endpoints.termDynamic(), 1);
         }
     };
 
-    fetchJsonCached(endpoints.termDynamic()).then(term => {
+    window.fetchJsonCached(window.endpoints.termDynamic()).then(term => {
         const targetObject = term.find(item => item.en === key);
         const partLength = targetObject ? targetObject.part.length : 0;
-        const cur = Number(term_status[name] || 0);
+        const cur = Number(window.term_status[name] || 0);
 
         // 当长度不可用时，按二态切换
         if(!partLength || partLength <= 1){
             const next = cur ^ 1;
-            ButtonUtils.applyButtonState(clickedButton, next === 0);
-            term_status[name] = next;
+            window.ButtonUtils.applyButtonState(clickedButton, next === 0);
+            window.term_status[name] = next;
             doReplace(name + String(cur), name + String(next));
             return;
         }
 
         // 多段循环切换：0 -> 1 -> ... -> N-1 -> 0
         const next = (cur + 1) % partLength;
-        ButtonUtils.applyButtonState(clickedButton, next === 0);
-        term_status[name] = next;
+        window.ButtonUtils.applyButtonState(clickedButton, next === 0);
+        window.term_status[name] = next;
         doReplace(name + String(cur), name + String(next));
     });
-}
+    };

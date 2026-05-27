@@ -1,6 +1,5 @@
 // 审批弹窗入口与基于角色的界面可见性控制。
 // CardUI Manager Controllers - approvals & visibility
-(function(){
   'use strict';
   var w = window;
   var dom = w.CardUI.Manager.Core.dom;
@@ -45,4 +44,3 @@
     onApproveClick: onApproveClick,
     updateVisibilityByRole: updateVisibilityByRole
   };
-})();

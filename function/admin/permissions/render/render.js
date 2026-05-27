@@ -1,4 +1,4 @@
-((w)=>{
+const w = window;
   // 命名空间与状态
   const ns = (w.TokensPerm = w.TokensPerm || {});
   ns.state = ns.state || { permMode: 'partial', renderSeq: 0 };
@@ -264,4 +264,3 @@
     getUsersData, getMasterData,
     searchKeyFromInput, DEFAULT_SEARCH_KEY,
   };
-})(window);

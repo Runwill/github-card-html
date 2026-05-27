@@ -1,4 +1,3 @@
-(function(){
   // tokens/actions/edit_delete
   // 行内编辑与删除、整对象删除、编辑对象的事件绑定（保持只读用户无效）
 
@@ -367,4 +366,3 @@
     bindDeleteDoc,
     bindEditDoc,
   });
-})();

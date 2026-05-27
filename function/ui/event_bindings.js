@@ -1,4 +1,3 @@
-(function(){
   const bind=(sel,handler)=>{ try{ document.querySelectorAll(sel).forEach(el=> el.addEventListener('click',handler)); }catch(_){} };
   const call=(name,...args)=>{ try{ const fn=window[name]; if(!fn) return; return fn.apply(window,args); }catch(_){} };
 
@@ -27,4 +26,3 @@
       for(let i=0;i<pairs.length;i++) bind(pairs[i][0], pairs[i][1]);
     });
   });
-})();

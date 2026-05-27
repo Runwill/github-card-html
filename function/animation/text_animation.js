@@ -1,4 +1,3 @@
-(function() {
     const TEXT_SELECTOR = 'h1, h2, h3, .indent, padding';
 
     function elements(scope, selector) {
@@ -65,4 +64,3 @@
     } else {
         init();
     }
-})();

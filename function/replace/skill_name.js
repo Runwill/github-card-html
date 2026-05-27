@@ -1,4 +1,4 @@
-﻿function replace_skill_name(path, paragraphs = document){
+﻿window.replace_skill_name = function replace_skill_name(path, paragraphs = document){
   // 返回 Promise，供进度条与启动流程感知完成时机
   return fetchJsonCached(path).then(skill => {
         const dataKey = 'skillProcessed';
@@ -159,4 +159,4 @@
             // 技能名没有特定的 TagName 或简单的选择器，所以利用 manualCheck + fallback 遍历
         });
   })
-}
+};

@@ -1,5 +1,4 @@
-(function() {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
     
     const UI = window.Game.UI;
@@ -295,7 +294,5 @@
     UI.DragAnimation = {
         startAnimationLoop,
         animateDropToPlaceholder,
-        createGhost,
+        createGhost
     };
-
-})();

@@ -1,6 +1,5 @@
 // tokens/ui/modals
 // 统一的“新建/编辑”弹窗；与渲染保持布局一致；支持“另存”
-(function(){
   const T = window.tokensAdmin;
   const { esc, setByPath, stripHidden, showToast: toast } = T;
   const { apiJson } = T;
@@ -156,4 +155,3 @@
     showModalAnim(backdrop, modal, editor);
   }
   Object.assign(window.tokensAdmin, { showCreateModal, hideCreateModal, openEditModal, hideEditModal });
-})();

@@ -1,4 +1,3 @@
-(function () {
   const STORAGE_KEY_SPEED = 'card_game_speed_setting';
   const STORAGE_KEY_INERTIA = 'card_game_inertia_setting';
   const GAME_SETTINGS_BUTTON_ID = 'game-settings-button';
@@ -116,4 +115,3 @@
   
   window.KeySettings = window.KeySettings || {};
   window.KeySettings.loadGameSettings = loadGameSettings;
-})();

@@ -1,4 +1,3 @@
-(function () {
   // tokens/actions/go
   // “跳转”按钮：优先滚动到各面板目标，失败再回退到 .html 链接
 
@@ -93,4 +92,3 @@
   }
 
   Object.assign(window.tokensAdmin, { bindGo });
-})();

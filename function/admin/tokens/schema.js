@@ -1,4 +1,3 @@
-(function () {
   // tokens/schema
   // 从样本推导 schema、合并 schema、生成骨架对象、构建模板、集合默认值
 
@@ -200,4 +199,3 @@
   }
 
   Object.assign(window.tokensAdmin, { deriveSchema, mergeSchemas, schemaSignature, skeletonFromSchema, flattenHintsFromSchema, buildTemplate, applyCollectionDefaults });
-})();

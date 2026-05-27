@@ -1,5 +1,4 @@
-(function() {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.Setup = window.Game.Setup || {};
 
     let characterCache = null;
@@ -321,7 +320,4 @@
     }
 
     window.Game.Setup.init = init;
-
-})();
-
 

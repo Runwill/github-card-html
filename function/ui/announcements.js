@@ -1,4 +1,3 @@
-;(function(){
   const t = (typeof window.t==='function') ? window.t : (k)=>k;
   const $ = (id)=> document.getElementById(id);
   const h = (tag, cls, text)=> { const e = document.createElement(tag); if(cls) e.className = cls; if(text!==undefined) e.textContent = text; return e; };
@@ -40,8 +39,6 @@
     container.addEventListener('mousemove', clear, {passive:true});
     container.addEventListener('mouseleave', clear, {passive:true});
   }
-
-  function delay(ms){ return new Promise(resolve => setTimeout(resolve, ms)); }
 
   async function fetchAnnouncements(force){
     if (!force && dataCache) return dataCache;
@@ -161,7 +158,7 @@
     const seq = ++renderSeq;
     try {
       const data = await fetchAnnouncements();
-      if (opts.afterOpen) await delay(OPEN_RENDER_DELAY);
+      if (opts.afterOpen) await new Promise(resolve => setTimeout(resolve, OPEN_RENDER_DELAY));
       if (seq !== renderSeq) return;
       render(data);
     } catch(err){
@@ -180,11 +177,8 @@
   }
 
   // 暴露给 bindings 调用
-  window.loadAnnouncements = function(){
-    return load.apply(null, arguments);
-  };
+  window.loadAnnouncements = load;
   window.preloadAnnouncements = preload;
 
   // 可选：当语言切换时重新应用容器中的 i18n（内容本身不翻译）
   try { window.addEventListener('i18n:changed', ()=>{ const el=$('announcements-modal'); if(el) window.i18n?.applySafe?.(el); }); } catch(_){ }
-})();

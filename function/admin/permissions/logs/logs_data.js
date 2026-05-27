@@ -1,9 +1,8 @@
-(function(){
   // permissions/logs/logs_data — 数据层: 日志获取、事件绑定、语言切换
   // UI factory 在 logs.js 中，通过 TokensPerm._LogsUI 共享
   const { jsonGet: apiGet, jsonDelete: apiDelete, jsonPatch: apiPatch, isAdmin, hasToken } = window.TokensPerm.API;
   const UI = window.TokensPerm._LogsUI;
-  const RenderUI = window.TokensPerm._RenderUI || {};
+  const renderUI = () => window.TokensPerm._RenderUI || {};
 
   async function hydrateUserLogs(){
     try{
@@ -62,7 +61,10 @@
         const panel = document.getElementById('panel_permissions');
         if (panel && !panel.__permsLogObsBound){
           panel.__permsLogObsBound = true;
-          const isVisible = (el)=> RenderUI.isVisible ? RenderUI.isVisible(el, false) : !!(el && el.offsetParent);
+          const isVisible = (el)=> {
+            const RenderUI = renderUI();
+            return RenderUI.isVisible ? RenderUI.isVisible(el, false) : !!(el && el.offsetParent);
+          };
           let wasVisible = isVisible(panel);
           const check = ()=>{
             try{
@@ -125,4 +127,3 @@
       window.TokensPerm.refreshLogs = hydrateUserLogs;
     } catch(_){ }
   });
-})();

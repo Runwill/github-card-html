@@ -1,6 +1,5 @@
 // 账户更新（修改密码）表单提交流程控制器。
 // CardUI Manager Controllers - account update form (change password)
-(function(){
   'use strict';
   var w = window;
   var dom = w.CardUI.Manager.Core.dom;
@@ -33,4 +32,3 @@
   }
 
   w.CardUI.Manager.Controllers.accountUpdateForm = { handleUpdateFormSubmit: handleUpdateFormSubmit };
-})();

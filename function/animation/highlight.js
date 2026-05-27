@@ -14,7 +14,7 @@ const HIGHLIGHT_CONFIG = {
  * 典雅主题辅助：将颜色混入 20% 金色 (#d3ad6b)，使高亮带有暖金色调
  * 支持 hex / rgb / rgba 输入，输出保持原格式
  */
-function _blendWithGold(color) {
+window._blendWithGold = function _blendWithGold(color) {
     try {
         const ratio = 0.2 // 金色混入比例
         const gold = { r: 211, g: 173, b: 107 }
@@ -40,7 +40,7 @@ function _blendWithGold(color) {
         if (isRgba || a < 1) return `rgba(${r},${g},${b},${a})`
         return `rgb(${r},${g},${b})`
     } catch(_) { return color }
-}
+};
 
 /**
  * 全局高亮注册表
@@ -91,7 +91,7 @@ function applyHighlight(selector, color) {
             color = window.ColorUtils.invertColor(color, { mode: 'luma', output: 'auto' })
             // 典雅主题：将反转后的颜色混入金色调，使高亮与主题和谐
             if (theme === 'elegant') {
-                color = _blendWithGold(color)
+                color = window._blendWithGold(color)
             }
         }
     } catch (e) { /* 忽略安全失败，继续使用原色 */ }
@@ -119,7 +119,7 @@ function removeHighlight(selector) {
  * @param {string} color - 高亮颜色
  * @param {string} scrollSelector - 滚动区域对应的选择器
  */
-function addStandardHighlight(element, color, scrollSelector) {
+window.addStandardHighlight = function addStandardHighlight(element, color, scrollSelector) {
     $(element).each(function() {
         const el = this;
         
@@ -141,7 +141,7 @@ function addStandardHighlight(element, color, scrollSelector) {
             ActiveHighlightRegistry.remove(this);
         });
     });
-}
+};
 
 /**
  * 术语高亮函数（从term.js迁移过来）
@@ -149,7 +149,7 @@ function addStandardHighlight(element, color, scrollSelector) {
  * @param {HTMLElement} element - DOM元素
  * @param {string} mode - 模式：'', 'divided', 'part'
  */
-function termHighlight(term, element, mode='') {
+window.termHighlight = function termHighlight(term, element, mode='') {
     // divided 模式：对每个 part 执行 fn(enSelector, color)
     const eachDivided = (currentTerm, fn) => {
         currentTerm.part.forEach((part) => {
@@ -205,4 +205,4 @@ function termHighlight(term, element, mode='') {
         performCleanup(target);
         ActiveHighlightRegistry.remove(target);
     })
-}
+};

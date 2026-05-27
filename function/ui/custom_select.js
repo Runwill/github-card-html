@@ -8,11 +8,8 @@
  *   CustomSelect.refreshAll()               — 刷新所有已包装的实例（选项变更后调用）
  *   CustomSelect.refresh(selectElement)      — 刷新单个已包装的实例
  *
- * IIFE 模块，挂载到 window.CustomSelect
+ * 模块脚本，挂载到 window.CustomSelect
  */
-;(function () {
-    'use strict';
-
     const WRAP_CLASS = 'custom-select';
     const TRIGGER_CLASS = 'custom-select__trigger';
     const DROPDOWN_CLASS = 'custom-select__dropdown';
@@ -399,5 +396,3 @@
 
     /* ── Expose ────────────────────────────────────────────────────── */
     window.CustomSelect = { init, wrap, refresh, refreshAll };
-
-})();

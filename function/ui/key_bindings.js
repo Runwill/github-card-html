@@ -1,4 +1,3 @@
-(function () {
   const STORAGE_KEY = 'user_key_bindings';
   const KEY_SETTINGS_BUTTON_ID = 'key-settings-button';
   
@@ -194,11 +193,9 @@
   });
   
   // Expose API
-  window.KeySettings = {
+  window.KeySettings = Object.assign(window.KeySettings || {}, {
       checkBinding,
       getBinding,
       getBindingText,
       ACTIONS
-  };
-
-})();
+  });

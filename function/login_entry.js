@@ -1,0 +1,9 @@
+import './ui/theme.js?v=202605241400';
+import './preload/manager.js?v=202605230500';
+import './preload/resources.js?v=202605230500';
+import '../i18n/strings.js?v=202605241100';
+import './i18n/i18n.js?v=202605240200';
+import './api/endpoints.js?v=202605230900';
+import './ui/lang_toggle_button.js?v=202605230400';
+import './auth/login.js?v=202605240100';
+import './auth/backend_toggle.js?v=202605230500';

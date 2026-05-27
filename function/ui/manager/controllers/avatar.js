@@ -1,6 +1,5 @@
 // 头像裁剪、上传与待审预览控制器（集成 Cropper 及上传流程）。
 // CardUI Manager Controllers - avatar upload & crop
-(function(){
   'use strict';
   var w = window;
   var dom = w.CardUI.Manager.Core.dom;
@@ -119,4 +118,3 @@
     handleCroppedUpload: handleCroppedUpload,
     loadPendingAvatarPreview: loadPendingAvatarPreview
   };
-})();

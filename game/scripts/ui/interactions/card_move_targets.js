@@ -1,5 +1,4 @@
-(function () {
-    "use strict";
+"use strict";
 
     window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
@@ -211,4 +210,3 @@
         findAnimationTargetForAreaPath,
         findAnimationTargetForDropZone
     };
-})();

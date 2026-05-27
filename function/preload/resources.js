@@ -1,8 +1,5 @@
-;(function(){
-  'use strict';
-
   var preload = window.AppPreload;
-  if (!preload) return;
+  if (preload) {
 
   var keyFonts = [
     { family: '康熙', url: 'source/康熙字典体.TTF', sample: '多少事 从来急' },
@@ -34,5 +31,5 @@
     ]);
   }, { context: 'app', priority: 60, delay: 360, timeout: 2600 });
 
-  preload.start();
-})();
+    preload.start();
+  }

@@ -1,4 +1,3 @@
-(function () {
   // tokens/api
   // 统一 API 封装：鉴权、JSON 序列化、错误处理
 
@@ -62,4 +61,3 @@
   const COLLECTION_TYPES = Object.freeze(Object.keys(COLLECTIONS));
 
   Object.assign(window.tokensAdmin, { getAuth, apiJson, COLLECTIONS, COLLECTION_TYPES, CLIENT_ID, fetchTokenLogs });
-})();

@@ -1,6 +1,3 @@
-;(function(){
-  'use strict';
-
   var tasks = [];
   var started = false;
   var activeContext = null;
@@ -124,4 +121,3 @@
     loadFont: loadFont,
     decodeImage: decodeImage
   };
-})();

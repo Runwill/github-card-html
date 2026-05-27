@@ -1,5 +1,4 @@
-(function() {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
     const DragState = {
@@ -446,5 +445,3 @@
     window.Game.UI.Interactions = {
         initDrag
     };
-
-})();

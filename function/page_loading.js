@@ -40,23 +40,20 @@ function calculateProgressBarDuration(text){
     return n<=len ? base : Math.min(cap, base*(n/len));
 }
 
-// 等待 DOM 与 partials 注入完毕后再设置加载文本与进度条时间
-function whenDOMReady(){ return new Promise(r=> document.readyState==='loading' ? document.addEventListener('DOMContentLoaded', r, {once:true}) : r()) }
-
-function whenPartialsReady(){ return window.partialsReady?.then ? window.partialsReady.catch(()=>{}) : Promise.resolve() }
-
 // 统一的随机选文案
 function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 
-;(async function(){
-    await whenDOMReady(); await whenPartialsReady();
+async function initLoadingOverlay(){
+    await window.whenDOMReady(); await window.whenPartialsReady();
     const text=pickRandom(loadingTexts), title=document.getElementById('loading-title');
     if(title){ loadingTitleText=text; title.textContent=text; applyLoadingTitleSpacing(); }
     const dur=calculateProgressBarDuration(text), bar=document.querySelector('.loading-bar');
     if(bar){ bar.style.setProperty('--pb-duration', `${dur}s`); const end= dur<=1.2?0.88:Math.min(0.93,0.88+(dur-1.2)*0.08); bar.style.setProperty('--pb-end', String(end)); }
     setTimeout(startCompletionCheck, dur*900+800);
     setTimeout(()=>{ if(!completionStarted) completeProgressBar() }, 10000);
-})()
+}
+
+initLoadingOverlay()
 
 window.addEventListener('resize', applyLoadingTitleSpacing)
 
@@ -111,7 +108,7 @@ document.addEventListener('DOMContentLoaded', ()=>{ domReady=true; scheduleStatu
 window.addEventListener('load', ()=>{ resourcesReady=true; scheduleStatus(); attemptCompletion() })
 
 // 名称 / 术语等替换完成（由 app_bootstrap.js 暴露）
-;(function(){
+function watchReplacementsReady(){
     try{
         const fallbackTimer = setTimeout(()=>{
             if(!replacementsReady){ replacementsReady=true; attemptCompletion() }
@@ -140,10 +137,12 @@ window.addEventListener('load', ()=>{ resourcesReady=true; scheduleStatus(); att
             })
         }
     }catch(_){ finishReplacements() }
-})()
+}
+
+watchReplacementsReady()
 
 // 字体加载完成（使用 FontFaceSet API；若不支持则回退为已就绪）
-;(function(){
+function watchFontsReady(){
     try{
         if(document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function'){
             // 严格等待：全局字体就绪 + 关键字体（康熙）加载完毕
@@ -157,6 +156,8 @@ window.addEventListener('load', ()=>{ resourcesReady=true; scheduleStatus(); att
     }catch(e){
         finishFonts()
     }
-})()
+}
+
+watchFontsReady()
 
 // 进度检查的定时已在 initLoadingOverlay 中按 partialsReady 之后统一安排

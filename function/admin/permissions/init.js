@@ -1,4 +1,4 @@
-(function(w){
+const w = window;
   const ns = w.TokensPerm = w.TokensPerm || {};
 
   const API = ns.API || {};
@@ -18,4 +18,3 @@
       try { ns.renderPermissionsPanel(''); } catch(_){ }
     }
   })).catch(()=>{});
-})(window);

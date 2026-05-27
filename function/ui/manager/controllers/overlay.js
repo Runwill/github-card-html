@@ -1,6 +1,5 @@
 // 统一覆盖层系统 - 用导航栈管理所有菜单和弹窗
 // 替代原 modal.js + sidebar.js
-(function(){
   'use strict';
   var w = window;
   var dom = w.CardUI.Manager.Core.dom;
@@ -196,4 +195,3 @@
     isAnyOpen: isAnyOpen,
     panelIds: Object.keys(PANELS)
   };
-})();

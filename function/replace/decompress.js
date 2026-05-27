@@ -1,4 +1,4 @@
-function decompress(path, paragraphs = document){
+window.decompress = function decompress(path, paragraphs = document){
     fetchJsonCached(path).then(compression => {
         for (var i in compression){
             $(paragraphs).find(compression[i].name).each(function() {
@@ -6,4 +6,4 @@ function decompress(path, paragraphs = document){
             })
         }
     })
-}
+};

@@ -1,4 +1,3 @@
-;(function(){
   // 一个在“将池页”和“技能页”之间共享的搜索输入框
   // 行为约定：
   // - 仅在将池页触发筛选（调用 window.filterParagraphs 若存在）
@@ -81,23 +80,10 @@
       try { applyPanelFilter(panelSelector); } catch(_) { /* ignore */ }
   }
 
-  // 当切换页签时，将同一个搜索框移动过去
-  function setupTabSync(){
-    const nav = document.getElementById('main-tabs');
-    if (!nav) return;
-    nav.addEventListener('click', (e)=>{
-      const a = e.target.closest('a.title-a');
-      if (!a) return;
-      const href = a.getAttribute('href');
-      if (href === '#panel_character' || href === '#panel_skill') requestAnimationFrame(()=> mountToPanel(href));
-    }, true);
-  }
-
   whenDOMReady().then(()=> whenPartialsReady().then(()=>{
     ensureSearchOnce();
     const initialPanel = document.querySelector('#panel_character') ? '#panel_character' : (document.querySelector('#panel_skill') ? '#panel_skill' : null);
     if (initialPanel) mountToPanel(initialPanel);
-    setupTabSync();
   }));
 
   // 简单的“将池页”筛选：根据输入内容隐藏/显示 <characterParagraph>
@@ -130,5 +116,4 @@
 
   window.filterParagraphs = makeFilter('#panel_character .standardCharactersBlock .characterParagraph');
   window.filterSkills = makeFilter('#panel_skill .standardCharacterSkillsBlock .skill-row', toggleTrailingBrs);
-
-})();
+  window.SharedSearch = Object.assign(window.SharedSearch || {}, { mountToPanel });

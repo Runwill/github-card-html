@@ -1,6 +1,5 @@
 // tokens/ui/render
 // 渲染统计瓦片、各集合区块与卡片；绑定操作；对接搜索/收起/展开状态
-(function(){
   const T = window.tokensAdmin;
   const { state } = T;
   const { esc, getAccent, computeTint } = T;
@@ -298,4 +297,3 @@
   async function tokensOpenCreate(collection){ try{ const dataArr= await getCollectionData(collection); const variants= computeCollectionVariants(collection, dataArr||[]); if(variants && variants.length>0){ window.tokensAdmin.showCreateModal(collection, null, variants[0].tpl, variants); return; } const shape = await apiJson(`/tokens/shape?collection=${encodeURIComponent(collection)}`, { auth:true }); const tpl = window.tokensAdmin.buildTemplate(collection, shape); window.tokensAdmin.showCreateModal(collection, shape, tpl, null); }catch(e){ alert(e.message || '获取结构失败'); } }
   function computeCollectionVariants(collection, arr){ const map=new Map(); for(const doc of (Array.isArray(arr)? arr:[])){ const schema=window.tokensAdmin.deriveSchema(doc||{}); const sig=window.tokensAdmin.schemaSignature(schema); let cur=map.get(sig); if(!cur){ cur={schema, count:0, samples:[]}; map.set(sig, cur); } cur.count+=1; if(cur.samples.length<3) cur.samples.push(doc); } const list= Array.from(map.values()).map((it,idx)=>{ const base=window.tokensAdmin.skeletonFromSchema(it.schema); const tpl=base; const hints= window.tokensAdmin.flattenHintsFromSchema(it.schema); return { id:`scheme-${idx+1}`, count:it.count, schema:it.schema, tpl, hints, samples:it.samples }; }); list.sort((a,b)=>{ const ak=a.hints.length, bk=b.hints.length; if(bk!==ak) return bk-ak; return b.count-a.count; }); return list; }
   Object.assign(window.tokensAdmin, { renderTokensDashboard, toggleTokensSection, tokensRefresh, tokensOpenCreate });
-})();

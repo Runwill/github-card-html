@@ -1,4 +1,3 @@
-(function(){
   // permissions/logs/logs: 在权限页添加用户变更日志，沿用 tokens 日志样式与行为
   // API 层复用 permissions/api.js 中的 TokensPerm.API
 
@@ -28,11 +27,11 @@
   let KNOWN_TYPES = new Set(TYPE_GROUPS.flatMap(item => item.types || []));
 
   // 时间工具：复用全局 TimeFmt
-  const { getLocaleFromI18n } = window.TimeFmt;
+  const getDateInputLocale = () => window.TimeFmt?.getLocaleFromI18n?.() || 'en-US';
   // 让日期输入控件的地区跟随当前语言
   function setDateInputLang(container){
     try{
-      const locale = getLocaleFromI18n();
+      const locale = getDateInputLocale();
       const scope = (container && container.querySelector) ? container : document;
       ['#perms-log-from', '#perms-log-to'].forEach(sel=>{
         const el = scope.querySelector(sel);
@@ -348,4 +347,3 @@
     setDateInputLang,
     buildQuery,
   };
-})();

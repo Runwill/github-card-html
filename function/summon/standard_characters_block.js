@@ -1,13 +1,13 @@
 // 等价精简版：渲染所有标准“角色段落”与技能列表
 // 维持原 HTML 输出与交互（搜索条动画、类名、顺序），仅减少拼接与循环开销
-function summonCharacters() {
+window.summonCharacters = function summonCharacters() {
     Promise.all([
         fetchJsonCached(endpoints.character()).catch(() => []),
         fetchJsonCached(endpoints.skill()).catch(() => [])
-    ]).then(([c, s]) => CharacterReplace(c || [], s || []))
-}
+    ]).then(([c, s]) => window.CharacterReplace(c || [], s || []))
+};
 
-function CharacterReplace(character, skill) {
+window.CharacterReplace = function CharacterReplace(character, skill) {
     const byId = new Map((character || []).map(c => [c.id, c]))
     const ids = Array.from(new Set((character || []).map(c => +c.id))).sort((a, b) => a - b)
 
@@ -48,4 +48,4 @@ function CharacterReplace(character, skill) {
     $('.standardCharactersBlock').html(`<br>${out}`)
         // 渲染后若搜索框有关键字，应用将池筛选
         try { window.filterParagraphs?.() } catch(_) {}
-}
+};

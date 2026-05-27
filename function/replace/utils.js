@@ -47,7 +47,7 @@ function bindDblclickAndHighlight($elements, options){
     }
     const selector = getScrollSelector ? getScrollSelector(el) : fixedScrollSelector
     const color = getColor ? getColor(el) : fixedColor
-    if (selector) addStandardHighlight($(el), color || '', selector)
+    if (selector) window.addStandardHighlight?.($(el), color || '', selector)
   })
 }
 

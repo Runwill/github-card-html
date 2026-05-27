@@ -1,14 +1,14 @@
 // 等价精简版：并发请求角色与技能，渲染标准“角色技能”区块
 // 保持原有 DOM 结构/类名/顺序；仅收紧实现以减少体积
-async function summonCharacterSkill() {
+window.summonCharacterSkill = async function summonCharacterSkill() {
     const [characterData, skillData] = await Promise.all([
         fetchJsonCached(endpoints.character()).catch(() => []),
         fetchJsonCached(endpoints.skill()).catch(() => [])
     ])
-    CharacterSkillReplace(characterData || [], skillData || [])
-}
+    window.CharacterSkillReplace(characterData || [], skillData || [])
+};
 
-function CharacterSkillReplace(character, skill) {
+window.CharacterSkillReplace = function CharacterSkillReplace(character, skill) {
     const byId = new Map((character || []).map(c => [c.id, c]))
     const html = '<br><br>' + (skill || [])
         .filter(s => s && s.role)
@@ -29,4 +29,4 @@ function CharacterSkillReplace(character, skill) {
     $('.standardCharacterSkillsBlock').html(html)
     // 渲染后若搜索框有关键字，应用技能筛选
     try { window.filterSkills?.() } catch(_) {}
-}
+};

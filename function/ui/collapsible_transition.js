@@ -1,7 +1,4 @@
 /** CollapsibleTransition — CSS height 过渡驱动的折叠/展开动画。由 collapsible.js 调用。 */
-;(function () {
-  'use strict';
-
   function finishTransition(el) {
     // 展开完成后，将高度改为 auto 以适配内容动态变化
     if (!el.classList.contains('is-collapsed')) {
@@ -35,4 +32,3 @@
   }
 
   window.CollapsibleTransition = { expand: expand, collapse: collapse };
-})();

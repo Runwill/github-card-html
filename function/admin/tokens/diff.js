@@ -1,4 +1,3 @@
-(function () {
   // tokens/diff
   // 计算对象差异并通过 API 应用（删除优先，后设置）
 
@@ -100,4 +99,3 @@
   }
 
   Object.assign(window.tokensAdmin, { diffObjects, applyObjectEdits });
-})();

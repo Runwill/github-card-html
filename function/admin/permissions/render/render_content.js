@@ -1,4 +1,4 @@
-((w)=>{
+const w = window;
   // permissions/render/render_content — 内容渲染: 用户权限块 + 主渲染入口
   // 动效与绑定在 render.js 中，通过 TokensPerm._RenderUI 共享
   const ns = w.TokensPerm;
@@ -364,4 +364,3 @@
     // 清理容器内联样式
     try { box.style.transition=''; box.style.height=''; box.style.overflow=''; } catch {}
   };
-})(window);

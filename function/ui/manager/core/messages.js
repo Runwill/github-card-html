@@ -1,6 +1,5 @@
 // 核心消息与吐司提示工具函数。
 // CardUI Manager Core - messages & toast helpers
-(function(){
   'use strict';
   var w = window;
   var ns = w.CardUI.Manager.Core;
@@ -12,4 +11,3 @@
   }
 
   ns.messages = { showMessage: showMessage };
-})();

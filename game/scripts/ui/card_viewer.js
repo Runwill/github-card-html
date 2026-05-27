@@ -1,5 +1,4 @@
-(function() {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
     // Registry of open viewers: sourceId -> { modal, cleanup }
@@ -50,7 +49,6 @@
     window.Game.UI.closeAllViewers = function() {
         Object.values(window.Game.UI.viewers).forEach(v => { if (v && v.cleanup) v.cleanup(); });
     };
-
     window.Game.UI.toggleCardViewer = function(title, cards, sourceId, options = {}) {
         if (window.Game.UI.viewers[sourceId]) {
             window.Game.UI.viewers[sourceId].cleanup();
@@ -58,7 +56,6 @@
             window.Game.UI.openCardViewer(title, cards, sourceId, options);
         }
     };
-
     /**
      * Helper: Attach Drag-to-Move Logic to a Modal
      */
@@ -426,5 +423,3 @@
              renderViewerGrid(grid.id, cardsFromArea(sourceArea), sourceId, options);
         });
     };
-
-})();

@@ -1,5 +1,4 @@
 // 通用按钮与DOM工具，减少重复逻辑
-(function(global){
   // 统一设置按钮颜色：true=Blue(开)，false=Red(关)
   function applyButtonState(btn,isOn){ if(!btn) return; btn.classList.remove('button_color_blue','button_color_red'); btn.classList.add(isOn?'button_color_blue':'button_color_red'); }
 
@@ -13,5 +12,4 @@
   // 标签替换：仅更换标签名，保留内容
   function replaceTag(from,to,scope){ (scope||document).querySelectorAll(from).forEach(el=>{ const neo=document.createElement(to); neo.innerHTML=el.innerHTML; el.parentNode?.replaceChild(neo,el); }); }
 
-  global.ButtonUtils={applyButtonState,toggleDisplay,replaceTag};
-})(window);
+  window.ButtonUtils={applyButtonState,toggleDisplay,replaceTag};

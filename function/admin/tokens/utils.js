@@ -1,4 +1,3 @@
-(function () {
   // tokens/utils
   // 常用工具：HTML 转义、按路径设置/删除、颜色工具
 
@@ -87,4 +86,3 @@
   }
 
   Object.assign(window.tokensAdmin, { esc, showToast, setByPath, deleteFieldInDocByPath, getAccent, computeTint, HIDE_KEYS, stripHidden });
-})();

@@ -8,8 +8,7 @@
  *
  * 同时控制底部区域(game-main-area) 仅在 'play' 时显示。
  */
-(function () {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
     const VIEW_IDS = {
@@ -100,4 +99,3 @@
     window.Game.UI.switchGameView = switchGameView;
     window.Game.UI.getCurrentView = getCurrentView;
     window.Game.UI.restorePreviousView = restorePreviousView;
-})();

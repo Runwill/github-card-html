@@ -1,15 +1,17 @@
 // 技能行复制：Ctrl 显示按钮 + 一键复制本行
-(function(){
-  // 权限白名单：仅审核员/管理员可用；与后端一致（admin, moderator）。
-  // 可通过 window.skillCopyAllowedRoles = ['admin','moderator'] 在外部覆盖。
+// 权限白名单：仅审核员/管理员可用；与后端一致（admin, moderator）。
+// 可通过 window.skillCopyAllowedRoles = ['admin','moderator'] 在外部覆盖。
+function canUseSkillCopy(){
   try {
     const roleRaw = (localStorage.getItem('role') || '').trim();
     const roleLc = roleRaw.toLowerCase();
-  const external = Array.isArray(window.skillCopyAllowedRoles) ? window.skillCopyAllowedRoles : null;
-  const baseList = external || ['admin','moderator'];
-    const isAllowed = baseList.some(r => String(r).toLowerCase() === roleLc || r === roleRaw);
-    if (!isAllowed) { return; }
-  } catch (_) { /* 容错：异常时默认禁用 */ return; }
+    const external = Array.isArray(window.skillCopyAllowedRoles) ? window.skillCopyAllowedRoles : null;
+    const baseList = external || ['admin','moderator'];
+    return baseList.some(r => String(r).toLowerCase() === roleLc || r === roleRaw);
+  } catch (_) { return false; }
+}
+
+if (canUseSkillCopy()) {
 
   // 切换 Ctrl 状态类
   function setCtrlPressed(on){
@@ -83,4 +85,4 @@
     await copyText(text);
     btn.blur(); // 释放焦点，避免 Ctrl 再按时仍显示此按钮
   });
-})();
+}

@@ -1,8 +1,7 @@
 // admin/collapsible_anim
 // 通用折叠/展开动画工具，配合 CSS .collapsible / .is-open 类使用
 // 消费者：tokens/ui/logger.js、permissions/logs/logs.js
-(function(){
-  function isAnimating(el){ return !!(el && (el.classList.contains('is-opening') || el.classList.contains('is-closing'))); }
+function isAnimating(el){ return !!(el && (el.classList.contains('is-opening') || el.classList.contains('is-closing'))); }
   function isOpen(el){ return !!(el && el.classList.contains('is-open')); }
   function onTransitionEnd(el, callback, timeoutMs, filter){
     if (!el) { if (callback) callback(); return function(){}; }
@@ -50,5 +49,4 @@
       }, 0, e => e.target === el);
     }catch(_){ }
   }
-  window.CollapsibleAnim = { isAnimating, isOpen, onTransitionEnd, openCollapsible, closeCollapsible };
-})();
+window.CollapsibleAnim = { isAnimating, isOpen, onTransitionEnd, openCollapsible, closeCollapsible };

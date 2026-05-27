@@ -2,8 +2,7 @@
  * Online Room Client
  * Socket.IO 客户端，管理与服务器的房间通信
  */
-(function () {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.Online = window.Game.Online || {};
 
     let socket = null;
@@ -56,13 +55,14 @@
             const baseUrl = window.endpoints ? window.endpoints.getBase() : 'http://localhost:3000';
 
             // socket.io-client 通过 CDN 加载
-            if (typeof io === 'undefined') {
+            const socketFactory = window.io;
+            if (typeof socketFactory !== 'function') {
                 console.error('[Online] Socket.IO client not loaded');
                 reject(new Error('Socket.IO client not loaded'));
                 return;
             }
 
-            socket = io(baseUrl, {
+            socket = socketFactory(baseUrl, {
                 transports: ['websocket', 'polling'],
                 timeout: 10000,
                 reconnectionAttempts: MAX_RECONNECT
@@ -278,5 +278,3 @@
         get currentRoomId() { return currentRoomId; },
         get socket() { return socket; }
     };
-
-})();

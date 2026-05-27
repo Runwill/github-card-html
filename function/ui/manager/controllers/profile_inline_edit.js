@@ -1,6 +1,5 @@
 // 用户名与个人简介的内联编辑及待审提示控制器。
 // CardUI Manager Controllers - username & intro inline edit
-(function(){
   'use strict';
   var w = window;
   var dom = w.CardUI.Manager.Core.dom;
@@ -250,4 +249,3 @@
     loadPendingUsernameBadge: loadPendingUsernameBadge,
     cancelPendingUsernameChange: cancelPendingUsernameChange
   };
-})();

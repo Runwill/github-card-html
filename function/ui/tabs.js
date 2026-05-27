@@ -1,4 +1,3 @@
-;(function(){
   const titles=['程序','技能','牌库','将池','草稿','词元','权限','对局'];
   const changeTitle=n=> document.title='Document丨'+(titles[n]||'');
   const isAdmin=()=> !!window.TokensPerm?.API?.isAdmin?.();
@@ -19,6 +18,9 @@
           const list = document.getElementById('perm-list');
           const hasRow = !!(list && list.querySelector && list.querySelector('.approval-row'));
           if(window.TokensPerm?.renderPermissionsPanel && !hasRow){ window.TokensPerm.renderPermissionsPanel(''); }
+        }
+        if(href==='#panel_character' || href==='#panel_skill'){
+          requestAnimationFrame(()=> window.SharedSearch?.mountToPanel?.(href));
         }
         if(href==='#panel_draft'){
           requestAnimationFrame(()=>{
@@ -80,4 +82,3 @@
     }
   }));
   window.TabsUI = Object.assign(window.TabsUI || {}, { changeTitle, getActivePanelId, isPanelActive });
-})()

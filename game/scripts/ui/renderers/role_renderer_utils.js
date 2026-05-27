@@ -1,5 +1,4 @@
-(function() {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
     /**
@@ -334,4 +333,3 @@
             document.querySelectorAll('.role-summary .player-name').forEach(fitSummaryName);
         }, 150);
     });
-})();

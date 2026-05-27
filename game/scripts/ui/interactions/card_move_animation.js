@@ -4,8 +4,7 @@
  * 弧形飞行动画、目标位置恢复、布局 FLIP 挤压/滑动动画等内部实现。
  * 从 card_move_animator.js 拆分。
  */
-(function () {
-    "use strict";
+"use strict";
 
     const I = window.Game.UI._CardMoveInternal;
     const { CONFIG, getContainerForArea, findCardElement, getFallbackAnchor, resolveAreaForPath, getCardElementAppearance } = I;
@@ -303,7 +302,5 @@
     window.Game.UI._CardMoveEngine = {
         animateArcFlight: _animateArcFlight,
         animateLayoutShift: _animateLayoutShift,
-        cleanup: _cleanup,
+        cleanup: _cleanup
     };
-
-})();

@@ -1,5 +1,4 @@
-(function(){
-    const zh = {
+const zh = {
         // Tokens panel
         'tokens.title': '词元',
         'tokens.search.placeholder': '搜索...',
@@ -72,9 +71,9 @@
         // Tokens statuses
         'tokens.status.loading': '加载中…',
         'tokens.status.loadFailedWithRefresh': '加载失败，请点击“刷新”重试',
-    };
+};
 
-    const en = {
+const en = {
         // Tokens panel
         'tokens.title': 'Tokens',
         'tokens.search.placeholder': 'Search...',
@@ -147,12 +146,11 @@
         // Tokens statuses
         'tokens.status.loading': 'Loading…',
         'tokens.status.loadFailedWithRefresh': 'Load failed, click “Refresh” to retry',
-    };
+};
 
-    if (window.I18N_STRINGS) {
-        Object.assign(window.I18N_STRINGS.zh, zh);
-        Object.assign(window.I18N_STRINGS.en, en);
-    } else {
-        console.warn('I18N_STRINGS not found, tokens strings not loaded');
-    }
-})();
+if (window.I18N_STRINGS) {
+    Object.assign(window.I18N_STRINGS.zh, zh);
+    Object.assign(window.I18N_STRINGS.en, en);
+} else {
+    console.warn('I18N_STRINGS not found, tokens strings not loaded');
+}

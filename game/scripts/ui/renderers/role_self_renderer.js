@@ -1,5 +1,4 @@
-(function() {
-    const { setupHandInspector, roleCharacterKey, updateAvatarImage, updateCountBadge, renderEquipNames, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
+const { setupHandInspector, roleCharacterKey, updateAvatarImage, updateCountBadge, renderEquipNames, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
 
     /**
      * 渲染自身角色信息 (Self Role Info)
@@ -190,4 +189,3 @@
 
     // 导出
     window.Game.UI.updateSelfRoleInfo = updateSelfRoleInfo;
-})();

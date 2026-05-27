@@ -1,5 +1,4 @@
 /* 行高亮条（贯穿屏幕宽度，元素同高）：淡入→停留→淡出 */
-(function(global){
   function highlightRowAtElement(elem, opts){
     if (!elem) return function(){}
 
@@ -68,7 +67,6 @@
     }
   }
 
-  global.rowHighlight = Object.assign(global.rowHighlight || {}, {
+  window.rowHighlight = Object.assign(window.rowHighlight || {}, {
     highlightRowAtElement
   })
-})(window)

@@ -1,8 +1,6 @@
 // 全局 Toast 通知（唯一实现）
 // 用法：window.showToast(message)          成功样式
 //       window.showToast(message, 'error')  错误样式
-(function(){
-  'use strict';
   var NS = 'http://www.w3.org/2000/svg';
 
   function showToast(message, type){
@@ -43,4 +41,3 @@
   }
 
   window.showToast = showToast;
-})();

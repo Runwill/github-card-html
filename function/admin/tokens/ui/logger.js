@@ -1,4 +1,3 @@
-(function () {
   const MAX_LOGS = 200;
 
   const T = window.tokensAdmin;
@@ -43,7 +42,7 @@
     } catch (_) { return null; }
   }
 
-  const { parseTimeValue } = window.TimeFmt;
+  const parseLogTime = value => window.TimeFmt?.parseTimeValue?.(value);
 
   function pickLogTime(v){
     try{
@@ -153,8 +152,8 @@
             const items = list.slice();
             try{
               items.sort((a,b)=>{
-                const tb = parseTimeValue(pickLogTime(b)) ?? 0;
-                const ta = parseTimeValue(pickLogTime(a)) ?? 0;
+                const tb = parseLogTime(pickLogTime(b)) ?? 0;
+                const ta = parseLogTime(pickLogTime(a)) ?? 0;
                 return tb - ta;
               });
             }catch(_){ }
@@ -191,4 +190,3 @@
     }
     try{ window.addEventListener && window.addEventListener('i18n:changed', onI18nChanged); }catch(_){ }
   });
-})();

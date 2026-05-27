@@ -1,5 +1,4 @@
-(function() {
-    const { fitSummaryName, setupHandInspector, roleCharacterKey, updateAvatarImage, updateCountBadge, renderEquipNames, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
+const { fitSummaryName, setupHandInspector, roleCharacterKey, updateAvatarImage, updateCountBadge, renderEquipNames, setupJudgeButton, setupEquipmentButton, updateViewerLabels, openJudgeViewer } = window.Game.UI._RoleUtils;
 
     function createSummaryButton(className, text, title) {
         const button = document.createElement('button');
@@ -296,4 +295,3 @@
 
     // 导出
     window.Game.UI.renderRoleList = renderRoleList;
-})();

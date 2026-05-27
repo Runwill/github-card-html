@@ -2,7 +2,6 @@
  * 统一滚动与闪烁高亮工具
  * 用于在切换 Tab 后滚动到目标并执行淡入淡出提示
  */
-(function(global){
   // 记录当前进行中的滚动+高亮操作，便于在切换 panel 时取消
   let __currentOp = null;
   let __opSeq = 0;
@@ -291,7 +290,7 @@
   }
 
   // 暴露到全局
-  global.scrollActions = {
+  window.scrollActions = {
     scrollToSelectorAndFlash,
     scrollToClassAndFlash,
     scrollToTagAndFlash,
@@ -314,4 +313,3 @@
     })
     mo.observe(root, { subtree: true, attributes: true, attributeFilter: ['class'] })
   } catch(_) {}
-})(window)

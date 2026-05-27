@@ -1,5 +1,4 @@
-(function(){
-  const STORAGE_KEY = 'lang';
+const STORAGE_KEY = 'lang';
   const DEFAULT_LANG = 'zh';
   // 明确定义语言循环顺序：zh -> en -> debug -> zh ...
   // 注意：保留通过按钮切换到调试语言（debug）的能力
@@ -204,5 +203,4 @@
 
   // 暴露全局 API：提供单一全局函数 t，避免重复别名
   window.t = t;
-  window.i18n = { t, apply, applySafe, setLang, getLang: current, nextLang, nameOf };
-})();
+window.i18n = { t, apply, applySafe, setLang, getLang: current, nextLang, nameOf };

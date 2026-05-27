@@ -1,6 +1,5 @@
 // 核心错误处理与响应解析工具。
 // CardUI Manager Core - error helpers
-(function(){
   'use strict';
   var w = window;
   var ns = w.CardUI.Manager.Core;
@@ -22,4 +21,3 @@
   }
 
   ns.errors = { parseErrorResponse: parseErrorResponse };
-})();

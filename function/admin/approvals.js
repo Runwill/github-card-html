@@ -1,12 +1,11 @@
 // 审核模块：统一管理注册与头像审核（管理员/版主）
-(function(){
   const refreshUser = () => { try { window.CardUI?.Manager?.Core?.userService?.refreshCurrentUserFromServer?.(); } catch(_){} };
 
   const jsonGet = path => endpoints.requestJson(path, { auth: 'always', preferJsonMessage: false });
   const jsonPost = (path, body)=> endpoints.requestJson(path, { method:'POST', auth: 'always', body: body || {} });
 
   const createdAtDate = value => new Date((window.TimeFmt?.parseTimeValue?.(value) ?? Date.parse(value)) || 0);
-  const el = window.LogUtils.elem;
+  const el = (...args) => window.LogUtils.elem(...args);
   const emptyOverlay = opacity => el('p', { cls:'empty-hint empty-overlay', text:'空', style:{ position:'absolute', inset:'0', display:'flex', alignItems:'center', justifyContent:'center', margin:'0', opacity:String(opacity), transition: opacity ? '' : 'opacity 180ms ease' } });
 
   // ── fetchPending 工厂 ──
@@ -135,4 +134,3 @@
     fetchPendingApprovalGroups, countPendingApprovalGroups, setPendingApprovalGroupsCache,
     renderApprovals
   });
-})();

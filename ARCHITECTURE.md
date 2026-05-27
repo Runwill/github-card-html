@@ -356,9 +356,9 @@ html.force-landscape {
 - **DOM 操作**: jQuery（仅用于 Foundation 初始化和部分替换逻辑）+ 原生 DOM API
 - **在线对局**: Socket.IO 4.7.5（CDN）
 - **图片裁剪**: Cropper.js 1.6.2（CDN）
-- **构建**: 无构建工具，全部 `<script>` 标签按序加载，通过 `?v=` 时间戳缓存刷新
+- **构建**: 生产路径仍为静态资源直连，通过 `?v=` 时间戳缓存刷新；主站由 `function/main_entry.js` 维护业务 module 顺序，登录页由 `function/login_entry.js` 维护登录页 module 顺序；本地开发使用 Vite，`npm run dev` 固定 `127.0.0.1:5500`
 - **后端**: 配套 Node.js 后端（`backend-project/`），通过 REST API + Socket.IO 通信
-- **模块化**: IIFE + `window` 全局命名空间（无 ES Modules / CommonJS）
+- **模块化**: 主体仍为 IIFE + `window` 全局命名空间；新增或迁移模块优先采用 ES Modules，并保留必要的 `window` 兼容边界
 
 ---
 
@@ -503,7 +503,7 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 ```
 
 - 所有组件通过 CSS 变量（`--bg-start`, `--surface`, `--text`, `--primary-2` 等）引用颜色
-- `function/ui/theme.js` 在 `<head>` 最先加载，从 `localStorage('theme')` 读取并立即设置 `data-theme`，防止 FOUC
+- `function/startup_seed.js` 在 `<head>` 最先加载，从 `localStorage('theme')` 读取并立即设置 `data-theme`，防止 FOUC；主站入口同时用 `data-partials` 预建 partial ready 信号；`function/main_entry.js` 再按原主站 module 顺序导入主题、i18n、后台、对局、草稿和启动链脚本
 - 切换时使用 View Transitions API（Chromium 111+）或 `.theme-switching` class 降级方案
 - 典雅主题额外使用衬线字体、金色（`#d3ad6b`）主色调
 
@@ -517,8 +517,11 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 
 | 文件 | 职责 | 命名空间/导出 | 依赖 |
 |---|---|---|---|
+| `startup_seed.js` | CSS 前同步设置首屏主题；主站用 `data-partials` 预建 ready helper 与 pending partials Promise | `window.whenDOMReady`, `window.whenPartialsReady`, `window.partialsReady` | — |
+| `main_entry.js` | 主站单一 ESM 入口：按原 `index.html` module script 顺序导入主题、i18n、后台、对局、草稿、菜单和页尾交互 | — | `startup_seed.js`, Foundation/Socket.IO/Cropper classic |
+| `login_entry.js` | 登录页单一 ESM 入口：按顺序导入主题、预加载、i18n、端点、语言按钮、登录表单和后端切换 | — | `startup_seed.js` |
 | `app_bootstrap.js` | 主页启动：等待 `partialsReady` → Foundation 初始化 → 召唤角色区块 → 术语/名称替换 → 代词校验 | `window.replacementsReady`（Promise）| `partialsReady`, `summonCharacters`, `replace_*`, `decompress` |
-| `page_loading.js` | 加载遮罩层：随机文案、动态字距、进度条、完成检查后淡出 | 直接操作 DOM | `partialsReady` |
+| `page_loading.js` | 加载遮罩层：随机文案、动态字距、进度条、完成检查后淡出 | 直接操作 DOM | `window.whenDOMReady`, `window.whenPartialsReady`, `partialsReady` |
 
 #### 4.1.2 `function/api/`
 
@@ -589,12 +592,12 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 
 | 文件 | 职责 | 命名空间/导出 |
 |---|---|---|
-| `theme.js` | 主题初始化（`<head>` 最先加载）：读取 `localStorage('theme')`、设置 `data-theme`、View Transitions | `window.setTheme()` |
+| `theme.js` | 主题切换主体：系统主题监听、View Transitions 与手动切换 | `window.setTheme()` |
 | `theme_toggle_button.js` | 主题切换按钮（light→dark→elegant→light） | `window.ThemeToggle` |
 | `force_landscape.js` | 手机竖屏强制横屏：检测触屏+窄屏条件、创建 `#fl-rotate` / `#fl-scroll` 旋转容器 | `window.__flTransformRect()`, `window.__flOffsetTopTo()`, `html.force-landscape` |
 | `touch_scroll.js` | 旋转容器触摸滚动：在 transform 父元素内恢复触摸滚动+惯性 | `window.TouchScrollManager`（`install`） |
 | `color_utils.js` | 颜色工具：解析/反转/混合（支持 hex/rgb/hsl） | `window.ColorUtils` |
-| `include_loader.js` | `data-include` 局部模板加载器：扫描→fetch→替换→移除占位 | `window.partialsReady`（Promise） |
+| `include_loader.js` | `data-include` 局部模板加载器：扫描→fetch→替换→移除占位，并 resolve `startup_seed.js` 预建的 `window.partialsReady` | `window.partialsReady`（Promise） |
 | `preload/manager.js` | 启动后预热调度：等待 DOM/partials、按空闲期执行任务、缓存静态 JSON 和资源 | `window.AppPreload` |
 | `preload/resources.js` | 资源预准备：登录页字体预取，主站字体、静态 JSON、常用图片预热 | 注册到 `window.AppPreload` |
 | `preload/ui_prewarm.js` | UI 预准备：公告、帮助等首次打开前的轻量预渲染/预加载 | 注册到 `window.AppPreload` |
@@ -691,8 +694,8 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `game_def.js` | 游戏流程树定义（回合→阶段→时机节点），节点类型 `process`/`ticking`/`tick` | `window.Game.Def.GAME_FLOW` |
 | `game_core.js` | 流程引擎核心：流程推进、事件堆栈、自动前进（auto-advance） | `window.Game.Core`（`startGame`, `advance`, `getCurrentNode`, `setSpeed`, `isInTurn`, `isInteractive`, `checkAutoAdvance`） |
 | `game_controller.js` | 游戏控制器：模式切换（auto/sandbox）、启动游戏 | `window.Game.Controller`（`init`, `startGame`, `switchMode`, `setSpeed`）、`window.Game._ControllerInternal` |
-| `game_controller_dispatch.js` | **控制器调度层**：统一 `dispatch(actionType, payload)` 处理 `place`/`move`/`modifyHealth` 等动作 + CardMoveAnimator 快照 | 通过 `window.Game._ControllerInternal` 共享 |
-| `game_main.js` | 对局初始化入口：绑定按钮、初始化 CustomSelect/SetupManager/Online 模块 | `window.initGame()` |
+| `game_controller_dispatch.js` | **控制器调度层**：统一 `dispatch(actionType, payload)` 处理 `place`/`move`/`modifyHealth` 等动作 + CardMoveAnimator 快照 | `window.Game.Controller.dispatch`，通过 `window.Game._ControllerInternal` 共享 |
+| `game_main.js` | 对局初始化入口：等待 DOM/partials 后绑定按钮、初始化 CustomSelect/SetupManager/Online 模块 | 模块内初始化，消费 `window.Game` 入口 |
 
 > **Split File 模式**: `game_controller.js` 暴露 `_ControllerInternal` 内部对象，`game_controller_dispatch.js` 通过 `const I = window.Game._ControllerInternal` 访问共享状态和工具方法。
 
@@ -722,7 +725,7 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `term_manager.js` | 术语数据管理：加载术语颜色、缓存、数据访问助手 | `window.Game.UI.loadTermColors`, `window.Game.UI.getTermData` |
 | `text_renderer.js` | GameText 统一文本渲染器：模板注册 + `{key}` 替换 + `<tagName></tagName>` 术语标签 | `window.Game.UI.GameText` |
 | `move_log.js` | 卡牌移动日志系统（沙盒模式）：记录/显示/过滤 | `window.Game.UI.MoveLog` |
-| `context_menu.js` | 右键上下文菜单：通用渲染器 + 卡牌/角色/区域专用菜单 | `window.Game.UI.ContextMenu` |
+| `context_menu.js` | 右键上下文菜单：通用渲染器 + 卡牌/角色/区域专用菜单 | `window.Game.UI.showContextMenu`, `window.Game.UI.showCardContextMenu` |
 | `card_viewer.js` | 卡牌检视浮窗（多实例）：轮盘滚动、z-index 管理 | `window.Game.UI.viewers` |
 | `view_switch.js` | 对局面板视图切换：setup / online / play 三个互斥视图 | `window.Game.UI.switchGameView` |
 | `setup_manager.js` | 游戏设置面板：人数、武将选择、牌堆预设、模式切换 | `window.Game.Setup` |
@@ -733,8 +736,8 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 
 | 文件 | 职责 | 命名空间/导出 |
 |---|---|---|
-| `render_utils.js` | 安全渲染（`safeRender`：脏检查防抖）、`updateSpreadLayouts`（自适应牌间距） | `window.Game.UI.safeRender`, `window.Game.UI.updateSpreadLayouts` |
-| `card_renderer.js` | 卡牌渲染：`renderCardList`（平铺/堆叠区域的卡牌 DOM 生成） | `window.Game.UI.renderCardList` |
+| `render_utils.js` | 安全渲染（`safeRender`：脏检查防抖）、布局测量与样式复制工具 | `window.Game.UI.safeRender`, `window.Game.UI.getLayoutRect`, `window.Game.UI.copyStyles` |
+| `card_renderer.js` | 卡牌渲染：`renderCardList`（平铺/堆叠区域的卡牌 DOM 生成）和 `updateSpreadLayouts`（自适应牌间距） | `window.Game.UI.renderCardList`, `window.Game.UI.updateSpreadLayouts` |
 | `role_renderer_utils.js` | 角色渲染共享工具：名字自适应缩放（`fitSummaryName`）、手牌检视器、判定区按钮、装备按钮 | `window.Game.UI._RoleUtils` |
 | `role_self_renderer.js` | 自身角色渲染（底部面板）：头像、血条、手牌区、装备区、判定区 | `window.Game.UI.updateSelfRoleInfo` |
 | `role_list_renderer.js` | 其他角色列表渲染（左/上/右三栏布局）：摘要卡片 | `window.Game.UI.renderRoleList` |
@@ -793,13 +796,13 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 
 ### 工作原理
 
-1. **词典文件**（纯 JS，在 i18n.js 之前加载）：
+1. **词典文件**（ESM 数据脚本，在 i18n.js 之前按 HTML 顺序加载）：
    - `i18n/strings.js` — 全局词典（导航、弹窗、账号、通用文案）
    - `game/i18n/strings.js` — 对局词典（游戏按钮、在线房间、面包屑）
    - `function/admin/tokens/i18n/strings.js` — 词元模块词典
    - `function/admin/permissions/i18n/strings.js` — 权限模块词典
 
-2. **词典格式**：每个文件是一个 IIFE，将 `{ zh: {...}, en: {...} }` 对象合并到 `window.I18N_STRINGS`
+2. **词典格式**：`i18n/strings.js` 创建 `window.I18N_STRINGS` 与 `window.I18N_STRINGS_READY`；其他词典文件在模块作用域定义 `{ zh: {...}, en: {...} }` 并合并到同一个 `window.I18N_STRINGS`。
 
 3. **运行时引擎** (`function/i18n/i18n.js`)：
    - `window.i18n.t(key, params)` / `window.t(key, params)` — 翻译函数
@@ -839,17 +842,21 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 
 ### 8.1 命名空间模式
 
-项目不使用 ES Modules，而是通过 IIFE + 全局命名空间组织代码：
+项目主体仍通过全局命名空间组织代码；已迁移脚本使用 ESM 作用域，但继续写入原有 `window.*` 入口。主站和登录页已经收敛到 entry 文件，生产路径不依赖 bundler：
 
 ```javascript
-// 典型模式
-(function() {
-    window.Game = window.Game || {};
-    window.Game.UI = window.Game.UI || {};
-    // ... 在此定义功能 ...
-    window.Game.UI.xxx = xxx;
-})();
+window.Game = window.Game || {};
+window.Game.UI = window.Game.UI || {};
+// ... 在模块作用域中定义功能 ...
+window.Game.UI.xxx = xxx;
 ```
+
+**ESM 约定**：
+
+- `startup_seed.js` 必须保持 classic，不能改成 module；它负责 CSS 前首屏主题和 parser 阶段 ready seed。
+- `main_entry.js` / `login_entry.js` 只按原顺序导入副作用模块，不写业务逻辑、不创建新状态层、不替代原 owner。
+- 第三方 classic 全局资源仍由 HTML 提供，业务 entry 不导入 Foundation、Socket.IO、Cropper 这类 CDN/vendor 脚本。
+- 后续真正减行应转向业务 owner 清理，例如后台日志模板、权限/词元重复渲染、对局 UI helper 重复路径。
 
 **主要命名空间树**：
 
@@ -985,8 +992,11 @@ before{Event} → when{Event}（执行实际逻辑）→ after{Event}
 ### 8.4 主题系统
 
 ```
-theme.js (head 最先加载)
-  └→ localStorage('theme') → apply data-theme
+startup_seed.js (head 最先加载)
+  └→ localStorage('theme') → apply data-theme before CSS
+
+theme.js (module)
+  └→ setTheme / system listener / View Transitions
   └→ window.setTheme(t) → freezeAnimated → ViewTransition / fallback
 
 theme.css
@@ -1010,12 +1020,16 @@ game/scripts/ui/utils.js
 
 ```
 index.html
+  ├→ startup_seed.js + main_entry.js
   └→ <div data-include="partials/header.html">
 
-include_loader.js (head 加载)
+startup_seed.js (classic head 加载，index.html 上带 data-partials)
+  └→ 同步建立 window.whenDOMReady / window.whenPartialsReady / pending window.partialsReady
+
+include_loader.js (module head 加载)
   └→ DOMContentLoaded → 扫描所有 [data-include]
   └→ fetch(url) → 将 HTML 插入 → 移除占位 div
-  └→ window.partialsReady (Promise) resolve
+  └→ resolve window.partialsReady
 
 app_bootstrap.js
   └→ 等待 partialsReady → $(document).foundation() → 后续初始化
@@ -1023,7 +1037,33 @@ app_bootstrap.js
 
 所有依赖 DOM 的模块都通过 `window.partialsReady.then(...)` 确保 partials 已注入。
 
-### 8.6 Socket.IO 在线对局流程
+### 8.6 ESM 入口停止线与回滚
+
+遇到以下任一信号，先停止扩展改动，回到 entry 和 ready 链排查：
+
+- 刷新时深色/典雅主题出现浅色闪烁。
+- `window.whenDOMReady`、`window.whenPartialsReady`、`window.partialsReady` 缺失或不 resolve。
+- `window.replacementsReady` 缺失，加载层卡在等待数据。
+- 词元页内容、词元日志、权限日志消失。
+- i18n 切换后出现 key，或词典扩展没有合并到 `window.I18N_STRINGS`。
+- `Game.UI.DragAnimation.createGhost`、`Game.UI.Interactions.initDrag`、`Game.UI.updateUI` 等对局入口缺失。
+- 登录页按钮存在但表单 submit 不调用 `window.endpoints.requestJson('/login')`。
+- 主站入口空白、partial 未注入、Foundation Tabs 不工作。
+- 本批 JS/CSS/HTML 净增明显偏高，且新增 owner 不能证明会消除更大重复。
+
+| 问题范围 | 优先回滚方式 |
+|---|---|
+| 登录页 entry 异常 | 恢复 `login.html` 中原登录页 module script 标签，移除 `login_entry.js` 标签 |
+| 主站 entry 异常 | 根据 `main_entry.js` 的 import 顺序恢复 `index.html` 中的 module script 标签，移除 `main_entry.js` 标签 |
+| 首屏主题或 ready helper 异常 | 优先保留或恢复 `startup_seed.js` classic；不要先改业务模块 |
+| partial 注入或日志缺失 | 检查 `include_loader.js` 是否 resolve 了 seed 预建的 `partialsReady` |
+| 加载层卡住 | 检查 `app_bootstrap.js` 是否在 summon 成功、失败或超时后都写入 `window.replacementsReady` |
+| i18n 文案退化 | 保持词典脚本顺序；不要把词典合并改成异步 JSON/import，除非单独规划 |
+| 对局拖拽入口缺失 | 先查 `main_entry.js` 的对局 imports 顺序，再查 `window.Game.UI` 兼容暴露 |
+
+关键验收入口：登录页语言/后端/登录表单；主站首屏脚本入口；词元内容和日志；权限列表和日志；草稿编辑器入口；对局设置、在线房间、沙盒拖牌和移动日志；设置菜单中的帮助、主题和语言切换。
+
+### 8.7 Socket.IO 在线对局流程
 
 ```
 用户操作                     模块调用链
@@ -1070,7 +1110,7 @@ app_bootstrap.js
 
 1. **CSS**: 创建 `style/theme_xxx.css`，定义 `html[data-theme="xxx"] { --bg-start: ...; --text: ...; }`
 2. **加载**: 在 `index.html` 中添加 `<link>` 引用
-3. **theme.js**: `apply` 函数中添加 `if(t==='xxx') return root.setAttribute('data-theme','xxx')`
+3. **主题脚本**: `startup_seed.js` 的首屏判断和 `theme.js` 的 `apply` 函数都要添加新主题分支
 4. **切换**: `theme_toggle_button.js` 中修改循环顺序，添加新主题到 `mode()` → `onClick()` 链
 5. **特殊处理**: 如需特殊效果（如典雅主题的金色混合），在 `function/animation/highlight.js` 的 `_blendWithGold` 等函数中添加条件
 
@@ -1312,7 +1352,7 @@ app_bootstrap.js
 | 拖动节点 | 拖拽结构树节点调整层级或同级顺序 |
 | 草稿快捷键 | 在按键设置中修改聚焦搜索、清除选择、添加子节点、添加同级节点、编辑、删除节点和变体插入的快捷键 |
 
-**实现**: `function/ui/draft_panel.js`（草稿输入/预览桥接）+ `editor/scripts/data.js`（元素数据）+ `editor/scripts/recommendations.js`（推荐关系）+ `editor/scripts/key_actions.js`（编辑器快捷键声明）+ `editor/scripts/panel.js`（编辑器交互）
+**实现**: `function/ui/draft_panel.js`（草稿输入/预览桥接）+ `editor/scripts/data.js`（元素数据）+ `editor/scripts/recommendations.js`（推荐关系）+ `editor/scripts/relation_graph.js`（关系图）+ `editor/scripts/key_actions.js`（编辑器快捷键声明）+ `editor/scripts/panel.js`（编辑器交互）；编辑器尾部脚本以 module 执行，对外仍保留 `window.CardEditor*` 入口。
 
 #### 词元面板 (`panel_tokens`，仅 admin)
 

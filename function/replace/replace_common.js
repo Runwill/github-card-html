@@ -1,10 +1,9 @@
-﻿(function() {
-    /**
-     * 通用的 DOM 扫描与 MutationObserver 封装
-     * 用于 card_name, term, character_name, skill_name 等替换脚本
-     */
-    function scanAndObserve(config) {
-        const { root, processor, dataKey, tagNameMap, selector, manualCheck } = config;
+﻿/**
+ * 通用的 DOM 扫描与 MutationObserver 封装
+ * 用于 card_name, term, character_name, skill_name 等替换脚本
+ */
+function scanAndObserve(config) {
+    const { root, processor, dataKey, tagNameMap, selector, manualCheck } = config;
 
         const processSafe = (node) => {
             if (node.nodeType !== 1) return;
@@ -49,5 +48,4 @@
         }
     }
 
-    window.scanAndObserve = scanAndObserve;
-})();
+window.scanAndObserve = scanAndObserve;

@@ -1,4 +1,4 @@
-function replace_card_name(path, paragraphs = document){
+window.replace_card_name = function replace_card_name(path, paragraphs = document){
   // 返回 Promise，供进度条与启动流程感知完成时机
   return fetchJsonCached(path).then(card => {
     // 建立速查 Map: enName -> CardObject
@@ -43,4 +43,4 @@ function replace_card_name(path, paragraphs = document){
         tagNameMap: cardMap
     });
   })
-}
+};

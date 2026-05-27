@@ -1,4 +1,4 @@
-function replace_character_name(path, paragraphs = document){
+window.replace_character_name = function replace_character_name(path, paragraphs = document){
     // 返回 Promise，供进度条与启动流程感知完成时机
     return fetchJsonCached(path).then(character => {
         const idToName = new Map(character.map(c => [c.id, c.name]))
@@ -41,4 +41,4 @@ function replace_character_name(path, paragraphs = document){
             selector: `[class*="${classPrefix}"]`
         });
     })
-}
+};

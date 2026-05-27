@@ -1,4 +1,3 @@
-(function () {
   // tokens/state
   // 全局状态容器与常量
 
@@ -17,4 +16,3 @@
 
   window.tokensAdmin.state = state;
   window.tokensAdmin.SEARCH_DELAY_MS = SEARCH_DELAY_MS;
-})();

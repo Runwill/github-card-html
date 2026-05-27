@@ -1,4 +1,3 @@
-(function () {
   // tokens/data
   // 本地内存数据操作：插入/更新/删除/查找 和 搜索过滤
 
@@ -134,4 +133,3 @@
     deepContains,
     filterByQuery,
   });
-})();

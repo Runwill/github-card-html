@@ -1,11 +1,11 @@
-function add_button_wave() {
+window.add_button_wave = function add_button_wave() {
     if (document.__waveButtonBound) return;
     document.__waveButtonBound = true;
     document.addEventListener('click', (event) => {
         const button = event.target.closest('.ripple-button');
         if (button && document.documentElement.dataset.theme !== 'elegant') createRipple(event, button);
     }, true);
-}
+};
 
 function createRipple(event, button) {
     const rect = button.getBoundingClientRect();

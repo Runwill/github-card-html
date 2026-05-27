@@ -1,6 +1,5 @@
 // 核心 DOM 与 URL 助手方法（IIFE + 全局命名空间）。
 // CardUI Manager Core - DOM and URL helpers (IIFE + window namespace)
-(function(){
   'use strict';
   var w = window;
   var ns = w.CardUI.Manager.Core;
@@ -26,4 +25,3 @@
   function setImagesSrc(ids, src, display){ (ids || []).forEach(function(id){ setImageSrc($(id), src, display); }); }
 
   ns.dom = { $, qs, abs, api, resolveAvatarUrl, setImageSrc, setImagesSrc };
-})();

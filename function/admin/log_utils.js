@@ -1,8 +1,9 @@
 // admin/log_utils
 // 日志面板共享工具：复制、删除、悬浮时间切换
 // 消费者：tokens/ui/logger.js、permissions/logs/logs.js
-(function(){
-  const { formatRel, formatAbsForLang } = window.TimeFmt;
+  const timeFmt = () => window.TimeFmt || {};
+  const formatRelTime = value => timeFmt().formatRel?.(value) || '';
+  const formatAbsTime = value => timeFmt().formatAbsForLang?.(value) || String(value || '');
 
   function esc(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
@@ -14,7 +15,7 @@
 
   function timeHtml(value, escapeFn){
     const escape = escapeFn || esc, parse = window.TimeFmt?.parseTimeValue;
-    const ts = (parse ? parse(value) : Number(value)) ?? Date.now(), rel = formatRel(ts), abs = formatAbsForLang(ts);
+    const ts = (parse ? parse(value) : Number(value)) ?? Date.now(), rel = formatRelTime(ts), abs = formatAbsTime(ts);
     return `<time class="log-time" datetime="${escape(new Date(ts).toISOString())}" data-ts="${escape(String(ts))}" data-rel="${escape(rel)}" data-abs="${escape(abs)}">${escape(rel)}</time>`;
   }
 
@@ -194,7 +195,7 @@
       try{
         document.querySelectorAll(selector)?.forEach(el=>{
           const ts = Number(el.getAttribute('data-ts')) || Date.now();
-          const rel = formatRel(ts);
+          const rel = formatRelTime(ts);
           el.setAttribute('data-rel', rel);
           if (!el.matches(':hover')) el.textContent = rel;
         });
@@ -206,8 +207,8 @@
     try{
       document.querySelectorAll(selector)?.forEach(el=>{
         const ts = Number(el.getAttribute('data-ts')) || Date.now();
-        const rel = formatRel(ts);
-        const abs = formatAbsForLang(ts);
+        const rel = formatRelTime(ts);
+        const abs = formatAbsTime(ts);
         el.setAttribute('data-rel', rel);
         el.setAttribute('data-abs', abs);
         el.textContent = el.matches(':hover') ? abs : rel;
@@ -216,4 +217,3 @@
   }
 
   window.LogUtils = { esc, elem, pill, actionsHtml, timeHtml, bindLogCollapse, ensureLogPanel, createLogEntry, appendLogEntries, prependLogEntry, bindLogCopy, bindLogDelete, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
-})();

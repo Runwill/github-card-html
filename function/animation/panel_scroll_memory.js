@@ -1,4 +1,3 @@
-(function() {
   const KEY_PREFIX = 'panelScroll:';
   let __ready = false;  // 页面初始化完成后才允许平滑滚动
 
@@ -137,4 +136,3 @@
   }
 
   whenDOMReady().then(bind);
-})();

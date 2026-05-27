@@ -8,8 +8,7 @@
  *   4. 固定层（蒙版/弹窗/底栏）放在 #fl-rotate 但不在 #fl-scroll 中
  *   5. 用 visualViewport 计算精确尺寸，避开浏览器 UI
  */
-;(function () {
-  'use strict';
+'use strict';
 
   /* ── 配置 ─────────────────────────────────────── */
   var MQ =
@@ -152,7 +151,7 @@
     };
 
     // 手动触摸滚动：部分手机浏览器在 transform 父元素内不支持原生触摸滚动
-    if (window.TouchScrollManager) TouchScrollManager.install(scrollEl);
+    window.TouchScrollManager?.install?.(scrollEl);
   }
 
   /* ── Scroll API 代理 ─────────────────────────── */
@@ -269,4 +268,3 @@
       location.reload();
     }
   });
-})();

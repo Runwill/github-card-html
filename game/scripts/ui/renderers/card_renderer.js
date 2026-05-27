@@ -1,5 +1,4 @@
-(function() {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
     function clamp(min, value, max) {
@@ -276,5 +275,3 @@
     window.Game.UI.getCardRenderState = getCardRenderState;
     window.Game.UI.getCardAppearanceForArea = getCardAppearanceForArea;
     window.Game.UI.updateSpreadLayouts = updateSpreadLayouts;
-
-})();

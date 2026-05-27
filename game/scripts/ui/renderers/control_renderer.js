@@ -1,5 +1,4 @@
-(function() {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
     function updateControls(GameState) {
@@ -14,8 +13,8 @@
             if (GameState.isGameRunning) {
                 pauseBtn.classList.remove('hidden');
                 const btnText = GameState.isPaused ? 
-                    (i18n.t('game.resume') || '继续') : 
-                    (i18n.t('game.pause') || '暂停');
+                    (window.i18n?.t?.('game.resume') || '继续') :
+                    (window.i18n?.t?.('game.pause') || '暂停');
                 
                 if (pauseBtn.textContent !== btnText) {
                     pauseBtn.textContent = btnText;
@@ -38,4 +37,3 @@
 
     // 导出
     window.Game.UI.updateControls = updateControls;
-})();

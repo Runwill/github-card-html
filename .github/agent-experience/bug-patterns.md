@@ -269,3 +269,42 @@
 - 打开装备窗口后验证同步/动画目标能命中已有牌槽和空槽；关闭窗口后再验证摘要 fallback。
 - 同时打开普通手牌/判定窗口和装备窗口，对比窗口外壳 class、正文 padding、内容行 min-width、缩小时的间距压缩，确认特殊区域不再有独立尺寸体系。
 - 在标准窗口和窄窗口分别验证空槽、满槽、插入/移出、同步飞行动画和调试信息，避免只证明模型层成功。
+
+## Module 迁移中 ready helper 与导出对象完整性回归
+
+**现象信号**
+
+- 静态检查显示 `window.*` owner 都存在，但真实页面中某些内容区、日志区或拖拽动画消失。
+- 把原 classic 脚本改成 `type="module"` 后，依赖 `whenDOMReady().then(() => whenPartialsReady())` 的模块在 partial DOM 注入前就运行。
+- 拆 IIFE 时只保留了被静态 owner 检查覆盖的函数，漏掉同一导出对象上的运行时方法。
+
+**常见误导**
+
+- 只验证命名空间对象存在，例如 `Game.UI.DragAnimation`、`tokensAdmin`、`TokensPerm`，没有验证对象上的完整方法集合。
+- 以为 module 脚本仍能像 classic 脚本一样在 parser 阶段同步建立全局 readiness 信号。
+- 只用干净 VM 顺序执行顶层代码，没有模拟真实浏览器中 module 执行期 `document.readyState === 'interactive'` 后 Promise 微任务会抢跑的时序。
+
+**根因模式**
+
+- module 脚本 defer 到解析后执行；此时 `whenDOMReady()` 可能立即 resolve，回调微任务会在后续 module 脚本赋值 `window.partialsReady` 前运行。
+- `include_loader.js` 这类 partial readiness 种子必须在 parser 阶段同步建立 `window.partialsReady`，否则后台、页签、对局和 i18n 等消费者会看到“无 partials 可等”。
+- IIFE 拆除时修改导出对象字面量，若只检查 owner 存在而不检查完整 API，容易漏掉 `createGhost` 这类只在真实交互路径调用的方法。
+
+**排查步骤**
+
+1. 对启动链脚本先分清“同步种子”和“可 defer 模块”：`page_loading.js`、`include_loader.js` 这类 readiness owner 需要特别保护。
+2. 搜索所有 `whenDOMReady().then(() => whenPartialsReady())`、直接读取 `window.partialsReady` 的模块，确认它们执行时 `partialsReady` 已经同步存在。
+3. 对每个迁移 owner 列完整导出方法清单，不只断言命名空间存在；对拖拽、日志、后台渲染等真实入口方法逐项检查。
+4. 浏览器验证必须覆盖真实入口：词元页内容与日志、权限页日志、对局拖拽 ghost 和落点动画。
+
+**修复方向**
+
+- 保留 `page_loading.js` 和 `include_loader.js` 为 classic 同步种子，或在更早 classic 脚本中建立等价的 `window.partialsReady` 占位 Promise。
+- `whenPartialsReady()` 不应在 partial owner 尚未建立时让关键初始化悄悄成功；需要时增加明确的早期占位或停止线。
+- IIFE 拆除后按原导出对象逐项恢复方法，尤其是拖拽 ghost、日志刷新、后台 render/hydrate 这类只在交互路径触发的 API。
+
+**验证入口**
+
+- 导航栏点词元 → 查看顶部类型统计、词元内容列表和变更日志是否同时出现。
+- 导航栏点权限 → 查看用户列表和用户变更日志是否同时出现，筛选/刷新仍可用。
+- 导航栏点对局 → 开始沙盒局 → 拖一张手牌，确认拖动 ghost 出现，松手后有落点动画。

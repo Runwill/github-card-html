@@ -1,4 +1,4 @@
-function replace_term(path, mode, paragraphs = document) {
+window.replace_term = function replace_term(path, mode, paragraphs = document) {
     // 返回 Promise，供进度条与启动流程感知完成时机
     return fetchJsonCached(path).then(term => {
         // [Optimization] 使用 Map 提升术语查找性能，便于 MutationObserver 复用
@@ -53,10 +53,10 @@ function replace_term(path, mode, paragraphs = document) {
                     
                     // 高亮
                     node.i = index; // 存储索引供 highlight 使用
-                    if (typeof termHighlight === 'function') {
+                    if (typeof window.termHighlight === 'function') {
                         // 移除旧绑定防止重复
                         $node.off('mouseover.termHl mouseout.termHl'); 
-                        termHighlight(term, node);
+                        window.termHighlight(term, node);
                     }
                 }
             } else {
@@ -85,9 +85,9 @@ function replace_term(path, mode, paragraphs = document) {
                    node.i = index;
                    
                    // 高亮 (Divided mode)
-                   if(typeof termHighlight === 'function') {
+                   if(typeof window.termHighlight === 'function') {
                        $node.off('mouseover.termHl mouseout.termHl');
-                       termHighlight(term, node, 'divided');
+                       window.termHighlight(term, node, 'divided');
                    }
 
                    // 双击滚动 (Main Term)
@@ -102,9 +102,9 @@ function replace_term(path, mode, paragraphs = document) {
                                const $subEl = $(subEl);
                                
                                // 高亮 (Part mode)
-                               if(typeof termHighlight === 'function') {
+                               if(typeof window.termHighlight === 'function') {
                                    $subEl.off('mouseover.termHl mouseout.termHl');
-                                   termHighlight(term, subEl, 'part');
+                                   window.termHighlight(term, subEl, 'part');
                                }
 
                                // 双击滚动 (Part)
@@ -133,17 +133,16 @@ function replace_term(path, mode, paragraphs = document) {
             tagNameMap: termMap
         });
     });
-}
+};
 
 // ----------------------------------------------------------------
 // 代词 (Pronoun) 系统集成
 // ----------------------------------------------------------------
-(function(){
-  /**
-   * 处理代词显示切换按钮点击事件
-   * @param {Event} event 
-   */
-  function pronounReplaceCheck(event){
+/**
+ * 处理代词显示切换按钮点击事件
+ * @param {Event} event
+ */
+function pronounReplaceCheck(event){
     const btn = event.target;
     // 确保 term_status 全局变量存在
     window.term_status = window.term_status || {};
@@ -157,17 +156,17 @@ function replace_term(path, mode, paragraphs = document) {
     
     window.term_status['pronoun'] = isOn;
     pronounCheck(); // 触发页面更新
-  }
+}
 
-    function forEachPronounNode(paragraphs, callback){
+function forEachPronounNode(paragraphs, callback){
         for(const i of [1, 2, 3]) $(paragraphs).find('pronoun'+i).each(function(){ callback(this, i); });
-    }
+}
 
-  /**
-   * 根据当前状态检查并更新页面中的代词显示
-   * @param {HTMLElement|Document} paragraphs 作用范围，默认为 document
-   */
-  function pronounCheck(paragraphs = document){
+/**
+ * 根据当前状态检查并更新页面中的代词显示
+ * @param {HTMLElement|Document} paragraphs 作用范围，默认为 document
+ */
+function pronounCheck(paragraphs = document){
     window.term_status = window.term_status || {};
     const on = Number(window.term_status['pronoun']) === 1;
     // 规范化状态值
@@ -179,13 +178,13 @@ function replace_term(path, mode, paragraphs = document) {
     }
     // 关闭：移除已添加的 <pronounName>（DOM 级删除）
         forEachPronounNode(paragraphs, node => node.querySelectorAll('pronounName').forEach(child => child.remove()));
-  }
+}
 
-  /**
-   * 向代词标签内添加可视化的名称标记
-   * @param {HTMLElement|Document} paragraphs 
-   */
-  function add_pronoun(paragraphs = document){
+/**
+ * 向代词标签内添加可视化的名称标记
+ * @param {HTMLElement|Document} paragraphs
+ */
+function add_pronoun(paragraphs = document){
     const pronounName = ['甲','乙','丙'];
         forEachPronounNode(paragraphs, (el, i) => {
                 if(!el.querySelector('pronounName')){
@@ -194,10 +193,7 @@ function replace_term(path, mode, paragraphs = document) {
                     el.appendChild(node);
         }
         });
-  }
+}
 
   // 暴露到全局以兼容现有调用
-  window.pronounReplaceCheck = pronounReplaceCheck;
-  window.pronounCheck = pronounCheck;
-  window.add_pronoun = add_pronoun;
-})();
+Object.assign(window, { pronounReplaceCheck, pronounCheck, add_pronoun });

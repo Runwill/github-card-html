@@ -52,7 +52,7 @@ async function postForm(path, body, onOk, failKey, errorKey) {
   const registerBtn = document.getElementById('register-button');
   loginBtn.disabled = true; registerBtn.disabled = true;
   try {
-    await onOk(await endpoints.requestJson(path, { method: 'POST', body }));
+    await onOk(await window.endpoints.requestJson(path, { method: 'POST', body }));
   } catch (err) {
     if (err && err.status) {
       if (err.data && err.data.message) { setMessage(err.data.message, 'error'); }

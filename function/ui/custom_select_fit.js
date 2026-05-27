@@ -1,7 +1,4 @@
 /** CustomSelect 文字自适应 — 选项溢出时统一缩小字号。由 custom_select.js 调用。 */
-;(function () {
-    'use strict';
-
     var MIN_SIZE = 9; // px minimum
 
     /** Measure text width using a temporary canvas (cached). */
@@ -107,4 +104,3 @@
     }
 
     window._CustomSelectFit = { fitOptionTexts: fitOptionTexts, measureTextWidth: measureTextWidth };
-})();

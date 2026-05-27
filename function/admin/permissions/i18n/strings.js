@@ -1,5 +1,4 @@
-(function(){
-    const zh = {
+const zh = {
         // Permissions panel
         'permissions.title': '权限',
         'permissions.search.placeholder': '按用户名/ID搜索',
@@ -88,9 +87,9 @@
         'permissions.log.filter.to': '结束日期',
         'permissions.log.filter.apply': '筛选',
         'permissions.log.filter.reset': '重置',
-    };
+};
 
-    const en = {
+const en = {
         // Permissions panel
         'permissions.title': 'Permissions',
         'permissions.search.placeholder': 'Search by username/ID',
@@ -179,12 +178,11 @@
         'permissions.log.filter.to': 'To',
         'permissions.log.filter.apply': 'Apply',
         'permissions.log.filter.reset': 'Reset',
-    };
+};
 
-    if (window.I18N_STRINGS) {
-        Object.assign(window.I18N_STRINGS.zh, zh);
-        Object.assign(window.I18N_STRINGS.en, en);
-    } else {
-        console.warn('I18N_STRINGS not found, permissions strings not loaded');
-    }
-})();
+if (window.I18N_STRINGS) {
+    Object.assign(window.I18N_STRINGS.zh, zh);
+    Object.assign(window.I18N_STRINGS.en, en);
+} else {
+    console.warn('I18N_STRINGS not found, permissions strings not loaded');
+}

@@ -1,5 +1,4 @@
-(function() {
-    window.Game = window.Game || {};
+window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
 
     const ACTION = 'inspect_details';
@@ -567,4 +566,3 @@
     } else {
         init();
     }
-})();

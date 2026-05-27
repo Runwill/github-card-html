@@ -1,13 +1,10 @@
 // 上下文帮助面板：按 ? 或从设置菜单打开，显示当前面板相关提示
-(function () {
-  'use strict';
-
   let data = null;
   let popoverEl = null;
   let visible = false;
 
   // Panel ID → nav i18n key
-  var PANEL_NAV_KEY = {
+  const PANEL_NAV_KEY = {
     panel_term: 'nav.term',
     panel_skill: 'nav.skill',
     panel_card: 'nav.card',
@@ -19,7 +16,7 @@
   };
 
   // Overlay ID → i18n title key
-  var OVERLAY_TITLE_KEY = {
+  const OVERLAY_TITLE_KEY = {
     'sidebar-menu': 'help.overlay.sidebar',
     'account-menu': 'help.overlay.account',
     'settings-menu': 'help.overlay.settings',
@@ -34,7 +31,7 @@
   };
 
   // 面板子视图 → i18n key
-  var PANEL_VIEW_LABEL = {
+  const PANEL_VIEW_LABEL = {
     panel_draft: {
       editor: 'editor.view.editor',
       relations: 'editor.view.relations'
@@ -95,7 +92,7 @@
     return window.TabsUI?.getActivePanelId?.('panel_term') || 'panel_term';
   }
 
-  const node = window.LogUtils.elem;
+  const node = (...args) => window.LogUtils.elem(...args);
 
   // ── DOM 创建 ──
   function ensurePopover() {
@@ -265,4 +262,3 @@
 
   window.openHelpPanel = toggleHelp;
   window.preloadHelpPanel = loadData;
-})();

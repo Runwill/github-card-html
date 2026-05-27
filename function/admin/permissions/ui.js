@@ -1,4 +1,4 @@
-(function(w){
+const w = window;
   const ns = w.TokensPerm = w.TokensPerm || {};
 
   function bindPermTooltip(el, permName){
@@ -25,7 +25,7 @@
     } catch(_){ }
   }
 
-  const makeEl = w.LogUtils.elem;
+  const makeEl = (...args) => w.LogUtils.elem(...args);
 
   function tag(text, more=false, tip){
     const s = makeEl('span', 'perm-tag' + (more ? ' perm-tag--more' : ''), text);
@@ -112,4 +112,3 @@
   }
 
   ns.UI = { bindPermTooltip, makeEl, tag, spinnerBtn, toggleSection };
-})(window);

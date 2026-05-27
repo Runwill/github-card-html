@@ -1,5 +1,4 @@
 // 全局事件绑定与界面交互初始化（菜单、遮罩、模态、角色可见性等）。
-(function(){
   'use strict';
   const Core = window.CardUI.Manager.Core;
   const C = window.CardUI.Manager.Controllers;
@@ -92,4 +91,3 @@
   }
 
   C.bindings = { init };
-})();

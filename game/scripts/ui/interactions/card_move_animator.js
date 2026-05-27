@@ -11,8 +11,7 @@
  *
  * 弧形动画使用二次贝塞尔曲线（< 1/4 圆弧），配合 ease-in-out 缓动。
  */
-(function () {
-    'use strict';
+'use strict';
 
     window.Game = window.Game || {};
     window.Game.UI = window.Game.UI || {};
@@ -336,5 +335,3 @@
         animateLayoutAfterMove,
         clearSnapshot,
     };
-
-})();

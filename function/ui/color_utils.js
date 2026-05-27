@@ -7,7 +7,6 @@
  * - Blend amount: 0..1 (0 = original, 1 = fully inverted)
  * - Output: 'hex' | 'rgb' | 'rgba' (auto if not specified)
  */
-(function(){
   function clamp01(x){ return Math.min(1, Math.max(0, x)); }
   function clamp255(x){ return Math.min(255, Math.max(0, Math.round(x))); }
 
@@ -167,4 +166,3 @@
   const api = { invertColor, pickTextOn };
   try { Object.defineProperty(window, 'ColorUtils', { value: api, writable: false, configurable: true }); }
   catch(_) { window.ColorUtils = api; }
-})();

@@ -1,6 +1,5 @@
 /** TouchScrollManager — transform 容器内手动触摸滚动（含惯性）。由 force_landscape.js 调用。 */
-;(function () {
-  'use strict';
+'use strict';
 
   /**
    * @param {HTMLElement} scrollEl - 需要手动触摸滚动的容器
@@ -80,5 +79,4 @@
     }, { passive: false });
   }
 
-  window.TouchScrollManager = { install: install };
-})();
+window.TouchScrollManager = { install: install };

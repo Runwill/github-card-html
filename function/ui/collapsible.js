@@ -3,7 +3,6 @@
 // - 将标题后连续的兄弟块（indent/padding 等）包裹进可折叠容器
 // - 默认状态：H1/H2 展开，H3 收起
 
-(function () {
   const PANEL_ID = 'panel_term';
   const HEADING_TAGS = ['H1', 'H2', 'H3'];
 
@@ -182,4 +181,3 @@
   }
 
   whenDOMReady().then(tryInit);
-})();
