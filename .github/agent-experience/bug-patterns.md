@@ -9,6 +9,45 @@
 - 命中某条经验后，不要只阅读正文；先把它转成当前任务的自检门禁，至少列出：相关 owner、必须覆盖的失败分支、状态组合、真实入口、无法验证的风险。实现和汇报都要对照这组门禁。
 - 如果某条经验很长，优先抽取“本任务最相关的 3-5 个检查点”执行；不要用泛读代替检查。
 
+## 共享动画类移除合成层提示导致边框跳变
+
+**现象信号**
+
+- 词元页、卡片列表、折叠区或其它带入场/显隐动画的卡片，在动画播放时边框颜色或粗细突然变深、变浅或抖动；动画结束后静态样式又正常。
+- 回退到旧提交后问题消失，但样式 diff 里没有直接改 `border`、`border-color`、`box-shadow` 或主题 token。
+- 问题只在带 `.animate-in`、`.visible` 等共享动画类的元素上出现，静止状态、普通 hover 或不播放动画的卡片不复现。
+
+**常见误导**
+
+- 只搜索边框颜色、边框宽度和 token，忽略浏览器合成层变化会影响动画中的次像素边框渲染。
+- 以为删除 `will-change` 一定只是性能优化，不会改变用户可见视觉。
+- 一次删除多处 `will-change` / `backface-visibility` / `translateZ(0)` 后，只按文件或模块猜测，没有继续做二分恢复。
+
+**根因模式**
+
+- 共享动画类原本通过 `will-change: transform, opacity` 提前创建合成层，动画期间边框、阴影和半透明背景在稳定的合成上下文里渲染。
+- 清理时删除 `.animate-in, .visible { will-change: transform, opacity; }` 后，元素动画期间回到普通绘制/合成路径；transform/opacity 动画叠加边框时出现次像素抗锯齿差异，表现为边框颜色或粗细跳变。
+- 该问题不一定由组件自身 CSS 引起，可能来自全局动画类、共享折叠类或按钮波纹类的合成层提示被移除。
+
+**排查步骤**
+
+1. 用提交二分或局部二分先确认引入范围；若某个提交批量删除动画性能提示，按相关度分组恢复验证。
+2. 搜索目标元素运行时 class：`.animate-in`、`.visible`、`.collapsible`、`.wave-ripple`、`.btn--lift` 等，确认动画实际消费的共享 owner。
+3. 在 DevTools 中观察动画元素的 computed style，重点看 `will-change`、`transform`、`opacity`、`backface-visibility`、`border-color`、`box-shadow` 是否在动画前后变化。
+4. 若恢复 `.animate-in, .visible { will-change: transform, opacity; }` 后问题消失，再逐个移除其它恢复项，确认最小必要 owner。
+
+**修复方向**
+
+- 不要把共享动画类上的 `will-change` 作为纯冗余删除；若要收敛性能提示，先确认所有消费这些动画类的卡片、按钮、折叠区和提示层动画边框/阴影稳定。
+- 最小修复优先保留动画 owner 上的提示，例如 `.animate-in, .visible { will-change: transform, opacity; }`，不要为了一个组件追加更高优先级的局部边框覆盖。
+- 若担心长期 `will-change` 成本，优先考虑只在动画前后由 JS 添加/移除专用 class，但必须覆盖动画取消、快速重复触发和 reduced-motion 分支。
+
+**验证入口**
+
+- 导航栏点词元 → 触发词元卡片入场、展开或编辑相关动画，观察动画播放期间卡片边框颜色和粗细是否保持稳定。
+- 同一入口在浅色、深色和典雅主题下重复测试；若 bug 只在某主题明显，也要比较 computed `border-color` 与合成层提示是否一致。
+- 对清理任务，删除任意共享 `will-change` 后至少验证一个实际使用 `.animate-in` / `.visible` 的列表卡片，而不只看静态截图。
+
 ## JSON 预加载缓存导致新逻辑配旧数据
 
 **现象信号**

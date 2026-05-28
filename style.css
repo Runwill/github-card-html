@@ -130,3 +130,5 @@ h3 { font-size: 1.0rem; }
         transition-duration: 0.01ms !important;
     }
 }
+
+.animate-in, .visible { will-change: transform, opacity; }
