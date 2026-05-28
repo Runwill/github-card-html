@@ -40,8 +40,8 @@
   transition: height var(--dur-normal) ease, opacity var(--dur-normal) var(--ease-default);
 }
 .collapsible__content.is-collapsed {
-  height: 0 !important;
-  opacity: 0 !important;
+  height: 0;
+  opacity: 0;
   pointer-events: none;
   /* 收起状态才裁剪，避免布局抖动 */
   overflow: hidden;

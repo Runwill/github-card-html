@@ -23,6 +23,7 @@
 
 #panel_permissions .tokens-log__filters-main {
   flex-wrap: nowrap;
+  --ui-input-group-radius: var(--radius-none);
 }
 
 #panel_permissions #perms-log-q { flex: 1 1 18em; }

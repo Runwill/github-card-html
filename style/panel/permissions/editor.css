@@ -53,22 +53,22 @@
 }
 
 #panel_permissions .perm-editor-stack.is-collapsed {
-  height: 0 !important;
-  opacity: 0 !important;
+  height: 0;
+  opacity: 0;
   transform: translateY(-0.222em);   /* 4/18 */
   pointer-events: none;
 }
 
 /* 收起态 */
 #panel_permissions .perm-editor.is-collapsed {
-  height: 0 !important;
-  opacity: 0 !important;
+  height: 0;
+  opacity: 0;
   transform: translateY(-0.222em);   /* 4/18 */
   pointer-events: none;
-  margin: 0 !important;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-  border-width: 0 !important;
+  margin: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-width: 0;
 }
 
 /* ── 面板头部 ──────────────────────────────────────────── */
