@@ -383,7 +383,7 @@ html[data-theme="dark"] .btn--accent {
 
 /* Tokens 页：容器与卡片/分区 */
 #tokens-summary .type-tile {
-  border-color: var(--border) !important;
+  border-color: var(--border);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
 }
 
@@ -398,8 +398,8 @@ html[data-theme="dark"] .btn--accent {
 .tokens-section { border-color: var(--border) !important; background: var(--surface) !important; }
 
 #termContainer {
-  background: var(--surface) !important;
-  color: var(--text) !important;
+  background: var(--surface);
+  color: var(--text);
 }
 
 :root {
@@ -422,9 +422,9 @@ html.force-landscape {
 #panel_character #character-placeholder { min-height: var(--character-placeholder-min-h, 500px); background-color: var(--surface); }
 
 #tokens-content .token-card {
-  background: var(--token-bg, var(--surface)) !important;
-  border: 1px solid var(--border) !important;
-  border-left-color: var(--token-accent, var(--border)) !important;
+  background: var(--token-bg, var(--surface));
+  border: 1px solid var(--border);
+  border-left-color: var(--token-accent, var(--border));
 }
 
 #tokens-content .kv-val:not(.is-editing):hover { background: color-mix(in srgb, var(--border) 30%, transparent) !important; }
@@ -434,8 +434,8 @@ html.force-landscape {
 
 /* Tokens 主面板占满可视高度，避免底部露出背景色差 */
 :root { --header-height: calc(var(--fs-root, 20px) * 3.2); }
-#panel_tokens { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
-#panel_permissions { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
+#panel_tokens { min-height: calc(100vh - var(--header-height)); background: var(--surface); }
+#panel_permissions { min-height: calc(100vh - var(--header-height)); background: var(--surface); }
 
 /* 审核窗口列表项（暗色/浅色自适应） */
 .approval-row {

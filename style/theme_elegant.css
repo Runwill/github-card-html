@@ -249,12 +249,6 @@ html[data-theme="elegant"] .equip-detail-btn,
 html[data-theme="elegant"] .judge-detail-btn {
   background: rgba(0, 0, 0, 0.4);
   box-shadow: 0 1px 2px rgba(0,0,0,0.3);
-}
-html[data-theme="elegant"] .equip-detail-btn {
-  --btn-accent: #d3ad6b;
-  --btn-accent-rgb: 211, 173, 107;
-}
-html[data-theme="elegant"] .judge-detail-btn {
   --btn-accent: #d3ad6b;
   --btn-accent-rgb: 211, 173, 107;
 }
@@ -309,7 +303,7 @@ html[data-theme="elegant"] .site-footer {
 }
 html[data-theme="elegant"] .site-footer .footer-inner { color: var(--text); }
 html[data-theme="elegant"] .site-footer .footer-text { color: var(--text-muted); }
-html[data-theme="elegant"] .site-footer .footer-sep { color: var(--text-subtle); }
+html[data-theme="elegant"] .site-footer .footer-sep  { color: var(--text-subtle); }
 
 /* ── announcements.css：公告卡片 ── */
 html[data-theme="elegant"] .ann-card {
@@ -331,31 +325,16 @@ html[data-theme="elegant"] .ann-label-优化 { background-color: rgba(211, 173, 
 html[data-theme="elegant"] .ann-label-修复 { background-color: rgba(200, 160, 80, 0.15); color: #d4b87a; }
 html[data-theme="elegant"] .ann-label-其他 { background-color: rgba(224, 224, 224, 0.10); color: #b0b0b0; }
 
-/* ── base.css：角色徽标（5种） ── */
-html[data-theme="elegant"] .badge.badge-admin {
-  color: #d3ad6b;
-  background: rgba(211, 173, 107, 0.12);
-  border-color: rgba(211, 173, 107, 0.30);
-}
-html[data-theme="elegant"] .badge.badge-moderator {
-  color: #c9a89c;
-  background: rgba(201, 168, 156, 0.12);
-  border-color: rgba(201, 168, 156, 0.30);
-}
-html[data-theme="elegant"] .badge.badge-user {
-  color: #a8bfa0;
-  background: rgba(168, 191, 160, 0.12);
-  border-color: rgba(168, 191, 160, 0.30);
-}
-html[data-theme="elegant"] .badge.badge-guest {
-  color: var(--text-subtle);
-  background: rgba(211, 173, 107, 0.06);
-  border-color: rgba(211, 173, 107, 0.15);
-}
-html[data-theme="elegant"] .badge.badge-permission {
-  color: #d3ad6b;
-  background: rgba(211, 173, 107, 0.08);
-  border-color: rgba(211, 173, 107, 0.30);
+/* ── base.css：角色徽标（5种，color+bg+border 通过 --_bd-* 派生） ── */
+html[data-theme="elegant"] .badge.badge-admin    { --_bd-rgb: 211,173,107; --_bd-color: #d3ad6b; --_bd-alpha: 0.12; }
+html[data-theme="elegant"] .badge.badge-moderator{ --_bd-rgb: 201,168,156; --_bd-color: #c9a89c; --_bd-alpha: 0.12; }
+html[data-theme="elegant"] .badge.badge-user     { --_bd-rgb: 168,191,160; --_bd-color: #a8bfa0; --_bd-alpha: 0.12; }
+html[data-theme="elegant"] .badge.badge-guest    { --_bd-rgb: 211,173,107; --_bd-color: var(--text-subtle); --_bd-alpha: 0.06; }
+html[data-theme="elegant"] .badge.badge-permission{ --_bd-rgb: 211,173,107; --_bd-color: #d3ad6b; --_bd-alpha: 0.08; }
+html[data-theme="elegant"] .badge[class*="badge-"] {
+  color: var(--_bd-color);
+  background: rgba(var(--_bd-rgb), var(--_bd-alpha));
+  border-color: rgba(var(--_bd-rgb), calc(var(--_bd-alpha) * 2.5));
 }
 
 /* ── permissions.css：日志参数高亮 ── */
@@ -388,26 +367,15 @@ html[data-theme="elegant"] #lore-tooltip {
   box-shadow: 0 4px 20px rgba(0,0,0,0.6);
 }
 
-/* ═══ 典雅主题：Tokens 日志徽章与路径 ═══════════════════════════ */
-html[data-theme="elegant"] .tokens-log .log-pill.is-green {
-  background: rgba(125, 184, 125, 0.12);
-  color: #8ed18e;
-  border-color: rgba(125, 184, 125, 0.30);
-}
-html[data-theme="elegant"] .tokens-log .log-pill.is-red {
-  background: rgba(200, 92, 92, 0.12);
-  color: #e8a0a0;
-  border-color: rgba(200, 92, 92, 0.30);
-}
-html[data-theme="elegant"] .tokens-log .log-pill.is-blue {
-  background: rgba(211, 173, 107, 0.12);
-  color: #d3ad6b;
-  border-color: rgba(211, 173, 107, 0.25);
-}
-html[data-theme="elegant"] .tokens-log .log-pill.is-indigo {
-  background: rgba(201, 168, 156, 0.12);
-  color: #c9a89c;
-  border-color: rgba(201, 168, 156, 0.25);
+/* ═══ 典雅主题：Tokens 日志徽章（4色通过 --_lp-* 派生） ═══════════ */
+html[data-theme="elegant"] .tokens-log .log-pill.is-green  { --_lp-rgb: 125,184,125; --_lp-color: #8ed18e; --_lp-border-a: 0.30; }
+html[data-theme="elegant"] .tokens-log .log-pill.is-red   { --_lp-rgb: 200,92,92; --_lp-color: #e8a0a0; --_lp-border-a: 0.30; }
+html[data-theme="elegant"] .tokens-log .log-pill.is-blue  { --_lp-rgb: 211,173,107; --_lp-color: #d3ad6b; --_lp-border-a: 0.25; }
+html[data-theme="elegant"] .tokens-log .log-pill.is-indigo{ --_lp-rgb: 201,168,156; --_lp-color: #c9a89c; --_lp-border-a: 0.25; }
+html[data-theme="elegant"] .tokens-log .log-pill[class*="is-"] {
+  background: rgba(var(--_lp-rgb), 0.12);
+  color: var(--_lp-color);
+  border-color: rgba(var(--_lp-rgb), var(--_lp-border-a));
 }
 html[data-theme="elegant"] .tokens-log .log-path {
   color: var(--primary-1);
@@ -440,40 +408,19 @@ html[data-theme="elegant"] .tokens-log__body:hover::-webkit-scrollbar-thumb {
   background-color: rgba(211, 173, 107, 0.4);
 }
 
-/* ═══ 典雅主题：波纹按钮（ripple-button） ═══════════════════════════ */
+/* ═══ 典雅主题：波纹按钮 ── 三色变体通过 CSS 属性派生 ═══════════ */
 html[data-theme="elegant"] .ripple-button {
+  --_rb-rgb: 211, 173, 107; --_rb-color: var(--primary-1);
   background: transparent;
-  border: 1px solid rgba(211, 173, 107, 0.45);
-  box-shadow: 0 0 8px rgba(211, 173, 107, 0.08);
-  color: var(--primary-1);
+  border: 1px solid rgba(var(--_rb-rgb), 0.45);
+  box-shadow: 0 0 8px rgba(var(--_rb-rgb), 0.08);
+  color: var(--_rb-color);
 }
 html[data-theme="elegant"] .ripple-button:hover {
-  background: rgba(211, 173, 107, 0.08);
-  border-color: rgba(211, 173, 107, 0.65);
-  box-shadow: 0 2px 12px rgba(211, 173, 107, 0.15);
+  background: rgba(var(--_rb-rgb), 0.08);
+  border-color: rgba(var(--_rb-rgb), 0.65);
+  box-shadow: 0 2px 12px rgba(var(--_rb-rgb), 0.15);
 }
-html[data-theme="elegant"] .ripple-button:active {
-  background: rgba(211, 173, 107, 0.15);
-}
-html[data-theme="elegant"] .ripple-button.button_color_red {
-  background: transparent;
-  border-color: rgba(200, 92, 92, 0.45);
-  color: #c85c5c;
-  box-shadow: 0 0 8px rgba(200, 92, 92, 0.08);
-}
-html[data-theme="elegant"] .ripple-button.button_color_red:hover {
-  background: rgba(200, 92, 92, 0.08);
-  border-color: rgba(200, 92, 92, 0.65);
-  box-shadow: 0 2px 12px rgba(200, 92, 92, 0.15);
-}
-html[data-theme="elegant"] .ripple-button.button_color_green {
-  background: transparent;
-  border-color: rgba(125, 184, 125, 0.45);
-  color: #7db87d;
-  box-shadow: 0 0 8px rgba(125, 184, 125, 0.08);
-}
-html[data-theme="elegant"] .ripple-button.button_color_green:hover {
-  background: rgba(125, 184, 125, 0.08);
-  border-color: rgba(125, 184, 125, 0.65);
-  box-shadow: 0 2px 12px rgba(125, 184, 125, 0.15);
-}
+html[data-theme="elegant"] .ripple-button:active { background: rgba(var(--_rb-rgb), 0.15); }
+html[data-theme="elegant"] .ripple-button.button_color_red { --_rb-rgb: 200, 92, 92; --_rb-color: #c85c5c; }
+html[data-theme="elegant"] .ripple-button.button_color_green { --_rb-rgb: 125, 184, 125; --_rb-color: #7db87d; }

@@ -243,6 +243,36 @@ window.Game = window.Game || {};
         return card;
     }
 
+    function setSandboxTurnRemote(payload) {
+        const gs = window.Game.GameState;
+        if (!gs) return;
+        gs.sandboxTurnIndex = payload.playerIndex;
+        if (payload.playerIndex >= 0) {
+            document.documentElement.style.setProperty('--turn-ring-color', '#48bb78');
+        }
+    }
+
+    function applySpectateToggle(data, payload) {
+        const fromUserId = data.from && data.from.userId;
+        if (fromUserId && perspectives) {
+            for (const idx in perspectives) {
+                const arr = perspectives[idx];
+                if (Array.isArray(arr)) {
+                    const viewer = arr.find(v => v.userId === fromUserId);
+                    if (viewer) { viewer.spectating = !!payload.spectating; break; }
+                }
+            }
+        }
+        if (window.Game.Online?.RoomUI) {
+            const roomUI = window.Game.Online.RoomUI;
+            if (roomUI.currentRoom && roomUI.currentRoom.users && data.from) {
+                const ru = roomUI.currentRoom.users[data.from.userId];
+                if (ru) ru.spectating = !!payload.spectating;
+            }
+            roomUI.renderRoomInfo();
+        }
+    }
+
     /**
      * 当远程用户执行了游戏动作
      */
@@ -317,45 +347,15 @@ window.Game = window.Game || {};
                     });
                 }
             } else {
-                if (actionType === 'modifyHealth') {
-                    applyRemoteHealthChange(payload);
-                } else if (actionType === 'modifyMaxHealth') {
-                    applyRemoteMaxHealthChange(payload);
-                } else if (actionType === 'fullSync') {
-                    applyFullState(payload.gameState);
-                } else if (actionType === 'setSandboxTurn') {
-                    const gs = window.Game.GameState;
-                    if (gs) {
-                        gs.sandboxTurnIndex = payload.playerIndex;
-                        if (payload.playerIndex >= 0) {
-                            document.documentElement.style.setProperty('--turn-ring-color', '#48bb78');
-                        }
-                    }
-                } else if (actionType === 'spectateToggle') {
-                    // 远程用户切换了旁观状态 → 更新 perspectives 中的 spectating 标记
-                    const fromUserId = data.from && data.from.userId;
-                    if (fromUserId && perspectives) {
-                        for (const idx in perspectives) {
-                            const arr = perspectives[idx];
-                            if (Array.isArray(arr)) {
-                                const viewer = arr.find(v => v.userId === fromUserId);
-                                if (viewer) {
-                                    viewer.spectating = !!payload.spectating;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    // 同步房间用户列表数据
-                    if (window.Game.Online?.RoomUI) {
-                        const roomUI = window.Game.Online.RoomUI;
-                        if (roomUI.currentRoom && roomUI.currentRoom.users && data.from) {
-                            const ru = roomUI.currentRoom.users[data.from.userId];
-                            if (ru) ru.spectating = !!payload.spectating;
-                        }
-                        roomUI.renderRoomInfo();
-                    }
-                }
+                const actionHandlers = {
+                    modifyHealth:     () => applyRemoteHealthChange(payload),
+                    modifyMaxHealth:  () => applyRemoteMaxHealthChange(payload),
+                    fullSync:         () => applyFullState(payload.gameState),
+                    setSandboxTurn:   () => setSandboxTurnRemote(payload),
+                    spectateToggle:   () => applySpectateToggle(data, payload)
+                };
+                const handler = actionHandlers[actionType];
+                if (handler) handler();
 
                 refreshGameUI();
             }

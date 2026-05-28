@@ -31,6 +31,16 @@ html.force-landscape {
 
 #panel_draft {
   color: inherit;
+  --ui-field-h: var(--admin-input-h, 36px);
+  --ui-field-bg: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
+  --ui-field-radius: var(--radius-md);
+  --ui-field-pad-y: 0.571em;
+  --ui-field-pad-x: 0.714em;
+  --ui-field-fs: var(--draft-fs-control, 14px);
+  --ui-action-h: var(--admin-input-h, 36px);
+  --ui-action-pad-y: 0;
+  --ui-action-pad-x: 0.857em;
+  --ui-action-fs: var(--draft-fs-control, 14px);
 }
 /* #panel_draft * 已删除——通配符 color:inherit 会压过按钮变体的文字颜色（如 .btn--danger color:#fff），
    草稿页内的文字颜色由 .draft-page 的 color:var(--text) 正常继承即可 */
@@ -134,6 +144,7 @@ html.force-landscape {
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--surface) 94%, var(--bg-soft, var(--surface)));
   box-shadow: var(--shadow-panel);
+  padding: 0.5em;
 }
 
 #panel_draft .relation-graph-shell {
@@ -412,6 +423,7 @@ html.force-landscape {
 #panel_draft .editor-toolbar h2 {
   margin: 0;
   line-height: var(--lh-tight);
+  font-size: var(--tp-fs-xl, 16px);
 }
 
 #panel_draft .draft-live__grid {
@@ -436,19 +448,7 @@ html.force-landscape {
   font-size: var(--draft-fs-control, 14px);
   font-weight: 600;
   line-height: var(--lh-tight);
-}
-
-#panel_draft {
-  --ui-field-h: var(--admin-input-h, 36px);
-  --ui-field-bg: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
-  --ui-field-radius: var(--radius-md);
-  --ui-field-pad-y: 0.571em;
-  --ui-field-pad-x: 0.714em;
-  --ui-field-fs: var(--draft-fs-control, 14px);
-  --ui-action-h: var(--admin-input-h, 36px);
-  --ui-action-pad-y: 0;
-  --ui-action-pad-x: 0.857em;
-  --ui-action-fs: var(--draft-fs-control, 14px);
+  margin-bottom: 0.333em;
 }
 
 #panel_draft #htmlInput {
@@ -504,18 +504,10 @@ html.force-landscape {
   line-height: var(--lh-relaxed);
 }
 
-#panel_draft .editor-shell {
-  padding: 0.5em;
-}
-
 #panel_draft .editor-toolbar {
   padding: 0 0 0.444em;
   margin-bottom: 0.444em;
   border-bottom: 1px solid var(--border);
-}
-
-#panel_draft .editor-toolbar h2 {
-  font-size: var(--tp-fs-xl, 16px);
 }
 
 #panel_draft .editor-toolbar__actions,
@@ -561,6 +553,7 @@ html.force-landscape {
 
 #panel_draft .editor-tree-pane {
   flex: 2.1 1 31em;
+  position: relative;
 }
 
 #panel_draft .editor-inspector {
@@ -725,10 +718,6 @@ html.force-landscape {
   margin-bottom: 0;
 }
 
-#panel_draft .editor-subtitle {
-  margin-bottom: 0.333em;
-}
-
 #panel_draft .editor-tree {
   position: relative;
   flex: 1 1 auto;
@@ -736,10 +725,6 @@ html.force-landscape {
   overflow: auto;
   box-sizing: border-box;
   padding: 0.222em 0.333em;
-}
-
-#panel_draft .editor-tree-pane {
-  position: relative;
 }
 
 #panel_draft .editor-variant-badge {
@@ -939,6 +924,10 @@ html.force-landscape {
 #panel_draft .editor-field > span {
   color: var(--text-muted);
   font-size: var(--tp-fs-sm, 12px);
+  height: var(--admin-input-h, 36px);
+  display: flex;
+  align-items: center;
+  line-height: var(--lh-tight);
 }
 
 #panel_draft .editor-node-attrs {
@@ -953,13 +942,6 @@ html.force-landscape {
   align-items: stretch;
   gap: 0.444em;
   font-size: var(--draft-fs-control, 14px);
-}
-
-#panel_draft .editor-field > span {
-  height: var(--admin-input-h, 36px);
-  display: flex;
-  align-items: center;
-  line-height: var(--lh-tight);
 }
 
 #panel_draft .editor-log {

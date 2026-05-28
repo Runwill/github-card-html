@@ -5,6 +5,14 @@
    - Area Configurations (Stacked vs Spread)
    ========================================================================== */
 
+/* Shared flex column layout — 6 board/table/slot containers */
+.game-table-panel,
+.table-side-col,
+.table-center-col,
+.game-board-panel,
+.treatment-area-wrappper,
+.board-pile-slot { display: flex; flex-direction: column; }
+
 .game-table-panel {
     width: 100%;
     min-height: var(--table-panel-minh, 120px);
@@ -13,8 +21,6 @@
     box-shadow: none;
     padding: 0;
     flex: 1;
-    display: flex;
-    flex-direction: column;
 }
 
 .table-layout-grid {
@@ -29,16 +35,12 @@
 }
 
 .table-side-col {
-    display: flex;
-    flex-direction: column;
     justify-content: center; 
     min-width: var(--table-side-col-minw, 140px);
     padding-top: 0; 
 }
 
 .table-center-col {
-    display: flex;
-    flex-direction: column;
     flex: 1;
     min-width: 0;
     align-items: center;
@@ -57,8 +59,6 @@
     margin: 0;
     /* 撑满 table-center-col 剩余空间，让牌堆/处理区有更多展示空间 */
     flex: 1;
-    display: flex;
-    flex-direction: column;
 }
 
 /* 牌堆行撑满 board-panel 剩余高度 */
@@ -105,8 +105,6 @@
     flex: 0.8;
     position: relative;
     min-width: 0;
-    display: flex;
-    flex-direction: column;
     z-index: 1;
     margin-bottom: 0;
 }
@@ -115,8 +113,6 @@
     flex: 0 0 var(--board-pile-slot-w, var(--card-w, 100px));
     width: var(--board-pile-slot-w, var(--card-w, 100px));
     min-width: 0;
-    display: flex;
-    flex-direction: column;
     justify-content: center;
     position: relative;
     z-index: 5;

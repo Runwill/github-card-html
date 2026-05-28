@@ -143,7 +143,7 @@ import { LogUtils, esc, getLocaleFromI18n } from '../../log_utils.js?v=202605230
         ].join('');
         window.i18n?.applySafe?.(filters);
   // 根据语言为日期输入设置地区
-        try { setDateInputLang(filters); } catch(_){ }
+        setDateInputLang?.(filters);
         const container = parent.querySelector('padding') || parent; // 放在 panel 内
         body = LogUtils.ensureLogPanel({
           panelId: 'perms-log-panel',
@@ -156,7 +156,7 @@ import { LogUtils, esc, getLocaleFromI18n } from '../../log_utils.js?v=202605230
         try { syncKnownTypes(Array.from(KNOWN_TYPES.values())); } catch(_){ }
 
         // 绑定筛选事件（hydrateUserLogs 在 logs_data.js 中定义，通过命名空间延迟绑定）
-        const apply = ()=>{ try { window.TokensPerm.hydrateUserLogs(); }catch(_){ } };
+        const apply = ()=> window.TokensPerm?.hydrateUserLogs?.();
         filters.querySelector('#perms-log-apply')?.addEventListener('click', apply);
         filters.querySelector('#perms-log-reset')?.addEventListener('click', ()=>{
           try{
@@ -308,7 +308,7 @@ import { LogUtils, esc, getLocaleFromI18n } from '../../log_utils.js?v=202605230
       }
       const key = val && val !== 'all' ? (metaForType(val).msgKey || '') : '';
       const tmpl = key ? getI18nString(key) || '' : '';
-      if (!tmpl.trim()) { if (preview) try{ preview.remove(); }catch(_){ } return; }
+      if (!tmpl.trim()) { preview?.remove(); return; }
       // 构造 HTML：非占位符部分做 HTML 转义，占位符使用样式突出显示
       let html = '';
       let last = 0;
