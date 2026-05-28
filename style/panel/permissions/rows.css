@@ -24,9 +24,6 @@
   gap: 0.667em;                     /* 12/18 */
   padding: 0.667em;                 /* 12/18 */
   margin-bottom: 0.556em;           /* 10/18 */
-  will-change: opacity, transform;
-  backface-visibility: hidden;
-  transform: translateZ(0);
 }
 #panel_permissions .approval-left {
   gap: 0.556em;                     /* 10/18 */
@@ -98,9 +95,9 @@
   #panel_permissions .approval-row,
   #panel_permissions .approval-row.perm-row-exit,
   #panel_permissions .approval-row.perm-row-enter.perm-row-enter-active {
-    transition: none !important;
-    transform: none !important;
-    opacity: 1 !important;
+    transition: none;
+    transform: none;
+    opacity: 1;
   }
 }
 

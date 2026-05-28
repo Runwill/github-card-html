@@ -8,15 +8,15 @@
    the default container styling from the wrapper.
 */
 .card-viewer-modal.modal {
-    padding: var(--viewer-modal-pad, var(--space-3xl)) !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    max-width: none !important; 
-    max-height: none !important;
-    overflow: visible !important; /* Allow dragged content to go outside */
+    padding: var(--viewer-modal-pad, var(--space-3xl));
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    max-width: none;
+    max-height: none;
+    overflow: visible; /* Allow dragged content to go outside */
     pointer-events: none; /* Allow clicking through the empty parts of the wrapper */
-    z-index: var(--z-panel) !important; /* Below sidebar/modal overlay */
+    z-index: var(--z-panel); /* Below sidebar/modal overlay */
 }
 
 /* Modal Specific Overrides */
@@ -102,6 +102,9 @@
 
 .card-grid {
     gap: var(--cards-container-gap, var(--space-2xl));
+    counter-reset: card-index;
+    position: relative;
+    z-index: 1;
 
     /* Pointer Events Logic for Watermark Interaction */
     pointer-events: none; /* Let events pass to watermark */
@@ -114,7 +117,7 @@
 
 /* Enable grid interaction during drag for dropping */
 body.is-global-dragging .card-grid {
-    pointer-events: auto !important;
+    pointer-events: auto;
 }
 @keyframes cardViewerIn {
     0% {
@@ -145,8 +148,8 @@ body.is-global-dragging .card-grid {
 /* Reset Outer Animation */
 .card-viewer-modal.modal.show,
 .card-viewer-modal.modal.closing {
-    animation: none !important;
-    transition: none !important;
+    animation: none;
+    transition: none;
 }
 
 /* Apply to Inner Content */
@@ -164,15 +167,6 @@ body.is-global-dragging .card-grid {
 .card-viewer-modal.modal.closing .modal-content {
     /* Very fast exit */
     animation: cardViewerOut 0.09s ease-in forwards; 
-}
-
-/* 
-   CSS Counter for Index Badges 
-   Only applied when inside .card-grid (the viewer).
-   When card is dragged out, it loses this context and the badge disappears automatically.
-*/
-.card-grid {
-    counter-reset: card-index;
 }
 
 .card-grid .card-placeholder::after {
@@ -207,7 +201,7 @@ body.is-global-dragging .card-grid {
 
 /* Watermark Tweaks for Detailed Viewer */
 .card-viewer-modal .area-watermark {
-    opacity: 1 !important;
+    opacity: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -215,14 +209,8 @@ body.is-global-dragging .card-grid {
     top: 50%; /* Reverted to 50% for standard centering */
     
     /* ALLOW events so hover works. We handle Grid pass-through via .card-grid pointer-events */
-    pointer-events: auto !important;
+    pointer-events: auto;
     z-index: 0;
-}
-
-/* Ensure Grid is ABOVE the watermark and clickable */
-.card-grid {
-    position: relative;
-    z-index: 1;
 }
 
 .card-viewer-modal .watermark-owner {

@@ -1,4 +1,6 @@
 // 上下文帮助面板：按 ? 或从设置菜单打开，显示当前面板相关提示
+import { elem as node } from '../admin/log_utils.js?v=202605230600';
+
   let data = null;
   let popoverEl = null;
   let visible = false;
@@ -91,8 +93,6 @@
   function getActivePanel() {
     return window.TabsUI?.getActivePanelId?.('panel_term') || 'panel_term';
   }
-
-  const node = (...args) => window.LogUtils.elem(...args);
 
   // ── DOM 创建 ──
   function ensurePopover() {

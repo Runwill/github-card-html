@@ -1,25 +1,24 @@
 // admin/log_utils
 // 日志面板共享工具：复制、删除、悬浮时间切换
 // 消费者：tokens/ui/logger.js、permissions/logs/logs.js
-  const timeFmt = () => window.TimeFmt || {};
-  const formatRelTime = value => timeFmt().formatRel?.(value) || '';
-  const formatAbsTime = value => timeFmt().formatAbsForLang?.(value) || String(value || '');
+import { formatAbsForLang, formatAbsOrRaw, formatRel, getLocaleFromI18n, parseTimeValue } from './time_fmt.js?v=202605230600';
+export { formatAbsOrRaw, getLocaleFromI18n, parseTimeValue };
 
-  function esc(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  export function esc(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-  function pill(key, cls){ return `<i class="log-pill ${esc(cls || '')}" data-i18n="${esc(key)}"></i>`; }
+  export function pill(key, cls){ return `<i class="log-pill ${esc(cls || '')}" data-i18n="${esc(key)}"></i>`; }
 
-  function actionsHtml(){
+  export function actionsHtml(){
     return '<div class="log-actions"><button class="btn-inline-action btn-copy" data-i18n="common.copy"></button><button class="btn-inline-action btn-del" data-i18n="common.delete"></button><button class="btn-inline-action btn-restore" data-i18n="common.restore"></button></div>';
   }
 
-  function timeHtml(value, escapeFn){
-    const escape = escapeFn || esc, parse = window.TimeFmt?.parseTimeValue;
-    const ts = (parse ? parse(value) : Number(value)) ?? Date.now(), rel = formatRelTime(ts), abs = formatAbsTime(ts);
+  export function timeHtml(value, escapeFn){
+    const escape = escapeFn || esc;
+    const ts = parseTimeValue(value) ?? Date.now(), rel = formatRel(ts), abs = formatAbsForLang(ts);
     return `<time class="log-time" datetime="${escape(new Date(ts).toISOString())}" data-ts="${escape(String(ts))}" data-rel="${escape(rel)}" data-abs="${escape(abs)}">${escape(rel)}</time>`;
   }
 
-  function elem(tag, props, children){
+  export function elem(tag, props, children){
     const node = document.createElement(tag);
     const append = items => (Array.isArray(items) ? items : [items]).forEach(item => {
       if (item == null) return;
@@ -40,7 +39,7 @@
     return node;
   }
 
-  function bindLogCollapse(header, panel){
+  export function bindLogCollapse(header, panel){
     if (!header || !panel) return;
     const btn = header.querySelector('.js-log-collapse');
     if (!btn || btn.__logCollapseBound) return;
@@ -58,7 +57,7 @@
     });
   }
 
-  function ensureLogPanel(options){
+  export function ensureLogPanel(options){
     const opts = options || {};
     let body = document.getElementById(opts.bodyId);
     if (body && body.__ready) return body;
@@ -88,7 +87,7 @@
     return body || null;
   }
 
-  function createLogEntry(html, options){
+  export function createLogEntry(html, options){
     const opts = options || {};
     const row = elem('div', { className: 'tokens-log__entry' + (opts.deleted ? ' is-deleted' : '') + (opts.extraClass ? ' ' + opts.extraClass : '') });
     Object.entries(opts.attrs || {}).forEach(([key, value]) => {
@@ -99,7 +98,7 @@
     return row;
   }
 
-  function appendLogEntries(body, items, makeHtml, options){
+  export function appendLogEntries(body, items, makeHtml, options){
     if (!body) return;
     const opts = options || {};
     const frag = document.createDocumentFragment();
@@ -109,7 +108,7 @@
     try { body.scrollTop = 0; } catch(_){ }
   }
 
-  function prependLogEntry(body, row, maxLogs){
+  export function prependLogEntry(body, row, maxLogs){
     if (!body || !row) return;
     const prevTop = body.scrollTop || 0;
     const atTop = prevTop <= 5;
@@ -131,7 +130,7 @@
     }
   }
 
-  function bindLogCopy(root){
+  export function bindLogCopy(root){
     if (!root || root.__copyDelegationBound) return;
     root.__copyDelegationBound = true;
     root.addEventListener('click', (ev)=>{
@@ -156,7 +155,7 @@
     });
   }
 
-  function bindLogDelete(root, deleteFn, restoreFn){
+  export function bindLogDelete(root, deleteFn, restoreFn){
     if (!root || root.__delDelegationBound) return;
     root.__delDelegationBound = true;
     root.addEventListener('click', (ev)=>{
@@ -179,7 +178,7 @@
     });
   }
 
-  function bindLogTimeHover(root){
+  export function bindLogTimeHover(root){
     if (!root) return;
     if (root.__logTimeHoverBound) return;
     root.__logTimeHoverBound = true;
@@ -189,7 +188,7 @@
     root.addEventListener('mouseout', onOut);
   }
 
-  function startRelTimeRefresh(selector, timerKey){
+  export function startRelTimeRefresh(selector, timerKey){
     if (window[timerKey]) return;
     window[timerKey] = setInterval(()=>{
       try{
@@ -203,7 +202,7 @@
     }, 60000);
   }
 
-  function refreshLogTimes(selector){
+  export function refreshLogTimes(selector){
     try{
       document.querySelectorAll(selector)?.forEach(el=>{
         const ts = Number(el.getAttribute('data-ts')) || Date.now();
@@ -216,4 +215,4 @@
     }catch(_){}
   }
 
-  window.LogUtils = { esc, elem, pill, actionsHtml, timeHtml, bindLogCollapse, ensureLogPanel, createLogEntry, appendLogEntries, prependLogEntry, bindLogCopy, bindLogDelete, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };
+  export const LogUtils = window.LogUtils = { esc, elem, pill, actionsHtml, timeHtml, bindLogCollapse, ensureLogPanel, createLogEntry, appendLogEntries, prependLogEntry, bindLogCopy, bindLogDelete, bindLogTimeHover, startRelTimeRefresh, refreshLogTimes };

@@ -1,5 +1,6 @@
   // permissions/logs/logs: 在权限页添加用户变更日志，沿用 tokens 日志样式与行为
   // API 层复用 permissions/api.js 中的 TokensPerm.API
+import { LogUtils, esc, getLocaleFromI18n } from '../../log_utils.js?v=202605230600';
 
   const MAX_LOGS = 200;
   const TYPE_GROUPS = [
@@ -26,12 +27,10 @@
   ];
   let KNOWN_TYPES = new Set(TYPE_GROUPS.flatMap(item => item.types || []));
 
-  // 时间工具：复用全局 TimeFmt
-  const getDateInputLocale = () => window.TimeFmt?.getLocaleFromI18n?.() || 'en-US';
   // 让日期输入控件的地区跟随当前语言
   function setDateInputLang(container){
     try{
-      const locale = getDateInputLocale();
+      const locale = getLocaleFromI18n() || 'en-US';
       const scope = (container && container.querySelector) ? container : document;
       ['#perms-log-from', '#perms-log-to'].forEach(sel=>{
         const el = scope.querySelector(sel);
@@ -223,7 +222,6 @@
   function roleCodeAttrs(log){
     if (String(log && log.type) !== 'role-changed') return '';
     const raw = (log && log.data) ? log.data : {};
-    const esc = LogUtils.esc;
     return ` data-old-role-code='${esc(raw.oldRole != null ? raw.oldRole : '')}' data-new-role-code='${esc(raw.newRole != null ? raw.newRole : '')}'`;
   }
 
@@ -239,8 +237,7 @@
       const msgParams = buildMsgParamsForLog(log);
       let msg = msgK ? `<span data-i18n="${msgK}" data-i18n-params='${msgParams}'${roleCodeAttrs(log)}></span>` : '';
       if (!msg && log && log.message) msg = `<span>${String(log.message)}</span>`;
-      const actions = LogUtils.actionsHtml();
-      return `<div class="log-row">${timeHtml}${k? LogUtils.pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${actions}</div>`;
+      return `<div class="log-row">${timeHtml}${k? LogUtils.pill(k, cls):''}<i class="log-ctx">${who? `[${who}]`:''}</i>${msg? `<i class=\"log-msg\">${msg}</i>`:''}${LogUtils.actionsHtml()}</div>`;
     }catch(_){ return ''; }
   }
 
@@ -302,20 +299,16 @@
       const val = selected === 'all' ? 'all' : (resolveTypeFilter(selected).find(type => metaForType(type).msgKey) || '');
       // 查找或创建预览行节点
       let preview = body.querySelector('#perms-log-preview');
-      const ensurePreview = ()=>{
-        if (!preview) {
-          const span = LogUtils.elem('span', 'fmt-one');
-          const msg = LogUtils.elem('i', 'log-msg', span);
-          const row = LogUtils.elem('div', 'log-row', msg);
-          preview = LogUtils.elem('div', { id: 'perms-log-preview', className: 'tokens-log__entry tokens-log__entry--preview' }, row);
-          body.insertBefore(preview, body.firstChild || null);
-        }
-        return preview;
-      };
+      if (!preview) {
+        const span = LogUtils.elem('span', 'fmt-one');
+        const msg = LogUtils.elem('i', 'log-msg', span);
+        const row = LogUtils.elem('div', 'log-row', msg);
+        preview = LogUtils.elem('div', { id: 'perms-log-preview', className: 'tokens-log__entry tokens-log__entry--preview' }, row);
+        body.insertBefore(preview, body.firstChild || null);
+      }
       const key = val && val !== 'all' ? (metaForType(val).msgKey || '') : '';
       const tmpl = key ? getI18nString(key) || '' : '';
       if (!tmpl.trim()) { if (preview) try{ preview.remove(); }catch(_){ } return; }
-      const esc = LogUtils.esc;
       // 构造 HTML：非占位符部分做 HTML 转义，占位符使用样式突出显示
       let html = '';
       let last = 0;
@@ -330,7 +323,6 @@
         last = idx + full.length;
       }
       if (last < tmpl.length) html += esc(tmpl.slice(last));
-      ensurePreview();
       const one = preview && preview.querySelector('.fmt-one');
       if (one) one.innerHTML = html;
     }catch(_){ }

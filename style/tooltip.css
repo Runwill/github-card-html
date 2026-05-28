@@ -14,8 +14,6 @@
         opacity var(--dur-normal) var(--ease-default),
         transform var(--dur-normal) cubic-bezier(0.16, 1, 0.3, 1),
         visibility 0s linear var(--dur-normal);
-    will-change: opacity, transform;
-
     /* 外观：毛玻璃卡片 */
     background: var(--surface-soft, rgba(255, 255, 255, 0.9));
     color: var(--text, #2d3748);
@@ -70,10 +68,6 @@ html[data-theme="dark"] #lore-tooltip {
 }
 
 /* 减少运动时的模糊感 */
-@media (prefers-reduced-motion: no-preference) {
-    #lore-tooltip { backface-visibility: hidden; }
-}
-
 @media (prefers-reduced-motion: reduce) {
     #lore-tooltip { transition: none !important; transform: none !important; }
 }

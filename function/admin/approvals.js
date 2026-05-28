@@ -1,11 +1,12 @@
 // 审核模块：统一管理注册与头像审核（管理员/版主）
+import { elem as el, parseTimeValue } from './log_utils.js?v=202605230600';
+
   const refreshUser = () => { try { window.CardUI?.Manager?.Core?.userService?.refreshCurrentUserFromServer?.(); } catch(_){} };
 
   const jsonGet = path => endpoints.requestJson(path, { auth: 'always', preferJsonMessage: false });
   const jsonPost = (path, body)=> endpoints.requestJson(path, { method:'POST', auth: 'always', body: body || {} });
 
-  const createdAtDate = value => new Date((window.TimeFmt?.parseTimeValue?.(value) ?? Date.parse(value)) || 0);
-  const el = (...args) => window.LogUtils.elem(...args);
+  const createdAtDate = value => new Date((parseTimeValue(value) ?? Date.parse(value)) || 0);
   const emptyOverlay = opacity => el('p', { cls:'empty-hint empty-overlay', text:'空', style:{ position:'absolute', inset:'0', display:'flex', alignItems:'center', justifyContent:'center', margin:'0', opacity:String(opacity), transition: opacity ? '' : 'opacity 180ms ease' } });
 
   // ── fetchPending 工厂 ──
@@ -18,15 +19,15 @@
   const fetchPendingIntros    = makeFetchPending('/intro/pending',    '获取待审简介失败:');
 
   let pendingApprovalGroupsCache = null;
-  async function fetchPendingApprovalGroups(){
+  export async function fetchPendingApprovalGroups(){
     const [users, avatars, usernames, intros] = await Promise.all([fetchPendingUsers(), fetchPendingAvatars(), fetchPendingUsernames(), fetchPendingIntros()]);
     return { users, avatars, usernames, intros };
   }
-  function countPendingApprovalGroups(groups){
+  export function countPendingApprovalGroups(groups){
     groups = groups || {};
     return ['users', 'avatars', 'usernames', 'intros'].reduce((sum, key) => sum + (Array.isArray(groups[key]) ? groups[key].length : 0), 0);
   }
-  function setPendingApprovalGroupsCache(groups){ pendingApprovalGroupsCache = groups || null; }
+  export function setPendingApprovalGroupsCache(groups){ pendingApprovalGroupsCache = groups || null; }
 
   function removeApprovalRowFromTrigger(trigger){
     try {
@@ -79,7 +80,7 @@
   const makeApprovalHandler = (apiPath, idKey, postSuccess)=> (recordId, action, trigger)=> handleApproval(apiPath, { [idKey]: recordId, action }, trigger, postSuccess);
   const HANDLER = { register: makeApprovalHandler('/approve', 'userId', refreshPermissionUsers), avatar: makeApprovalHandler('/avatar/approve', 'recordId', refreshUser), username: makeApprovalHandler('/username/approve', 'recordId', refreshUser), intro: makeApprovalHandler('/intro/approve', 'recordId', refreshUser) };
 
-  async function renderApprovals(){
+  export async function renderApprovals(){
     const container = document.getElementById('pending-approvals-modal-content');
     if (!container) return;
     container.innerHTML = '';
@@ -129,8 +130,3 @@
       container.innerHTML = '<p class="empty-hint error">加载失败，请重试</p>';
     }
   }
-
-  Object.assign(window, {
-    fetchPendingApprovalGroups, countPendingApprovalGroups, setPendingApprovalGroupsCache,
-    renderApprovals
-  });

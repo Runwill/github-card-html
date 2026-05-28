@@ -18,7 +18,6 @@ html { scrollbar-gutter: stable both-edges; }
   opacity: 0;
   transition: height var(--dur-slow) var(--ease-standard),
               opacity var(--dur-normal) var(--ease-standard);
-  will-change: height, opacity;
 }
 .collapsible.is-open {
   display: block;

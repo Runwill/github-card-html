@@ -1,7 +1,8 @@
+import { LogUtils, esc, parseTimeValue } from '../../log_utils.js?v=202605230600';
+
   const MAX_LOGS = 200;
 
   const T = window.tokensAdmin;
-  const esc = T.esc;
   const { COLLECTIONS } = T;
 
   async function mutateLog(id, suffix, method, toastKey) {
@@ -41,8 +42,6 @@
       return body || null;
     } catch (_) { return null; }
   }
-
-  const parseLogTime = value => window.TimeFmt?.parseTimeValue?.(value);
 
   function pickLogTime(v){
     try{
@@ -152,8 +151,8 @@
             const items = list.slice();
             try{
               items.sort((a,b)=>{
-                const tb = parseLogTime(pickLogTime(b)) ?? 0;
-                const ta = parseLogTime(pickLogTime(a)) ?? 0;
+                const tb = parseTimeValue(pickLogTime(b)) ?? 0;
+                const ta = parseTimeValue(pickLogTime(a)) ?? 0;
                 return tb - ta;
               });
             }catch(_){ }

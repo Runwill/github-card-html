@@ -1,9 +1,8 @@
   // tokens/utils
   // 常用工具：HTML 转义、按路径设置/删除、颜色工具
+import { esc } from '../log_utils.js?v=202605230600';
 
   window.tokensAdmin = window.tokensAdmin || {};
-
-  const esc = window.LogUtils?.esc || (value => String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'));
 
   function showToast(message, type) {
     if (typeof window.showToast === 'function') window.showToast(message, type);

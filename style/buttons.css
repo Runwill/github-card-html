@@ -14,7 +14,6 @@
   cursor: pointer;
   user-select: none;
   transition: background-color var(--dur-normal) var(--ease-default), color var(--dur-normal) var(--ease-default), border-color var(--dur-normal) var(--ease-default), box-shadow var(--dur-normal) var(--ease-default), transform var(--dur-fast) var(--ease-default), background-position var(--dur-moderate) var(--ease-default); 
-  will-change: background-position, box-shadow;
 }
 
 .btn:focus {
@@ -39,7 +38,6 @@
 .btn--block { width: 100%; }
 
 /* 动作按钮交互反馈（颜色由 theme.css 统一管理） */
-.btn--lift { will-change: background-position, box-shadow, transform; }
 .btn--lift:hover { transform: translateY(-1px); }
 .btn--lift:active { transform: translateY(0.5px); }
 

@@ -1,6 +1,8 @@
 const w = window;
   // permissions/render/render_content — 内容渲染: 用户权限块 + 主渲染入口
   // 动效与绑定在 render.js 中，通过 TokensPerm._RenderUI 共享
+import { formatAbsOrRaw } from '../../time_fmt.js?v=202605230600';
+
   const ns = w.TokensPerm;
   const S = ns.state;
   const API = ns.API || {};
@@ -36,7 +38,7 @@ const w = window;
     // 注册时间
     if (u.createdAt) {
       const dateSpan = makeEl('span', 'approval-sub__date');
-      dateSpan.textContent = w.TimeFmt.formatAbsOrRaw(u.createdAt);
+      dateSpan.textContent = formatAbsOrRaw(u.createdAt);
       sub.append(dateSpan);
     }
 

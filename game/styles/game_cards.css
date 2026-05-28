@@ -129,16 +129,6 @@ html.force-landscape {
     border-color: var(--primary-1) !important;
 }
 
-/* Card Back Styling */
-.card-placeholder[data-card-key='CardBack'] {
-    background: linear-gradient(135deg, var(--surface) 0%, var(--bg-end) 100%) !important;
-    box-shadow: var(--card-shadow-rest, 0 2px 5px var(--shadow-1));
-    position: relative;
-    overflow: hidden;
-    filter: none !important;
-    opacity: 1 !important;
-}
-
 .card-placeholder[data-card-key='CardBack'] .card-face-content {
     opacity: 0;
     text-shadow: none;
@@ -159,16 +149,6 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     /* Inverts black line-art to white for dark backgrounds */
     filter: invert(1);
     opacity: 0.8;
-}
-
-/* Ensure CardBacks in Stacked/Deck slots stay absolute centered */
-.area-stacked > .card-placeholder[data-card-key='CardBack'] {
-    position: absolute;
-}
-
-/* Ensure CardBacks in Spread slots can contain their absolute ::after children */
-.area-spread > .card-placeholder[data-card-key='CardBack'] {
-    position: relative;
 }
 
 /* Remote Move Arc-Flight Ghost */

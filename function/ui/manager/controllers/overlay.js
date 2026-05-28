@@ -1,5 +1,7 @@
 // 统一覆盖层系统 - 用导航栈管理所有菜单和弹窗
 // 替代原 modal.js + sidebar.js
+import { renderApprovals } from '../../../admin/approvals.js?v=202605230600';
+
   'use strict';
   var w = window;
   var dom = w.CardUI.Manager.Core.dom;
@@ -103,7 +105,7 @@
       if (u) u.value = localStorage.getItem('username') || localStorage.getItem('user') || '';
       var pwd = el.querySelector('#oldPassword'); if (pwd) pwd.focus();
     } else if (panelId === 'approve-user-modal') {
-      if (typeof w.renderApprovals === 'function') w.renderApprovals();
+      renderApprovals();
       if (refresh) refresh();
     } else if (panelId === 'sidebar-menu' || panelId === 'account-menu') {
       if (refresh) refresh();

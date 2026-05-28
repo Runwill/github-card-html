@@ -1,7 +1,7 @@
 // admin/time_fmt
 // 共享时间格式化工具：解析、绝对/相对格式化、locale 推断
 // 消费者：tokens/ui/logger.js、permissions/logs/logs.js
-  function parseTimeValue(v){
+  export function parseTimeValue(v){
     try{
       if (v == null) return undefined;
       if (v instanceof Date) return v.getTime();
@@ -11,7 +11,7 @@
     }catch(_){ return undefined; }
   }
 
-  function getLocaleFromI18n(){
+  export function getLocaleFromI18n(){
     try{
       const lang = window.i18n?.getLang?.() || 'zh';
       if (lang === 'zh') return 'zh-CN';
@@ -20,7 +20,7 @@
     }catch(_){ return 'en-US'; }
   }
 
-  function formatAbsForLang(v){
+  export function formatAbsForLang(v){
     try{
       const t = parseTimeValue(v) ?? Date.now();
       const locale = getLocaleFromI18n();
@@ -28,14 +28,14 @@
     }catch(_){ return String(v || ''); }
   }
 
-  function formatAbsOrRaw(value){
+  export function formatAbsOrRaw(value){
     try{
       const t = parseTimeValue(value);
       return t == null ? String(value || '') : formatAbsForLang(t);
     }catch(_){ return String(value || ''); }
   }
 
-  function formatRel(v){
+  export function formatRel(v){
     try{
       const now = Date.now();
       const t = parseTimeValue(v) ?? now;
@@ -56,4 +56,4 @@
     }catch(_){ return ''; }
   }
 
-  window.TimeFmt = { parseTimeValue, getLocaleFromI18n, formatAbsForLang, formatAbsOrRaw, formatRel };
+  export const TimeFmt = window.TimeFmt = { parseTimeValue, getLocaleFromI18n, formatAbsForLang, formatAbsOrRaw, formatRel };

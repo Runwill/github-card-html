@@ -49,7 +49,6 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.25s ease;
-    will-change: opacity, transform;
 }
 
 /* ── The spinning gradient ring ── */
@@ -74,6 +73,9 @@
         var(--turn-ring-color, #ffd700)                                        100%
     );
     -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask:
         linear-gradient(#fff 0 0) content-box,
         linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;

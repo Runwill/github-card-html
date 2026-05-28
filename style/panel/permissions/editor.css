@@ -39,7 +39,6 @@
   transition: height var(--dur-normal) var(--ease-default),
               opacity var(--dur-normal) var(--ease-default),
               transform var(--dur-normal) var(--ease-default);
-  will-change: height, opacity, transform;
 }
 
 #panel_permissions .perm-editor-stack {
@@ -51,7 +50,6 @@
     height var(--dur-normal) var(--ease-default),
     opacity var(--dur-fast) var(--ease-default),
     transform var(--dur-normal) var(--ease-default);
-  will-change: height, opacity, transform;
 }
 
 #panel_permissions .perm-editor-stack.is-collapsed {

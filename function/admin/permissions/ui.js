@@ -1,3 +1,5 @@
+import { elem as makeEl } from '../log_utils.js?v=202605230600';
+
 const w = window;
   const ns = w.TokensPerm = w.TokensPerm || {};
 
@@ -24,8 +26,6 @@ const w = window;
       try { el.setAttribute('data-tooltip', w.t ? w.t(keyForAttr, params) : (params ? (params.name||'') : keyForAttr)); } catch(_){ }
     } catch(_){ }
   }
-
-  const makeEl = (...args) => w.LogUtils.elem(...args);
 
   function tag(text, more=false, tip){
     const s = makeEl('span', 'perm-tag' + (more ? ' perm-tag--more' : ''), text);

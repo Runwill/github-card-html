@@ -1,0 +1,471 @@
+﻿diff --git a/editor/scripts/panel.js b/editor/scripts/panel.js
+index f62e29f..560afa1 100644
+--- a/editor/scripts/panel.js
++++ b/editor/scripts/panel.js
+@@ -35,12 +35,6 @@
+   var POINTER_DRAG_THRESHOLD = 6;
+   var HISTORY_LIMIT = 80;
+   var GUIDE_COLOR_COUNT = 5;
+-  var EDGE_SCROLL_ACCELERATION = 0.25;
+-  var EDGE_SCROLL_FRICTION = 0.82;
+-  var EDGE_SCROLL_MAX_SPEED = 18;
+-  var EDGE_SCROLL_ZONE_RATIO = 0.08;
+-  var EDGE_SCROLL_MIN_ZONE = 12;
+-  var EDGE_SCROLL_MAX_ZONE = 28;
+ 
+   function t(key, params) {
+     return window.t ? window.t(key, params) : key;
+@@ -658,9 +652,9 @@
+     var velocityY = 0;
+     var directionX = 0;
+     var directionY = 0;
+-    var acceleration = EDGE_SCROLL_ACCELERATION;
+-    var friction = EDGE_SCROLL_FRICTION;
+-    var maxSpeed = EDGE_SCROLL_MAX_SPEED;
++    var acceleration = 4.6;
++    var friction = 0.86;
++    var maxSpeed = 96;
+ 
+     function canScrollX() {
+       return element.scrollWidth > element.clientWidth + 1;
+@@ -697,7 +691,7 @@
+ 
+     element.addEventListener('mousemove', function (event) {
+       var rect = element.getBoundingClientRect();
+-      var edge = Math.max(EDGE_SCROLL_MIN_ZONE, Math.min(EDGE_SCROLL_MAX_ZONE, Math.min(rect.width, rect.height) * EDGE_SCROLL_ZONE_RATIO));
++      var edge = Math.max(24, Math.min(56, Math.min(rect.width, rect.height) * 0.16));
+       var pointerX = event.clientX - rect.left;
+       var pointerY = event.clientY - rect.top;
+       directionX = 0;
+diff --git a/editor/styles/editor.css b/editor/styles/editor.css
+index bae532d..cfcb914 100644
+--- a/editor/styles/editor.css
++++ b/editor/styles/editor.css
+@@ -187,9 +187,8 @@ html.force-landscape {
+ }
+ 
+ #panel_draft .relation-graph-search {
+-  --draft-field-width: min(18em, 24vw);
+   width: min(18em, 24vw);
+-  min-width: min(10em, 100%);
++  min-width: 10em;
+ }
+ 
+ #panel_draft .relation-graph-mode-button {
+@@ -451,6 +450,17 @@ html.force-landscape {
+   --ui-action-fs: var(--draft-fs-control, 14px);
+ }
+ 
++#panel_draft #htmlInput {
++  border: 1px solid var(--border);
++  border-radius: var(--radius-md);
++  background: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
++  color: var(--text);
++  box-shadow: none;
++  transition: border-color var(--dur-fast) var(--ease-default),
++              background-color var(--dur-fast) var(--ease-default),
++              box-shadow var(--dur-fast) var(--ease-default);
++}
++
+ #panel_draft #htmlInput {
+   width: 100%;
+   flex: 1 1 auto;
+@@ -458,18 +468,10 @@ html.force-landscape {
+   margin: 0;
+   overflow: auto;
+   resize: none;
+-  border: 1px solid var(--border);
+-  border-radius: var(--radius-md);
+-  background: color-mix(in srgb, var(--surface) 96%, var(--bg-soft, var(--surface)));
+-  color: var(--text);
+-  box-shadow: none;
+   font-family: var(--font-mono);
+   font-size: var(--draft-fs-control, 14px);
+   line-height: var(--lh-relaxed);
+   padding: 0.714em 0.857em;
+-  transition: border-color var(--dur-fast) var(--ease-default),
+-              background-color var(--dur-fast) var(--ease-default),
+-              box-shadow var(--dur-fast) var(--ease-default);
+ }
+ 
+ #panel_draft #htmlInput::placeholder {
+@@ -495,6 +497,12 @@ html.force-landscape {
+   outline-offset: -0.071em;
+ }
+ 
++#panel_draft #htmlInput:focus {
++  box-shadow: none;
++  outline: 0.071em solid var(--primary-ring);
++  outline-offset: -0.071em;
++}
++
+ #panel_draft .draftBlock {
+   flex: 1 1 auto;
+   min-height: 0;
+@@ -568,10 +576,14 @@ html.force-landscape {
+   overflow: auto;
+ }
+ 
++#panel_draft .editor-search,
++#panel_draft .editor-field .admin-input {
++  width: 100%;
++}
++
+ #panel_draft .editor-search,
+ #panel_draft .relation-graph-search,
+ #panel_draft .editor-field .admin-input {
+-  width: var(--draft-field-width, 100%);
+   margin: 0;
+ }
+ 
+diff --git a/function/ui/shared_search.js b/function/ui/shared_search.js
+index aa9143d..43bd36b 100644
+--- a/function/ui/shared_search.js
++++ b/function/ui/shared_search.js
+@@ -11,7 +11,6 @@
+ 
+     const input = document.createElement('input');
+     input.type = 'text';
+-    input.className = 'ui-field';
+     input.id = 'search-input';
+     input.placeholder = '妫€绱?;
+     input.autocomplete = 'off';
+diff --git a/index.html b/index.html
+index e0ff590..b096bdb 100644
+--- a/index.html
++++ b/index.html
+@@ -16,7 +16,7 @@
+ 
+     
+     <link rel="stylesheet" type="text/css" href="style/fonts.css?v=202604102135">
+-    <link rel="stylesheet" type="text/css" href="style/header/_variables.css?v=202605180220">
++    <link rel="stylesheet" type="text/css" href="style/header/_variables.css?v=202605111831">
+     <link rel="stylesheet" type="text/css" href="style/media/game_controls.css?v=202605010330">
+     <link rel="stylesheet" type="text/css" href="style/media/summary_roles.css?v=202605110020">
+     <link rel="stylesheet" type="text/css" href="style/media/main_perspective.css?v=202605010410">
+@@ -31,7 +31,7 @@
+     <link rel="stylesheet" type="text/css" href="style/modals/_variables.css?v=202605030210">
+     <link rel="stylesheet" type="text/css" href="style/modals/base.css?v=202605171230">
+     <link rel="stylesheet" type="text/css" href="style/menu/_variables.css?v=202604232700">
+-    <link rel="stylesheet" type="text/css" href="style/menu/panel.css?v=202605171234">
++    <link rel="stylesheet" type="text/css" href="style/menu/panel.css?v=202605100030">
+     <link rel="stylesheet" type="text/css" href="style/menu/sidebar.css?v=202604232400">
+     <link rel="stylesheet" type="text/css" href="style/menu/settings.css?v=202605171030">
+     <link rel="stylesheet" type="text/css" href="style/modals/account-info.css?v=202605171230">
+@@ -40,25 +40,25 @@
+     <link rel="stylesheet" type="text/css" href="style/modals/help.css?v=202605030210">
+     <link rel="stylesheet" type="text/css" href="style/modals/tokens-create.css?v=202605171230">
+     <link rel="stylesheet" type="text/css" href="style/modals/tokens-edit.css?v=202604282100">
+-    <link rel="stylesheet" type="text/css" href="style/header.css?v=202605180210">
++    <link rel="stylesheet" type="text/css" href="style/header.css?v=202605111831">
+     <link rel="stylesheet" type="text/css" href="style/tooltip.css?v=202605010410">
+     <link rel="stylesheet" type="text/css" href="style/animations.css?v=202605111831">
+     <link rel="stylesheet" type="text/css" href="game/styles/role_animations.css?v=202604102135">
+     <link rel="stylesheet" type="text/css" href="game/styles/role_summary.css?v=202605111831">
+     <link rel="stylesheet" type="text/css" href="style/row_highlight.css?v=202604102135">
+     <link rel="stylesheet" type="text/css" href="style/buttons.css?v=202605100620">
+-    <link rel="stylesheet" type="text/css" href="style.css?v=202605171235">
++    <link rel="stylesheet" type="text/css" href="style.css?v=202605111831">
+     <link rel="stylesheet" type="text/css" href="style/panel/tokens/_variables.css?v=202605080120">
+     <link rel="stylesheet" type="text/css" href="style/panel/admin_controls.css?v=202605171230">
+     <link rel="stylesheet" type="text/css" href="style/panel/tokens/toolbar.css?v=202605100100">
+-    <link rel="stylesheet" type="text/css" href="style/panel/tokens/summary.css?v=202605180100">
++    <link rel="stylesheet" type="text/css" href="style/panel/tokens/summary.css?v=202604102135">
+     <link rel="stylesheet" type="text/css" href="style/panel/tokens/section.css?v=202604102135">
+     <link rel="stylesheet" type="text/css" href="style/panel/tokens/card.css?v=202605100330">
+     <link rel="stylesheet" type="text/css" href="style/panel/tokens/kv.css?v=202605111831">
+     <link rel="stylesheet" type="text/css" href="style/panel/tokens/nest.css?v=202604102135">
+     <link rel="stylesheet" type="text/css" href="style/panel/tokens/log.css?v=202605100800">
+     <link rel="stylesheet" type="text/css" href="style/panel/tokens/animation.css?v=202604102135">
+-    <link rel="stylesheet" type="text/css" href="style/theme.css?v=202605180200">
++    <link rel="stylesheet" type="text/css" href="style/theme.css?v=202605171230">
+     <link rel="stylesheet" type="text/css" href="style/theme_elegant.css?v=202605171230">
+     <link rel="stylesheet" type="text/css" href="style/skill_copy.css?v=202605100610">
+     <link rel="stylesheet" type="text/css" href="style/footer.css?v=202605010410">
+@@ -66,7 +66,7 @@
+     <link rel="stylesheet" type="text/css" href="style/panel/permissions/filters.css?v=202605171230">
+     <link rel="stylesheet" type="text/css" href="style/panel/permissions/editor.css?v=202605171230">
+     <link rel="stylesheet" type="text/css" href="style/panel/permissions/rows.css?v=202604102135">
+-    <link rel="stylesheet" type="text/css" href="editor/styles/editor.css?v=202605180900">
++    <link rel="stylesheet" type="text/css" href="editor/styles/editor.css?v=202605171233">
+     <link rel="stylesheet" type="text/css" href="style/collapsible.css?v=202604102135">
+     <!-- Game Modules (Replaces game.css) -->
+     <link rel="stylesheet" type="text/css" href="game/styles/game_layout.css?v=202605110020">
+@@ -217,13 +217,13 @@
+     <script src="function/ui/announcements.js?v=202605061730"></script>
+     <script src="function/ui/event_bindings.js?v=202604102135"></script>
+     <script src="function/ui/tabs.js?v=202605110020"></script>
+-    <script src="function/ui/shared_search.js?v=202605180220"></script>
++    <script src="function/ui/shared_search.js?v=202605110020"></script>
+     <script src="function/ui/draft_panel.js?v=202605040760"></script>
+     <script src="editor/scripts/key_actions.js?v=202605040760"></script>
+     <script src="editor/scripts/data.js?v=202605120100"></script>
+     <script src="editor/scripts/recommendations.js?v=202605160100"></script>
+     <script src="editor/scripts/relation_graph.js?v=202605170450"></script>
+-    <script src="editor/scripts/panel.js?v=202605180940"></script>
++    <script src="editor/scripts/panel.js?v=202605160100"></script>
+     <script src="function/ui/theme_toggle_button.js?v=202605050600"></script>
+     <script src="function/ui/lang_toggle_button.js?v=202604102135"></script>
+     <script src="function/app_bootstrap.js?v=202605040760"></script>
+diff --git a/login.html b/login.html
+index 2309322..c1c2b9b 100644
+--- a/login.html
++++ b/login.html
+@@ -18,10 +18,10 @@
+     <link rel="stylesheet" type="text/css" href="Foundation-Sites-CSS/css/foundation.css?v=202604102135">
+     <link rel="stylesheet" type="text/css" href="style/modals/base.css?v=202605171230">
+     <link rel="stylesheet" type="text/css" href="style/buttons.css?v=202605100310">
+-    <link rel="stylesheet" type="text/css" href="style.css?v=202605171235">
++    <link rel="stylesheet" type="text/css" href="style.css?v=202604102135">
+     <link rel="stylesheet" type="text/css" href="style/login.css?v=202605171230">
+-    <link rel="stylesheet" type="text/css" href="style/theme.css?v=202605180210">
+-    <link rel="stylesheet" type="text/css" href="style/ui_controls.css?v=202605171232">
++    <link rel="stylesheet" type="text/css" href="style/theme.css?v=202605171230">
++    <link rel="stylesheet" type="text/css" href="style/ui_controls.css?v=202605171231">
+ </head>
+ <body>
+     <!-- 璇█鍒囨崲鎸夐挳锛堝浐瀹氬湪鍙充笂瑙掞級 -->
+diff --git a/style.css b/style.css
+index 73c334d..699e5c8 100644
+--- a/style.css
++++ b/style.css
+@@ -14,9 +14,6 @@
+ body { overflow-x: hidden; margin: 0; font-size: .9rem; }
+ .hidden { display: none; }
+ 
+-/* 鑿滃崟鎸夐挳鍩虹鑹诧紙鐧诲綍椤?涓荤珯閫氱敤锛?*/
+-.menu__button { color: var(--text); }
+-
+ /* 鏍囬鍜岀壒娈婂厓绱犳牱寮?*/
+ .strength_title {
+     line-height: 1;
+@@ -72,6 +69,9 @@ pronounName {
+ .container:hover .role_icon.dominator { opacity: 0.025; left: 5%; }
+ .container:hover .role_icon.not_dominator { opacity: 0.025; left: 4.5%; }
+ 
++/* 璇存槑锛氬師鍏堣繖閲屼娇鐢ㄥ叏灞€ span 閫夋嫨鍣ㄥ疄鐜扳€滄按娉㈠姩鐢烩€濓紝浼氬奖鍝嶆墍鏈?span 鏂囨湰鍏冪礌銆?+   宸茬Щ闄よ鍏ㄥ眬鏍峰紡锛岄伩鍏嶅鑷村叏绔?span 鍑虹幇寮傚父鏀惧ぇ鍔ㄧ敾銆傝嫢闇€瑕佺偣鍑绘按娉㈡晥鏋滐紝
++   璇蜂娇鐢?function/button/wave.js 涓殑 .wave-ripple 涓撴湁鍔ㄧ敾銆?*/
+ 
+ /* 缂╄繘鍜屽竷灞€鏍峰紡 */
+ .indent {
+@@ -79,11 +79,11 @@ pronounName {
+     line-height: var(--indent-lh, 1.9em);
+     position: relative;
+     transform: translateX(0);
+-    transition: transform var(--dur-slow) var(--ease-standard),
+-                background-color var(--dur-normal) var(--ease-default),
+-                border-left-color var(--dur-normal) var(--ease-default);
++    /* 浠呭 transform/box-shadow/鑳屾櫙杈圭嚎鍚敤杩囨浮锛岄伩鍏嶄富棰樺彉閲忓彉鍔ㄩ€犳垚鍏ㄥ眬鍔ㄧ敾 */
++    transition: transform var(--dur-slow) var(--ease-standard), background-color var(--dur-normal) var(--ease-default), border-left-color var(--dur-normal) var(--ease-default), box-shadow var(--dur-normal) var(--ease-default);
+     border-left: 3px solid transparent;
+     padding-left: 0;
++    /* 闄嶄綆 will-change 鑼冨洿锛岄伩鍏嶆寔缁殑鍚堟垚灞傚紑閿€ */
+     will-change: transform;
+ }
+ 
+diff --git a/style/header.css b/style/header.css
+index 2f33e21..864f709 100644
+--- a/style/header.css
++++ b/style/header.css
+@@ -1,7 +1,7 @@
+ #header {
+-    background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 92%, transparent) 100%);
++    background: linear-gradient(135deg, #fff 0%, #fafafa 100%);
+     text-align: center;
+-    box-shadow: var(--shadow-header);
++    box-shadow: 0 2px 8px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+     display: flex;
+     left: 0;
+     right: 0;
+@@ -14,7 +14,7 @@
+         transform var(--dur-moderate) var(--ease-standard),
+         border-color var(--dur-moderate) var(--ease-standard);
+     backdrop-filter: blur(8px) saturate(1.1);
+-    border-bottom: 1px solid var(--border);
++    border-bottom: 1px solid rgba(0,0,0,0.06);
+     align-items: center;
+     padding-right: 2.2rem;
+     position: sticky;
+@@ -37,7 +37,7 @@
+ 
+ #sidebar .title-a {
+     text-decoration: none;
+-    color: var(--text);
++    color: #2d3748;
+     transition: color var(--dur-moderate) var(--ease-standard), transform var(--dur-moderate) var(--ease-standard);
+     position: relative;
+     padding: 0.2em 0;
+@@ -50,13 +50,13 @@
+     left: 50%;
+     width: 0;
+     height: 2px;
+-    background: var(--text);
++    background: #2d3748;
+     transition: width var(--dur-moderate) var(--ease-standard), opacity var(--dur-moderate) var(--ease-standard);
+     transform: translateX(-50%);
+ }
+ 
+ #sidebar .title-a:hover {
+-    color: var(--text);
++    color: #2d3748;
+     transform: translateY(-1px);
+ }
+ 
+@@ -73,7 +73,7 @@
+     transition-duration: var(--dur-fast);
+ }
+ 
+-#sidebar { background: inherit; padding: 0; z-index: calc(var(--z-header) + 7); }
++#sidebar { background: #fff; padding: 0; z-index: calc(var(--z-header) + 7); }
+ 
+ #header-avatar {
+     position: absolute;
+@@ -81,7 +81,7 @@
+     object-fit: cover;
+     border: 1px solid var(--border);
+     background: var(--surface);
+-    box-shadow: var(--shadow-avatar);
++    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+     cursor: pointer;
+     display: none;
+     transition: transform var(--dur-normal) ease, box-shadow var(--dur-normal) var(--ease-default);
+diff --git a/style/header/_variables.css b/style/header/_variables.css
+index 3ca10fa..92e0f2c 100644
+--- a/style/header/_variables.css
++++ b/style/header/_variables.css
+@@ -87,7 +87,6 @@ padding {
+ 
+ /* 鈹€鈹€ 鎼滅储瀹瑰櫒 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€ */
+ #search-input {
+-  --ui-field-focus-border: color-mix(in srgb, var(--text-subtle) 60%, transparent);
+   position: relative;
+   right: -95%;
+   transition: right var(--dur-slowest) var(--ease-default),
+diff --git a/style/menu/panel.css b/style/menu/panel.css
+index 083877a..35a043c 100644
+--- a/style/menu/panel.css
++++ b/style/menu/panel.css
+@@ -60,8 +60,8 @@
+     background-color var(--dur-normal) var(--ease-standard),
+     color var(--dur-normal) var(--ease-standard),
+     border-color var(--dur-normal) var(--ease-standard),
+-    box-shadow var(--dur-normal) var(--ease-standard);
+-  font-weight: 500;
++    box-shadow var(--dur-normal) var(--ease-standard) !important;
++  font-weight: 500 !important;
+   position: relative;
+   left: 0;
+   width: 100%;
+diff --git a/style/panel/tokens/summary.css b/style/panel/tokens/summary.css
+index c677540..7f930b6 100644
+--- a/style/panel/tokens/summary.css
++++ b/style/panel/tokens/summary.css
+@@ -50,7 +50,6 @@
+   border: 1px solid var(--border);
+   border-radius: var(--radius-md);
+   padding: 0.556em;           /* 10/18 */
+-  overflow: hidden;
+ }
+ #tokens-summary .type-tile__label {
+   font-size: var(--tp-fs-sm, 12px);
+diff --git a/style/theme.css b/style/theme.css
+index 57082b7..27fbff4 100644
+--- a/style/theme.css
++++ b/style/theme.css
+@@ -381,11 +381,29 @@ html[data-theme="dark"] .btn--accent {
+   color: var(--text);
+ }
+ 
++/* 椤堕儴 Header 涓庡鑸?*/
++#header {
++  background: linear-gradient(135deg, var(--surface) 0%, color-mix(in srgb, var(--surface) 92%, transparent) 100%) !important;
++  border-bottom: 1px solid var(--border) !important;
++  box-shadow: var(--shadow-header) !important;
++}
++#sidebar .title-a { color: var(--text) !important; }
++#sidebar .title-a::after { background: var(--text) !important; }
++#sidebar { background: inherit !important; }
++#header-avatar { border-color: var(--border) !important; background: var(--surface) !important; box-shadow: var(--shadow-avatar) !important; }
++
++
++
++/* 鑿滃崟鎸夐挳鏂囧瓧鑹诧紙涓婚鑷€傚簲锛屼綔鐢ㄤ簬渚ц竟鏍?璐﹀彿/璁剧疆涓夎彍鍗曪級*/
++.menu__button { color: var(--text) !important; }
++
+ /* Tokens 椤碉細瀹瑰櫒涓庡崱鐗?鍒嗗尯 */
+ #tokens-summary .type-tile {
+   border-color: var(--border) !important;
+   background: color-mix(in srgb, var(--surface) 92%, transparent);
+ }
++#tokens-summary .type-tile__label { color: var(--text-muted) !important; }
++#tokens-summary .type-tile__value { color: var(--text) !important; }
+ 
+ .tabs.nav[data-tabs],
+ #main-tabs {
+@@ -396,12 +414,28 @@ html[data-theme="dark"] .btn--accent {
+ .tabs-content { border-bottom: none !important; }
+ 
+ .tokens-section { border-color: var(--border) !important; background: var(--surface) !important; }
++.tokens-section__header { background: var(--panel-header-bg) !important; border-bottom: 1px solid var(--border) !important; }
++.tokens-section__title { color: var(--text) !important; }
++.tokens-empty { color: var(--text-subtle) !important; }
+ 
+ #termContainer {
+   background: var(--surface) !important;
+   color: var(--text) !important;
+ }
+ 
++/* 灏嗘睜/鎶€鑳?鎼滅储妗嗕富棰橀€傞厤 */
++#panel_character #search-input,
++#panel_skill #search-input {
++  background-color: var(--surface) !important;
++  color: var(--text) !important;
++  border: 1px solid var(--border) !important;
++  border-radius: var(--radius-sm) !important;
++}
++#panel_character #search-input::placeholder,
++#panel_skill #search-input::placeholder { color: var(--text-subtle) !important; }
++#panel_character #search-input:focus,
++#panel_skill #search-input:focus { border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important; }
++
+ :root {
+   --character-placeholder-min-h: clamp(280px, 52.743vh, 500px);
+   --approval-img-size: clamp(36px, 5.063vh, 52px);
+@@ -426,17 +460,37 @@ html.force-landscape {
+   border: 1px solid var(--border) !important;
+   border-left-color: var(--token-accent, var(--border)) !important;
+ }
++#tokens-content .token-list > .token-card:nth-child(odd) {
++  --token-bg: var(--token-odd-bg);
++  --token-accent: var(--token-accent-blue);
++}
++#tokens-content .token-list > .token-card:nth-child(even) {
++  --token-bg: var(--token-even-bg);
++  --token-accent: var(--token-accent-green);
++}
+ 
++#tokens-content .kv-row { border-bottom-color: var(--border) !important; }
++#tokens-content .kv-key { color: var(--text-muted) !important; }
++#tokens-content .kv-val { color: var(--text) !important; }
+ #tokens-content .kv-val:not(.is-editing):hover { background: color-mix(in srgb, var(--border) 30%, transparent) !important; }
+ #tokens-content .kv-val.is-editing { background: color-mix(in srgb, var(--surface) 92%, transparent) !important; box-shadow: var(--shadow-inset-border) !important; }
+ 
++.tokens-log { background: var(--log-bg) !important; border-color: var(--log-border) !important; }
++.tokens-log__header { background: var(--log-header-bg) !important; border-bottom-color: var(--log-border) !important; }
++.tokens-log__title, .tokens-log .log-row, .tokens-log .log-val { color: var(--text) !important; }
+ .tokens-log .log-time, .tokens-log .log-ctx { color: var(--text-subtle) !important; }
++.tokens-log code.log-code { background: var(--panel-header-bg) !important; border-color: var(--border) !important; color: var(--text) !important; }
+ 
+ /* Tokens 涓婚潰鏉垮崰婊″彲瑙嗛珮搴︼紝閬垮厤搴曢儴闇插嚭鑳屾櫙鑹插樊 */
+ :root { --header-height: calc(var(--fs-root, 20px) * 3.2); }
+ #panel_tokens { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
+ #panel_permissions { min-height: calc(100vh - var(--header-height)); background: var(--surface) !important; }
+ 
++/* Toast 鏍峰紡 */
++.tokens-toast { background: var(--toast-ok-bg) !important; border-color: var(--toast-ok-border) !important; color: var(--toast-ok-text) !important; }
++.tokens-toast.tokens-toast--error { background: var(--toast-err-bg) !important; border-color: var(--toast-err-border) !important; color: var(--toast-err-text) !important; }
++.tokens-toast.tokens-toast--error > svg { color: var(--toast-err-icon) !important; }
++
+ /* 瀹℃牳绐楀彛鍒楄〃椤癸紙鏆楄壊/娴呰壊鑷€傚簲锛?*/
+ .approval-row {
+   display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg);

@@ -38,7 +38,6 @@
   height: auto;
   opacity: 1;
   transition: height var(--dur-normal) ease, opacity var(--dur-normal) var(--ease-default);
-  will-change: height, opacity;
 }
 .collapsible__content.is-collapsed {
   height: 0 !important;

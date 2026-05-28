@@ -1,8 +1,9 @@
   // permissions/logs/logs_data — 数据层: 日志获取、事件绑定、语言切换
   // UI factory 在 logs.js 中，通过 TokensPerm._LogsUI 共享
+import { LogUtils } from '../../log_utils.js?v=202605230600';
+
   const { jsonGet: apiGet, jsonDelete: apiDelete, jsonPatch: apiPatch, isAdmin, hasToken } = window.TokensPerm.API;
   const UI = window.TokensPerm._LogsUI;
-  const renderUI = () => window.TokensPerm._RenderUI || {};
 
   async function hydrateUserLogs(){
     try{
@@ -62,7 +63,7 @@
         if (panel && !panel.__permsLogObsBound){
           panel.__permsLogObsBound = true;
           const isVisible = (el)=> {
-            const RenderUI = renderUI();
+            const RenderUI = window.TokensPerm._RenderUI || {};
             return RenderUI.isVisible ? RenderUI.isVisible(el, false) : !!(el && el.offsetParent);
           };
           let wasVisible = isVisible(panel);

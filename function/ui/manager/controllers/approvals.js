@@ -1,5 +1,7 @@
 // 审批弹窗入口与基于角色的界面可见性控制。
 // CardUI Manager Controllers - approvals & visibility
+import { countPendingApprovalGroups, fetchPendingApprovalGroups, setPendingApprovalGroupsCache } from '../../../admin/approvals.js?v=202605230600';
+
   'use strict';
   var w = window;
   var dom = w.CardUI.Manager.Core.dom;
@@ -8,10 +10,10 @@
 
   async function onApproveClick(){
     try {
-      var groups = await w.fetchPendingApprovalGroups?.();
-      var total = w.countPendingApprovalGroups?.(groups) || 0;
+      var groups = await fetchPendingApprovalGroups();
+      var total = countPendingApprovalGroups(groups) || 0;
       if (total > 0) {
-        try { w.setPendingApprovalGroupsCache?.(groups); } catch(_){ }
+        try { setPendingApprovalGroupsCache(groups); } catch(_){ }
         try { w.CardUI.Manager.Controllers.overlay.open('approve-user-modal'); } catch(_){ }
       } else {
         var msg = t('toast.noRequests');

@@ -48,17 +48,9 @@ html.force-landscape .modal-backdrop,
 html.force-landscape #loading-overlay,
 html.force-landscape .reveal-overlay {
   inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
 }
 
 /* ── 底栏 ── */
 html.force-landscape .site-footer {
   z-index: 100;
-}
-
-/* ── 行高亮 ── */
-html.force-landscape #row-highlight-overlay {
-  left: 0 !important;
-  right: 0 !important;
 }
