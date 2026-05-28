@@ -153,9 +153,9 @@
     z-index: 12;
 
     /* Appearance: Matched with .stat-hp style but using Judge Colors */
-    background-color: rgba(255, 193, 7, 0.15); /* Low opacity yellow background */
-    color: #f59e0b; /* Amber/Gold text (var(--text-gold) usually) */
-    border: 1px solid rgba(255, 193, 7, 0.5); /* Subtle border */
+    background-color: rgba(251, 191, 36, 0.2);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.3);
     
     /* Layout */
     min-width: var(--player-judge-count-size, 18px); /* Slightly tighter than hand count */
@@ -193,14 +193,6 @@ html[data-theme="dark"] .player-judge-count {
     color: #ffd700;
     border-color: rgba(255, 215, 0, 0.4);
     box-shadow: 0 0 8px rgba(255, 215, 0, 0.2);
-}
-
-/* Ensure no conflicts with legacy */
-html[data-theme="light"] .player-judge-count {
-     /* Ensure text is readable on light bg */
-     color: #d97706; /* Darker amber for contrast against white/light-gray */
-     background-color: rgba(251, 191, 36, 0.2);
-     border-color: rgba(245, 158, 11, 0.3);
 }
 
 /* Update Animation (Pulse on Change) */

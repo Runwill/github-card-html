@@ -55,26 +55,13 @@
     margin: var(--space-2xs) 0;
 }
 
-/* Dark Mode Support */
-[data-theme='dark'] .custom-context-menu {
-    background: var(--surface);
-    border-color: var(--border);
-    color: var(--text);
-}
-
 [data-theme='dark'] .context-menu-header {
-    background: var(--bg-start);
-    border-bottom-color: var(--border);
     color: var(--text-subtle);
 }
 
 [data-theme='dark'] .context-menu-item:hover {
     background: color-mix(in srgb, var(--primary-1) 20%, transparent);
     color: var(--primary-1);
-}
-
-[data-theme='dark'] .context-menu-separator {
-    background: var(--border);
 }
 
 @keyframes fadeIn {

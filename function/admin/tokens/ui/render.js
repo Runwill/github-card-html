@@ -122,7 +122,7 @@
   // 卡片包装：左侧色带、工具栏（跳转/编辑/删除）+ 内部键值树
   function cardShell(coll, obj, innerHtml){
     const col=getAccent(obj);
-    const style= col? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:3px solid ${esc(col)}"`: '';
+    const style= col? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:1px solid ${esc(col)}"`: '';
     const { canEdit }=getAuth();
     const toolbar = `<div class="token-card__toolbar">
       <button class="btn btn--secondary btn--xs btn-go-doc" data-i18n="tokens.toolbar.go"></button>
@@ -265,28 +265,16 @@
       const more=document.getElementById('more-'+baseId) || root.querySelector('.js-more');
       if(!more) return;
       const expanded=root.getAttribute('data-expanded')==='1';
-      const transitionMs=400;
   const setBtn=(isOpen)=>{ if(btn){ btn.setAttribute('data-i18n', isOpen? 'common.collapse':'common.expand'); window.i18n?.applySafe?.(btn); btn.classList.toggle('is-expanded', isOpen); } };
-      const onEnd=(cb)=> window.CollapsibleAnim.onTransitionEnd(more, cb, transitionMs+50);
       if(!expanded){
         more.style.display='block';
-        more.classList.add('is-opening');
-        more.style.height='0px';
-        void more.offsetHeight;
-        const target=more.scrollHeight;
-        more.style.height=target+'px';
-        onEnd(()=>{ more.classList.remove('is-opening'); more.classList.add('is-open'); more.style.height='auto'; });
+        window.CollapsibleAnim.openCollapsible(more);
         root.setAttribute('data-expanded','1');
         setBtn(true);
         if(type){ try{ state.openTypes.add(type); }catch(_){ } }
       } else {
-        const from=more.scrollHeight;
-        more.style.height=from+'px';
-        void more.offsetHeight;
-        more.classList.remove('is-open');
-        more.classList.add('is-closing');
-        more.style.height='0px';
-        onEnd(()=>{ more.classList.remove('is-closing'); more.style.display='none'; more.style.height='0px'; });
+        window.CollapsibleAnim.closeCollapsible(more);
+        window.CollapsibleAnim.onTransitionEnd(more, ()=>{ more.style.display='none'; }, 450);
         root.setAttribute('data-expanded','0');
         setBtn(false);
         if(type){ try{ state.openTypes.delete(type); }catch(_){ } }

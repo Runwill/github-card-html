@@ -13,34 +13,6 @@ function canUseSkillCopy(){
 
 if (canUseSkillCopy()) {
 
-  // 切换 Ctrl 状态类
-  function setCtrlPressed(on){
-    document.documentElement.classList.toggle('ctrl-pressed', !!on);
-  }
-
-  let ctrlDown = false;
-
-  // 键盘监听：keydown/keyup
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Control' && !ctrlDown){
-      ctrlDown = true;
-      setCtrlPressed(true);
-    }
-  }, true);
-
-  window.addEventListener('keyup', (e) => {
-    if (e.key === 'Control'){
-      ctrlDown = false;
-      setCtrlPressed(false);
-    }
-  }, true);
-
-  // 失去窗口焦点时重置，避免状态卡住
-  window.addEventListener('blur', () => {
-    ctrlDown = false;
-    setCtrlPressed(false);
-  });
-
   async function copyText(text){
     try{
       await navigator.clipboard.writeText(text);

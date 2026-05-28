@@ -52,3 +52,28 @@
   });
   window.addEventListener('resize', ()=>{ if (currentTarget && tipEl) place(tipEl, currentTarget); });
   window.addEventListener('scroll', ()=>{ if (currentTarget && tipEl) place(tipEl, currentTarget); }, { passive: true });
+
+  function showLore(anchor, html){
+    const el = ensureTip();
+    currentTarget = anchor;
+    el.classList.remove('show', 'from-left', 'from-right');
+    el.innerHTML = html;
+    el.style.cssText = 'visibility:hidden;display:block;left:-9999px;top:-9999px';
+    const rect = anchor.getBoundingClientRect();
+    const sx = window.scrollX, sy = window.scrollY, vw = window.innerWidth, m = 12;
+    let tipW = el.offsetWidth, tipH = el.offsetHeight;
+    let left = Math.min(Math.max(rect.left + sx + rect.width/2 - tipW*0.15, sx + m), sx + vw - tipW - m);
+    const availW = vw - 2*m;
+    if (tipW > availW){
+      el.style.maxWidth = availW + 'px'; el.style.whiteSpace = 'normal';
+      tipW = el.offsetWidth; tipH = el.offsetHeight;
+      left = Math.min(Math.max(rect.left + sx + rect.width/2 - tipW*0.15, sx + m), sx + vw - tipW - m);
+    }
+    let top = rect.bottom + sy + 8, placement = 'bottom';
+    if (top + tipH > window.innerHeight + sy - m){ top = rect.top + sy - tipH - 12; placement = 'top'; }
+    const cx = left + tipW/2 - sx;
+    el.setAttribute('data-placement', placement);
+    el.style.cssText = 'left:' + left + 'px;top:' + top + 'px;visibility:visible';
+    el.classList.add(cx > vw/2 ? 'from-left' : 'from-right', 'show');
+  }
+  window.LoreTooltip = { showLore, hide: ()=>{ if(tipEl){ tipEl.classList.remove('show','from-left','from-right'); currentTarget=null; } } };

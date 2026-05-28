@@ -4,11 +4,7 @@ window.Game = window.Game || {};
     const UI = window.Game.UI;
     const getLayoutRect = UI.getLayoutRect; // Import from global
 
-    // 强制横屏坐标转换辅助
-    function _flR(rect) {
-        if (window.__flTransformRect) return window.__flTransformRect(rect);
-        return rect;
-    }
+    const _flR = UI._flR;
 
     function getSortableSelector(el) {
         return el.getAttribute('data-item-selector') || '.card-placeholder';

@@ -39,7 +39,7 @@ function initGame() {
 
     if (pauseBtn) {
         pauseBtn.addEventListener('click', () => {
-            window.Game.Controller.togglePause();
+            window.Game.Core.togglePause();
         });
     }
 

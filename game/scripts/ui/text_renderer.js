@@ -61,23 +61,6 @@ const GameText = {
     },
 
     /**
-     * 将文本挂载到容器中。
-     * 代理给 window.Game.UI.safeRender 以确保安全性
-     */
-    mount(container, key, data = {}) {
-        if (!container) return;
-        const html = this.render(key, data);
-
-        // Generate a simple key based on content if none exists
-        // Or just rely on content diffing in safeRender
-        if (window.Game.UI?.safeRender) {
-            window.Game.UI.safeRender(container, html);
-        } else {
-            container.innerHTML = html;
-        }
-    },
-
-    /**
      * 注册/覆盖模板
      */
     registerTemplates(map) {

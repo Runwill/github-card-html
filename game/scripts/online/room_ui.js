@@ -487,13 +487,7 @@ window.Game = window.Game || {};
         refreshRoomList();
     }
 
-    // ===== 工具函数 =====
-
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-    }
+    const escapeHtml = window.Game.UI.escapeHtml;
 
     // ===== 导出 =====
 

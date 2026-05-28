@@ -1,6 +1,19 @@
   const bind=(sel,handler)=>{ try{ document.querySelectorAll(sel).forEach(el=> el.addEventListener('click',handler)); }catch(_){} };
   const call=(name,...args)=>{ try{ const fn=window[name]; if(!fn) return; return fn.apply(window,args); }catch(_){} };
 
+  (function trackCtrlKey(){
+    let down = false;
+    const set = (on) => {
+      if (down === on) return;
+      down = on;
+      document.body.classList.toggle('ctrl-down', on);
+      document.documentElement.classList.toggle('ctrl-pressed', on);
+    };
+    window.addEventListener('keydown', (e) => { if (e.ctrlKey) set(true); }, true);
+    window.addEventListener('keyup', (e) => { if (!e.ctrlKey) set(false); }, true);
+    window.addEventListener('blur', () => set(false));
+  })();
+
   whenDOMReady().then(()=>{
     whenPartialsReady().then(()=>{
       // 初始同步：根据 term_status 设置按钮颜色与页面状态，避免首次点击才加载/切换

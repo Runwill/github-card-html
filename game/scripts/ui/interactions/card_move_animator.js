@@ -116,14 +116,8 @@
         }) || null;
     }
 
-    function directChildWithClass(parent, className) {
-        return Array.from(parent.children).find(child => child.classList.contains(className)) || null;
-    }
-
-    function composeCardAppearanceHTML(faceHTML, annotationsHTML = '') {
-        return `<div class="card-face-content">${faceHTML || ''}</div>`
-            + `<div class="card-annotations">${annotationsHTML || ''}</div>`;
-    }
+    const directChildWithClass = window.Game.UI.directChildWithClass;
+    const composeCardAppearanceHTML = window.Game.UI.composeCardShellHTML;
 
     function getCardElementAppearance(el, options = {}) {
         if (!el) return null;

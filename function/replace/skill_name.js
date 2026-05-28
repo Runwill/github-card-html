@@ -25,13 +25,6 @@
             return roleIdx === -1 ? null : { skObj, roleIdx };
         };
 
-        // Tooltip 单例初始化
-        if (!window._loreTooltipAppended) {
-            window._loreTooltipAppended = true;
-            $('body').append('<div id="lore-tooltip"></div>');
-        }
-        const $tooltip = $('#lore-tooltip');
-
         // 核心处理函数（dom 操作与事件绑定）
         const processor = (node) => {
              const $node = $(node);
@@ -67,67 +60,13 @@
                                  $node.prop('loreSkillPosition', skill.indexOf(skObj));
                                  $node.prop('loreRolePosition', roleIdx);
 
-                                 // 绑定事件 (直接复用原有逻辑)
-                                 $node.on('mouseenter', function () {
-                                    const sIdx = $(this).prop('loreSkillPosition')
-                                    const rIdx = $(this).prop('loreRolePosition')
-                                    const loreData = skill[sIdx].role[rIdx]
-                                    const loreText = '「' + loreData.lore + '」——《' + loreData.legend + '》'
-            
-                                    const rect = this.getBoundingClientRect()
-                                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-                                    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft
-                                    const viewportWidth = window.innerWidth
-            
-                                    let left = rect.left + scrollLeft + rect.width / 2
-                                    let top = rect.bottom + scrollTop + 8
-                                    let placement = 'bottom'
-                                    const margin = 12
-            
-                                    $tooltip
-                                      .removeClass('show')
-                                      .html(loreText)
-                                      .css({ visibility: 'hidden', display: 'block', left: '-9999px', top: '-9999px' })
-            
-                                    let tipWidth = $tooltip.outerWidth()
-                                    let tipHeight = $tooltip.outerHeight()
-            
-                                    left = Math.min(
-                                      Math.max(left - tipWidth * 0.15, scrollLeft + margin),
-                                      scrollLeft + viewportWidth - tipWidth - margin
-                                    )
-            
-                                    const availableWidth = viewportWidth - 2 * margin
-                                    if (tipWidth > availableWidth) {
-                                      $tooltip.css({ 'max-width': availableWidth + 'px', 'white-space': 'normal' })
-                                      tipWidth = $tooltip.outerWidth()
-                                      tipHeight = $tooltip.outerHeight()
-                                      left = Math.min(
-                                        Math.max(rect.left + scrollLeft + rect.width / 2 - tipWidth * 0.15, scrollLeft + margin),
-                                        scrollLeft + viewportWidth - tipWidth - margin
-                                      )
-                                    }
-            
-                                    if (top + tipHeight > window.innerHeight + scrollTop - margin) {
-                                      top = rect.top + scrollTop - tipHeight - 12
-                                      placement = 'top'
-                                    }
-            
-                                    const tooltipCenterX = left + tipWidth / 2 - scrollLeft
-                                    const viewportCenterX = viewportWidth / 2
-                                    const fromLeft = tooltipCenterX > viewportCenterX
-            
-                                    $tooltip.removeClass('from-left from-right')
-                                    $tooltip
-                                      .attr('data-placement', placement)
-                                      .css({ left: left + 'px', top: top + 'px', visibility: 'visible' })
-                                      .each(function(){ this.style.removeProperty('opacity'); this.style.removeProperty('transform'); })
-                                      .addClass(fromLeft ? 'from-left' : 'from-right')
-                                      .addClass('show')
-                                })
-                                $node.on('mouseleave', function () {
-                                    $tooltip.removeClass('show from-left from-right')
-                                });
+                                  $node.on('mouseenter', function(){
+                                    const sIdx = $(this).prop('loreSkillPosition');
+                                    const rIdx = $(this).prop('loreRolePosition');
+                                    const d = skill[sIdx].role[rIdx];
+                                    window.LoreTooltip.showLore(this, '「' + d.lore + '」——《' + d.legend + '》');
+                                  });
+                                  $node.on('mouseleave', ()=> window.LoreTooltip.hide());
                      }
                  }
              }

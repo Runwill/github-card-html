@@ -135,7 +135,6 @@
 #nav .tabs-title a:hover::before { left: 100%; }
 
 .tabs-title.is-active > a {
-    /* font-weight: 600; */
     text-shadow: 0 0 1px currentColor, 0 0 1px currentColor;
 }
 

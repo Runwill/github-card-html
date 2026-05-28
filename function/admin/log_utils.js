@@ -194,7 +194,7 @@ export { formatAbsOrRaw, getLocaleFromI18n, parseTimeValue };
       try{
         document.querySelectorAll(selector)?.forEach(el=>{
           const ts = Number(el.getAttribute('data-ts')) || Date.now();
-          const rel = formatRelTime(ts);
+          const rel = formatRel(ts);
           el.setAttribute('data-rel', rel);
           if (!el.matches(':hover')) el.textContent = rel;
         });
@@ -206,8 +206,8 @@ export { formatAbsOrRaw, getLocaleFromI18n, parseTimeValue };
     try{
       document.querySelectorAll(selector)?.forEach(el=>{
         const ts = Number(el.getAttribute('data-ts')) || Date.now();
-        const rel = formatRelTime(ts);
-        const abs = formatAbsTime(ts);
+        const rel = formatRel(ts);
+        const abs = formatAbsForLang(ts);
         el.setAttribute('data-rel', rel);
         el.setAttribute('data-abs', abs);
         el.textContent = el.matches(':hover') ? abs : rel;

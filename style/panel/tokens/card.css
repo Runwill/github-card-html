@@ -14,7 +14,7 @@
 
 #tokens-content .token-card {
   border: 1px solid var(--border);
-  border-left: 3px solid var(--token-accent, var(--border));
+  border-left: 1px solid var(--token-accent, var(--border));
   border-radius: var(--radius-sm);
   padding: 0.444em 0.556em;    /* 8/18, 10/18 */
   background: var(--token-bg, var(--surface));

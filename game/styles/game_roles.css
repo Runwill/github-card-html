@@ -85,18 +85,11 @@
     display: flex;
     align-items: center;
     gap: var(--character-info-gap, var(--space-3xl));
-    border-bottom: 1px solid var(--border); /* Default fallback */
-    /* Table specific overrides merged */
     width: auto;
     flex-shrink: var(--character-info-flex-shrink, 0);
-    border-bottom: none;
     border-left: 1px solid var(--border);
     padding-bottom: 0;
     padding-left: var(--pad-character-info-l, var(--space-3xl));
-}
-
-/* responsive behaviour is handled via tokens in media.css */
-.character-info {
     flex-direction: var(--character-info-flex, row);
     text-align: var(--character-info-textalign, left);
     padding-right: var(--pad-character-info-r, var(--space-3xl));
@@ -104,8 +97,10 @@
 }
 
 .player-hand {
+    flex: 1;
     padding-right: var(--pad-player-hand-r, var(--space-3xl));
     position: relative;
+    min-width: 0;
 }
 
 .char-avatar {
@@ -187,13 +182,6 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
 
 .stat-hp.hp-changed {
     animation: hp-pulse var(--dur-slow) cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* Hand Cards Area */
-.player-hand {
-    flex: 1;
-    padding-right: var(--pad-player-hand-r, var(--space-3xl));
-    min-width: 0;
 }
 
 .player-hand h4 {

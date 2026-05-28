@@ -46,11 +46,7 @@ window.Game = window.Game || {};
 
     function isCardDragging() { return !!window.Game.UI.DragState?.isDragging; }
 
-    function escapeHtml(value) {
-        const div = document.createElement('div');
-        div.textContent = value == null ? '' : String(value);
-        return div.innerHTML;
-    }
+    const escapeHtml = window.Game.UI.escapeHtml;
 
     /**
      * 设置手牌检视器 (Hand Inspector)

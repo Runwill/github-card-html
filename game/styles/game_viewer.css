@@ -220,7 +220,7 @@ body.is-global-dragging .card-grid {
     opacity: 0.1; /* 调低不透明度，使其接近区域水印的深浅 (此前为 0.4) */
     white-space: nowrap;
     letter-spacing: 0.05em;
-    /* text-shadow: 0 1px 2px var(--shadow-1); */ /* 移除阴影以保持扁平淡化 */
+
 }
 
 /* 强制内部标签（如角色名）继承颜色，覆盖原本的势力色 */

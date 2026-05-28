@@ -496,12 +496,6 @@ window.Game = window.Game || {};
         removeUserFromPerspectives,
         clearPerspectives,
         onRemoteGameStart,
-        getAreaPath,
-        getAreaLocationPath,
-        getCardLocationPath,
-        resolveAreaByPath,
-        resolveAreaLocationByPath,
-        _resolveArea: resolveAreaByPath,
         get isApplyingRemote() { return isApplyingRemote; },
         get perspectives() { return perspectives; }
     };

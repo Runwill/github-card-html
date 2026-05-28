@@ -16,7 +16,7 @@
  * ─────────────────────────────────────────────────────── */
 
 #tokens-content .nest-block {
-  border-left: 3px solid var(--token-accent);
+  border-left: 1px solid var(--token-accent);
   padding-left: 0.556em;      /* 10/18 */
   margin: 0.444em 0;          /* 8/18 0 */
 }

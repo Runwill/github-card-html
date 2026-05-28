@@ -58,10 +58,7 @@ window.Game = window.Game || {};
         };
     }
 
-    function composeCardShellHTML(faceHTML, annotationsHTML = '') {
-        return `<div class="card-face-content">${faceHTML || ''}</div>`
-            + `<div class="card-annotations">${annotationsHTML || ''}</div>`;
-    }
+    const composeCardShellHTML = window.Game.UI.composeCardShellHTML;
 
     function getCardAppearanceForArea(card, area, options = {}) {
         const visibilityState = window.Game.Models?.getCardVisibilityForArea?.(area) || null;
@@ -73,9 +70,7 @@ window.Game = window.Game || {};
         };
     }
 
-    function directChildWithClass(parent, className) {
-        return Array.from(parent.children).find(child => child.classList.contains(className)) || null;
-    }
+    const directChildWithClass = window.Game.UI.directChildWithClass;
 
     function ensureCardShell(cardEl) {
         let faceEl = directChildWithClass(cardEl, 'card-face-content');

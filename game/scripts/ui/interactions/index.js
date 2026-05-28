@@ -37,18 +37,9 @@ window.Game = window.Game || {};
         swapAnimationDuration: 200 // 毫秒
     };
 
-    // ── 强制横屏坐标转换辅助 ─────────────────────
-    // 将物理触摸坐标（clientX/Y）转为视觉坐标
-    function _flPt(x, y) {
-        if (window.__flTransformPoint) return window.__flTransformPoint(x, y);
-        return { x: x, y: y };
-    }
-    // 将物理 BoundingClientRect 转为视觉矩形
-    function _flR(rect) {
-        if (window.__flTransformRect) return window.__flTransformRect(rect);
-        return rect;
-    }
-    
+    const _flR = window.Game.UI._flR;
+    const _flPt = window.Game.UI._flPt;
+
     // Bind to Global for Split Modules
     window.Game.UI.DragState = DragState;
     window.Game.UI.DragConfig = DRAG_CONFIG;

@@ -23,7 +23,7 @@
           el.style.setProperty('--token-accent', col);
           if (el.classList.contains('token-card')) {
             if (tint) el.style.setProperty('--token-bg', tint);
-            el.style.borderLeft = `3px solid ${col}`;
+            el.style.borderLeft = `1px solid ${col}`;
           }
         } catch (_) {}
       });

@@ -29,5 +29,35 @@ function getAdaptiveColor(color) {
     return color;
 }
 
+function escapeHtml(value) {
+    const div = document.createElement('div');
+    div.textContent = value == null ? '' : String(value);
+    return div.innerHTML;
+}
+
+function _flPt(x, y) {
+    if (window.__flTransformPoint) return window.__flTransformPoint(x, y);
+    return { x: x, y: y };
+}
+
+function _flR(rect) {
+    if (window.__flTransformRect) return window.__flTransformRect(rect);
+    return rect;
+}
+
+function directChildWithClass(parent, className) {
+    return Array.from(parent.children).find(child => child.classList.contains(className)) || null;
+}
+
+function composeCardShellHTML(faceHTML, annotationsHTML = '') {
+    return `<div class="card-face-content">${faceHTML || ''}</div>`
+        + `<div class="card-annotations">${annotationsHTML || ''}</div>`;
+}
+
 window.Game.UI.hexToRgba = hexToRgba;
 window.Game.UI.getAdaptiveColor = getAdaptiveColor;
+window.Game.UI.escapeHtml = escapeHtml;
+window.Game.UI._flR = _flR;
+window.Game.UI._flPt = _flPt;
+window.Game.UI.directChildWithClass = directChildWithClass;
+window.Game.UI.composeCardShellHTML = composeCardShellHTML;

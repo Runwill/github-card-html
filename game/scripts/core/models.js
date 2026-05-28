@@ -157,10 +157,6 @@ function getTargetSlotIndex(area, toIndex, card = null) {
     return getDefaultSlotIndex(area, card);
 }
 
-function getEquipSlots(player) {
-    return player ? getAreaSlots(player.equipArea) : [];
-}
-
 function getEquipSlot(player, slotIndex) {
     return player ? getAreaSlot(player.equipArea, slotIndex) : null;
 }
@@ -512,12 +508,9 @@ window.Game.Models.getAreaSlots = getAreaSlots;
 window.Game.Models.getAreaSlot = getAreaSlot;
 window.Game.Models.getSlotCards = getSlotCards;
 window.Game.Models.findCardSlotIndex = findCardSlotIndex;
-window.Game.Models.getEquipSlots = getEquipSlots;
 window.Game.Models.getEquipSlot = getEquipSlot;
 window.Game.Models.getDefaultEquipSlotIndex = getDefaultEquipSlotIndex;
 window.Game.Models.getAreaCards = getAreaCards;
-window.Game.Models.getPlayerAreas = getPlayerAreas;
-window.Game.Models.getGameAreas = getGameAreas;
 window.Game.Models.findCardArea = findCardArea;
 window.Game.Models.findCardById = findCardById;
 window.Game.Models.EQUIP_SLOT_KEYS = EQUIP_SLOT_KEYS;
