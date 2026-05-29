@@ -10,4 +10,5 @@
     window.__partialsReadySeed = { resolve: resolvePartialsReady };
   }
   window.whenPartialsReady = function(){ return window.partialsReady && typeof window.partialsReady.then === 'function' ? window.partialsReady.catch(function(){}) : Promise.resolve(); };
+  window.whenReady = function(fn){ return window.whenDOMReady().then(function(){ return window.whenPartialsReady(); }).then(fn); };
 })();

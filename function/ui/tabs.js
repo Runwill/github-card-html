@@ -5,7 +5,7 @@
   const getActivePanelId=(fallback)=> document.querySelector('.tabs-panel.is-active')?.id || document.querySelector('#main-tabs .tabs-title.is-active a')?.getAttribute('href')?.replace('#', '') || fallback || null;
   const isPanelActive=(panelId)=>{ const activeId = panelId && getActivePanelId(); return !panelId || !activeId || activeId === (panelId[0] === '#' ? panelId.slice(1) : panelId); };
 
-  whenDOMReady().then(()=> whenPartialsReady().then(()=>{
+  whenReady(()=>{
     document.querySelectorAll('#main-tabs a.title-a').forEach((a,idx)=>{
       a.addEventListener('click',e=>{
         const href=a.getAttribute('href')||'';
@@ -80,5 +80,5 @@
         }
       }, { passive: false });
     }
-  }));
+  });
   window.TabsUI = Object.assign(window.TabsUI || {}, { changeTitle, getActivePanelId, isPanelActive });

@@ -17,7 +17,7 @@
   var requestJson = w.endpoints && w.endpoints.requestJson;
 
   var cropper = null;
-  function storageValue(key){ return w.localStorage ? (w.localStorage.getItem(key) || '') : ''; }
+  var storageValue = key => w.endpoints?.storageGet?.(key) || '';
 
   function openAvatarCropper(event){
     var file = (event && event.target && event.target.files && event.target.files[0]) || null;

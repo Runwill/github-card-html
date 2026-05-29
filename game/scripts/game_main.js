@@ -59,4 +59,4 @@ function initGame() {
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 }
 
-window.whenDOMReady().then(() => window.whenPartialsReady().then(initGame));
+window.whenReady(initGame);

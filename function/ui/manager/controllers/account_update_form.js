@@ -12,8 +12,8 @@
 
   async function handleUpdateFormSubmit(event){
     event.preventDefault();
-    var id = (w.localStorage && w.localStorage.getItem('id')) || '';
-    var token = (w.localStorage && w.localStorage.getItem('token')) || '';
+    var id = w.endpoints?.storageGet?.('id') || '';
+    var token = w.endpoints?.storageGet?.('token') || '';
     var oldPassword = fieldValue('oldPassword'), newPassword = fieldValue('newPassword'), confirmPassword = fieldValue('confirmPassword');
     var responseMessage = $('response-message');
     if (!id || !token) { showMessage(responseMessage, t('error.noLogin'), 'error'); return; }

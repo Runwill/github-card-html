@@ -2,6 +2,6 @@
   'use strict';
   var w = window;
 
-  function handleLogout(){ try { ['token','username','id'].forEach(function(k){ window.localStorage?.removeItem(k); }); } catch(_){} window.location.href = 'login.html'; }
+  function handleLogout(){ try { window.endpoints?.clearSession?.(); } catch(_){} window.location.href = 'login.html'; }
 
   w.CardUI.Manager.Controllers.session = { handleLogout: handleLogout };

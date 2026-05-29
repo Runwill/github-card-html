@@ -24,7 +24,7 @@
   })();
 
   function handleUnauthorized(){
-    try { ['token','id','username','role','avatar'].forEach(key => localStorage.removeItem(key)); } catch (_) {}
+    try { endpoints.clearSession(); } catch (_) {}
     try {
       if (!/login\.html$/i.test(location.pathname)) {
         console.warn('登录已过期，请重新登录');

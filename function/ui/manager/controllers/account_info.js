@@ -9,8 +9,7 @@ import { formatAbsOrRaw } from '../../../admin/time_fmt.js?v=202605230600';
   const resolveAvatarUrl = dom.resolveAvatarUrl;
   const setImageSrc = dom.setImageSrc;
 
-  const t = (typeof window.t === 'function') ? window.t : (k)=>k;
-  const localValue = key => localStorage.getItem(key) || '';
+  const localValue = key => window.endpoints?.storageGet?.(key) || '';
   const ROLE_CLS_MAP = { admin: 'badge-admin', moderator: 'badge-moderator', user: 'badge-user', guest: 'badge-guest' };
 
   function setTextById(id, text){ const el = $(id); if (el) el.textContent = text; return el; }
@@ -32,20 +31,20 @@ import { formatAbsOrRaw } from '../../../admin/time_fmt.js?v=202605230600';
         nameRow.style.cursor = 'pointer';
         nameRow.addEventListener('click', function() {
           const text = nameTextEl.textContent || '';
-          if (text) navigator.clipboard.writeText(text).then(function() { if (window.showToast) window.showToast(t('common.copied')); }).catch(function() {});
+          if (text) navigator.clipboard.writeText(text).then(function() { if (window.showToast) window.showToast(window.t('common.copied')); }).catch(function() {});
         });
       }
       const createdAtEl = $('account-info-createdAt'), ca = localValue('createdAt');
       if (createdAtEl && ca) createdAtEl.textContent = formatAbsOrRaw(ca);
       else if (createdAtEl) { createdAtEl.textContent = '-'; Core.userService?.refreshCurrentUserFromServer?.()?.then(()=>{ const next = localValue('createdAt'); if (next) createdAtEl.textContent = formatAbsOrRaw(next); }); }
       if (introEl) {
-        const ph = t('account.info.placeholder.intro');
+        const ph = window.t('account.info.placeholder.intro');
         if (introEl.tagName === 'TEXTAREA') introEl.value = intro || '';
         else introEl.textContent = intro || ph;
       }
       if (avatarEl) setImageSrc(avatarEl, resolvedAvatar);
       if (roleEl) {
-        const roleText = t('role.'+role);
+        const roleText = window.t('role.'+role);
         roleEl.textContent = roleText;
         roleEl.className = 'badge ' + (ROLE_CLS_MAP[role] || 'badge-user');
       }
@@ -56,13 +55,13 @@ import { formatAbsOrRaw } from '../../../admin/time_fmt.js?v=202605230600';
           Array.from(badgeContainer.querySelectorAll('.badge-permission')).forEach(n => n.remove());
           const permRaw = localValue('permissions');
           const perms = permRaw ? JSON.parse(permRaw) : [];
-          const PERM_DESC = { '仪同三司': t('perm.tooltip.仪同三司'), '赞拜不名': t('perm.tooltip.赞拜不名') };
+          const PERM_DESC = { '仪同三司': window.t('perm.tooltip.仪同三司'), '赞拜不名': window.t('perm.tooltip.赞拜不名') };
           if (Array.isArray(perms)) perms.forEach(raw => {
             const p = String(raw);
             const badge = document.createElement('span');
             badge.className = 'badge badge-permission';
             badge.textContent = p;
-            badge.setAttribute('data-tooltip', PERM_DESC[p] || t('perm.tooltip.prefix', { name: p }));
+            badge.setAttribute('data-tooltip', PERM_DESC[p] || window.t('perm.tooltip.prefix', { name: p }));
             badgeContainer.appendChild(badge);
           });
         }

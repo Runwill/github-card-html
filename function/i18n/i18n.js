@@ -23,7 +23,6 @@ const STORAGE_KEY = 'lang';
   let ensureRetryTimer = null;
   let ensureRetryCount = 0;
   const MAX_ENSURE_RETRY = 12;
-  const USER_CACHE_KEYS = ['id','token','username','avatar','intro','permissions'];
   const scheduleEnsureRetry = () => {
     if (ensureRetryCount >= MAX_ENSURE_RETRY) return;
     if (ensureRetryTimer) return;
@@ -44,7 +43,7 @@ const STORAGE_KEY = 'lang';
       if (!requestJson) { scheduleEnsureRetry(); return; }
       let data;
       try { data = await requestJson('/user/' + encodeURIComponent(id), { auth: true }); }
-      catch(e){ if (e?.status === 404) try { USER_CACHE_KEYS.forEach(key => localStorage.removeItem(key)); } catch(_){}; return; }
+      catch(e){ if (e?.status === 404) try { window.endpoints?.clearSession?.(); } catch(_){}; return; }
       ensureRetryCount = 0;
       try { localStorage.setItem('permissions', JSON.stringify(Array.isArray(data?.permissions) ? data.permissions : [])); } catch(_){ }
     } catch(_){ }

@@ -103,7 +103,7 @@
     if (savedInertia !== null) applyInertiaConfig(parseFloat(savedInertia));
   }
 
-  whenDOMReady().then(()=> whenPartialsReady().then(()=>{
+  whenReady(()=>{
     const gameSettingsBtn = $(GAME_SETTINGS_BUTTON_ID);
     if (gameSettingsBtn) gameSettingsBtn.addEventListener('click', () => {
       var OV = window.CardUI?.Manager?.Controllers?.overlay;
@@ -111,7 +111,7 @@
       initGameSettingsUI();
     });
     initGameSettingsUI();
-  }));
+  });
   
   window.KeySettings = window.KeySettings || {};
   window.KeySettings.loadGameSettings = loadGameSettings;

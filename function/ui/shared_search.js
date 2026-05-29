@@ -80,11 +80,11 @@
       try { applyPanelFilter(panelSelector); } catch(_) { /* ignore */ }
   }
 
-  whenDOMReady().then(()=> whenPartialsReady().then(()=>{
+  whenReady(()=>{
     ensureSearchOnce();
     const initialPanel = document.querySelector('#panel_character') ? '#panel_character' : (document.querySelector('#panel_skill') ? '#panel_skill' : null);
     if (initialPanel) mountToPanel(initialPanel);
-  }));
+  });
 
   // 简单的“将池页”筛选：根据输入内容隐藏/显示 <characterParagraph>
   // 通用筛选工厂：根据关键词隐藏/显示匹配元素，可选处理相邻节点

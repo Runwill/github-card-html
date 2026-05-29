@@ -328,7 +328,6 @@ html[data-theme="dark"] .judge-detail-btn {
 html[data-theme="dark"] .equip-detail-btn:hover,
 html[data-theme="dark"] .judge-detail-btn:hover {
     background: rgba(var(--btn-accent-rgb), 0.2);
-    border-color: var(--btn-accent);
     box-shadow: 0 2px 4px rgba(0,0,0,0.5);
     text-shadow: 0 0 5px rgba(var(--btn-accent-rgb), 0.5);
 }

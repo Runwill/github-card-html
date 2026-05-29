@@ -72,7 +72,7 @@
         clearTimeout(state.timer);
         state.timer = setTimeout(() => {
           const text = (input.value || '');
-          try { localStorage.setItem('tokens_search_q', text); } catch (_) {}
+          window.endpoints?.storageSet?.('tokens_search_q', text);
           if (text === state.q) return;
           const trimmed = (text || '').trim();
           try {

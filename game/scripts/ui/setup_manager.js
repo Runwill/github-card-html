@@ -135,12 +135,8 @@ window.Game = window.Game || {};
      * 切换设置面板（打开/关闭）
      */
     function toggleSetupPanel() {
-        const cur = window.Game.UI.getCurrentView ? window.Game.UI.getCurrentView() : 'none';
-        if (cur === 'setup') {
-            hideSetupPanel();
-            return;
-        }
-        showSetupPanel();
+        if (window.Game.UI.getCurrentView?.() === 'setup') hideSetupPanel();
+        else showSetupPanel();
     }
 
     async function showSetupPanel() {

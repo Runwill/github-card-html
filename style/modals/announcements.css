@@ -5,7 +5,7 @@
   font-size: var(--modal-fs-2xl, 18px);
 }
 .ann-content {
-  font-size: var(--modal-fs-lg, var(--fs-lg));
+  font-size: var(--modal-fs-lg);
   padding: 0.267em;
   display: block;
   max-height: var(--ann-content-max-h, 65vh);
@@ -94,7 +94,7 @@
 }
 
 .ann-card-meta {
-  font-size: var(--modal-fs-base, var(--fs-base));
+  font-size: var(--modal-fs-base);
   color: var(--text-subtle, #94a3b8);
   margin-bottom: 0.923em;
   display: flex;
@@ -146,7 +146,7 @@
 .ann-badge-important {
   display: inline-flex;
   align-items: center;
-  font-size: var(--modal-fs-sm, var(--fs-sm));
+  font-size: var(--modal-fs-sm);
   line-height: var(--lh-none);
   padding: 0.333em 0.667em;
   border-radius: var(--radius-lg) ;
@@ -185,7 +185,7 @@ html[data-theme="dark"] .ann-card.is-important.is-hovered {
 
 .ann-group-label {
   display: inline-block;
-  font-size: var(--modal-fs-sm, var(--fs-sm));
+  font-size: var(--modal-fs-sm);
   font-weight: 600;
   padding: 0.083em 0.667em;
   border-radius: var(--radius-pill);

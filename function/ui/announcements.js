@@ -1,4 +1,3 @@
-  const t = (typeof window.t==='function') ? window.t : (k)=>k;
   const $ = (id)=> document.getElementById(id);
   const h = (tag, cls, text)=> { const e = document.createElement(tag); if(cls) e.className = cls; if(text!==undefined) e.textContent = text; return e; };
   const ANN_URL = 'base/announcements.json';
@@ -62,7 +61,7 @@
     const container = $('announcements-content');
     if (!container) return;
     if (!Array.isArray(list) || list.length === 0){
-      container.replaceChildren(h('div','ann-empty',t('announcements.empty')));
+      container.replaceChildren(h('div','ann-empty',window.t('announcements.empty')));
       container.dataset.announcementsRendered = '1';
       return;
     }
@@ -73,7 +72,7 @@
       
       const title = h('div','ann-card-title', it.title || '');
       if (it.important) {
-        title.prepend(h('span','ann-badge-important','★ ' + t('announcements.important', '重要')));
+        title.prepend(h('span','ann-badge-important','★ ' + window.t('announcements.important', '重要')));
       }
 
       const meta = h('div','ann-card-meta', it.date ? String(it.date) : '');
@@ -163,7 +162,7 @@
       render(data);
     } catch(err){
       if (seq !== renderSeq) return;
-      container.replaceChildren(h('div','ann-empty',t('announcements.error.loadFailed')));
+      container.replaceChildren(h('div','ann-empty',window.t('announcements.error.loadFailed')));
     }
   }
 

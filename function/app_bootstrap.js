@@ -7,7 +7,7 @@ const withTimeout = (promise, ms)=>Promise.race([
   delay(ms).then(()=>{})
 ])
 
-window.whenDOMReady().then(()=> window.whenPartialsReady().then(()=>{
+window.whenReady(()=>{
       try{ $(document).foundation() }catch(_){}
       sr(typeof window.summonCharacters==='function' && window.summonCharacters)
       const afterSkills = withTimeout(sr(typeof window.summonCharacterSkill==='function' && window.summonCharacterSkill), 4500)
@@ -28,4 +28,4 @@ window.whenDOMReady().then(()=> window.whenPartialsReady().then(()=>{
 
         setTimeout(()=>{ try{ window.pronounCheck?.() }catch(_){} },100)
       }).catch(()=>{ window.replacementsReady = Promise.resolve() })
-}))
+})

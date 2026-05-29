@@ -44,7 +44,7 @@ function calculateProgressBarDuration(text){
 function pickRandom(arr){ return arr[Math.floor(Math.random()*arr.length)] }
 
 async function initLoadingOverlay(){
-    await window.whenDOMReady(); await window.whenPartialsReady();
+    await window.whenReady();
     const text=pickRandom(loadingTexts), title=document.getElementById('loading-title');
     if(title){ loadingTitleText=text; title.textContent=text; applyLoadingTitleSpacing(); }
     const dur=calculateProgressBarDuration(text), bar=document.querySelector('.loading-bar');

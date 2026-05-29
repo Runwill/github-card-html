@@ -6,7 +6,7 @@
   box-sizing: border-box;
   width: min(var(--help-w, 380px), var(--help-safe-w, calc(100dvw - 1.846em)));
   max-height: var(--help-max-h, calc(100dvh - 1.846em));
-  font-size: var(--modal-fs-base, var(--fs-base));
+  font-size: var(--modal-fs-base);
   display: flex;
   flex-direction: column;
   background: var(--surface);

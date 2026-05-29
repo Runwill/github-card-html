@@ -46,4 +46,4 @@
 
   // 若页面使用了 partials 异步插入，等待其完成再挂载，避免布局抖动
   var boot = function(){ bind(createButton()); };
-  whenDOMReady().then(()=> whenPartialsReady().then(boot)).catch(boot);
+  whenReady(boot).catch(boot);

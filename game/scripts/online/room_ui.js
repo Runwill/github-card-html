@@ -66,12 +66,8 @@ window.Game = window.Game || {};
      * 切换在线面板（打开/关闭）
      */
     function toggleOnlinePanel() {
-        const cur = window.Game.UI.getCurrentView ? window.Game.UI.getCurrentView() : 'none';
-        if (cur === 'online') {
-            hideOnlinePanel();
-            return;
-        }
-        showOnlinePanel();
+        if (window.Game.UI.getCurrentView?.() === 'online') hideOnlinePanel();
+        else showOnlinePanel();
     }
 
     async function showOnlinePanel() {

@@ -20,7 +20,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: var(--modal-fs-md, var(--fs-md));
+  font-size: var(--modal-fs-md);
   gap: 1.429em;
 }
 
@@ -56,7 +56,7 @@
 }
 
 #avatar-pending-wrap div[data-i18n="modal.avatar.pending"] {
-  font-size: var(--modal-fs-base, var(--fs-base));
+  font-size: var(--modal-fs-base);
   color: var(--text-subtle, #718096);
   font-weight: 500;
 }

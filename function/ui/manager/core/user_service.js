@@ -3,7 +3,6 @@
   'use strict';
   var w = window;
   var ns = w.CardUI.Manager.Core;
-  var USER_CACHE_KEYS = ['id','username','avatar','intro','permissions'];
 
   async function refreshCurrentUserFromServer(){
     try {
@@ -14,7 +13,7 @@
       if (!requestJson) return;
       var data;
       try { data = await requestJson('/user/' + encodeURIComponent(id), { auth: true }); }
-      catch(e){ if (e && e.status === 404 && w.localStorage) try { USER_CACHE_KEYS.forEach(function(k){ w.localStorage.removeItem(k); }); } catch(_){}; return; }
+      catch(e){ if (e && e.status === 404) try { w.endpoints?.clearSession?.(); } catch(_){}; return; }
       if (!data) return;
 
       if (typeof data.intro === 'string' && w.localStorage) w.localStorage.setItem('intro', data.intro || '');

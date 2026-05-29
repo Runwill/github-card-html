@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function(){
       if(payload?.exp){
         const nowSec=Math.floor(Date.now()/1000);
         if(nowSec>=Number(payload.exp)){
-          ['token','id','username','role','avatar'].forEach(k=>localStorage.removeItem(k));
+          window.endpoints?.clearSession?.();
           window.location.href='login.html';
           return;
         }

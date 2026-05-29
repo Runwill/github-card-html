@@ -7,8 +7,8 @@
   var $ = dom.$;
   var requestJson = w.endpoints && w.endpoints.requestJson;
 
-  function currentUserId(){ return w.localStorage ? w.localStorage.getItem('id') : ''; }
-  function setLocalValue(key, value){ if (w.localStorage) w.localStorage.setItem(key, value); }
+  function currentUserId(){ return w.endpoints?.storageGet?.('id') || ''; }
+  function setLocalValue(key, value){ w.endpoints?.storageSet?.(key, value); }
   function currentUserIdOrAlert(){ var id = currentUserId(); if (!id) alert(t('error.noLoginSimple')); return id; }
   function clearPendingHtml(el){ collapsePending(el, function(){ el.innerHTML = ''; }); }
 

@@ -14,11 +14,11 @@
   }
 
   function save(html){
-    try { localStorage.setItem(STORAGE_KEY, html || ''); } catch(_) {}
+    window.endpoints?.storageSet?.(STORAGE_KEY, html || '');
   }
 
   function load(){
-    try { return localStorage.getItem(STORAGE_KEY) || ''; } catch(_) { return ''; }
+    return window.endpoints?.storageGet?.(STORAGE_KEY) || '';
   }
 
   function onInput(){

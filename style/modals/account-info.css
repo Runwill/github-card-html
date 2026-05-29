@@ -1,6 +1,6 @@
 /* Account info modal - modern card layout with avatar, title and detail list */
 .account-info-modal {
-  font-size: var(--modal-fs-md, var(--fs-md));
+  font-size: var(--modal-fs-md);
   padding: 1.714em; /* 24/14 */
 }
 

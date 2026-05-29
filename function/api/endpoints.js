@@ -90,12 +90,18 @@ let DEFAULT_BASE=(function(){
     return out;
   }
 
+var SESSION_KEYS = ['token','id','username','role','avatar','intro','permissions','createdAt'];
+  function clearSession(){ try { SESSION_KEYS.forEach(function(k){ localStorage.removeItem(k); }); } catch(_){} }
+
 window.endpoints={
     base,
     getBase,
     setBase,
     authHeader,
     requestJson,
+    clearSession: clearSession,
+    storageGet: storageGet,
+    storageSet: storageSet,
     api: function(p){ return withBase(p) },
     abs: function(u){ if(!u) return ''; return /^https?:\/\//i.test(u)?u:withBase(u.startsWith('/')?u:'/'+u) },
     character: function(){ return withBase('/api/character') },

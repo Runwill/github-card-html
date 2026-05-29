@@ -220,7 +220,7 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
     if (visible) hideHelp(); else showHelp();
   }
 
-  whenDOMReady().then(()=> whenPartialsReady().then(()=>{
+  whenReady(()=>{
     document.addEventListener('keydown', function (e) {
       var tag = (e.target.tagName || '').toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
@@ -258,7 +258,7 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
     window.addEventListener('i18n:changed', function () {
       if (visible) renderContent(getActiveContext());
     });
-  }));
+  });
 
   window.openHelpPanel = toggleHelp;
   window.preloadHelpPanel = loadData;

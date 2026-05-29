@@ -157,7 +157,7 @@
   }
 
   loadBindings();
-  whenDOMReady().then(()=> whenPartialsReady().then(()=>{
+  whenReady(()=>{
     const keySettingsBtn = document.getElementById(KEY_SETTINGS_BUTTON_ID);
     if (keySettingsBtn) keySettingsBtn.addEventListener('click', () => {
       var OV = window.CardUI?.Manager?.Controllers?.overlay;
@@ -176,7 +176,7 @@
         });
       }
     });
-  }));
+  });
 
   document.addEventListener('keydown', (e) => {
     if (recordingAction) return;
