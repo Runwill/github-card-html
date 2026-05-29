@@ -64,7 +64,7 @@ const { fitSummaryName, setupHandInspector, roleCharacterKey, updateAvatarImage,
                     delete nameEl._origNameHTML;
                     delete nameEl._origRenderedContent;
                     delete nameEl._origRenderKey;
-                    fitSummaryName(nameEl);
+                    requestAnimationFrame(() => fitSummaryName(nameEl));
                 };
 
                 const showJudgeSummaryName = () => {
@@ -82,7 +82,7 @@ const { fitSummaryName, setupHandInspector, roleCharacterKey, updateAvatarImage,
                         nameEl.innerHTML = judgeHTML;
                         nameEl.setAttribute('data-render-key', renderKey);
                     }
-                    fitSummaryName(nameEl);
+                    requestAnimationFrame(() => fitSummaryName(nameEl));
                 };
 
                 const clearHoverTimer = () => {
@@ -204,7 +204,7 @@ const { fitSummaryName, setupHandInspector, roleCharacterKey, updateAvatarImage,
                 nameSpan.setAttribute('data-render-key', renderKey);
                 nameSpan.__lastRenderedContent = newNameHtml;
             }
-            if (didRenderName) fitSummaryName(nameSpan);
+            if (didRenderName) requestAnimationFrame(() => fitSummaryName(nameSpan));
             
             // 判定区牌数
             const judgeCountSpan = pEl.querySelector('.player-judge-count');

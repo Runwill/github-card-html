@@ -304,3 +304,24 @@ return {
 2. 启动链相关脚本迁移时，必须单独模拟 `document.readyState === 'interactive'` 下的微任务顺序，确认 readiness 种子已经在消费者之前同步建立。
 3. 任何 partial 注入 owner 改动后，验收入口必须包含词元内容、词元日志、权限日志、页签点击和对局初始化，不能只测加载层或首页可见。
 4. 如果浏览器工具不可用，最终风险要列出所有未跑的真实入口，而不是只列当前正在改的一个入口。
+
+## 清理时新增共享定义反而膨胀代码
+
+**自检触发信号**
+
+- 清理过程中新增了 `:root` 块、共享 helper、工具函数、token 提升等"收敛"代码，但没有在新增前比较新增行数与被消除行数。
+- 删除了 N 处重复代码，但新增的共享定义本身超过 N 行，导致净增而非净删。
+- 用户指出"你增加了代码"或 `git diff --shortstat` 显示 insertions > deletions。
+
+**当时漏掉的情况**
+
+- 删除 21 处 CSS `var(--modal-fs-*, var(--fs-*))` 冗余 fallback 后，为了"消除重复"新增了 35 行 `:root` token 定义块——净增 14 行。
+- 将 6 处局部 `bind()`/`t()`/`currentUserId()` 提取到 `Game.Utils` 共享函数，新增 29 行，但消费者端只省了约 15 行——净增 14 行。
+- 两次都在动手前没有先算"新增 N 行能消除 M 行"，而是先写了共享定义再删消费者，最终发现共享定义比被消除的重复更大。
+
+**下次自检**
+
+1. 新增任何共享定义（`:root` 块、helper 函数、工具类、token 提升）前，先计算"新增 N 行能消除 M 行"，M > N 才执行。
+2. 若 M ≤ N，保留原样或只做消费者侧的局部简化，不引入新的共享层。
+3. 每批次清理结束前运行 `git diff --shortstat`，确保 deletions > insertions；若 insertions 偏高，先找到膨胀源头并回退。
+4. CSS token fallback 如果已在 `style/media/*.css` 中定义，消费者侧的 `var(--token, fallback)` 本身就是正确的静态值——删除 fallback 不改变 computed 值，但新增 `:root` 定义块会膨胀代码，得不偿失。

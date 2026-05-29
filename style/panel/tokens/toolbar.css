@@ -20,6 +20,8 @@
   justify-content: space-between;
   font-size: var(--tp-fs-2xl, 18px);
   gap: 0.667em;             /* 12/18 */
+  margin-top: var(--tokens-toolbar-mt);
+  margin-bottom: var(--tokens-toolbar-mb);
 }
 
 .admin-panel .tokens-toolbar h2 {

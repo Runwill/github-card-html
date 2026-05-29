@@ -21,6 +21,8 @@
   --admin-input-h:      clamp(20px, 3.797vh, 40px);    /* 管理输入框 / 按钮固定高度 */
   --tokens-kv-key-w:    clamp(60px, 8.368vw, 180px);   /* 键值对键名列宽（横向 → vw） */
   --tokens-log-max-h:   clamp(100px, 27.426vh, 300px); /* 日志面板最大高度 */
+  --tokens-toolbar-mt:  clamp(4px, 0.844vh, 8px);      /* 工具栏上间距 */
+  --tokens-toolbar-mb:  clamp(11px, 2.321vh, 22px);    /* 工具栏下间距 */
 }
 
 /* -- force-landscape：vh↔vw 互换 -------------------------
@@ -41,6 +43,8 @@ html.force-landscape {
 
   /* 横向尺寸：视觉宽度 = 物理高 → vh */
   --tokens-kv-key-w:  clamp(60px, 8.368vh, 180px);
+  --tokens-toolbar-mt:  clamp(4px, 0.844vw, 8px);
+  --tokens-toolbar-mb:  clamp(11px, 2.321vw, 22px);
 }
 
 /* -- 全局 .btn--sm 集成 -----------------------------------
