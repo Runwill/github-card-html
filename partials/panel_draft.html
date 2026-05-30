@@ -1,6 +1,6 @@
 <div class="tabs-panel" id="panel_draft">
-  <main class="draft-page panel-enter-target" data-editor-view="editor">
-    <header class="draft-module-switch" data-i18n-attr="aria-label" data-i18n-aria-label="editor.viewSwitcher.label" aria-label="HTML 编辑模块">
+  <main class="draft-page" data-editor-view="editor">
+    <header class="draft-module-switch panel-enter-target" data-i18n-attr="aria-label" data-i18n-aria-label="editor.viewSwitcher.label" aria-label="HTML 编辑模块">
       <div class="draft-module-switch__tabs" role="tablist">
         <button type="button" class="draft-module-tab is-active" id="draft-view-editor-tab" role="tab" aria-selected="true" aria-controls="draft-editor-view" data-editor-view="editor" data-i18n="editor.view.editor">编辑器</button>
         <button type="button" class="draft-module-tab" id="draft-view-relations-tab" role="tab" aria-selected="false" aria-controls="draft-relations-view" data-editor-view="relations" data-i18n="editor.view.relations">关系图</button>
@@ -8,7 +8,7 @@
     </header>
 
     <div class="draft-view draft-view--editor" id="draft-editor-view" role="tabpanel" aria-labelledby="draft-view-editor-tab">
-      <section class="draft-live" data-i18n-attr="aria-label" data-i18n-aria-label="nav.draft" aria-label="草稿">
+      <section class="draft-live panel-enter-target" data-i18n-attr="aria-label" data-i18n-aria-label="nav.draft" aria-label="草稿">
         <div class="draft-live__grid">
           <label class="draft-pane draft-pane--input" for="htmlInput" data-i18n-attr="aria-label" data-i18n-aria-label="draft.input.title" aria-label="HTML 输入">
             <textarea id="htmlInput" data-i18n-attr="placeholder" data-i18n-placeholder="draft.input.placeholder" placeholder="输入HTML代码"></textarea>
@@ -20,7 +20,7 @@
       </section>
 
       <section class="editor-shell" aria-labelledby="editor-title">
-        <header class="editor-toolbar">
+          <header class="editor-toolbar panel-enter-target">
           <h2 id="editor-title" data-i18n="editor.title">HTML 编辑器</h2>
           <div class="editor-toolbar__actions">
             <button type="button" class="btn btn--sm btn--secondary is-active" id="editor-escape-toggle" aria-pressed="true" data-i18n="editor.action.escapeQuotes">转义引号</button>
@@ -33,7 +33,7 @@
         </header>
 
         <div class="editor-workspace scrollbar-hidden">
-          <aside class="editor-pane editor-palette" data-i18n-attr="aria-label" data-i18n-aria-label="editor.palette.title" aria-label="元素库">
+          <aside class="editor-pane editor-palette panel-enter-target" data-i18n-attr="aria-label" data-i18n-aria-label="editor.palette.title" aria-label="元素库">
             <div class="editor-search-row ui-input-group admin-input-group">
               <input id="editor-search" class="ui-field ui-input-field admin-input editor-search" type="search" data-i18n-attr="placeholder" data-i18n-placeholder="editor.search.placeholder" placeholder="搜索元素">
               <button type="button" class="btn btn--secondary ui-input-action admin-input-btn admin-toolbar-action" id="editor-reload-palette" data-i18n="editor.action.reloadPalette">刷新</button>
@@ -48,12 +48,12 @@
             <div id="editor-palette-list" class="editor-entry-list scrollbar-hidden" role="listbox"></div>
           </aside>
 
-          <section class="editor-pane editor-tree-pane" id="editor-tree-pane" data-i18n-attr="aria-label" data-i18n-aria-label="editor.tree.title" aria-label="结构树">
+          <section class="editor-pane editor-tree-pane panel-enter-target" id="editor-tree-pane" data-i18n-attr="aria-label" data-i18n-aria-label="editor.tree.title" aria-label="结构树">
             <div id="editor-variant-badge" class="editor-variant-badge" hidden data-i18n="editor.variant.badge">变体</div>
             <div id="editor-tree" class="editor-tree scrollbar-thin" role="tree"></div>
           </section>
 
-          <aside class="editor-pane editor-inspector scrollbar-hidden" id="editor-inspector" data-i18n-attr="aria-label" data-i18n-aria-label="editor.inspector.title" aria-label="属性">
+          <aside class="editor-pane editor-inspector scrollbar-hidden panel-enter-target" id="editor-inspector" data-i18n-attr="aria-label" data-i18n-aria-label="editor.inspector.title" aria-label="属性">
             <label class="editor-field">
               <span>Class</span>
               <input id="editor-class-input" class="ui-field admin-input" type="text" disabled>
@@ -78,7 +78,7 @@
     </div>
 
     <section class="draft-view draft-view--relations relation-graph-shell" id="draft-relations-view" role="tabpanel" aria-labelledby="draft-view-relations-tab" hidden>
-      <header class="relation-graph-toolbar">
+      <header class="relation-graph-toolbar panel-enter-target">
         <div class="relation-graph-title-group">
           <h2 id="relation-graph-title" data-i18n="editor.graph.title">词元关系图</h2>
           <span class="relation-graph-status" id="relation-graph-status"></span>
@@ -94,7 +94,7 @@
           <button type="button" class="btn btn--sm" id="relation-graph-reset" data-i18n="editor.graph.reset">适配全图</button>
         </div>
       </header>
-      <div class="relation-graph-stage" id="relation-graph-stage">
+      <div class="relation-graph-stage panel-enter-target" id="relation-graph-stage">
         <canvas id="relation-graph-canvas" data-i18n-attr="aria-label" data-i18n-aria-label="editor.graph.canvas" aria-label="词元关系图"></canvas>
         <div class="relation-graph-empty" id="relation-graph-empty" hidden data-i18n="editor.graph.empty">暂无关系数据</div>
         <div class="relation-graph-legend" aria-hidden="true">

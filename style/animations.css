@@ -19,7 +19,7 @@ h2 { animation-name: fadeInUp; animation-delay: var(--dur-fast); }
 h3 { animation-name: fadeInLeft; animation-delay: var(--dur-fast); }
 .indent { animation-name: slideInFromRight; animation-delay: var(--dur-normal); opacity: 0; transform: translateX(50px); }
 padding { animation-name: fadeInUp; animation-delay: 0.02s; }
-.panel-enter-target { animation-name: fadeInUp; animation-delay: 0s; }
+.panel-enter-target { animation-name: fadeInUp; animation-delay: calc(var(--index, 0) * 50ms); }
 
 .indent .indent { animation-delay: var(--dur-normal); }
 .indent .indent .indent { animation-delay: var(--dur-moderate); }

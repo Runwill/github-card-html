@@ -1,11 +1,11 @@
 <div class="tabs-panel" id="panel_game">
-    <div class="game-container panel-enter-target">
+    <div class="game-container">
         <!-- Top Section: Board/Controls + Sidebar -->
         <div class="game-top-section">
 
             <!-- ====== VIEW: Setup Panel ====== -->
             <div id="game-view-setup" class="game-view hidden">
-                <div id="game-setup-ui" class="game-panel setup-panel">
+                <div id="game-setup-ui" class="game-panel setup-panel panel-enter-target">
                     <div class="row">
                                  <div class="ui-input-group input-group">
                                      <span class="ui-input-label input-group-label" data-i18n="game.setup.playerCount">座位数</span>
@@ -49,7 +49,7 @@
 
             <!-- ====== VIEW: Online Room Panel ====== -->
             <div id="game-view-online" class="game-view hidden">
-                <div id="online-room-ui" class="game-panel">
+                <div id="online-room-ui" class="game-panel panel-enter-target">
                     <div class="online-panel-header">
                         <h4 data-i18n="online.title">在线房间</h4>
                         <span id="online-status" class="online-status"></span>
@@ -98,7 +98,7 @@
             <div class="game-layout-main">
 
             <!-- Card Table Area (Encircling Layout) -->
-            <div class="game-panel game-table-panel hidden" id="game-table-panel">
+            <div class="game-panel game-table-panel hidden panel-enter-target" id="game-table-panel">
                 <div class="table-layout-grid">
                     <!-- Left Side (Upstream) -->
                     <div class="table-side-col left-col">
@@ -152,7 +152,7 @@
             </div> <!-- End of game-layout-main -->
 
             <div class="game-layout-sidebar">
-                <div class="game-panel game-log-panel scrollbar-thin">
+                <div class="game-panel game-log-panel scrollbar-thin panel-enter-target">
                     <div id="game-timing-badge" class="timing-badge"></div>
                     <div id="game-breadcrumbs" class="breadcrumbs"></div>
                     <div id="game-move-log" class="move-log scrollbar-thin"></div>
@@ -166,7 +166,7 @@
         <!-- Bottom Section: Main Perspective -->
         <div class="game-bottom-section">
             <!-- Independent Control Panel -->
-            <div class="game-panel game-action-panel">
+                <div class="game-panel game-action-panel panel-enter-target">
                 <div id="game-controls">
                     <button class="btn btn--primary" id="btn-show-setup" data-i18n="game.setup">Game Setup</button>
                     <button class="btn btn--accent" id="btn-show-online" data-i18n="online.room">Online Room</button>
@@ -179,7 +179,7 @@
                 </div>
             </div>
 
-            <div class="game-main-area hidden" id="game-main-area">
+            <div class="game-main-area hidden panel-enter-target" id="game-main-area">
                 <div class="main-perspective-container">
                 <div class="current-character-panel">
                     <div class="player-hand">
