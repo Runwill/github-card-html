@@ -1,4 +1,4 @@
-    const TEXT_SELECTOR = 'h1, h2, h3, .indent, padding';
+    const TEXT_SELECTOR = 'h1, h2, h3, .indent, padding, .panel-enter-target';
 
     function elements(scope, selector) {
         return Array.from((scope || document).querySelectorAll(selector));

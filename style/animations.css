@@ -5,7 +5,7 @@
 @keyframes slideInFromRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes highlight { 0% { background-size: 0% 100%; } 100% { background-size: 100% 100%; } }
 
-h1, h2, h3, .indent, padding {
+h1, h2, h3, .indent, padding, .panel-enter-target {
     opacity: 0;
     transform: translateY(20px);
     animation-fill-mode: both;
@@ -19,6 +19,7 @@ h2 { animation-name: fadeInUp; animation-delay: var(--dur-fast); }
 h3 { animation-name: fadeInLeft; animation-delay: var(--dur-fast); }
 .indent { animation-name: slideInFromRight; animation-delay: var(--dur-normal); opacity: 0; transform: translateX(50px); }
 padding { animation-name: fadeInUp; animation-delay: 0.02s; }
+.panel-enter-target { animation-name: fadeInUp; animation-delay: 0s; }
 
 .indent .indent { animation-delay: var(--dur-normal); }
 .indent .indent .indent { animation-delay: var(--dur-moderate); }
