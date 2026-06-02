@@ -63,7 +63,7 @@ export { formatAbsOrRaw, getLocaleFromI18n, parseTimeValue };
     if (body && body.__ready) return body;
     let panel = document.getElementById(opts.panelId);
     if (!panel) {
-      panel = elem('div', { id: opts.panelId, className: opts.panelClass || 'tokens-log' });
+      panel = elem('div', { id: opts.panelId, className: (opts.panelClass || 'tokens-log') + ' panel-enter-target' });
       const header = elem('div', { className: 'tokens-log__header' });
       header.innerHTML = `<div class="tokens-log__title" data-i18n="${esc(opts.titleKey)}"></div><div class="tokens-log__ctrls"><button class="btn btn--secondary btn--sm expand-btn js-log-collapse is-expanded" data-i18n="common.collapse"></button></div>`;
       window.i18n?.applySafe?.(header);

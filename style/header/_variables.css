@@ -87,8 +87,10 @@ padding {
 
 /* ── 搜索容器 ────────────────────────────────── */
 #search-input {
-  --ui-field-w: 100%;
-  --ui-field-focus-border: color-mix(in srgb, var(--text-subtle) 60%, transparent);
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+  border-radius: var(--radius-sm) !important;
   position: relative;
   right: -95%;
   transition: right var(--dur-slowest) var(--ease-default),
@@ -96,6 +98,11 @@ padding {
               box-shadow var(--dur-normal) var(--ease-default);
   transform: translateY(0) scale(1);
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+#search-input::placeholder { color: var(--text-subtle) !important; }
+#search-input:focus {
+  background-color: var(--surface) !important;
+  border-color: color-mix(in srgb, var(--text-subtle) 60%, transparent) !important;
 }
 #search-input.is-lifted {
   transform: translateY(-3px) scale(1.01);

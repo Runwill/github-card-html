@@ -1,4 +1,6 @@
-# Copilot 全局指令
+# 全局开发指令
+
+> **适用范围**：本文件适用于所有 AI agent（Copilot、Cursor、OpenCode 等），不仅限于 Copilot。文件命名沿用历史名称。
 
 ## CSS 修改前必检
 

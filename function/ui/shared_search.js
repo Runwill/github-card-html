@@ -8,7 +8,7 @@
     const container = document.createElement('div');
     container.className = 'search-container';
 
-    const input = Object.assign(document.createElement('input'), { type: 'text', className: 'ui-field', id: 'search-input', placeholder: '检索', autocomplete: 'off' });
+    const input = Object.assign(document.createElement('input'), { type: 'text', id: 'search-input', placeholder: '检索', autocomplete: 'off' });
 
     // 仅当当前位于“将池页”时才真正触发筛选
     input.addEventListener('input', () => { try { applyPanelFilter(mountedPanel); } catch(_) {} });

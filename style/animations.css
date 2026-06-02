@@ -1,37 +1,44 @@
-/* 动画关键帧与通用动画配置 */
+/* 入场动画系统
+ *
+ * 统一入口：.panel-enter-target
+ * 统一延迟公式：min(calc(var(--index) * 50ms), 1.5s)
+ *   - 自动标记元素（h1/h2/h3/.indent/padding）：CSS 按类型设 --index
+ *   - 手动标记容器（div/section/header 等）：JS 按顺序设 --index
+ *   - 嵌套元素：CSS 按深度覆盖 --index
+ */
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes fadeInScale { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+@keyframes fadeInLeft { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes slideInFromRight { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes highlight { 0% { background-size: 0% 100%; } 100% { background-size: 100% 100%; } }
 
-h1, h2, h3, .indent, padding, .panel-enter-target {
+.panel-enter-target {
+    --index: 0;
     opacity: 0;
     transform: translateY(20px);
-    animation-fill-mode: both;
-    animation-duration: var(--animation-duration);
-    animation-timing-function: var(--animation-easing);
+    animation: fadeInUp var(--animation-duration) var(--animation-easing) both;
+    animation-delay: min(calc(var(--index) * 50ms), 1.5s);
     animation-play-state: paused;
 }
 
-h1 { animation-name: fadeInScale; animation-delay: 0s; }
-h2 { animation-name: fadeInUp; animation-delay: var(--dur-fast); }
-h3 { animation-name: fadeInLeft; animation-delay: var(--dur-fast); }
-.indent { animation-name: slideInFromRight; animation-delay: var(--dur-normal); opacity: 0; transform: translateX(50px); }
-padding { animation-name: fadeInUp; animation-delay: 0.02s; }
-.panel-enter-target { animation-name: fadeInUp; animation-delay: calc(var(--index, 0) * 50ms); }
+/* 自动标记元素：按类型设 --index 和动画方向 */
+h1.panel-enter-target { --index: 0; animation-name: fadeInScale; }
+h2.panel-enter-target { --index: 2; }
+h3.panel-enter-target { --index: 3; animation-name: fadeInLeft; }
+.indent.panel-enter-target { --index: 4; animation-name: slideInFromRight; transform: translateX(50px); }
+padding.panel-enter-target { --index: 1; }
 
-.indent .indent { animation-delay: var(--dur-normal); }
-.indent .indent .indent { animation-delay: var(--dur-moderate); }
-padding padding { animation-delay: 0.07s; }
-padding padding padding { animation-delay: 0.12s; }
+/* 嵌套深度覆盖 --index */
+.indent .indent.panel-enter-target { --index: 6; }
+.indent .indent .indent.panel-enter-target { --index: 8; }
+padding padding.panel-enter-target { --index: 3; }
+padding padding padding.panel-enter-target { --index: 5; }
 
 .animate-in { animation-play-state: running; }
 
-/* 动画完成后脱离 fill-mode 依赖，防止主题切换时 CSS 变量重算导致动画重置、元素回到 opacity:0 */
 .animate-done {
     opacity: 1 !important;
-    transform: translateY(0) !important;
+    transform: none !important;
     animation: none !important;
 }
 

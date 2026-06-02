@@ -528,6 +528,10 @@ function setEditorView(view) {
   if (view === 'relations') {
     window.requestAnimationFrame(function () { refreshRelationGraph(false); });
   }
+  var targetView = view === 'relations' ? els.relationView : els.editorView;
+  if (targetView && window.textAnimationController && window.textAnimationController.replay) {
+    window.requestAnimationFrame(function () { window.textAnimationController.replay(targetView); });
+  }
 }
 
 function recommendationForKey(key) {

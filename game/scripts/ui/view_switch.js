@@ -64,6 +64,10 @@ window.Game = window.Game || {};
         // 显示目标视图
         if (viewName && viewName !== 'none' && VIEW_IDS[viewName]) {
             setHidden(VIEW_IDS[viewName], false);
+            const viewEl = document.getElementById(VIEW_IDS[viewName]);
+            if (viewEl && window.textAnimationController?.replay) {
+                requestAnimationFrame(() => window.textAnimationController.replay(viewEl));
+            }
         }
 
         // play 视图：同时显示对局子面板

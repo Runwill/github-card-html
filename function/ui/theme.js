@@ -28,6 +28,6 @@ const fade=t=>{
     timer=window.setTimeout(()=>{ root.classList.remove('theme-switching'); timer=null },180)
   })
 }
-const saved=window.endpoints?.storageGet?.(KEY)||'system'; apply(saved)
+const saved=(()=>{ try{ return window.localStorage.getItem(KEY)||'system' }catch(_){ return 'system' } })(); apply(saved)
 if(saved==='system'){ const h=()=>fade('system'); try{ media.addEventListener('change',h) }catch(_){ media.addListener(h) } }
-window.setTheme=function(t){ const v=(t==='light'||t==='dark'||t==='elegant')?t:'system'; window.endpoints?.storageSet?.(KEY,v); fade(v) }
+window.setTheme=function(t){ const v=(t==='light'||t==='dark'||t==='elegant')?t:'system'; try{ window.localStorage.setItem(KEY,v) }catch(_){} fade(v) }
