@@ -65,7 +65,7 @@ html[data-theme="elegant"] {
   --ui-field-focus-ring: rgba(211, 173, 107, 0.32);
   --ui-choice-hover-bg: rgba(211, 173, 107, 0.08);
   --ui-choice-hover-border: rgba(211, 173, 107, 0.4);
-  --ui-choice-active-bg: transparent;
+  --ui-choice-active-bg: rgba(211, 173, 107, 0.15);
   --ui-choice-active-color: var(--primary-1);
   --ui-choice-active-border: var(--primary-1);
   --ui-choice-active-border-width: 1.5px;
@@ -111,7 +111,7 @@ html[data-theme="elegant"]::before {
 html[data-theme="elegant"] .btn--primary {
   background: transparent;
   color: var(--primary-1);
-  border-color: var(--primary-1);
+  border-color: color-mix(in srgb, var(--primary-1) 45%, transparent);
   box-shadow: none;
 }
 html[data-theme="elegant"] .btn--primary:hover {
@@ -165,12 +165,13 @@ html[data-theme="elegant"] .btn--danger:hover {
 html[data-theme="elegant"] .btn--accent {
   background: transparent;
   color: var(--primary-1);
-  border-color: rgba(211, 173, 107, 0.45);
+  border-color: color-mix(in srgb, var(--primary-1) 45%, transparent);
   box-shadow: none;
 }
 html[data-theme="elegant"] .btn--accent:hover {
-  background: rgba(211, 173, 107, 0.10);
+  background: rgba(211, 173, 107, 0.12);
   color: #fff;
+  box-shadow: 0 0 15px rgba(211, 173, 107, 0.18);
 }
 
 /* ── Ghost：更淡的金色调 ── */
