@@ -68,6 +68,7 @@ html[data-theme="elegant"] {
   --ui-choice-active-bg: transparent;
   --ui-choice-active-color: var(--primary-1);
   --ui-choice-active-border: var(--primary-1);
+  --ui-choice-active-border-width: 1.5px;
   --ui-choice-active-hover-bg: rgba(211, 173, 107, 0.08);
   --ui-choice-disabled-bg: rgba(211, 173, 107, 0.04);
   --ui-choice-disabled-color: rgba(211, 173, 107, 0.35);

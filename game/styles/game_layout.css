@@ -17,11 +17,6 @@
     display: inline-block;
 }
 
-/* Utilities */
-.hidden {
-    display: none !important;
-}
-
 /* Game Panel Container */
 #panel_game {
     padding: var(--panel-game-pad, 15px);

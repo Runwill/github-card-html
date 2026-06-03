@@ -136,10 +136,13 @@ html[data-theme="dark"] .char-avatar img.position-avatar {
 }
 
 .char-stats {
+    position: relative;
     display: flex;
     gap: var(--role-badge-gap, var(--space-2xs));
     align-items: center;
     justify-content: var(--char-stats-justify, flex-start);
+    min-height: var(--char-stats-minh, 32px);
+    min-width: calc(var(--detail-btn-size, 24px) * 2 + var(--role-badge-gap, var(--space-2xs)));
 }
 
 .char-stats .player-hand-count {
@@ -417,16 +420,4 @@ html[data-theme="dark"] .judge-detail-btn:active {
     /* Ensure they take up layout space */
     opacity: 1;
     transform: scale(1);
-}
-
-/* Main View Container Adjustment */
-.char-stats {
-    position: relative; /* Context for absolute buttons */
-    min-height: var(--char-stats-minh, 32px);  /* Maintain height */
-    min-width: calc(var(--detail-btn-size, 24px) * 2 + var(--role-badge-gap, var(--space-2xs)));   /* Maintain minimal width for buttons */
-}
-/* Sidebar Container Adjustment */
-.player-stats-row {
-    position: relative; /* Context for absolute buttons */
-    /* Ensure flex centering for stats */
 }

@@ -11,8 +11,8 @@
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
 }
-body { margin: 0; font-size: .9rem; }
-.hidden { display: none; }
+.hidden { display: none !important; }
+.text-center { text-align: center; }
 
 /* 菜单按钮基础色（登录页/主站通用） */
 .menu__button { color: var(--text); }

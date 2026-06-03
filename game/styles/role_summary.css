@@ -132,12 +132,13 @@
 }
 
 .player-stats-row {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     margin-top: var(--player-stats-row-mt, var(--space-3xs));
-    min-height: var(--role-summary-stats-minh, 31.5px); /* Prevent layout jump during hover swap */
+    min-height: var(--role-summary-stats-minh, 31.5px);
 }
 
 /* Judge Area Card Count Badge (Matches HP Style) */

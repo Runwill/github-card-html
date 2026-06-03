@@ -321,6 +321,7 @@
   background: var(--ui-choice-active-bg, transparent);
   color: var(--ui-choice-active-color, var(--primary-2));
   border-color: var(--ui-choice-active-border, var(--primary-2));
+  border-width: var(--ui-choice-active-border-width, 1px);
   box-shadow: var(--ui-choice-active-shadow, none);
 }
 
@@ -340,14 +341,15 @@
   transform: none;
 }
 
-.btn.is-active {
+html .btn.is-active {
   background: var(--ui-choice-active-bg, transparent);
   color: var(--ui-choice-active-color, var(--_btn-accent, var(--primary-2)));
   border-color: var(--ui-choice-active-border, var(--_btn-accent, var(--primary-2)));
+  border-width: var(--ui-choice-active-border-width, 1px);
   box-shadow: var(--ui-choice-active-shadow, none);
 }
 
-.btn.is-active:hover {
+html .btn.is-active:hover {
   background: var(--ui-choice-active-hover-bg, color-mix(in srgb, var(--_btn-accent-soft, var(--_btn-accent, var(--primary-2))) 10%, transparent));
   color: var(--ui-choice-active-hover-color, var(--ui-choice-active-color, var(--_btn-accent, var(--primary-2))));
 }
