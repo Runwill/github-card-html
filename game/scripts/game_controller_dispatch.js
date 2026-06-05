@@ -154,53 +154,34 @@ function dispatch(actionType, payload) {
             }
         }
     } else {
-        // 自动/流程模式
+        // 自动/流程模式：所有移动走事件栈
          if (actionType === 'move') {
-             if (isDragMove) {
-                 // ── 拖拽移动：使用同步路径，避免事件栈时序导致的重复动画 ──
-                 // 拖拽操作应和沙盒模式一样同步执行，确保动画逻辑一致
-                 const targetArea = I.resolveArea(payload.toArea);
-                 const sourceArea = payload.fromArea || I.findCardSource(payload.card);
+             commitMoveLog(
+                 captureMoveLog(payload, payload.card, payload.fromArea || (payload.card && payload.card.lyingArea)),
+                 I.resolveArea(payload.toArea)
+             );
 
-                 if (targetArea && payload.card) {
-                     const card = payload.card;
-                     const insertIdx = Math.max(0, (payload.position || 1) - 1);
-                     runDirectMove(targetArea, sourceArea, () => window.Game.Models.moveCardToArea(card, targetArea, insertIdx, sourceArea));
-                 } else {
-                     runMoveCallbacks(payload.callbacks, false);
-                 }
-             } else {
-                 // ── 非拖拽移动：走事件栈 ──
-                 commitMoveLog(
-                     captureMoveLog(payload, payload.card, payload.fromArea || (payload.card && payload.card.lyingArea)),
-                     I.resolveArea(payload.toArea)
-                 );
-
-                 // 注入动画回调
-                 let callbacks = payload.callbacks || {};
-                 if (typeof callbacks === 'function') {
-                     const oldCb = callbacks;
-                     callbacks = { onComplete: oldCb };
-                 }
-
-                 const originalOnMove = callbacks.onMoveExecuted;
-                 callbacks.onMoveExecuted = (ctx) => {
-                     if (originalOnMove) originalOnMove(ctx);
-
-                     // 触发 CardMoveAnimator 动画（统一动画路径）
-                     triggerCardMoveAnimation();
-                 };
-
-                 window.Game.Core.Events.move(
-                     payload.moveRole,
-                     payload.card,
-                     payload.toArea,
-                     payload.position,
-                     payload.fromArea,
-                     payload.fromIndex,
-                     callbacks
-                 );
+             let callbacks = payload.callbacks || {};
+             if (typeof callbacks === 'function') {
+                 const oldCb = callbacks;
+                 callbacks = { onComplete: oldCb };
              }
+
+             const originalOnMove = callbacks.onMoveExecuted;
+             callbacks.onMoveExecuted = (ctx) => {
+                 if (originalOnMove) originalOnMove(ctx);
+                 triggerCardMoveAnimation();
+             };
+
+             window.Game.Core.Events.move(
+                 payload.moveRole,
+                 payload.card,
+                 payload.toArea,
+                 payload.position,
+                 payload.fromArea,
+                 payload.fromIndex,
+                 callbacks
+             );
          }
     }
 }
