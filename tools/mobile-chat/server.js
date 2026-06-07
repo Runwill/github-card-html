@@ -6,8 +6,13 @@ const PORT = 3001;
 const OPENCODE_HOST = '127.0.0.1:4096';
 const OPENCODE_AUTH = 'Basic ' + Buffer.from('opencode:demo123').toString('base64');
 
+const MSG_LIMIT = 80; // 超过此消息数则新建会话，避免上下文过长超时
+
 let currentSessionId = null;
-let defaultModel = null; // { providerID, modelID }
+let defaultModel = null;
+
+// 自动生成标题模式（agent 测试时创建的会话，不作为默认会话）
+const AUTO_TITLE = /^(Mobile Chat|Test Chat|Quick|Quick Test|Test|Mobile Chat Test|Mobile Test|New session)/;
 
 const server = http.createServer(async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -68,9 +73,38 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 每次创建新会话（避免旧会话上下文过长导致超时）
+  // 获取或复用会话（默认打开最新的非自动标题会话）
   if (req.url === '/api/session' && req.method === 'GET') {
     try {
+      const sessions = await fetchFromOpenCode('/session');
+      const mainSessions = sessions.filter(s => !s.parentID);
+
+      // 优先选最新的用户会话（非自动标题）
+      const userSessions = mainSessions
+        .filter(s => !AUTO_TITLE.test(s.title || s.slug || ''))
+        .sort((a, b) => (b.time?.created || 0) - (a.time?.created || 0));
+
+      if (userSessions.length > 0) {
+        const latest = userSessions[0];
+        const msgs = await fetchFromOpenCode(`/session/${latest.id}/message`);
+        if (msgs.length <= MSG_LIMIT) {
+          currentSessionId = latest.id;
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ sessionId: currentSessionId }));
+          return;
+        }
+      }
+
+      // 回退到最新任意会话
+      const sorted = mainSessions.sort((a, b) => (b.time?.created || 0) - (a.time?.created || 0));
+      if (sorted.length > 0) {
+        currentSessionId = sorted[0].id;
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ sessionId: currentSessionId }));
+        return;
+      }
+
+      // 无会话则新建
       const newSession = await postToOpenCode('/session', { title: 'Mobile Chat' });
       currentSessionId = newSession.id;
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -83,17 +117,52 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 获取所有会话列表
+  // 获取所有会话列表（过滤子会话和自动生成的测试会话）
   if (req.url === '/api/sessions' && req.method === 'GET') {
     try {
       const sessions = await fetchFromOpenCode('/session');
       const mainSessions = sessions.filter(s => !s.parentID);
+
+      // 过滤：保留用户手动创建的会话（排除 agent 会话和自动标题）
+      const userSessions = mainSessions.filter(s => {
+        const title = s.title || s.slug || '';
+        const sum = s.summary || {};
+        const changes = (sum.additions || 0) + (sum.deletions || 0) + (sum.files || 0);
+        if (AUTO_TITLE.test(title) && changes === 0) return false;
+        return true;
+      });
+
+      userSessions.sort((a, b) => (b.time?.created || 0) - (a.time?.created || 0));
+
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(mainSessions));
+      res.end(JSON.stringify(userSessions.slice(0, 30)));
     } catch (error) {
       console.error('Sessions list error:', error);
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'Failed to fetch sessions' }));
+    }
+    return;
+  }
+
+  // 删除会话
+  if (req.url.startsWith('/api/sessions/') && req.method === 'DELETE') {
+    const sessionId = req.url.split('/api/sessions/')[1];
+    if (!sessionId) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Missing session ID' }));
+      return;
+    }
+    try {
+      await deleteFromOpenCode('/session/' + sessionId);
+      if (currentSessionId === sessionId) {
+        currentSessionId = null;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true }));
+    } catch (error) {
+      console.error('Delete session error:', error);
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Failed to delete session' }));
     }
     return;
   }
@@ -361,6 +430,36 @@ function extractReply(response) {
     }
   }
   return null;
+}
+
+function deleteFromOpenCode(apiPath) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      hostname: OPENCODE_HOST.split(':')[0],
+      port: OPENCODE_HOST.split(':')[1],
+      path: apiPath,
+      method: 'DELETE',
+      headers: {
+        'Authorization': OPENCODE_AUTH,
+        'Accept': 'application/json'
+      }
+    };
+
+    const req = http.request(options, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(true);
+        } else {
+          reject(new Error('Delete failed: ' + res.statusCode));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.end();
+  });
 }
 
 server.listen(PORT, '0.0.0.0', () => {

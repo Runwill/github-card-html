@@ -172,6 +172,23 @@
             border-radius: 0 2px 2px 0;
         }
 
+        .session-delete-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .session-delete-btn:active {
+            background: #fee;
+            color: #e53935;
+        }
+
         .session-icon {
             width: 36px;
             height: 36px;
@@ -760,7 +777,7 @@
         let isSending = false;
         let lastMessageCount = 0;
         let lastPartCount = 0;
-        let currentModelId = '';
+        let optimisticUserMsg = null; // 乐观添加的用户消息，防轮询重复
 
         // ── 模型选择 ──
         async function loadModels() {
@@ -770,13 +787,18 @@
                 const data = await response.json();
                 const models = data.models || [];
                 const def = data.defaultModel;
-                
-                currentModelId = def ? def.providerID + '/' + def.modelID : (models[0]?.id || '');
-                
+
+                // 优先使用缓存的模型选择
+                const cached = localStorage.getItem('mobile-chat-model');
+                if (cached && models.some(m => m.id === cached)) {
+                    currentModelId = cached;
+                } else {
+                    currentModelId = def ? def.providerID + '/' + def.modelID : (models[0]?.id || '');
+                }
+
                 const selector = document.getElementById('modelSelector');
                 selector.innerHTML = '';
-                
-                // 按 provider 分组
+
                 let currentProvider = '';
                 models.forEach(m => {
                     if (m.provider !== currentProvider) {
@@ -792,7 +814,7 @@
                     const lastOptgroup = selector.lastElementChild;
                     if (lastOptgroup) lastOptgroup.appendChild(option);
                 });
-                
+
                 selector.disabled = false;
             } catch (e) {
                 console.error('Failed to load models:', e);
@@ -801,6 +823,7 @@
 
         function onModelChange() {
             currentModelId = document.getElementById('modelSelector').value;
+            localStorage.setItem('mobile-chat-model', currentModelId);
         }
 
         // 已渲染的 part 状态: partId → { element, status }
@@ -840,6 +863,7 @@
                     chatContainer.innerHTML = '';
                     loadedCount = 0;
                     hasMore = true;
+                    optimisticUserMsg = null;
                 }
 
                 const offset = reset ? 0 : loadedCount;
@@ -851,12 +875,12 @@
                 totalMessages = data.total;
                 hasMore = data.hasMore;
                 
-                // 保存滚动位置
                 const prevScrollHeight = chatContainer.scrollHeight;
                 const prevScrollTop = chatContainer.scrollTop;
 
-                // 如果是加载更多，在顶部插入
-                if (!reset && loadedCount > 0) {
+                // offset > 0 时是加载更多历史（向上滚动），插入顶部
+                // offset = 0 时是加载最新，追加底部
+                if (offset > 0) {
                     const fragment = document.createDocumentFragment();
                     const tempContainer = document.createElement('div');
                     
@@ -864,30 +888,30 @@
                         renderMessage(msg, tempContainer);
                     });
                     
-                    // 将新消息插入到顶部
                     while (tempContainer.firstChild) {
                         fragment.appendChild(tempContainer.firstChild);
                     }
                     chatContainer.insertBefore(fragment, chatContainer.firstChild);
                     
-                    // 恢复滚动位置
                     const newScrollHeight = chatContainer.scrollHeight;
                     chatContainer.scrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight);
                 } else {
-                    // 首次加载或重置，追加到底部
                     data.messages.forEach(msg => {
                         renderMessage(msg, chatContainer);
                     });
                     chatContainer.scrollTop = chatContainer.scrollHeight;
                 }
 
-                loadedCount += data.messages.length;
+                // 更新已加载计数：offset=0 时重新计数
+                if (offset === 0) {
+                    loadedCount = data.messages.length;
+                } else {
+                    loadedCount += data.messages.length;
+                }
                 lastMessageCount = totalMessages;
                 lastPartCount = data.messages.reduce((sum, m) => sum + (m.parts?.length || 0), 0);
 
-                // 显示加载更多的提示
                 updateLoadMoreIndicator();
-
             } catch (error) {
                 console.error('Failed to load history:', error);
             } finally {
@@ -913,6 +937,13 @@
 
                 const existing = renderedParts.get(part.id);
                 const currentStatus = part.state?.status || 'unknown';
+
+                // 跳过乐观添加的用户消息，避免重复
+                if (!existing && part.type === 'text' && part.text && part.text.trim() === optimisticUserMsg) {
+                    renderedParts.set(part.id, { element: null, status: currentStatus });
+                    optimisticUserMsg = null;
+                    return;
+                }
 
                 if (existing && existing.status === currentStatus) {
                     if (!firstElement) firstElement = existing.element;
@@ -1307,6 +1338,10 @@
             messageInput.value = '';
             messageInput.style.height = 'auto';
             sendButton.disabled = true;
+
+            // 乐观添加用户消息（立即可见）
+            const userEl = addMessage(message, true);
+            optimisticUserMsg = message;
             showTypingIndicator();
 
             try {
@@ -1321,12 +1356,12 @@
                 if (!response.ok) {
                     const err = await response.json().catch(() => ({}));
                     addMessage(err.error || '抱歉，发生了错误，请稍后再试。', false);
-                } else {
-                    const data = await response.json();
-                    if (data.reply) {
-                        addMessage(data.reply, false);
-                    }
+                    // 移除乐观消息
+                    if (userEl && userEl.parentNode) userEl.remove();
                 }
+                // 重置计数以强制从头部加载最新消息
+                loadedCount = 0;
+                await loadHistory(false);
             } catch (error) {
                 hideTypingIndicator();
                 addMessage('网络连接失败，请检查网络设置。', false);
@@ -1393,6 +1428,13 @@
 
                             const existing = renderedParts.get(part.id);
                             const currentStatus = part.state?.status || 'unknown';
+
+                            // 跳过乐观添加的用户消息，避免重复
+                            if (!existing && part.type === 'text' && part.text && part.text.trim() === optimisticUserMsg) {
+                                renderedParts.set(part.id, { element: null, status: currentStatus });
+                                optimisticUserMsg = null;
+                                return;
+                            }
 
                             // 已渲染且状态未变 → 跳过
                             if (existing && existing.status === currentStatus) return;
@@ -1475,7 +1517,10 @@
                 const sessionList = document.getElementById('sessionList');
                 sessionList.innerHTML = '';
 
-                sessions.forEach(session => {
+                // 过滤 subagent 子会话和带 parentID 的会话
+                const mainSessions = sessions.filter(s => !s.parentID);
+
+                mainSessions.forEach(session => {
                     const item = document.createElement('div');
                     item.className = 'session-item' + (session.id === sessionId ? ' current' : '');
                     const title = session.title || '未命名会话';
@@ -1488,12 +1533,42 @@
                             <div class="session-title">${escapeHtml(title)}</div>
                             ${time ? `<div class="session-time">${time}</div>` : ''}
                         </div>
+                        <button class="session-delete-btn" title="删除会话">×</button>
                     `;
-                    item.onclick = () => switchSession(session.id);
+                    item.onclick = (e) => {
+                        if (e.target.classList.contains('session-delete-btn')) return;
+                        switchSession(session.id);
+                    };
+                    item.querySelector('.session-delete-btn').onclick = (e) => {
+                        e.stopPropagation();
+                        deleteSession(session.id, session.title || session.slug);
+                    };
                     sessionList.appendChild(item);
                 });
             } catch (error) {
                 console.error('Failed to load sessions:', error);
+            }
+        }
+
+        async function deleteSession(id, title) {
+            if (!confirm(`确定删除会话「${title}」吗？此操作不可撤销。`)) return;
+            try {
+                const response = await fetch('/api/sessions/' + id, { method: 'DELETE' });
+                if (!response.ok) {
+                    alert('删除失败');
+                    return;
+                }
+                // 如果删除的是当前会话，重新初始化
+                if (id === sessionId) {
+                    sessionId = null;
+                    chatContainer.innerHTML = '';
+                    await initSession();
+                }
+                // 刷新列表
+                await loadSessions();
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('删除失败');
             }
         }
 
