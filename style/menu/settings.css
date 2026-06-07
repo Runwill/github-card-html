@@ -137,5 +137,4 @@ html:not([data-theme="dark"]):not([data-theme="elegant"]) .settings-menu__viewpo
   text-align: center;
   font-size: 0.867em; /* 13/15 */
   color: var(--text-muted, #718096);
-  user-select: none;
 }

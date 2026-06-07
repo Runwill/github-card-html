@@ -405,6 +405,7 @@ html[data-theme="dark"] .btn--accent {
 :root {
   --character-placeholder-min-h: clamp(280px, 52.743vh, 500px);
   --approval-img-size: clamp(36px, 5.063vh, 52px);
+  --header-height: calc(var(--fs-root, 20px) * 3.2);
 }
 
 html.force-landscape {
@@ -432,10 +433,8 @@ html.force-landscape {
 
 .tokens-log .log-time, .tokens-log .log-ctx { color: var(--text-subtle) !important; }
 
-/* Tokens 主面板占满可视高度，避免底部露出背景色差 */
-:root { --header-height: calc(var(--fs-root, 20px) * 3.2); }
-#panel_tokens { min-height: calc(100vh - var(--header-height)); background: var(--surface); }
-#panel_permissions { min-height: calc(100vh - var(--header-height)); background: var(--surface); }
+/* Tokens / Permissions 主面板占满可视高度，避免底部露出背景色差 */
+#panel_tokens, #panel_permissions { min-height: calc(100vh - var(--header-height)); background: var(--surface); }
 
 /* 审核窗口列表项（暗色/浅色自适应） */
 .approval-row {
@@ -447,7 +446,7 @@ html.force-landscape {
 .approval-left { display: flex; align-items: center; gap: var(--space-md); }
 .approval-img { width: var(--approval-img-size, 48px); height: var(--approval-img-size, 48px); border-radius: var(--radius-full); object-fit: cover; border: 1px solid var(--border) !important; background: var(--surface) !important; }
 .approval-title { font-weight: 600; color: var(--text) !important; }
-.approval-sub { font-size: var(--fs-sm); color: var(--text-subtle) !important; }
+.approval-sub { font-size: var(--fs-sm); color: var(--text-subtle) !important; font-weight: 600; }
 .approval-right { display: flex; gap: var(--space-sm); }
 
 /* 空列表提示（遵循主题色） */

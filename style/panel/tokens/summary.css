@@ -72,7 +72,6 @@
 /* 类型筛选卡片：可点击 + 激活样式 */
 #panel_tokens .type-tile {
   cursor: pointer;
-  user-select: none;
   transition: transform var(--dur-normal) var(--ease-standard),
               box-shadow var(--dur-normal) var(--ease-standard),
               border-color var(--dur-normal) var(--ease-standard),

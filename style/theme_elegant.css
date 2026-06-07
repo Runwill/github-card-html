@@ -108,13 +108,15 @@ html[data-theme="elegant"]::before {
 }
 
 /* 典雅主题：按钮风格 —— 金色描边 + 透明底 */
-html[data-theme="elegant"] .btn--primary {
+html[data-theme="elegant"] .btn--primary,
+html[data-theme="elegant"] .btn--accent {
   background: transparent;
   color: var(--primary-1);
   border-color: color-mix(in srgb, var(--primary-1) 45%, transparent);
   box-shadow: none;
 }
-html[data-theme="elegant"] .btn--primary:hover {
+html[data-theme="elegant"] .btn--primary:hover,
+html[data-theme="elegant"] .btn--accent:hover {
   background: rgba(211, 173, 107, 0.12);
   color: #fff;
   box-shadow: 0 0 15px rgba(211, 173, 107, 0.18);
@@ -126,13 +128,15 @@ html[data-theme="elegant"] .btn:focus-visible {
   box-shadow: 0 0 15px rgba(211, 173, 107, 0.18);
 }
 
-/* ── Secondary：金色描边 + 柔和字色 ── */
-html[data-theme="elegant"] .btn--secondary {
+/* ── Secondary / Ghost：金色描边 + 柔和字色 ── */
+html[data-theme="elegant"] .btn--secondary,
+html[data-theme="elegant"] .btn--ghost {
   background: transparent;
   color: rgba(211, 173, 107, 0.7);
   border-color: rgba(211, 173, 107, 0.25);
 }
-html[data-theme="elegant"] .btn--secondary:hover {
+html[data-theme="elegant"] .btn--secondary:hover,
+html[data-theme="elegant"] .btn--ghost:hover {
   background: rgba(211, 173, 107, 0.08);
   border-color: rgba(211, 173, 107, 0.4);
   color: var(--primary-1);
@@ -162,26 +166,7 @@ html[data-theme="elegant"] .btn--danger:hover {
   color: #e8a0a0;
 }
 
-html[data-theme="elegant"] .btn--accent {
-  background: transparent;
-  color: var(--primary-1);
-  border-color: color-mix(in srgb, var(--primary-1) 45%, transparent);
-  box-shadow: none;
-}
-html[data-theme="elegant"] .btn--accent:hover {
-  background: rgba(211, 173, 107, 0.12);
-  color: #fff;
-  box-shadow: 0 0 15px rgba(211, 173, 107, 0.18);
-}
-
-/* ── Ghost：更淡的金色调 ── */
-html[data-theme="elegant"] .btn--ghost {
-  color: rgba(211, 173, 107, 0.55);
-}
-html[data-theme="elegant"] .btn--ghost:hover {
-  background: rgba(211, 173, 107, 0.06);
-  color: var(--primary-1);
-}
+/* ── Ghost：已在 .btn--secondary 中合并 ── */
 
 /* 典雅主题：Header 金色底线 */
 html[data-theme="elegant"] #header {

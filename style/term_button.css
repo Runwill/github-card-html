@@ -7,7 +7,6 @@
     overflow: hidden;
     background: linear-gradient(90deg, hsl(233, 100%, 78%) 0%, hsl(233, 100%, 73%) 100%);
     transition: background 0.15s var(--ease-standard), box-shadow 0.15s var(--ease-standard), transform 0.15s var(--ease-standard);
-    user-select: none;
     outline: none;
     display: inline-block;
     box-shadow: 0 2px 8px #8698ff22;

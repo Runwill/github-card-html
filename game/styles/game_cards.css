@@ -51,7 +51,6 @@ html.force-landscape {
     font-size: var(--card-fs, 0.9rem);
     color: var(--text);
     font-weight: 500;
-    user-select: none;
     position: relative;
     touch-action: none;
     text-align: center;
@@ -281,15 +280,7 @@ html[data-theme="dark"] .card-placeholder[data-card-key='CardBack']::before {
     font-size: 0.86em;
 }
 
-.game-inspector-body {
-    flex: 1 1 auto;
-    min-height: 0;
-    padding: var(--game-inspector-pad);
-    overflow: auto;
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--border) 62%, transparent) transparent;
-}
-
+.game-inspector-body,
 .game-inspector-raw-body {
     flex: 1 1 auto;
     min-height: 0;

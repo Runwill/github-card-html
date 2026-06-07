@@ -15,11 +15,7 @@
   width: 1em;
   height: 1em;
   line-height: var(--lh-none);
-  /* Prevent mobile long-press blue/gray highlight and text selection */
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
+  /* mobile anti-touch/select: covered by global * in style.css */
 }
 
 .collapsible__chevron {

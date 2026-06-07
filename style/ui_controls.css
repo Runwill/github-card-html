@@ -287,7 +287,6 @@
   box-shadow: var(--ui-choice-shadow, none);
   box-sizing: border-box;
   cursor: pointer;
-  user-select: none;
   font-family: inherit;
   font-size: var(--ui-choice-fs, inherit);
   font-weight: var(--ui-choice-weight, inherit);

@@ -160,7 +160,6 @@
     text-overflow: ellipsis;
     line-height: var(--lh-normal);
     border-radius: var(--radius-sm);
-    user-select: none;
 }
 
 .custom-select__option:hover,

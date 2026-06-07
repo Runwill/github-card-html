@@ -12,7 +12,6 @@
   white-space: nowrap;
   border: 1px solid transparent;
   cursor: pointer;
-  user-select: none;
   transition: background-color var(--dur-normal) var(--ease-default), color var(--dur-normal) var(--ease-default), border-color var(--dur-normal) var(--ease-default), box-shadow var(--dur-normal) var(--ease-default), transform var(--dur-fast) var(--ease-default), background-position var(--dur-moderate) var(--ease-default); 
 }
 
@@ -73,23 +72,4 @@
 /* 间距工具（用于堆叠按钮轻微错位） */
 .btn--mt-2 { margin-top: var(--space-3xs); }
 
-/* 全站按钮的移动端防误触设置（与“返回顶部按钮/水波按钮”保持一致） */
-button,
-.btn,
-.admin-input-btn,
-.menu__button,
-.ripple-button {
-  -webkit-touch-callout: none;      /* 禁用 iOS 长按呼出菜单 */
-  -webkit-user-select: none;        /* iOS/Safari 禁止文本选择 */
-  user-select: none;                /* 现代浏览器禁止文本选择 */
-  -webkit-tap-highlight-color: rgba(0,0,0,0); /* 去除移动端点击高亮（变蓝/灰） */
-}
-button *,
-.btn *,
-.admin-input-btn *,
-.menu__button *,
-.ripple-button * {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
+/* 全站按钮的移动端防误触已由 style.css 全局 * 规则统一提供 */
