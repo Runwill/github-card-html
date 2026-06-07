@@ -1,6 +1,16 @@
 {
   "announcements": [
     {
+      "date": "2026-06-07",
+      "title": "Mobile Chat 接入真实 AI 与模型选择",
+      "changes": [
+        "新增：Mobile Chat (3001) 支持选择模型，列出所有已连接提供商的 74 个模型",
+        "新增：Mobile Chat 消息发送接入真实 AI（通过 opencode API），移除模拟回复",
+        "修复：opencode CLI 升级至 1.16.2，修复消息发送的数据库 seq 错误",
+        "修复：start.bat 启动端口前清理旧进程，密码 demo123 可靠生效"
+      ]
+    },
+    {
       "date": "2026-05-29",
       "title": "词元工具栏与前端架构整理",
       "changes": [
