@@ -778,6 +778,8 @@
         let lastMessageCount = 0;
         let lastPartCount = 0;
         let optimisticUserMsg = null; // 乐观添加的用户消息，防轮询重复
+        let isLoadingHistory = false; // 防轮询与 loadHistory 竞态
+        let currentModelId = null;
 
         // ── 模型选择 ──
         async function loadModels() {
@@ -818,6 +820,10 @@
                 selector.disabled = false;
             } catch (e) {
                 console.error('Failed to load models:', e);
+                // 加载失败时启用选择器并显示错误状态，允许用户稍后刷新页面
+                const selector = document.getElementById('modelSelector');
+                selector.innerHTML = '<option value="">模型加载失败</option>';
+                selector.disabled = false;
             }
         }
 
@@ -856,6 +862,7 @@
         async function loadHistory(reset = false) {
             if (!reset && isLoadingMore) return;
             isLoadingMore = true;
+            isLoadingHistory = true;
 
             try {
                 if (reset) {
@@ -916,6 +923,7 @@
                 console.error('Failed to load history:', error);
             } finally {
                 isLoadingMore = false;
+                isLoadingHistory = false;
             }
         }
 
@@ -1358,12 +1366,14 @@
                     addMessage(err.error || '抱歉，发生了错误，请稍后再试。', false);
                     // 移除乐观消息
                     if (userEl && userEl.parentNode) userEl.remove();
+                } else {
+                    // 重置计数以强制从头部加载最新消息
+                    loadedCount = 0;
+                    await loadHistory(false);
                 }
-                // 重置计数以强制从头部加载最新消息
-                loadedCount = 0;
-                await loadHistory(false);
             } catch (error) {
                 hideTypingIndicator();
+                optimisticUserMsg = null;
                 addMessage('网络连接失败，请检查网络设置。', false);
             } finally {
                 isSending = false;
@@ -1395,7 +1405,7 @@
         // ── 实时更新 ──
         function startRealtimeUpdates() {
             setInterval(async () => {
-                if (!sessionId || isSending) return;
+                if (!sessionId || isSending || isLoadingHistory) return;
                 try {
                     const response = await fetch('/api/history?limit=20&offset=0');
                     if (!response.ok) return;
@@ -1472,6 +1482,11 @@
                                 hasChanges = true;
                             }
                         });
+
+                        // 为 AI 消息添加元信息（与 renderMessage 保持一致）
+                        if (!isUser && msg.info && textElement) {
+                            addMessageMeta(textElement, msg.info);
+                        }
                     });
 
                     if (hasChanges) {
@@ -1481,10 +1496,11 @@
                         }
                     }
 
-                    // 更新计数
+                    // 更新计数（先保存差值，避免 totalMessages 被覆盖后差值为 0）
                     if (newTotal > totalMessages) {
+                        const diff = newTotal - totalMessages;
                         totalMessages = newTotal;
-                        loadedCount = Math.min(loadedCount + (newTotal - totalMessages), newTotal);
+                        loadedCount = Math.min(loadedCount + diff, newTotal);
                         hasMore = loadedCount < newTotal;
                         updateLoadMoreIndicator();
                     }
@@ -1524,8 +1540,8 @@
                     const item = document.createElement('div');
                     item.className = 'session-item' + (session.id === sessionId ? ' current' : '');
                     const title = session.title || '未命名会话';
-                    const time = session.created_at
-                        ? new Date(session.created_at).toLocaleString('zh-CN')
+                    const time = session.time?.created
+                        ? new Date(session.time.created).toLocaleString('zh-CN')
                         : '';
                     item.innerHTML = `
                         <div class="session-icon">💬</div>

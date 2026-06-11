@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const PORT = 3001;
 const OPENCODE_HOST = '127.0.0.1:4096';
@@ -95,17 +96,20 @@ const server = http.createServer(async (req, res) => {
         }
       }
 
-      // 回退到最新任意会话
+      // 回退到最新任意会话（逐条检查消息数限制，避免选中超长测试会话）
       const sorted = mainSessions.sort((a, b) => (b.time?.created || 0) - (a.time?.created || 0));
-      if (sorted.length > 0) {
-        currentSessionId = sorted[0].id;
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ sessionId: currentSessionId }));
-        return;
+      for (const s of sorted) {
+        const msgs = await fetchFromOpenCode(`/session/${s.id}/message`);
+        if (msgs.length <= MSG_LIMIT) {
+          currentSessionId = s.id;
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ sessionId: currentSessionId }));
+          return;
+        }
       }
 
       // 无会话则新建
-      const newSession = await postToOpenCode('/session', { title: 'Mobile Chat' });
+      const newSession = await postToOpenCode('/session', { title: 'Chat' });
       currentSessionId = newSession.id;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ sessionId: currentSessionId }));
@@ -179,7 +183,7 @@ const server = http.createServer(async (req, res) => {
   // 创建新会话
   if (req.url === '/api/new-session' && req.method === 'POST') {
     try {
-      const newSession = await postToOpenCode('/session', { title: 'Mobile Chat' });
+      const newSession = await postToOpenCode('/session', { title: 'Chat' });
       currentSessionId = newSession.id;
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(newSession));
@@ -428,8 +432,30 @@ function extractReply(response) {
     if (textParts.length > 0) {
       return textParts.map(p => p.text).join('\n');
     }
+    // AI 只返回了工具调用/思考过程，生成摘要
+    const toolParts = response.parts.filter(p => p.type === 'tool');
+    const reasoningParts = response.parts.filter(p => p.type === 'reasoning');
+    if (toolParts.length > 0 || reasoningParts.length > 0) {
+      const names = [
+        ...toolParts.map(p => `\`${p.tool || '工具'}\``),
+        ...(reasoningParts.length > 0 ? ['思考过程'] : [])
+      ];
+      return `[AI 执行了 ${names.join('、')}]`;
+    }
   }
   return null;
+}
+
+function getLocalIP() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return '0.0.0.0';
 }
 
 function deleteFromOpenCode(apiPath) {
@@ -463,8 +489,9 @@ function deleteFromOpenCode(apiPath) {
 }
 
 server.listen(PORT, '0.0.0.0', () => {
+  const localIP = getLocalIP();
   console.log(`\nMobile Chat Server running at:`);
   console.log(`   Local:   http://localhost:${PORT}`);
-  console.log(`   Network: http://100.95.190.86:${PORT}`);
+  console.log(`   Network: http://${localIP}:${PORT}`);
   console.log(`\nOpen on your phone to start chatting!\n`);
 });
