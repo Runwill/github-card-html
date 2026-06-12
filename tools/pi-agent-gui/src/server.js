@@ -12,6 +12,8 @@ const MAX_TREE_DEPTH = 4;
 const MAX_TREE_ENTRIES = 240;
 const MAX_FILE_BYTES = 256 * 1024;
 const MAX_DIFF_BYTES = 512 * 1024;
+const MAX_SEARCH_RESULTS = 80;
+const MAX_SEARCH_FILE_BYTES = 128 * 1024;
 const ignoredTreeNames = new Set(['.git', 'node_modules', '.venv', 'env', 'dist', 'build', 'coverage', '.vite']);
 const rootDir = path.resolve(__dirname, '..');
 const mediaDir = path.join(rootDir, 'media');
@@ -103,6 +105,15 @@ async function route(request, response) {
   }
   if (request.method === 'GET' && requestUrl.pathname === '/api/project/file') {
     sendJson(response, 200, await readProjectFile(requestUrl.searchParams.get('path') || ''));
+    return;
+  }
+  if (request.method === 'PUT' && requestUrl.pathname === '/api/project/file') {
+    const body = await readJson(request);
+    sendJson(response, 200, await writeProjectFile(requestUrl.searchParams.get('path') || '', body));
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/project/search') {
+    sendJson(response, 200, await searchProject(requestUrl.searchParams.get('q') || ''));
     return;
   }
   if (request.method === 'GET' && requestUrl.pathname === '/api/git/status') {
@@ -455,6 +466,100 @@ async function readProjectFile(relativePath) {
     truncated,
     content: stripNulls(content)
   };
+}
+
+async function writeProjectFile(relativePath, body) {
+  const filePath = resolveProjectPath(relativePath);
+  const stats = await fs.stat(filePath).catch((error) => {
+    if (error.code === 'ENOENT') {
+      throw new Error('Project file does not exist.');
+    }
+    throw error;
+  });
+  if (!stats.isFile()) {
+    throw new Error('Project file path must be a file.');
+  }
+  const content = String(body.content ?? '');
+  if (Buffer.byteLength(content, 'utf8') > MAX_FILE_BYTES) {
+    throw new Error('File content is too large to save from the GUI.');
+  }
+  await fs.writeFile(filePath, content, 'utf8');
+  const nextStats = await fs.stat(filePath);
+  return {
+    path: normalizeRelativePath(relativePath),
+    size: nextStats.size,
+    saved: true
+  };
+}
+
+async function searchProject(query) {
+  const normalizedQuery = String(query || '').trim();
+  if (normalizedQuery.length < 2) {
+    return { root: targetProject, query: normalizedQuery, results: [], truncated: false };
+  }
+  const lowerQuery = normalizedQuery.toLowerCase();
+  const results = [];
+  const state = { truncated: false };
+  await searchDirectory(targetProject, '', lowerQuery, results, state);
+  return { root: targetProject, query: normalizedQuery, results, truncated: state.truncated };
+}
+
+async function searchDirectory(absolutePath, relativePath, lowerQuery, results, state) {
+  if (results.length >= MAX_SEARCH_RESULTS) {
+    state.truncated = true;
+    return;
+  }
+  const entries = (await fs.readdir(absolutePath, { withFileTypes: true })).sort((left, right) => left.name.localeCompare(right.name));
+  for (const entry of entries) {
+    if (results.length >= MAX_SEARCH_RESULTS) {
+      state.truncated = true;
+      return;
+    }
+    if (ignoredTreeNames.has(entry.name)) {
+      continue;
+    }
+    const childRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+    const childAbsolutePath = path.join(absolutePath, entry.name);
+    if (entry.isDirectory()) {
+      await searchDirectory(childAbsolutePath, childRelativePath, lowerQuery, results, state);
+      continue;
+    }
+    if (!entry.isFile()) {
+      continue;
+    }
+    await searchFile(childAbsolutePath, childRelativePath, lowerQuery, results);
+  }
+}
+
+async function searchFile(absolutePath, relativePath, lowerQuery, results) {
+  const nameMatches = relativePath.toLowerCase().includes(lowerQuery);
+  const stats = await fs.stat(absolutePath);
+  if (stats.size > MAX_SEARCH_FILE_BYTES) {
+    if (nameMatches) {
+      results.push({ path: relativePath, type: 'name', line: null, preview: relativePath });
+    }
+    return;
+  }
+  const buffer = await fs.readFile(absolutePath);
+  if (buffer.includes(0)) {
+    if (nameMatches) {
+      results.push({ path: relativePath, type: 'name', line: null, preview: relativePath });
+    }
+    return;
+  }
+  const text = buffer.toString('utf8');
+  const lines = text.split(/\r?\n/);
+  let matchedContent = false;
+  for (let index = 0; index < lines.length; index += 1) {
+    if (lines[index].toLowerCase().includes(lowerQuery)) {
+      results.push({ path: relativePath, type: 'content', line: index + 1, preview: lines[index].trim().slice(0, 180) });
+      matchedContent = true;
+      break;
+    }
+  }
+  if (nameMatches && !matchedContent) {
+    results.push({ path: relativePath, type: 'name', line: null, preview: relativePath });
+  }
 }
 
 async function readGitStatus() {

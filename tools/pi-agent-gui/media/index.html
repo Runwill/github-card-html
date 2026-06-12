@@ -52,6 +52,11 @@
 
       <section id="projectPanel" class="panel-section">
         <h2 data-i18n="tabs.project">Project</h2>
+        <form id="projectSearchForm" class="project-search-form">
+          <input id="projectSearchInput" autocomplete="off" placeholder="Search project" data-i18n-placeholder="project.searchPlaceholder" data-help="help.projectSearch">
+          <button id="projectSearchButton" type="submit" class="secondary" data-i18n="actions.search" data-help="help.projectSearchButton">Search</button>
+        </form>
+        <div id="projectSearchResults" class="search-results"></div>
         <div id="projectTree" class="tree-list"></div>
         <p id="projectStatus" class="form-status"></p>
       </section>
@@ -139,10 +144,16 @@
     <section class="chat-panel">
       <section class="preview-panel" aria-live="polite">
         <div class="preview-heading">
-          <strong id="previewTitle" data-i18n="preview.title">Preview</strong>
-          <span id="previewMeta"></span>
+          <div>
+            <strong id="previewTitle" data-i18n="preview.title">Preview</strong>
+            <span id="previewMeta"></span>
+          </div>
+          <div class="preview-actions">
+            <button id="reloadFileButton" type="button" class="secondary" data-i18n="actions.reload" data-help="help.reloadFile">Reload</button>
+            <button id="saveFileButton" type="button" class="secondary" data-i18n="actions.saveFile" data-help="help.saveFile">Save</button>
+          </div>
         </div>
-        <pre id="previewContent" data-i18n="preview.empty">Select a file or change to preview it here.</pre>
+        <textarea id="previewEditor" spellcheck="false" data-i18n-placeholder="preview.empty" data-help="help.previewEditor"></textarea>
       </section>
       <div id="messages" class="messages"></div>
       <form id="composer" class="composer">

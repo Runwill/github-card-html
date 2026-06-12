@@ -306,11 +306,18 @@ dd {
 }
 
 .preview-heading {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   justify-content: space-between;
   gap: 0.65rem;
   padding: 0.65rem 0.85rem 0.45rem;
+}
+
+.preview-heading > div:first-child {
+  min-width: 0;
+  display: grid;
+  gap: 0.2rem;
 }
 
 .preview-heading strong {
@@ -324,24 +331,46 @@ dd {
 .preview-heading span {
   min-width: 0;
   overflow: hidden;
-  text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--muted);
   font-size: 0.76rem;
 }
 
-#previewContent {
+#previewEditor {
   width: 100%;
   min-width: 0;
   min-height: 0;
+  border: 0;
+  border-radius: 0;
   margin: 0;
   overflow: auto;
+  resize: none;
+  background: transparent;
   padding: 0 0.85rem 0.75rem;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   color: var(--muted);
   font: 0.78rem ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+}
+
+#previewEditor:focus {
+  outline: 2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: -2px;
+}
+
+.preview-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(4.5rem, 1fr));
+  gap: 0.4rem;
+}
+
+.preview-actions button {
+  width: auto;
+  min-width: 0;
+  min-height: 1.9rem;
+  padding-inline: 0.45rem;
+  font-size: 0.76rem;
 }
 
 .messages {
@@ -402,11 +431,29 @@ dd {
 }
 
 .tree-list,
-.changes-list {
+.changes-list,
+.search-results {
   display: grid;
   gap: 0.25rem;
   color: var(--muted);
   font-size: 0.8rem;
+}
+
+.project-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(4.5rem, auto);
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.project-search-form button {
+  width: auto;
+  min-width: 0;
+  padding-inline: 0.55rem;
+}
+
+.search-results {
+  margin-bottom: 0.6rem;
 }
 
 .tree-row {
@@ -421,7 +468,8 @@ dd {
 }
 
 .text-button,
-.change-row {
+.change-row,
+.search-result-row {
   min-height: 1.75rem;
   border: 1px solid transparent;
   border-radius: 5px;
@@ -443,10 +491,36 @@ dd {
   padding: 0.2rem 0.35rem;
 }
 
+.search-result-row {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.3rem 0.35rem;
+}
+
+.search-result-row strong,
+.search-result-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-result-row strong {
+  color: var(--text);
+  font-size: 0.76rem;
+}
+
+.search-result-row span {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
 .text-button:hover,
 .change-row:hover,
+.search-result-row:hover,
 .text-button:focus-visible,
-.change-row:focus-visible {
+.change-row:focus-visible,
+.search-result-row:focus-visible {
   border-color: var(--border);
   background: var(--surface-muted);
   color: var(--text);
@@ -573,6 +647,15 @@ dd {
 
   .composer {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .preview-heading,
+  .project-search-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .preview-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .runtime-actions {

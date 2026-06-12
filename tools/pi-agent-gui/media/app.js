@@ -6,7 +6,11 @@ const state = {
   activeAssistant: null,
   tools: new Map(),
   projectTree: null,
+  searchResults: null,
   gitStatus: null,
+  currentFile: null,
+  previewMode: 'empty',
+  previewDirty: false,
   helpKey: 'help.default',
   language: localStorage.getItem('pi-agent-gui-language') || 'zh'
 };
@@ -46,6 +50,9 @@ const i18n = {
     'actions.setModel': '设为当前模型',
     'actions.saveProvider': '保存 Provider',
     'actions.deleteProvider': '删除 Provider',
+    'actions.search': '搜索',
+    'actions.reload': '重载',
+    'actions.saveFile': '保存',
     'actions.send': '发送',
     'sendMode.prompt': '任务',
     'sendMode.steer': '插话',
@@ -53,11 +60,17 @@ const i18n = {
     'models.none': '暂无模型配置',
     'project.empty': '暂无可显示文件。',
     'project.truncated': '文件树已截断，建议从更具体目录查看。',
+    'project.searchPlaceholder': '搜索文件名或内容',
+    'project.searchEmpty': '没有搜索结果。',
+    'project.searchHint': '输入至少 2 个字符搜索项目。',
+    'project.searchTruncated': '搜索结果已截断，请输入更精确的关键词。',
     'changes.empty': '当前没有 Git 变更。',
     'preview.title': '预览',
     'preview.empty': '选择文件或变更后，会在这里预览内容。',
     'preview.fileMeta': '{path} · {size} bytes',
     'preview.diffMeta': '{path} · diff',
+    'preview.savedMeta': '{path} · 已保存 · {size} bytes',
+    'preview.dirty': '未保存',
     'preview.truncated': '\n\n[内容已截断]',
     'messages.configPath': '配置文件：{path}',
     'messages.saved': '已保存。重启 runtime 或重新打开模型列表后 Pi 会重新加载。',
@@ -74,6 +87,8 @@ const i18n = {
     'help.abort': '中止当前 Pi agent 运行中的任务，不会删除配置或历史文件。',
     'help.runtimeTab': '查看共享 Pi runtime 的启动状态、当前项目和当前模型。',
     'help.projectTab': '浏览当前项目文件树，点击文件后在右侧预览内容。',
+    'help.projectSearch': '按文件名或文件内容搜索当前项目，搜索结果会显示在项目树上方。',
+    'help.projectSearchButton': '执行项目搜索，结果可直接点击打开到右侧编辑区。',
     'help.changesTab': '查看当前 Git 变更列表，点击文件后在右侧预览 diff。',
     'help.modelTab': '查看 Pi 当前可用模型，并把选中的模型设为本次 agent 会话使用的模型。',
     'help.configTab': '在浏览器中维护 Pi 的模型 Provider 配置，保存后 Pi 重新加载即可使用。',
@@ -93,6 +108,9 @@ const i18n = {
     'help.noReasoningEffort': '如果 Provider 不支持 reasoning effort 参数，开启此项避免发送该字段。',
     'help.saveProvider': '保存当前 Provider 和模型配置到 Pi 的 models.json。',
     'help.deleteProvider': '删除当前 Provider 配置；删除前请确认 Provider 名称正确。',
+    'help.reloadFile': '重新从磁盘读取当前文件，会丢弃右侧编辑区尚未保存的修改。',
+    'help.saveFile': '把右侧编辑区内容保存回当前项目文件。只会写入当前项目目录内的已存在文件。',
+    'help.previewEditor': '显示文件、diff 或错误内容。打开普通文件后可直接编辑并保存。',
     'help.sendMode': '任务会开启新的 agent 目标；插话用于中途补充指令；后续用于继续上一轮。',
     'help.messageInput': '输入要交给共享 Pi agent 的任务、补充说明或后续要求。',
     'help.sendButton': '把当前输入按所选发送模式提交给共享 Pi agent。'
@@ -131,6 +149,9 @@ const i18n = {
     'actions.setModel': 'Set model',
     'actions.saveProvider': 'Save provider',
     'actions.deleteProvider': 'Delete provider',
+    'actions.search': 'Search',
+    'actions.reload': 'Reload',
+    'actions.saveFile': 'Save',
     'actions.send': 'Send',
     'sendMode.prompt': 'Prompt',
     'sendMode.steer': 'Steer',
@@ -138,11 +159,17 @@ const i18n = {
     'models.none': 'No models configured',
     'project.empty': 'No files to display.',
     'project.truncated': 'The file tree was truncated. Open a narrower folder when available.',
+    'project.searchPlaceholder': 'Search files or content',
+    'project.searchEmpty': 'No search results.',
+    'project.searchHint': 'Enter at least 2 characters to search the project.',
+    'project.searchTruncated': 'Search results were truncated. Try a more specific query.',
     'changes.empty': 'No Git changes right now.',
     'preview.title': 'Preview',
     'preview.empty': 'Select a file or change to preview it here.',
     'preview.fileMeta': '{path} · {size} bytes',
     'preview.diffMeta': '{path} · diff',
+    'preview.savedMeta': '{path} · saved · {size} bytes',
+    'preview.dirty': 'Unsaved',
     'preview.truncated': '\n\n[Content truncated]',
     'messages.configPath': 'Config: {path}',
     'messages.saved': 'Saved. Restart runtime or reopen model list to reload Pi models.',
@@ -159,6 +186,8 @@ const i18n = {
     'help.abort': 'Abort the currently running Pi agent task without deleting configuration or files.',
     'help.runtimeTab': 'View the shared Pi runtime status, target project, and active model.',
     'help.projectTab': 'Browse the current project file tree and preview selected files on the right.',
+    'help.projectSearch': 'Search the current project by file name or file content. Results appear above the tree.',
+    'help.projectSearchButton': 'Run project search. Results can be opened directly in the editor on the right.',
     'help.changesTab': 'Review current Git changes and preview file diffs on the right.',
     'help.modelTab': 'View available Pi models and set the selected model for this agent session.',
     'help.configTab': 'Maintain Pi model provider settings in the browser, then reload Pi to use them.',
@@ -178,6 +207,9 @@ const i18n = {
     'help.noReasoningEffort': 'Enable this if the provider does not accept the reasoning effort parameter.',
     'help.saveProvider': 'Save the current provider and model settings into Pi models.json.',
     'help.deleteProvider': 'Delete the current provider configuration. Check the provider name first.',
+    'help.reloadFile': 'Reload the current file from disk. This discards unsaved editor changes.',
+    'help.saveFile': 'Save the editor content back to the current project file. It only writes existing files inside the project.',
+    'help.previewEditor': 'Shows file, diff, or error content. Open a regular file to edit and save it.',
     'help.sendMode': 'Prompt starts a new goal; Steer adds mid-run guidance; Follow-up continues the previous turn.',
     'help.messageInput': 'Type the task, steering note, or follow-up you want to send to the shared Pi agent.',
     'help.sendButton': 'Submit the current input to the shared Pi agent using the selected send mode.'
@@ -193,13 +225,18 @@ const elements = {
   runtimeStatus: document.getElementById('runtimeStatus'),
   targetProject: document.getElementById('targetProject'),
   currentModel: document.getElementById('currentModel'),
+  projectSearchForm: document.getElementById('projectSearchForm'),
+  projectSearchInput: document.getElementById('projectSearchInput'),
+  projectSearchResults: document.getElementById('projectSearchResults'),
   projectTree: document.getElementById('projectTree'),
   projectStatus: document.getElementById('projectStatus'),
   changesList: document.getElementById('changesList'),
   changesStatus: document.getElementById('changesStatus'),
   previewTitle: document.getElementById('previewTitle'),
   previewMeta: document.getElementById('previewMeta'),
-  previewContent: document.getElementById('previewContent'),
+  previewEditor: document.getElementById('previewEditor'),
+  reloadFileButton: document.getElementById('reloadFileButton'),
+  saveFileButton: document.getElementById('saveFileButton'),
   startButton: document.getElementById('startButton'),
   abortButton: document.getElementById('abortButton'),
   modelSelect: document.getElementById('modelSelect'),
@@ -245,8 +282,14 @@ function bindEvents() {
   for (const button of elements.tabButtons) {
     button.addEventListener('click', () => activatePanel(button.dataset.panelTarget));
   }
+  elements.projectSearchForm.addEventListener('submit', searchProject);
+  elements.projectSearchInput.addEventListener('keydown', handleProjectSearchKeydown);
+  elements.projectSearchResults.addEventListener('click', handleSearchResultClick);
   elements.projectTree.addEventListener('click', handleProjectTreeClick);
   elements.changesList.addEventListener('click', handleChangesClick);
+  elements.previewEditor.addEventListener('input', markPreviewDirty);
+  elements.reloadFileButton.addEventListener('click', reloadCurrentFile);
+  elements.saveFileButton.addEventListener('click', saveCurrentFile);
   document.addEventListener('pointerover', updateHelpFromEvent);
   document.addEventListener('focusin', updateHelpFromEvent);
   document.addEventListener('click', updateHelpFromEvent);
@@ -348,17 +391,50 @@ async function loadGitStatus() {
   }
 }
 
+async function searchProject(event) {
+  event.preventDefault();
+  const query = elements.projectSearchInput.value.trim();
+  if (query.length < 2) {
+    state.searchResults = { results: [], truncated: false };
+    elements.projectSearchResults.textContent = t('project.searchHint');
+    return;
+  }
+  try {
+    state.searchResults = await api(`/api/project/search?q=${encodeURIComponent(query)}`);
+    renderSearchResults();
+  } catch (error) {
+    elements.projectSearchResults.textContent = error.message || String(error);
+  }
+}
+
+function handleProjectSearchKeydown(event) {
+  if (event.key !== 'Enter' || event.isComposing) {
+    return;
+  }
+  event.preventDefault();
+  elements.projectSearchForm.requestSubmit();
+}
+
+async function handleSearchResultClick(event) {
+  const button = event.target.closest('[data-file-path]');
+  if (!button) {
+    return;
+  }
+  await openProjectFile(button.dataset.filePath);
+}
+
 async function handleProjectTreeClick(event) {
   const button = event.target.closest('[data-file-path]');
   if (!button) {
     return;
   }
+  await openProjectFile(button.dataset.filePath);
+}
+
+async function openProjectFile(filePath) {
   try {
-    const file = await api(`/api/project/file?path=${encodeURIComponent(button.dataset.filePath)}`);
-    setPreviewActive(true);
-    elements.previewTitle.textContent = file.path;
-    elements.previewMeta.textContent = t('preview.fileMeta', { path: file.path, size: String(file.size) });
-    elements.previewContent.textContent = file.content + (file.truncated ? t('preview.truncated') : '');
+    const file = await api(`/api/project/file?path=${encodeURIComponent(filePath)}`);
+    showEditableFile(file);
   } catch (error) {
     showPreviewError(error);
   }
@@ -372,12 +448,52 @@ async function handleChangesClick(event) {
   try {
     const diff = await api(`/api/git/diff?path=${encodeURIComponent(button.dataset.changePath)}`);
     setPreviewActive(true);
+    state.currentFile = null;
+    state.previewMode = 'diff';
+    state.previewDirty = false;
     elements.previewTitle.textContent = diff.path;
     elements.previewMeta.textContent = t('preview.diffMeta', { path: diff.path });
-    elements.previewContent.textContent = diff.diff || t('changes.empty');
+    elements.previewEditor.value = diff.diff || t('changes.empty');
+    elements.previewEditor.readOnly = true;
+    updatePreviewActions();
   } catch (error) {
     showPreviewError(error);
   }
+}
+
+async function reloadCurrentFile() {
+  if (!state.currentFile) {
+    return;
+  }
+  await openProjectFile(state.currentFile.path);
+}
+
+async function saveCurrentFile() {
+  if (!state.currentFile || state.previewMode !== 'file') {
+    return;
+  }
+  try {
+    const result = await api(`/api/project/file?path=${encodeURIComponent(state.currentFile.path)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ content: elements.previewEditor.value })
+    });
+    state.currentFile = { ...state.currentFile, size: result.size, content: elements.previewEditor.value, truncated: false };
+    state.previewDirty = false;
+    elements.previewMeta.textContent = t('preview.savedMeta', { path: result.path, size: String(result.size) });
+    updatePreviewActions();
+    await loadGitStatus().catch(() => {});
+  } catch (error) {
+    showPreviewError(error);
+  }
+}
+
+function markPreviewDirty() {
+  if (state.previewMode !== 'file') {
+    return;
+  }
+  state.previewDirty = true;
+  updatePreviewMeta();
+  updatePreviewActions();
 }
 
 async function saveModelConfig(event) {
@@ -608,6 +724,33 @@ function renderProjectTree() {
   elements.projectStatus.textContent = state.projectTree && state.projectTree.truncated ? t('project.truncated') : '';
 }
 
+function renderSearchResults() {
+  const results = state.searchResults && state.searchResults.results ? state.searchResults.results : [];
+  if (!results.length) {
+    elements.projectSearchResults.textContent = t('project.searchEmpty');
+    return;
+  }
+  elements.projectSearchResults.replaceChildren(...results.map((result) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'search-result-row';
+    button.dataset.filePath = result.path;
+    button.setAttribute('data-help', 'help.projectSearch');
+    const title = document.createElement('strong');
+    title.textContent = result.line ? `${result.path}:${result.line}` : result.path;
+    const preview = document.createElement('span');
+    preview.textContent = result.preview || result.path;
+    button.append(title, preview);
+    return button;
+  }));
+  if (state.searchResults.truncated) {
+    const note = document.createElement('p');
+    note.className = 'form-status';
+    note.textContent = t('project.searchTruncated');
+    elements.projectSearchResults.append(note);
+  }
+}
+
 function renderTreeEntry(entry, depth) {
   const row = document.createElement('div');
   row.className = `tree-row ${entry.type}`;
@@ -662,9 +805,43 @@ function normalizeGitPath(filePath) {
 
 function showPreviewError(error) {
   setPreviewActive(true);
+  state.currentFile = null;
+  state.previewMode = 'error';
+  state.previewDirty = false;
   elements.previewTitle.textContent = t('preview.title');
   elements.previewMeta.textContent = '';
-  elements.previewContent.textContent = error.message || String(error);
+  elements.previewEditor.value = error.message || String(error);
+  elements.previewEditor.readOnly = true;
+  updatePreviewActions();
+}
+
+function showEditableFile(file) {
+  setPreviewActive(true);
+  state.currentFile = file;
+  state.previewMode = 'file';
+  state.previewDirty = false;
+  elements.previewTitle.textContent = file.path;
+  elements.previewEditor.value = file.content + (file.truncated ? t('preview.truncated') : '');
+  elements.previewEditor.readOnly = Boolean(file.truncated);
+  updatePreviewMeta();
+  updatePreviewActions();
+}
+
+function updatePreviewMeta() {
+  if (!state.currentFile) {
+    return;
+  }
+  const dirty = state.previewDirty ? ` · ${t('preview.dirty')}` : '';
+  elements.previewMeta.textContent = `${t('preview.fileMeta', {
+    path: state.currentFile.path,
+    size: String(state.currentFile.size)
+  })}${dirty}`;
+}
+
+function updatePreviewActions() {
+  const editable = state.previewMode === 'file' && state.currentFile && !state.currentFile.truncated;
+  elements.reloadFileButton.disabled = !state.currentFile;
+  elements.saveFileButton.disabled = !editable || !state.previewDirty;
 }
 
 function setPreviewActive(active) {
