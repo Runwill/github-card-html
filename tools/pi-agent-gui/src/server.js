@@ -113,7 +113,7 @@ async function route(request, response) {
     return;
   }
   if (request.method === 'GET' && requestUrl.pathname === '/api/project/search') {
-    sendJson(response, 200, await searchProject(requestUrl.searchParams.get('q') || ''));
+    sendJson(response, 200, await searchProject(requestUrl.searchParams.get('q') || '', requestUrl.searchParams.get('scope') || 'all'));
     return;
   }
   if (request.method === 'GET' && requestUrl.pathname === '/api/git/status') {
@@ -492,19 +492,20 @@ async function writeProjectFile(relativePath, body) {
   };
 }
 
-async function searchProject(query) {
+async function searchProject(query, scope) {
   const normalizedQuery = String(query || '').trim();
+  const normalizedScope = ['all', 'name', 'content'].includes(scope) ? scope : 'all';
   if (normalizedQuery.length < 2) {
-    return { root: targetProject, query: normalizedQuery, results: [], truncated: false };
+    return { root: targetProject, query: normalizedQuery, scope: normalizedScope, results: [], truncated: false };
   }
   const lowerQuery = normalizedQuery.toLowerCase();
   const results = [];
   const state = { truncated: false };
-  await searchDirectory(targetProject, '', lowerQuery, results, state);
-  return { root: targetProject, query: normalizedQuery, results, truncated: state.truncated };
+  await searchDirectory(targetProject, '', lowerQuery, normalizedScope, results, state);
+  return { root: targetProject, query: normalizedQuery, scope: normalizedScope, results, truncated: state.truncated };
 }
 
-async function searchDirectory(absolutePath, relativePath, lowerQuery, results, state) {
+async function searchDirectory(absolutePath, relativePath, lowerQuery, scope, results, state) {
   if (results.length >= MAX_SEARCH_RESULTS) {
     state.truncated = true;
     return;
@@ -520,30 +521,44 @@ async function searchDirectory(absolutePath, relativePath, lowerQuery, results, 
     }
     const childRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
     const childAbsolutePath = path.join(absolutePath, entry.name);
+    const nameMatches = childRelativePath.toLowerCase().includes(lowerQuery);
     if (entry.isDirectory()) {
-      await searchDirectory(childAbsolutePath, childRelativePath, lowerQuery, results, state);
+      if (nameMatches && scope !== 'content') {
+        results.push({ path: childRelativePath, type: 'directory', line: null, preview: childRelativePath, isDirectory: true });
+        if (results.length >= MAX_SEARCH_RESULTS) {
+          state.truncated = true;
+          return;
+        }
+      }
+      await searchDirectory(childAbsolutePath, childRelativePath, lowerQuery, scope, results, state);
       continue;
     }
     if (!entry.isFile()) {
       continue;
     }
-    await searchFile(childAbsolutePath, childRelativePath, lowerQuery, results);
+    await searchFile(childAbsolutePath, childRelativePath, lowerQuery, scope, results);
   }
 }
 
-async function searchFile(absolutePath, relativePath, lowerQuery, results) {
+async function searchFile(absolutePath, relativePath, lowerQuery, scope, results) {
   const nameMatches = relativePath.toLowerCase().includes(lowerQuery);
+  if (scope === 'name') {
+    if (nameMatches) {
+      results.push({ path: relativePath, type: 'file', line: null, preview: relativePath });
+    }
+    return;
+  }
   const stats = await fs.stat(absolutePath);
   if (stats.size > MAX_SEARCH_FILE_BYTES) {
-    if (nameMatches) {
-      results.push({ path: relativePath, type: 'name', line: null, preview: relativePath });
+    if (nameMatches && scope === 'all') {
+      results.push({ path: relativePath, type: 'file', line: null, preview: relativePath });
     }
     return;
   }
   const buffer = await fs.readFile(absolutePath);
   if (buffer.includes(0)) {
-    if (nameMatches) {
-      results.push({ path: relativePath, type: 'name', line: null, preview: relativePath });
+    if (nameMatches && scope === 'all') {
+      results.push({ path: relativePath, type: 'file', line: null, preview: relativePath });
     }
     return;
   }
@@ -552,14 +567,30 @@ async function searchFile(absolutePath, relativePath, lowerQuery, results) {
   let matchedContent = false;
   for (let index = 0; index < lines.length; index += 1) {
     if (lines[index].toLowerCase().includes(lowerQuery)) {
-      results.push({ path: relativePath, type: 'content', line: index + 1, preview: lines[index].trim().slice(0, 180) });
+      results.push({ path: relativePath, type: 'content', line: index + 1, preview: createSearchPreviewSnippet(lines[index], lowerQuery) });
       matchedContent = true;
       break;
     }
   }
-  if (nameMatches && !matchedContent) {
-    results.push({ path: relativePath, type: 'name', line: null, preview: relativePath });
+  if (scope === 'all' && nameMatches && !matchedContent) {
+    results.push({ path: relativePath, type: 'file', line: null, preview: relativePath });
   }
+}
+
+function createSearchPreviewSnippet(text, lowerQuery) {
+  const value = String(text || '').trim();
+  if (!value || !lowerQuery) {
+    return value.slice(0, 180);
+  }
+  const found = value.toLowerCase().indexOf(lowerQuery);
+  if (found === -1) {
+    return value.slice(0, 180);
+  }
+  const beforeContext = 18;
+  const afterContext = 78;
+  const start = Math.max(0, found - beforeContext);
+  const end = Math.min(value.length, found + lowerQuery.length + afterContext);
+  return `${start > 0 ? '...' : ''}${value.slice(start, end)}${end < value.length ? '...' : ''}`;
 }
 
 async function readGitStatus() {
@@ -573,9 +604,17 @@ async function readGitStatus() {
 
 async function readGitDiff(relativePath) {
   const normalized = normalizeRelativePath(relativePath);
-  const args = ['diff', '--', normalized];
-  const output = await runGit(args, MAX_DIFF_BYTES);
+  const unstaged = await runGit(['diff', '--', normalized], MAX_DIFF_BYTES);
+  const staged = await runGit(['diff', '--cached', '--', normalized], MAX_DIFF_BYTES);
+  const output = combineGitDiff(staged, unstaged);
   return { path: normalized, diff: output, truncated: output.length >= MAX_DIFF_BYTES };
+}
+
+function combineGitDiff(staged, unstaged) {
+  if (staged && unstaged) {
+    return `# Staged changes\n${staged}\n# Unstaged changes\n${unstaged}`;
+  }
+  return unstaged || staged || '';
 }
 
 async function runGit(args, maxBuffer = 256 * 1024) {

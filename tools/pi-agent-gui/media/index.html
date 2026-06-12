@@ -7,15 +7,14 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <main class="app-shell">
+  <main id="appShell" class="app-shell">
     <header class="topbar">
-      <div>
+      <div class="brand-block">
         <h1>Pi Agent GUI</h1>
         <p id="runtimeSummary" data-i18n="runtime.loading">Loading runtime...</p>
       </div>
       <div class="runtime-actions">
         <label class="language-picker">
-          <span data-i18n="language.label">Language</span>
           <select id="languageSelect" aria-label="Language" data-help="help.language">
             <option value="zh">中文</option>
             <option value="en">English</option>
@@ -26,12 +25,16 @@
       </div>
     </header>
 
-    <aside class="side-panel">
-      <section class="help-panel" aria-live="polite">
-        <strong data-i18n="help.title">说明</strong>
-        <p id="helpText" data-i18n="help.default">悬浮或聚焦到控件时，这里会显示功能解释。</p>
-      </section>
+    <nav class="activity-rail" aria-label="Pi GUI panels">
+      <button type="button" class="rail-button active" data-panel-target="runtimePanel" data-i18n-title="tabs.runtime" title="Runtime" data-help="help.runtimeTab">Run</button>
+      <button type="button" class="rail-button" data-panel-target="projectPanel" data-i18n-title="tabs.project" title="Project" data-help="help.projectTab">Proj</button>
+      <button type="button" class="rail-button" data-panel-target="changesPanel" data-i18n-title="tabs.changes" title="Changes" data-help="help.changesTab">Git</button>
+      <button type="button" class="rail-button" data-panel-target="modelPanel" data-i18n-title="tabs.model" title="Model" data-help="help.modelTab">AI</button>
+      <button type="button" class="rail-button" data-panel-target="configPanel" data-i18n-title="tabs.config" title="Config" data-help="help.configTab">Cfg</button>
+      <button type="button" class="rail-button" data-panel-target="activityPanel" data-i18n-title="tabs.activity" title="Activity" data-help="help.activityTab">Log</button>
+    </nav>
 
+    <aside id="sidePanel" class="side-panel">
       <nav class="panel-tabs" aria-label="Pi GUI panels">
         <button type="button" class="tab-button active" data-panel-target="runtimePanel" data-i18n="tabs.runtime" data-help="help.runtimeTab">Runtime</button>
         <button type="button" class="tab-button" data-panel-target="projectPanel" data-i18n="tabs.project" data-help="help.projectTab">Project</button>
@@ -53,9 +56,15 @@
       <section id="projectPanel" class="panel-section">
         <h2 data-i18n="tabs.project">Project</h2>
         <form id="projectSearchForm" class="project-search-form">
+          <select id="projectSearchScope" data-help="help.projectSearchScope">
+            <option value="current" data-i18n="project.searchCurrent">Current</option>
+            <option value="name" data-i18n="project.searchName">Names</option>
+            <option value="content" data-i18n="project.searchContent">Content</option>
+          </select>
           <input id="projectSearchInput" autocomplete="off" placeholder="Search project" data-i18n-placeholder="project.searchPlaceholder" data-help="help.projectSearch">
           <button id="projectSearchButton" type="submit" class="secondary" data-i18n="actions.search" data-help="help.projectSearchButton">Search</button>
         </form>
+        <button id="revealCurrentFileButton" type="button" class="secondary reveal-current-file" data-i18n="actions.revealCurrentFile" data-help="help.revealCurrentFile">Reveal current file</button>
         <div id="projectSearchResults" class="search-results"></div>
         <div id="projectTree" class="tree-list"></div>
         <p id="projectStatus" class="form-status"></p>
@@ -140,11 +149,13 @@
         <div id="activityList" class="activity-list"></div>
       </section>
     </aside>
+    <div id="sidebarResizeHandle" class="resize-handle resize-handle-vertical" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" data-help="help.resizeSidebar"></div>
 
-    <section class="chat-panel">
-      <section class="preview-panel" aria-live="polite">
+    <section id="chatPanel" class="chat-panel">
+      <section id="previewPanel" class="preview-panel" aria-live="polite">
         <div class="preview-heading">
           <div>
+            <span id="previewIcon" class="file-icon file-icon-text" hidden aria-hidden="true">txt</span>
             <strong id="previewTitle" data-i18n="preview.title">Preview</strong>
             <span id="previewMeta"></span>
           </div>
@@ -153,18 +164,30 @@
             <button id="saveFileButton" type="button" class="secondary" data-i18n="actions.saveFile" data-help="help.saveFile">Save</button>
           </div>
         </div>
-        <textarea id="previewEditor" spellcheck="false" data-i18n-placeholder="preview.empty" data-help="help.previewEditor"></textarea>
+        <div class="preview-viewport">
+          <pre id="previewCode" class="preview-code" tabindex="0" data-help="help.previewEditor"></pre>
+          <textarea id="previewEditor" spellcheck="false" data-i18n-placeholder="preview.empty" data-help="help.previewEditor"></textarea>
+          <div id="previewMinimap" class="preview-minimap" aria-hidden="true"></div>
+        </div>
       </section>
+      <div id="previewResizeHandle" class="resize-handle resize-handle-horizontal" role="separator" aria-orientation="horizontal" aria-label="Resize preview" data-help="help.resizePreview"></div>
       <div id="messages" class="messages"></div>
       <form id="composer" class="composer">
-        <select id="sendMode" aria-label="Send mode" data-help="help.sendMode">
-          <option value="prompt" data-i18n="sendMode.prompt">Prompt</option>
-          <option value="steer" data-i18n="sendMode.steer">Steer</option>
-          <option value="follow-up" data-i18n="sendMode.followUp">Follow-up</option>
-        </select>
+        <div class="composer-controls">
+          <select id="sendMode" aria-label="Send mode" data-help="help.sendMode">
+            <option value="prompt" data-i18n="sendMode.prompt">Prompt</option>
+            <option value="steer" data-i18n="sendMode.steer">Steer</option>
+            <option value="follow-up" data-i18n="sendMode.followUp">Follow-up</option>
+          </select>
+          <button id="sendButton" type="submit" data-i18n="actions.send" data-help="help.sendButton">Send</button>
+        </div>
         <textarea id="messageInput" placeholder="Send a task to the shared Pi agent" data-i18n-placeholder="composer.placeholder" data-help="help.messageInput"></textarea>
-        <button id="sendButton" type="submit" data-i18n="actions.send" data-help="help.sendButton">Send</button>
       </form>
+    </section>
+
+    <section class="help-panel" aria-live="polite">
+      <strong data-i18n="help.title">说明</strong>
+      <p id="helpText" data-i18n="help.default">悬浮或聚焦到控件时，这里会显示功能解释。</p>
     </section>
   </main>
 
