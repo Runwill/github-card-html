@@ -1,0 +1,107 @@
+{
+  "name": "vscode-mobile-chat",
+  "displayName": "VS Code Mobile Chat",
+  "description": "Mobile browser bridge for VS Code language model chat sessions.",
+  "version": "0.1.11",
+  "publisher": "local-tools",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://example.invalid/local-tools/vscode-mobile-chat"
+  },
+  "activationEvents": [
+    "*",
+    "onStartupFinished",
+    "onUri"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscodeMobileChat.startServer",
+        "title": "Mobile Chat: Start Server"
+      },
+      {
+        "command": "vscodeMobileChat.stopServer",
+        "title": "Mobile Chat: Stop Server"
+      },
+      {
+        "command": "vscodeMobileChat.openClient",
+        "title": "Mobile Chat: Open Client"
+      },
+      {
+        "command": "vscodeMobileChat.setCustomEndpointKey",
+        "title": "Mobile Chat: Set Custom Endpoint Key"
+      },
+      {
+        "command": "vscodeMobileChat.clearCustomEndpointKey",
+        "title": "Mobile Chat: Clear Custom Endpoint Key"
+      },
+      {
+        "command": "vscodeMobileChat.showCustomEndpointKeyStatus",
+        "title": "Mobile Chat: Show Custom Endpoint Key Status"
+      }
+    ],
+    "configuration": {
+      "title": "VS Code Mobile Chat",
+      "properties": {
+        "vscodeMobileChat.host": {
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "Host interface used by the mobile chat server. Use 0.0.0.0 only for trusted LAN testing."
+        },
+        "vscodeMobileChat.port": {
+          "type": "number",
+          "default": 3011,
+          "minimum": 1024,
+          "maximum": 65535,
+          "description": "Port used by the mobile chat server."
+        },
+        "vscodeMobileChat.requireToken": {
+          "type": "boolean",
+          "default": true,
+          "description": "Require a generated access token for browser API requests."
+        },
+        "vscodeMobileChat.customModels": {
+          "type": "array",
+          "default": [],
+          "description": "Additional model ids shown in the mobile model picker. The extension also imports display-safe model entries from VS Code's chatLanguageModels.json when present.",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "vscodeMobileChat.modelConfigFiles": {
+          "type": "array",
+          "default": [],
+          "description": "Extra chatLanguageModels-style JSON files to import. API keys stay in the extension host and are never returned to the mobile browser.",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

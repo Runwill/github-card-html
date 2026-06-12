@@ -4,6 +4,8 @@
 
 计划将旧的 OpenCode Mobile Chat 实验工具替换为一个面向 VS Code 的移动聊天工具。新工具不尝试接管 VS Code 桌面端原生 Copilot Chat 会话，而是由 VS Code 扩展维护一套独立的手机端会话系统，并复用 VS Code 暴露的模型、工作区、诊断、Git 和编辑能力。
 
+当前已落地第一版原型骨架：`tools/vscode-mobile-chat/` 中包含 VS Code 扩展 manifest、本地 HTTP/SSE 网关、独立手机端会话存储、Copilot 模型调用层和移动端页面。
+
 这是公开 API 边界下最稳妥的方向：VS Code 提供 Language Model API、Chat Participant API、工具注册 API、工作区 API、终端/任务/诊断/SCM 等能力，但没有公开提供“读取、切换、删除或遥控原生 Copilot Chat 会话”的完整接口。
 
 ## 会话设计原则
@@ -112,6 +114,8 @@ tools/vscode-mobile-chat/
 ### 阶段 1：最小可用原型
 
 目标：手机能连到 VS Code，选择模型，发送消息并收到流式回复。
+
+状态：已完成原型骨架，需在 VS Code Extension Host 中实际联调 Copilot 授权与模型响应。
 
 - 新建 VS Code 扩展工程。
 - 增加命令 `Mobile Chat: Start Server` 和 `Mobile Chat: Stop Server`。

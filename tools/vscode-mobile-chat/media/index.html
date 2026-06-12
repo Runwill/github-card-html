@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VS Code Mobile Chat</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>VS Code Mobile Chat</h1>
+        <p id="workspaceStatus">Connecting...</p>
+      </div>
+      <button id="newSessionButton" type="button" title="新建会话">+</button>
+    </header>
+
+    <section class="session-row" aria-label="会话和模型">
+      <select id="sessionSelect" aria-label="会话"></select>
+      <div class="model-control">
+        <select id="modelSelect" aria-label="模型"></select>
+        <div class="model-meta">
+          <span id="modelStatus">Model status</span>
+          <span class="model-actions">
+            <button id="setKeyButton" class="quiet-button" type="button" title="配置当前模型 API Key">Set key</button>
+            <button id="clearKeyButton" class="quiet-button danger" type="button" title="清除当前模型 API Key">Clear</button>
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section id="messages" class="messages" aria-live="polite"></section>
+
+    <form id="composer" class="composer">
+      <textarea id="messageInput" rows="3" placeholder="输入消息"></textarea>
+      <button id="sendButton" type="submit" title="发送">Send</button>
+    </form>
+
+    <dialog id="keyDialog">
+      <form id="keyForm" method="dialog">
+        <p id="keyDialogTitle">API Key</p>
+        <input id="keyInput" type="password" autocomplete="off" placeholder="API key">
+        <menu>
+          <button id="cancelKeyButton" value="cancel" type="button">Cancel</button>
+          <button id="saveKeyButton" value="default" type="submit">Save</button>
+        </menu>
+      </form>
+    </dialog>
+
+    <dialog id="confirmDialog">
+      <form id="confirmForm" method="dialog">
+        <p id="confirmDialogTitle">Confirm</p>
+        <p id="confirmDialogMessage"></p>
+        <menu>
+          <button id="cancelConfirmButton" value="cancel" type="button">Cancel</button>
+          <button id="confirmActionButton" value="default" type="submit">Clear</button>
+        </menu>
+      </form>
+    </dialog>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>
