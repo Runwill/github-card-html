@@ -17,8 +17,15 @@
   --control-h: 2.35rem;
   --topbar-pad: 0.75rem;
   --panel-pad: 0.75rem;
+  --preview-row: minmax(8rem, 0.42fr);
+  --messages-row: minmax(0, 1fr);
   --shadow: 0 14px 36px rgba(15, 23, 42, 0.1);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body.preview-active {
+  --preview-row: minmax(18rem, 1fr);
+  --messages-row: minmax(5rem, 0.28fr);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -226,7 +233,7 @@ dd {
   z-index: 1;
   grid-row: 2;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(4.2rem, 1fr));
   gap: 0.4rem;
   margin-bottom: 0.7rem;
 }
@@ -286,10 +293,59 @@ dd {
   min-width: 0;
   min-height: 0;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-rows: var(--preview-row) var(--messages-row) auto;
+}
+
+.preview-panel {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.preview-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem 0.45rem;
+}
+
+.preview-heading strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+}
+
+.preview-heading span {
+  min-width: 0;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+#previewContent {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: auto;
+  padding: 0 0.85rem 0.75rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+  font: 0.78rem ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
 }
 
 .messages {
+  min-width: 0;
   min-height: 0;
   overflow: auto;
   display: flex;
@@ -331,6 +387,8 @@ dd {
 }
 
 .composer {
+  width: 100%;
+  min-width: 0;
   display: grid;
   grid-template-columns: minmax(7rem, 0.18fr) minmax(0, 1fr) auto;
   gap: 0.6rem;
@@ -341,6 +399,62 @@ dd {
 .activity-list {
   display: grid;
   gap: 0.55rem;
+}
+
+.tree-list,
+.changes-list {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.tree-row {
+  display: grid;
+  gap: 0.22rem;
+  padding-left: calc(var(--depth, 0) * 0.75rem);
+}
+
+.tree-row strong {
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.text-button,
+.change-row {
+  min-height: 1.75rem;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: left;
+}
+
+.text-button {
+  padding: 0.15rem 0.35rem;
+}
+
+.change-row {
+  display: grid;
+  grid-template-columns: 2.2rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.35rem;
+}
+
+.text-button:hover,
+.change-row:hover,
+.text-button:focus-visible,
+.change-row:focus-visible {
+  border-color: var(--border);
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+.change-status {
+  color: var(--accent);
+  font: 0.76rem ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
 }
 
 .model-config-form {
@@ -420,11 +534,21 @@ dd {
     --control-h: 2.2rem;
     --topbar-pad: 0.6rem;
     --panel-pad: 0.6rem;
+    --preview-row: minmax(6rem, 0.36fr);
+  }
+
+  body.preview-active {
+    --preview-row: minmax(12rem, 1fr);
+    --messages-row: minmax(4.5rem, 0.22fr);
   }
 
   .app-shell {
     grid-template-columns: 1fr;
-    grid-template-rows: auto minmax(18rem, 0.58fr) minmax(0, 1fr);
+    grid-template-rows: auto minmax(18rem, 0.52fr) minmax(0, 1fr);
+  }
+
+  .chat-panel {
+    grid-template-rows: var(--preview-row) var(--messages-row) auto;
   }
 
   .topbar {
@@ -441,11 +565,14 @@ dd {
   }
 
   .runtime-actions,
-  .composer,
   .model-config-form,
   .form-actions,
   .number-grid {
     grid-template-columns: 1fr;
+  }
+
+  .composer {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .runtime-actions {

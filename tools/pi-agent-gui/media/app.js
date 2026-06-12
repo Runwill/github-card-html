@@ -5,6 +5,8 @@ const state = {
   messages: [],
   activeAssistant: null,
   tools: new Map(),
+  projectTree: null,
+  gitStatus: null,
   helpKey: 'help.default',
   language: localStorage.getItem('pi-agent-gui-language') || 'zh'
 };
@@ -22,6 +24,8 @@ const i18n = {
     'status.stopped': '已停止',
     'status.unknown': '未知',
     'tabs.runtime': '运行',
+    'tabs.project': '项目',
+    'tabs.changes': '变更',
     'tabs.model': '模型',
     'tabs.config': '配置',
     'tabs.activity': '活动',
@@ -47,6 +51,14 @@ const i18n = {
     'sendMode.steer': '插话',
     'sendMode.followUp': '后续',
     'models.none': '暂无模型配置',
+    'project.empty': '暂无可显示文件。',
+    'project.truncated': '文件树已截断，建议从更具体目录查看。',
+    'changes.empty': '当前没有 Git 变更。',
+    'preview.title': '预览',
+    'preview.empty': '选择文件或变更后，会在这里预览内容。',
+    'preview.fileMeta': '{path} · {size} bytes',
+    'preview.diffMeta': '{path} · diff',
+    'preview.truncated': '\n\n[内容已截断]',
     'messages.configPath': '配置文件：{path}',
     'messages.saved': '已保存。重启 runtime 或重新打开模型列表后 Pi 会重新加载。',
     'messages.deleted': 'Provider 已删除。重启 runtime 或重新打开模型列表后 Pi 会重新加载。',
@@ -61,6 +73,8 @@ const i18n = {
     'help.start': '启动共享 Pi runtime，启动后手机和电脑会连接到同一个 agent 会话。',
     'help.abort': '中止当前 Pi agent 运行中的任务，不会删除配置或历史文件。',
     'help.runtimeTab': '查看共享 Pi runtime 的启动状态、当前项目和当前模型。',
+    'help.projectTab': '浏览当前项目文件树，点击文件后在右侧预览内容。',
+    'help.changesTab': '查看当前 Git 变更列表，点击文件后在右侧预览 diff。',
     'help.modelTab': '查看 Pi 当前可用模型，并把选中的模型设为本次 agent 会话使用的模型。',
     'help.configTab': '在浏览器中维护 Pi 的模型 Provider 配置，保存后 Pi 重新加载即可使用。',
     'help.activityTab': '查看 agent 启动、结束和工具调用等运行活动。',
@@ -95,6 +109,8 @@ const i18n = {
     'status.stopped': 'Stopped',
     'status.unknown': 'Unknown',
     'tabs.runtime': 'Runtime',
+    'tabs.project': 'Project',
+    'tabs.changes': 'Changes',
     'tabs.model': 'Model',
     'tabs.config': 'Config',
     'tabs.activity': 'Activity',
@@ -120,6 +136,14 @@ const i18n = {
     'sendMode.steer': 'Steer',
     'sendMode.followUp': 'Follow-up',
     'models.none': 'No models configured',
+    'project.empty': 'No files to display.',
+    'project.truncated': 'The file tree was truncated. Open a narrower folder when available.',
+    'changes.empty': 'No Git changes right now.',
+    'preview.title': 'Preview',
+    'preview.empty': 'Select a file or change to preview it here.',
+    'preview.fileMeta': '{path} · {size} bytes',
+    'preview.diffMeta': '{path} · diff',
+    'preview.truncated': '\n\n[Content truncated]',
     'messages.configPath': 'Config: {path}',
     'messages.saved': 'Saved. Restart runtime or reopen model list to reload Pi models.',
     'messages.deleted': 'Provider deleted. Restart runtime or reopen model list to reload Pi models.',
@@ -134,6 +158,8 @@ const i18n = {
     'help.start': 'Start the shared Pi runtime so phone and desktop connect to the same agent session.',
     'help.abort': 'Abort the currently running Pi agent task without deleting configuration or files.',
     'help.runtimeTab': 'View the shared Pi runtime status, target project, and active model.',
+    'help.projectTab': 'Browse the current project file tree and preview selected files on the right.',
+    'help.changesTab': 'Review current Git changes and preview file diffs on the right.',
     'help.modelTab': 'View available Pi models and set the selected model for this agent session.',
     'help.configTab': 'Maintain Pi model provider settings in the browser, then reload Pi to use them.',
     'help.activityTab': 'Watch agent starts, finishes, and tool activity from the shared runtime.',
@@ -167,6 +193,13 @@ const elements = {
   runtimeStatus: document.getElementById('runtimeStatus'),
   targetProject: document.getElementById('targetProject'),
   currentModel: document.getElementById('currentModel'),
+  projectTree: document.getElementById('projectTree'),
+  projectStatus: document.getElementById('projectStatus'),
+  changesList: document.getElementById('changesList'),
+  changesStatus: document.getElementById('changesStatus'),
+  previewTitle: document.getElementById('previewTitle'),
+  previewMeta: document.getElementById('previewMeta'),
+  previewContent: document.getElementById('previewContent'),
   startButton: document.getElementById('startButton'),
   abortButton: document.getElementById('abortButton'),
   modelSelect: document.getElementById('modelSelect'),
@@ -200,6 +233,7 @@ async function init() {
   bindEvents();
   connectEvents();
   await loadRuntime();
+  await Promise.allSettled([loadProjectTree(), loadGitStatus()]);
   await loadModelConfig();
   if (state.runtime.pi.running) {
     await Promise.allSettled([loadState(), loadModels(), loadMessages()]);
@@ -211,6 +245,8 @@ function bindEvents() {
   for (const button of elements.tabButtons) {
     button.addEventListener('click', () => activatePanel(button.dataset.panelTarget));
   }
+  elements.projectTree.addEventListener('click', handleProjectTreeClick);
+  elements.changesList.addEventListener('click', handleChangesClick);
   document.addEventListener('pointerover', updateHelpFromEvent);
   document.addEventListener('focusin', updateHelpFromEvent);
   document.addEventListener('click', updateHelpFromEvent);
@@ -292,6 +328,56 @@ async function loadModels() {
 async function loadModelConfig() {
   state.modelConfig = await api('/api/model-config');
   elements.modelConfigStatus.textContent = state.modelConfig.path ? t('messages.configPath', { path: state.modelConfig.path }) : '';
+}
+
+async function loadProjectTree() {
+  try {
+    state.projectTree = await api('/api/project/tree');
+    renderProjectTree();
+  } catch (error) {
+    elements.projectStatus.textContent = error.message || String(error);
+  }
+}
+
+async function loadGitStatus() {
+  try {
+    state.gitStatus = await api('/api/git/status');
+    renderGitStatus();
+  } catch (error) {
+    elements.changesStatus.textContent = error.message || String(error);
+  }
+}
+
+async function handleProjectTreeClick(event) {
+  const button = event.target.closest('[data-file-path]');
+  if (!button) {
+    return;
+  }
+  try {
+    const file = await api(`/api/project/file?path=${encodeURIComponent(button.dataset.filePath)}`);
+    setPreviewActive(true);
+    elements.previewTitle.textContent = file.path;
+    elements.previewMeta.textContent = t('preview.fileMeta', { path: file.path, size: String(file.size) });
+    elements.previewContent.textContent = file.content + (file.truncated ? t('preview.truncated') : '');
+  } catch (error) {
+    showPreviewError(error);
+  }
+}
+
+async function handleChangesClick(event) {
+  const button = event.target.closest('[data-change-path]');
+  if (!button) {
+    return;
+  }
+  try {
+    const diff = await api(`/api/git/diff?path=${encodeURIComponent(button.dataset.changePath)}`);
+    setPreviewActive(true);
+    elements.previewTitle.textContent = diff.path;
+    elements.previewMeta.textContent = t('preview.diffMeta', { path: diff.path });
+    elements.previewContent.textContent = diff.diff || t('changes.empty');
+  } catch (error) {
+    showPreviewError(error);
+  }
 }
 
 async function saveModelConfig(event) {
@@ -510,6 +596,79 @@ function activatePanel(panelId) {
   for (const section of elements.panelSections) {
     section.classList.toggle('active', section.id === panelId);
   }
+}
+
+function renderProjectTree() {
+  const entries = state.projectTree && state.projectTree.entries ? state.projectTree.entries : [];
+  if (!entries.length) {
+    elements.projectTree.textContent = t('project.empty');
+  } else {
+    elements.projectTree.replaceChildren(...entries.map((entry) => renderTreeEntry(entry, 0)));
+  }
+  elements.projectStatus.textContent = state.projectTree && state.projectTree.truncated ? t('project.truncated') : '';
+}
+
+function renderTreeEntry(entry, depth) {
+  const row = document.createElement('div');
+  row.className = `tree-row ${entry.type}`;
+  row.style.setProperty('--depth', depth);
+  if (entry.type === 'file') {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'text-button';
+    button.dataset.filePath = entry.path;
+    button.textContent = entry.name;
+    button.setAttribute('data-help', 'help.projectTab');
+    row.append(button);
+    return row;
+  }
+  const label = document.createElement('strong');
+  label.textContent = entry.name;
+  row.append(label);
+  const children = Array.isArray(entry.children) ? entry.children : [];
+  if (children.length) {
+    row.append(...children.map((child) => renderTreeEntry(child, depth + 1)));
+  }
+  return row;
+}
+
+function renderGitStatus() {
+  const files = state.gitStatus && state.gitStatus.files ? state.gitStatus.files : [];
+  if (!files.length) {
+    elements.changesList.textContent = t('changes.empty');
+    elements.changesStatus.textContent = '';
+    return;
+  }
+  elements.changesList.replaceChildren(...files.map((file) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'change-row';
+    button.dataset.changePath = normalizeGitPath(file.path);
+    button.setAttribute('data-help', 'help.changesTab');
+    const status = document.createElement('span');
+    status.className = 'change-status';
+    status.textContent = file.status;
+    const name = document.createElement('span');
+    name.textContent = file.path;
+    button.append(status, name);
+    return button;
+  }));
+  elements.changesStatus.textContent = '';
+}
+
+function normalizeGitPath(filePath) {
+  return String(filePath || '').split(' -> ').pop();
+}
+
+function showPreviewError(error) {
+  setPreviewActive(true);
+  elements.previewTitle.textContent = t('preview.title');
+  elements.previewMeta.textContent = '';
+  elements.previewContent.textContent = error.message || String(error);
+}
+
+function setPreviewActive(active) {
+  document.body.classList.toggle('preview-active', active);
 }
 
 function t(key, values = {}) {

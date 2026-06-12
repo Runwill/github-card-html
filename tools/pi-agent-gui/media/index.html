@@ -34,6 +34,8 @@
 
       <nav class="panel-tabs" aria-label="Pi GUI panels">
         <button type="button" class="tab-button active" data-panel-target="runtimePanel" data-i18n="tabs.runtime" data-help="help.runtimeTab">Runtime</button>
+        <button type="button" class="tab-button" data-panel-target="projectPanel" data-i18n="tabs.project" data-help="help.projectTab">Project</button>
+        <button type="button" class="tab-button" data-panel-target="changesPanel" data-i18n="tabs.changes" data-help="help.changesTab">Changes</button>
         <button type="button" class="tab-button" data-panel-target="modelPanel" data-i18n="tabs.model" data-help="help.modelTab">Model</button>
         <button type="button" class="tab-button" data-panel-target="configPanel" data-i18n="tabs.config" data-help="help.configTab">Config</button>
         <button type="button" class="tab-button" data-panel-target="activityPanel" data-i18n="tabs.activity" data-help="help.activityTab">Activity</button>
@@ -46,6 +48,18 @@
           <div><dt data-i18n="runtime.project">Project</dt><dd id="targetProject">-</dd></div>
           <div><dt data-i18n="runtime.model">Model</dt><dd id="currentModel">-</dd></div>
         </dl>
+      </section>
+
+      <section id="projectPanel" class="panel-section">
+        <h2 data-i18n="tabs.project">Project</h2>
+        <div id="projectTree" class="tree-list"></div>
+        <p id="projectStatus" class="form-status"></p>
+      </section>
+
+      <section id="changesPanel" class="panel-section">
+        <h2 data-i18n="tabs.changes">Changes</h2>
+        <div id="changesList" class="changes-list"></div>
+        <p id="changesStatus" class="form-status"></p>
       </section>
 
       <section id="modelPanel" class="panel-section">
@@ -123,6 +137,13 @@
     </aside>
 
     <section class="chat-panel">
+      <section class="preview-panel" aria-live="polite">
+        <div class="preview-heading">
+          <strong id="previewTitle" data-i18n="preview.title">Preview</strong>
+          <span id="previewMeta"></span>
+        </div>
+        <pre id="previewContent" data-i18n="preview.empty">Select a file or change to preview it here.</pre>
+      </section>
       <div id="messages" class="messages"></div>
       <form id="composer" class="composer">
         <select id="sendMode" aria-label="Send mode" data-help="help.sendMode">

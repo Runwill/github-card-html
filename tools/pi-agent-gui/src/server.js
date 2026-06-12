@@ -1,10 +1,18 @@
 const fs = require('fs/promises');
 const http = require('http');
 const path = require('path');
+const { execFile } = require('child_process');
+const { promisify } = require('util');
 const { checkCommand } = require('./commandCheck');
 const { PiRpcClient } = require('./piRpcClient');
 
+const execFileAsync = promisify(execFile);
 const MAX_BODY_BYTES = 256 * 1024;
+const MAX_TREE_DEPTH = 4;
+const MAX_TREE_ENTRIES = 240;
+const MAX_FILE_BYTES = 256 * 1024;
+const MAX_DIFF_BYTES = 512 * 1024;
+const ignoredTreeNames = new Set(['.git', 'node_modules', '.venv', 'env', 'dist', 'build', 'coverage', '.vite']);
 const rootDir = path.resolve(__dirname, '..');
 const mediaDir = path.join(rootDir, 'media');
 const defaultTarget = path.resolve(rootDir, '..', '..');
@@ -87,6 +95,22 @@ async function route(request, response) {
   }
   if (request.method === 'GET' && requestUrl.pathname === '/api/model-config') {
     sendJson(response, 200, sanitizeModelConfig(await readModelConfig()));
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/project/tree') {
+    sendJson(response, 200, await readProjectTree(requestUrl.searchParams.get('path') || ''));
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/project/file') {
+    sendJson(response, 200, await readProjectFile(requestUrl.searchParams.get('path') || ''));
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/git/status') {
+    sendJson(response, 200, await readGitStatus());
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/git/diff') {
+    sendJson(response, 200, await readGitDiff(requestUrl.searchParams.get('path') || ''));
     return;
   }
   if (request.method === 'POST' && requestUrl.pathname === '/api/model-config/providers') {
@@ -360,6 +384,124 @@ function buildCompat(disableDeveloperRole, disableReasoningEffort) {
     compat.supportsReasoningEffort = false;
   }
   return Object.keys(compat).length ? compat : null;
+}
+
+async function readProjectTree(relativePath) {
+  const directory = resolveProjectPath(relativePath);
+  const stats = await fs.stat(directory);
+  if (!stats.isDirectory()) {
+    throw new Error('Project tree path must be a directory.');
+  }
+  const counter = { count: 0, truncated: false };
+  const root = await buildTree(directory, normalizeRelativePath(relativePath), 0, counter);
+  return {
+    root: targetProject,
+    path: root.path,
+    entries: root.children || [],
+    truncated: counter.truncated
+  };
+}
+
+async function buildTree(absolutePath, relativePath, depth, counter) {
+  if (depth >= MAX_TREE_DEPTH || counter.count >= MAX_TREE_ENTRIES) {
+    counter.truncated = true;
+    return { type: 'directory', name: path.basename(absolutePath), path: relativePath, children: [] };
+  }
+  const entries = (await fs.readdir(absolutePath, { withFileTypes: true })).sort((left, right) => {
+    if (left.isDirectory() !== right.isDirectory()) {
+      return left.isDirectory() ? 1 : -1;
+    }
+    return left.name.localeCompare(right.name);
+  });
+  const children = [];
+  for (const entry of entries) {
+    if (counter.count >= MAX_TREE_ENTRIES) {
+      counter.truncated = true;
+      break;
+    }
+    if (ignoredTreeNames.has(entry.name)) {
+      continue;
+    }
+    const childRelativePath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+    const childAbsolutePath = path.join(absolutePath, entry.name);
+    counter.count += 1;
+    if (entry.isDirectory()) {
+      children.push(await buildTree(childAbsolutePath, childRelativePath, depth + 1, counter));
+    } else if (entry.isFile()) {
+      children.push({ type: 'file', name: entry.name, path: childRelativePath });
+    }
+  }
+  children.sort((left, right) => {
+    if (left.type !== right.type) {
+      return left.type === 'directory' ? -1 : 1;
+    }
+    return left.name.localeCompare(right.name);
+  });
+  return { type: 'directory', name: path.basename(absolutePath), path: relativePath, children };
+}
+
+async function readProjectFile(relativePath) {
+  const filePath = resolveProjectPath(relativePath);
+  const stats = await fs.stat(filePath);
+  if (!stats.isFile()) {
+    throw new Error('Project file path must be a file.');
+  }
+  const buffer = await fs.readFile(filePath);
+  const truncated = buffer.length > MAX_FILE_BYTES;
+  const content = buffer.subarray(0, MAX_FILE_BYTES).toString('utf8');
+  return {
+    path: normalizeRelativePath(relativePath),
+    size: stats.size,
+    truncated,
+    content: stripNulls(content)
+  };
+}
+
+async function readGitStatus() {
+  const output = await runGit(['status', '--short']);
+  const files = output.split('\n').filter(Boolean).map((line) => ({
+    status: line.slice(0, 2).trim() || line.slice(0, 2),
+    path: line.slice(3).trim()
+  }));
+  return { root: targetProject, files };
+}
+
+async function readGitDiff(relativePath) {
+  const normalized = normalizeRelativePath(relativePath);
+  const args = ['diff', '--', normalized];
+  const output = await runGit(args, MAX_DIFF_BYTES);
+  return { path: normalized, diff: output, truncated: output.length >= MAX_DIFF_BYTES };
+}
+
+async function runGit(args, maxBuffer = 256 * 1024) {
+  try {
+    const result = await execFileAsync('git', args, {
+      cwd: targetProject,
+      windowsHide: true,
+      maxBuffer
+    });
+    return result.stdout || '';
+  } catch (error) {
+    throw new Error(error.stderr || error.message || 'Git command failed.');
+  }
+}
+
+function resolveProjectPath(relativePath) {
+  const normalized = normalizeRelativePath(relativePath);
+  const resolved = path.resolve(targetProject, normalized);
+  const relative = path.relative(targetProject, resolved);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
+    throw new Error('Path is outside the target project.');
+  }
+  return resolved;
+}
+
+function normalizeRelativePath(relativePath) {
+  return String(relativePath || '').replace(/\\/g, '/').replace(/^\/+/, '');
+}
+
+function stripNulls(text) {
+  return text.includes('\u0000') ? '[Binary file preview is not available.]' : text;
 }
 
 async function sendStatic(response, fileName, contentType) {
