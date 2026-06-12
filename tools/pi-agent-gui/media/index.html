@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pi Agent GUI</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <h1>Pi Agent GUI</h1>
+        <p id="runtimeSummary" data-i18n="runtime.loading">Loading runtime...</p>
+      </div>
+      <div class="runtime-actions">
+        <label class="language-picker">
+          <span data-i18n="language.label">Language</span>
+          <select id="languageSelect" aria-label="Language" data-help="help.language">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+        <button id="startButton" type="button" data-i18n="actions.start" data-help="help.start">Start</button>
+        <button id="abortButton" type="button" class="danger" data-i18n="actions.abort" data-help="help.abort">Abort</button>
+      </div>
+    </header>
+
+    <aside class="side-panel">
+      <section class="help-panel" aria-live="polite">
+        <strong data-i18n="help.title">说明</strong>
+        <p id="helpText" data-i18n="help.default">悬浮或聚焦到控件时，这里会显示功能解释。</p>
+      </section>
+
+      <nav class="panel-tabs" aria-label="Pi GUI panels">
+        <button type="button" class="tab-button active" data-panel-target="runtimePanel" data-i18n="tabs.runtime" data-help="help.runtimeTab">Runtime</button>
+        <button type="button" class="tab-button" data-panel-target="modelPanel" data-i18n="tabs.model" data-help="help.modelTab">Model</button>
+        <button type="button" class="tab-button" data-panel-target="configPanel" data-i18n="tabs.config" data-help="help.configTab">Config</button>
+        <button type="button" class="tab-button" data-panel-target="activityPanel" data-i18n="tabs.activity" data-help="help.activityTab">Activity</button>
+      </nav>
+
+      <section id="runtimePanel" class="panel-section active">
+        <h2 data-i18n="tabs.runtime">Runtime</h2>
+        <dl class="status-list">
+          <div><dt data-i18n="runtime.status">Status</dt><dd id="runtimeStatus">Unknown</dd></div>
+          <div><dt data-i18n="runtime.project">Project</dt><dd id="targetProject">-</dd></div>
+          <div><dt data-i18n="runtime.model">Model</dt><dd id="currentModel">-</dd></div>
+        </dl>
+      </section>
+
+      <section id="modelPanel" class="panel-section">
+        <h2 data-i18n="tabs.model">Model</h2>
+        <select id="modelSelect" data-help="help.modelSelect"></select>
+        <button id="setModelButton" type="button" class="secondary" data-i18n="actions.setModel" data-help="help.setModel">Set model</button>
+      </section>
+
+      <section id="configPanel" class="panel-section">
+        <h2 data-i18n="config.title">Configure provider</h2>
+        <form id="modelConfigForm" class="model-config-form">
+          <label>
+            <span data-i18n="config.provider">Provider</span>
+            <input id="providerIdInput" name="providerId" autocomplete="off" placeholder="openrouter" data-help="help.provider">
+          </label>
+          <label>
+            <span data-i18n="config.api">API</span>
+            <select id="apiTypeSelect" name="api" data-help="help.api">
+              <option value="openai-completions">OpenAI compatible</option>
+              <option value="openai-responses">OpenAI responses</option>
+              <option value="anthropic-messages">Anthropic messages</option>
+              <option value="google-generative-ai">Google Generative AI</option>
+            </select>
+          </label>
+          <label>
+            <span data-i18n="config.baseUrl">Base URL</span>
+            <input id="baseUrlInput" name="baseUrl" autocomplete="url" placeholder="https://api.openai.com/v1" data-help="help.baseUrl">
+          </label>
+          <label>
+            <span data-i18n="config.apiKey">API key or env ref</span>
+            <input id="apiKeyInput" name="apiKey" type="password" autocomplete="off" placeholder="$OPENAI_API_KEY" data-help="help.apiKey">
+          </label>
+          <label>
+            <span data-i18n="config.modelId">Model ID</span>
+            <input id="modelIdInput" name="modelId" autocomplete="off" placeholder="gpt-4o" data-help="help.modelId">
+          </label>
+          <label>
+            <span data-i18n="config.displayName">Display name</span>
+            <input id="modelNameInput" name="modelName" autocomplete="off" placeholder="optional" data-i18n-placeholder="placeholders.optional" data-help="help.modelName">
+          </label>
+          <div class="number-grid">
+            <label>
+              <span data-i18n="config.context">Context</span>
+              <input id="contextWindowInput" name="contextWindow" inputmode="numeric" placeholder="128000" data-help="help.contextWindow">
+            </label>
+            <label>
+              <span data-i18n="config.maxTokens">Max tokens</span>
+              <input id="maxTokensInput" name="maxTokens" inputmode="numeric" placeholder="16384" data-help="help.maxTokens">
+            </label>
+          </div>
+          <label class="checkbox-row">
+            <input id="reasoningInput" name="reasoning" type="checkbox" data-help="help.reasoning">
+            <span data-i18n="config.reasoning">Reasoning model</span>
+          </label>
+          <label class="checkbox-row">
+            <input id="disableDeveloperRoleInput" name="disableDeveloperRole" type="checkbox" data-help="help.noDeveloperRole">
+            <span data-i18n="config.noDeveloperRole">No developer role</span>
+          </label>
+          <label class="checkbox-row">
+            <input id="disableReasoningEffortInput" name="disableReasoningEffort" type="checkbox" data-help="help.noReasoningEffort">
+            <span data-i18n="config.noReasoningEffort">No reasoning effort</span>
+          </label>
+          <div class="form-actions">
+            <button id="saveModelConfigButton" type="submit" class="secondary" data-i18n="actions.saveProvider" data-help="help.saveProvider">Save provider</button>
+            <button id="deleteProviderButton" type="button" class="secondary danger-outline" data-i18n="actions.deleteProvider" data-help="help.deleteProvider">Delete provider</button>
+          </div>
+          <p id="modelConfigStatus" class="form-status"></p>
+        </form>
+      </section>
+
+      <section id="activityPanel" class="panel-section">
+        <h2 data-i18n="tabs.activity">Activity</h2>
+        <div id="activityList" class="activity-list"></div>
+      </section>
+    </aside>
+
+    <section class="chat-panel">
+      <div id="messages" class="messages"></div>
+      <form id="composer" class="composer">
+        <select id="sendMode" aria-label="Send mode" data-help="help.sendMode">
+          <option value="prompt" data-i18n="sendMode.prompt">Prompt</option>
+          <option value="steer" data-i18n="sendMode.steer">Steer</option>
+          <option value="follow-up" data-i18n="sendMode.followUp">Follow-up</option>
+        </select>
+        <textarea id="messageInput" placeholder="Send a task to the shared Pi agent" data-i18n-placeholder="composer.placeholder" data-help="help.messageInput"></textarea>
+        <button id="sendButton" type="submit" data-i18n="actions.send" data-help="help.sendButton">Send</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

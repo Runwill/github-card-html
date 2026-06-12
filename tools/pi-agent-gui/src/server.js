@@ -1,0 +1,439 @@
+const fs = require('fs/promises');
+const http = require('http');
+const path = require('path');
+const { checkCommand } = require('./commandCheck');
+const { PiRpcClient } = require('./piRpcClient');
+
+const MAX_BODY_BYTES = 256 * 1024;
+const rootDir = path.resolve(__dirname, '..');
+const mediaDir = path.join(rootDir, 'media');
+const defaultTarget = path.resolve(rootDir, '..', '..');
+const host = process.env.PI_AGENT_GUI_HOST || '127.0.0.1';
+const port = Number(process.env.PI_AGENT_GUI_PORT || 3002);
+const targetProject = path.resolve(process.env.PI_AGENT_GUI_TARGET || defaultTarget);
+const piCommand = process.env.PI_AGENT_GUI_PI_COMMAND || 'pi';
+const approve = process.env.PI_AGENT_GUI_APPROVE === '1';
+const tools = process.env.PI_AGENT_GUI_TOOLS || '';
+const configDir = path.resolve(process.env.PI_CODING_AGENT_DIR || path.join(process.env.USERPROFILE || process.env.HOME || '', '.pi', 'agent'));
+const modelsConfigPath = path.join(configDir, 'models.json');
+
+const clients = new Set();
+let pi = null;
+const recentEvents = [];
+
+const server = http.createServer((request, response) => {
+  route(request, response).catch((error) => {
+    sendJson(response, 500, { error: error.message || String(error) });
+  });
+});
+
+server.listen(port, host, () => {
+  console.log(`Pi Agent GUI listening at http://${host}:${port}/`);
+  console.log(`Target project: ${targetProject}`);
+});
+
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+
+async function route(request, response) {
+  const requestUrl = new URL(request.url || '/', `http://${host}:${port}`);
+
+  if (request.method === 'GET' && requestUrl.pathname === '/') {
+    await sendStatic(response, 'index.html', 'text/html; charset=utf-8');
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/app.js') {
+    await sendStatic(response, 'app.js', 'text/javascript; charset=utf-8');
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/style.css') {
+    await sendStatic(response, 'style.css', 'text/css; charset=utf-8');
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/events') {
+    openEventStream(response);
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/runtime') {
+    sendJson(response, 200, getRuntime());
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/runtime/start') {
+    await startRuntime();
+    sendJson(response, 202, getRuntime());
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/runtime/stop') {
+    if (pi) {
+      pi.stop();
+    }
+    sendJson(response, 202, getRuntime());
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/state') {
+    const result = await requireRuntime().request({ type: 'get_state' });
+    sendJson(response, 200, result.data || {});
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/messages') {
+    const result = await requireRuntime().request({ type: 'get_messages' });
+    sendJson(response, 200, result.data || { messages: [] });
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/models') {
+    const result = await requireRuntime().request({ type: 'get_available_models' });
+    sendJson(response, 200, result.data || { models: [] });
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/model-config') {
+    sendJson(response, 200, sanitizeModelConfig(await readModelConfig()));
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/model-config/providers') {
+    const body = await readJson(request);
+    const config = await upsertProviderConfig(body);
+    sendJson(response, 200, sanitizeModelConfig(config));
+    return;
+  }
+  if (request.method === 'DELETE' && requestUrl.pathname.startsWith('/api/model-config/providers/')) {
+    const providerId = decodeURIComponent(requestUrl.pathname.slice('/api/model-config/providers/'.length));
+    const config = await deleteProviderConfig(providerId);
+    sendJson(response, 200, sanitizeModelConfig(config));
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/model') {
+    const body = await readJson(request);
+    const provider = String(body.provider || '').trim();
+    const modelId = String(body.modelId || '').trim();
+    if (!provider || !modelId) {
+      sendJson(response, 400, { error: 'provider and modelId are required.' });
+      return;
+    }
+    const result = await requireRuntime().request({ type: 'set_model', provider, modelId });
+    sendJson(response, 200, result.data || {});
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/prompt') {
+    await handleTextCommand(request, response, 'prompt', 'message');
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/steer') {
+    await handleTextCommand(request, response, 'steer', 'message');
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/follow-up') {
+    await handleTextCommand(request, response, 'follow_up', 'message');
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/abort') {
+    const result = await requireRuntime().request({ type: 'abort' });
+    sendJson(response, 202, result);
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/sessions') {
+    const result = await requireRuntime().request({ type: 'new_session' });
+    sendJson(response, 202, result.data || {});
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/extension-ui-response') {
+    const body = await readJson(request);
+    const result = await requireRuntime().request({ type: 'extension_ui_response', ...body });
+    sendJson(response, 202, result);
+    return;
+  }
+
+  sendJson(response, 404, { error: 'Not found.' });
+}
+
+function sanitizeModelConfig(config) {
+  const providers = {};
+  for (const [providerId, provider] of Object.entries(config.providers || {})) {
+    const nextProvider = { ...provider };
+    if (typeof nextProvider.apiKey === 'string' && !nextProvider.apiKey.startsWith('$')) {
+      nextProvider.apiKey = '';
+      nextProvider.hasLiteralApiKey = true;
+    }
+    providers[providerId] = nextProvider;
+  }
+  return { path: config.path, providers };
+}
+
+async function startRuntime() {
+  if (pi && pi.isRunning) {
+    return;
+  }
+  const hasPi = await checkCommand(piCommand);
+  if (!hasPi) {
+    throw new Error('Pi command was not found in PATH. Install it with: npm install -g --ignore-scripts @earendil-works/pi-coding-agent');
+  }
+  pi = new PiRpcClient({
+    command: piCommand,
+    cwd: targetProject,
+    name: path.basename(targetProject) || 'pi-agent-gui',
+    approve,
+    tools
+  });
+  pi.on('rpc-event', (event) => broadcast('pi:event', event));
+  pi.on('status', (status) => broadcast('runtime:status', status));
+  pi.on('error-event', (event) => broadcast('runtime:error', event));
+  pi.start();
+  try {
+    await waitForRuntimeReady(pi);
+  } catch (error) {
+    pi.stop();
+    throw error;
+  }
+}
+
+async function waitForRuntimeReady(client) {
+  const startedAt = Date.now();
+  let lastError = null;
+  while (Date.now() - startedAt < 8000) {
+    if (!client.isRunning) {
+      throw new Error(lastError ? lastError.message : 'Pi runtime exited before RPC became ready.');
+    }
+    try {
+      await client.request({ type: 'get_state' }, 2000);
+      return;
+    } catch (error) {
+      lastError = error;
+      await delay(250);
+    }
+  }
+  throw new Error(lastError ? lastError.message : 'Timed out while waiting for Pi RPC to become ready.');
+}
+
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function requireRuntime() {
+  if (!pi || !pi.isRunning) {
+    throw new Error('Pi runtime is not running. Press Start runtime first.');
+  }
+  return pi;
+}
+
+async function handleTextCommand(request, response, type, field) {
+  const body = await readJson(request);
+  const message = String(body[field] || '').trim();
+  if (!message) {
+    sendJson(response, 400, { error: 'Message is required.' });
+    return;
+  }
+  const command = { type, [field]: message };
+  if (body.streamingBehavior) {
+    command.streamingBehavior = body.streamingBehavior;
+  }
+  const result = await requireRuntime().request(command);
+  sendJson(response, 202, result);
+}
+
+function getRuntime() {
+  return {
+    version: require('../package.json').version,
+    host,
+    port,
+    targetProject,
+    modelsConfigPath,
+    piCommand,
+    approve,
+    tools: tools || null,
+    pi: pi ? pi.status() : { running: false, command: piCommand, cwd: targetProject }
+  };
+}
+
+async function readModelConfig() {
+  try {
+    const text = await fs.readFile(modelsConfigPath, 'utf8');
+    const parsed = text.trim() ? JSON.parse(text) : {};
+    const providers = parsed.providers && typeof parsed.providers === 'object' ? parsed.providers : {};
+    return { path: modelsConfigPath, providers };
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return { path: modelsConfigPath, providers: {} };
+    }
+    throw error;
+  }
+}
+
+async function upsertProviderConfig(body) {
+  const providerId = normalizeId(body.providerId, 'providerId');
+  const api = normalizeApi(body.api);
+  const baseUrl = String(body.baseUrl || '').trim();
+  const apiKey = String(body.apiKey || '').trim();
+  const modelId = normalizeId(body.modelId, 'modelId');
+  const modelName = String(body.modelName || '').trim();
+  const contextWindow = normalizePositiveNumber(body.contextWindow);
+  const maxTokens = normalizePositiveNumber(body.maxTokens);
+  const reasoning = Boolean(body.reasoning);
+  const disableDeveloperRole = Boolean(body.disableDeveloperRole);
+  const disableReasoningEffort = Boolean(body.disableReasoningEffort);
+
+  if (!baseUrl && api !== 'anthropic-messages') {
+    throw new Error('baseUrl is required for this provider type.');
+  }
+  if (!apiKey) {
+    throw new Error('apiKey is required. Use an environment reference like $OPENAI_API_KEY if you do not want to store the literal key.');
+  }
+
+  const config = await readModelConfig();
+  const providers = { ...config.providers };
+  const previousProvider = providers[providerId] && typeof providers[providerId] === 'object' ? providers[providerId] : {};
+  const models = Array.isArray(previousProvider.models) ? previousProvider.models.slice() : [];
+  const model = {
+    id: modelId,
+    ...(modelName ? { name: modelName } : {}),
+    ...(reasoning ? { reasoning: true } : {}),
+    ...(contextWindow ? { contextWindow } : {}),
+    ...(maxTokens ? { maxTokens } : {})
+  };
+  const modelIndex = models.findIndex((item) => item && item.id === modelId);
+  if (modelIndex >= 0) {
+    models[modelIndex] = { ...models[modelIndex], ...model };
+  } else {
+    models.push(model);
+  }
+
+  const provider = {
+    ...previousProvider,
+    ...(baseUrl ? { baseUrl } : {}),
+    api,
+    apiKey,
+    models
+  };
+  const compat = buildCompat(disableDeveloperRole, disableReasoningEffort);
+  if (compat) {
+    provider.compat = { ...(previousProvider.compat || {}), ...compat };
+  }
+  providers[providerId] = provider;
+  const nextConfig = { providers };
+  await fs.mkdir(configDir, { recursive: true });
+  await fs.writeFile(modelsConfigPath, `${JSON.stringify(nextConfig, null, 2)}\n`, 'utf8');
+  return { path: modelsConfigPath, providers };
+}
+
+async function deleteProviderConfig(providerId) {
+  const id = normalizeId(providerId, 'providerId');
+  const config = await readModelConfig();
+  const providers = { ...config.providers };
+  delete providers[id];
+  await fs.mkdir(configDir, { recursive: true });
+  await fs.writeFile(modelsConfigPath, `${JSON.stringify({ providers }, null, 2)}\n`, 'utf8');
+  return { path: modelsConfigPath, providers };
+}
+
+function normalizeId(value, field) {
+  const text = String(value || '').trim();
+  if (!text) {
+    throw new Error(`${field} is required.`);
+  }
+  return text;
+}
+
+function normalizeApi(value) {
+  const api = String(value || '').trim();
+  const allowed = new Set(['openai-completions', 'openai-responses', 'anthropic-messages', 'google-generative-ai']);
+  if (!allowed.has(api)) {
+    throw new Error('Unsupported provider API.');
+  }
+  return api;
+}
+
+function normalizePositiveNumber(value) {
+  if (value === undefined || value === null || value === '') {
+    return null;
+  }
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) {
+    throw new Error('Token limits must be positive numbers.');
+  }
+  return Math.round(number);
+}
+
+function buildCompat(disableDeveloperRole, disableReasoningEffort) {
+  const compat = {};
+  if (disableDeveloperRole) {
+    compat.supportsDeveloperRole = false;
+  }
+  if (disableReasoningEffort) {
+    compat.supportsReasoningEffort = false;
+  }
+  return Object.keys(compat).length ? compat : null;
+}
+
+async function sendStatic(response, fileName, contentType) {
+  const filePath = path.join(mediaDir, fileName);
+  try {
+    const content = await fs.readFile(filePath);
+    response.writeHead(200, {
+      'Content-Type': contentType,
+      'Cache-Control': 'no-store'
+    });
+    response.end(content);
+  } catch (error) {
+    sendJson(response, 404, { error: 'Static file not found.' });
+  }
+}
+
+function openEventStream(response) {
+  response.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive'
+  });
+  response.write('\n');
+  clients.add(response);
+  for (const event of recentEvents.slice(-20)) {
+    writeEvent(response, event.type, event.payload);
+  }
+  requestClose(response, () => clients.delete(response));
+}
+
+function requestClose(response, callback) {
+  response.on('close', callback);
+}
+
+function broadcast(type, payload) {
+  recentEvents.push({ type, payload });
+  if (recentEvents.length > 100) {
+    recentEvents.shift();
+  }
+  for (const client of clients) {
+    writeEvent(client, type, payload);
+  }
+}
+
+function writeEvent(response, type, payload) {
+  response.write(`event: ${type}\n`);
+  response.write(`data: ${JSON.stringify(payload)}\n\n`);
+}
+
+async function readJson(request) {
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of request) {
+    size += chunk.length;
+    if (size > MAX_BODY_BYTES) {
+      throw new Error('Request body is too large.');
+    }
+    chunks.push(chunk);
+  }
+  const text = Buffer.concat(chunks).toString('utf8');
+  return text ? JSON.parse(text) : {};
+}
+
+function sendJson(response, status, data) {
+  response.writeHead(status, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Cache-Control': 'no-store'
+  });
+  response.end(JSON.stringify(data));
+}
+
+function shutdown() {
+  if (pi) {
+    pi.stop();
+  }
+  server.close(() => process.exit(0));
+}
