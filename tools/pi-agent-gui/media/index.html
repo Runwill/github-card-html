@@ -45,46 +45,75 @@
       </nav>
 
       <section id="runtimePanel" class="panel-section active">
-        <h2 data-i18n="tabs.runtime">Runtime</h2>
-        <dl class="status-list">
-          <div><dt data-i18n="runtime.status">Status</dt><dd id="runtimeStatus">Unknown</dd></div>
-          <div><dt data-i18n="runtime.project">Project</dt><dd id="targetProject">-</dd></div>
-          <div><dt data-i18n="runtime.model">Model</dt><dd id="currentModel">-</dd></div>
-        </dl>
+        <div class="panel-section-header">
+          <h2 data-i18n="tabs.runtime">Runtime</h2>
+        </div>
+        <div class="panel-section-body">
+          <dl class="status-list panel-group">
+            <div><dt data-i18n="runtime.status">Status</dt><dd id="runtimeStatus">Unknown</dd></div>
+            <div><dt data-i18n="runtime.project">Project</dt><dd id="targetProject">-</dd></div>
+            <div><dt data-i18n="runtime.model">Model</dt><dd id="currentModel">-</dd></div>
+          </dl>
+        </div>
       </section>
 
       <section id="projectPanel" class="panel-section">
-        <h2 data-i18n="tabs.project">Project</h2>
-        <form id="projectSearchForm" class="project-search-form">
-          <select id="projectSearchScope" data-help="help.projectSearchScope">
-            <option value="current" data-i18n="project.searchCurrent">Current</option>
-            <option value="name" data-i18n="project.searchName">Names</option>
-            <option value="content" data-i18n="project.searchContent">Content</option>
-          </select>
-          <input id="projectSearchInput" autocomplete="off" placeholder="Search project" data-i18n-placeholder="project.searchPlaceholder" data-help="help.projectSearch">
-          <button id="projectSearchButton" type="submit" class="secondary" data-i18n="actions.search" data-help="help.projectSearchButton">Search</button>
-        </form>
-        <button id="revealCurrentFileButton" type="button" class="secondary reveal-current-file" data-i18n="actions.revealCurrentFile" data-help="help.revealCurrentFile">Reveal current file</button>
-        <div id="projectSearchResults" class="search-results"></div>
-        <div id="projectTree" class="tree-list"></div>
-        <p id="projectStatus" class="form-status"></p>
+        <div class="panel-section-header">
+          <h2 data-i18n="tabs.project">Project</h2>
+        </div>
+        <div class="panel-section-body panel-section-body-stacked">
+          <div class="panel-group project-tools-group">
+            <form id="projectSearchForm" class="project-search-form">
+              <select id="projectSearchScope" data-help="help.projectSearchScope">
+                <option value="current" data-i18n="project.searchCurrent">Current</option>
+                <option value="name" data-i18n="project.searchName">Names</option>
+                <option value="content" data-i18n="project.searchContent">Content</option>
+              </select>
+              <input id="projectSearchInput" autocomplete="off" placeholder="Search project" data-i18n-placeholder="project.searchPlaceholder" data-help="help.projectSearch">
+              <button id="projectSearchButton" type="submit" class="secondary" data-i18n="actions.search" data-help="help.projectSearchButton">Search</button>
+            </form>
+            <button id="revealCurrentFileButton" type="button" class="secondary reveal-current-file" data-i18n="actions.revealCurrentFile" data-help="help.revealCurrentFile">Reveal current file</button>
+          </div>
+          <div class="panel-group project-results-group">
+            <div id="projectSearchResults" class="search-results"></div>
+          </div>
+          <div class="panel-group project-tree-group">
+            <div id="projectTree" class="tree-list"></div>
+          </div>
+          <p id="projectStatus" class="form-status"></p>
+        </div>
       </section>
 
       <section id="changesPanel" class="panel-section">
-        <h2 data-i18n="tabs.changes">Changes</h2>
-        <div id="changesList" class="changes-list"></div>
-        <p id="changesStatus" class="form-status"></p>
+        <div class="panel-section-header">
+          <h2 data-i18n="tabs.changes">Changes</h2>
+        </div>
+        <div class="panel-section-body panel-section-body-stacked">
+          <div class="panel-group changes-group">
+            <div id="changesList" class="changes-list"></div>
+          </div>
+          <p id="changesStatus" class="form-status"></p>
+        </div>
       </section>
 
       <section id="modelPanel" class="panel-section">
-        <h2 data-i18n="tabs.model">Model</h2>
-        <select id="modelSelect" data-help="help.modelSelect"></select>
-        <button id="setModelButton" type="button" class="secondary" data-i18n="actions.setModel" data-help="help.setModel">Set model</button>
+        <div class="panel-section-header">
+          <h2 data-i18n="tabs.model">Model</h2>
+        </div>
+        <div class="panel-section-body panel-section-body-stacked">
+          <div class="panel-group model-picker-group">
+            <select id="modelSelect" data-help="help.modelSelect"></select>
+            <button id="setModelButton" type="button" class="secondary" data-i18n="actions.setModel" data-help="help.setModel">Set model</button>
+          </div>
+        </div>
       </section>
 
       <section id="configPanel" class="panel-section">
-        <h2 data-i18n="config.title">Configure provider</h2>
-        <form id="modelConfigForm" class="model-config-form">
+        <div class="panel-section-header">
+          <h2 data-i18n="config.title">Configure provider</h2>
+        </div>
+        <div class="panel-section-body">
+        <form id="modelConfigForm" class="model-config-form panel-group">
           <label>
             <span data-i18n="config.provider">Provider</span>
             <input id="providerIdInput" name="providerId" autocomplete="off" placeholder="openrouter" data-help="help.provider">
@@ -142,11 +171,16 @@
           </div>
           <p id="modelConfigStatus" class="form-status"></p>
         </form>
+        </div>
       </section>
 
       <section id="activityPanel" class="panel-section">
-        <h2 data-i18n="tabs.activity">Activity</h2>
-        <div id="activityList" class="activity-list"></div>
+        <div class="panel-section-header">
+          <h2 data-i18n="tabs.activity">Activity</h2>
+        </div>
+        <div class="panel-section-body">
+          <div id="activityList" class="activity-list"></div>
+        </div>
       </section>
     </aside>
     <div id="sidebarResizeHandle" class="resize-handle resize-handle-vertical" role="separator" aria-orientation="vertical" aria-label="Resize sidebar" data-help="help.resizeSidebar"></div>
@@ -164,14 +198,18 @@
             <button id="saveFileButton" type="button" class="secondary" data-i18n="actions.saveFile" data-help="help.saveFile">Save</button>
           </div>
         </div>
+        <div class="preview-workspace">
         <div class="preview-viewport">
           <pre id="previewCode" class="preview-code" tabindex="0" data-help="help.previewEditor"></pre>
           <textarea id="previewEditor" spellcheck="false" data-i18n-placeholder="preview.empty" data-help="help.previewEditor"></textarea>
           <div id="previewMinimap" class="preview-minimap" aria-hidden="true"></div>
         </div>
+        </div>
       </section>
       <div id="previewResizeHandle" class="resize-handle resize-handle-horizontal" role="separator" aria-orientation="horizontal" aria-label="Resize preview" data-help="help.resizePreview"></div>
-      <div id="messages" class="messages"></div>
+      <div class="conversation-stack">
+        <div id="messages" class="messages"></div>
+      </div>
       <form id="composer" class="composer">
         <div class="composer-controls">
           <select id="sendMode" aria-label="Send mode" data-help="help.sendMode">

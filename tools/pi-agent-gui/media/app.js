@@ -1296,11 +1296,12 @@ function highlightCode(content, language, searchHit = null) {
   const nodes = [];
   const marks = [];
   let index = 0;
+  let htmlTagOpen = false;
   for (const match of content.matchAll(pattern)) {
     if (match.index > index) {
       appendSearchAwareText(nodes, content.slice(index, match.index), searchHit, index);
     }
-    const tokenClass = getTokenClass(match[0], content.slice(match.index + match[0].length), language);
+    const tokenClass = getTokenClass(match[0], content.slice(match.index + match[0].length), language, htmlTagOpen);
     if (isQuotedString(match[0])) {
       nodes.push(...createHighlightedStringTokens(match[0], tokenClass, searchHit, match.index));
     } else {
@@ -1309,6 +1310,7 @@ function highlightCode(content, language, searchHit = null) {
     if (tokenClass !== 'syntax-punctuation') {
       marks.push({ line: countLinesBefore(content, match.index), type: tokenClass.replace('syntax-', '') });
     }
+    htmlTagOpen = getNextHtmlTagState(htmlTagOpen, match[0], tokenClass);
     index = match.index + match[0].length;
   }
   if (index < content.length) {
@@ -1322,7 +1324,7 @@ function highlightCode(content, language, searchHit = null) {
   return { nodes, marks: normalizePreviewMarks(marks, content.split('\n').length) };
 }
 
-function getTokenClass(value, following = '', language = '') {
+function getTokenClass(value, following = '', language = '', htmlTagOpen = false) {
   if (value.startsWith('//') || value.startsWith('#') || value.startsWith('/*') || value.startsWith('<!--')) {
     return 'syntax-comment';
   }
@@ -1332,7 +1334,10 @@ function getTokenClass(value, following = '', language = '') {
   if (/^&[a-zA-Z0-9#]+;$/.test(value)) {
     return 'syntax-entity';
   }
-  if (value.startsWith('<')) {
+  if (/^<\/?[a-zA-Z][\w:-]*$/.test(value)) {
+    return 'syntax-tag';
+  }
+  if (htmlTagOpen && /^[\s/>]+$/.test(value) && value.includes('>')) {
     return 'syntax-tag';
   }
   if (value.startsWith('"') || value.startsWith("'") || value.startsWith('`')) {
@@ -1360,6 +1365,19 @@ function getTokenClass(value, following = '', language = '') {
     return 'syntax-identifier';
   }
   return 'syntax-keyword';
+}
+
+function getNextHtmlTagState(htmlTagOpen, value, tokenClass) {
+  if (value.startsWith('<!--') || /^<!DOCTYPE/i.test(value)) {
+    return false;
+  }
+  if (tokenClass === 'syntax-tag' && value.startsWith('<')) {
+    return !value.includes('>');
+  }
+  if (htmlTagOpen && value.includes('>')) {
+    return false;
+  }
+  return htmlTagOpen;
 }
 
 function isQuotedString(value) {
