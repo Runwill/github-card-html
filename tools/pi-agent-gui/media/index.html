@@ -188,7 +188,7 @@
     <section id="chatPanel" class="chat-panel">
       <section id="previewPanel" class="preview-panel" aria-live="polite">
         <div class="preview-heading">
-          <div>
+          <div class="preview-identity">
             <span id="previewIcon" class="file-icon file-icon-text" hidden aria-hidden="true">txt</span>
             <strong id="previewTitle" data-i18n="preview.title">Preview</strong>
             <span id="previewMeta"></span>
@@ -210,6 +210,7 @@
       <div class="conversation-stack">
         <div id="messages" class="messages"></div>
       </div>
+      <div id="composerResizeHandle" class="resize-handle resize-handle-composer" role="separator" aria-orientation="horizontal" aria-label="Resize composer" data-help="help.resizeComposer"></div>
       <form id="composer" class="composer">
         <div class="composer-controls">
           <select id="sendMode" aria-label="Send mode" data-help="help.sendMode">

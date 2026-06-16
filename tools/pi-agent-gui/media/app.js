@@ -13,6 +13,7 @@ const state = {
   previewMode: 'empty',
   previewEditing: false,
   previewDirty: false,
+  previewHighlightTimer: 0,
   collapsedFolders: new Set(),
   helpKey: 'help.default',
   language: localStorage.getItem('pi-agent-gui-language') || 'zh'
@@ -56,6 +57,7 @@ const i18n = {
     'actions.search': '搜索',
     'actions.reload': '重载',
     'actions.saveFile': '保存',
+    'actions.openFile': '打开文件',
     'actions.send': '发送',
     'actions.revealCurrentFile': '定位当前文件',
     'sendMode.prompt': '任务',
@@ -106,8 +108,9 @@ const i18n = {
     'help.fileIcon': '文件类型标识：js/ts 表示脚本，css 表示样式，<> 表示 HTML，{} 表示 JSON，md 表示 Markdown，img/svg 表示图片。',
     'help.folderIcon': '文件夹标识；左侧箭头表示当前文件夹是展开还是折叠。',
     'help.changeStatus': 'Git 双列状态：左列是暂存区，右列是工作区。M 是修改，A 是新增，D 是删除，R 是重命名，?? 是未跟踪；MM 表示同一文件既有暂存修改也有未暂存修改。',
-    'help.previewMinimap': '预览概览条：彩色短线表示代码、注释、搜索命中、diff 增删或错误的大致位置，浅色框表示当前可见区域。',
+    'help.previewMinimap': '预览概览条：左侧细轨显示代码结构，右侧窄轨显示搜索、diff 增删或错误位置，浅色框表示当前可见区域。',
     'help.changesTab': '查看当前 Git 变更列表，点击文件后在右侧预览 diff。',
+    'help.openChangedFile': '打开这个变更对应的项目文件，并在项目树中定位。',
     'help.modelTab': '查看 Pi 当前可用模型，并把选中的模型设为本次 agent 会话使用的模型。',
     'help.configTab': '在浏览器中维护 Pi 的模型 Provider 配置，保存后 Pi 重新加载即可使用。',
     'help.activityTab': '查看 agent 启动、结束和工具调用等运行活动。',
@@ -128,9 +131,10 @@ const i18n = {
     'help.deleteProvider': '删除当前 Provider 配置；删除前请确认 Provider 名称正确。',
     'help.reloadFile': '重新从磁盘读取当前文件，会丢弃右侧编辑区尚未保存的修改。',
     'help.saveFile': '把右侧编辑区内容保存回当前项目文件。只会写入当前项目目录内的已存在文件。',
-    'help.previewEditor': '显示带高亮的文件、diff 或错误内容。普通文件点击预览区后可进入编辑并保存。',
+    'help.previewEditor': '显示带高亮的文件、diff 或错误内容。普通文件点击预览区后会在同一高亮层进入编辑并保存。',
     'help.resizeSidebar': '拖动这里调整侧边栏宽度，方便在文件树和编辑区之间分配空间。',
     'help.resizePreview': '桌面端拖动这里调整预览编辑区和 agent 对话区宽度；手机端调整预览高度。',
+    'help.resizeComposer': '拖动这里调整对话区和输入区的高度，适合在长提示词和阅读回复之间分配空间。',
     'help.sendMode': '任务会开启新的 agent 目标；插话用于中途补充指令；后续用于继续上一轮。',
     'help.messageInput': '输入要交给共享 Pi agent 的任务、补充说明或后续要求。',
     'help.sendButton': '把当前输入按所选发送模式提交给共享 Pi agent。'
@@ -172,6 +176,7 @@ const i18n = {
     'actions.search': 'Search',
     'actions.reload': 'Reload',
     'actions.saveFile': 'Save',
+    'actions.openFile': 'Open file',
     'actions.send': 'Send',
     'actions.revealCurrentFile': 'Reveal current file',
     'sendMode.prompt': 'Prompt',
@@ -222,8 +227,9 @@ const i18n = {
     'help.fileIcon': 'File type marker: js/ts are scripts, css is style, <> is HTML, {} is JSON, md is Markdown, and img/svg are images.',
     'help.folderIcon': 'Folder marker. The arrow shows whether the folder is expanded or collapsed.',
     'help.changeStatus': 'Git two-column status: left is staged, right is working tree. M means modified, A added, D deleted, R renamed, ?? untracked; MM means both staged and unstaged edits exist.',
-    'help.previewMinimap': 'Preview overview bar: colored marks show approximate positions of code, comments, search hits, diff changes, or errors; the pale frame is the visible viewport.',
+    'help.previewMinimap': 'Preview overview bar: the left track shows code structure, the right track shows search, diff, or error positions, and the pale frame is the visible viewport.',
     'help.changesTab': 'Review current Git changes and preview file diffs on the right.',
+    'help.openChangedFile': 'Open this changed project file and reveal it in the project tree.',
     'help.modelTab': 'View available Pi models and set the selected model for this agent session.',
     'help.configTab': 'Maintain Pi model provider settings in the browser, then reload Pi to use them.',
     'help.activityTab': 'Watch agent starts, finishes, and tool activity from the shared runtime.',
@@ -244,9 +250,10 @@ const i18n = {
     'help.deleteProvider': 'Delete the current provider configuration. Check the provider name first.',
     'help.reloadFile': 'Reload the current file from disk. This discards unsaved editor changes.',
     'help.saveFile': 'Save the editor content back to the current project file. It only writes existing files inside the project.',
-    'help.previewEditor': 'Shows highlighted files, diffs, or errors. Click a regular file preview to edit and save it.',
+    'help.previewEditor': 'Shows highlighted files, diffs, or errors. Click a regular file preview to edit in the same highlighted layer and save it.',
     'help.resizeSidebar': 'Drag this divider to resize the sidebar and give the file tree or editor more room.',
     'help.resizePreview': 'On desktop, drag this divider to resize the preview editor and agent conversation columns. On mobile, it resizes preview height.',
+    'help.resizeComposer': 'Drag this divider to resize the conversation and composer areas when writing longer prompts or reading replies.',
     'help.sendMode': 'Prompt starts a new goal; Steer adds mid-run guidance; Follow-up continues the previous turn.',
     'help.messageInput': 'Type the task, steering note, or follow-up you want to send to the shared Pi agent.',
     'help.sendButton': 'Submit the current input to the shared Pi agent using the selected send mode.'
@@ -276,6 +283,7 @@ const elements = {
   previewTitle: document.getElementById('previewTitle'),
   previewIcon: document.getElementById('previewIcon'),
   previewMeta: document.getElementById('previewMeta'),
+  previewPanel: document.getElementById('previewPanel'),
   previewCode: document.getElementById('previewCode'),
   previewEditor: document.getElementById('previewEditor'),
   previewMinimap: document.getElementById('previewMinimap'),
@@ -302,8 +310,10 @@ const elements = {
   activityList: document.getElementById('activityList'),
   messages: document.getElementById('messages'),
   composer: document.getElementById('composer'),
+  chatPanel: document.getElementById('chatPanel'),
   sidebarResizeHandle: document.getElementById('sidebarResizeHandle'),
   previewResizeHandle: document.getElementById('previewResizeHandle'),
+  composerResizeHandle: document.getElementById('composerResizeHandle'),
   sendMode: document.getElementById('sendMode'),
   messageInput: document.getElementById('messageInput'),
   sendButton: document.getElementById('sendButton')
@@ -312,6 +322,7 @@ const elements = {
 init().catch((error) => addSystemMessage(error.message || String(error), true));
 
 async function init() {
+  updateAppViewportHeight();
   applyLanguage();
   bindEvents();
   connectEvents();
@@ -323,7 +334,72 @@ async function init() {
   }
 }
 
+function updateAppViewportHeight() {
+  const viewportHeight = Math.min(window.visualViewport?.height || window.innerHeight, window.innerHeight);
+  if (!viewportHeight) {
+    return;
+  }
+  document.documentElement.style.setProperty('--app-height', `${Math.round(viewportHeight)}px`);
+  clampWorkbenchSizes();
+}
+
+function clampWorkbenchSizes() {
+  clampMainPanelSize();
+  clampMobilePreviewSize();
+  clampComposerSize();
+}
+
+function clampMainPanelSize() {
+  const currentBlockSize = parseFloat(elements.appShell.style.getPropertyValue('--side-panel-size'));
+  if (Number.isFinite(currentBlockSize)) {
+    const { min, max } = getMainPanelBlockBounds();
+    const nextSize = clamp(currentBlockSize, min, max);
+    if (Math.round(nextSize) !== Math.round(currentBlockSize)) {
+      elements.appShell.style.setProperty('--side-panel-size', `${Math.round(nextSize)}px`);
+    }
+  }
+
+  const currentInlineSize = parseFloat(elements.appShell.style.getPropertyValue('--sidebar-size'));
+  if (Number.isFinite(currentInlineSize)) {
+    const { min, max } = getSidebarInlineBounds();
+    const nextSize = clamp(currentInlineSize, min, max);
+    if (Math.round(nextSize) !== Math.round(currentInlineSize)) {
+      elements.appShell.style.setProperty('--sidebar-size', `${Math.round(nextSize)}px`);
+    }
+  }
+}
+
+function clampMobilePreviewSize() {
+  if (!window.matchMedia('(max-width: 760px)').matches) {
+    return;
+  }
+  const currentSize = parseFloat(elements.appShell.style.getPropertyValue('--preview-size'));
+  if (!Number.isFinite(currentSize)) {
+    return;
+  }
+  const { min, max } = getMobilePreviewBounds();
+  const nextSize = clamp(currentSize, min, max);
+  if (Math.round(nextSize) !== Math.round(currentSize)) {
+    elements.appShell.style.setProperty('--preview-size', `${Math.round(nextSize)}px`);
+  }
+}
+
+function clampComposerSize() {
+  const currentSize = parseFloat(elements.appShell.style.getPropertyValue('--composer-size'));
+  if (!Number.isFinite(currentSize)) {
+    return;
+  }
+  const { min, max } = getComposerBounds();
+  const nextSize = clamp(currentSize, min, max);
+  if (Math.round(nextSize) !== Math.round(currentSize)) {
+    elements.appShell.style.setProperty('--composer-size', `${Math.round(nextSize)}px`);
+  }
+}
+
 function bindEvents() {
+  window.addEventListener('resize', updateAppViewportHeight);
+  window.addEventListener('orientationchange', updateAppViewportHeight);
+  window.visualViewport?.addEventListener('resize', updateAppViewportHeight);
   elements.languageSelect.addEventListener('change', setLanguage);
   for (const button of elements.railButtons) {
     button.addEventListener('click', () => activatePanel(button.dataset.panelTarget));
@@ -339,6 +415,7 @@ function bindEvents() {
   elements.projectTree.addEventListener('click', handleProjectTreeClick);
   elements.changesList.addEventListener('click', handleChangesClick);
   elements.previewEditor.addEventListener('input', markPreviewDirty);
+  elements.previewCode.addEventListener('input', markPreviewDirty);
   elements.previewCode.addEventListener('click', beginPreviewEdit);
   elements.previewCode.addEventListener('keydown', handlePreviewCodeKeydown);
   elements.previewCode.addEventListener('scroll', updatePreviewMinimapViewport);
@@ -361,6 +438,7 @@ function bindEvents() {
   elements.composer.addEventListener('submit', sendMessage);
   bindResizeHandle(elements.sidebarResizeHandle, resizeSidebar);
   bindResizeHandle(elements.previewResizeHandle, resizePreview);
+  bindResizeHandle(elements.composerResizeHandle, resizeComposer);
 }
 
 function connectEvents() {
@@ -476,7 +554,7 @@ function searchCurrentFile(query) {
     return { scope: 'current', query, results: [], truncated: false, message: t('project.searchNeedFile') };
   }
   const lowerQuery = query.toLowerCase();
-  const lines = String(elements.previewEditor.value || state.currentFile.content || '').split('\n');
+  const lines = String(getPreviewText() || state.currentFile.content || '').split('\n');
   const results = [];
   for (let index = 0; index < lines.length; index += 1) {
     if (lines[index].toLowerCase().includes(lowerQuery)) {
@@ -528,7 +606,7 @@ function getSearchTargetFromElement(element) {
 function focusSearchHit(target) {
   state.activeSearchHit = target && target.query ? target : null;
   if (state.currentFile && state.previewMode === 'file') {
-    renderPreviewContent(elements.previewEditor.value || state.currentFile.content || '', state.currentFile.path, 'file');
+    renderPreviewContent(getPreviewText() || state.currentFile.content || '', state.currentFile.path, 'file');
   }
   if (target && target.line) {
     requestAnimationFrame(() => scrollPreviewToLine(target.line));
@@ -563,6 +641,12 @@ async function openProjectFile(filePath, searchTarget = null) {
 }
 
 async function handleChangesClick(event) {
+  const openButton = event.target.closest('[data-change-open-path]');
+  if (openButton) {
+    activatePanel('projectPanel');
+    await openProjectFile(openButton.dataset.changeOpenPath);
+    return;
+  }
   const button = event.target.closest('[data-change-path]');
   if (!button) {
     return;
@@ -596,14 +680,16 @@ async function saveCurrentFile() {
     return;
   }
   try {
+    const savedContent = getPreviewText();
     const result = await api(`/api/project/file?path=${encodeURIComponent(state.currentFile.path)}`, {
       method: 'PUT',
-      body: JSON.stringify({ content: elements.previewEditor.value })
+      body: JSON.stringify({ content: savedContent })
     });
-    state.currentFile = { ...state.currentFile, size: result.size, content: elements.previewEditor.value, truncated: false };
+    state.currentFile = { ...state.currentFile, size: result.size, content: savedContent, truncated: false };
     state.previewEditing = false;
     state.previewDirty = false;
     elements.previewMeta.textContent = t('preview.savedMeta', { path: result.path, size: String(result.size) });
+    renderPreviewContent(savedContent, state.currentFile.path, 'file');
     updatePreviewActions();
     await loadGitStatus().catch(() => {});
   } catch (error) {
@@ -618,6 +704,7 @@ function markPreviewDirty() {
   state.previewEditing = true;
   state.previewDirty = true;
   syncPreviewClass();
+  schedulePreviewHighlightRefresh();
   updatePreviewMeta();
   updatePreviewActions();
 }
@@ -1107,7 +1194,7 @@ function scrollTreePathIntoView(treePath, type) {
 }
 
 function scrollPreviewToLine(lineNumber) {
-  const target = state.previewEditing ? elements.previewEditor : elements.previewCode;
+  const target = state.previewMode === 'empty' ? elements.previewEditor : elements.previewCode;
   const lineHeight = parseFloat(getComputedStyle(target).lineHeight) || 18;
   target.scrollTop = Math.max(0, (lineNumber - 2) * lineHeight);
   target.focus();
@@ -1128,10 +1215,13 @@ function renderGitStatus() {
     return;
   }
   elements.changesList.replaceChildren(...files.map((file) => {
+    const row = document.createElement('div');
+    row.className = 'change-row';
+    const changePath = normalizeGitPath(file.path);
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = 'change-row';
-    button.dataset.changePath = normalizeGitPath(file.path);
+    button.className = 'change-diff-button';
+    button.dataset.changePath = changePath;
     button.setAttribute('data-help', 'help.changesTab');
     const status = document.createElement('span');
     status.className = 'change-status';
@@ -1144,7 +1234,16 @@ function renderGitStatus() {
     name.textContent = file.path;
     fileCell.append(createFileIcon(file.path), name);
     button.append(status, fileCell);
-    return button;
+    const openButton = document.createElement('button');
+    openButton.type = 'button';
+    openButton.className = 'change-open-button';
+    openButton.dataset.changeOpenPath = changePath;
+    openButton.textContent = '↗';
+    openButton.title = t('actions.openFile');
+    openButton.setAttribute('aria-label', `${t('actions.openFile')} ${changePath}`);
+    openButton.setAttribute('data-help', 'help.openChangedFile');
+    row.append(button, openButton);
+    return row;
   }));
   elements.changesStatus.textContent = '';
 }
@@ -1229,10 +1328,13 @@ function beginPreviewEdit() {
   }
   state.previewEditing = true;
   syncPreviewClass();
-  elements.previewEditor.focus();
+  elements.previewCode.focus();
 }
 
 function handlePreviewCodeKeydown(event) {
+  if (state.previewEditing) {
+    return;
+  }
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
     beginPreviewEdit();
@@ -1252,15 +1354,81 @@ function renderPreviewContent(content, filePath, mode) {
 }
 
 function syncPreviewClass() {
-  elements.previewCode.hidden = state.previewEditing || state.previewMode === 'empty';
-  elements.previewEditor.hidden = !state.previewEditing && state.previewMode !== 'empty';
+  const editable = state.previewMode === 'file' && Boolean(state.currentFile) && !state.currentFile.truncated;
+  elements.previewCode.hidden = state.previewMode === 'empty';
+  elements.previewEditor.hidden = state.previewMode !== 'empty';
+  elements.previewCode.contentEditable = editable && state.previewEditing ? 'plaintext-only' : 'false';
+  elements.previewCode.classList.toggle('is-editing', editable && state.previewEditing);
   elements.previewCode.setAttribute('aria-hidden', elements.previewCode.hidden ? 'true' : 'false');
   elements.previewEditor.setAttribute('aria-hidden', elements.previewEditor.hidden ? 'true' : 'false');
 }
 
+function getPreviewText() {
+  return state.previewMode === 'empty' ? elements.previewEditor.value : elements.previewCode.textContent;
+}
+
+function schedulePreviewHighlightRefresh() {
+  if (state.previewMode !== 'file' || !state.previewEditing) {
+    return;
+  }
+  window.clearTimeout(state.previewHighlightTimer);
+  state.previewHighlightTimer = window.setTimeout(refreshEditablePreviewHighlight, 120);
+}
+
+function refreshEditablePreviewHighlight() {
+  if (state.previewMode !== 'file' || !state.previewEditing || !state.currentFile) {
+    return;
+  }
+  const caretOffset = getEditableCaretOffset(elements.previewCode);
+  const scrollTop = elements.previewCode.scrollTop;
+  const content = getPreviewText();
+  const highlighted = highlightContent(content, state.currentFile.path, 'file');
+  elements.previewCode.replaceChildren(...highlighted.nodes);
+  elements.previewEditor.value = content;
+  renderPreviewMinimap(highlighted.marks);
+  restoreEditableCaretOffset(elements.previewCode, caretOffset);
+  elements.previewCode.scrollTop = scrollTop;
+  requestAnimationFrame(updatePreviewMinimapViewport);
+}
+
+function getEditableCaretOffset(root) {
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) {
+    return root.textContent.length;
+  }
+  const range = selection.getRangeAt(0);
+  if (!root.contains(range.endContainer)) {
+    return root.textContent.length;
+  }
+  const prefix = range.cloneRange();
+  prefix.selectNodeContents(root);
+  prefix.setEnd(range.endContainer, range.endOffset);
+  return prefix.toString().length;
+}
+
+function restoreEditableCaretOffset(root, offset) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let remaining = Math.max(0, offset);
+  let node = walker.nextNode();
+  while (node) {
+    if (remaining <= node.nodeValue.length) {
+      const range = document.createRange();
+      range.setStart(node, remaining);
+      range.collapse(true);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      return;
+    }
+    remaining -= node.nodeValue.length;
+    node = walker.nextNode();
+  }
+  root.focus();
+}
+
 function highlightContent(content, filePath, mode) {
   if (mode === 'diff') {
-    return highlightDiff(content);
+    return highlightDiff(content, getFileKind(filePath).language);
   }
   if (mode === 'error') {
     return { nodes: [createToken(content, 'syntax-error')], marks: [{ line: 0, type: 'error' }] };
@@ -1268,7 +1436,7 @@ function highlightContent(content, filePath, mode) {
   return highlightCode(content, getFileKind(filePath).language, state.activeSearchHit);
 }
 
-function highlightDiff(content) {
+function highlightDiff(content, language = 'text') {
   const nodes = [];
   const marks = [];
   const lines = content.split('\n');
@@ -1285,16 +1453,37 @@ function highlightDiff(content) {
     } else if (row.className.includes('diff-hunk')) {
       marks.push({ line: index, type: 'hunk' });
     }
-    row.textContent = `${line}\n`;
+    if (row.className.includes('diff-hunk')) {
+      row.textContent = `${line}\n`;
+    } else {
+      const hasDiffPrefix = /^[ +\-]/.test(line);
+      const prefix = hasDiffPrefix ? line.slice(0, 1) : '';
+      const codeText = hasDiffPrefix ? line.slice(1) : line;
+      if (prefix) {
+        row.append(createToken(prefix, 'syntax-punctuation'));
+      }
+      const highlighted = highlightCode(codeText, language);
+      row.append(...highlighted.nodes, document.createTextNode('\n'));
+      highlighted.marks.forEach((mark) => {
+        if (mark.type !== 'search') {
+          marks.push({ line: index, type: mark.type });
+        }
+      });
+    }
     nodes.push(row);
   });
   return { nodes, marks: normalizePreviewMarks(marks, lines.length) };
 }
 
 function highlightCode(content, language, searchHit = null) {
-  const pattern = /(<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|\/\/.*|#.*|<!DOCTYPE[^>]*>|&[a-zA-Z0-9#]+;|<\/?[a-zA-Z][\w:-]*|\b[a-zA-Z_$][\w$:-]*(?=\s*=)|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\b[a-zA-Z_$][\w$]*(?=\s*\()|\b(?:async|await|const|let|var|function|return|if|else|for|while|class|import|export|from|try|catch|new|throw|true|false|null|undefined|def|with|as|self|None|True|False|public|private|static|void|int|string|boolean|document|window|return|this)\b|\b\d+(?:\.\d+)?\b|\b[a-zA-Z_$][\w$]*\b|[{}()[\].,;:=+\-*\/<>!&|?]+)/g;
+  const pattern = /(<!--[\s\S]*?-->|\/\*[\s\S]*?\*\/|\/\/.*|#[0-9a-fA-F]{3,8}\b|#.*|<!DOCTYPE[^>]*>|&[a-zA-Z0-9#]+;|<\/?[a-zA-Z][\w:-]*|\b[a-zA-Z_$][\w$:-]*(?=\s*=)|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\b[a-zA-Z_$][\w$]*(?=\s*\()|\b(?:async|await|const|let|var|function|return|if|else|for|while|class|import|export|from|try|catch|new|throw|true|false|null|undefined|def|with|as|self|None|True|False|public|private|static|void|int|string|boolean|document|window|return|this)\b|\b\d+(?:\.\d+)?(?:rem|em|px|vh|vw|vmin|vmax|%|s|ms|deg|turn)?\b|\b[a-zA-Z_$][\w$]*\b|[{}()[\].,;:=+\-*\/<>!&|?]+)/g;
   const nodes = [];
   const marks = [];
+  content.split('\n').forEach((line, lineIndex) => {
+    if (line.trim()) {
+      marks.push({ line: lineIndex, type: 'line' });
+    }
+  });
   let index = 0;
   let htmlTagOpen = false;
   for (const match of content.matchAll(pattern)) {
@@ -1302,7 +1491,13 @@ function highlightCode(content, language, searchHit = null) {
       appendSearchAwareText(nodes, content.slice(index, match.index), searchHit, index);
     }
     const tokenClass = getTokenClass(match[0], content.slice(match.index + match[0].length), language, htmlTagOpen);
-    if (isQuotedString(match[0])) {
+    const cssColorMatch = language === 'css' ? match[0].match(/^(#[0-9a-fA-F]{3,8}\b)(.*)$/) : null;
+    if (cssColorMatch) {
+      nodes.push(...createSearchAwareToken(cssColorMatch[1], tokenClass, searchHit, match.index));
+      if (cssColorMatch[2]) {
+        nodes.push(...createSearchAwareToken(cssColorMatch[2], getTokenClass(cssColorMatch[2], '', language, htmlTagOpen), searchHit, match.index + cssColorMatch[1].length));
+      }
+    } else if (isQuotedString(match[0])) {
       nodes.push(...createHighlightedStringTokens(match[0], tokenClass, searchHit, match.index));
     } else {
       nodes.push(...createSearchAwareToken(match[0], tokenClass, searchHit, match.index));
@@ -1325,7 +1520,7 @@ function highlightCode(content, language, searchHit = null) {
 }
 
 function getTokenClass(value, following = '', language = '', htmlTagOpen = false) {
-  if (value.startsWith('//') || value.startsWith('#') || value.startsWith('/*') || value.startsWith('<!--')) {
+  if (value.startsWith('//') || value.startsWith('/*') || value.startsWith('<!--') || (value.startsWith('#') && language !== 'css')) {
     return 'syntax-comment';
   }
   if (/^<!DOCTYPE/i.test(value)) {
@@ -1333,6 +1528,9 @@ function getTokenClass(value, following = '', language = '', htmlTagOpen = false
   }
   if (/^&[a-zA-Z0-9#]+;$/.test(value)) {
     return 'syntax-entity';
+  }
+  if (language === 'css' && /^#[0-9a-fA-F]{3,8}\b/.test(value)) {
+    return 'syntax-number';
   }
   if (/^<\/?[a-zA-Z][\w:-]*$/.test(value)) {
     return 'syntax-tag';
@@ -1480,36 +1678,96 @@ function normalizePreviewMarks(marks, lineCount) {
     return [];
   }
   const seen = new Set();
-  const total = Math.max(1, lineCount - 1);
+  const total = Math.max(1, lineCount);
+  const lineHeight = 100 / total;
   return marks.filter((mark) => {
-    const bucket = `${mark.type}:${Math.round((mark.line / total) * 160)}`;
+    const line = Math.min(total - 1, Math.max(0, mark.line));
+    const bucket = `${mark.type}:${line}`;
     if (seen.has(bucket)) {
       return false;
     }
     seen.add(bucket);
+    mark.line = line;
     return true;
-  }).map((mark) => ({ ...mark, top: `${Math.min(99, Math.max(0, (mark.line / total) * 100))}%` }));
+  }).map((mark) => ({ ...mark, lineHeight, spanLines: 1, top: `${mark.line * lineHeight}%` }));
 }
 
 function renderPreviewMinimap(marks) {
-  const prioritizedMarks = [
-    ...marks.filter((mark) => mark.type === 'search'),
-    ...marks.filter((mark) => mark.type !== 'search')
-  ];
-  const markNodes = prioritizedMarks.slice(0, 260).map((mark) => {
-    const node = document.createElement('span');
-    node.className = `preview-minimap-mark minimap-${mark.type}`;
-    node.style.top = mark.top;
-    return node;
-  });
+  const codeTrack = document.createElement('span');
+  codeTrack.className = 'preview-minimap-track preview-minimap-code-track';
+  const overviewTrack = document.createElement('span');
+  overviewTrack.className = 'preview-minimap-track preview-minimap-overview-track';
+  const codeTypes = new Set(['line', 'keyword', 'function', 'identifier', 'tag', 'attribute', 'doctype', 'json-key', 'path', 'entity', 'string', 'number', 'comment']);
+  codeTrack.replaceChildren(...createMinimapMarkNodes(limitPreviewMarks(mergePreviewMarks(marks.filter((mark) => codeTypes.has(mark.type))), 220), 'code'));
+  overviewTrack.replaceChildren(...createMinimapMarkNodes(limitPreviewMarks(mergePreviewMarks(marks.filter((mark) => !codeTypes.has(mark.type))), 180), 'overview'));
   const viewport = document.createElement('span');
   viewport.className = 'preview-minimap-viewport';
-  elements.previewMinimap.replaceChildren(...markNodes, viewport);
+  elements.previewMinimap.replaceChildren(codeTrack, overviewTrack, viewport);
+}
+
+function createMinimapMarkNodes(marks, lane) {
+  return marks.map((mark) => {
+    const node = document.createElement('span');
+    node.className = `preview-minimap-mark preview-minimap-${lane}-mark minimap-${mark.type}`;
+    node.style.top = mark.top;
+    if (mark.spanLines) {
+      node.style.setProperty('--mark-lines', mark.spanLines);
+    }
+    if (mark.height) {
+      node.style.height = mark.height;
+    }
+    return node;
+  });
+}
+
+function mergePreviewMarks(marks) {
+  if (!marks.length) {
+    return [];
+  }
+  const priority = { search: 4, error: 4, add: 3, remove: 3, hunk: 2, comment: 2 };
+  const sorted = [...marks].sort((a, b) => {
+    const priorityDiff = (priority[b.type] || 1) - (priority[a.type] || 1);
+    return priorityDiff || a.line - b.line;
+  });
+  const merged = [];
+  sorted.forEach((mark) => {
+    const top = parseFloat(mark.top);
+    if (mark.type === 'line') {
+      merged.push({ ...mark, start: top, end: top, startLine: mark.line, endLine: mark.line });
+      return;
+    }
+    const existing = merged.find((item) => item.type === mark.type && mark.line - item.endLine <= 1);
+    if (existing) {
+      existing.endLine = Math.max(existing.endLine, mark.line);
+      existing.end = Math.max(existing.end, top);
+      existing.spanLines = existing.endLine - existing.startLine + 1;
+      return;
+    }
+    merged.push({ ...mark, start: top, end: top, startLine: mark.line, endLine: mark.line });
+  });
+  return merged.sort((a, b) => a.start - b.start).map(({ start, end, startLine, endLine, lineHeight, ...mark }) => mark);
+}
+
+function limitPreviewMarks(marks, maxMarks) {
+  if (marks.length <= maxMarks) {
+    return marks;
+  }
+  const limited = [];
+  const lastIndex = marks.length - 1;
+  const selected = new Set();
+  for (let index = 0; index < maxMarks; index += 1) {
+    const sourceIndex = Math.round((index / Math.max(1, maxMarks - 1)) * lastIndex);
+    if (!selected.has(sourceIndex)) {
+      selected.add(sourceIndex);
+      limited.push(marks[sourceIndex]);
+    }
+  }
+  return limited;
 }
 
 function updatePreviewMinimapViewport() {
   const viewport = elements.previewMinimap.querySelector('.preview-minimap-viewport');
-  const source = state.previewEditing ? elements.previewEditor : elements.previewCode;
+  const source = state.previewMode === 'empty' ? elements.previewEditor : elements.previewCode;
   if (!viewport || !source) {
     return;
   }
@@ -1577,40 +1835,253 @@ function setPreviewActive(active) {
 function bindResizeHandle(handle, onMove) {
   handle.addEventListener('pointerdown', (event) => {
     event.preventDefault();
-    handle.setPointerCapture(event.pointerId);
+    try {
+      handle.setPointerCapture(event.pointerId);
+    } catch {
+      // Some synthetic or browser edge-case pointer events cannot be captured.
+    }
     document.body.classList.add('is-resizing');
     const move = (moveEvent) => onMove(moveEvent);
     const stop = () => {
       document.body.classList.remove('is-resizing');
-      handle.removeEventListener('pointermove', move);
-      handle.removeEventListener('pointerup', stop);
-      handle.removeEventListener('pointercancel', stop);
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', stop);
+      document.removeEventListener('pointercancel', stop);
     };
-    handle.addEventListener('pointermove', move);
-    handle.addEventListener('pointerup', stop);
-    handle.addEventListener('pointercancel', stop);
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', stop);
+    document.addEventListener('pointercancel', stop);
   });
 }
 
 function resizeSidebar(event) {
+  if (window.matchMedia('(max-width: 760px) and (min-height: 431px)').matches) {
+    const shellRect = elements.appShell.getBoundingClientRect();
+    const { min, max } = getMainPanelBlockBounds();
+    const sidePanelHeight = clamp(event.clientY - shellRect.top - getTopbarSize(), min, max);
+    elements.appShell.style.setProperty('--side-panel-size', `${Math.round(sidePanelHeight)}px`);
+    clampWorkbenchSizes();
+    return;
+  }
   const shellRect = elements.appShell.getBoundingClientRect();
-  const railWidth = getComputedStyle(elements.appShell).getPropertyValue('--rail-size').trim() || '2.6rem';
-  const railPixels = railWidth.endsWith('rem') ? parseFloat(railWidth) * parseFloat(getComputedStyle(document.documentElement).fontSize) : parseFloat(railWidth);
-  const sidebarWidth = Math.min(Math.max(event.clientX - shellRect.left - railPixels, 220), Math.min(520, shellRect.width * 0.55));
+  const railPixels = getRailSize();
+  const { min, max } = getSidebarInlineBounds();
+  const sidebarWidth = clamp(event.clientX - shellRect.left - railPixels, min, max);
   elements.appShell.style.setProperty('--sidebar-size', `${Math.round(sidebarWidth)}px`);
+  clampWorkbenchSizes();
 }
 
 function resizePreview(event) {
-  const chatRect = document.getElementById('chatPanel').getBoundingClientRect();
+  const chatRect = elements.chatPanel.getBoundingClientRect();
   if (window.matchMedia('(max-width: 760px)').matches) {
-    const composerRect = elements.composer.getBoundingClientRect();
-    const available = chatRect.height - composerRect.height;
-    const previewHeight = Math.min(Math.max(event.clientY - chatRect.top, 120), Math.max(160, available - 90));
+    const { min, max } = getMobilePreviewBounds();
+    const previewHeight = clamp(event.clientY - chatRect.top, min, max);
     elements.appShell.style.setProperty('--preview-size', `${Math.round(previewHeight)}px`);
     return;
   }
-  const conversationWidth = Math.min(Math.max(chatRect.right - event.clientX, 280), Math.min(560, chatRect.width * 0.55));
+  const { min, max } = getConversationInlineBounds();
+  const conversationWidth = clamp(chatRect.right - event.clientX, min, max);
   elements.appShell.style.setProperty('--conversation-size', `${Math.round(conversationWidth)}px`);
+}
+
+function resizeComposer(event) {
+  const chatRect = elements.chatPanel.getBoundingClientRect();
+  const { min, max } = getComposerBounds();
+  const composerHeight = clamp(chatRect.bottom - event.clientY, min, max);
+  elements.appShell.style.setProperty('--composer-size', `${Math.round(composerHeight)}px`);
+  clampMobilePreviewSize();
+}
+
+function getMobilePreviewBounds() {
+  const chatRect = elements.chatPanel.getBoundingClientRect();
+  const composerRect = elements.composer.getBoundingClientRect();
+  const handleSize = getResizeTrackSize();
+  const composerHandleSize = getComposerResizeTrackSize();
+  const available = chatRect.height - composerRect.height - handleSize;
+  const min = getPreviewMinimumBlockSize();
+  const minConversation = getConversationMinimumBlockSize();
+  const max = Math.max(min, available - minConversation - composerHandleSize);
+  return { min, max };
+}
+
+function getComposerBounds() {
+  const chatRect = elements.chatPanel.getBoundingClientRect();
+  const previewRect = elements.previewPanel.getBoundingClientRect();
+  const min = getComposerMinimumBlockSize();
+  const reserved = window.matchMedia('(max-width: 760px)').matches
+    ? previewRect.height + getResizeTrackSize() + getComposerResizeTrackSize() + getConversationMinimumBlockSize()
+    : getComposerResizeTrackSize() + getConversationMinimumBlockSize();
+  const max = Math.max(min, chatRect.height - reserved);
+  return { min, max };
+}
+
+function getMainPanelBlockBounds() {
+  const shellRect = elements.appShell.getBoundingClientRect();
+  const topbarSize = getTopbarSize();
+  const helpSize = getHelpPanelSize();
+  const handleSize = getResizeTrackSize();
+  const available = shellRect.height - topbarSize - helpSize - handleSize;
+  const min = getSidePanelMinimumBlockSize();
+  const max = Math.max(min, available - getChatPanelMinimumBlockSize());
+  return { min, max };
+}
+
+function getSidebarInlineBounds() {
+  const shellRect = elements.appShell.getBoundingClientRect();
+  const handleWidth = getResizeTrackSize();
+  const available = shellRect.width - getRailSize() - handleWidth;
+  const min = getSidePanelMinimumInlineSize();
+  const max = Math.max(min, available - getChatPanelMinimumInlineSize());
+  return { min, max };
+}
+
+function getConversationInlineBounds() {
+  const chatRect = elements.chatPanel.getBoundingClientRect();
+  const handleWidth = getResizeTrackSize();
+  const min = getConversationMinimumInlineSize();
+  const max = Math.max(min, chatRect.width - handleWidth - getPreviewMinimumInlineSize());
+  return { min, max };
+}
+
+function getSidePanelMinimumBlockSize() {
+  const tabs = getBlockSize(document.querySelector('.panel-tabs'));
+  const activePanel = document.querySelector('.panel-section.active');
+  const header = getBlockSize(activePanel?.querySelector('.panel-section-header'));
+  const body = activePanel?.querySelector('.panel-section-body');
+  const bodyExtras = getBlockExtras(body);
+  const firstGroup = getBlockSize(activePanel?.querySelector('.panel-group'));
+  const status = getBlockSize(activePanel?.querySelector('.form-status'));
+  const row = getControlBlockSize(activePanel);
+  return tabs + header + bodyExtras + Math.max(firstGroup, row * 2) + status;
+}
+
+function getChatPanelMinimumBlockSize() {
+  return getPreviewMinimumBlockSize() + getResizeTrackSize() + getConversationMinimumBlockSize() + getComposerResizeTrackSize() + getComposerMinimumBlockSize();
+}
+
+function getPreviewMinimumBlockSize() {
+  return getBlockSize(document.querySelector('.preview-heading')) + getControlBlockSize(elements.previewPanel) + getBlockExtras(document.querySelector('.preview-workspace'));
+}
+
+function getConversationMinimumBlockSize() {
+  return getControlBlockSize(elements.messages);
+}
+
+function getComposerMinimumBlockSize() {
+  return getControlBlockSize(elements.messageInput) + getBlockExtras(elements.composer);
+}
+
+function getSidePanelMinimumInlineSize() {
+  const activePanel = document.querySelector('.panel-section.active');
+  const group = activePanel?.querySelector('.panel-group');
+  return getControlBlockSize(activePanel) * 4 + getInlineExtras(group) + getInlineExtras(activePanel?.querySelector('.panel-section-body'));
+}
+
+function getChatPanelMinimumInlineSize() {
+  const handleWidth = window.matchMedia('(max-width: 760px)').matches ? 0 : getInlineSize(elements.previewResizeHandle);
+  return getPreviewMinimumInlineSize() + handleWidth + getConversationMinimumInlineSize();
+}
+
+function getPreviewMinimumInlineSize() {
+  const heading = document.querySelector('.preview-heading');
+  const action = document.querySelector('.preview-actions button');
+  return getControlBlockSize(heading) + getControlBlockSize(action?.parentElement) * 2 + getInlineExtras(heading);
+}
+
+function getConversationMinimumInlineSize() {
+  const controls = document.querySelector('.composer-controls');
+  return getControlBlockSize(controls) * 3 + getControlBlockSize(elements.messageInput) + getInlineExtras(elements.composer);
+}
+
+function getTopbarSize() {
+  return getBlockSize(document.querySelector('.topbar'));
+}
+
+function getHelpPanelSize() {
+  return getBlockSize(document.querySelector('.help-panel'));
+}
+
+function getRailSize() {
+  return getInlineSize(document.querySelector('.activity-rail'));
+}
+
+function getResizeTrackSize() {
+  return toPixels(getComputedStyle(document.documentElement).getPropertyValue('--resize-track-size'));
+}
+
+function getComposerResizeTrackSize() {
+  const value = getComputedStyle(document.documentElement).getPropertyValue('--composer-resize-track-size');
+  return value.trim() ? toPixels(value) : getBlockSize(elements.composerResizeHandle);
+}
+
+function getBlockSize(element) {
+  return element ? element.getBoundingClientRect().height : 0;
+}
+
+function getInlineSize(element) {
+  return element ? element.getBoundingClientRect().width : 0;
+}
+
+function getScrollInlineSize(element) {
+  return element ? element.scrollWidth : 0;
+}
+
+function getControlBlockSize(root) {
+  const control = root?.querySelector('textarea, input, select, button, .text-button, .tree-folder-button, .message');
+  if (!control) {
+    return getControlTokenSize();
+  }
+  return control.getBoundingClientRect().height;
+}
+
+function getControlInlineSize(root) {
+  const control = root?.querySelector('textarea, input, select, button, .text-button, .tree-folder-button, .message');
+  if (control) {
+    return Math.max(getScrollInlineSize(control), getControlBlockSize(root));
+  }
+  return getControlTokenSize();
+}
+
+function getControlTokenSize() {
+  return toPixels(getComputedStyle(document.documentElement).getPropertyValue('--control-h'));
+}
+
+function getBlockExtras(element) {
+  if (!element) {
+    return 0;
+  }
+  const style = getComputedStyle(element);
+  return toPixels(style.paddingTop) + toPixels(style.paddingBottom) + toPixels(style.borderTopWidth) + toPixels(style.borderBottomWidth);
+}
+
+function getInlineExtras(element) {
+  if (!element) {
+    return 0;
+  }
+  const style = getComputedStyle(element);
+  return toPixels(style.paddingLeft) + toPixels(style.paddingRight) + toPixels(style.borderLeftWidth) + toPixels(style.borderRightWidth);
+}
+
+function toPixels(value) {
+  const number = parseFloat(value);
+  if (!Number.isFinite(number)) {
+    return 0;
+  }
+  if (String(value).trim().endsWith('px')) {
+    return number;
+  }
+  const probe = document.createElement('div');
+  probe.style.position = 'absolute';
+  probe.style.visibility = 'hidden';
+  probe.style.width = String(value).trim();
+  document.body.append(probe);
+  const pixels = probe.getBoundingClientRect().width;
+  probe.remove();
+  return pixels || number;
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), Math.max(min, max));
 }
 
 function t(key, values = {}) {
