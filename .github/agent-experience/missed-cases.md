@@ -49,6 +49,72 @@ return {
 };
 ```
 
+## 只验证默认表单和保存成功，漏测刷新后持久配置回填
+
+**自检触发信号**
+
+- 配置类 UI 同时有默认值、保存接口、脱敏字段和刷新后恢复路径。
+- 为了安全不回显 secret，但同一表单允许用户以后修改非 secret 字段。
+- 验证只覆盖了初始默认值和一次保存成功，没有覆盖刷新、重新加载、二次保存。
+
+**当时漏掉的情况**
+
+- 已验证 Provider 默认值正确、`models.json` 写入正确、API Key 不回显正确。
+- 没有在保存后刷新页面检查表单是否从持久配置 hydrate，导致页面重新回到默认状态。
+- 没有模拟“Key 留空但修改其它字段再保存”，漏掉空 Key 应保留旧 Key的编辑语义。
+
+**下次自检**
+
+1. 配置页改动必须覆盖三段链路：默认空配置、保存后磁盘状态、刷新后 UI 状态。
+2. 任何脱敏字段都要定义空输入语义：新增时是否必填，编辑已有配置时是否保留旧值。
+3. 验证时用真实页面刷新和一次二次保存请求，不只看 DOM 默认值或单次保存响应。
+
+**推荐验证片段**
+
+```js
+const initial = Object.fromEntries(['providerIdInput', 'apiKeyInput', 'modelIdInput'].map((id) => [id, document.getElementById(id)?.value]));
+await fetch('/api/model-config/providers', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ...payload, apiKey: '' }) });
+return initial;
+```
+
+## Bridge 已接入但旧 prompt fallback 仍污染消息正文
+
+**自检触发信号**
+
+- 已经把上下文能力迁移到 extension、bridge 或 custom tool，但发送消息后仍出现自动追加的文件列表、Git 变更、说明文字。
+- 页面状态、工具接口或预览面板看起来正确，用户真实发送记录却混入了旧的 prompt 包装内容。
+- UI 文案仍写着“将随消息发送”“附带引用”等旧语义，和新的工具读取架构冲突。
+
+**当时漏掉的情况**
+
+- 已实现 `get_ide_context` bridge，并验证服务端能同步 IDE 状态。
+- 没有继续拦截 `/api/prompt`、`/api/steer`、`/api/follow-up` 的真实请求体，导致 `buildOutgoingMessage()` 仍把 Git changes 拼进用户消息。
+- 只把上下文预览当成 UI 展示，没有检查同一数据是否还被旧发送路径消费。
+
+**下次自检**
+
+1. 任何“从 prompt 注入迁移到工具/bridge”的任务，都必须全局搜索旧的正文拼接函数和文案。
+2. 验证时拦截真实发送请求体，断言用户输入和发送 payload 完全一致；上下文只能通过 bridge/tool 读取。
+3. 预览面板可以展示 IDE 状态，但文案必须明确“不会拼进消息正文”。
+4. 历史消息里已有旧污染内容时，汇报要区分“旧记录仍显示”和“新发送 payload 已修复”。
+
+**推荐验证片段**
+
+```js
+const originalFetch = window.fetch;
+const captured = [];
+window.fetch = async (...args) => {
+  const [url, options] = args;
+  if (String(url).includes('/api/prompt')) {
+    captured.push(String(options.body));
+    return new Response('{"ok":true}', { status: 200 });
+  }
+  return originalFetch(...args);
+};
+document.getElementById('messageInput').value = '你好';
+document.getElementById('composer').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+```
+
 ## 经验库触发条件过窄：把规则优化当成普通措辞修改
 
 **自检触发信号**
@@ -201,6 +267,7 @@ return {
 **自检触发信号**
 
 - 固定视口、IDE 工作台、面板网格或移动端布局中，一个控件文字、说明文案、文件名、消息内容或按钮组会改变外层区域尺寸。
+- 在既有工作台 chrome 中新增状态行、上下文提示、元信息或辅助预览时，新样式看起来像独立卡片/面板，而不是继承当前区域的视觉 owner。
 - 已经修过按钮换行、输入区撑高、长路径溢出等问题，但同一页面还有说明栏、标题栏、tabs、messages、表单标签等动态内容 owner。
 - 用户指出“这和刚才的问题类似”“你没有学会前一个问题的修改逻辑”“这些只是我找的问题”。
 - 浏览器验证只断言页面无整体 overflow，没有逐个验证固定区域在短文本、长文本、双语和状态切换下高度/宽度是否稳定。
@@ -211,13 +278,15 @@ return {
 - 说明文字从一行变两行时会撑高侧栏第一行，导致整个工作台跳变；这本质上和按钮换行同属“动态内容改变布局 chrome 尺寸”。
 - messages 面板代表 agent 对话，却被放在预览下方，和 composer 语义分离；布局验证只看区域能显示，没有追问内容区域和输入区域是否属于同一 owner。
 - 一次 CSS patch 还把样式表前部规则串位，浏览器 CSSOM 只剩 1 条规则；说明静态 diff 通过后仍必须检查真实 CSSOM 和 computed style。
+- Pi GUI 输入区新增“包含上下文”时，功能验证通过但视觉 owner 没过关：状态行和预览最初带独立背景/边框，风格像额外卡片；展开态还参与 composer 布局，长上下文会撑出固定输入区。
 
 **下次自检**
 
 1. 改固定视口/IDE 工作台样式前，先列出动态内容 owner：说明栏、按钮组、tabs、标题/路径、搜索结果、文件树、messages、composer、表单标签和状态文本。
 2. 对每个固定 chrome 区域，要求内容只能在区域内自适应、截断、缩小或内部滚动，不能改变外层 grid row/column 尺寸。
 3. 对语义上成组的区域先问“是否应共享同一 owner”：agent messages 必须和 composer 同列/同区，预览编辑区才是另一侧内容区。
-4. 验证时覆盖短说明、长说明、中英文、长文件名、长消息和窄屏；断言关键区域 rect 不因文本长度变化而改变。
+4. 新增状态行、辅助预览或上下文摘要时，先复用所属区域的视觉语言；默认应是低调元信息，只有确有必要才做成卡片或面板。
+5. 验证时覆盖短说明、长说明、中英文、长文件名、长消息和窄屏；断言关键区域 rect 不因文本长度变化而改变。
 
 ## 触摸热区可拖动，但漏查相邻控件命中层级
 

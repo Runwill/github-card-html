@@ -23,6 +23,9 @@ if errorlevel 1 (
   exit /b 1
 )
 
+echo Checking for existing Pi Agent GUI server...
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Get-CimInstance Win32_Process | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -like '*pi-agent-gui*src*server.js*' } | ForEach-Object { Write-Host ('Stopping existing PID: ' + $_.ProcessId); Stop-Process -Id $_.ProcessId -Force }"
+
 set "TAILSCALE_IP="
 for /f "tokens=* delims=" %%A in ('tailscale ip -4 2^>nul') do if not defined TAILSCALE_IP set "TAILSCALE_IP=%%A"
 

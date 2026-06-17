@@ -21,7 +21,7 @@
           </select>
         </label>
         <button id="startButton" type="button" data-i18n="actions.start" data-help="help.start">Start</button>
-        <button id="abortButton" type="button" class="danger" data-i18n="actions.abort" data-help="help.abort">Abort</button>
+        <button id="abortButton" type="button" data-i18n="actions.abort" data-help="help.abort" disabled>Abort</button>
       </div>
     </header>
 
@@ -116,7 +116,7 @@
         <form id="modelConfigForm" class="model-config-form panel-group">
           <label>
             <span data-i18n="config.provider">Provider</span>
-            <input id="providerIdInput" name="providerId" autocomplete="off" placeholder="openrouter" data-help="help.provider">
+            <input id="providerIdInput" name="providerId" autocomplete="off" value="lupo-gpt-03x" placeholder="openrouter" data-help="help.provider">
           </label>
           <label>
             <span data-i18n="config.api">API</span>
@@ -129,40 +129,40 @@
           </label>
           <label>
             <span data-i18n="config.baseUrl">Base URL</span>
-            <input id="baseUrlInput" name="baseUrl" autocomplete="url" placeholder="https://api.openai.com/v1" data-help="help.baseUrl">
+            <input id="baseUrlInput" name="baseUrl" autocomplete="url" value="https://ai.lupoapi.com/v1" placeholder="https://api.openai.com/v1" data-help="help.baseUrl">
           </label>
           <label>
             <span data-i18n="config.apiKey">API key or env ref</span>
-            <input id="apiKeyInput" name="apiKey" type="password" autocomplete="off" placeholder="$OPENAI_API_KEY" data-help="help.apiKey">
+            <input id="apiKeyInput" name="apiKey" type="password" autocomplete="off" placeholder="paste key or $OPENAI_API_KEY" data-i18n-placeholder="placeholders.apiKey" data-help="help.apiKey">
           </label>
           <label>
             <span data-i18n="config.modelId">Model ID</span>
-            <input id="modelIdInput" name="modelId" autocomplete="off" placeholder="gpt-4o" data-help="help.modelId">
+            <input id="modelIdInput" name="modelId" autocomplete="off" value="gpt-5.5" placeholder="gpt-4o" data-help="help.modelId">
           </label>
           <label>
             <span data-i18n="config.displayName">Display name</span>
-            <input id="modelNameInput" name="modelName" autocomplete="off" placeholder="optional" data-i18n-placeholder="placeholders.optional" data-help="help.modelName">
+            <input id="modelNameInput" name="modelName" autocomplete="off" value="GPT-5.5" placeholder="optional" data-i18n-placeholder="placeholders.optional" data-help="help.modelName">
           </label>
           <div class="number-grid">
             <label>
               <span data-i18n="config.context">Context</span>
-              <input id="contextWindowInput" name="contextWindow" inputmode="numeric" placeholder="128000" data-help="help.contextWindow">
+              <input id="contextWindowInput" name="contextWindow" inputmode="numeric" value="128000" placeholder="128000" data-help="help.contextWindow">
             </label>
             <label>
               <span data-i18n="config.maxTokens">Max tokens</span>
-              <input id="maxTokensInput" name="maxTokens" inputmode="numeric" placeholder="16384" data-help="help.maxTokens">
+              <input id="maxTokensInput" name="maxTokens" inputmode="numeric" value="16000" placeholder="16000" data-help="help.maxTokens">
             </label>
           </div>
           <label class="checkbox-row">
-            <input id="reasoningInput" name="reasoning" type="checkbox" data-help="help.reasoning">
+            <input id="reasoningInput" name="reasoning" type="checkbox" checked data-help="help.reasoning">
             <span data-i18n="config.reasoning">Reasoning model</span>
           </label>
           <label class="checkbox-row">
-            <input id="disableDeveloperRoleInput" name="disableDeveloperRole" type="checkbox" data-help="help.noDeveloperRole">
+            <input id="disableDeveloperRoleInput" name="disableDeveloperRole" type="checkbox" checked data-help="help.noDeveloperRole">
             <span data-i18n="config.noDeveloperRole">No developer role</span>
           </label>
           <label class="checkbox-row">
-            <input id="disableReasoningEffortInput" name="disableReasoningEffort" type="checkbox" data-help="help.noReasoningEffort">
+            <input id="disableReasoningEffortInput" name="disableReasoningEffort" type="checkbox" checked data-help="help.noReasoningEffort">
             <span data-i18n="config.noReasoningEffort">No reasoning effort</span>
           </label>
           <div class="form-actions">
@@ -212,6 +212,16 @@
       </div>
       <div id="composerResizeHandle" class="resize-handle resize-handle-composer" role="separator" aria-orientation="horizontal" aria-label="Resize composer" data-help="help.resizeComposer"></div>
       <form id="composer" class="composer">
+        <details id="contextPanel" class="composer-context" data-help="help.contextPanel">
+          <summary>
+            <label class="context-toggle" data-help="help.showIdeState">
+              <input id="showIdeStateInput" type="checkbox" checked>
+              <span data-i18n="context.include">显示 IDE 状态</span>
+            </label>
+            <span id="contextSummary" class="context-summary"></span>
+          </summary>
+          <pre id="contextPreview" class="context-preview"></pre>
+        </details>
         <div class="composer-controls">
           <select id="sendMode" aria-label="Send mode" data-help="help.sendMode">
             <option value="prompt" data-i18n="sendMode.prompt">Prompt</option>

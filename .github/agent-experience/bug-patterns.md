@@ -129,6 +129,45 @@
 - 移动聊天选择自定义 `chat-completions` 模型发送一句话，确认错误说明是“未解析 VS Code input secret”，而不是上游 401。
 - 再检查 `/api/models`，确认只出现 `requiresVsCodeInputSecret` 等安全标记，不包含真实 key、占位符以外的 secret 或 Authorization 内容。
 
+## 保存成功但刷新后表单回默认，空 Key 二次保存覆盖旧凭据
+
+**现象信号**
+
+- Provider、模型或其它本地配置保存接口返回成功，磁盘配置也写入了；刷新页面后表单又回到默认值或空值。
+- 为了安全不回显明文 Key，刷新后 Key 输入框为空；用户只改其它字段再保存时，后端提示缺少 Key，或把旧 Key 覆盖成空。
+- 模型列表能从配置文件读到模型，但配置表单本身没有选中已保存 Provider。
+
+**常见误导**
+
+- 只验证保存接口和磁盘文件，忽略刷新后的 `load -> hydrate form` 路径。
+- 只验证“明文 Key 不回显”这个安全目标，漏掉“空输入应表示保留旧 Key”这个编辑语义。
+- 把默认值初始化放在页面启动早期，却没有在加载持久配置后用配置覆盖默认值。
+
+**根因模式**
+
+- 前端 `loadModelConfig()` 只保存了 state 和状态文本，没有把 `models.json` 中的 provider/model/compat 回填到表单。
+- 后端 `upsert` 把请求里的空 `apiKey` 当成新配置必填，而不是在已有 provider 存在时沿用旧 `apiKey`。
+- 脱敏响应把明文 Key 清空后，前端如果没有 `hasLiteralApiKey` 之类标记，就无法提示用户“已保存但不回显”。
+
+**排查步骤**
+
+1. 先读磁盘配置，确认保存是否真实落盘；不要直接把问题归因给写入失败。
+2. 刷新真实页面后读取表单 DOM 值，确认 provider、baseUrl、model、tokens、compat 和 Key 提示是否来自持久配置。
+3. 用空 `apiKey` 对已有 provider 再保存一次，随后重新读取磁盘配置，确认旧 Key 仍存在。
+4. 检查 GET 配置接口是否只返回脱敏 Key 和安全标记，不把真实 Key 回显给浏览器。
+
+**修复方向**
+
+- 持久配置加载完成后显式 hydrate 表单；优先选中当前输入的 provider，其次选默认测试 provider，再退到第一个 provider。
+- 对已有 provider，空 `apiKey` 应表示保留旧 Key；只有新 provider 且没有旧 Key 时才要求填写 Key。
+- 脱敏响应保留 `hasLiteralApiKey` 标记，用状态文本或短 placeholder 告知“Key 已保存，留空保留”。
+
+**验证入口**
+
+- 配置页保存 Provider → 刷新页面 → 断言表单字段从 `models.json` 回填，Key 输入框为空但有已保存提示。
+- 不填 Key 再保存同一 Provider → 重新读取 `~/.pi/agent/models.json`，确认旧 `apiKey` 没被空值覆盖。
+- 检查浏览器响应和页面 DOM 不包含真实 Key。
+
 **当前任务门禁**
 
 - 发送路径：自定义 endpoint 不能再向上游发送 `${input:...}`。

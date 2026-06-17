@@ -947,11 +947,12 @@ dd {
 .composer {
   grid-column: 3;
   grid-row: 3;
+  position: relative;
   min-width: 0;
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 0.5rem;
   border-top: 1px solid var(--line);
   border-left: 1px solid var(--line);
@@ -959,9 +960,72 @@ dd {
   padding: 0.55rem;
 }
 
+.composer-context {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.composer-context summary {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.composer-context summary::-webkit-details-marker {
+  display: none;
+}
+
+.context-toggle {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 0.32rem;
+  color: var(--muted-strong);
+  white-space: nowrap;
+}
+
+.context-toggle input {
+  margin: 0;
+}
+
+.context-summary {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.context-preview {
+  position: absolute;
+  right: 0.55rem;
+  bottom: calc(100% + 0.35rem);
+  left: 0.55rem;
+  z-index: 4;
+  max-height: min(12rem, 36vh);
+  overflow: auto;
+  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, #101720 94%, transparent);
+  padding: 0.45rem 0.55rem;
+  color: var(--muted);
+  font-size: 0.66rem;
+  line-height: 1.32;
+  white-space: pre-wrap;
+  box-shadow: 0 0.5rem 1rem #00000024;
+}
+
 .composer-controls {
   grid-column: 2;
-  grid-row: 1;
+  grid-row: 2;
   width: clamp(5.4rem, 10vw, 7.6rem);
   display: grid;
   grid-template-rows: min-content min-content;
@@ -971,7 +1035,7 @@ dd {
 
 #messageInput {
   grid-column: 1;
-  grid-row: 1;
+  grid-row: 2;
   min-height: 0;
   height: 100%;
   max-height: 100%;
@@ -1063,6 +1127,13 @@ dd {
 }
 
 .tree-row.current-file > .text-button {
+  border-color: color-mix(in srgb, var(--accent) 46%, transparent);
+  background: linear-gradient(180deg, var(--accent-surface-soft), color-mix(in srgb, var(--accent) 12%, transparent));
+  color: var(--text);
+  box-shadow: inset 2px 0 0 var(--accent), inset 3px 0 0 color-mix(in srgb, var(--thread-blue) 72%, transparent);
+}
+
+.change-row.current-change .change-diff-button {
   border-color: color-mix(in srgb, var(--accent) 46%, transparent);
   background: linear-gradient(180deg, var(--accent-surface-soft), color-mix(in srgb, var(--accent) 12%, transparent));
   color: var(--text);
@@ -1503,9 +1574,23 @@ dd {
     grid-column: 1;
     grid-row: 5;
     grid-template-columns: minmax(0, 1fr) clamp(4.8rem, 20vw, 5.8rem);
+    grid-template-rows: auto minmax(0, 1fr);
     gap: 0.38rem;
     border-left: 0;
     padding: 0.36rem;
+  }
+
+  .composer-context {
+    font-size: 0.6rem;
+  }
+
+  .composer-context summary {
+    gap: 0.35em;
+  }
+
+  .context-preview {
+    max-height: 5.2em;
+    font-size: 0.58rem;
   }
 
   .help-panel {

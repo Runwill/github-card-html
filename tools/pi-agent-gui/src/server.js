@@ -17,6 +17,7 @@ const MAX_SEARCH_FILE_BYTES = 128 * 1024;
 const ignoredTreeNames = new Set(['.git', 'node_modules', '.venv', 'env', 'dist', 'build', 'coverage', '.vite']);
 const rootDir = path.resolve(__dirname, '..');
 const mediaDir = path.join(rootDir, 'media');
+const extensionPath = path.join(rootDir, 'extension', 'ide-bridge.js');
 const defaultTarget = path.resolve(rootDir, '..', '..');
 const host = process.env.PI_AGENT_GUI_HOST || '127.0.0.1';
 const port = Number(process.env.PI_AGENT_GUI_PORT || 3002);
@@ -30,6 +31,7 @@ const modelsConfigPath = path.join(configDir, 'models.json');
 const clients = new Set();
 let pi = null;
 const recentEvents = [];
+let ideState = createDefaultIdeState();
 
 const server = http.createServer((request, response) => {
   route(request, response).catch((error) => {
@@ -91,8 +93,12 @@ async function route(request, response) {
     return;
   }
   if (request.method === 'GET' && requestUrl.pathname === '/api/models') {
-    const result = await requireRuntime().request({ type: 'get_available_models' });
-    sendJson(response, 200, result.data || { models: [] });
+    if (pi && pi.isRunning) {
+      const result = await requireRuntime().request({ type: 'get_available_models' });
+      sendJson(response, 200, result.data || { models: [] });
+      return;
+    }
+    sendJson(response, 200, buildModelsFromConfig(await readModelConfig()));
     return;
   }
   if (request.method === 'GET' && requestUrl.pathname === '/api/model-config') {
@@ -122,6 +128,15 @@ async function route(request, response) {
   }
   if (request.method === 'GET' && requestUrl.pathname === '/api/git/diff') {
     sendJson(response, 200, await readGitDiff(requestUrl.searchParams.get('path') || ''));
+    return;
+  }
+  if (request.method === 'POST' && requestUrl.pathname === '/api/bridge/ide-state') {
+    ideState = normalizeIdeState(await readJson(request));
+    sendJson(response, 200, ideState);
+    return;
+  }
+  if (request.method === 'GET' && requestUrl.pathname === '/api/bridge/ide-context') {
+    sendJson(response, 200, await readIdeContext());
     return;
   }
   if (request.method === 'POST' && requestUrl.pathname === '/api/model-config/providers') {
@@ -193,6 +208,26 @@ function sanitizeModelConfig(config) {
   return { path: config.path, providers };
 }
 
+function buildModelsFromConfig(config) {
+  const models = [];
+  for (const [providerId, provider] of Object.entries(config.providers || {})) {
+    const providerModels = Array.isArray(provider.models) ? provider.models : [];
+    for (const model of providerModels) {
+      if (!model || !model.id) {
+        continue;
+      }
+      models.push({
+        ...model,
+        provider: providerId,
+        id: model.id,
+        api: provider.api || '',
+        baseUrl: provider.baseUrl || ''
+      });
+    }
+  }
+  return { models };
+}
+
 async function startRuntime() {
   if (pi && pi.isRunning) {
     return;
@@ -206,8 +241,10 @@ async function startRuntime() {
     cwd: targetProject,
     name: path.basename(targetProject) || 'pi-agent-gui',
     approve,
-    tools
+    tools,
+    extraArgs: ['--extension', extensionPath]
   });
+  process.env.PI_AGENT_GUI_BRIDGE_URL = `http://${host === '0.0.0.0' ? '127.0.0.1' : host}:${port}/api/bridge/ide-context`;
   pi.on('rpc-event', (event) => broadcast('pi:event', event));
   pi.on('status', (status) => broadcast('runtime:status', status));
   pi.on('error-event', (event) => broadcast('runtime:error', event));
@@ -274,7 +311,57 @@ function getRuntime() {
     piCommand,
     approve,
     tools: tools || null,
+    extensionPath,
     pi: pi ? pi.status() : { running: false, command: piCommand, cwd: targetProject }
+  };
+}
+
+function createDefaultIdeState() {
+  return {
+    previewMode: 'empty',
+    activeFile: null,
+    activeDiff: null,
+    previewDirty: false,
+    gitFiles: [],
+    updatedAt: new Date().toISOString()
+  };
+}
+
+function normalizeIdeState(body) {
+  const previewMode = ['empty', 'file', 'diff', 'error'].includes(body.previewMode) ? body.previewMode : 'empty';
+  const gitFiles = Array.isArray(body.gitFiles) ? body.gitFiles.slice(0, 80).map((file) => ({
+    status: String(file.status || '').slice(0, 8),
+    path: normalizeRelativePath(file.path || '')
+  })).filter((file) => file.path) : [];
+  return {
+    previewMode,
+    activeFile: body.activeFile ? normalizeRelativePath(body.activeFile) : null,
+    activeDiff: body.activeDiff ? normalizeRelativePath(body.activeDiff) : null,
+    previewDirty: Boolean(body.previewDirty),
+    gitFiles,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+async function readIdeContext() {
+  const gitStatus = await readGitStatus().catch(() => ({ root: targetProject, files: ideState.gitFiles || [] }));
+  const gitFiles = Array.isArray(gitStatus.files) ? gitStatus.files : [];
+  const ide = {
+    ...ideState,
+    gitFiles
+  };
+  return {
+    root: targetProject,
+    cwd: targetProject,
+    ide,
+    git: {
+      root: gitStatus.root || targetProject,
+      files: gitFiles
+    },
+    tools: {
+      readFile: 'Use the built-in read tool with ide.activeFile when file contents are needed.',
+      readDiff: 'Use the built-in bash/git diff or the GUI /api/git/diff endpoint when diff contents are needed.'
+    }
   };
 }
 
@@ -308,13 +395,15 @@ async function upsertProviderConfig(body) {
   if (!baseUrl && api !== 'anthropic-messages') {
     throw new Error('baseUrl is required for this provider type.');
   }
-  if (!apiKey) {
-    throw new Error('apiKey is required. Use an environment reference like $OPENAI_API_KEY if you do not want to store the literal key.');
-  }
 
   const config = await readModelConfig();
   const providers = { ...config.providers };
   const previousProvider = providers[providerId] && typeof providers[providerId] === 'object' ? providers[providerId] : {};
+  const previousApiKey = typeof previousProvider.apiKey === 'string' ? previousProvider.apiKey.trim() : '';
+  const nextApiKey = apiKey || previousApiKey;
+  if (!nextApiKey) {
+    throw new Error('apiKey is required. Use an environment reference like $OPENAI_API_KEY if you do not want to store the literal key.');
+  }
   const models = Array.isArray(previousProvider.models) ? previousProvider.models.slice() : [];
   const model = {
     id: modelId,
@@ -334,7 +423,7 @@ async function upsertProviderConfig(body) {
     ...previousProvider,
     ...(baseUrl ? { baseUrl } : {}),
     api,
-    apiKey,
+    apiKey: nextApiKey,
     models
   };
   const compat = buildCompat(disableDeveloperRole, disableReasoningEffort);

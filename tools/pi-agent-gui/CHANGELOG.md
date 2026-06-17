@@ -2,8 +2,32 @@
 
 这个日志只记录 `tools/pi-agent-gui/` 工具本身的变化，避免混入网站面向玩家的 `base/announcements.json`。
 
+## 2026-06-17
+
+- 修复：gpt5.5 中转默认 Base URL 改为 `https://ai.lupoapi.com/v1`。VS Code custom endpoint 配置可填站点根地址，但 Pi/OpenAI SDK 会把 `baseUrl` 直接与 `/chat/completions` 组合，因此 GUI 侧默认值必须使用 API 根路径。
+- 新增：Pi runtime 启动时自动加载 `extension/ide-bridge.js`，首个 `get_ide_context` 工具可读取 GUI 当前项目、活动文件、活动 diff、未保存状态和 Git 变更摘要。
+- 新增：GUI server 增加 IDE bridge 状态接口，浏览器在打开文件、查看 diff、保存和编辑时同步当前 IDE 状态，供 Pi extension 按需读取。
+- 修复：模型列表在 runtime 未启动时也会从 `models.json` 读取，保存或删除 Provider 后立即刷新，避免未配置模型阶段无法继续试用配置页。
+- 优化：Provider 配置里的 API Key 字段明确支持直接粘贴 Key 或填写环境变量引用，明文保存后不在页面回显，降低首次配置成本。
+- 优化：Provider 表单默认填入 `Context=128000` 和 `Max tokens=16000`，新建自定义中转模型时不再需要手动补这两个常用值。
+- 优化：Provider 兼容性选项的标签和说明改为 Pi `models.json` 源码语义，明确对应 `reasoning`、`supportsDeveloperRole` 和 `supportsReasoningEffort`。
+- 优化：Provider 表单默认带入 `gpt-5.5` 中转测试参数（不含 API Key），方便只粘贴 Key 后直接保存试跑。
+- 修复：Provider 保存后刷新页面会从 `models.json` 回填已保存配置；明文 Key 仍不回显，但再次保存其它字段时会保留原 Key。
+- 修复：模型面板现在会在 runtime 未启动时也读取 `models.json`，避免后端已有模型但下拉框仍显示为空。
+- 修复：发送消息时不再把 IDE 引用和 Git 变更拼进正文；这些状态仅通过 IDE bridge/tool 供 agent 按需读取。
+- 优化：同步更新 README、计划和静态界面文案，移除旧的 prompt fallback 表述，避免后续实现回到正文拼接路线。
+- 优化：将输入区开关和帮助说明的内部 owner 从 `includeContext` 收敛为 `showIdeState`，明确它只控制人类预览，不控制发送正文。
+- 修复：`start-tailscale.bat` 启动前会清理旧的 Pi Agent GUI server，避免旧的 `127.0.0.1:3002` 进程占用端口导致手机端访问不存在。
+- 新增：补充 `PLAN.md` 项目计划，明确 Pi Agent GUI 后续要从 RPC 包装层升级为 Pi-native IDE bridge，把项目、Git、编辑器状态和上下文选择沉淀为 extension/custom tool 能力。
+
+## 2026-06-16
+
+- 新增：输入区曾增加上下文开关和预览；当前版本已调整为“显示 IDE 状态”，仅供人类查看，不再随消息发送。
+- 修复：上下文状态行改为贴合输入区的轻量样式，展开预览改为不撑高输入区的浮层，避免新增 UI 像独立卡片并破坏小屏布局。
+
 ## 2026-06-15
 
+- 优化：文件预览编辑增加未保存、保存中、保存失败状态，保存成功后自动刷新 Git 变更列表并同步当前文件高亮。
 - 优化：移动端工作台补齐 VS Code 式分隔条，支持项目区/聊天区、预览区/对话区、对话区/输入区之间按当前内容动态伸缩。
 - 修复：运行面板侧栏分隔条不再被标题、按钮或横向预览分隔条的滚动宽度反向推宽，左右拖动方向与实际指针一致。
 - 修复：手机竖屏分隔条保留 12px 触摸热区，但只显示 1px 中线，避免中间出现突兀黑色横条。

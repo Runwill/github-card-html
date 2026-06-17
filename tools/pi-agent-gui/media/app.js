@@ -13,11 +13,22 @@ const state = {
   previewMode: 'empty',
   previewEditing: false,
   previewDirty: false,
+  previewSaveState: 'idle',
+  previewSaveError: '',
+  activeChangePath: '',
   previewHighlightTimer: 0,
+  ideSyncTimer: 0,
   collapsedFolders: new Set(),
   helpKey: 'help.default',
   language: localStorage.getItem('pi-agent-gui-language') || 'zh'
 };
+
+const DEFAULT_MODEL_CONTEXT_WINDOW = '128000';
+const DEFAULT_MODEL_MAX_TOKENS = '16000';
+const DEFAULT_PROVIDER_ID = 'lupo-gpt-03x';
+const DEFAULT_PROVIDER_BASE_URL = 'https://ai.lupoapi.com/v1';
+const DEFAULT_PROVIDER_MODEL_ID = 'gpt-5.5';
+const DEFAULT_PROVIDER_MODEL_NAME = 'GPT-5.5';
 
 const i18n = {
   zh: {
@@ -41,14 +52,14 @@ const i18n = {
     'config.provider': 'Provider',
     'config.api': 'API',
     'config.baseUrl': 'Base URL',
-    'config.apiKey': 'API key 或环境变量',
+    'config.apiKey': 'API Key（可直接粘贴）',
     'config.modelId': '模型 ID',
     'config.displayName': '显示名称',
     'config.context': '上下文',
     'config.maxTokens': '最大输出',
     'config.reasoning': '推理模型',
-    'config.noDeveloperRole': '不使用 developer role',
-    'config.noReasoningEffort': '不发送 reasoning effort',
+    'config.noDeveloperRole': '禁用 developer role',
+    'config.noReasoningEffort': '禁用 reasoning effort',
     'actions.start': '启动',
     'actions.abort': '中止',
     'actions.setModel': '设为当前模型',
@@ -78,21 +89,36 @@ const i18n = {
     'project.fileNameMatch': '文件名匹配',
     'project.folderNameMatch': '文件夹名匹配',
     'changes.empty': '当前没有 Git 变更。',
+    'context.include': '显示 IDE 状态',
+    'context.none': '无当前文件或 Git 变更',
+    'context.file': '文件：{path}',
+    'context.diff': 'Diff：{path}',
+    'context.git': 'Git：{count} 个变更',
+    'context.dirty': '未保存',
+    'context.previewTitle': '当前 IDE 状态（agent 可通过 get_ide_context 工具读取）：',
+    'context.readInstruction': '这些内容不会自动拼进消息正文。',
+    'context.unsavedWarning': '注意：当前编辑器有未保存内容，磁盘文件可能不是最新版本。',
     'preview.title': '预览',
     'preview.empty': '选择文件或变更后，会在这里预览内容。',
     'preview.fileMeta': '{path} · {size} bytes',
     'preview.diffMeta': '{path} · diff',
     'preview.savedMeta': '{path} · 已保存 · {size} bytes',
     'preview.dirty': '未保存',
+    'preview.saving': '保存中...',
+    'preview.saveFailed': '保存失败：{message}',
+    'preview.discardConfirm': '当前文件有未保存修改。要丢弃这些修改并继续吗？',
     'preview.truncated': '\n\n[内容已截断]',
     'messages.configPath': '配置文件：{path}',
-    'messages.saved': '已保存。重启 runtime 或重新打开模型列表后 Pi 会重新加载。',
+    'messages.saved': '已保存。明文 Key 会写入 Pi 配置但不会在页面回显；重启 runtime 或重新打开模型列表后 Pi 会重新加载。',
+    'messages.loadedSavedKey': '已加载保存的 Provider。Key 已保存但不会回显；留空保存会继续保留原 Key。',
+    'placeholders.savedApiKey': 'Key 已保存，留空保留原 Key',
     'messages.deleted': 'Provider 已删除。重启 runtime 或重新打开模型列表后 Pi 会重新加载。',
     'messages.providerRequired': '请先填写 Provider。',
     'activity.agentStarted': 'Agent 已开始',
     'activity.agentFinished': 'Agent 已完成',
     'composer.placeholder': '向共享 Pi agent 发送任务',
     'placeholders.optional': '可选',
+    'placeholders.apiKey': '直接粘贴 key，或填 $OPENAI_API_KEY',
     'help.title': '说明',
     'help.default': '悬浮、点击或聚焦到控件时，这里会显示功能解释。',
     'help.language': '切换界面语言，说明栏和主要控件文案会同步切换。',
@@ -118,15 +144,15 @@ const i18n = {
     'help.setModel': '把下拉框里的模型切换为 Pi agent 当前使用的模型。',
     'help.provider': 'Provider 是模型服务的名称，例如 openai、openrouter 或本地服务名。',
     'help.api': '选择该 Provider 使用的 API 协议，需与服务商兼容接口匹配。',
-    'help.baseUrl': '填写模型服务的 API 根地址，例如 OpenAI 兼容接口的 /v1 地址。',
-    'help.apiKey': '建议填写环境变量引用，例如 $OPENAI_API_KEY，避免把密钥明文写入配置文件。',
+    'help.baseUrl': '填写 Pi/OpenAI SDK 实际请求的 API 根地址。VS Code custom endpoint 可只填站点根地址；这里需要能直接拼出 /chat/completions 的地址，例如 https://ai.lupoapi.com/v1。',
+    'help.apiKey': '可以直接粘贴 API Key，保存后会写入 Pi 的 models.json 但不会在页面回显；也可以填 $OPENAI_API_KEY 这类环境变量引用。',
     'help.modelId': '填写服务商真实模型 ID，Pi 会用它向 Provider 发起请求。',
     'help.modelName': '可选显示名，只影响界面展示，不改变实际请求的模型 ID。',
     'help.contextWindow': '模型上下文窗口大小，用来告诉 Pi 可保留多少上下文。',
     'help.maxTokens': '单次回复允许的最大输出 token 数。',
-    'help.reasoning': '开启后把该模型标记为推理模型，适合支持 reasoning 的模型。',
-    'help.noDeveloperRole': '如果 Provider 不支持 developer role，开启此项让 Pi 避免发送该角色。',
-    'help.noReasoningEffort': '如果 Provider 不支持 reasoning effort 参数，开启此项避免发送该字段。',
+    'help.reasoning': '写入 Pi models.json 的 model.reasoning=true。Pi 源码用它判断 supportsThinking()，并在 OpenAI compatible 请求中决定是否启用推理相关参数。',
+    'help.noDeveloperRole': '写入 compat.supportsDeveloperRole=false。Pi 的 openai-completions 实现会把推理模型的系统提示从 developer role 改为 system role。',
+    'help.noReasoningEffort': '写入 compat.supportsReasoningEffort=false。Pi 的 openai-completions 实现会跳过 reasoning_effort 字段，避免中转接口不支持该参数时报错。',
     'help.saveProvider': '保存当前 Provider 和模型配置到 Pi 的 models.json。',
     'help.deleteProvider': '删除当前 Provider 配置；删除前请确认 Provider 名称正确。',
     'help.reloadFile': '重新从磁盘读取当前文件，会丢弃右侧编辑区尚未保存的修改。',
@@ -135,6 +161,8 @@ const i18n = {
     'help.resizeSidebar': '拖动这里调整侧边栏宽度，方便在文件树和编辑区之间分配空间。',
     'help.resizePreview': '桌面端拖动这里调整预览编辑区和 agent 对话区宽度；手机端调整预览高度。',
     'help.resizeComposer': '拖动这里调整对话区和输入区的高度，适合在长提示词和阅读回复之间分配空间。',
+    'help.contextPanel': '查看当前同步给 IDE bridge 的状态。Pi agent 需要项目上下文时应通过 get_ide_context 等工具读取，而不是从消息正文里拿。',
+    'help.showIdeState': '只控制这里是否展示 IDE 状态；发送给 Pi agent 的正文始终只包含输入框里的文字。',
     'help.sendMode': '任务会开启新的 agent 目标；插话用于中途补充指令；后续用于继续上一轮。',
     'help.messageInput': '输入要交给共享 Pi agent 的任务、补充说明或后续要求。',
     'help.sendButton': '把当前输入按所选发送模式提交给共享 Pi agent。'
@@ -160,14 +188,14 @@ const i18n = {
     'config.provider': 'Provider',
     'config.api': 'API',
     'config.baseUrl': 'Base URL',
-    'config.apiKey': 'API key or env ref',
+    'config.apiKey': 'API key (paste allowed)',
     'config.modelId': 'Model ID',
     'config.displayName': 'Display name',
     'config.context': 'Context',
     'config.maxTokens': 'Max tokens',
     'config.reasoning': 'Reasoning model',
-    'config.noDeveloperRole': 'No developer role',
-    'config.noReasoningEffort': 'No reasoning effort',
+    'config.noDeveloperRole': 'Disable developer role',
+    'config.noReasoningEffort': 'Disable reasoning effort',
     'actions.start': 'Start',
     'actions.abort': 'Abort',
     'actions.setModel': 'Set model',
@@ -197,21 +225,36 @@ const i18n = {
     'project.fileNameMatch': 'File name match',
     'project.folderNameMatch': 'Folder name match',
     'changes.empty': 'No Git changes right now.',
+    'context.include': 'Show IDE state',
+    'context.none': 'No current file or Git changes',
+    'context.file': 'File: {path}',
+    'context.diff': 'Diff: {path}',
+    'context.git': 'Git: {count} changes',
+    'context.dirty': 'unsaved',
+    'context.previewTitle': 'Current IDE state (available through the get_ide_context tool):',
+    'context.readInstruction': 'This content is not appended to the message body.',
+    'context.unsavedWarning': 'Note: the current editor has unsaved changes, so the disk file may not be current.',
     'preview.title': 'Preview',
     'preview.empty': 'Select a file or change to preview it here.',
     'preview.fileMeta': '{path} · {size} bytes',
     'preview.diffMeta': '{path} · diff',
     'preview.savedMeta': '{path} · saved · {size} bytes',
     'preview.dirty': 'Unsaved',
+    'preview.saving': 'Saving...',
+    'preview.saveFailed': 'Save failed: {message}',
+    'preview.discardConfirm': 'The current file has unsaved changes. Discard them and continue?',
     'preview.truncated': '\n\n[Content truncated]',
     'messages.configPath': 'Config: {path}',
-    'messages.saved': 'Saved. Restart runtime or reopen model list to reload Pi models.',
+    'messages.saved': 'Saved. Raw keys are written to Pi config but not echoed back in the page; restart runtime or reopen model list to reload Pi models.',
+    'messages.loadedSavedKey': 'Loaded saved provider. The key is saved but not echoed; leave it blank to keep the existing key when saving.',
+    'placeholders.savedApiKey': 'Key saved; leave blank to keep it',
     'messages.deleted': 'Provider deleted. Restart runtime or reopen model list to reload Pi models.',
     'messages.providerRequired': 'Provider is required.',
     'activity.agentStarted': 'Agent started',
     'activity.agentFinished': 'Agent finished',
     'composer.placeholder': 'Send a task to the shared Pi agent',
     'placeholders.optional': 'optional',
+    'placeholders.apiKey': 'Paste a key, or use $OPENAI_API_KEY',
     'help.title': 'Help',
     'help.default': 'Hover, tap, or focus a control to show its explanation here.',
     'help.language': 'Switch the UI language. The help panel and main control labels update together.',
@@ -237,15 +280,15 @@ const i18n = {
     'help.setModel': 'Switch Pi agent to the model currently selected in the list.',
     'help.provider': 'Provider is the model service name, such as openai, openrouter, or a local endpoint.',
     'help.api': 'Choose the API protocol used by this provider. It must match the provider endpoint.',
-    'help.baseUrl': 'Enter the model service API base URL, such as an OpenAI-compatible /v1 endpoint.',
-    'help.apiKey': 'Prefer an environment variable reference like $OPENAI_API_KEY instead of storing a raw secret.',
+    'help.baseUrl': 'Enter the API root used by the Pi/OpenAI SDK. VS Code custom endpoints may accept the site root; this field must compose directly with /chat/completions, for example https://ai.lupoapi.com/v1.',
+    'help.apiKey': 'Paste an API key for the easiest setup. It is saved into Pi models.json but not echoed back in the page; you can also use an environment reference like $OPENAI_API_KEY.',
     'help.modelId': 'Enter the provider model ID that Pi should send with requests.',
     'help.modelName': 'Optional display name. It only changes the UI label, not the real model ID.',
     'help.contextWindow': 'The model context window size, used by Pi to estimate how much context can be kept.',
     'help.maxTokens': 'The maximum output token count allowed for one response.',
-    'help.reasoning': 'Mark this model as a reasoning model when the provider supports reasoning behavior.',
-    'help.noDeveloperRole': 'Enable this if the provider does not accept developer role messages.',
-    'help.noReasoningEffort': 'Enable this if the provider does not accept the reasoning effort parameter.',
+    'help.reasoning': 'Writes model.reasoning=true to Pi models.json. Pi uses it for supportsThinking() and OpenAI-compatible reasoning behavior.',
+    'help.noDeveloperRole': 'Writes compat.supportsDeveloperRole=false. Pi openai-completions then sends system prompts as system role instead of developer role for reasoning models.',
+    'help.noReasoningEffort': 'Writes compat.supportsReasoningEffort=false. Pi openai-completions then skips the reasoning_effort request field for incompatible gateways.',
     'help.saveProvider': 'Save the current provider and model settings into Pi models.json.',
     'help.deleteProvider': 'Delete the current provider configuration. Check the provider name first.',
     'help.reloadFile': 'Reload the current file from disk. This discards unsaved editor changes.',
@@ -254,6 +297,8 @@ const i18n = {
     'help.resizeSidebar': 'Drag this divider to resize the sidebar and give the file tree or editor more room.',
     'help.resizePreview': 'On desktop, drag this divider to resize the preview editor and agent conversation columns. On mobile, it resizes preview height.',
     'help.resizeComposer': 'Drag this divider to resize the conversation and composer areas when writing longer prompts or reading replies.',
+    'help.contextPanel': 'Review the IDE state synchronized to the IDE bridge. Pi agent should use tools such as get_ide_context for project context instead of reading it from the message body.',
+    'help.showIdeState': 'Only controls whether this IDE state preview is shown. The message sent to Pi agent always contains only the text you typed.',
     'help.sendMode': 'Prompt starts a new goal; Steer adds mid-run guidance; Follow-up continues the previous turn.',
     'help.messageInput': 'Type the task, steering note, or follow-up you want to send to the shared Pi agent.',
     'help.sendButton': 'Submit the current input to the shared Pi agent using the selected send mode.'
@@ -314,6 +359,9 @@ const elements = {
   sidebarResizeHandle: document.getElementById('sidebarResizeHandle'),
   previewResizeHandle: document.getElementById('previewResizeHandle'),
   composerResizeHandle: document.getElementById('composerResizeHandle'),
+  showIdeStateInput: document.getElementById('showIdeStateInput'),
+  contextSummary: document.getElementById('contextSummary'),
+  contextPreview: document.getElementById('contextPreview'),
   sendMode: document.getElementById('sendMode'),
   messageInput: document.getElementById('messageInput'),
   sendButton: document.getElementById('sendButton')
@@ -324,13 +372,15 @@ init().catch((error) => addSystemMessage(error.message || String(error), true));
 async function init() {
   updateAppViewportHeight();
   applyLanguage();
+  applyProviderDefaults();
   bindEvents();
   connectEvents();
   await loadRuntime();
   await Promise.allSettled([loadProjectTree(), loadGitStatus()]);
   await loadModelConfig();
+  await loadModels().catch(() => {});
   if (state.runtime.pi.running) {
-    await Promise.allSettled([loadState(), loadModels(), loadMessages()]);
+    await Promise.allSettled([loadState(), loadMessages()]);
   }
 }
 
@@ -435,6 +485,7 @@ function bindEvents() {
   elements.modelConfigForm.addEventListener('submit', saveModelConfig);
   elements.providerIdInput.addEventListener('change', fillProviderFromConfig);
   elements.deleteProviderButton.addEventListener('click', deleteProviderConfig);
+  elements.showIdeStateInput.addEventListener('change', updateContextPreview);
   elements.composer.addEventListener('submit', sendMessage);
   bindResizeHandle(elements.sidebarResizeHandle, resizeSidebar);
   bindResizeHandle(elements.previewResizeHandle, resizePreview);
@@ -507,6 +558,7 @@ async function loadModels() {
 async function loadModelConfig() {
   state.modelConfig = await api('/api/model-config');
   elements.modelConfigStatus.textContent = state.modelConfig.path ? t('messages.configPath', { path: state.modelConfig.path }) : '';
+  hydrateModelConfigForm();
 }
 
 async function loadProjectTree() {
@@ -522,6 +574,8 @@ async function loadGitStatus() {
   try {
     state.gitStatus = await api('/api/git/status');
     renderGitStatus();
+    updateContextPreview();
+    syncIdeState();
   } catch (error) {
     elements.changesStatus.textContent = error.message || String(error);
   }
@@ -626,7 +680,10 @@ async function handleProjectTreeClick(event) {
   await openProjectFile(button.dataset.filePath);
 }
 
-async function openProjectFile(filePath, searchTarget = null) {
+async function openProjectFile(filePath, searchTarget = null, options = {}) {
+  if (!options.skipDirtyConfirm && !confirmDiscardPreviewChanges()) {
+    return;
+  }
   try {
     const file = await api(`/api/project/file?path=${encodeURIComponent(filePath)}`);
     state.activeSearchHit = searchTarget && searchTarget.query ? searchTarget : null;
@@ -651,18 +708,27 @@ async function handleChangesClick(event) {
   if (!button) {
     return;
   }
+  if (!confirmDiscardPreviewChanges()) {
+    return;
+  }
   try {
     const diff = await api(`/api/git/diff?path=${encodeURIComponent(button.dataset.changePath)}`);
     setPreviewActive(true);
     state.currentFile = null;
+    state.activeChangePath = normalizeGitPath(diff.path || button.dataset.changePath);
     state.previewMode = 'diff';
     state.previewEditing = false;
     state.previewDirty = false;
+    state.previewSaveState = 'idle';
+    state.previewSaveError = '';
     elements.previewTitle.textContent = diff.path;
     elements.previewMeta.textContent = t('preview.diffMeta', { path: diff.path });
     setPreviewIcon(diff.path);
     renderPreviewContent(diff.diff || t('changes.empty'), diff.path, 'diff');
+    renderGitStatus();
     updatePreviewActions();
+    updateContextPreview();
+    syncIdeState();
   } catch (error) {
     showPreviewError(error);
   }
@@ -672,28 +738,50 @@ async function reloadCurrentFile() {
   if (!state.currentFile) {
     return;
   }
-  await openProjectFile(state.currentFile.path);
+  if (!confirmDiscardPreviewChanges()) {
+    return;
+  }
+  await openProjectFile(state.currentFile.path, null, { skipDirtyConfirm: true });
 }
 
 async function saveCurrentFile() {
   if (!state.currentFile || state.previewMode !== 'file') {
     return;
   }
+  if (state.previewSaveState === 'saving') {
+    return;
+  }
+  const targetPath = state.currentFile.path;
+  const savedContent = getPreviewText();
+  state.previewSaveState = 'saving';
+  state.previewSaveError = '';
+  updatePreviewMeta();
+  updatePreviewActions();
   try {
-    const savedContent = getPreviewText();
-    const result = await api(`/api/project/file?path=${encodeURIComponent(state.currentFile.path)}`, {
+    const result = await api(`/api/project/file?path=${encodeURIComponent(targetPath)}`, {
       method: 'PUT',
       body: JSON.stringify({ content: savedContent })
     });
     state.currentFile = { ...state.currentFile, size: result.size, content: savedContent, truncated: false };
     state.previewEditing = false;
     state.previewDirty = false;
-    elements.previewMeta.textContent = t('preview.savedMeta', { path: result.path, size: String(result.size) });
+    state.previewSaveState = 'saved';
+    state.previewSaveError = '';
     renderPreviewContent(savedContent, state.currentFile.path, 'file');
+    updatePreviewMeta();
     updatePreviewActions();
-    await loadGitStatus().catch(() => {});
+    updateContextPreview();
+    syncIdeState();
+    await refreshProjectFileStateAfterSave(targetPath);
   } catch (error) {
-    showPreviewError(error);
+    state.previewSaveState = 'error';
+    state.previewSaveError = error.message || String(error);
+    state.previewDirty = true;
+    state.previewEditing = true;
+    syncPreviewClass();
+    updatePreviewMeta();
+    updatePreviewActions();
+    addSystemMessage(state.previewSaveError, true);
   }
 }
 
@@ -703,14 +791,19 @@ function markPreviewDirty() {
   }
   state.previewEditing = true;
   state.previewDirty = true;
+  state.previewSaveState = 'idle';
+  state.previewSaveError = '';
   syncPreviewClass();
   schedulePreviewHighlightRefresh();
   updatePreviewMeta();
   updatePreviewActions();
+  updateContextPreview();
+  syncIdeState({ delay: 400 });
 }
 
 async function saveModelConfig(event) {
   event.preventDefault();
+  applyModelTokenDefaults();
   const payload = {
     providerId: elements.providerIdInput.value,
     api: elements.apiTypeSelect.value,
@@ -718,8 +811,8 @@ async function saveModelConfig(event) {
     apiKey: elements.apiKeyInput.value,
     modelId: elements.modelIdInput.value,
     modelName: elements.modelNameInput.value,
-    contextWindow: elements.contextWindowInput.value,
-    maxTokens: elements.maxTokensInput.value,
+    contextWindow: elements.contextWindowInput.value || DEFAULT_MODEL_CONTEXT_WINDOW,
+    maxTokens: elements.maxTokensInput.value || DEFAULT_MODEL_MAX_TOKENS,
     reasoning: elements.reasoningInput.checked,
     disableDeveloperRole: elements.disableDeveloperRoleInput.checked,
     disableReasoningEffort: elements.disableReasoningEffortInput.checked
@@ -731,9 +824,7 @@ async function saveModelConfig(event) {
     });
     elements.apiKeyInput.value = payload.apiKey.startsWith('$') ? payload.apiKey : '';
     elements.modelConfigStatus.textContent = t('messages.saved');
-    if (state.runtime && state.runtime.pi && state.runtime.pi.running) {
-      await loadModels().catch(() => {});
-    }
+    await loadModels().catch(() => {});
   } catch (error) {
     elements.modelConfigStatus.textContent = error.message || String(error);
   }
@@ -750,10 +841,9 @@ async function deleteProviderConfig() {
       method: 'DELETE'
     });
     elements.modelConfigForm.reset();
+    applyProviderDefaults();
     elements.modelConfigStatus.textContent = t('messages.deleted');
-    if (state.runtime && state.runtime.pi && state.runtime.pi.running) {
-      await loadModels().catch(() => {});
-    }
+    await loadModels().catch(() => {});
   } catch (error) {
     elements.modelConfigStatus.textContent = error.message || String(error);
   }
@@ -772,11 +862,69 @@ function fillProviderFromConfig() {
   elements.apiKeyInput.value = provider.apiKey && String(provider.apiKey).startsWith('$') ? provider.apiKey : '';
   elements.modelIdInput.value = firstModel ? firstModel.id || '' : '';
   elements.modelNameInput.value = firstModel ? firstModel.name || '' : '';
-  elements.contextWindowInput.value = firstModel && firstModel.contextWindow ? firstModel.contextWindow : '';
-  elements.maxTokensInput.value = firstModel && firstModel.maxTokens ? firstModel.maxTokens : '';
+  elements.contextWindowInput.value = firstModel && firstModel.contextWindow ? firstModel.contextWindow : DEFAULT_MODEL_CONTEXT_WINDOW;
+  elements.maxTokensInput.value = firstModel && firstModel.maxTokens ? firstModel.maxTokens : DEFAULT_MODEL_MAX_TOKENS;
   elements.reasoningInput.checked = Boolean(firstModel && firstModel.reasoning);
   elements.disableDeveloperRoleInput.checked = Boolean(provider.compat && provider.compat.supportsDeveloperRole === false);
   elements.disableReasoningEffortInput.checked = Boolean(provider.compat && provider.compat.supportsReasoningEffort === false);
+  updateSavedApiKeyHint(provider);
+}
+
+function hydrateModelConfigForm() {
+  if (!state.modelConfig || !state.modelConfig.providers) {
+    applyProviderDefaults();
+    return;
+  }
+  const providers = state.modelConfig.providers;
+  const currentProviderId = elements.providerIdInput.value.trim();
+  const providerId = providers[currentProviderId]
+    ? currentProviderId
+    : providers[DEFAULT_PROVIDER_ID]
+      ? DEFAULT_PROVIDER_ID
+      : Object.keys(providers)[0];
+  if (!providerId) {
+    applyProviderDefaults();
+    return;
+  }
+  elements.providerIdInput.value = providerId;
+  fillProviderFromConfig();
+}
+
+function updateSavedApiKeyHint(provider) {
+  if (provider && provider.hasLiteralApiKey) {
+    elements.apiKeyInput.placeholder = t('placeholders.savedApiKey');
+    elements.modelConfigStatus.textContent = t('messages.loadedSavedKey');
+  } else {
+    elements.apiKeyInput.placeholder = t('placeholders.apiKey');
+  }
+}
+
+function applyModelTokenDefaults() {
+  if (!elements.contextWindowInput.value) {
+    elements.contextWindowInput.value = DEFAULT_MODEL_CONTEXT_WINDOW;
+  }
+  if (!elements.maxTokensInput.value) {
+    elements.maxTokensInput.value = DEFAULT_MODEL_MAX_TOKENS;
+  }
+}
+
+function applyProviderDefaults() {
+  if (!elements.providerIdInput.value) {
+    elements.providerIdInput.value = DEFAULT_PROVIDER_ID;
+  }
+  if (!elements.baseUrlInput.value) {
+    elements.baseUrlInput.value = DEFAULT_PROVIDER_BASE_URL;
+  }
+  if (!elements.modelIdInput.value) {
+    elements.modelIdInput.value = DEFAULT_PROVIDER_MODEL_ID;
+  }
+  if (!elements.modelNameInput.value) {
+    elements.modelNameInput.value = DEFAULT_PROVIDER_MODEL_NAME;
+  }
+  applyModelTokenDefaults();
+  elements.reasoningInput.checked = true;
+  elements.disableDeveloperRoleInput.checked = true;
+  elements.disableReasoningEffortInput.checked = true;
 }
 
 async function loadMessages() {
@@ -810,6 +958,70 @@ async function sendMessage(event) {
     method: 'POST',
     body: JSON.stringify({ message })
   });
+}
+
+function updateContextPreview() {
+  const enabled = elements.showIdeStateInput.checked;
+  const context = buildIdeStatePreview();
+  elements.contextSummary.textContent = enabled ? context.summary : t('context.none');
+  elements.contextPreview.textContent = enabled && context.text ? context.text : t('context.none');
+}
+
+function syncIdeState(options = {}) {
+  window.clearTimeout(state.ideSyncTimer);
+  const delay = Number.isFinite(options.delay) ? options.delay : 80;
+  state.ideSyncTimer = window.setTimeout(() => {
+    const gitFiles = state.gitStatus && Array.isArray(state.gitStatus.files) ? state.gitStatus.files : [];
+    api('/api/bridge/ide-state', {
+      method: 'POST',
+      body: JSON.stringify({
+        previewMode: state.previewMode,
+        activeFile: state.previewMode === 'file' && state.currentFile ? state.currentFile.path : null,
+        activeDiff: state.previewMode === 'diff' ? state.activeChangePath : null,
+        previewDirty: state.previewDirty,
+        gitFiles: gitFiles.map((file) => ({ status: file.status, path: file.path }))
+      })
+    }).catch(() => {});
+  }, delay);
+}
+
+function buildIdeStatePreview() {
+  const parts = [];
+  const summary = [];
+  const gitFiles = state.gitStatus && Array.isArray(state.gitStatus.files) ? state.gitStatus.files : [];
+  if (state.previewMode === 'file' && state.currentFile) {
+    summary.push(t('context.file', { path: state.currentFile.path }));
+    if (state.previewDirty) {
+      summary.push(t('context.dirty'));
+    }
+    parts.push([
+      'Current file:',
+      `path: ${state.currentFile.path}`,
+      `unsaved: ${state.previewDirty ? 'yes' : 'no'}`,
+      `read: open this file from the workspace when needed`,
+      state.previewDirty ? t('context.unsavedWarning') : ''
+    ].filter(Boolean).join('\n'));
+  } else if (state.previewMode === 'diff' && state.activeChangePath) {
+    summary.push(t('context.diff', { path: state.activeChangePath }));
+    parts.push([
+      'Current diff:',
+      `path: ${state.activeChangePath}`,
+      `read: inspect git diff for this path when needed`
+    ].join('\n'));
+  }
+  if (gitFiles.length) {
+    summary.push(t('context.git', { count: String(gitFiles.length) }));
+    parts.push([
+      'Git changes:',
+      ...gitFiles.slice(0, 40).map((file) => `${file.status} ${file.path}`),
+      gitFiles.length > 40 ? `... ${gitFiles.length - 40} more` : ''
+    ].filter(Boolean).join('\n'));
+  }
+  const text = parts.length ? `${t('context.previewTitle')}\n${t('context.readInstruction')}\n\n${parts.join('\n\n')}` : '';
+  return {
+    summary: summary.length ? summary.join(' · ') : t('context.none'),
+    text
+  };
 }
 
 function handlePiEvent(event) {
@@ -884,9 +1096,7 @@ function setLanguage(event) {
   applyLanguage();
   renderRuntime();
   setHelp(state.helpKey);
-  if (!state.models.length) {
-    loadModels().catch(() => {});
-  }
+  loadModels().catch(() => {});
   if (state.modelConfig && state.modelConfig.path) {
     elements.modelConfigStatus.textContent = t('messages.configPath', { path: state.modelConfig.path });
   }
@@ -906,6 +1116,8 @@ function applyLanguage() {
     element.setAttribute('aria-label', t(element.dataset.i18nTitle));
   }
   updateProjectSearchPlaceholder();
+  updatePreviewActions();
+  updateContextPreview();
   setHelp(state.helpKey);
 }
 
@@ -958,6 +1170,16 @@ function renderProjectTree() {
   }
   elements.projectStatus.textContent = state.projectTree && state.projectTree.truncated ? t('project.truncated') : '';
   elements.revealCurrentFileButton.disabled = !state.currentFile;
+}
+
+function confirmDiscardPreviewChanges() {
+  if (state.previewSaveState === 'saving') {
+    return false;
+  }
+  if (!state.previewDirty) {
+    return true;
+  }
+  return window.confirm(t('preview.discardConfirm'));
 }
 
 function renderSearchResults() {
@@ -1218,6 +1440,7 @@ function renderGitStatus() {
     const row = document.createElement('div');
     row.className = 'change-row';
     const changePath = normalizeGitPath(file.path);
+    row.classList.toggle('current-change', isActiveChangePath(changePath));
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'change-diff-button';
@@ -1263,49 +1486,88 @@ function normalizeGitPath(filePath) {
   return String(filePath || '').split(' -> ').pop();
 }
 
+function isActiveChangePath(filePath) {
+  const normalized = normalizeGitPath(filePath);
+  if (state.activeChangePath) {
+    return normalized === normalizeGitPath(state.activeChangePath);
+  }
+  return Boolean(state.currentFile && normalized === normalizeGitPath(state.currentFile.path));
+}
+
 function showPreviewError(error) {
   setPreviewActive(true);
   state.currentFile = null;
+  state.activeChangePath = '';
   renderProjectTree();
   state.previewMode = 'error';
   state.previewEditing = false;
   state.previewDirty = false;
+  state.previewSaveState = 'idle';
+  state.previewSaveError = '';
   elements.previewTitle.textContent = t('preview.title');
   elements.previewMeta.textContent = '';
   setPreviewIcon('');
   renderPreviewContent(error.message || String(error), '', 'error');
   updatePreviewActions();
+  updateContextPreview();
+  syncIdeState();
 }
 
 function showEditableFile(file) {
   setPreviewActive(true);
   state.currentFile = file;
+  state.activeChangePath = normalizeGitPath(file.path);
   state.previewMode = 'file';
   state.previewEditing = false;
   state.previewDirty = false;
+  state.previewSaveState = 'idle';
+  state.previewSaveError = '';
   elements.previewTitle.textContent = file.path;
   setPreviewIcon(file.path);
   renderPreviewContent(file.content + (file.truncated ? t('preview.truncated') : ''), file.path, 'file');
   elements.previewEditor.readOnly = Boolean(file.truncated);
   updatePreviewMeta();
+  renderGitStatus();
   updatePreviewActions();
+  updateContextPreview();
+  syncIdeState();
 }
 
 function updatePreviewMeta() {
   if (!state.currentFile) {
     return;
   }
-  const dirty = state.previewDirty ? ` · ${t('preview.dirty')}` : '';
-  elements.previewMeta.textContent = `${t('preview.fileMeta', {
+  const status = getPreviewStatusText();
+  const metaKey = state.previewSaveState === 'saved' && !state.previewDirty ? 'preview.savedMeta' : 'preview.fileMeta';
+  elements.previewMeta.textContent = `${t(metaKey, {
     path: state.currentFile.path,
     size: String(state.currentFile.size)
-  })}${dirty}`;
+  })}${status}`;
+}
+
+function getPreviewStatusText() {
+  if (state.previewSaveState === 'saving') {
+    return ` · ${t('preview.saving')}`;
+  }
+  if (state.previewSaveState === 'error') {
+    return ` · ${t('preview.saveFailed', { message: state.previewSaveError })}`;
+  }
+  return state.previewDirty ? ` · ${t('preview.dirty')}` : '';
 }
 
 function updatePreviewActions() {
   const editable = state.previewMode === 'file' && state.currentFile && !state.currentFile.truncated;
-  elements.reloadFileButton.disabled = !state.currentFile;
-  elements.saveFileButton.disabled = !editable || !state.previewDirty;
+  const saving = state.previewSaveState === 'saving';
+  elements.reloadFileButton.disabled = !state.currentFile || saving;
+  elements.saveFileButton.disabled = !editable || !state.previewDirty || saving;
+  elements.saveFileButton.textContent = saving ? t('preview.saving') : t('actions.saveFile');
+}
+
+async function refreshProjectFileStateAfterSave(filePath) {
+  await loadGitStatus().catch(() => {});
+  state.activeChangePath = normalizeGitPath(filePath);
+  renderProjectTree();
+  renderGitStatus();
 }
 
 function setPreviewIcon(filePath) {
