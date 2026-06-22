@@ -1,6 +1,9 @@
-const { spawn } = require('child_process');
+const { execFile, spawn } = require('child_process');
 const { EventEmitter } = require('events');
 const { StringDecoder } = require('string_decoder');
+const { promisify } = require('util');
+
+const execFileAsync = promisify(execFile);
 
 class PiRpcClient extends EventEmitter {
   constructor(options = {}) {
@@ -68,11 +71,32 @@ class PiRpcClient extends EventEmitter {
     });
   }
 
-  stop() {
+  async stop() {
     if (!this.process) {
       return;
     }
-    this.process.kill();
+    const processToStop = this.process;
+    const pid = processToStop.pid;
+    if (!pid || processToStop.exitCode !== null) {
+      return;
+    }
+
+    const stopped = new Promise((resolve) => {
+      const settle = () => resolve();
+      processToStop.once('exit', settle);
+      setTimeout(settle, 3000);
+    });
+
+    if (process.platform === 'win32') {
+      await execFileAsync('taskkill', ['/pid', String(pid), '/t', '/f']).catch((error) => {
+        if (error && error.code !== 128) {
+          this.emit('error-event', { message: `Failed to stop Pi process tree: ${error.message || error}` });
+        }
+      });
+    } else {
+      processToStop.kill('SIGTERM');
+    }
+    await stopped;
   }
 
   status() {
@@ -134,6 +158,7 @@ class PiRpcClient extends EventEmitter {
         line = line.slice(0, -1);
       }
       if (line.trim()) {
+        this.emit('terminal-output', { stream: 'stderr', text: line });
         this.emit('rpc-event', { type: 'runtime_stderr', text: line });
       }
     }
@@ -150,6 +175,7 @@ class PiRpcClient extends EventEmitter {
       line = line.slice(0, -1);
     }
     if (line.trim()) {
+      this.emit('terminal-output', { stream: 'stderr', text: line });
       this.emit('rpc-event', { type: 'runtime_stderr', text: line });
     }
   }
@@ -168,6 +194,7 @@ class PiRpcClient extends EventEmitter {
       if (!line.trim()) {
         continue;
       }
+      this.emit('terminal-output', { stream: 'stdout', text: line });
       this.handleLine(line);
     }
   }
@@ -183,6 +210,7 @@ class PiRpcClient extends EventEmitter {
       line = line.slice(0, -1);
     }
     if (line.trim()) {
+      this.emit('terminal-output', { stream: 'stdout', text: line });
       this.handleLine(line);
     }
   }

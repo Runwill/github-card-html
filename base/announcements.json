@@ -1,6 +1,13 @@
 {
   "announcements": [
     {
+      "date": "2026-06-21",
+      "title": "Pi Agent GUI 会话体验修复",
+      "changes": [
+        "修复：Pi Agent GUI 的运行跟踪、待确认文件编辑列表、编辑步骤文件路径、编辑重发取消流程和本次编辑 diff 收起行为更清晰可见"
+      ]
+    },
+    {
       "date": "2026-06-07",
       "title": "代码清理与样式瘦身",
       "changes": [

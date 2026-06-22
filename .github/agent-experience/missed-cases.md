@@ -62,12 +62,28 @@ return {
 - 已验证 Provider 默认值正确、`models.json` 写入正确、API Key 不回显正确。
 - 没有在保存后刷新页面检查表单是否从持久配置 hydrate，导致页面重新回到默认状态。
 - 没有模拟“Key 留空但修改其它字段再保存”，漏掉空 Key 应保留旧 Key的编辑语义。
+- Pi Agent GUI Sessions 面板初次实现时，只验证了当前 Node 进程内的 `sessionConfig` 和页面刷新，没有验证 server 重启后是否仍从磁盘恢复；用户实际刷新/重启后启动方式和会话选择丢失。
+- 后续补上会话选择持久化后，仍只把“保存了下次启动参数”当作完成，没有验证用户在 Sessions 面板能否看到所选会话的历史内容；导致设置确实保存，但刷新后用户仍看不到会话内容。
+- 再次补上所选会话最近消息预览后，只验证了 Sessions 面板内的侧栏预览，没有验证用户认定的主 `messages` 对话区；导致 session 文件里已有历史消息，但主消息区仍因为 `/api/messages` 只读运行中的 Pi RPC 而为空。
+- Pi Agent GUI 补工具调用/思考过程显示时，只确认了 `thinking`、`toolCall`、`toolResult` 的字段、文案和渲染函数存在，并且 Activity 能显示运行事件；没有把“正在思考/正在调用工具/工具结果返回”作为主 `messages` 对话区的真实过程态做端到端断言，也没有暴露 Pi 子进程 stdout/stderr 原始输出来对照 RPC 时序，导致通道存在但 GUI 上没有真实 VS Code Copilot Agent 式过程可视化。
+- 修复复制消息跳底后，仍把停止进程、状态刷新、加载消息等路径视为“无害刷新”，没有专门验证主 `messages` 已滚到中间时是否会被 `replaceChildren` 或默认滚底扰动；导致停止 Pi agent 和多种 no-op 刷新会让消息列表跳到底部或闪烁。
 
 **下次自检**
 
 1. 配置页改动必须覆盖三段链路：默认空配置、保存后磁盘状态、刷新后 UI 状态。
 2. 任何脱敏字段都要定义空输入语义：新增时是否必填，编辑已有配置时是否保留旧值。
 3. 验证时用真实页面刷新和一次二次保存请求，不只看 DOM 默认值或单次保存响应。
+4. 配置类状态如果由后端进程持有，还必须重启后端进程再刷新页面，确认不是只存在内存里。
+5. 会话/历史类设置必须区分“下次启动参数”“当前运行进程”“离线历史内容预览”三层；保存成功后要验证对应内容入口也恢复，而不只验证表单值。
+6. 如果功能有侧栏预览和主内容区两个入口，必须验证用户任务语义里的 canonical surface，例如会话历史应同时确认主 `messages` 对话区，而不能只看 Sessions 列表里的最近消息。
+7. 会话工具调用/工具结果有实时流和刷新回放两条路径；验证时必须在不刷新页面的情况下发送一次会触发工具的消息，确认主 `messages` 与左侧 Activity 同步更新，再刷新确认历史回放一致。工具调用和工具结果可以保持语义中立，但主对话渲染前必须归入相邻 assistant 的步骤流，不能作为独立中立消息打断折叠；同时要覆盖同一 content 数组内夹杂文本、assistant 字符串里的 markdown transcript、相邻 step-only assistant 消息三种边界，断言连续工具步骤最终只形成一个可展开步骤块。步骤块验收不能停在“有折叠”：展开后还要断言步骤类型/状态 badge、JSON 参数或结果字段结构化显示、非 JSON 文本 fallback 可读；assistant 正文至少要验证加粗、分隔线、行内代码、代码块和列表这些基础 Markdown 格式。
+8. Agent 过程态功能不能只验字段、事件通道、渲染函数或 Activity 侧栏；必须在当前浏览器页面断言主 `messages` DOM 中出现进行中的 assistant 卡片、状态文本、工具块/思考块，并覆盖发送后立即等待、`/api/messages` 刷新返回空 assistant、空 `response` / `message_end`、空 `agent_end` 这类结束元事件、首个工具事件前的等待空档，以及完成或失败后的状态收敛。
+9. 消息列表任务必须单独验证视口稳定性：把 `#messages` 滚到中间，再触发停止运行、状态刷新、重复 `loadMessages` 或 Activity 更新，断言 `scrollTop`、消息渲染签名和首个消息节点不被无变化刷新扰动；只有用户发送/实时生成新内容时才允许贴底。若用 `null` 表示“当前无待处理渲染选项”，不能只依赖函数默认参数，合并函数必须显式把 `null` 归一成空对象。
+10. Agent 流式显示必须验证真实 RPC 事件结构和请求时序：若 `/api/prompt` 等接口等待最终 RPC response 才返回，或者前端只识别模拟的 `message_update/tool_execution_*` 字段，就会出现“UI 有入口但真实使用只在最后输出”。必须检查 SSE 是否在命令执行期间持续收到事件、最终 `response` 是否能合并进正在生成的 assistant 消息，以及无输出工具步骤是否折叠成紧凑摘要。
+11. 若用户反馈过程态仍有空白，不能继续猜测 active assistant 或消息合并逻辑；必须先让当前页面能看到 Pi 请求 accepted、关键 RPC 阶段事件、子进程 stdout/stderr、最终 response 之间的顺序，再根据真实空档定位。运行跟踪不要逐 token 复制 `message_update`，否则会把观测性变成新的 SSE 和 DOM 渲染压力。
+12. 编辑重发/消息分叉状态必须覆盖“只点击不发送”的临时草稿期：进入草稿后触发后台 `loadMessages`、重复点击同一条编辑、取消草稿、再发送，都不能把已裁剪的原历史尾部重新拼回主 `messages`，也不能把第一次进入草稿时的原始历史边界缩成裁剪后的短列表长度。
+13. 编辑重发如果涉及“撤回后续文件编辑”，必须把进入草稿、取消草稿、真正发送三段分开验证：进入草稿只应隐藏后续消息并保留工作区文件现状；取消应恢复当前视图且不改文件；发送前才按绑定的 edit checkpoint 恢复文件，并覆盖二次恢复、恢复失败/跳过文件提示。不能把“消息裁剪”和“文件恢复”混成同一次点击完成。
+14. 待确认修改列表、步骤文件路径和 scoped diff 这类功能不能只验证 state、API 或按钮数量；必须在用户认定的 canonical surface 里断言可见文本、路径按钮、增删 stats、点击后的预览标题/meta/diff 内容。若页面有历史只读会话、Activity 面板、消息区 notice、项目预览等多个入口，必须说明哪个入口已视觉确认、哪个入口因当前状态不可点击。
 
 **推荐验证片段**
 
@@ -114,6 +130,149 @@ window.fetch = async (...args) => {
 document.getElementById('messageInput').value = '你好';
 document.getElementById('composer').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
 ```
+
+## 只给子元素最小高度，漏查父 grid 与持久内容是否仍会挤出视口
+
+**自检触发信号**
+
+- 刷新后持久化 chip、标签、筛选项或其它动态内容已经存在，初始布局和空状态/少量内容状态不同。
+- 修复目标是“给输入框/列表/面板一个最小高度”，但父容器使用 CSS grid/flex 分配剩余空间。
+- 媒体查询里重复定义了父容器行列、尺寸 token 或 `minmax(0, 1fr)`，可能覆盖基础规则。
+- 元素自身 computed height 看起来正确，但视觉上不可见、被推出父容器，或被父级 `overflow: hidden` 裁掉。
+- 拉高父容器后，动态内容已经完全显示，但 `1fr` 行/列仍继续吃掉剩余空间，形成大片空白。
+
+**当时漏掉的情况**
+
+- Pi Agent GUI 上下文 chip 持久化后，刷新初始 composer 会先占用高度；只给 `#messageInput` 加 `min-height` 后，输入框自身保住了高度，却被 context 行按内容撑高后排到 composer 外面。
+- 第一次验证只看 `inputVisible` 和输入框高度，没有同时断言 `inputRect` 是否仍在 `.composer` 边界内。
+- 小屏媒体查询里还有一份 `.composer` 的 `grid-template-rows`，基础规则改完后仍可能被当前 390px 宽视口覆盖。
+- 上下文 chip 容器开始是被父级裁切，而不是自身滚动；需要把 chip 列表约束到 picker 高度内滚动，才算完整修复。
+- 后续继续拉高 composer 时，context 行仍由 `1fr` 分配剩余高度，即使 chip 已全部显示也会继续拉伸留白；需要把“自然内容高度”和“可用最大高度”分开测量。
+
+**下次自检**
+
+1. 布局最小高度修复必须同时验证子元素高度、父容器边界和真实视口内可见性，不能只看目标元素 computed `min-height`。
+2. 如果问题依赖刷新后的持久状态，验证时保留已有 localStorage/state，不只测空状态或手动新加一个对象。
+3. 改 grid/flex 行列时搜索所有媒体查询里的同一 owner，确保当前验收尺寸消费的是同一套 token。
+4. 动态列表过多时，优先让列表自身在分配到的空间里滚动；避免父容器裁切导致交互目标不可达。
+5. 可拖拽调整的父容器要分别验证“内容不足时不拉伸留白”和“内容过多时内部滚动”，不能只验证最小高度。
+
+**推荐验证片段**
+
+```js
+const composer = document.querySelector('.composer');
+const input = document.querySelector('#messageInput');
+const chips = document.querySelector('.context-chips');
+const composerRect = composer.getBoundingClientRect();
+const inputRect = input.getBoundingClientRect();
+return {
+  inputInsideComposer: inputRect.top >= composerRect.top && inputRect.bottom <= composerRect.bottom,
+  inputHeight: inputRect.height,
+  chipsScrollable: chips.scrollHeight > chips.clientHeight && getComputedStyle(chips).overflowY !== 'visible'
+};
+```
+
+## 把底层能力直接映射成 UI，浪费在中间形态
+
+**自检触发信号**
+
+- 用户要求“做某个功能”后，实现方案先从内部枚举、权限范围、bridge 能力或数据结构出发，而不是从用户熟悉的最终操作模型出发。
+- 旧设计被指出语义不对后，只把抽象层级下调一层，例如从“范围下拉”改成“来源 checkbox”，但仍不是目标交互。
+- UI 主语仍是底层能力名、权限开关或数据来源，而用户期望的是可添加、可移除、可预览的具体对象。
+- 计划或文档中的设计门禁是在实现后才补写，而不是实现前阻止中间方案落地。
+
+**当时漏掉的情况**
+
+- Pi Agent GUI 的上下文选择原本被做成 `all/file/diff/git/none` 范围下拉；用户指出这不是“选择上下文”。
+- 随后又把底层 bridge 能力 `file/diff/git/unsaved` 直接做成四个常驻 checkbox；这比范围下拉更准确，但仍是服务权限门禁的中间形态。
+- 没有先对照 VS Code/Copilot Chat 中“点击添加上下文、拖拽文件、chip 列表管理”的用户模型定稿，再进入实现。
+- `PLAN.md` 的 owner 门禁补在实现之后，未能阻止资源继续花在 checkbox 中间形态上。
+- 后续修上下文面板时，脚本里用 `.click()` / 直接 dispatch 事件验证展开、移除和拖放成功，但真实页面入口仍失败；原因包括原生 `details/summary` 交互和 CSS `display` 规则破坏 `[hidden]` 语义，导致“DOM 状态看似能改”不等于用户 pointer/click 路径可用。
+
+**用户引导带来的关键转向**
+
+- 用户指出自己在 VS Code 中只见过直接点击选择和拖动选择文件，追问“这些部分 VS Code 有吗”。
+- 用户进一步指出这是否又是在做中间形态，迫使实现目标从“暴露 bridge 来源开关”改为“添加上下文对象 + chip 列表 + 拖拽添加”。
+
+**下次自检**
+
+1. 新 UI 进入实现前，先写一句“用户以什么动作完成任务”，再写“内部 owner 如何消费”；不能只从内部能力枚举生成控件。
+2. 若用户要求的是编辑器/IDE 类既有体验，先对照成熟工具的交互模型：添加、移除、预览、拖拽、当前对象快捷项，而不是常驻权限开关。
+3. 语义纠偏后必须问：这是不是最终形态，还是只是把中间层换了个 UI？若仍是中间层，先停下写目标设计。
+4. 实现前把目标形态写进项目计划或对应 skill；实现中若出现与目标形态不一致的临时控件，标记为待替换且不继续扩建。
+5. 交互修复验证不能只调用元素 `.click()` 或直接 dispatch 目标事件；必须覆盖真实入口的 pointer/click、隐藏面板初始状态、菜单展开状态、chip 移除后摘要变化、项目树拖入后的路径显示。若工具鼠标事件异常，至少记录命中链、层叠/`pointer-events`、`[hidden]` 是否被 CSS 覆盖，并在最终风险中说明。
+
+**推荐验证入口**
+
+- 页面主入口应显示已添加上下文 chip，而不是内部来源 checkbox。
+- “添加上下文”菜单应提供当前文件、当前 Diff、Git 变更、未保存状态和选择文件；拖拽文件到输入区后应生成可移除 chip。
+- 上下文头部点击应展开/收起面板；添加菜单默认隐藏且只在按钮触发后显示；移除 chip 后计数摘要同步减少；把项目树文件拖到上下文区域任意位置应自动展开并新增真实文件路径 chip。
+- Bridge API 可继续使用内部 `contextItems`/路径字段，但 UI 文案不能让用户管理底层权限枚举。
+
+## 文件路径功能完成后，漏测文件夹路径的对称行为
+
+**自检触发信号**
+
+- 同一 UI 能力同时支持文件和文件夹，例如路径 token、项目树跳转、拖拽加入上下文、chip 展示、bridge 同步和项目树高亮。
+- 文件路径已通过验证，但文件夹路径只验证了识别或数据字段，没有继续验证点击、上下文、树节点高亮和可访问标签。
+- CSS/JS 中分别存在 `.text-button` / `.tree-folder-button`、`data-file-path` / `data-folder-path` 等成对 owner。
+
+**当时漏掉的情况**
+
+- Pi Agent GUI 消息路径先补了文件 token，再补显式尾斜杠的 folder token；浏览器验证确认 folder token 能生成。
+- 但后续没有把“作为上下文时高亮”也纳入 folder 验收：JS 已给 folder row 加 `in-context`，CSS 高亮规则却只覆盖 `.tree-row.in-context > .text-button`，导致文件会高亮、文件夹不会。
+- 用户追问“文件夹是不是还没有文件的全部功能”后，才回头对照文件和文件夹的交互链路。
+- 后续又只用含 `/` 的 plain text 路径验收，漏掉 Copilot 风格消息里常见的裸文件名、行内代码样式文件名、引号包裹路径和 `file:///` 复制链接；结果 `base/announcements.json` 可点，但 `announcements.json`、`` `app.js` `` 一类文本不会按路径处理。
+- 路径 token 对齐问题先只在步骤标题入口修了局部 `.step-title .message-path-token` 参数，没有回到全局 `.message-path-token` owner；当正文、列表、引用和行内代码开始生成更多路径 token 后，同一 `inline-flex` baseline 偏移在消息正文复现。
+
+**下次自检**
+
+1. 任何文件/文件夹共享能力都要列出成对验收：识别、点击、拖拽、上下文 chip、项目树高亮、bridge payload、截断树兜底。
+2. CSS 规则若按文件按钮写选择器，必须检查同一状态是否需要覆盖文件夹按钮；不要只看 JS class 是否加上。
+3. 验证时至少选一个真实存在的文件夹节点和一个截断树兜底路径，分别断言 token 类型、点击结果和上下文高亮。
+4. 对树节点高亮要检查 DOM class、可访问标签和 computed style，避免“状态存在但视觉未消费”。
+5. 路径 token 验收不能只测含斜杠路径；还要覆盖可唯一定位的裸文件名、行内代码里的文件名、引号包裹路径，并确认日期、版本号和普通词不会误判。
+6. 路径 token 的视觉修复必须回到 `.message-path-token` owner 验证正文、列表、引用、标题和步骤标题，不要只在 `.step-title` 等单一入口追加局部对齐覆盖。
+
+**推荐验证入口**
+
+- 消息中点击 `tools/pi-agent-gui/extension/` 应识别为 folder token；若项目树被截断，至少不降级为普通文本。
+- 消息中的 `announcements.json`、`` `app.js` `` 和 `base/announcements.json` 应在能定位真实项目文件时生成 file token；`2026-06-19` 应保持普通文本或 code。
+- 段落、列表、引用、标题和步骤标题里的路径 token 都应保持垂直居中，图标在 token 内部上下留白应接近一致。
+- 将真实存在的文件夹加入上下文后，项目树对应 `[data-folder-path]` 的 row 应有 `in-context`，按钮应显示“已在上下文中”的可访问标签，并消费高亮样式。
+
+## 性能修复只消掉算法热点，漏测真实浏览器主线程瓶颈
+
+**自检触发信号**
+
+- 用户反馈打开、搜索、渲染或滚动卡顿，但代码里同时存在多种潜在热点：正则扫描、DOM 节点量、minimap/overview、布局计算、缓存刷新。
+- 已找到一个明显复杂度问题，例如 O(n²) 循环，但还没有在真实浏览器里量化修复前后的耗时和节点量。
+- 用户反馈“仍然卡顿、毫无变化”，说明先前修复没有覆盖主瓶颈，或页面仍加载旧脚本/旧缓存。
+- 用户点名的真实文件低于优化阈值，或优化分支虽然先显示内容，但仍在后台生成全量高亮 DOM，卡顿只是延后出现。
+
+**当时漏掉的情况**
+
+- Pi Agent GUI 长文件预览先修了 `countLinesBefore()` 对每个 token 从头数换行的 O(n²) 问题。
+- 但主卡顿实际还来自全量语法正则 token 化和一次性生成数万个 `span` DOM 节点；只消掉行号计算后，用户可感知卡顿几乎没变化。
+- 第一轮修复后只跑了静态校验，没有立刻在浏览器构造接近 256KB 的内容测 `highlightCode()` 耗时、节点数和搜索命中分支。
+- 浏览器页面若没有强制刷新脚本，也会继续运行旧 `app.js`，让“修了但没变化”的判断更混乱。
+- 后续尝试把高亮改成空闲时间片后台补齐，但仍会为 `base/announcements.json` 这类中等文件生成 5000+ 个语法节点；这不是根治，只是把主线程成本从打开瞬间搬到后台，性价比低。
+
+**下次自检**
+
+1. 性能 bug 不能只凭源码复杂度判断完成；必须用真实浏览器或目标运行时记录耗时、DOM 节点量、数据量和是否命中新分支。
+2. 若一个渲染入口同时做解析、DOM 生成和概览标记，先按阶段测量，不要只修第一个看起来明显的循环。
+3. 大文件/长列表场景要设置轻量模式或虚拟化阈值；只优化内部算法但仍生成海量 DOM 时，用户体验可能没有变化。
+4. 阈值必须用用户点名的真实文件大小校准，不能只测 synthetic 90KB/200KB；如果返回内容被后端截断或裁剪，也要按浏览器实际 `textLength` 判断是否命中分支。
+5. 后台补齐全量 DOM 不是默认合格方案；若最终仍要生成成千上万个节点，必须说明用户可见收益并与纯文本/可视区高亮/搜索命中高亮方案做成本对比。
+6. 验证时先确认页面加载的是新脚本或新资源，例如检查函数源码特征、版本 query 或强制 reload；SSE 页面不要用 `networkidle` 作为唯一刷新等待条件。
+
+**推荐验证入口**
+
+- 在 Pi Agent GUI 页面构造接近 200KB-256KB 的 JS/CSS/JSON 内容，直接测 `highlightCode()` 或预览打开路径的耗时、返回节点数和 minimap 标记数。
+- 分别测无搜索和有搜索命中两种状态：无搜索时大文件应主要是单个文本节点，有搜索时节点数应只随命中数量增长。
+- 等待 1-2 秒后再次测节点数，确认没有后台任务把轻量预览悄悄替换成海量高亮 DOM。
+- 刷新页面后先断言新分支存在，再执行性能对比，避免旧脚本缓存造成误判。
 
 ## 经验库触发条件过窄：把规则优化当成普通措辞修改
 
@@ -367,6 +526,31 @@ document.getElementById('composer').dispatchEvent(new Event('submit', { bubbles:
 8. 搜索验收要分别跑当前文件、名称、全文三种入口，并确认当前文件结果滚到行、文件夹结果展开树、全文结果打开文件。
 9. 搜索结果列表不能只显示纯文本：路径、文件名、行号/类型和命中片段应有语义区分；长行结果必须裁成围绕命中词的可见片段，而不是只截取行首，且要在窄侧栏宽度下确认命中元素仍处于预览行可见矩形内；点击结果后预览正文必须高亮具体命中字符，概览条也要显示搜索命中位置，避免用户只到达大概文件/行却找不到目标字符。验收不能只数 `.search-hit` 或结果 DOM 数量，还要量 `getComputedStyle()` 的颜色是否被通用 `span/button` 规则覆盖，并用 `getBoundingClientRect()` 检查文件图标相对结果行垂直居中。
 10. 打开文件后检查项目树当前项：父文件夹应展开，当前行应高亮，切到 diff 或错误预览时旧高亮应清除。
+
+## 把 IDE GUI 架构问题当成局部 UI 修补
+
+**自检触发信号**
+
+- 用户要求做 VS Code-like、agent GUI、IDE bridge、双端共享工作台或类似 IDE 的 agent 使用体验，但实现只围绕按钮、缓存、提示词拼接或单个面板修补。
+- 已经发现一个 owner 错位（如浏览器缓存消息、prompt 正文拼上下文），却没有继续检查 runtime/session、IDE state、bridge tools、browser view、docs 是否也有同类错位。
+- 用户问“还有没有类似问题”“这不像 GUI/不像 VS Code”“正常 agent 会话如何实现”，或指出“缺少开发这个 agent 的 IDE 全局观念”。
+- 验证只证明 HTTP API 或 DOM 功能可用，没有证明 agent 能通过真实工具入口获取当前文件、diff、Git 变更和未保存状态。
+
+**当时漏掉的情况**
+
+- Pi Agent GUI 已经不应只是网页聊天壳，但我最初把问题拆成局部 UI 和浏览器缓存修复，没有主动建立 IDE owner 矩阵。
+- 发现浏览器 `localStorage` 不适合做共享消息历史后，若只删除缓存而不接 Pi 原生 session 参数，桌面/手机刷新和重启后的会话 owner 仍不清晰。
+- 发现 prompt 正文不该拼 IDE 状态后，若只保留 `get_ide_context` 摘要工具，agent 仍不能用 Pi-native 工具读取当前文件、当前 diff、Git 变更和未保存 buffer。
+- 浏览器页面旧资源未刷新时，DOM 仍是旧 Runtime 面板；如果只看运行中状态或旧页面截图，会误判新 session UI 没生效或反过来误判已经验证过。
+
+**下次自检**
+
+1. 做 agent GUI/IDE bridge 任务前，先列 owner 矩阵：runtime/session、message、IDE state、bridge tools、project/Git API、browser view、docs/plan；每个 owner 都要说明主数据源和禁止的数据源。
+2. 发现一个“局部功能不像 IDE”的问题后，继续反查相邻 owner 是否也只是 chat wrapper 思路，不要只修当前按钮、文案或缓存。
+3. 会话历史只能由 runtime/session owner 或 server-side store 统一，浏览器偏好可以进 `localStorage`，共享消息和 agent 状态不能进浏览器私有缓存。
+4. IDE 上下文不能只在页面预览或消息正文里存在；必须有真实 agent 工具入口，并验证工具能读 context、file、diff、changes、unsaved buffers，同时验证 scope 拒绝分支。
+5. 浏览器验证前先刷新或断言静态资源版本；当前页面现象和文件修改不一致时，优先怀疑旧页面/旧 JS/旧 HTML，而不是直接否定实现。
+6. 生命周期控制必须验证正反两端：启动成功后还要从真实按钮/API 触发停止，确认后端 endpoint 等待进程退出、Windows 进程树被清理、运行状态刷新、相关会话/按钮禁用态恢复；不能把“按钮会变灰”或“存在终止入口”当作停止功能完成。
 
 ## 参考 Web 只学到颜色，没有学到设计逻辑
 

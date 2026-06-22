@@ -11,7 +11,7 @@
     <header class="topbar">
       <div class="brand-block">
         <h1>Pi Agent GUI</h1>
-        <p id="runtimeSummary" data-i18n="runtime.loading">Loading runtime...</p>
+        <p id="runtimeSummary" data-i18n="runtime.loading">Loading agent process...</p>
       </div>
       <div class="runtime-actions">
         <label class="language-picker">
@@ -26,33 +26,36 @@
     </header>
 
     <nav class="activity-rail" aria-label="Pi GUI panels">
-      <button type="button" class="rail-button active" data-panel-target="runtimePanel" data-i18n-title="tabs.runtime" title="Runtime" data-help="help.runtimeTab">Run</button>
+      <button type="button" class="rail-button active" data-panel-target="runtimePanel" data-i18n-title="tabs.runtime" title="Agent" data-help="help.runtimeTab">Run</button>
       <button type="button" class="rail-button" data-panel-target="projectPanel" data-i18n-title="tabs.project" title="Project" data-help="help.projectTab">Proj</button>
       <button type="button" class="rail-button" data-panel-target="changesPanel" data-i18n-title="tabs.changes" title="Changes" data-help="help.changesTab">Git</button>
       <button type="button" class="rail-button" data-panel-target="modelPanel" data-i18n-title="tabs.model" title="Model" data-help="help.modelTab">AI</button>
+      <button type="button" class="rail-button" data-panel-target="sessionsPanel" data-i18n-title="tabs.sessions" title="Sessions" data-help="help.sessionsTab">Sess</button>
       <button type="button" class="rail-button" data-panel-target="configPanel" data-i18n-title="tabs.config" title="Config" data-help="help.configTab">Cfg</button>
       <button type="button" class="rail-button" data-panel-target="activityPanel" data-i18n-title="tabs.activity" title="Activity" data-help="help.activityTab">Log</button>
     </nav>
 
     <aside id="sidePanel" class="side-panel">
       <nav class="panel-tabs" aria-label="Pi GUI panels">
-        <button type="button" class="tab-button active" data-panel-target="runtimePanel" data-i18n="tabs.runtime" data-help="help.runtimeTab">Runtime</button>
+        <button type="button" class="tab-button active" data-panel-target="runtimePanel" data-i18n="tabs.runtime" data-help="help.runtimeTab">Agent</button>
         <button type="button" class="tab-button" data-panel-target="projectPanel" data-i18n="tabs.project" data-help="help.projectTab">Project</button>
         <button type="button" class="tab-button" data-panel-target="changesPanel" data-i18n="tabs.changes" data-help="help.changesTab">Changes</button>
         <button type="button" class="tab-button" data-panel-target="modelPanel" data-i18n="tabs.model" data-help="help.modelTab">Model</button>
+        <button type="button" class="tab-button" data-panel-target="sessionsPanel" data-i18n="tabs.sessions" data-help="help.sessionsTab">Sessions</button>
         <button type="button" class="tab-button" data-panel-target="configPanel" data-i18n="tabs.config" data-help="help.configTab">Config</button>
         <button type="button" class="tab-button" data-panel-target="activityPanel" data-i18n="tabs.activity" data-help="help.activityTab">Activity</button>
       </nav>
 
       <section id="runtimePanel" class="panel-section active">
         <div class="panel-section-header">
-          <h2 data-i18n="tabs.runtime">Runtime</h2>
+          <h2 data-i18n="tabs.runtime">Agent</h2>
         </div>
         <div class="panel-section-body">
           <dl class="status-list panel-group">
             <div><dt data-i18n="runtime.status">Status</dt><dd id="runtimeStatus">Unknown</dd></div>
             <div><dt data-i18n="runtime.project">Project</dt><dd id="targetProject">-</dd></div>
             <div><dt data-i18n="runtime.model">Model</dt><dd id="currentModel">-</dd></div>
+            <div><dt data-i18n="runtime.session">Session</dt><dd id="currentSession">-</dd></div>
           </dl>
         </div>
       </section>
@@ -104,6 +107,43 @@
           <div class="panel-group model-picker-group">
             <select id="modelSelect" data-help="help.modelSelect"></select>
             <button id="setModelButton" type="button" class="secondary" data-i18n="actions.setModel" data-help="help.setModel">Set model</button>
+          </div>
+        </div>
+      </section>
+
+      <section id="sessionsPanel" class="panel-section">
+        <div class="panel-section-header">
+          <h2 data-i18n="tabs.sessions">Sessions</h2>
+        </div>
+        <div class="panel-section-body panel-section-body-stacked">
+          <form id="sessionForm" class="session-form panel-group">
+            <label>
+              <span data-i18n="sessions.startMode">Start mode</span>
+              <select id="sessionModeSelect" data-help="help.sessionMode">
+                <option value="default" data-i18n="sessions.modeDefault">Default</option>
+                <option value="continue" data-i18n="sessions.modeContinue">Continue previous</option>
+                <option value="resume" data-i18n="sessions.modeResume">Pick in Pi</option>
+                <option value="session" data-i18n="sessions.modeSession">Specific session</option>
+                <option value="session-id" data-i18n="sessions.modeSessionId">Exact session id</option>
+                <option value="none" data-i18n="sessions.modeNone">No session</option>
+              </select>
+            </label>
+            <label>
+              <span data-i18n="sessions.sessionValue">Session path or id</span>
+              <input id="sessionValueInput" autocomplete="off" data-i18n-placeholder="sessions.sessionValuePlaceholder" placeholder="Select a session below or paste a path/id" data-help="help.sessionValue">
+            </label>
+            <label>
+              <span data-i18n="sessions.sessionDir">Session directory</span>
+              <input id="sessionDirInput" autocomplete="off" data-i18n-placeholder="sessions.sessionDirPlaceholder" placeholder="Pi default session directory" data-help="help.sessionDir">
+            </label>
+            <div class="form-actions">
+              <button id="saveSessionSelectionButton" type="button" class="secondary" data-i18n="actions.saveSession" data-help="help.saveSession">Use on next start</button>
+              <button id="newSessionButton" type="button" class="secondary" data-i18n="actions.newSession" data-help="help.newSession">New session</button>
+            </div>
+            <p id="sessionStatus" class="form-status"></p>
+          </form>
+          <div class="panel-group sessions-list-group">
+            <div id="sessionsList" class="sessions-list"></div>
           </div>
         </div>
       </section>
@@ -178,8 +218,23 @@
         <div class="panel-section-header">
           <h2 data-i18n="tabs.activity">Activity</h2>
         </div>
-        <div class="panel-section-body">
+        <div class="panel-section-body panel-section-body-stacked">
+          <div class="panel-group step-reference-group" data-help="help.stepReference">
+            <label class="step-reference-search">
+              <span data-i18n="stepReference.title">步骤类型参考</span>
+              <input id="stepReferenceSearch" type="search" autocomplete="off" placeholder="搜索步骤类型" data-i18n-placeholder="stepReference.searchPlaceholder" data-help="help.stepReferenceSearch">
+            </label>
+            <div id="stepReferenceList" class="step-reference-list"></div>
+          </div>
+          <section id="pendingEditCheckpoint" class="pending-edit-checkpoint panel-group" hidden></section>
           <div id="activityList" class="activity-list"></div>
+          <section class="terminal-output-group panel-group" data-help="help.terminalOutput">
+            <div class="terminal-output-header">
+              <strong data-i18n="runtime.terminalOutput">Pi 运行跟踪</strong>
+              <span id="terminalOutputMeta" data-i18n="runtime.terminalEmpty">暂无输出</span>
+            </div>
+            <pre id="terminalOutput" class="terminal-output" aria-live="polite"></pre>
+          </section>
         </div>
       </section>
     </aside>
@@ -208,20 +263,23 @@
       </section>
       <div id="previewResizeHandle" class="resize-handle resize-handle-horizontal" role="separator" aria-orientation="horizontal" aria-label="Resize preview" data-help="help.resizePreview"></div>
       <div class="conversation-stack">
+        <div id="conversationNotices" class="conversation-notices" aria-live="polite"></div>
         <div id="messages" class="messages"></div>
       </div>
       <div id="composerResizeHandle" class="resize-handle resize-handle-composer" role="separator" aria-orientation="horizontal" aria-label="Resize composer" data-help="help.resizeComposer"></div>
       <form id="composer" class="composer">
-        <details id="contextPanel" class="composer-context" data-help="help.contextPanel">
-          <summary>
-            <label class="context-toggle" data-help="help.showIdeState">
-              <input id="showIdeStateInput" type="checkbox" checked>
-              <span data-i18n="context.include">显示 IDE 状态</span>
-            </label>
-            <span id="contextSummary" class="context-summary"></span>
-          </summary>
-          <pre id="contextPreview" class="context-preview"></pre>
-        </details>
+        <div id="contextPanel" class="composer-context" data-help="help.contextPanel">
+          <div class="context-picker" id="contextPicker" data-help="help.contextPicker" role="group" tabindex="0" aria-label="Added context" aria-expanded="false" aria-haspopup="listbox">
+            <div id="contextChips" class="context-chips" role="list" aria-label="Added context"></div>
+            <div class="context-add" data-help="help.contextAdd">
+            </div>
+            <div class="context-add-menu" hidden>
+              <input id="contextSearchInput" class="context-search-input" type="search" autocomplete="off" data-i18n-placeholder="context.searchPlaceholder" placeholder="搜索文件或上下文">
+              <div id="contextObjectList" class="context-object-list" role="listbox" aria-label="Context objects"></div>
+              <button type="button" data-context-add="clear" data-i18n="context.presetNone">清空</button>
+            </div>
+          </div>
+        </div>
         <div class="composer-controls">
           <select id="sendMode" aria-label="Send mode" data-help="help.sendMode">
             <option value="prompt" data-i18n="sendMode.prompt">Prompt</option>
