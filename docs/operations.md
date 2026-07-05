@@ -26,7 +26,7 @@ npm run dev
 
 ## 导入程序页数据
 
-先在前端项目生成 `base/program_panel.json`，再在后端项目导入到本地数据库：
+先在前端项目临时生成 `base/program_panel.json`，再在后端项目导入到本地数据库。该 JSON 已加入 `.gitignore`，仅用于导入/恢复，不作为程序页运行时兜底；若后端或数据库不可用，程序页会直接显示加载错误。
 
 ```powershell
 node .\scripts\extract-program-panel.js

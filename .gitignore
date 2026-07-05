@@ -3,3 +3,6 @@
 
 # Local npm dependencies
 node_modules/
+
+# Generated import snapshots
+base/program_panel.json

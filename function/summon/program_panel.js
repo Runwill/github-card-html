@@ -1,21 +1,24 @@
 window.summonProgramPanel = async function summonProgramPanel() {
+  const panel = document.getElementById('panel_term');
+  if (!panel) return false;
+  const main = panel.querySelector('main') || panel;
   try {
     const data = await loadProgramPanelData();
-    if (!isRenderableProgramPanel(data)) return false;
-    const panel = document.getElementById('panel_term');
-    if (!panel) return false;
-    const main = panel.querySelector('main') || panel;
+    if (!isRenderableProgramPanel(data)) throw new Error(tProgram('programPanel.invalidData', '程序页数据库数据格式不可渲染'));
     const html = renderProgramPanelData(data);
-    if (!html) return false;
+    if (!html) throw new Error(tProgram('programPanel.emptyData', '程序页数据库数据为空'));
     main.innerHTML = html;
     panel.dataset.programPanelMode = 'generated';
+    panel.dataset.programPanelSource = 'backend';
+    delete panel.dataset.programPanelError;
     window.programPanelData = data;
     try {
       window.dispatchEvent(new CustomEvent('program-panel:rendered', { detail: { data, panel, main } }));
     } catch (_) {}
     return true;
   } catch (err) {
-    console.warn('[program_panel] fallback to static panel', err);
+    console.error('[program_panel] database render failed', err);
+    renderProgramPanelError(panel, main, err);
     return false;
   }
 };
@@ -24,13 +27,30 @@ async function loadProgramPanelData() {
   const endpoint = window.endpoints && typeof window.endpoints.programPanel === 'function'
     ? window.endpoints.programPanel()
     : '';
-  if (endpoint) {
-    try {
-      const data = await fetchJsonCached(endpoint, { cache: 'no-cache' });
-      if (isRenderableProgramPanel(data)) return data;
-    } catch (_) {}
-  }
-  return fetchJsonCached('base/program_panel.json', { cache: 'no-cache' });
+  if (!endpoint) throw new Error(tProgram('programPanel.missingEndpoint', '程序页后端接口未配置'));
+  return fetchJsonCached(endpoint, { cache: 'no-cache' });
+}
+
+function renderProgramPanelError(panel, main, err) {
+  panel.dataset.programPanelMode = 'error';
+  panel.dataset.programPanelSource = 'backend';
+  panel.dataset.programPanelError = 'load-failed';
+  window.programPanelData = null;
+  const message = err && err.message ? err.message : tProgram('programPanel.loadFailed', '程序页数据库内容加载失败');
+  main.innerHTML = [
+    '<div class="callout alert" data-program-panel-error>',
+    '  <h3>' + escapeHtml(tProgram('programPanel.loadFailed', '程序页数据库内容加载失败')) + '</h3>',
+    '  <p>' + escapeHtml(tProgram('programPanel.loadFailedHint', '请确认后端正在运行，并且 MongoDB 已导入 ProgramPanel 数据。当前已禁用 base/program_panel.json 运行时兜底。')) + '</p>',
+    '  <pre>' + escapeHtml(message) + '</pre>',
+    '</div>'
+  ].join('');
+  try {
+    window.dispatchEvent(new CustomEvent('program-panel:error', { detail: { error: err, panel, main } }));
+  } catch (_) {}
+}
+
+function tProgram(key, fallback) {
+  try { return window.t ? window.t(key) : fallback; } catch (_) { return fallback; }
 }
 
 function isRenderableProgramPanel(data) {

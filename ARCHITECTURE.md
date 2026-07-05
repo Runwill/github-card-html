@@ -1306,7 +1306,7 @@ app_bootstrap.js
 | 动态标签 | 术语、卡牌名、角色名等标签悬停高亮，双击跳转到对应面板定义处 |
 
 **实现**: `function/summon/program_panel.js`（树数据渲染）+ `function/ui/collapsible.js`（折叠）+ `function/replace/*.js`（动态标签）
-**内容源**: MongoDB `ProgramPanel.tree`（`program_panel.v2`，节点由 Mongo `_id` 定位）；`base/program_panel.json` 为本地兜底快照，`partials/panel_term.html` 为抽取来源
+**内容源**: MongoDB `ProgramPanel.tree`（`program_panel.v2`，节点由 Mongo `_id` 定位）；运行时禁用本地兜底，后端不可用或数据不可渲染时程序页显示错误；`base/program_panel.json` 仅由抽取脚本临时生成用于导入，已从仓库跟踪中移除，`partials/panel_term.html` 为抽取来源
 
 #### 技能面板 (`panel_skill`)
 
