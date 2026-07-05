@@ -1,5 +1,5 @@
 // 统一 API 端点配置（支持 URL 参数 / localStorage / 环境默认）
-// 暴露 window.endpoints：base/getBase/setBase/api/abs/character/skill/card/termDynamic/termFixed
+// 暴露 window.endpoints：base/getBase/setBase/api/abs/character/skill/card/termDynamic/termFixed/programPanel/programPanelDebug
 function storageGet(key){ try { return (typeof localStorage!== 'undefined' && localStorage.getItem(key)) || ''; } catch(e) { return ''; } }
   function storageSet(key, value){ try { if (typeof localStorage!== 'undefined') localStorage.setItem(key, value); } catch(e) {} }
 
@@ -107,6 +107,8 @@ window.endpoints={
     character: function(){ return withBase('/api/character') },
     skill: function(strength){ var s=strength || storageGet('strength'); return withBase('/api/skill?strength='+encodeURIComponent(s||'')) },
     card: function(){ return withBase('/api/card') },
+    programPanel: function(){ return withBase('/api/program-panel') },
+    programPanelDebug: function(){ return withBase('/api/program-panel/debug') },
     termDynamic: function(){ return withBase('/api/term-dynamic') },
     termFixed: function(){ return withBase('/api/term-fixed') }
 };

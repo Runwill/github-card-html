@@ -6,6 +6,8 @@
 
 浏览器直接打开 `index.html`（推荐通过 VS Code Live Server）。后端配套 `backend-project/`，接口基址可在运行时切换。
 
+数据库备份/恢复、后端启动、前端时间戳刷新命令见 [运维命令速查](docs/operations.md)。
+
 ## 架构概要
 
 | 目录 | 职责 |

@@ -71,11 +71,22 @@
     ]
   },
   "panels": {
-    "panel_term": [
-      { "keys": ["▾ 三角按钮"], "desc": "help.term.collapse" },
-      { "actions": ["expand_all_terms"], "desc": "help.term.expandAll" },
-      { "keys": ["悬停 / 双击标签"], "desc": "help.term.dynamic" }
-    ],
+    "panel_term": {
+      "common": [
+        { "keys": ["▾ 三角按钮"], "desc": "help.term.collapse" },
+        { "actions": ["expand_all_terms"], "desc": "help.term.expandAll" },
+        { "keys": ["悬停 / 双击标签"], "desc": "help.term.dynamic" }
+      ],
+      "normal": [
+        { "keys": ["Shift+F8"], "desc": "help.term.programDebug" }
+      ],
+      "debug": [
+        { "keys": ["Shift+F8 / 关闭"], "desc": "help.term.programDebugClose" },
+        { "keys": ["页面文本"], "desc": "help.term.debugSelect" },
+        { "keys": ["内容片段"], "desc": "help.term.debugEdit" },
+        { "keys": ["定位 / 保存"], "desc": "help.term.debugActions" }
+      ]
+    },
     "panel_skill": [
       { "keys": ["搜索框"], "desc": "help.skill.search" },
       { "keys": ["Ctrl"], "desc": "help.skill.copy" },

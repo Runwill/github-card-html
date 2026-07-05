@@ -9,9 +9,12 @@ const withTimeout = (promise, ms)=>Promise.race([
 
 window.whenReady(()=>{
       try{ $(document).foundation() }catch(_){}
+      const afterProgram = withTimeout(sr(typeof window.summonProgramPanel==='function' && window.summonProgramPanel), 4500)
+      window.programPanelReady = afterProgram
       sr(typeof window.summonCharacters==='function' && window.summonCharacters)
       const afterSkills = withTimeout(sr(typeof window.summonCharacterSkill==='function' && window.summonCharacterSkill), 4500)
-      afterSkills.then(()=>{
+      Promise.all([afterProgram, afterSkills]).then(()=>{
+        sr(()=> window.syncTermPanelButtonStates?.())
         // 收集需要等待的替换 Promise，确保进度条可感知
         const tasks = []
         sr(()=> window.decompress?.('base/compression.json'))

@@ -34,6 +34,10 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
 
   // 面板子视图 → i18n key
   const PANEL_VIEW_LABEL = {
+    panel_term: {
+      normal: 'help.term.viewRead',
+      debug: 'help.term.viewDebug'
+    },
     panel_draft: {
       editor: 'editor.view.editor',
       relations: 'editor.view.relations'
@@ -54,7 +58,12 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
     return page && page.dataset.editorView === 'relations' ? 'relations' : 'editor';
   }
 
+  function getProgramView() {
+    try { return window.ProgramPanelDebug?.isOpen?.() ? 'debug' : 'normal'; } catch (_) { return 'normal'; }
+  }
+
   function getPanelView(panelId) {
+    if (panelId === 'panel_term') return getProgramView();
     if (panelId === 'panel_game') return getGameView();
     if (panelId === 'panel_draft') return getDraftView();
     return null;
@@ -253,6 +262,9 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
     }, true);
 
     window.addEventListener('keybindings-changed', function () {
+      if (visible) renderContent(getActiveContext());
+    });
+    window.addEventListener('program-debug:changed', function () {
       if (visible) renderContent(getActiveContext());
     });
     window.addEventListener('i18n:changed', function () {

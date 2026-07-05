@@ -5,11 +5,17 @@
 
 :root {
   --footer-fs: clamp(10px, calc(var(--fs-root, 20px) * 0.65), var(--fs-base, 13px)); /* 页脚字号 */
-  --footer-pad: clamp(2px, calc(-6px + 1.2vw), 8px) clamp(6px, calc(-14px + 2.5vw), 16px); /* 页脚内距 */
+  --footer-line-height: var(--lh-tight, 1.2); /* 页脚单行高度 */
+  --footer-pad-y: clamp(2px, calc(-6px + 1.2vw), 8px); /* 页脚纵向内距 */
+  --footer-pad-x: clamp(6px, calc(-14px + 2.5vw), 16px); /* 页脚横向内距 */
+  --footer-pad: var(--footer-pad-y) var(--footer-pad-x); /* 页脚内距 */
   --footer-gap: clamp(6px, calc(-4px + 1.6vw), 10px); /* 页脚元素间距 */
+  --footer-height: calc(var(--footer-fs) * var(--footer-line-height) + var(--footer-pad-y) * 2 + 1px); /* 页脚占用高度 */
+  --footer-safe-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px)); /* 固定底栏避让高度 */
 }
 
 html.force-landscape {
-  --footer-pad: clamp(2px, calc(-6px + 1.2vh), 8px) clamp(6px, calc(-14px + 2.5vh), 16px);
+  --footer-pad-y: clamp(2px, calc(-6px + 1.2vh), 8px);
+  --footer-pad-x: clamp(6px, calc(-14px + 2.5vh), 16px);
   --footer-gap: clamp(6px, calc(-4px + 1.6vh), 10px);
 }

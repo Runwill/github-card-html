@@ -180,4 +180,5 @@
     mo.observe(container, { childList: true, subtree: true });
   }
 
-  whenDOMReady().then(tryInit);
+  window.initTermPanelCollapsible = tryInit;
+  whenReady().then(() => Promise.resolve(window.programPanelReady).then(tryInit, tryInit));
