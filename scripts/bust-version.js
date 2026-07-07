@@ -20,11 +20,21 @@ try {
 }
 
 function main(){
-  const htmlFiles = collectHtmlFiles(ROOT);
+  const htmlFiles = collectFiles(ROOT, file => file.toLowerCase().endsWith('.html'));
+  const moduleFiles = collectBrowserModuleFiles(ROOT);
   let changed = 0;
   for (const file of htmlFiles){
     const before = fs.readFileSync(file, 'utf8');
     const after = processHtml(before, VERSION);
+    if (after !== before){
+      fs.writeFileSync(file, after, 'utf8');
+      changed++;
+      console.log('[bust-version] updated:', path.relative(ROOT, file));
+    }
+  }
+  for (const file of moduleFiles){
+    const before = fs.readFileSync(file, 'utf8');
+    const after = processModuleImports(before, VERSION);
     if (after !== before){
       fs.writeFileSync(file, after, 'utf8');
       changed++;
@@ -45,7 +55,7 @@ function getTimestamp(){
   return `${YYYY}${MM}${DD}${HH}${mm}`;
 }
 
-function collectHtmlFiles(dir){
+function collectFiles(dir, matchFile){
   const out = [];
   const stack = [dir];
   const skipDirs = new Set(['node_modules', '.git', '.vscode']);
@@ -56,12 +66,19 @@ function collectHtmlFiles(dir){
       const p = path.join(cur, e.name);
       if (e.isDirectory()){
         if (!skipDirs.has(e.name)) stack.push(p);
-      } else if (e.isFile() && p.toLowerCase().endsWith('.html')){
+      } else if (e.isFile() && matchFile(p)){
         out.push(p);
       }
     }
   }
   return out;
+}
+
+function collectBrowserModuleFiles(root){
+  const roots = ['function', 'game', 'editor']
+    .map(name => path.join(root, name))
+    .filter(dir => fs.existsSync(dir));
+  return roots.flatMap(dir => collectFiles(dir, file => file.toLowerCase().endsWith('.js')));
 }
 
 function processHtml(html, version){
@@ -71,6 +88,26 @@ function processHtml(html, version){
       const nextUrl = updateVersionParam(url, version);
       return nextUrl === url ? match : `${attr}="${nextUrl}"`;
     });
+}
+
+function processModuleImports(source, version){
+  return source
+    .replace(/(\bimport\s+(?:[^'"]*?\s+from\s*)?["'])([^"']+)(["'])/g, replaceModuleUrl(version))
+    .replace(/(\bimport\s*\(\s*["'])([^"']+)(["']\s*\))/g, replaceModuleUrl(version));
+}
+
+function replaceModuleUrl(version){
+  return (match, before, url, after) => {
+    if (!shouldBustModuleUrl(url)) return match;
+    const nextUrl = updateVersionParam(url, version);
+    return nextUrl === url ? match : `${before}${nextUrl}${after}`;
+  };
+}
+
+function shouldBustModuleUrl(url){
+  if (!url || !url.trim()) return false;
+  if (/^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(url)) return false;
+  return url.startsWith('.') || url.startsWith('/');
 }
 
 function updateVersionParam(url, version){

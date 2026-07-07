@@ -1,5 +1,5 @@
 // 账户信息弹窗渲染与角色/权限徽章展示控制器。
-import { formatAbsOrRaw } from '../../../admin/time_fmt.js?v=202605230600';
+import { formatAbsOrRaw } from '../../../admin/time_fmt.js?v=202607072241';
 
   'use strict';
   const Core = window.CardUI.Manager.Core;
@@ -55,13 +55,11 @@ import { formatAbsOrRaw } from '../../../admin/time_fmt.js?v=202605230600';
           Array.from(badgeContainer.querySelectorAll('.badge-permission')).forEach(n => n.remove());
           const permRaw = localValue('permissions');
           const perms = permRaw ? JSON.parse(permRaw) : [];
-          const PERM_DESC = { '仪同三司': window.t('perm.tooltip.仪同三司'), '赞拜不名': window.t('perm.tooltip.赞拜不名') };
           if (Array.isArray(perms)) perms.forEach(raw => {
             const p = String(raw);
             const badge = document.createElement('span');
             badge.className = 'badge badge-permission';
             badge.textContent = p;
-            badge.setAttribute('data-tooltip', PERM_DESC[p] || window.t('perm.tooltip.prefix', { name: p }));
             badgeContainer.appendChild(badge);
           });
         }

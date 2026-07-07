@@ -119,17 +119,37 @@
     return parts.join('');
   }
   const tagAttrs=(coll, obj)=>` data-coll="${coll}" data-id="${esc(obj&&obj._id||'')}"`;
+  function tokenLabel(coll, obj){
+    if(!obj || typeof obj!=='object') return '';
+    return obj.cn || obj.name || obj.en || obj.id || obj._id || coll || '';
+  }
+  function renderCardTokenFace(coll, obj){
+    const label = tokenLabel(coll, obj);
+    if(!label) return '';
+    const detail = {
+      collection: coll,
+      id: obj && obj._id,
+      token: obj || {},
+      semantic: { label }
+    };
+    const inline = T.renderTokenDetailInline
+      ? T.renderTokenDetailInline(detail, 'token-card__token')
+      : `<span class="token-card__token is-static">${esc(label)}</span>`;
+    return `<div class="token-card__face" data-dynamic-html-scope>${inline}</div>`;
+  }
   // 卡片包装：左侧色带、工具栏（跳转/编辑/删除）+ 内部键值树
   function cardShell(coll, obj, innerHtml){
     const col=getAccent(obj);
     const style= col? ` style="--token-accent:${esc(col)}; --token-bg:${esc(computeTint(col))}; border-left:1px solid ${esc(col)}"`: '';
     const { canEdit }=getAuth();
     const toolbar = `<div class="token-card__toolbar">
+      <span class="token-card__toolbar-advanced">
       <button class="btn btn--secondary btn--xs btn-go-doc" data-i18n="tokens.toolbar.go"></button>
       <button class="btn btn--secondary btn--xs btn-edit-doc" data-i18n="tokens.toolbar.editDoc"></button>
       <button class="btn btn--danger btn--lift btn--xs btn-del-doc${canEdit? '':' is-disabled'}" data-i18n="tokens.toolbar.deleteDoc"></button>
+      </span>
     </div>`;
-    return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${toolbar}${innerHtml}</div>`;
+    return `<div class="token-card"${style}${tagAttrs(coll,obj)}>${toolbar}${renderCardTokenFace(coll,obj)}${innerHtml}</div>`;
   }
   const renderCollectionItem = (coll, doc)=> cardShell(coll, doc, renderKV(doc, getAccent(doc), ''));
   function hasLoadedDashboardData(){

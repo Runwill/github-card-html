@@ -1,5 +1,5 @@
 // 审核模块：统一管理注册与头像审核（管理员/版主）
-import { elem as el, parseTimeValue } from './log_utils.js?v=202605230600';
+import { elem as el, parseTimeValue } from './log_utils.js?v=202607072241';
 
   const refreshUser = () => { try { window.CardUI?.Manager?.Core?.userService?.refreshCurrentUserFromServer?.(); } catch(_){} };
 

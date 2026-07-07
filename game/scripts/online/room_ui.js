@@ -411,7 +411,7 @@ window.Game = window.Game || {};
                 <span class="room-user-name">${escapeHtml(info.username)}</span>
                 ${userId === currentRoom.host ? `<span class="room-user-badge host">${t('online.host')}</span>` : ''}
                 ${userId === myId ? `<span class="room-user-badge self">${t('online.you')}</span>` : ''}
-                ${info.spectating ? `<span class="room-user-spectate-icon" title="${t('online.spectating')}">👁</span>` : ''}
+                ${info.spectating ? `<span class="room-user-spectate-icon" aria-label="${escapeHtml(t('online.spectating'))}">👁</span>` : ''}
             </div>
         `).join('');
 

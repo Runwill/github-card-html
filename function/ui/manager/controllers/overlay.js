@@ -1,6 +1,6 @@
 // 统一覆盖层系统 - 用导航栈管理所有菜单和弹窗
 // 替代原 modal.js + sidebar.js
-import { renderApprovals } from '../../../admin/approvals.js?v=202605230600';
+import { renderApprovals } from '../../../admin/approvals.js?v=202607072241';
 
   'use strict';
   var w = window;

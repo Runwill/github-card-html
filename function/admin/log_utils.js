@@ -1,7 +1,7 @@
 // admin/log_utils
 // 日志面板共享工具：复制、删除、悬浮时间切换
 // 消费者：tokens/ui/logger.js、permissions/logs/logs.js
-import { formatAbsForLang, formatAbsOrRaw, formatRel, getLocaleFromI18n, parseTimeValue } from './time_fmt.js?v=202605230600';
+import { formatAbsForLang, formatAbsOrRaw, formatRel, getLocaleFromI18n, parseTimeValue } from './time_fmt.js?v=202607072241';
 export { formatAbsOrRaw, getLocaleFromI18n, parseTimeValue };
 
   export function esc(value){ return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }

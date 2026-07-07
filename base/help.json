@@ -75,7 +75,7 @@
       "common": [
         { "keys": ["▾ 三角按钮"], "desc": "help.term.collapse" },
         { "actions": ["expand_all_terms"], "desc": "help.term.expandAll" },
-        { "keys": ["悬停 / 双击标签"], "desc": "help.term.dynamic" }
+        { "keys": ["单击 / 双击标签"], "desc": "help.term.dynamic" }
       ],
       "normal": [
         { "keys": ["Shift+F8"], "desc": "help.term.programDebug" }
@@ -90,15 +90,14 @@
     "panel_skill": [
       { "keys": ["搜索框"], "desc": "help.skill.search" },
       { "keys": ["Ctrl"], "desc": "help.skill.copy" },
-      { "keys": ["悬停 / 双击标签"], "desc": "help.skill.dynamic" }
+      { "keys": ["单击 / 双击标签"], "desc": "help.skill.dynamic" }
     ],
     "panel_card": [
-      { "keys": ["悬停 / 双击标签"], "desc": "help.card.dynamic" }
+      { "keys": ["单击 / 双击标签"], "desc": "help.card.dynamic" }
     ],
     "panel_character": [
       { "keys": ["搜索框"], "desc": "help.character.search" },
-      { "keys": ["技能名悬停"], "desc": "help.character.lore" },
-      { "keys": ["悬停 / 双击标签"], "desc": "help.character.dynamic" }
+      { "keys": ["单击 / 双击标签"], "desc": "help.character.dynamic" }
     ],
     "panel_draft": {
       "common": [
@@ -137,10 +136,31 @@
       { "keys": ["刷新"], "desc": "help.tokens.refresh" },
       { "keys": ["缩略/详细"], "desc": "help.tokens.compact" },
       { "keys": ["点击值"], "desc": "help.tokens.inlineEdit" },
+      { "keys": ["词元标签 / Enter"], "desc": "help.tokens.detail" },
       { "keys": ["跳转按钮"], "desc": "help.tokens.go" },
       { "keys": ["日志面板"], "desc": "help.tokens.logs" },
       { "keys": ["日志操作"], "desc": "help.tokens.logOps" }
     ],
+    "token_detail": {
+      "common": [
+        { "keys": ["返回来源"], "desc": "help.tokenDetail.back" },
+        { "keys": ["模块按钮"], "desc": "help.tokenDetail.tabs" },
+        { "keys": ["跳转位置"], "desc": "help.tokenDetail.goto" }
+      ],
+      "document": [
+        { "keys": ["词元数据"], "desc": "help.tokenDetail.document" }
+      ],
+      "related": [
+        { "keys": ["展开内容"], "desc": "help.tokenDetail.related" },
+        { "keys": ["单击 / 双击标签"], "desc": "help.tokenDetail.dynamic" }
+      ],
+      "logs": [
+        { "keys": ["改动记录"], "desc": "help.tokenDetail.logs" }
+      ],
+      "peers": [
+        { "keys": ["同语义词元"], "desc": "help.tokenDetail.peers" }
+      ]
+    },
     "panel_permissions": [
       { "keys": ["搜索框"], "desc": "help.perm.search" },
       { "keys": ["部分/完全"], "desc": "help.perm.mode" },

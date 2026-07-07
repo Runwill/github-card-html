@@ -23,8 +23,8 @@ window.whenReady(()=>{
         sr(()=> window.replace_card_name && tasks.push(Promise.resolve(window.replace_card_name(window.endpoints.card()))))
         sr(()=> window.check_strength?.())
         sr(()=> window.add_button_wave?.())
-        sr(()=> window.replace_term && tasks.push(Promise.resolve(window.replace_term(window.endpoints.termDynamic(),1))))
-        sr(()=> window.replace_term && tasks.push(Promise.resolve(window.replace_term(window.endpoints.termFixed(),1))))
+        sr(()=> window.replace_term && tasks.push(Promise.resolve(window.replace_term(window.endpoints.termDynamic(),1,document,'term-dynamic'))))
+        sr(()=> window.replace_term && tasks.push(Promise.resolve(window.replace_term(window.endpoints.termFixed(),1,document,'term-fixed'))))
 
         // 向全局暴露术语/名称替换完成信号，供加载覆盖层附加等待
         window.replacementsReady = tasks.length ? Promise.all(tasks.map(task=>withTimeout(task, 4500))).catch(()=>{}) : Promise.resolve()

@@ -1,6 +1,7 @@
-window.replace_term = function replace_term(path, mode, paragraphs = document) {
+window.replace_term = function replace_term(path, mode, paragraphs = document, collection = '') {
     // 返回 Promise，供进度条与启动流程感知完成时机
     return fetchJsonCached(path).then(term => {
+        const detailCollection = collection || (String(path || '').includes('term-dynamic') ? 'term-dynamic' : (String(path || '').includes('term-fixed') ? 'term-fixed' : ''));
         // [Optimization] 使用 Map 提升术语查找性能，便于 MutationObserver 复用
         // key: 术语英文标签名 (大写), value: 术语对象
         const termMap = new Map();
@@ -50,6 +51,7 @@ window.replace_term = function replace_term(path, mode, paragraphs = document) {
                 if (mode) {
                     // 双击滚动
                     bindTermDoubleClick($node, currentTarget => currentTarget.tagName);
+                    window.bindTokenDetailOpen?.($node, { collection: detailCollection, id: t._id });
                     
                     // 高亮
                     node.i = index; // 存储索引供 highlight 使用
@@ -92,6 +94,7 @@ window.replace_term = function replace_term(path, mode, paragraphs = document) {
 
                    // 双击滚动 (Main Term)
                    bindTermDoubleClick($node, t.en);
+                   window.bindTokenDetailOpen?.($node, { collection: detailCollection, id: t._id });
 
                    // 子元素交互 (Parts)
                    for (var j in t.part) {
@@ -109,6 +112,7 @@ window.replace_term = function replace_term(path, mode, paragraphs = document) {
 
                                // 双击滚动 (Part)
                                bindTermDoubleClick($subEl, currentTarget => t.part[currentTarget.j].en);
+                               window.bindTokenDetailOpen?.($subEl, { collection: detailCollection, id: t._id });
                            });
                        }
                    }

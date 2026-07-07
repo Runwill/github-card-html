@@ -1,5 +1,5 @@
 // 上下文帮助面板：按 ? 或从设置菜单打开，显示当前面板相关提示
-import { elem as node } from '../admin/log_utils.js?v=202605230600';
+import { elem as node } from '../admin/log_utils.js?v=202607072241';
 
   let data = null;
   let popoverEl = null;
@@ -13,6 +13,7 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
     panel_character: 'nav.character',
     panel_draft: 'nav.draft',
     panel_tokens: 'nav.tokens',
+    token_detail: 'tokens.detail.title',
     panel_permissions: 'nav.permissions',
     panel_game: 'nav.game'
   };
@@ -38,6 +39,12 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
       normal: 'help.term.viewRead',
       debug: 'help.term.viewDebug'
     },
+    token_detail: {
+      document: 'tokens.detail.tabDocument',
+      related: 'tokens.detail.tabRelated',
+      logs: 'tokens.detail.tabLogs',
+      peers: 'tokens.detail.tabPeers'
+    },
     panel_draft: {
       editor: 'editor.view.editor',
       relations: 'editor.view.relations'
@@ -62,7 +69,13 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
     try { return window.ProgramPanelDebug?.isOpen?.() ? 'debug' : 'normal'; } catch (_) { return 'normal'; }
   }
 
+  function getTokenDetailView() {
+    var tab = document.querySelector('.tokens-detail-tab.is-active[data-token-detail-tab]');
+    return tab ? tab.getAttribute('data-token-detail-tab') : 'document';
+  }
+
   function getPanelView(panelId) {
+    if (panelId === 'token_detail') return getTokenDetailView();
     if (panelId === 'panel_term') return getProgramView();
     if (panelId === 'panel_game') return getGameView();
     if (panelId === 'panel_draft') return getDraftView();
@@ -100,7 +113,20 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
 
   // ── 当前面板检测 ──
   function getActivePanel() {
+    if (document.documentElement.classList.contains('token-detail-root') || document.body.classList.contains('token-detail-page')) {
+      return 'token_detail';
+    }
     return window.TabsUI?.getActivePanelId?.('panel_term') || 'panel_term';
+  }
+
+  function globalTipsForContext(ctx) {
+    var tips = data.global || [];
+    if (ctx && ctx.type === 'panel' && ctx.id === 'token_detail') {
+      return tips.filter(function (tip) {
+        return tip.desc !== 'help.nav.scroll' && tip.desc !== 'help.nav.sidebar';
+      });
+    }
+    return tips;
   }
 
   // ── DOM 创建 ──
@@ -167,7 +193,7 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
     }
 
     // Separator + global tips
-    var globalTips = data.global || [];
+    var globalTips = globalTipsForContext(ctx);
     if (globalTips.length > 0) {
       body.appendChild(node('div', 'help-popover__separator', t('help.global')));
       for (var j = 0; j < globalTips.length; j++) {
@@ -265,6 +291,9 @@ import { elem as node } from '../admin/log_utils.js?v=202605230600';
       if (visible) renderContent(getActiveContext());
     });
     window.addEventListener('program-debug:changed', function () {
+      if (visible) renderContent(getActiveContext());
+    });
+    window.addEventListener('token-detail:tab-changed', function () {
       if (visible) renderContent(getActiveContext());
     });
     window.addEventListener('i18n:changed', function () {

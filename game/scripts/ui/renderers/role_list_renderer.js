@@ -4,7 +4,7 @@ const { fitSummaryName, setupHandInspector, roleCharacterKey, updateAvatarImage,
         const button = document.createElement('button');
         button.className = className;
         button.innerText = text;
-        if (title) button.title = title;
+        if (title) button.setAttribute('aria-label', title);
         return button;
     }
 

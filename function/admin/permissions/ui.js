@@ -1,36 +1,14 @@
-import { elem as makeEl } from '../log_utils.js?v=202605230600';
+import { elem as makeEl } from '../log_utils.js?v=202607072241';
 
 const w = window;
   const ns = w.TokensPerm = w.TokensPerm || {};
 
-  function bindPermTooltip(el, permName){
-    try {
-      if (!el) return;
-      const specializedKey = 'perm.tooltip.' + String(permName);
-      let keyForAttr = specializedKey;
-      let params = null;
-      try {
-        const lang = (w.i18n && w.i18n.getLang && w.i18n.getLang()) || 'zh';
-        const resolved = w.t ? w.t(specializedKey) : specializedKey;
-        if (lang !== 'debug' && resolved === specializedKey) {
-          keyForAttr = 'perm.tooltip.prefix';
-          params = { name: String(permName) };
-        }
-      } catch(_) {
-        keyForAttr = 'perm.tooltip.prefix';
-        params = { name: String(permName) };
-      }
-      el.setAttribute('data-i18n-attr', 'data-tooltip');
-      el.setAttribute('data-i18n-data-tooltip', keyForAttr);
-      if (params) el.setAttribute('data-i18n-params-data-tooltip', JSON.stringify(params)); else el.removeAttribute('data-i18n-params-data-tooltip');
-      try { el.setAttribute('data-tooltip', w.t ? w.t(keyForAttr, params) : (params ? (params.name||'') : keyForAttr)); } catch(_){ }
-    } catch(_){ }
+  function bindPermTooltip(el){
+    return el;
   }
 
-  function tag(text, more=false, tip){
+  function tag(text, more=false){
     const s = makeEl('span', 'perm-tag' + (more ? ' perm-tag--more' : ''), text);
-    const tooltip = (tip || text);
-    try { s.setAttribute('data-tooltip', tooltip); } catch { s.title = tooltip; }
     return s;
   }
 

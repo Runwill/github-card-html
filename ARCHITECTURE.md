@@ -1,6 +1,6 @@
 # ARCHITECTURE.md — card-html 前端项目架构文档
 
-> **最后更新**: 2026-05-22
+> **最后更新**: 2026-07-07
 > **适用对象**: AI Agent、新开发者快速定位代码
 > **帮助数据源**: `base/help.json` + `i18n/strings.js` 为用户可见的功能速查内容
 
@@ -18,13 +18,11 @@
 |---|---|---|
 | `term.js` | `<round>`, `<currentRound>` 等术语标签 | 中文文本 + 主题色 + 折叠交互 |
 | `card_name.js` | `<ATTACK>`, `<DODGE>` 等卡牌标签名 | 卡牌中文名 + 类型着色（基本牌绿/锦囊橙） |
-| `character_name.js` | `<characterName class="characterID{id}">` | 角色中文名 + 高亮 + 双击跳转 |
-| `skill_name.js` | `<characterSkillElement class="{name}...">` | 技能中文名 + 高亮 + 双击跳转 |
+| `character_name.js` | `<characterName class="characterID{id}">` | 角色中文名 + 高亮 + 单击详情 + 双击跳转 |
+| `skill_name.js` | `<characterSkillElement class="{name}...">` | 技能中文名 + 高亮 + 单击详情 + 双击跳转 |
 | `decompress.js` | 压缩标签（从 `base/compression.json`） | 解压为带前后缀 HTML 的完整内容 |
 
-**所有替换后的标签都支持**：悬停高亮 + 双击跳转到对应面板定义处。
-
-**⚠️ 关键区分**：`skill_name.js` 中的 **Lore Tooltip（典故引言浮层）仅在将池面板（panel_character）生效**——判定依据是 class 中包含 `LoreCharacterID{id}` 格式。技能面板（panel_skill）的 `<characterSkillElement>` 不含此格式，因此没有 Lore Tooltip。
+**所有替换后的标签都支持**：悬停高亮 + 单击打开词元详情 + 双击跳转到对应面板定义处。
 
 ### 0.2 Foundation CSS 硬编码覆盖
 
@@ -351,6 +349,7 @@ html.force-landscape {
 |---|---|
 | `index.html` | 主页面。登录后进入，包含所有 Tab 面板（程序/技能/牌库/将池/草稿/词元/权限/对局） |
 | `login.html` | 登录/注册页。独立页面，无 Foundation Tabs |
+| `token_detail.html` | 词元详情页。独立页面，通过 URL 参数读取词元并展示关联内容与日志 |
 
 ### 技术栈
 
@@ -370,6 +369,7 @@ html.force-landscape {
 card-html/
 ├── index.html                  # 主入口页面
 ├── login.html                  # 登录页
+├── token_detail.html           # 词元详情独立页
 ├── style.css                   # 全局基础样式（兼容层、布局）
 ├── base/                       # 静态数据文件（公告、压缩映射）
 ├── Foundation-Sites-CSS/       # Foundation CSS/JS 框架（vendor）
@@ -431,6 +431,7 @@ card-html/
 | `style/panel/tokens/nest.css` | 嵌套结构 |
 | `style/panel/tokens/log.css` | 变更日志面板 |
 | `style/panel/tokens/animation.css` | 词元页动画（card-in、collapsible、toast） |
+| `style/token_detail.css` | 词元详情独立页布局、模块切换、窗口内滚动内容区和日志 |
 | `style/panel/permissions/filters.css` | 权限页日志筛选条 |
 | `style/panel/permissions/editor.css` | 权限页行内编辑器 |
 | `style/panel/permissions/rows.css` | 权限页用户行、标签、过渡、参数高亮 |
@@ -441,7 +442,6 @@ card-html/
 | `style/back_to_top.css` | 回到顶部按钮 |
 | `style/page_loading.css` | 加载遮罩层与进度条 |
 | `style/login.css` | 登录页专属样式 |
-| `style/tooltip.css` | 悬浮提示框 |
 | `style/custom_select.css` | 自定义下拉选择器 |
 
 **样式复用约定**：新增或重构控件前，先查找同类页面/组件的既有实现并复用全局语义类。按钮优先使用 `.btn` 及 `.btn--secondary` / `.btn.is-active` 等状态范式；滚动区域优先使用 `.scrollbar-thin` / `.scrollbar-hidden`；不要为单个页面临时自创一套颜色、滚动条或切换按钮样式，除非已有范式无法表达该交互。
@@ -522,6 +522,7 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `startup_seed.js` | CSS 前同步设置首屏主题；主站用 `data-partials` 预建 ready helper 与 pending partials Promise | `window.whenDOMReady`, `window.whenPartialsReady`, `window.partialsReady` | — |
 | `main_entry.js` | 主站单一 ESM 入口：按原 `index.html` module script 顺序导入主题、i18n、后台、对局、草稿、菜单和页尾交互 | — | `startup_seed.js`, Foundation/Socket.IO/Cropper classic |
 | `login_entry.js` | 登录页单一 ESM 入口：按顺序导入主题、预加载、i18n、端点、语言按钮、登录表单和后端切换 | — | `startup_seed.js` |
+| `token_detail_entry.js` | 词元详情独立页入口：加载词元详情 API、渲染共享详情视图、处理模块切换、返回与跳转位置 | — | `startup_seed.js`, `tokensAdmin.fetchTokenDetail`, `renderTokenDetail` |
 | `app_bootstrap.js` | 主页启动：等待 `partialsReady` → Foundation 初始化 → 召唤角色区块 → 术语/名称替换 → 代词校验 | `window.replacementsReady`（Promise）| `partialsReady`, `summonCharacters`, `replace_*`, `decompress` |
 | `page_loading.js` | 加载遮罩层：随机文案、动态字距、进度条、完成检查后淡出 | 直接操作 DOM | `window.whenDOMReady`, `window.whenPartialsReady`, `partialsReady` |
 
@@ -565,7 +566,7 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 
 | 文件 | 职责 | 命名空间/导出 | 依赖 |
 |---|---|---|---|
-| `utils.js` | 替换模块共享工具：JSON 缓存（`fetchJsonCached`）、双击滚动+高亮绑定（`bindDblclickAndHighlight`） | `window.fetchJsonCached()`, `window.bindDblclickAndHighlight()` | — |
+| `utils.js` | 替换模块共享工具：JSON 缓存（`fetchJsonCached`）、双击滚动+高亮绑定（`bindDblclickAndHighlight`）、词元详情入口绑定（`bindTokenDetailOpen`） | `window.fetchJsonCached()`, `window.bindDblclickAndHighlight()`, `window.bindTokenDetailOpen()` | — |
 | `replace_common.js` | 通用 DOM 扫描 + MutationObserver 封装（`scanAndObserve`） | `window.scanAndObserve()` | — |
 | `decompress.js` | 解压缩映射：读取 `base/compression.json`，将自定义标签包裹前后缀 | `window.decompress()` | `fetchJsonCached` |
 | `character_name.js` | 角色名替换：`<characterName class="characterID{id}">` → 中文名 | `window.replace_character_name()` | `scanAndObserve`, `bindDblclickAndHighlight`, `scrollActions` |
@@ -606,7 +607,7 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `toast.js` | 全局 Toast 通知（成功/错误，自动消失） | `window.showToast()` |
 | `tabs.js` | Tab 切换逻辑：标题更新、管理员面板控制、鼠标滚轮切换 Tab | IIFE 内部 |
 | `event_bindings.js` | 全局按钮事件绑定（strength、pronoun、include 等切换按钮） | IIFE 内部 |
-| `tooltip.js` | 轻量级悬浮提示管理器（`data-tooltip` 属性触发） | IIFE 内部 |
+| `tooltip.js` | 全站悬浮备注压制器：移除 `title` / `data-tooltip`，并兼容旧 `LoreTooltip` 调用 | `window.HoverHints` |
 | `custom_select.js` | 原生 `<select>` → 主题化自定义下拉组件 | `window.CustomSelect`（`init`, `wrap`, `refresh`, `refreshAll`） |
 | `custom_select_fit.js` | 下拉选项文字自适应缩小工具（Canvas 测量+二分搜索精确拟合） | `window._CustomSelectFit`（`fitOptionTexts`, `measureTextWidth`） |
 | `shared_search.js` | 将池/技能面板共享搜索框 | IIFE 内部 |
@@ -664,6 +665,7 @@ html[data-theme="elegant"]    → 典雅（theme_elegant.css 覆盖）
 | `schema.js` | 词元结构/校验 | `window.tokensAdmin` |
 | `ui/search.js` | 搜索过滤 | `window.tokensAdmin` |
 | `ui/render.js` | 词元列表渲染 | `window.tokensAdmin` |
+| `ui/detail.js` | 词元详情共享渲染器：详情页和跳转定位复用 | `window.tokensAdmin` + ESM 导出 |
 | `ui/logger.js` | 词元操作日志 | `window.tokensAdmin` |
 | `ui/modals.js` | 创建/编辑弹窗 | `window.tokensAdmin` |
 | `actions/edit_delete.js` | 编辑/删除操作 | `window.tokensAdmin` |
@@ -1168,7 +1170,7 @@ app_bootstrap.js
 | 切换主题快捷键 | 快速切换主题（浅色 → 深色 → 典雅），按键可在按键设置中修改 | `function/ui/key_bindings.js` + `function/ui/theme_toggle_button.js` |
 | 导航栏滚轮 | 滚动鼠标滚轮快速切换 Tab 面板 | `function/ui/tabs.js` |
 | ☰ / 头像按钮 | 打开侧边栏菜单 | `function/ui/manager/controllers/bindings.js` |
-| 动态标签（全局） | 术语/卡牌名/角色名/技能名标签悬停高亮，双击跳转定义处 | `function/replace/*.js`（MutationObserver 全局生效） |
+| 动态标签（全局） | 术语/卡牌名/角色名/技能名标签悬停高亮，单击打开词元详情，双击跳转定义处 | `function/replace/*.js`（MutationObserver 全局生效） |
 
 ### 10.2 侧边栏菜单 (`sidebar-menu`)
 
@@ -1303,7 +1305,7 @@ app_bootstrap.js
 |---|---|
 | ▾ 三角按钮 | 点击标题前的三角按钮，折叠/展开该章节内容；状态自动保存 |
 | 展开所有术语 | 在按键设置中绑定快捷键，可一键展开所有折叠的术语 |
-| 动态标签 | 术语、卡牌名、角色名等标签悬停高亮，双击跳转到对应面板定义处 |
+| 动态标签 | 术语、卡牌名、角色名等标签悬停高亮，单击打开词元详情，双击跳转到对应面板定义处 |
 
 **实现**: `function/summon/program_panel.js`（树数据渲染）+ `function/ui/collapsible.js`（折叠）+ `function/replace/*.js`（动态标签）
 **内容源**: MongoDB `ProgramPanel.tree`（`program_panel.v2`，节点由 Mongo `_id` 定位）；运行时禁用本地兜底，后端不可用或数据不可渲染时程序页显示错误；`base/program_panel.json` 仅由抽取脚本临时生成用于导入，已从仓库跟踪中移除，`partials/panel_term.html` 为抽取来源
@@ -1314,7 +1316,7 @@ app_bootstrap.js
 |---|---|
 | 搜索框 | 输入关键词实时过滤技能列表 |
 | 检查键（按住） | 按住按键设置中的检查键后悬停技能行，出现复制按钮，点击复制整行文本 |
-| 动态标签 | 描述中的术语、卡牌名、角色名标签同样支持悬停高亮与双击跳转 |
+| 动态标签 | 描述中的术语、卡牌名、角色名标签同样支持悬停高亮、单击打开详情与双击跳转 |
 
 **实现**: `function/ui/shared_search.js` + `function/ui/skill_copy.js` + `function/summon/standard_character_skills_block.js`
 
@@ -1322,7 +1324,7 @@ app_bootstrap.js
 
 | 操作 | 用户行为 |
 |---|---|
-| 动态标签 | 卡牌名按类型着色（基本牌绿 / 锦囊牌橙），描述中的术语、角色名标签悬停高亮，双击跳转 |
+| 动态标签 | 卡牌名按类型着色（基本牌绿 / 锦囊牌橙），描述中的术语、角色名标签悬停高亮、单击打开详情、双击跳转 |
 
 **内容源**: `partials/panel_card.html`
 
@@ -1331,12 +1333,9 @@ app_bootstrap.js
 | 操作 | 用户行为 |
 |---|---|
 | 搜索框 | 输入关键词实时过滤武将列表 |
-| 技能名悬停 | 悬停武将的技能名，显示该武将专属的典故引言浮层（Lore Tooltip） |
-| 动态标签 | 描述中的术语、卡牌名、技能名标签支持悬停高亮与双击跳转 |
+| 动态标签 | 描述中的术语、卡牌名、技能名标签支持悬停高亮、单击打开详情与双击跳转 |
 
-**实现**: `function/ui/shared_search.js` + `function/summon/standard_characters_block.js` + `function/replace/skill_name.js`（Lore Tooltip）
-
-**⚠️ Lore Tooltip 仅在此面板生效**——判定依据是 `<characterSkillElement>` 的 class 中包含 `LoreCharacterID{id}` 格式。
+**实现**: `function/ui/shared_search.js` + `function/summon/standard_characters_block.js` + `function/replace/skill_name.js`
 
 #### 草稿面板 (`panel_draft`)
 
@@ -1364,6 +1363,7 @@ app_bootstrap.js
 | 刷新 | 点击刷新按钮重新从服务器加载词元数据 |
 | 缩略/详细 | 点击按钮切换显示模式，缩略模式隐藏英文名、颜色标签、序号 |
 | 点击值 | 点击词元的属性值可行内编辑；颜色字段会出现取色器 |
+| 词元标签 / Enter | 点击词元标签或按 Enter 打开词元详情；详情页按词元数据、关联内容、改动记录、同语义词元切换查看 |
 | 跳转按钮 | 点击跳转按钮可跳转到对应面板的术语/牌/武将/技能位置 |
 | 日志面板 | 展开底部日志面板查看词元变更历史 |
 | 日志操作 | 复制、删除或清空词元日志记录 |

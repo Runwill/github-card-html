@@ -1,4 +1,4 @@
-import { LogUtils, esc, parseTimeValue } from '../../log_utils.js?v=202605230600';
+import { LogUtils, esc, parseTimeValue } from '../../log_utils.js?v=202607072241';
 
   const MAX_LOGS = 200;
 

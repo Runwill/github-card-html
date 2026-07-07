@@ -4,6 +4,14 @@
 
     const TARGET = '.panel-enter-target';
     const AUTO_TAGS = 'h1, h2, h3, .indent, padding';
+    const hasStartupTokenLocator = (() => {
+        try {
+            return new URLSearchParams(window.location.search).has('tokenLocator');
+        } catch (_) {
+            return false;
+        }
+    })();
+    let startupAnimationHandled = false;
 
     function panels() {
         return document.querySelectorAll('.tabs-panel');
@@ -60,6 +68,14 @@
         });
     }
 
+    function finishAnimations(panel) {
+        assignIndexes(panel);
+        panel.querySelectorAll(TARGET).forEach(el => {
+            el.classList.remove('animate-in', 'visible');
+            el.classList.add('animate-done');
+        });
+    }
+
     function replayAnimations(panel) {
         if (!panel) return;
         const targets = panel.querySelectorAll(TARGET);
@@ -78,7 +94,11 @@
                 link.addEventListener('click', () => {
                     const panel = document.querySelector(link.getAttribute('href') || '');
                     if (panel && !panel.classList.contains('is-active')) {
-                        requestAnimationFrame(() => replayAnimations(panel));
+                        const skipReplay = !!window.__scrollActionActive;
+                        requestAnimationFrame(() => {
+                            if (skipReplay) finishAnimations(panel);
+                            else replayAnimations(panel);
+                        });
                     }
                 }, { passive: true });
             });
@@ -91,11 +111,17 @@
     }
 
     function startAll() {
+        if (hasStartupTokenLocator && !startupAnimationHandled) {
+            panels().forEach(finishAnimations);
+            startupAnimationHandled = true;
+            return;
+        }
+        startupAnimationHandled = true;
         panels().forEach(p => { assignIndexes(p); startAnimations(p); });
     }
 
     function init() {
-        window.textAnimationController = { replayAnimations, startAnimations: startAll, replay: replayAnimations };
+        window.textAnimationController = { replayAnimations, startAnimations: startAll, replay: replayAnimations, finishAnimations };
         panels().forEach(assignIndexes);
         document.body.classList.add('loaded');
         listenTabSwitch();

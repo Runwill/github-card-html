@@ -83,7 +83,18 @@ if (window.MutationObserver) {
  * @param {string} color - 高亮颜色
  */
 function applyHighlight(selector, color) {
-    // 在暗色模式反转亮度（依赖 ColorUtils），未加载则保持原色
+    color = resolveHighlightColor(color);
+    $(selector).each(function() {
+        if (color.raw) this.dataset.activeHighlightColor = color.raw;
+        else delete this.dataset.activeHighlightColor;
+    }).css({
+        'background-color': color.value,
+        'transition': `background-color ${HIGHLIGHT_CONFIG.HIGHLIGHT_DURATION} ${HIGHLIGHT_CONFIG.EASE_TYPE}`
+    })
+}
+
+function resolveHighlightColor(color) {
+    const raw = color || '';
     try {
         const theme = document.documentElement.getAttribute('data-theme')
         const isDark = theme === 'dark' || theme === 'elegant'
@@ -95,11 +106,7 @@ function applyHighlight(selector, color) {
             }
         }
     } catch (e) { /* 忽略安全失败，继续使用原色 */ }
-
-    $(selector).css({
-        'background-color': color,
-        'transition': `background-color ${HIGHLIGHT_CONFIG.HIGHLIGHT_DURATION} ${HIGHLIGHT_CONFIG.EASE_TYPE}`
-    })
+    return { raw, value: color || '' }
 }
 
 /**
@@ -107,10 +114,23 @@ function applyHighlight(selector, color) {
  * @param {string|jQuery} selector - 选择器或jQuery对象
  */
 function removeHighlight(selector) {
-    $(selector).css({
+    $(selector).each(function() {
+        delete this.dataset.activeHighlightColor;
+    }).css({
         'background-color': '',
         'transition': `background-color ${HIGHLIGHT_CONFIG.REMOVE_DURATION} ${HIGHLIGHT_CONFIG.EASE_TYPE}`
     })
+}
+
+if (window.MutationObserver) {
+    const themeObserver = new MutationObserver((mutations) => {
+        if (!mutations.some(item => item.attributeName === 'data-theme')) return;
+        document.querySelectorAll('[data-active-highlight-color]').forEach((el) => {
+            const color = resolveHighlightColor(el.dataset.activeHighlightColor || '');
+            el.style.backgroundColor = color.value;
+        });
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 }
 
 /**

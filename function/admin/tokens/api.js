@@ -50,6 +50,13 @@
     return apiJson('/tokens/logs' + (q.toString()? ('?' + q.toString()) : ''), { auth: true });
   }
 
+  async function fetchTokenDetail(collection, id) {
+    const q = new URLSearchParams();
+    q.set('collection', String(collection || ''));
+    q.set('id', String(id || ''));
+    return apiJson('/tokens/detail?' + q.toString(), { auth: true });
+  }
+
   // 统一的集合元信息
   const COLLECTIONS = Object.freeze({
     'term-fixed': { key: 'termFixed', url: '/term-fixed', summaryKey: 'tokens.summary.termFixed', sectionKey: 'tokens.section.termFixed' },
@@ -60,4 +67,4 @@
   });
   const COLLECTION_TYPES = Object.freeze(Object.keys(COLLECTIONS));
 
-  Object.assign(window.tokensAdmin, { getAuth, apiJson, COLLECTIONS, COLLECTION_TYPES, CLIENT_ID, fetchTokenLogs });
+  Object.assign(window.tokensAdmin, { getAuth, apiJson, COLLECTIONS, COLLECTION_TYPES, CLIENT_ID, fetchTokenLogs, fetchTokenDetail });

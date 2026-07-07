@@ -2,6 +2,7 @@ window.replace_character_name = function replace_character_name(path, paragraphs
     // 返回 Promise，供进度条与启动流程感知完成时机
     return fetchJsonCached(path).then(character => {
         const idToName = new Map(character.map(c => [c.id, c.name]))
+        const idToInfo = new Map(character.map(c => [c.id, c]))
         const classPrefix = 'characterID' // 目标类名前缀
         const dataKey = 'characterProcessed' // 处理标记
 
@@ -32,6 +33,7 @@ window.replace_character_name = function replace_character_name(path, paragraphs
                 getScrollSelector: (el) => '.' + classPrefix + id + '.scroll',
                 highlightColor: '#9ca8ee'
             });
+            window.bindTokenDetailOpen?.($node, { collection: 'character', id: idToInfo.get(id)?._id });
         };
 
         scanAndObserve({

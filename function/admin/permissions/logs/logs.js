@@ -1,6 +1,6 @@
   // permissions/logs/logs: 在权限页添加用户变更日志，沿用 tokens 日志样式与行为
   // API 层复用 permissions/api.js 中的 TokensPerm.API
-import { LogUtils, esc, getLocaleFromI18n } from '../../log_utils.js?v=202605230600';
+import { LogUtils, esc, getLocaleFromI18n } from '../../log_utils.js?v=202607072241';
 
   const MAX_LOGS = 200;
   const TYPE_GROUPS = [

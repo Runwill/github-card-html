@@ -96,6 +96,16 @@ padding { display: block; padding-bottom: var(--pad-block, 1.2em); }
 .bold { font-weight: bold; }
 .scroll { scroll-margin-top: var(--scroll-snap, 70px); }
 
+:where([data-token-detail-id]) {
+    cursor: pointer;
+}
+
+:where([data-token-detail-id]):focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary-2) 55%, transparent);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+}
+
 lore {
     color: gray;
     font-weight: normal;

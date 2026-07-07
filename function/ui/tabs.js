@@ -4,6 +4,16 @@
   const isAdminPanel=href=> href==='#panel_tokens' || href==='#panel_permissions';
   const getActivePanelId=(fallback)=> document.querySelector('.tabs-panel.is-active')?.id || document.querySelector('#main-tabs .tabs-title.is-active a')?.getAttribute('href')?.replace('#', '') || fallback || null;
   const isPanelActive=(panelId)=>{ const activeId = panelId && getActivePanelId(); return !panelId || !activeId || activeId === (panelId[0] === '#' ? panelId.slice(1) : panelId); };
+  const selectPanel=(panelId)=>{
+    const id = String(panelId || '').replace(/^#/, '');
+    if(!id) return false;
+    const link = Array.from(document.querySelectorAll('#main-tabs a.title-a')).find(a=> a.getAttribute('href') === '#' + id);
+    if(link){ link.click(); return true; }
+    try{ $("#main-tabs").foundation('selectTab', id, 1); return true; }catch(_){ return false; }
+  };
+  const startupPanel=()=>{
+    try { return new URL(window.location.href).searchParams.get('openPanel') || ''; } catch(_) { return ''; }
+  };
 
   whenReady(()=>{
     document.querySelectorAll('#main-tabs a.title-a').forEach((a,idx)=>{
@@ -80,5 +90,9 @@
         }
       }, { passive: false });
     }
+    requestAnimationFrame(()=>{
+      const panelId = startupPanel();
+      if(panelId) selectPanel(panelId);
+    });
   });
-  window.TabsUI = Object.assign(window.TabsUI || {}, { changeTitle, getActivePanelId, isPanelActive });
+  window.TabsUI = Object.assign(window.TabsUI || {}, { changeTitle, getActivePanelId, isPanelActive, selectPanel });

@@ -33,6 +33,7 @@ window.replace_card_name = function replace_card_name(path, paragraphs = documen
                 return t == '基本' ? '#c2f3c2' : (t == '锦囊' ? '#f3e6c2' : '');
             }
         });
+        window.bindTokenDetailOpen?.($node, { collection: 'card', id: info._id });
     };
 
     // 通用扫描与监听器（replace_common.js 提供）

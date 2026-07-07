@@ -46,16 +46,52 @@
   transform: translateY(-0.222em); /* -4/18 */
   transition: opacity var(--dur-normal) var(--ease-default),
               transform var(--dur-normal) var(--ease-default);
-  pointer-events: none;
+  pointer-events: auto;
   z-index: 1;
 }
 
-/* Alt + hover/focus 时显示工具条 */
+/* hover/focus 时显示工具条；高级操作仍需 Ctrl 态 */
+#tokens-content .token-card:hover .token-card__toolbar,
+#tokens-content .token-card:focus-within .token-card__toolbar,
+#tokens-content .token-card__toolbar:hover,
+#tokens-content .token-card__toolbar:focus-within,
 .ctrl-down #tokens-content .token-card:hover .token-card__toolbar,
-.ctrl-down #tokens-content .token-card:focus-within .token-card__toolbar {
+.ctrl-down #tokens-content .token-card:focus-within .token-card__toolbar,
+.ctrl-down #tokens-content .token-card__toolbar:hover,
+.ctrl-down #tokens-content .token-card__toolbar:focus-within {
   opacity: 1;
   transform: translateY(0);
-  pointer-events: auto;
+}
+
+#tokens-content .token-card__toolbar-advanced {
+  display: none;
+  align-items: center;
+  gap: 0.333em;                /* 6/18 */
+}
+
+.ctrl-down #tokens-content .token-card__toolbar-advanced {
+  display: inline-flex;
+}
+
+#tokens-content .token-card__face {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.333em;
+  min-block-size: 1.6em;
+  margin-block-end: 0.333em;
+  padding-inline-end: 5.5em;
+}
+
+#tokens-content .token-card__token {
+  display: inline-flex;
+  align-items: center;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  font-size: var(--tp-fs-md, 14px);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  color: var(--token-accent, var(--primary-2));
 }
 
 /* Ctrl 按住时隐藏属性删除按钮 */

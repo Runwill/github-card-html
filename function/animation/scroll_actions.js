@@ -16,6 +16,11 @@
   }
   function selectTab(panelId){
     try {
+      if (window.TabsUI?.selectPanel?.(panelId)) return;
+    } catch(e) {
+      // fall back to Foundation below
+    }
+    try {
       if (window.$) {
         $("#main-tabs").foundation('selectTab', panelId, 1)
       }
@@ -140,6 +145,14 @@
     } catch(e) { return true }
   }
 
+  function finishPanelEnterAnimation(panelId){
+    try {
+      const id = String(panelId || '').replace(/^#/, '')
+      const panel = id ? document.getElementById(id) : null
+      if (panel) window.textAnimationController?.finishAnimations?.(panel)
+    } catch(_) {}
+  }
+
   // “文本进场动画”的固定时长（毫秒），用于延迟高亮出现时间
   // 说明：按当前样式约定取 600ms，不再做动态读取；若用户开启减少动态则为 0。
   function textEnterDurationMs(){
@@ -210,6 +223,7 @@
     // 跨面板时设置标记，告知 panel_scroll_memory 跳过恢复（后续由 performScroll 接管滚动）
     if (switching) window.__scrollActionActive = true
     selectTab(panelId)
+    if (switching) finishPanelEnterAnimation(panelId)
     if (switching) window.__scrollActionActive = false
 
     // 3. 展开路径上的折叠区域
@@ -289,12 +303,172 @@
     if ($matches && $matches.length) commonFlow(panelId, $matches, Object.assign({}, opts, { center: true, closestContainer: centerSelector }))
   }
 
+  function applyTokenLocator(locator, opts){
+    if (!locator || typeof locator !== 'object') return false
+    const method = locator.method
+    if (method === 'tag') {
+      scrollToTagAndFlash(locator.panelId, locator.key, opts)
+      return true
+    }
+    if (method === 'selector') {
+      scrollToSelectorAndFlash(locator.panelId, locator.selector, opts)
+      return true
+    }
+    if (method === 'class') {
+      scrollToClassAndFlash(locator.panelId, locator.className, opts)
+      return true
+    }
+    if (method === 'classWithCenter') {
+      scrollToClassWithCenter(locator.panelId, locator.className, locator.centerSelector, opts)
+      return true
+    }
+    return false
+  }
+
+  function readStartupTokenLocator(){
+    try {
+      const params = new URLSearchParams(window.location.search)
+      const raw = params.get('tokenLocator')
+      return raw ? JSON.parse(raw) : null
+    } catch(e) {
+      return null
+    }
+  }
+
+  function clearStartupTokenLocator(){
+    try {
+      const url = new URL(window.location.href)
+      if (!url.searchParams.has('tokenLocator')) return
+      url.searchParams.delete('tokenLocator')
+      window.history.replaceState(window.history.state, document.title, url.pathname + url.search + url.hash)
+    } catch(e) {}
+  }
+
+  function waitForReplacementsReady(){
+    return new Promise(resolve => {
+      let tries = 0
+      const tick = () => {
+        const ready = window.replacementsReady
+        if (ready && typeof ready.then === 'function') {
+          Promise.resolve(ready).catch(()=>{}).then(resolve)
+          return
+        }
+        if (tries >= 100) {
+          resolve()
+          return
+        }
+        tries += 1
+        setTimeout(tick, 50)
+      }
+      tick()
+    })
+  }
+
+  function scheduleStartupTokenLocator(){
+    const locator = readStartupTokenLocator()
+    if (!locator) return
+    const run = () => {
+      waitForReplacementsReady().then(() => {
+        requestAnimationFrame(() => {
+          applyTokenLocator(locator, { behavior: 'smooth', stop: true })
+          clearStartupTokenLocator()
+        })
+      })
+    }
+    if (typeof window.whenReady === 'function') {
+      window.whenReady(run).catch(run)
+    } else {
+      run()
+    }
+  }
+
   // 暴露到全局
+  const TOKEN_DETAIL_CHANNEL = 'card-html-token-detail'
+
+  function runTokenLocator(locator){
+    if (!locator) return
+    waitForReplacementsReady().then(() => {
+      requestAnimationFrame(() => {
+        applyTokenLocator(locator, { behavior: 'smooth', stop: true })
+      })
+    })
+  }
+
+  function focusAfterReturnTargetReady(){
+    requestAnimationFrame(() => {
+      try { window.focus() } catch(_) {}
+    })
+  }
+
+  function primeReturnPanel(panelId){
+    if (!panelId) return
+    const switching = !isPanelActive(panelId)
+    if (switching) window.__scrollActionActive = true
+    selectTab(panelId)
+    if (switching) finishPanelEnterAnimation(panelId)
+    if (switching) window.__scrollActionActive = false
+  }
+
+  function sendTokenDetailReturnAck(data, reply){
+    if (!data || !data.requestId || typeof reply !== 'function') return
+    try {
+      reply({
+        source: TOKEN_DETAIL_CHANNEL,
+        type: 'return-ack',
+        requestId: data.requestId
+      })
+    } catch(_) {}
+  }
+
+  function handleTokenDetailMessage(data, reply){
+    if (!data || data.source !== TOKEN_DETAIL_CHANNEL) return false
+    if (data.type === 'return-ack') return false
+    if (data.type === 'back') {
+      primeReturnPanel(data.panelId || 'panel_tokens')
+      focusAfterReturnTargetReady()
+      sendTokenDetailReturnAck(data, reply)
+      return true
+    }
+    if (data.type === 'source') {
+      focusAfterReturnTargetReady()
+      sendTokenDetailReturnAck(data, reply)
+      return true
+    }
+    if (data.type === 'locator') {
+      primeReturnPanel(data.locator && data.locator.panelId)
+      focusAfterReturnTargetReady()
+      sendTokenDetailReturnAck(data, reply)
+      runTokenLocator(data.locator)
+      return true
+    }
+    return false
+  }
+
+  function bindTokenDetailReturnChannel(){
+    try {
+      window.addEventListener('message', function(ev){
+        if (ev.origin && ev.origin !== 'null' && ev.origin !== window.location.origin) return
+        handleTokenDetailMessage(ev.data, function(ack){
+          const targetOrigin = ev.origin && ev.origin !== 'null' ? ev.origin : '*'
+          try { ev.source && ev.source.postMessage(ack, targetOrigin) } catch(_) {}
+        })
+      })
+    } catch(_) {}
+    try {
+      if (!('BroadcastChannel' in window)) return
+      const channel = new BroadcastChannel(TOKEN_DETAIL_CHANNEL)
+      channel.onmessage = function(ev){
+        handleTokenDetailMessage(ev.data, function(ack){ channel.postMessage(ack) })
+      }
+    } catch(_) {}
+  }
+
   window.scrollActions = {
     scrollToSelectorAndFlash,
     scrollToClassAndFlash,
     scrollToTagAndFlash,
     scrollToClassWithCenter,
+    applyTokenLocator,
     cancel: cancelCurrentOp,
     cappedScrollTo,
     resolveMaxScrollDistance,
@@ -313,3 +487,6 @@
     })
     mo.observe(root, { subtree: true, attributes: true, attributeFilter: ['class'] })
   } catch(_) {}
+
+  bindTokenDetailReturnChannel()
+  scheduleStartupTokenLocator()

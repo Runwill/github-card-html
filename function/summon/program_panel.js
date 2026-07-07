@@ -171,3 +171,29 @@ function escapeAttr(value) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 }
+
+const ProgramPanelRenderer = Object.freeze({
+  isRenderableProgramPanel,
+  renderProgramPanelData,
+  renderProgramTreeNodes,
+  renderProgramTreeNode,
+  renderInlineContent,
+  renderInlineNode,
+  renderTag,
+  escapeHtml,
+  escapeAttr
+});
+
+window.ProgramPanelRenderer = ProgramPanelRenderer;
+
+export {
+  isRenderableProgramPanel,
+  renderProgramPanelData,
+  renderProgramTreeNodes,
+  renderProgramTreeNode,
+  renderInlineContent,
+  renderInlineNode,
+  renderTag,
+  escapeHtml,
+  escapeAttr
+};

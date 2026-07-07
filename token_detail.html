@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" class="token-detail-root">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <script src="function/startup_seed.js?v=202607072241"></script>
+  <script src="Foundation-Sites-CSS/js/vendor/jquery.js?v=202607072241"></script>
+  <script type="module" src="function/token_detail_entry.js?v=202607072241"></script>
+  <link rel="stylesheet" type="text/css" href="Foundation-Sites-CSS/css/foundation.css?v=202607072241">
+  <link rel="stylesheet" type="text/css" href="style/fonts.css?v=202607072241">
+  <link rel="stylesheet" type="text/css" href="style/theme.css?v=202607072241">
+  <link rel="stylesheet" type="text/css" href="style/term_button.css?v=202607072241">
+  <link rel="stylesheet" type="text/css" href="style/modals/_variables.css?v=202607072241">
+  <link rel="stylesheet" type="text/css" href="style/modals/help.css?v=202607072241">
+  <link rel="stylesheet" type="text/css" href="style/buttons.css?v=202607072241">
+  <link rel="stylesheet" type="text/css" href="style.css?v=202607072241">
+  <link rel="stylesheet" type="text/css" href="style/token_detail.css?v=202607072241">
+  <link rel="stylesheet" type="text/css" href="style/theme_elegant.css?v=202607072241">
+  <link rel="icon" href="data:;base64,=">
+  <title>Token Detail</title>
+</head>
+<body class="token-detail-page">
+  <main class="token-detail-page__shell">
+    <header class="token-detail-page__topbar">
+      <div class="token-detail-page__actions">
+        <button type="button" id="token-detail-back" class="btn btn--secondary btn--sm" data-i18n="tokens.detail.backToSource">返回来源</button>
+        <button type="button" id="token-detail-help" class="btn btn--ghost btn--sm" data-i18n="sidebar.help">功能速查</button>
+        <button type="button" id="theme-toggle-button" class="btn btn--ghost btn--sm" data-i18n="theme.toggle">切换主题</button>
+        <button type="button" id="lang-toggle-button" class="btn btn--ghost btn--sm"></button>
+      </div>
+    </header>
+    <section class="token-detail-hero" aria-labelledby="token-detail-title">
+      <div class="token-detail-page__title">
+        <span class="token-detail-page__kicker" data-i18n="tokens.detail.title">词元详情</span>
+        <h1 id="token-detail-title" data-i18n="tokens.detail.loading" data-dynamic-html-scope>详情加载中…</h1>
+        <p id="token-detail-subtitle"></p>
+      </div>
+      <div id="token-detail-meta" class="token-detail-meta" aria-label="Token metadata"></div>
+    </section>
+    <div id="token-detail-status" class="token-detail-status" hidden></div>
+    <section id="token-detail-content" class="token-detail-content" aria-live="polite"></section>
+  </main>
+</body>
+</html>

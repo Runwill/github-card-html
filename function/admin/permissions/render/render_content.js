@@ -1,7 +1,7 @@
 const w = window;
   // permissions/render/render_content — 内容渲染: 用户权限块 + 主渲染入口
   // 动效与绑定在 render.js 中，通过 TokensPerm._RenderUI 共享
-import { formatAbsOrRaw } from '../../time_fmt.js?v=202605230600';
+import { formatAbsOrRaw } from '../../time_fmt.js?v=202607072241';
 
   const ns = w.TokensPerm;
   const S = ns.state;

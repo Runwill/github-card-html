@@ -21,7 +21,7 @@ window.elementReplaceCheck = function elementReplaceCheck(key, name, event){
         parents.forEach(p => { if (p.dataset) delete p.dataset.termProcessed; });
 
         if(typeof window.replace_term === 'function'){
-            window.replace_term(window.endpoints.termDynamic(), 1);
+            window.replace_term(window.endpoints.termDynamic(), 1, document, 'term-dynamic');
         }
     };
 

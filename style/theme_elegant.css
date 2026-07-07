@@ -347,13 +347,6 @@ html[data-theme="elegant"] .context-menu-item:hover {
   color: var(--primary-1);
 }
 
-/* ── tooltip.css：知识提示框 ── */
-html[data-theme="elegant"] #lore-tooltip {
-  background: var(--surface-soft);
-  border-color: rgba(211, 173, 107, 0.25);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-}
-
 /* ═══ 典雅主题：Tokens 日志徽章（4色通过 --_lp-* 派生） ═══════════ */
 html[data-theme="elegant"] .tokens-log .log-pill.is-green  { --_lp-rgb: 125,184,125; --_lp-color: #8ed18e; --_lp-border-a: 0.30; }
 html[data-theme="elegant"] .tokens-log .log-pill.is-red   { --_lp-rgb: 200,92,92; --_lp-color: #e8a0a0; --_lp-border-a: 0.30; }

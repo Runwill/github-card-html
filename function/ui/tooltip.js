@@ -1,79 +1,93 @@
-// Lightweight tooltip manager using #lore-tooltip styles
-  let tipEl = null; let currentTarget = null; const MARGIN = 8;
-  function ensureTip(){
-    if (!tipEl) {
-      tipEl = document.getElementById('lore-tooltip');
-      if (!tipEl) {
-        tipEl = document.createElement('div');
-        tipEl.id = 'lore-tooltip';
-        document.body.appendChild(tipEl);
-      }
-    }
-    return tipEl;
-  }
-  function place(el, anchor){
-    const rect = anchor.getBoundingClientRect();
-    const w = el.offsetWidth;
-    let left = rect.left + rect.width/2 - w/2 + window.scrollX;
-    left = Math.max(8 + window.scrollX, Math.min(left, window.scrollX + window.innerWidth - w - 8));
-    const top = rect.bottom + MARGIN + window.scrollY;
-    el.style.left = left + 'px';
-    el.style.top = top + 'px';
-    const center = rect.left + rect.width/2;
-    el.classList.toggle('from-left', center < window.innerWidth/2);
-    el.classList.toggle('from-right', center >= window.innerWidth/2);
-  }
-  function show(anchor){
-    const text = anchor.getAttribute('data-tooltip') || '';
-    if (!text) return;
-    const el = ensureTip();
-    if (currentTarget === anchor && el.classList.contains('show')) return;
-    currentTarget = anchor;
-    el.textContent = text;
-    el.classList.remove('show');
-    el.style.display = 'block';
-    requestAnimationFrame(()=>{
-      place(el, anchor);
-      el.classList.add('show');
-    });
-  }
-  function hide(anchor){
-    const el = ensureTip();
-    if (!anchor || anchor === currentTarget) { el.classList.remove('show'); currentTarget = null; }
-  }
-  document.addEventListener('mouseover', (e)=>{
-    const t = e.target && (e.target.closest ? e.target.closest('[data-tooltip]') : null);
-    if (t) show(t);
-  });
-  document.addEventListener('mouseout', (e)=>{
-    const t = e.target && (e.target.closest ? e.target.closest('[data-tooltip]') : null);
-    const to = e.relatedTarget;
-    if (t && (!to || !(to.closest && to.closest('[data-tooltip]')))) hide(t);
-  });
-  window.addEventListener('resize', ()=>{ if (currentTarget && tipEl) place(tipEl, currentTarget); });
-  window.addEventListener('scroll', ()=>{ if (currentTarget && tipEl) place(tipEl, currentTarget); }, { passive: true });
+// Hover notes are disabled globally. Keep this module as a compatibility layer
+// so legacy tooltip calls cannot recreate native title boxes or #lore-tooltip.
+const HINT_SELECTOR = '[title],[data-tooltip]';
+let observerStarted = false;
 
-  function showLore(anchor, html){
-    const el = ensureTip();
-    currentTarget = anchor;
-    el.classList.remove('show', 'from-left', 'from-right');
-    el.innerHTML = html;
-    el.style.cssText = 'visibility:hidden;display:block;left:-9999px;top:-9999px';
-    const rect = anchor.getBoundingClientRect();
-    const sx = window.scrollX, sy = window.scrollY, vw = window.innerWidth, m = 12;
-    let tipW = el.offsetWidth, tipH = el.offsetHeight;
-    let left = Math.min(Math.max(rect.left + sx + rect.width/2 - tipW*0.15, sx + m), sx + vw - tipW - m);
-    const availW = vw - 2*m;
-    if (tipW > availW){
-      el.style.maxWidth = availW + 'px'; el.style.whiteSpace = 'normal';
-      tipW = el.offsetWidth; tipH = el.offsetHeight;
-      left = Math.min(Math.max(rect.left + sx + rect.width/2 - tipW*0.15, sx + m), sx + vw - tipW - m);
-    }
-    let top = rect.bottom + sy + 8, placement = 'bottom';
-    if (top + tipH > window.innerHeight + sy - m){ top = rect.top + sy - tipH - 12; placement = 'top'; }
-    const cx = left + tipW/2 - sx;
-    el.setAttribute('data-placement', placement);
-    el.style.cssText = 'left:' + left + 'px;top:' + top + 'px;visibility:visible';
-    el.classList.add(cx > vw/2 ? 'from-left' : 'from-right', 'show');
+function removeLoreTooltip() {
+  try { document.getElementById('lore-tooltip')?.remove(); } catch (_) {}
+}
+
+function preserveAccessibleName(el, title) {
+  if (!title || el.hasAttribute('aria-label') || el.hasAttribute('aria-labelledby')) return;
+  try { el.setAttribute('aria-label', title); } catch (_) {}
+}
+
+function removeI18nHintBindings(el) {
+  const raw = el.getAttribute('data-i18n-attr');
+  if (!raw) return;
+  const kept = raw.split(',')
+    .map(attr => attr.trim())
+    .filter(attr => attr && attr !== 'title' && attr !== 'data-tooltip');
+
+  if (kept.length) el.setAttribute('data-i18n-attr', kept.join(','));
+  else el.removeAttribute('data-i18n-attr');
+
+  ['title', 'data-tooltip'].forEach(attr => {
+    el.removeAttribute('data-i18n-' + attr);
+    el.removeAttribute('data-i18n-params-' + attr);
+  });
+}
+
+function stripHint(el) {
+  if (!(el instanceof Element)) return;
+  if (el.hasAttribute('title')) {
+    preserveAccessibleName(el, el.getAttribute('title'));
+    el.removeAttribute('title');
   }
-  window.LoreTooltip = { showLore, hide: ()=>{ if(tipEl){ tipEl.classList.remove('show','from-left','from-right'); currentTarget=null; } } };
+  if (el.hasAttribute('data-tooltip')) el.removeAttribute('data-tooltip');
+  removeI18nHintBindings(el);
+}
+
+function stripTree(root = document) {
+  try {
+    if (root instanceof Element && root.matches(HINT_SELECTOR)) stripHint(root);
+    root.querySelectorAll?.(HINT_SELECTOR).forEach(stripHint);
+    removeLoreTooltip();
+  } catch (_) {}
+}
+
+function stripEventPath(target) {
+  let el = target instanceof Element ? target : target?.parentElement;
+  while (el && el instanceof Element) {
+    if (el.matches(HINT_SELECTOR)) stripHint(el);
+    el = el.parentElement;
+  }
+  removeLoreTooltip();
+}
+
+function observeHints() {
+  if (observerStarted || !document.documentElement || typeof MutationObserver !== 'function') return;
+  observerStarted = true;
+  const observer = new MutationObserver(records => {
+    records.forEach(record => {
+      if (record.type === 'attributes') stripHint(record.target);
+      record.addedNodes.forEach(node => {
+        if (node instanceof Element) stripTree(node);
+      });
+    });
+  });
+  observer.observe(document.documentElement, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    attributeFilter: ['title', 'data-tooltip']
+  });
+}
+
+function noop(anchor) {
+  if (anchor instanceof Element) stripHint(anchor);
+  removeLoreTooltip();
+}
+
+document.addEventListener('mouseover', event => stripEventPath(event.target), true);
+document.addEventListener('pointerover', event => stripEventPath(event.target), true);
+document.addEventListener('focusin', event => stripEventPath(event.target), true);
+
+stripTree(document);
+observeHints();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => stripTree(document), { once: true });
+}
+
+window.LoreTooltip = { showLore: noop, hide: noop };
+window.HoverHints = { suppress: stripTree };

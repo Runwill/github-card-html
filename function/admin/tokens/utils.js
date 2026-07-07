@@ -1,6 +1,6 @@
   // tokens/utils
   // 常用工具：HTML 转义、按路径设置/删除、颜色工具
-import { esc } from '../log_utils.js?v=202605230600';
+import { esc } from '../log_utils.js?v=202607072241';
 
   window.tokensAdmin = window.tokensAdmin || {};
 

@@ -1,6 +1,6 @@
 // 审批弹窗入口与基于角色的界面可见性控制。
 // CardUI Manager Controllers - approvals & visibility
-import { countPendingApprovalGroups, fetchPendingApprovalGroups, setPendingApprovalGroupsCache } from '../../../admin/approvals.js?v=202605230600';
+import { countPendingApprovalGroups, fetchPendingApprovalGroups, setPendingApprovalGroupsCache } from '../../../admin/approvals.js?v=202607072241';
 
   'use strict';
   var w = window;
